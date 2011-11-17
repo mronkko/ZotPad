@@ -7,42 +7,26 @@
 //
 
 #import "ZPDetailViewController.h"
+#import "ZPDataLayer.h"
+#import <QuartzCore/QuartzCore.h>
 
 @interface ZPDetailViewController ()
 @property (strong, nonatomic) UIPopoverController *masterPopoverController;
-- (void)configureView;
 @end
 
 @implementation ZPDetailViewController
 
-@synthesize detailItem = _detailItem;
-@synthesize detailDescriptionLabel = _detailDescriptionLabel;
+@synthesize collectionID = _collectionID;
+@synthesize libraryID =  _libraryID;
+@synthesize searchString = _searchString;
+@synthesize sortField = _sortField;
+@synthesize sortIsDescending = _sortIsDescending;
+
 @synthesize masterPopoverController = _masterPopoverController;
 
+@synthesize itemTableView;
+
 #pragma mark - Managing the detail item
-
-- (void)setDetailItem:(id)newDetailItem
-{
-    if (_detailItem != newDetailItem) {
-        _detailItem = newDetailItem;
-        
-        // Update the view.
-        [self configureView];
-    }
-
-    if (self.masterPopoverController != nil) {
-        [self.masterPopoverController dismissPopoverAnimated:YES];
-    }        
-}
-
-- (void)configureView
-{
-    // Update the user interface for the detail item.
-
-    if (self.detailItem) {
-        self.detailDescriptionLabel.text = [self.detailItem description];
-    }
-}
 
 - (void)didReceiveMemoryWarning
 {
@@ -50,11 +34,112 @@
     // Release any cached data, images, etc that aren't in use.
 }
 
+- (NSInteger)tableView:(UITableView *)aTableView numberOfRowsInSection:(NSInteger)section {
+    // Return the number of rows in the section.
+    return [_itemIDsShown count];
+}
+
+
+
+- (void)configureView
+{
+    // Update the user interface for the detail item.
+    
+    if (self.masterPopoverController != nil) {
+        [self.masterPopoverController dismissPopoverAnimated:YES];
+    }
+    
+    // Retrieve the item IDs
+    
+    //TODO: Make this run asynchornously. See http://developer.apple.com/library/ios/#documentation/General/Conceptual/ConcurrencyProgrammingGuide/OperationQueues/OperationQueues.html
+    self->_itemIDsShown = [[ZPDataLayer instance] getItemIDsForView: self];
+    
+    [self.itemTableView reloadData];
+}
+
+- (UITableViewCell *)tableView:(UITableView *)tableView cellForRowAtIndexPath:(NSIndexPath *)indexPath {
+
+    //TODO: Implement a cache for cells. 
+    
+
+   
+    NSInteger itemID = [[_itemIDsShown objectAtIndex: indexPath.row]integerValue];
+    
+    
+	UITableViewCell *cell = [tableView 
+                             dequeueReusableCellWithIdentifier:@"ZoteroItemCell"];
+    
+    NSDictionary* itemFieldValues = [[ZPDataLayer instance] getFieldsForItem: itemID];
+    
+	UILabel *titleLabel = (UILabel *)[cell viewWithTag:1];
+	titleLabel.text = [itemFieldValues objectForKey:@"title"];
+    
+	UILabel *authorsLabel = (UILabel *)[cell viewWithTag:2];
+	authorsLabel.text = [[[ZPDataLayer instance] getCreatorsForItem: itemID]componentsJoinedByString: @"; "];
+    
+    UILabel *publicationLabel = (UILabel *)[cell viewWithTag:3];
+
+
+	publicationLabel.text = [NSString stringWithFormat:@"%@, vol %@, iss %@ (%@)",[itemFieldValues objectForKey:@"publicationTitle"],[itemFieldValues objectForKey:@"volume"],[itemFieldValues objectForKey:@"issue"],[itemFieldValues objectForKey:@"date"]];
+
+    //Check if the item has attachments and render a thumbnail from the first attachment PDF
+    
+    NSArray* attachmentFilePaths = [[ZPDataLayer instance] getAttachmentFilePathsForItem: itemID];
+    
+    if([attachmentFilePaths count] > 0 ){
+        UIImageView* articleThumbnail = (UIImageView *) [cell viewWithTag:4];
+        
+        NSLog([attachmentFilePaths objectAtIndex:0]);
+        
+        NSURL *pdfUrl = [NSURL fileURLWithPath:[attachmentFilePaths objectAtIndex:0]];
+        CGPDFDocumentRef document = CGPDFDocumentCreateWithURL((__bridge_retained CFURLRef)pdfUrl);
+        
+        /*
+         
+         Renders a first page of a PDF as an image
+         
+         Source: http://stackoverflow.com/questions/5658993/creating-pdf-thumbnail-in-iphone
+         
+         
+         
+         */
+        
+        CGPDFPageRef pageRef = CGPDFDocumentGetPage(document, 1);
+        CGRect pageRect = CGPDFPageGetBoxRect(pageRef, kCGPDFCropBox);
+        
+        UIGraphicsBeginImageContext(pageRect.size);
+        CGContextRef context = UIGraphicsGetCurrentContext();
+        CGContextTranslateCTM(context, CGRectGetMinX(pageRect),CGRectGetMaxY(pageRect));
+        CGContextScaleCTM(context, 1, -1);  
+        CGContextTranslateCTM(context, -(pageRect.origin.x), -(pageRect.origin.y));
+        CGContextDrawPDFPage(context, pageRef);
+        
+        UIImage *finalImage = UIGraphicsGetImageFromCurrentImageContext();
+        UIGraphicsEndImageContext();
+
+        articleThumbnail.image = finalImage;
+        [articleThumbnail.layer setBorderColor: [[UIColor blackColor] CGColor]];
+        [articleThumbnail.layer setBorderWidth: 2.0];
+    }
+    return cell;
+}
+
+
 #pragma mark - View lifecycle
 
 - (void)viewDidLoad
 {
+
+    
     [super viewDidLoad];
+    
+    //Set library to my library if it is not defined
+    
+    if(self->_libraryID == 0){
+        self->_libraryID = 1; 
+    }
+    
+
 	// Do any additional setup after loading the view, typically from a nib.
     [self configureView];
 }

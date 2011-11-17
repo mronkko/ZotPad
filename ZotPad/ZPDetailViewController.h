@@ -8,10 +8,32 @@
 
 #import <UIKit/UIKit.h>
 
-@interface ZPDetailViewController : UIViewController <UISplitViewControllerDelegate>
+@interface ZPDetailViewController : UIViewController <UISplitViewControllerDelegate, UITableViewDataSource, UITableViewDelegate>{
+    NSString* _searchString;
+    NSInteger _collectionID;
+    NSInteger _libraryID;
+    NSString* _sortField;
+    BOOL _sortIsDescending;
+    
+    NSArray* _itemIDsShown;
+  
+    UITableView* itemTableView;
 
-@property (strong, nonatomic) id detailItem;
+}
 
-@property (strong, nonatomic) IBOutlet UILabel *detailDescriptionLabel;
+- (void)configureView;
+- (UIImage *)renderPDFPageToImage:(CGPDFDocumentRef*) pathToPDF;
+
+@property (nonatomic, retain) IBOutlet UITableView* itemTableView;
+
+@property NSInteger collectionID;
+@property NSInteger libraryID;
+
+@property (copy) NSString* searchString;
+
+@property (copy) NSString* sortField;
+@property BOOL sortIsDescending;
+
+
 
 @end

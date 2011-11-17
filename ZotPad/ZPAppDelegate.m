@@ -14,7 +14,29 @@
 
 - (BOOL)application:(UIApplication *)application didFinishLaunchingWithOptions:(NSDictionary *)launchOptions
 {
-    // Override point for customization after application launch.
+    //Copy a demo database to documents folder if there is no database currently
+    
+    NSString *documentsDirectory = [NSSearchPathForDirectoriesInDomains(NSDocumentDirectory, NSUserDomainMask, YES) objectAtIndex:0];
+    NSString *sourceFile = [[[NSBundle mainBundle] resourcePath] stringByAppendingPathComponent:@"zotero.sqlite"];
+    
+    NSString *toFile = [documentsDirectory stringByAppendingPathComponent:@"zotero.sqlite"];
+
+    if(![[NSFileManager defaultManager] fileExistsAtPath:toFile]){
+        NSLog(@"Source Path: %@\n Target Path: %@", sourceFile, toFile);
+
+        NSError *error;
+    
+        if([[NSFileManager defaultManager] copyItemAtPath:sourceFile toPath:toFile error:&error]){
+            NSLog(@"Database successfully copied");
+        } else {
+            NSLog(@"Error description-%@ \n", [error localizedDescription]);
+            NSLog(@"Error reason-%@", [error localizedFailureReason]);
+        }
+    }
+    else{
+        NSLog(@"Existing database found at: %@", toFile);
+    }
+         
     UISplitViewController *splitViewController = (UISplitViewController *)self.window.rootViewController;
     UINavigationController *navigationController = [splitViewController.viewControllers lastObject];
     splitViewController.delegate = (id)navigationController.topViewController;
