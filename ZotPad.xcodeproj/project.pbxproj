@@ -19,8 +19,8 @@
 		A7200DEE14718DC1004347C9 /* ZPDetailViewController.m in Sources */ = {isa = PBXBuildFile; fileRef = A7200DED14718DC1004347C9 /* ZPDetailViewController.m */; };
 		A7200DF614718F44004347C9 /* ZPDataLayer.m in Sources */ = {isa = PBXBuildFile; fileRef = A7200DF514718F44004347C9 /* ZPDataLayer.m */; };
 		A7200DF8147193C0004347C9 /* libsqlite3.dylib in Frameworks */ = {isa = PBXBuildFile; fileRef = A7200DF7147193C0004347C9 /* libsqlite3.dylib */; };
-		A74D95EC1475AC27002AE78D /* Test Article.pdf in Resources */ = {isa = PBXBuildFile; fileRef = A74D95EA1475AC27002AE78D /* Test Article.pdf */; };
-		A74D95ED1475AC27002AE78D /* zotero.sqlite in Resources */ = {isa = PBXBuildFile; fileRef = A74D95EB1475AC27002AE78D /* zotero.sqlite */; };
+		A74D95F01475ACAB002AE78D /* storage in Resources */ = {isa = PBXBuildFile; fileRef = A74D95EE1475ACAB002AE78D /* storage */; };
+		A74D95F11475ACAB002AE78D /* zotero.sqlite in Resources */ = {isa = PBXBuildFile; fileRef = A74D95EF1475ACAB002AE78D /* zotero.sqlite */; };
 /* End PBXBuildFile section */
 
 /* Begin PBXFileReference section */
@@ -44,8 +44,8 @@
 		A7200DF414718F44004347C9 /* ZPDataLayer.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = ZPDataLayer.h; sourceTree = "<group>"; };
 		A7200DF514718F44004347C9 /* ZPDataLayer.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = ZPDataLayer.m; sourceTree = "<group>"; };
 		A7200DF7147193C0004347C9 /* libsqlite3.dylib */ = {isa = PBXFileReference; lastKnownFileType = "compiled.mach-o.dylib"; name = libsqlite3.dylib; path = usr/lib/libsqlite3.dylib; sourceTree = SDKROOT; };
-		A74D95EA1475AC27002AE78D /* Test Article.pdf */ = {isa = PBXFileReference; lastKnownFileType = image.pdf; path = "Test Article.pdf"; sourceTree = "<group>"; };
-		A74D95EB1475AC27002AE78D /* zotero.sqlite */ = {isa = PBXFileReference; lastKnownFileType = file; name = zotero.sqlite; path = "../../../../../Library/Application Support/Firefox/Profiles/wisl2luy.test/zotero/zotero.sqlite"; sourceTree = "<group>"; };
+		A74D95EE1475ACAB002AE78D /* storage */ = {isa = PBXFileReference; lastKnownFileType = folder; path = storage; sourceTree = "<group>"; };
+		A74D95EF1475ACAB002AE78D /* zotero.sqlite */ = {isa = PBXFileReference; lastKnownFileType = file; path = zotero.sqlite; sourceTree = "<group>"; };
 /* End PBXFileReference section */
 
 /* Begin PBXFrameworksBuildPhase section */
@@ -113,31 +113,14 @@
 		A7200DDB14718DC0004347C9 /* Supporting Files */ = {
 			isa = PBXGroup;
 			children = (
-				A74D95E81475AC27002AE78D /* storage */,
-				A74D95EB1475AC27002AE78D /* zotero.sqlite */,
+				A74D95EE1475ACAB002AE78D /* storage */,
+				A74D95EF1475ACAB002AE78D /* zotero.sqlite */,
 				A7200DDC14718DC0004347C9 /* ZotPad-Info.plist */,
 				A7200DDD14718DC0004347C9 /* InfoPlist.strings */,
 				A7200DE014718DC0004347C9 /* main.m */,
 				A7200DE214718DC0004347C9 /* ZotPad-Prefix.pch */,
 			);
 			name = "Supporting Files";
-			sourceTree = "<group>";
-		};
-		A74D95E81475AC27002AE78D /* storage */ = {
-			isa = PBXGroup;
-			children = (
-				A74D95E91475AC27002AE78D /* 6DGKID6R */,
-			);
-			name = storage;
-			path = "../../../../../Library/Application Support/Firefox/Profiles/wisl2luy.test/zotero/storage";
-			sourceTree = "<group>";
-		};
-		A74D95E91475AC27002AE78D /* 6DGKID6R */ = {
-			isa = PBXGroup;
-			children = (
-				A74D95EA1475AC27002AE78D /* Test Article.pdf */,
-			);
-			path = 6DGKID6R;
 			sourceTree = "<group>";
 		};
 /* End PBXGroup section */
@@ -192,8 +175,8 @@
 			files = (
 				A7200DDF14718DC0004347C9 /* InfoPlist.strings in Resources */,
 				A7200DE814718DC1004347C9 /* MainStoryboard.storyboard in Resources */,
-				A74D95EC1475AC27002AE78D /* Test Article.pdf in Resources */,
-				A74D95ED1475AC27002AE78D /* zotero.sqlite in Resources */,
+				A74D95F01475ACAB002AE78D /* storage in Resources */,
+				A74D95F11475ACAB002AE78D /* zotero.sqlite in Resources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
