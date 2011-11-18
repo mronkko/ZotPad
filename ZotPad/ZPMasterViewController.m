@@ -67,7 +67,7 @@
 
 - (UITableViewCell *)tableView:(UITableView *)tableView cellForRowAtIndexPath:(NSIndexPath *)indexPath {
     
-     NSString *CellIdentifier = @"NavigationItemCellIdentifier";
+     NSString *CellIdentifier = @"CollectionCell";
     
     //TODO:
     // Read this http://stackoverflow.com/questions/7911588/should-xcode-storyboard-support-segues-from-a-uitableview-with-dynamic-prototy
