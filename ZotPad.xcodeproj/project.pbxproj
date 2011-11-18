@@ -14,13 +14,14 @@
 		A7200DDF14718DC0004347C9 /* InfoPlist.strings in Resources */ = {isa = PBXBuildFile; fileRef = A7200DDD14718DC0004347C9 /* InfoPlist.strings */; };
 		A7200DE114718DC0004347C9 /* main.m in Sources */ = {isa = PBXBuildFile; fileRef = A7200DE014718DC0004347C9 /* main.m */; };
 		A7200DE514718DC0004347C9 /* ZPAppDelegate.m in Sources */ = {isa = PBXBuildFile; fileRef = A7200DE414718DC0004347C9 /* ZPAppDelegate.m */; };
-		A7200DE814718DC1004347C9 /* MainStoryboard.storyboard in Resources */ = {isa = PBXBuildFile; fileRef = A7200DE614718DC1004347C9 /* MainStoryboard.storyboard */; };
+		A7200DE814718DC1004347C9 /* MainStoryboard_iPad.storyboard in Resources */ = {isa = PBXBuildFile; fileRef = A7200DE614718DC1004347C9 /* MainStoryboard_iPad.storyboard */; };
 		A7200DEB14718DC1004347C9 /* ZPMasterViewController.m in Sources */ = {isa = PBXBuildFile; fileRef = A7200DEA14718DC1004347C9 /* ZPMasterViewController.m */; };
 		A7200DEE14718DC1004347C9 /* ZPDetailViewController.m in Sources */ = {isa = PBXBuildFile; fileRef = A7200DED14718DC1004347C9 /* ZPDetailViewController.m */; };
 		A7200DF614718F44004347C9 /* ZPDataLayer.m in Sources */ = {isa = PBXBuildFile; fileRef = A7200DF514718F44004347C9 /* ZPDataLayer.m */; };
 		A7200DF8147193C0004347C9 /* libsqlite3.dylib in Frameworks */ = {isa = PBXBuildFile; fileRef = A7200DF7147193C0004347C9 /* libsqlite3.dylib */; };
 		A74D95F01475ACAB002AE78D /* storage in Resources */ = {isa = PBXBuildFile; fileRef = A74D95EE1475ACAB002AE78D /* storage */; };
 		A74D95F11475ACAB002AE78D /* zotero.sqlite in Resources */ = {isa = PBXBuildFile; fileRef = A74D95EF1475ACAB002AE78D /* zotero.sqlite */; };
+		A786F7781476A56200B35B92 /* MainStoryboard_iPhone.storyboard in Resources */ = {isa = PBXBuildFile; fileRef = A786F7771476A56200B35B92 /* MainStoryboard_iPhone.storyboard */; };
 /* End PBXBuildFile section */
 
 /* Begin PBXFileReference section */
@@ -36,7 +37,7 @@
 		A7200DE214718DC0004347C9 /* ZotPad-Prefix.pch */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = "ZotPad-Prefix.pch"; sourceTree = "<group>"; };
 		A7200DE314718DC0004347C9 /* ZPAppDelegate.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = ZPAppDelegate.h; sourceTree = "<group>"; };
 		A7200DE414718DC0004347C9 /* ZPAppDelegate.m */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.objc; path = ZPAppDelegate.m; sourceTree = "<group>"; };
-		A7200DE714718DC1004347C9 /* en */ = {isa = PBXFileReference; lastKnownFileType = file.storyboard; name = en; path = en.lproj/MainStoryboard.storyboard; sourceTree = "<group>"; };
+		A7200DE714718DC1004347C9 /* en */ = {isa = PBXFileReference; lastKnownFileType = file.storyboard; name = en; path = en.lproj/MainStoryboard_iPad.storyboard; sourceTree = "<group>"; };
 		A7200DE914718DC1004347C9 /* ZPMasterViewController.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = ZPMasterViewController.h; sourceTree = "<group>"; };
 		A7200DEA14718DC1004347C9 /* ZPMasterViewController.m */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.objc; path = ZPMasterViewController.m; sourceTree = "<group>"; };
 		A7200DEC14718DC1004347C9 /* ZPDetailViewController.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = ZPDetailViewController.h; sourceTree = "<group>"; };
@@ -46,6 +47,7 @@
 		A7200DF7147193C0004347C9 /* libsqlite3.dylib */ = {isa = PBXFileReference; lastKnownFileType = "compiled.mach-o.dylib"; name = libsqlite3.dylib; path = usr/lib/libsqlite3.dylib; sourceTree = SDKROOT; };
 		A74D95EE1475ACAB002AE78D /* storage */ = {isa = PBXFileReference; lastKnownFileType = folder; path = storage; sourceTree = "<group>"; };
 		A74D95EF1475ACAB002AE78D /* zotero.sqlite */ = {isa = PBXFileReference; lastKnownFileType = file; path = zotero.sqlite; sourceTree = "<group>"; };
+		A786F7771476A56200B35B92 /* MainStoryboard_iPhone.storyboard */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = file.storyboard; path = MainStoryboard_iPhone.storyboard; sourceTree = "<group>"; };
 /* End PBXFileReference section */
 
 /* Begin PBXFrameworksBuildPhase section */
@@ -96,7 +98,8 @@
 			children = (
 				A7200DE314718DC0004347C9 /* ZPAppDelegate.h */,
 				A7200DE414718DC0004347C9 /* ZPAppDelegate.m */,
-				A7200DE614718DC1004347C9 /* MainStoryboard.storyboard */,
+				A786F7771476A56200B35B92 /* MainStoryboard_iPhone.storyboard */,
+				A7200DE614718DC1004347C9 /* MainStoryboard_iPad.storyboard */,
 				A7200DE914718DC1004347C9 /* ZPMasterViewController.h */,
 				A7200DEA14718DC1004347C9 /* ZPMasterViewController.m */,
 				A7200DEC14718DC1004347C9 /* ZPDetailViewController.h */,
@@ -174,9 +177,10 @@
 			buildActionMask = 2147483647;
 			files = (
 				A7200DDF14718DC0004347C9 /* InfoPlist.strings in Resources */,
-				A7200DE814718DC1004347C9 /* MainStoryboard.storyboard in Resources */,
+				A7200DE814718DC1004347C9 /* MainStoryboard_iPad.storyboard in Resources */,
 				A74D95F01475ACAB002AE78D /* storage in Resources */,
 				A74D95F11475ACAB002AE78D /* zotero.sqlite in Resources */,
+				A786F7781476A56200B35B92 /* MainStoryboard_iPhone.storyboard in Resources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
@@ -207,12 +211,12 @@
 			name = InfoPlist.strings;
 			sourceTree = "<group>";
 		};
-		A7200DE614718DC1004347C9 /* MainStoryboard.storyboard */ = {
+		A7200DE614718DC1004347C9 /* MainStoryboard_iPad.storyboard */ = {
 			isa = PBXVariantGroup;
 			children = (
 				A7200DE714718DC1004347C9 /* en */,
 			);
-			name = MainStoryboard.storyboard;
+			name = MainStoryboard_iPad.storyboard;
 			sourceTree = "<group>";
 		};
 /* End PBXVariantGroup section */

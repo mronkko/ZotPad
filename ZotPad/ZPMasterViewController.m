@@ -51,7 +51,9 @@
     
 	// Do any additional setup after loading the view, typically from a nib.
     self.detailViewController = (ZPDetailViewController *)[[self.splitViewController.viewControllers lastObject] topViewController];
-    [self.tableView selectRowAtIndexPath:[NSIndexPath indexPathForRow:0 inSection:0] animated:NO scrollPosition:UITableViewScrollPositionMiddle];
+    if ([[UIDevice currentDevice] userInterfaceIdiom] == UIUserInterfaceIdiomPad) {
+        [self.tableView selectRowAtIndexPath:[NSIndexPath indexPathForRow:0 inSection:0] animated:NO scrollPosition:UITableViewScrollPositionMiddle];
+    }
 }
 
 
@@ -66,6 +68,10 @@
 - (UITableViewCell *)tableView:(UITableView *)tableView cellForRowAtIndexPath:(NSIndexPath *)indexPath {
     
      NSString *CellIdentifier = @"NavigationItemCellIdentifier";
+    
+    //TODO:
+    // Read this http://stackoverflow.com/questions/7911588/should-xcode-storyboard-support-segues-from-a-uitableview-with-dynamic-prototy
+    // Fix iPhone seque from navigator cell to detail view
     
     // Dequeue or create a cell of the appropriate type.
     UITableViewCell *cell = [tableView dequeueReusableCellWithIdentifier:CellIdentifier];
@@ -102,6 +108,7 @@
     self.detailViewController.collectionID = [node collectionID];
     
     [self.detailViewController configureView];
+    
 }
 
 - (void) tableView: (UITableView *) aTableView accessoryButtonTappedForRowWithIndexPath: (NSIndexPath *) indexPath

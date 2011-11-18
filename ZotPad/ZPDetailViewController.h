@@ -22,7 +22,6 @@
 }
 
 - (void)configureView;
-- (UIImage *)renderPDFPageToImage:(CGPDFDocumentRef*) pathToPDF;
 
 @property (nonatomic, retain) IBOutlet UITableView* itemTableView;
 
