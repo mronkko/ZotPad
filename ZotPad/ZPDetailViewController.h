@@ -18,7 +18,7 @@
     NSArray* _itemIDsShown;
   
     UITableView* itemTableView;
-
+    NSMutableDictionary* _cellCache;
 }
 
 - (void)configureView;

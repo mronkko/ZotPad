@@ -10,6 +10,8 @@
 #import "ZPDetailViewController.h"
 #import "ZPNavigatorNode.h"
 #import "ZPDataLayer.h"
+#import "ZPServerConnection.h"
+#import "ZPAuthenticationDialog.h"
 
 @implementation ZPMasterViewController
 
@@ -37,9 +39,7 @@
 {
     [super viewDidLoad];
 
-    //Initialize database if it does not exists
 
-    
     //If the current library is not defined, show a list of libraries
     if(self->_currentLibrary == 0){
         self->_content = [[ZPDataLayer instance] libraries];
@@ -143,6 +143,12 @@
 - (void)viewDidAppear:(BOOL)animated
 {
     [super viewDidAppear:animated];
+    
+    if(! [[ZPServerConnection instance] authenticated]){
+        [[ZPServerConnection instance] doAuthenticate: self];
+    }
+    
+    
 }
 
 - (void)viewWillDisappear:(BOOL)animated

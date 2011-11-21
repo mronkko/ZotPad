@@ -59,67 +59,78 @@
 
 - (UITableViewCell *)tableView:(UITableView *)tableView cellForRowAtIndexPath:(NSIndexPath *)indexPath {
 
-    //TODO: Implement a cache for cells. 
-    
-
    
     NSInteger itemID = [[_itemIDsShown objectAtIndex: indexPath.row]integerValue];
-    
-    
-	UITableViewCell *cell = [tableView 
-                             dequeueReusableCellWithIdentifier:@"ZoteroItemCell"];
-    
-    NSDictionary* itemFieldValues = [[ZPDataLayer instance] getFieldsForItem: itemID];
-    
-	UILabel *titleLabel = (UILabel *)[cell viewWithTag:1];
-	titleLabel.text = [itemFieldValues objectForKey:@"title"];
-    
-	UILabel *authorsLabel = (UILabel *)[cell viewWithTag:2];
-	authorsLabel.text = [[[ZPDataLayer instance] getCreatorsForItem: itemID]componentsJoinedByString: @"; "];
-    
-    UILabel *publicationLabel = (UILabel *)[cell viewWithTag:3];
 
-
-	publicationLabel.text = [NSString stringWithFormat:@"%@, vol %@, iss %@ (%@)",[itemFieldValues objectForKey:@"publicationTitle"],[itemFieldValues objectForKey:@"volume"],[itemFieldValues objectForKey:@"issue"],[itemFieldValues objectForKey:@"date"]];
-
-    //Check if the item has attachments and render a thumbnail from the first attachment PDF
+    //TODO: Implement purging of the cache
+    if(self->_cellCache==nil){
+        self->_cellCache = [NSMutableDictionary dictionary];
+    }
     
-    NSArray* attachmentFilePaths = [[ZPDataLayer instance] getAttachmentFilePathsForItem: itemID];
     
-    if([attachmentFilePaths count] > 0 ){
-        UIImageView* articleThumbnail = (UIImageView *) [cell viewWithTag:4];
+    
+	UITableViewCell* cell = [self->_cellCache objectForKey:[NSNumber numberWithInteger:itemID]];
+    
+    if(cell==nil){
         
-        NSLog([attachmentFilePaths objectAtIndex:0]);
+        cell = [tableView dequeueReusableCellWithIdentifier:@"ZoteroItemCell"];
         
-        NSURL *pdfUrl = [NSURL fileURLWithPath:[attachmentFilePaths objectAtIndex:0]];
-        CGPDFDocumentRef document = CGPDFDocumentCreateWithURL((__bridge_retained CFURLRef)pdfUrl);
+        NSDictionary* itemFieldValues = [[ZPDataLayer instance] getFieldsForItem: itemID];
         
-        /*
-         
-         Renders a first page of a PDF as an image
-         
-         Source: http://stackoverflow.com/questions/5658993/creating-pdf-thumbnail-in-iphone
-         
-         
-         
-         */
+        UILabel *titleLabel = (UILabel *)[cell viewWithTag:1];
+        titleLabel.text = [itemFieldValues objectForKey:@"title"];
         
-        CGPDFPageRef pageRef = CGPDFDocumentGetPage(document, 1);
-        CGRect pageRect = CGPDFPageGetBoxRect(pageRef, kCGPDFCropBox);
+        UILabel *authorsLabel = (UILabel *)[cell viewWithTag:2];
+        authorsLabel.text = [[[ZPDataLayer instance] getCreatorsForItem: itemID]componentsJoinedByString: @"; "];
         
-        UIGraphicsBeginImageContext(pageRect.size);
-        CGContextRef context = UIGraphicsGetCurrentContext();
-        CGContextTranslateCTM(context, CGRectGetMinX(pageRect),CGRectGetMaxY(pageRect));
-        CGContextScaleCTM(context, 1, -1);  
-        CGContextTranslateCTM(context, -(pageRect.origin.x), -(pageRect.origin.y));
-        CGContextDrawPDFPage(context, pageRef);
+        UILabel *publicationLabel = (UILabel *)[cell viewWithTag:3];
         
-        UIImage *finalImage = UIGraphicsGetImageFromCurrentImageContext();
-        UIGraphicsEndImageContext();
-
-        articleThumbnail.image = finalImage;
-        [articleThumbnail.layer setBorderColor: [[UIColor blackColor] CGColor]];
-        [articleThumbnail.layer setBorderWidth: 2.0];
+        
+        publicationLabel.text = [NSString stringWithFormat:@"%@, vol %@, iss %@ (%@)",[itemFieldValues objectForKey:@"publicationTitle"],[itemFieldValues objectForKey:@"volume"],[itemFieldValues objectForKey:@"issue"],[itemFieldValues objectForKey:@"date"]];
+        
+        //Check if the item has attachments and render a thumbnail from the first attachment PDF
+        
+        NSArray* attachmentFilePaths = [[ZPDataLayer instance] getAttachmentFilePathsForItem: itemID];
+        
+        if([attachmentFilePaths count] > 0 ){
+            UIImageView* articleThumbnail = (UIImageView *) [cell viewWithTag:4];
+            
+            NSLog([attachmentFilePaths objectAtIndex:0]);
+            
+            NSURL *pdfUrl = [NSURL fileURLWithPath:[attachmentFilePaths objectAtIndex:0]];
+            CGPDFDocumentRef document = CGPDFDocumentCreateWithURL((__bridge_retained CFURLRef)pdfUrl);
+            
+            /*
+             
+             Renders a first page of a PDF as an image
+             
+             Source: http://stackoverflow.com/questions/5658993/creating-pdf-thumbnail-in-iphone
+             
+             
+             
+             */
+            
+            CGPDFPageRef pageRef = CGPDFDocumentGetPage(document, 1);
+            CGRect pageRect = CGPDFPageGetBoxRect(pageRef, kCGPDFCropBox);
+            
+            UIGraphicsBeginImageContext(pageRect.size);
+            CGContextRef context = UIGraphicsGetCurrentContext();
+            CGContextTranslateCTM(context, CGRectGetMinX(pageRect),CGRectGetMaxY(pageRect));
+            CGContextScaleCTM(context, 1, -1);  
+            CGContextTranslateCTM(context, -(pageRect.origin.x), -(pageRect.origin.y));
+            CGContextDrawPDFPage(context, pageRef);
+            
+            UIImage *finalImage = UIGraphicsGetImageFromCurrentImageContext();
+            UIGraphicsEndImageContext();
+            
+            articleThumbnail.image = finalImage;
+            [articleThumbnail.layer setBorderColor: [[UIColor blackColor] CGColor]];
+            [articleThumbnail.layer setBorderWidth: 2.0];
+            
+           
+        }
+        
+       [self->_cellCache setObject:cell forKey:[NSNumber numberWithInteger:itemID]];
     }
     return cell;
 }
