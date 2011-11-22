@@ -17,81 +17,6 @@
 
 - (BOOL)application:(UIApplication *)application didFinishLaunchingWithOptions:(NSDictionary *)launchOptions
 {
-    //Copy a template database to documents folder if there is no database currently
-    
-    NSString *documentsDirectory = [NSSearchPathForDirectoriesInDomains(NSDocumentDirectory, NSUserDomainMask, YES) objectAtIndex:0];
-    NSString *sourceFile = [[[NSBundle mainBundle] resourcePath] stringByAppendingPathComponent:@"zotpad.sqlite"];
-    
-    NSString *toFile = [documentsDirectory stringByAppendingPathComponent:@"zotpad.sqlite"];
-
-    if(![[NSFileManager defaultManager] fileExistsAtPath:toFile]){
-        NSLog(@"Source Path: %@\n Target Path: %@", sourceFile, toFile);
-
-        NSError *error;
-    
-        if([[NSFileManager defaultManager] copyItemAtPath:sourceFile toPath:toFile error:&error]){
-            NSLog(@"Database successfully copied");
-        } else {
-            NSLog(@"Error description-%@ \n", [error localizedDescription]);
-            NSLog(@"Error reason-%@", [error localizedFailureReason]);
-        }
-    }
-    else{
-        NSLog(@"Existing database found at: %@", toFile);
-    }
-
-
-    
-    /*
-
-    //If a Zip archive is found in the documents directory, unzip it
-    //TODO: Make this run in background and fix it so that it works
-    
-    
-    NSString* filePath = [NSString stringWithFormat:@"%@/storage.zip",documentsDirectory];
-
-    
-    if([[NSFileManager defaultManager] fileExistsAtPath:filePath]){
-        
-        NSLog([NSString stringWithFormat:@"Found storage.zip (%i bytes) in documents folder, preparing to unzip", [[[NSFileManager defaultManager]  attributesOfItemAtPath:filePath error:nil] fileSize]]);
-
-        // Trouble shooting code to get the size of the file with C.  
-        char* filen = [filePath UTF8String];
-        FILE *fp;
-        printf(filen);
-        if(fp=fopen(filen, "rb")){
-            fseeko(fp,0,SEEK_END);
-            NSLog([NSString stringWithFormat:@"File size is %i", ftello(fp)]);
-        }
-      
-        
-        ZipArchive *zipArchive = [[ZipArchive alloc] init];
-    
-        if([zipArchive UnzipOpenFile:filePath]) {
-        
-        
-        
-            if ([zipArchive UnzipFileTo:documentsDirectory overWrite:YES]) {
-			//unzipped successfully
-                NSLog(@"Archive unzip Success");
-//			[self.fileManager removeItemAtPath:filePath error:NULL];
-            } else {
-                NSLog(@"Failure To Unzip Archive");
-            }
-        
-        } else  {
-		NSLog(@"Failure To Open Archive");
-        }    
-    } 
-     
-     */
-
-    
-    
-    
-    
-
-
     
     // Override point for customization after application launch.
     if ([[UIDevice currentDevice] userInterfaceIdiom] == UIUserInterfaceIdiomPad) {
@@ -100,7 +25,6 @@
         splitViewController.delegate = (id)navigationController.topViewController;
     }
     
-
     
     return YES;
 }

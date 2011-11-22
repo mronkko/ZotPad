@@ -22,6 +22,8 @@
 		A74348D7147AB37A00DA6FC3 /* ZPAuthenticationDialog.m in Sources */ = {isa = PBXBuildFile; fileRef = A74348D6147AB37A00DA6FC3 /* ZPAuthenticationDialog.m */; };
 		A786F7781476A56200B35B92 /* MainStoryboard_iPhone.storyboard in Resources */ = {isa = PBXBuildFile; fileRef = A786F7771476A56200B35B92 /* MainStoryboard_iPhone.storyboard */; };
 		A7A3F94D147AE0F200CA7266 /* Authenticate.xib in Resources */ = {isa = PBXBuildFile; fileRef = A7A3F94C147AE0F200CA7266 /* Authenticate.xib */; };
+		A7A3F950147BAB6C00CA7266 /* database.sql in Resources */ = {isa = PBXBuildFile; fileRef = A7A3F94F147BAB6C00CA7266 /* database.sql */; };
+		A7A3F953147BBCCB00CA7266 /* ZPServerResponseXMLParser.m in Sources */ = {isa = PBXBuildFile; fileRef = A7A3F952147BBCCA00CA7266 /* ZPServerResponseXMLParser.m */; };
 		A7A7C9B1147A8144004D8756 /* ZPServerConnection.m in Sources */ = {isa = PBXBuildFile; fileRef = A7A7C9B0147A8144004D8756 /* ZPServerConnection.m */; };
 		A7A7C9F8147AA2EE004D8756 /* NSMutableURLRequest+Parameters.m in Sources */ = {isa = PBXBuildFile; fileRef = A7A7C9D0147AA2EE004D8756 /* NSMutableURLRequest+Parameters.m */; settings = {COMPILER_FLAGS = "-fno-objc-arc"; }; };
 		A7A7C9F9147AA2EE004D8756 /* NSString+URLEncoding.m in Sources */ = {isa = PBXBuildFile; fileRef = A7A7C9D2147AA2EE004D8756 /* NSString+URLEncoding.m */; settings = {COMPILER_FLAGS = "-fno-objc-arc"; }; };
@@ -72,6 +74,9 @@
 		A74348D6147AB37A00DA6FC3 /* ZPAuthenticationDialog.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = ZPAuthenticationDialog.m; sourceTree = "<group>"; };
 		A786F7771476A56200B35B92 /* MainStoryboard_iPhone.storyboard */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = file.storyboard; path = MainStoryboard_iPhone.storyboard; sourceTree = "<group>"; };
 		A7A3F94C147AE0F200CA7266 /* Authenticate.xib */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = file.xib; path = Authenticate.xib; sourceTree = "<group>"; };
+		A7A3F94F147BAB6C00CA7266 /* database.sql */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = text; path = database.sql; sourceTree = "<group>"; };
+		A7A3F951147BBCCA00CA7266 /* ZPServerResponseXMLParser.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = ZPServerResponseXMLParser.h; sourceTree = "<group>"; };
+		A7A3F952147BBCCA00CA7266 /* ZPServerResponseXMLParser.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = ZPServerResponseXMLParser.m; sourceTree = "<group>"; };
 		A7A7C9AF147A8144004D8756 /* ZPServerConnection.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = ZPServerConnection.h; sourceTree = "<group>"; };
 		A7A7C9B0147A8144004D8756 /* ZPServerConnection.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = ZPServerConnection.m; sourceTree = "<group>"; };
 		A7A7C9CF147AA2EE004D8756 /* NSMutableURLRequest+Parameters.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = "NSMutableURLRequest+Parameters.h"; sourceTree = "<group>"; };
@@ -170,8 +175,8 @@
 			isa = PBXGroup;
 			children = (
 				A7200DE314718DC0004347C9 /* ZPAppDelegate.h */,
-				A7A3F94C147AE0F200CA7266 /* Authenticate.xib */,
 				A7200DE414718DC0004347C9 /* ZPAppDelegate.m */,
+				A7A3F94C147AE0F200CA7266 /* Authenticate.xib */,
 				A786F7771476A56200B35B92 /* MainStoryboard_iPhone.storyboard */,
 				A7200DE614718DC1004347C9 /* MainStoryboard_iPad.storyboard */,
 				A7200DE914718DC1004347C9 /* ZPMasterViewController.h */,
@@ -186,6 +191,8 @@
 				A7A7C9B0147A8144004D8756 /* ZPServerConnection.m */,
 				A74348D5147AB37A00DA6FC3 /* ZPAuthenticationDialog.h */,
 				A74348D6147AB37A00DA6FC3 /* ZPAuthenticationDialog.m */,
+				A7A3F951147BBCCA00CA7266 /* ZPServerResponseXMLParser.h */,
+				A7A3F952147BBCCA00CA7266 /* ZPServerResponseXMLParser.m */,
 				A7200DDB14718DC0004347C9 /* Supporting Files */,
 			);
 			path = ZotPad;
@@ -198,6 +205,7 @@
 				A7200DDD14718DC0004347C9 /* InfoPlist.strings */,
 				A7200DE014718DC0004347C9 /* main.m */,
 				A7200DE214718DC0004347C9 /* ZotPad-Prefix.pch */,
+				A7A3F94F147BAB6C00CA7266 /* database.sql */,
 			);
 			name = "Supporting Files";
 			sourceTree = "<group>";
@@ -322,6 +330,7 @@
 				A7A7CA08147AA2EE004D8756 /* OATestServer.rb in Resources */,
 				A7A7CA0B147AA2EE004D8756 /* README in Resources */,
 				A7A3F94D147AE0F200CA7266 /* Authenticate.xib in Resources */,
+				A7A3F950147BAB6C00CA7266 /* database.sql in Resources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
@@ -358,6 +367,7 @@
 				A7A7CA09147AA2EE004D8756 /* OAToken.m in Sources */,
 				A7A7CA0A147AA2EE004D8756 /* OATokenManager.m in Sources */,
 				A74348D7147AB37A00DA6FC3 /* ZPAuthenticationDialog.m in Sources */,
+				A7A3F953147BBCCB00CA7266 /* ZPServerResponseXMLParser.m in Sources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};

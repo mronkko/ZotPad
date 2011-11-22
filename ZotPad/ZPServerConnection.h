@@ -14,8 +14,11 @@
 #import "ZPAuthenticationDialog.h"
 
 @interface ZPServerConnection : NSObject{
+    
     //The Oauht key to use
     NSString* _oauthkey;
+    NSString* _username;
+    NSString* _userID;
     
     OAToken* _requestToken;
     
@@ -38,5 +41,9 @@
 // Methods used in the OAuth authentication
 - (void) makeOAuthRequest: (OAToken *) token;
 - (void)requestTokenTicket:(OAServiceTicket *)ticket didFinishWithData:(NSData *)data;
+
+// Methods to get data from the server
+-(NSArray*) retrieveLibrariesFromServer;
+-(NSArray*) retrieveCollectionsForLibraryFromServer:(NSInteger)libraryID;
 
 @end

@@ -8,7 +8,7 @@
 
 #import "ZPDataLayer.h"
 #import "ZPNavigatorNode.h"
-
+#import "ZPServerConnection.h"
 
 @implementation ZPDataLayer
 
@@ -18,10 +18,34 @@ static ZPDataLayer* _instance = nil;
 -(id)init
 {
     self = [super init];
-	NSString *dbPath = [[NSSearchPathForDirectoriesInDomains(NSDocumentDirectory, NSUserDomainMask, YES) objectAtIndex:0] stringByAppendingPathComponent:@"zotero.sqlite"];
+	NSString *dbPath = [[NSSearchPathForDirectoriesInDomains(NSDocumentDirectory, NSUserDomainMask, YES) objectAtIndex:0] stringByAppendingPathComponent:@"zotpad.sqlite"];
+    
+    //Delete the file if it exists. This is just to always start with an empty cache while developing.
+    NSError* error;
+    [[NSFileManager defaultManager] removeItemAtPath: dbPath error:&error];
+    NSLog(error);
     
 	//TODO: Check if this is the apprpriate way to handle errors in Objective C 
 	NSAssert((sqlite3_open([dbPath UTF8String], &database) == SQLITE_OK), @"Failed to open the database");
+   
+    
+    
+    //Read the database structure from file and create the database
+    
+    NSString *sqlFile = [NSString stringWithContentsOfFile:[[NSBundle mainBundle]
+                                                            pathForResource:@"database"
+                                                            ofType:@"sql"]];
+    
+    NSArray *sqlStatements = [sqlFile componentsSeparatedByString:@";"];
+    
+    NSEnumerator *e = [sqlStatements objectEnumerator];
+    id object;
+    while (object = [e nextObject]) {
+        [self executeStatement:object];
+    }
+    
+    _collectionsSynced = FALSE;
+    
 	return self;
 }
 
@@ -37,6 +61,70 @@ static ZPDataLayer* _instance = nil;
 }
 
 /*
+ Updates the local cache for libraries and collections and retrieves this data from the server
+ */
+
+-(void) updateLibrariesAndCollectionsFromServer{
+
+    NSLog(@"Loading group library information from server");
+    NSArray* libraries = [[ZPServerConnection instance] retrieveLibrariesFromServer];
+ 
+    //Library IDs are stored on the server, so we can just drop the content of the library table and recreate it
+
+    [self executeStatement:@"DELETE FROM groups"];
+    
+    NSEnumerator* e = [libraries objectEnumerator];
+    
+    id library;
+    
+    while ( library = [e nextObject]) {
+        
+        NSString* libraryIDString =(NSString*)[(NSDictionary*) library objectForKey:@"id"];
+                             
+        
+        [self executeStatement:[NSString stringWithFormat:@"INSERT INTO groups (groupID, name) VALUES (%@, '%@')",
+                                libraryIDString,[(NSDictionary*) library objectForKey:@"title"]]];
+                          
+        NSLog([NSString stringWithFormat:@"Loading collections for group library '%@' from server",[(NSDictionary*) library objectForKey:@"title"]]);
+        
+        NSArray* collections = [[ZPServerConnection instance] retrieveCollectionsForLibraryFromServer:[libraryIDString intValue]];
+        
+        NSEnumerator* e2 = [collections objectEnumerator];
+        id collection;
+        while( collection =[e2 nextObject]){
+            
+            [self executeStatement:[NSString stringWithFormat:@"INSERT INTO collections (collectionName, key, libraryID, parentCollectionKey) VALUES ('%@','%@',%@,'%@')",
+                                    [(NSDictionary*) collection objectForKey:@"title"],[(NSDictionary*) collection objectForKey:@"id"],
+                                    libraryIDString,[(NSDictionary*) collection objectForKey:@"parentID"]]];    
+        
+        }
+    }
+    
+    //Collections for My Library
+    
+    NSArray* collections = [[ZPServerConnection instance] retrieveCollectionsForLibraryFromServer:NULL];
+    
+    NSEnumerator* e2 = [collections objectEnumerator];
+    id collection;
+    while( collection =[e2 nextObject]){
+        
+        [self executeStatement:[NSString stringWithFormat:@"INSERT INTO collections (collectionName, key, parentCollectionKey) VALUES ('%@','%@','%@')",
+                                [(NSDictionary*) collection objectForKey:@"title"],[(NSDictionary*) collection objectForKey:@"id"],
+                                [(NSDictionary*) collection objectForKey:@"parentID"]]];    
+        
+    }
+
+    // Resolve parent IDs based on parent keys
+    // A nested subquery is needed to rename columns because SQLite does not support table aliases in update statement
+
+    [self executeStatement:@"UPDATE collections SET parentCollectionID = (SELECT A FROM (SELECT collectionID as A, key AS B FROM collections) WHERE B=parentCollectionKey)"];
+    
+    
+    //TODO: Delete orhpaned collections and items if a library was deleted 
+
+}
+
+/*
  
  Returns an array containing all libraries  
  
@@ -44,14 +132,19 @@ static ZPDataLayer* _instance = nil;
 
 - (NSArray*) libraries {
 	
-	sqlite3_stmt *selectstmt;
+    //If we have not updated with server yet, do so
+    if(! _collectionsSynced & [[ZPServerConnection instance] authenticated]){
+        [self updateLibrariesAndCollectionsFromServer];
+    }
+    
 
     NSMutableArray *returnArray = [[NSMutableArray alloc] init];
     
     //Check if there are collections in my library
-    const char *sqlmy = [@"SELECT collectionID FROM collections WHERE libraryID IS NULL LIMIT 1" UTF8String];
+    
+    sqlite3_stmt *selectstmt = [self prepareStatement:@"SELECT collectionID FROM collections WHERE libraryID IS NULL LIMIT 1"];
 	
-	sqlite3_prepare_v2(database, sqlmy,-1, &selectstmt, NULL);
+	
 	
 	NSInteger libraryID = 1;
 	NSString* name = @"My Library";
@@ -67,9 +160,7 @@ static ZPDataLayer* _instance = nil;
 
     //Group libraries
     
-	const char *sqlgroup = [@"SELECT libraryID, name, libraryID IN (SELECT DISTINCT libraryID from collections) AS hasChildren FROM groups" UTF8String];
-	
-	sqlite3_prepare_v2(database, sqlgroup,-1, &selectstmt, NULL);
+	 selectstmt = [self prepareStatement:@"SELECT groupID, name, groupID IN (SELECT DISTINCT libraryID from collections) AS hasChildren FROM groups"];
 		
     
 	while(sqlite3_step(selectstmt) == SQLITE_ROW) {
@@ -119,13 +210,9 @@ static ZPDataLayer* _instance = nil;
         collectionCondition = [NSString stringWithFormat:@"parentCollectionID = %i",currentCollectionID];
     }
     
-	sqlite3_stmt *selectstmt;
-	
-	const char *sql = [[NSString stringWithFormat: @"SELECT collectionID, collectionName, collectionID IN (SELECT DISTINCT parentCollectionID FROM collections WHERE %@) AS hasChildren FROM collections WHERE %@ AND %@",libraryCondition,libraryCondition,collectionCondition ] UTF8String];
+	sqlite3_stmt *selectstmt = [self prepareStatement:[NSString stringWithFormat: @"SELECT collectionID, collectionName, collectionID IN (SELECT DISTINCT parentCollectionID FROM collections WHERE %@) AS hasChildren FROM collections WHERE %@ AND %@",libraryCondition,libraryCondition,collectionCondition ]];
 	
     
-	sqlite3_prepare_v2(database, sql,-1, &selectstmt, NULL);
-	
 	
 	NSMutableArray *returnArray = [[NSMutableArray alloc] init];
     
@@ -176,13 +263,7 @@ static ZPDataLayer* _instance = nil;
     }
     
     
-	sqlite3_stmt *selectstmt;
-	
-	const char *sql = [baseSQL UTF8String];
-	
-    
-	sqlite3_prepare_v2(database, sql,-1, &selectstmt, NULL);
-	
+	sqlite3_stmt *selectstmt = [self prepareStatement:baseSQL];
 	
 	NSMutableArray *returnArray = [[NSMutableArray alloc] init];
     
@@ -204,15 +285,7 @@ static ZPDataLayer* _instance = nil;
 
 - (NSDictionary*) getFieldsForItem: (NSInteger) itemID  {
  
-    sqlite3_stmt *selectstmt;
-	
-	const char *sql = [[NSString stringWithFormat: @"SELECT fieldName, value FROM itemData, fields, itemDataValues WHERE itemData.itemID = %i AND itemData.fieldID = fields.fieldID AND itemData.valueID = itemDataValues.valueID",itemID] UTF8String];
-	
-    // NSLog([NSString stringWithUTF8String:sql]);
-
-    
-	sqlite3_prepare_v2(database, sql,-1, &selectstmt, NULL);
-	
+    sqlite3_stmt *selectstmt = [self prepareStatement:[NSString stringWithFormat: @"SELECT fieldName, value FROM itemData, fields, itemDataValues WHERE itemData.itemID = %i AND itemData.fieldID = fields.fieldID AND itemData.valueID = itemDataValues.valueID",itemID]];
 	
 	NSMutableDictionary* returnDictionary = [[NSMutableDictionary alloc] init];
     
@@ -237,16 +310,10 @@ static ZPDataLayer* _instance = nil;
 
 - (NSArray*) getCreatorsForItem: (NSInteger) itemID  {
     
-    sqlite3_stmt *selectstmt;
-	
-	const char *sql = [[NSString stringWithFormat: @"SELECT firstName, lastName FROM itemCreators, creators, creatorData WHERE itemCreators.itemID = %i AND itemCreators.creatorID = creators.creatorID AND creators.creatorDataID = creatorData.creatorDataID ORDER BY itemCreators.orderIndex ASC",itemID] UTF8String];
+    sqlite3_stmt *selectstmt = [self prepareStatement:[NSString stringWithFormat: @"SELECT firstName, lastName FROM itemCreators, creators, creatorData WHERE itemCreators.itemID = %i AND itemCreators.creatorID = creators.creatorID AND creators.creatorDataID = creatorData.creatorDataID ORDER BY itemCreators.orderIndex ASC",itemID]];
 	
     
-    // NSLog([NSString stringWithUTF8String:sql]);
 
-    sqlite3_prepare_v2(database, sql,-1, &selectstmt, NULL);
-	
-	
 	NSMutableArray* returnArray = [[NSMutableArray alloc] init];
     
 	while(sqlite3_step(selectstmt) == SQLITE_ROW) {
@@ -264,16 +331,9 @@ static ZPDataLayer* _instance = nil;
 
 - (NSArray*) getAttachmentFilePathsForItem: (NSInteger) itemID{
         
-    sqlite3_stmt *selectstmt;
-        
-    const char *sql = [[NSString stringWithFormat: @"SELECT key, path FROM itemAttachments ia, items i WHERE ia.sourceItemID=%i AND ia.linkMode=1 AND ia.mimeType='application/pdf' AND i.itemID=ia.itemID;",itemID] UTF8String];
+    sqlite3_stmt *selectstmt =[self prepareStatement:[NSString stringWithFormat: @"SELECT key, path FROM itemAttachments ia, items i WHERE ia.sourceItemID=%i AND ia.linkMode=1 AND ia.mimeType='application/pdf' AND i.itemID=ia.itemID;",itemID]];
         
         
-    NSLog([NSString stringWithUTF8String:sql]);
-        
-    sqlite3_prepare_v2(database, sql,-1, &selectstmt, NULL);
-        
-      
     
     NSMutableArray* returnArray = [[NSMutableArray alloc] init];
     
@@ -294,5 +354,30 @@ static ZPDataLayer* _instance = nil;
         
     return returnArray;
 }    
+
+-(sqlite3_stmt*) prepareStatement:(NSString*) sqlString{
+
+    const char *errmsg;
+    
+    sqlite3_stmt *selectstmt;
+    
+    if(sqlite3_prepare_v2(database,[sqlString UTF8String],-1, &selectstmt,&errmsg) != SQLITE_OK){
+        NSLog(sqlString);
+        NSLog([NSString stringWithUTF8String:errmsg]);
+    }
+    
+    return selectstmt;
+}
+
+-(void) executeStatement:(NSString*) sqlString{
+    
+    char *errmsg;
+    
+    if(sqlite3_exec(database,[sqlString UTF8String],NULL,NULL,&errmsg) != SQLITE_OK){
+        NSLog(sqlString);
+        NSLog([NSString stringWithUTF8String:errmsg]);
+    }
+}
+
 
 @end

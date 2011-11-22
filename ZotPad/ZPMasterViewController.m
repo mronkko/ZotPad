@@ -12,6 +12,7 @@
 #import "ZPDataLayer.h"
 #import "ZPServerConnection.h"
 #import "ZPAuthenticationDialog.h"
+#import "ZPAppDelegate.h"
 
 @implementation ZPMasterViewController
 
@@ -39,6 +40,10 @@
 {
     [super viewDidLoad];
 
+    if(! [[ZPServerConnection instance] authenticated]){
+        [[ZPServerConnection instance] doAuthenticate: self];
+    }    
+
 
     //If the current library is not defined, show a list of libraries
     if(self->_currentLibrary == 0){
@@ -51,9 +56,7 @@
     
 	// Do any additional setup after loading the view, typically from a nib.
     self.detailViewController = (ZPDetailViewController *)[[self.splitViewController.viewControllers lastObject] topViewController];
-    if ([[UIDevice currentDevice] userInterfaceIdiom] == UIUserInterfaceIdiomPad) {
-        [self.tableView selectRowAtIndexPath:[NSIndexPath indexPathForRow:0 inSection:0] animated:NO scrollPosition:UITableViewScrollPositionMiddle];
-    }
+ 
 }
 
 
@@ -143,12 +146,7 @@
 - (void)viewDidAppear:(BOOL)animated
 {
     [super viewDidAppear:animated];
-    
-    if(! [[ZPServerConnection instance] authenticated]){
-        [[ZPServerConnection instance] doAuthenticate: self];
-    }
-    
-    
+        
 }
 
 - (void)viewWillDisappear:(BOOL)animated

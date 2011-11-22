@@ -11,6 +11,7 @@
 #import "OAuthConsumer.h"
 #import "OAToken.h"
 #import "ZPAuthenticationDialog.h"
+#import "ZPServerResponseXMLParser.h"
 
 @implementation ZPServerConnection
 
@@ -24,8 +25,9 @@ static ZPServerConnection* _instance = nil;
     
     NSUserDefaults* defaults = [NSUserDefaults standardUserDefaults];
     self->_oauthkey = [defaults objectForKey:@"OAuthKey"];
-
-	
+	self->_userID = [defaults objectForKey:@"userID"];
+    self->_username = [defaults objectForKey:@"username"];
+    
     return self;
 }
 
@@ -132,6 +134,20 @@ static ZPServerConnection* _instance = nil;
         [[NSUserDefaults standardUserDefaults] setValue:[requestToken key] forKey:@"OAuthKey"];
         self->_oauthkey = [requestToken key];
         
+        //Save userID and username
+        NSArray* parts = [responseBody componentsSeparatedByString:@"&"];
+        
+        NSString* userID = [[[parts objectAtIndex:2]componentsSeparatedByString:@"="] objectAtIndex:1];
+        [[NSUserDefaults standardUserDefaults] setValue:userID forKey:@"userID"];
+        self->_userID = userID;
+        
+        NSString* username = [[[parts objectAtIndex:3]componentsSeparatedByString:@"="] objectAtIndex:1];
+        [[NSUserDefaults standardUserDefaults] setValue:username forKey:@"username"];
+        self->_username = username;
+        
+        //Force update from server
+//TODO:        [(UITableViewController*) self->_sourceViewController reloadData];
+        
         //Dismiss the modal dialog
         [ self->_authenticationDialog dismissModalViewControllerAnimated:YES];
 
@@ -146,6 +162,44 @@ static ZPServerConnection* _instance = nil;
 }
 - (void)requestAccessToken:(OAServiceTicket *)ticket didFailWithError:(NSError *)error {
     NSLog(@"Error");
+}
+
+
+-(NSArray*) retrieveLibrariesFromServer{
+        
+    //Retrieve all libraries from the server
+    
+    NSURL *fileURL = [NSURL URLWithString:[NSString stringWithFormat:@"https://api.zotero.org/users/%@/groups?key=%@",_userID,_oauthkey]];
+    NSXMLParser *parser = [[NSXMLParser alloc] initWithContentsOfURL:fileURL];
+
+    ZPServerResponseXMLParser* parserDelegate =  [[ZPServerResponseXMLParser alloc] init];
+    
+    [parser setDelegate: parserDelegate];
+    [parser parse];
+    
+    return [parserDelegate results];
+    
+}
+
+-(NSArray*) retrieveCollectionsForLibraryFromServer:(NSInteger)libraryID{
+    
+    NSURL *fileURL;
+    
+    if(libraryID==0){
+        fileURL = [NSURL URLWithString:[NSString stringWithFormat:@"https://api.zotero.org/users/%@/collections?key=%@",_userID,_oauthkey]];
+    }
+    else{
+        fileURL = [NSURL URLWithString:[NSString stringWithFormat:@"https://api.zotero.org/groups/%i/collections?key=%@",libraryID,_oauthkey]];        
+    }
+    
+    NSXMLParser *parser = [[NSXMLParser alloc] initWithContentsOfURL:fileURL];
+    
+    ZPServerResponseXMLParser* parserDelegate =  [[ZPServerResponseXMLParser alloc] init];
+    
+    [parser setDelegate: parserDelegate];
+    [parser parse];
+    
+    return [parserDelegate results];
 }
 
 @end

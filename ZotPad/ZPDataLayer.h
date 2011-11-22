@@ -12,6 +12,7 @@
 
 @interface ZPDataLayer : NSObject {
 	sqlite3 *database;
+    BOOL    _collectionsSynced;
 }
 
 // This class is used as a singleton
@@ -24,5 +25,13 @@
 - (NSDictionary*) getFieldsForItem: (NSInteger) itemID;
 - (NSArray*) getCreatorsForItem: (NSInteger) itemID;
 - (NSArray*) getAttachmentFilePathsForItem: (NSInteger) itemID;
+
+
+// Helper functions to prepare and execute statements. All SQL queries should be done through these
+
+-(sqlite3_stmt*) prepareStatement:(NSString*) sqlString;
+
+//Executes a statement which does not return results.
+-(void) executeStatement:(NSString*) sqlString;
 
 @end
