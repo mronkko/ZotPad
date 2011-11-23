@@ -21,6 +21,7 @@
 		A7200DF8147193C0004347C9 /* libsqlite3.dylib in Frameworks */ = {isa = PBXBuildFile; fileRef = A7200DF7147193C0004347C9 /* libsqlite3.dylib */; };
 		A737A461147C24A700174E16 /* ZPItemRetrieveOperation.m in Sources */ = {isa = PBXBuildFile; fileRef = A737A460147C24A700174E16 /* ZPItemRetrieveOperation.m */; };
 		A74348D7147AB37A00DA6FC3 /* ZPAuthenticationDialog.m in Sources */ = {isa = PBXBuildFile; fileRef = A74348D6147AB37A00DA6FC3 /* ZPAuthenticationDialog.m */; };
+		A7692D84147D112D000C1A8F /* ZPZoteroItem.m in Sources */ = {isa = PBXBuildFile; fileRef = A7692D83147D112D000C1A8F /* ZPZoteroItem.m */; };
 		A786F7781476A56200B35B92 /* MainStoryboard_iPhone.storyboard in Resources */ = {isa = PBXBuildFile; fileRef = A786F7771476A56200B35B92 /* MainStoryboard_iPhone.storyboard */; };
 		A7A3F94D147AE0F200CA7266 /* Authenticate.xib in Resources */ = {isa = PBXBuildFile; fileRef = A7A3F94C147AE0F200CA7266 /* Authenticate.xib */; };
 		A7A3F950147BAB6C00CA7266 /* database.sql in Resources */ = {isa = PBXBuildFile; fileRef = A7A3F94F147BAB6C00CA7266 /* database.sql */; };
@@ -75,6 +76,8 @@
 		A737A460147C24A700174E16 /* ZPItemRetrieveOperation.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = ZPItemRetrieveOperation.m; sourceTree = "<group>"; };
 		A74348D5147AB37A00DA6FC3 /* ZPAuthenticationDialog.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = ZPAuthenticationDialog.h; sourceTree = "<group>"; };
 		A74348D6147AB37A00DA6FC3 /* ZPAuthenticationDialog.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = ZPAuthenticationDialog.m; sourceTree = "<group>"; };
+		A7692D82147D112D000C1A8F /* ZPZoteroItem.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = ZPZoteroItem.h; sourceTree = "<group>"; };
+		A7692D83147D112D000C1A8F /* ZPZoteroItem.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = ZPZoteroItem.m; sourceTree = "<group>"; };
 		A786F7771476A56200B35B92 /* MainStoryboard_iPhone.storyboard */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = file.storyboard; path = MainStoryboard_iPhone.storyboard; sourceTree = "<group>"; };
 		A7A3F94C147AE0F200CA7266 /* Authenticate.xib */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = file.xib; path = Authenticate.xib; sourceTree = "<group>"; };
 		A7A3F94F147BAB6C00CA7266 /* database.sql */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = text; path = database.sql; sourceTree = "<group>"; };
@@ -190,6 +193,8 @@
 				A7200DF514718F44004347C9 /* ZPDataLayer.m */,
 				A701AF491473FC9A0027DDF2 /* ZPNavigatorNode.h */,
 				A701AF4A1473FC9A0027DDF2 /* ZPNavigatorNode.m */,
+				A7692D82147D112D000C1A8F /* ZPZoteroItem.h */,
+				A7692D83147D112D000C1A8F /* ZPZoteroItem.m */,
 				A7A7C9AF147A8144004D8756 /* ZPServerConnection.h */,
 				A7A7C9B0147A8144004D8756 /* ZPServerConnection.m */,
 				A737A45F147C24A600174E16 /* ZPItemRetrieveOperation.h */,
@@ -374,6 +379,7 @@
 				A74348D7147AB37A00DA6FC3 /* ZPAuthenticationDialog.m in Sources */,
 				A7A3F953147BBCCB00CA7266 /* ZPServerResponseXMLParser.m in Sources */,
 				A737A461147C24A700174E16 /* ZPItemRetrieveOperation.m in Sources */,
+				A7692D84147D112D000C1A8F /* ZPZoteroItem.m in Sources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
