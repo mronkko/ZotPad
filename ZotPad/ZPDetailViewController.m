@@ -35,8 +35,13 @@
 }
 
 - (NSInteger)tableView:(UITableView *)aTableView numberOfRowsInSection:(NSInteger)section {
-    // Return the number of rows in the section.
-    return [_itemIDsShown count];
+    // Return the number of rows in the section. Initially there is no library selected, so we will just return an empty view
+    if(_itemIDsShown==nil){
+        return 0;
+    }
+    else{
+        return [_itemIDsShown count];
+    }
 }
 
 
@@ -49,12 +54,12 @@
         [self.masterPopoverController dismissPopoverAnimated:YES];
     }
     
-    // Retrieve the item IDs
+    // Retrieve the item IDs if a library is selected. 
     
-    //TODO: Make this run asynchornously. See http://developer.apple.com/library/ios/#documentation/General/Conceptual/ConcurrencyProgrammingGuide/OperationQueues/OperationQueues.html
-    self->_itemIDsShown = [[ZPDataLayer instance] getItemIDsForView: self];
-    
-    [self.itemTableView reloadData];
+    if(_libraryID!=0){
+        self->_itemIDsShown = [[ZPDataLayer instance] getItemIDsForView: self];
+        [self.itemTableView reloadData];
+    }
 }
 
 - (UITableViewCell *)tableView:(UITableView *)tableView cellForRowAtIndexPath:(NSIndexPath *)indexPath {
@@ -83,6 +88,8 @@
     if(cell==nil){
         
         cell = [tableView dequeueReusableCellWithIdentifier:@"ZoteroItemCell"];
+        
+        //TODO: Change this to use ZPZoteroItem instances instead of NSDictionary instances
         
         NSDictionary* itemFieldValues = [[ZPDataLayer instance] getFieldsForItem: itemID];
         
@@ -153,12 +160,7 @@
     
     [super viewDidLoad];
     
-    //Set library to my library if it is not defined
-    
-    if(self->_libraryID == 0){
-        self->_libraryID = 1; 
-    }
-    
+ 
 
 	// Do any additional setup after loading the view, typically from a nib.
     [self configureView];

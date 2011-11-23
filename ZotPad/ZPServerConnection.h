@@ -48,6 +48,8 @@
 // Methods to get data from the server
 -(NSArray*) retrieveLibrariesFromServer;
 -(NSArray*) retrieveCollectionsForLibraryFromServer:(NSInteger)libraryID;
--(NSArray*) retrieveItemsFromLibrary:(NSInteger)libraryID collection:(NSInteger)collectionID searchString:(NSString*)searchString sortField:(NSString*)sortField sortDescending:(BOOL)sortIsDescending;
 
+// The first of these two methods is called to retrieve all items in a view. It will then call the second to retrieve blocks.
+-(NSArray*) retrieveItemsFromLibrary:(NSInteger)libraryID collection:(NSInteger)collectionID searchString:(NSString*)searchString sortField:(NSString*)sortField sortDescending:(BOOL)sortIsDescending;
+-(NSArray*) retrieveItemsFromLibrary:(NSInteger)libraryID collection:(NSString*)collectionKey searchString:(NSString*)searchString sortField:(NSString*)sortField sortDescending:(BOOL)sortIsDescending maxCount:(NSInteger)maxCount offset:(NSInteger)offset;
 @end

@@ -29,8 +29,7 @@
 
 // Helper functions to prepare and execute statements. All SQL queries should be done through these
 
--(void) prepareStatement(NSString*) sqlString;
-
--(void) executeStatement(NSString*) sqlString;
+-(sqlite3_stmt*) prepareStatement:(NSString*) sqlString;
+-(void) executeStatement:(NSString*) sqlString;
 
 @end

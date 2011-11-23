@@ -205,13 +205,14 @@ static ZPServerConnection* _instance = nil;
 }
 
 
--(NSArray*) retrieveItemsFromLibrary:(NSInteger)libraryID collection:(NSString)collectionKey searchString:(NSString*)searchString sortField:(NSString*)sortField sortDescending:(BOOL)sortIsDescending{
+-(NSArray*) retrieveItemsFromLibrary:(NSInteger)libraryID collection:(NSString*)collectionKey searchString:(NSString*)searchString sortField:(NSString*)sortField sortDescending:(BOOL)sortIsDescending{
     
     //We know that a view has changed, so we can cancel all existing item retrieving
     
     [self->_itemRetrieveQueue cancelAllOperations];
     
-    NSArray* returnArray = [self _retrieveItemsFromLibrary:libraryID collection:collectionKey searchString:searchString sortField:sortField sortDescending:sortIsDescending maxCount:15 offset:0];
+    //Retrieve 
+    NSArray* returnArray = [self retrieveItemsFromLibrary:libraryID collection:collectionKey searchString:searchString sortField:sortField sortDescending:sortIsDescending maxCount:15 offset:0];
     
     
     //Set up a background operation to retrieve rest of the items in the view
@@ -222,10 +223,12 @@ static ZPServerConnection* _instance = nil;
 }
 
 /*
-    Retrieves items from server and stores these in the database. Returns and array of NSStrings that contain the item keys
+
+Retrieves items from server and stores these in the database. Returns and array of NSStrings that contain the item keys
+   
 */
 
--(NSArray*) _retrieveItemsFromLibrary:(NSInteger)libraryID collection:(NSString*)collectionKey searchString:(NSString*)searchString sortField:(NSString*)sortField sortDescending:(BOOL)sortIsDescending maxCount:(NSInteger)maxCount offset:(NSInteger)offest{
+-(NSArray*) retrieveItemsFromLibrary:(NSInteger)libraryID collection:(NSString*)collectionKey searchString:(NSString*)searchString sortField:(NSString*)sortField sortDescending:(BOOL)sortIsDescending maxCount:(NSInteger)maxCount offset:(NSInteger)offest{
     
     //We know that a view has changed, so we can cancel all existing item retrieving
     

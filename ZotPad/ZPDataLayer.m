@@ -142,7 +142,7 @@ static ZPDataLayer* _instance = nil;
     
     //Check if there are collections in my library
     
-    sqlite3_stmt *selectstmt = [self prepareStatement:@"SELECT collectionID FROM collections WHERE libraryID IS NULL LIMIT 1"];
+    sqlite3_stmt* selectstmt = [self prepareStatement:@"SELECT collectionID FROM collections WHERE libraryID IS NULL LIMIT 1"];
 	
 	
 	
@@ -284,7 +284,6 @@ static ZPDataLayer* _instance = nil;
 - (NSArray*) getAttachmentFilePathsForItem: (NSInteger) itemID{
         
     sqlite3_stmt *selectstmt =[self prepareStatement:[NSString stringWithFormat: @"SELECT key, path FROM itemAttachments ia, items i WHERE ia.sourceItemID=%i AND ia.linkMode=1 AND ia.mimeType='application/pdf' AND i.itemID=ia.itemID;",itemID]];
-        
         
     
     NSMutableArray* returnArray = [[NSMutableArray alloc] init];
