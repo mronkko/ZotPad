@@ -182,6 +182,7 @@ static ZPDataLayer* _instance = nil;
 	return returnArray;
 }
 
+
 /*
  
  Returns an array containing all libraries with their collections 
@@ -237,71 +238,22 @@ static ZPDataLayer* _instance = nil;
 	return returnArray;
 }
 
-/*
- Returns an array of item IDs corresponding to the currently selected collection, library, search criteria and sort criteria.
- */
-
-- (NSArray*) getItemIDsForView:(ZPDetailViewController*)view {
-
-    NSString* baseSQL;
-    
-    //My library is coded as 1 in ZotPad and is NULL in the database.
-    
-    //Attachments have itemType 14, so exclude these
-    
-    if([view collectionID] == 0){
-        if([view libraryID] == 1){
-            baseSQL = @"SELECT itemID FROM items WHERE libraryID IS NULL AND itemTypeID <> 14";
-        }
-        else{
-            baseSQL = [NSString stringWithFormat: @"SELECT itemID FROM items WHERE libraryID = %i AND itemTypeID <> 14",[view libraryID]];
-        }
-    }
-    else{
-        //TODO: Exclude attachments here 
-         baseSQL = [NSString stringWithFormat: @"SELECT itemID FROM collectionItems WHERE collectionID = %i ",[view collectionID]];
-    }
-    
-    
-	sqlite3_stmt *selectstmt = [self prepareStatement:baseSQL];
-	
-	NSMutableArray *returnArray = [[NSMutableArray alloc] init];
-    
-	while(sqlite3_step(selectstmt) == SQLITE_ROW) {
-		
-		[returnArray addObject:[NSNumber numberWithInteger:sqlite3_column_int(selectstmt, 0)]];
-        
-	}
-	
-	sqlite3_finalize(selectstmt);
-	
-	return returnArray;
-
-}
 
 /*
- Returns the  fields for an item as a dictionary
- */
-
-- (NSDictionary*) getFieldsForItem: (NSInteger) itemID  {
  
-    sqlite3_stmt *selectstmt = [self prepareStatement:[NSString stringWithFormat: @"SELECT fieldName, value FROM itemData, fields, itemDataValues WHERE itemData.itemID = %i AND itemData.fieldID = fields.fieldID AND itemData.valueID = itemDataValues.valueID",itemID]];
-	
-	NSMutableDictionary* returnDictionary = [[NSMutableDictionary alloc] init];
+ Creates an array that will hold the item IDs of the current view. Initially contains only 15 first
+    IDs with the rest of the item ids set to 0 and populated later in the bacground.
+
+ */
+
+- (NSArray*) getItemIDsForView:(ZPDetailViewController*)view{
     
-	while(sqlite3_step(selectstmt) == SQLITE_ROW) {
-		
-		
-		NSString *key = [[NSString alloc] initWithUTF8String:(const char *) sqlite3_column_text(selectstmt, 0)];
-        NSString *value = [[NSString alloc] initWithUTF8String:(const char *) sqlite3_column_text(selectstmt, 1)];
-        
-        [returnDictionary setObject:value forKey:key];
-	}
-	
-	sqlite3_finalize(selectstmt);
-	
-	return returnDictionary;
+    //Retrieve first 15 items
+    
+    return [[ZPServerConnection instance] retrieveItemsFromLibrary:view.libraryID collection:view.collectionID searchString:view.searchString sortField:view.sortField sortDescending:view.sortIsDescending];
+    
 }
+
 
 /*
  Returns the creators (i.e. authors) for an item

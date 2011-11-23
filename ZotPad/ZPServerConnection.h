@@ -27,6 +27,9 @@
     
     // Dialog that will show the Zotero login
     ZPAuthenticationDialog* _authenticationDialog;
+    
+    // An operation que to fetch items in the background
+    NSOperationQueue* _itemRetrieveQueue;
 }
 
 // This class is used as a singleton
@@ -45,5 +48,6 @@
 // Methods to get data from the server
 -(NSArray*) retrieveLibrariesFromServer;
 -(NSArray*) retrieveCollectionsForLibraryFromServer:(NSInteger)libraryID;
+-(NSArray*) retrieveItemsFromLibrary:(NSInteger)libraryID collection:(NSInteger)collectionID searchString:(NSString*)searchString sortField:(NSString*)sortField sortDescending:(BOOL)sortIsDescending;
 
 @end

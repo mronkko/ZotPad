@@ -60,8 +60,17 @@
 - (UITableViewCell *)tableView:(UITableView *)tableView cellForRowAtIndexPath:(NSIndexPath *)indexPath {
 
    
+    
     NSInteger itemID = [[_itemIDsShown objectAtIndex: indexPath.row]integerValue];
 
+    //It is possible that we do not yet have data for the full view. Sleep until we have it
+    //More data is retrieved in the background
+    
+    while(itemID==0){
+        [NSThread sleepForTimeInterval:.5];
+        itemID = [[_itemIDsShown objectAtIndex: indexPath.row]integerValue];
+    }
+    
     //TODO: Implement purging of the cache
     if(self->_cellCache==nil){
         self->_cellCache = [NSMutableDictionary dictionary];
