@@ -16,7 +16,7 @@
 
 @implementation ZPDetailViewController
 
-@synthesize collectionID = _collectionID;
+@synthesize collectionID = _collectionKey;
 @synthesize libraryID =  _libraryID;
 @synthesize searchString = _searchString;
 @synthesize sortField = _sortField;
@@ -101,6 +101,7 @@
         
         UILabel *publicationLabel = (UILabel *)[cell viewWithTag:3];
         
+        //TODO: Check this and consider presenting the full citation with HTLM format http://stackoverflow.com/questions/2261654/html-string-content-for-uilabel-and-textview
         
         publicationLabel.text = [NSString stringWithFormat:@"%@, vol %@, iss %@ (%@)",[itemFieldValues objectForKey:@"publicationTitle"],[itemFieldValues objectForKey:@"volume"],[itemFieldValues objectForKey:@"issue"],[itemFieldValues objectForKey:@"date"]];
         

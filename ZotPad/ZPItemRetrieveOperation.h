@@ -11,6 +11,8 @@
 //  means the list of items that are currently shown). The operation will fill the array
 //  with item IDs and then record data about these items in the database.
 //
+//  Each operation does one API call to the server and if needed, schedules more calls
+//
 //  Tutorial on NSOperation http://developer.apple.com/cocoa/managingconcurrency.html
 //
 //  Created by Rönkkö Mikko on 11/22/11.
@@ -34,5 +36,7 @@
 @property BOOL sortIsDescending;
 @property (retain) NSString* searchString;
 @property (retain) NSString* sortField;
+
+-(id) initWithArray:(NSArray*)itemArray library:(NSInteger)libraryID collection:(NSString*)collectionKey searchString:(NSString*)searchString sortField:(NSString*)sortField sortDescending:(BOOL)sortIsDescending;
 
 @end

@@ -27,9 +27,7 @@ static ZPServerConnection* _instance = nil;
     self->_oauthkey = [defaults objectForKey:@"OAuthKey"];
 	self->_userID = [defaults objectForKey:@"userID"];
     self->_username = [defaults objectForKey:@"username"];
-    
-    self->_itemRetrieveQueue = [[NSOperationQueue alloc] init];
-    
+        
     return self;
 }
 
@@ -179,7 +177,7 @@ static ZPServerConnection* _instance = nil;
     [parser setDelegate: parserDelegate];
     [parser parse];
     
-    return [parserDelegate results];
+    return [parserDelegate parsedElements];
     
 }
 
@@ -201,26 +199,10 @@ static ZPServerConnection* _instance = nil;
     [parser setDelegate: parserDelegate];
     [parser parse];
     
-    return [parserDelegate results];
+    return [parserDelegate parsedElements];
 }
 
 
--(NSArray*) retrieveItemsFromLibrary:(NSInteger)libraryID collection:(NSString*)collectionKey searchString:(NSString*)searchString sortField:(NSString*)sortField sortDescending:(BOOL)sortIsDescending{
-    
-    //We know that a view has changed, so we can cancel all existing item retrieving
-    
-    [self->_itemRetrieveQueue cancelAllOperations];
-    
-    //Retrieve 
-    NSArray* returnArray = [self retrieveItemsFromLibrary:libraryID collection:collectionKey searchString:searchString sortField:sortField sortDescending:sortIsDescending maxCount:15 offset:0];
-    
-    
-    //Set up a background operation to retrieve rest of the items in the view
-    
-    
-    
-
-}
 
 /*
 
@@ -231,8 +213,6 @@ Retrieves items from server and stores these in the database. Returns and array 
 -(NSArray*) retrieveItemsFromLibrary:(NSInteger)libraryID collection:(NSString*)collectionKey searchString:(NSString*)searchString sortField:(NSString*)sortField sortDescending:(BOOL)sortIsDescending maxCount:(NSInteger)maxCount offset:(NSInteger)offest{
     
     //We know that a view has changed, so we can cancel all existing item retrieving
-    
-    [self->_itemRetrieveQueue cancelAllOperations];
     
     NSString* urlString = @"https://api.zotero.org/";
     NSURL* fileURL =[NSURL URLWithString:urlString];

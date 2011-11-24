@@ -7,8 +7,20 @@
 //
 
 #import "ZPDataLayer.h"
-#import "ZPNavigatorNode.h"
+
+//Data objects
+#import "ZPZoteroLibrary.h"
+#import "ZPZoteroCollection.h"
+#import "ZPZoteroItem.h"
+
+//Operations
+#import "ZPItemCacheWriteOperation.h"
+#import "ZPItemRetrieveOperation.h"
+
+//Server connection
 #import "ZPServerConnection.h"
+#import "ZPServerResponseXMLParser.h"
+
 
 @implementation ZPDataLayer
 
@@ -44,7 +56,12 @@ static ZPDataLayer* _instance = nil;
         [self executeStatement:object];
     }
     
-    _collectionsSynced = FALSE;
+    //Initialize OperationQueues for retrieving data from server and writing it to cache
+    _itemRetrieveQueue = [[NSOperationQueue alloc] init];
+    _itemCacheWriteQueue = [[NSOperationQueue alloc] init];
+    
+    _collectionTreeCached = FALSE;
+    _collectionCacheStatus = [[NSDictionary alloc] init];
     
 	return self;
 }
@@ -133,26 +150,23 @@ static ZPDataLayer* _instance = nil;
 - (NSArray*) libraries {
 	
     //If we have not updated with server yet, do so
-    if(! _collectionsSynced & [[ZPServerConnection instance] authenticated]){
+    if(! _collectionTreeCached & [[ZPServerConnection instance] authenticated]){
         [self updateLibrariesAndCollectionsFromServer];
     }
     
 
     NSMutableArray *returnArray = [[NSMutableArray alloc] init];
     
+       
+	ZPZoteroLibrary* thisLibrary = [[ZPZoteroLibrary alloc] init];
+    [thisLibrary setLibraryID : 1];
+	[thisLibrary setTitle: @"My Library"];
+    
     //Check if there are collections in my library
     
     sqlite3_stmt* selectstmt = [self prepareStatement:@"SELECT collectionID FROM collections WHERE libraryID IS NULL LIMIT 1"];
-	
-	
-	
-	NSInteger libraryID = 1;
-	NSString* name = @"My Library";
-    BOOL hasChildren  =sqlite3_step(selectstmt) == SQLITE_ROW;
-       
-	ZPNavigatorNode* thisLibrary = [[ZPNavigatorNode alloc] init];
-    [thisLibrary setLibraryID : libraryID];
-	[thisLibrary setName : name];
+	BOOL hasChildren  =sqlite3_step(selectstmt) == SQLITE_ROW;
+    
     [thisLibrary setHasChildren:hasChildren];
 	[returnArray addObject:thisLibrary];
 	
@@ -169,9 +183,9 @@ static ZPDataLayer* _instance = nil;
 		NSString* name = [[NSString alloc] initWithUTF8String:(const char *) sqlite3_column_text(selectstmt, 1)];
         BOOL hasChildren = sqlite3_column_int(selectstmt, 2);
 
-		ZPNavigatorNode* thisLibrary = [[ZPNavigatorNode alloc] init];
+        ZPZoteroLibrary* thisLibrary = [[ZPZoteroLibrary alloc] init];
         [thisLibrary setLibraryID : libraryID];
-		[thisLibrary setName : name];
+        [thisLibrary setName: name];
 		[thisLibrary setHasChildren:hasChildren];
         
 		[returnArray addObject:thisLibrary];
@@ -223,7 +237,7 @@ static ZPDataLayer* _instance = nil;
 		NSString *name = [[NSString alloc] initWithUTF8String:(const char *) sqlite3_column_text(selectstmt, 1)];
         BOOL hasChildren = sqlite3_column_int(selectstmt, 2);
         
-		ZPNavigatorNode* thisCollection = [[ZPNavigatorNode alloc] init];
+		ZPZoteroCollection* thisCollection = [[ZPZoteroCollection alloc] init];
         [thisCollection setLibraryID : currentLibraryID];
         [thisCollection setCollectionID : collectionID];
 		[thisCollection setName : name];
@@ -244,16 +258,70 @@ static ZPDataLayer* _instance = nil;
  Creates an array that will hold the item IDs of the current view. Initially contains only 15 first
     IDs with the rest of the item ids set to 0 and populated later in the bacground.
 
+ //TODO: The client should always load all items in a collection as long as collection is shown and maybe continue in the background if the collection is almost completely retrieved.
+ 
  */
 
 - (NSArray*) getItemIDsForView:(ZPDetailViewController*)view{
     
-    //Retrieve first 15 items
+    //Start by deciding if we need to connect to the server or can use cache. We can rely on cache if this collection is completely cached already
     
-    return [[ZPServerConnection instance] retrieveItemsFromLibrary:view.libraryID collection:view.collectionID searchString:view.searchString sortField:view.sortField sortDescending:view.sortIsDescending];
+    NSNumber* cacheStatus = [_collectionCacheStatus objectForKey:[NSNumber numberWithInt:view.collectionID]];
+    if( cacheStatus == NULL || [cacheStatus intValue] == 0 ){
+        
+        NSString* collectionKey = [self collectionKeyFromCollectionID:view.collectionID];
+        
+        //Retrieve initial 15 items
+        
+        ZPServerResponseXMLParser* parserResults = [[ZPServerConnection instance] retrieveItemsFromLibrary:view.libraryID collection:collectionKey searchString:view.searchString sortField:view.sortField sortDescending:view.sortIsDescending maxCount:15 offset:0];
+        
+        //Construct a return array
+        NSMutableArray* returnArray = [NSMutableArray arrayWithCapacity:[parserResults totalResults]];
+        
+        //Fill in what we got from the parser and pad with NULL
+        
+        for (int i = 0; i < [parserResults totalResults]; i++) {
+            ZPZoteroItem* item = (ZPZoteroItem*)[[parserResults parsedElements] objectAtIndex:i];
+            if(item!=NULL){
+                [returnArray addObject:[item key]];
+            }
+            else{
+                [returnArray addObject:NULL];
+            }
+        }
+        
+        //Que an operation to cache the results of the server response
+        //TODO: Consider if these initial items should be given higher priority. It is possible that there are other items already in the queue.
+        
+        [self cacheZoteroItems:[parserResults parsedElements]];
+        
+        //Retrieve the rest of the items into the array
+        
+        
+        return returnArray;
+
+    }
+    // Retrieve itemIDs from cache
+    else{
+        return NULL;
+    }
+    
+    
+    return NULL;
     
 }
 
+-(NSString*) collectionKeyFromCollectionID:(NSInteger)collectionID{
+    //TODO: This could be optimized by loading the results in an array or dictionary instead of retrieving them from the database over and over 
+    sqlite3_stmt *selectstmt = [self prepareStatement:[NSString stringWithFormat: @"SELECT key FROM collections WHERE collectionID = %i LIMIT 1",collectionID]];
+    sqlite3_step(selectstmt);
+    return [NSString stringWithCString:sqlite3_column_text(selectstmt, 0)];
+}
+
+-(void) cacheZoteroItems:(NSArray*)items {
+    ZPItemCacheWriteOperation* cacheWriteOperation = [[ZPItemCacheWriteOperation alloc] initWithZoteroItemArray:items];
+    [_itemCacheWriteQueue addOperation:cacheWriteOperation];
+}
 
 /*
  Returns the creators (i.e. authors) for an item

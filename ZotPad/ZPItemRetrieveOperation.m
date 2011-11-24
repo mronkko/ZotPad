@@ -16,6 +16,13 @@
 
 @synthesize itemIDs, libraryID, collectionKey, sortIsDescending, searchString, sortField;
 
+-(id) initWithArray:(NSArray*)itemArray library:(NSInteger)libraryID collection:(NSString*)collectionKey searchString:(NSString*)searchString sortField:(NSString*)sortField sortDescending:(BOOL)sortIsDescending{
+    self = [super init];
+    [self setItemIDs:itemArray];
+    
+    return self;
+}
+
 // Calls the methods for retrieving data
 
 -(void)main {

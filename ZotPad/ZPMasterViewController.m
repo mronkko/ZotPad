@@ -8,11 +8,11 @@
 
 #import "ZPMasterViewController.h"
 #import "ZPDetailViewController.h"
-#import "ZPNavigatorNode.h"
 #import "ZPDataLayer.h"
 #import "ZPServerConnection.h"
 #import "ZPAuthenticationDialog.h"
 #import "ZPAppDelegate.h"
+#import "ZPNavigatorNode.h"
 
 @implementation ZPMasterViewController
 
@@ -72,7 +72,7 @@
     
      NSString *CellIdentifier = @"CollectionCell";
     
-    //TODO:
+    // TODO:
     // Read this http://stackoverflow.com/questions/7911588/should-xcode-storyboard-support-segues-from-a-uitableview-with-dynamic-prototy
     // Fix iPhone seque from navigator cell to detail view
     
@@ -84,7 +84,7 @@
     }
     
     // Configure the cell.
-	ZPNavigatorNode* node = [self->_content objectAtIndex: indexPath.row];
+	NSObject <ZPNavigatorNode>* node = [self->_content objectAtIndex: indexPath.row];
 	if ( [node hasChildren])
 	{
 		cell.accessoryType = UITableViewCellAccessoryDetailDisclosureButton;
@@ -106,7 +106,7 @@
      When a row is selected, set the detail view controller's library and collection and refresh
      */
     
-    ZPNavigatorNode* node = [self->_content objectAtIndex: indexPath.row];
+    NSObject <ZPNavigatorNode>* node = [self->_content objectAtIndex: indexPath.row];
     self.detailViewController.libraryID = [node libraryID];
     self.detailViewController.collectionID = [node collectionID];
     
@@ -122,7 +122,7 @@
     
     ZPMasterViewController* subController = [[ZPMasterViewController alloc] initWithStyle: UITableViewStylePlain];
 	subController.detailViewController = self.detailViewController;
-    ZPNavigatorNode* selectedNode = [self->_content objectAtIndex: indexPath.row];
+    NSObject <ZPNavigatorNode>* selectedNode  = [self->_content objectAtIndex: indexPath.row];
 	subController.currentLibrary=[selectedNode libraryID];
 	subController.currentCollection=[selectedNode collectionID];
 	

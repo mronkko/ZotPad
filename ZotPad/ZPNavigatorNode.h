@@ -2,18 +2,15 @@
 //  ZPNavigatorNode.h
 //  ZotPad
 //
-//  Created by Rönkkö Mikko on 11/16/11.
+//  Created by Rönkkö Mikko on 11/24/11.
 //  Copyright (c) 2011 __MyCompanyName__. All rights reserved.
 //
 
 #import <Foundation/Foundation.h>
 
-@interface ZPNavigatorNode : NSObject
-
-@property (retain) NSString* name;
-@property (assign) NSInteger libraryID;
-@property (assign) NSInteger collectionID; 
-@property (assign) BOOL hasChildren;
-
-
+@protocol ZPNavigatorNode <NSObject>
+-(BOOL) hasChildren;
+-(NSInteger) libraryID;
+-(NSInteger) collectionID;
+-(NSString*) name;
 @end
