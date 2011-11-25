@@ -27,7 +27,9 @@ static ZPServerConnection* _instance = nil;
     self->_oauthkey = [defaults objectForKey:@"OAuthKey"];
 	self->_userID = [defaults objectForKey:@"userID"];
     self->_username = [defaults objectForKey:@"username"];
-        
+    
+    _debugServerConnection = TRUE;
+    
     return self;
 }
 
@@ -169,7 +171,7 @@ static ZPServerConnection* _instance = nil;
         
     //Retrieve all libraries from the server
     
-    NSURL *fileURL = [NSURL URLWithString:[NSString stringWithFormat:@"https://api.zotero.org/users/%@/groups?key=%@",_userID,_oauthkey]];
+    NSURL *fileURL = [NSURL URLWithString:[NSString stringWithFormat:@"https://api.zotero.org/users/%@/groups?key=%@&content=none",_userID,_oauthkey]];
     NSXMLParser *parser = [[NSXMLParser alloc] initWithContentsOfURL:fileURL];
 
     ZPServerResponseXMLParser* parserDelegate =  [[ZPServerResponseXMLParser alloc] init];
@@ -177,7 +179,24 @@ static ZPServerConnection* _instance = nil;
     [parser setDelegate: parserDelegate];
     [parser parse];
     
-    return [parserDelegate parsedElements];
+    NSArray* returnArray = [parserDelegate parsedElements];
+    
+    //If there is more data coming, retrieve it
+    while([returnArray count] < parserDelegate.totalResults){
+        fileURL = [NSURL URLWithString:[NSString stringWithFormat:@"https://api.zotero.org/users/%@/groups?key=%@&content=none&start=%i",
+                                        _userID,_oauthkey,[returnArray count]]];
+        parser = [[NSXMLParser alloc] initWithContentsOfURL:fileURL];
+        
+        parserDelegate =  [[ZPServerResponseXMLParser alloc] init];
+        
+        [parser setDelegate: parserDelegate];
+        [parser parse];
+        
+        returnArray=[returnArray arrayByAddingObjectsFromArray:parserDelegate.parsedElements];
+    }
+    
+    
+    return returnArray;
     
 }
 
@@ -185,13 +204,17 @@ static ZPServerConnection* _instance = nil;
     
     NSURL *fileURL;
     
-    if(libraryID==0){
+    if(libraryID==1){
         fileURL = [NSURL URLWithString:[NSString stringWithFormat:@"https://api.zotero.org/users/%@/collections?key=%@",_userID,_oauthkey]];
     }
     else{
         fileURL = [NSURL URLWithString:[NSString stringWithFormat:@"https://api.zotero.org/groups/%i/collections?key=%@",libraryID,_oauthkey]];        
     }
     
+    if(_debugServerConnection){
+        NSLog(@"%@",[fileURL absoluteURL]);
+    }
+
     NSXMLParser *parser = [[NSXMLParser alloc] initWithContentsOfURL:fileURL];
     
     ZPServerResponseXMLParser* parserDelegate =  [[ZPServerResponseXMLParser alloc] init];
@@ -199,7 +222,30 @@ static ZPServerConnection* _instance = nil;
     [parser setDelegate: parserDelegate];
     [parser parse];
     
-    return [parserDelegate parsedElements];
+    NSArray* returnArray = [parserDelegate parsedElements];
+    
+    //If there is more data coming, retrieve it
+    while([returnArray count] < parserDelegate.totalResults){
+        
+        if(libraryID==1){
+            fileURL = [NSURL URLWithString:[NSString stringWithFormat:@"https://api.zotero.org/users/%@/collections?key=%@&start=%i",_userID,_oauthkey,[returnArray count]]];
+        }
+        else{
+            fileURL = [NSURL URLWithString:[NSString stringWithFormat:@"https://api.zotero.org/groups/%i/collections?key=%@&start=%i",libraryID,_oauthkey,[returnArray count]]];        
+        }
+
+        parser = [[NSXMLParser alloc] initWithContentsOfURL:fileURL];
+        
+        parserDelegate =  [[ZPServerResponseXMLParser alloc] init];
+        
+        [parser setDelegate: parserDelegate];
+        [parser parse];
+        
+        returnArray=[returnArray arrayByAddingObjectsFromArray:parserDelegate.parsedElements];
+    }
+    
+    
+    return returnArray;
 }
 
 
@@ -210,12 +256,11 @@ Retrieves items from server and stores these in the database. Returns and array 
    
 */
 
--(NSArray*) retrieveItemsFromLibrary:(NSInteger)libraryID collection:(NSString*)collectionKey searchString:(NSString*)searchString sortField:(NSString*)sortField sortDescending:(BOOL)sortIsDescending maxCount:(NSInteger)maxCount offset:(NSInteger)offest{
+-(ZPServerResponseXMLParser*) retrieveItemsFromLibrary:(NSInteger)libraryID collection:(NSString*)collectionKey searchString:(NSString*)searchString sortField:(NSString*)sortField sortDescending:(BOOL)sortIsDescending limit:(NSInteger)limit start:(NSInteger)start{
     
     //We know that a view has changed, so we can cancel all existing item retrieving
     
     NSString* urlString = @"https://api.zotero.org/";
-    NSURL* fileURL =[NSURL URLWithString:urlString];
     
     if(libraryID==0){
         urlString = [NSString stringWithFormat:@"%@users/%@/",urlString,_userID];
@@ -228,13 +273,13 @@ Retrieves items from server and stores these in the database. Returns and array 
         urlString = [NSString stringWithFormat:@"%@collections/%@/items",urlString,collectionKey];
     }
     else{
-        urlString = [NSString stringWithFormat:@"%@top",urlString];
+        urlString = [NSString stringWithFormat:@"%@items/top",urlString];
     }
     
-    urlString = [NSString stringWithFormat:@"?key=%@",urlString,_oauthkey];
+    urlString = [NSString stringWithFormat:@"%@?key=%@&format=atom&content=bib&style=apa",urlString,_oauthkey];
     
     //Search
-    if(searchString!=NULL & ! [[searchString stringByTrimmingCharactersInSet:[NSCharacterSet whitespaceAndNewlineCharacterSet]] isEqualToString:@""]){
+    if(searchString!=NULL && ! [searchString isEqualToString:@""]){
         urlString = [NSString stringWithFormat:@"&q=%@",urlString,searchString];
     }
     //Sort
@@ -247,13 +292,34 @@ Retrieves items from server and stores these in the database. Returns and array 
             sortDirString=@"asc";
         }
         
-        [NSString stringWithFormat:@"&order=%@&sort=%@",urlString,sortField,sortDirString];
+        urlString =[NSString stringWithFormat:@"%@&order=%@&sort=%@",urlString,sortField,sortDirString];
+    }
+    if(start!=0){
+        urlString =[NSString stringWithFormat:@"%@&start=%i",urlString,start];
+    }
+    if(limit!=0){
+       urlString = [NSString stringWithFormat:@"%@&limit=%i",urlString,limit];
     }
     
-    fileURL = [NSURL URLWithString:urlString];        
+    if(_debugServerConnection){
+        NSLog(@"%@",urlString);
+    }
+    
+    NSURL* fileURL = [NSURL URLWithString:urlString];        
     
     
-    //TODO: Continue from here
+    NSXMLParser *parser = [[NSXMLParser alloc] initWithContentsOfURL:fileURL];
+    
+    ZPServerResponseXMLParser* parserDelegate =  [[ZPServerResponseXMLParser alloc] init];
+    
+    [parser setDelegate: parserDelegate];
+    [parser parse];
+    
+    if(_debugServerConnection){
+        NSLog(@"Response contained %i elements and we got %i",parserDelegate.totalResults,[[parserDelegate parsedElements] count]);
+    }
+    
+    return parserDelegate;
     
 }
 

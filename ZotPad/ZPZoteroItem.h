@@ -8,12 +8,12 @@
 
 
 #import <Foundation/Foundation.h>
-#import "ZPNavigatorNode.h"
 
-@interface ZPZoteroItem : NSObject <ZPNavigatorNode>{
+
+@interface ZPZoteroItem : NSObject{
     NSString* title;
     NSString* key;
-    NSString* formattedCitation;
+    NSString* pubishedIn;
     NSString* authors;
     NSInteger year;
     NSInteger libraryID;
@@ -28,7 +28,7 @@
 @property (retain) NSString* title;
 @property (retain) NSString* key;
 @property (retain) NSString* authors;
-@property (retain) NSString* formattedCitation;
+@property (retain) NSString* publishedIn;
 @property (assign) NSInteger year;
 @property (assign) NSInteger libraryID;
 @property (assign) BOOL hasChildren;
@@ -37,8 +37,5 @@
 @property (assign) NSInteger numChildren;
 @property (assign) NSInteger numTags;
 
-//The XML parser uses strings with these convenience methods
--(void) setNumChildren:(NSString*)numChildren;
--(void) setNumTags:(NSString*)numTags;
 
 @end

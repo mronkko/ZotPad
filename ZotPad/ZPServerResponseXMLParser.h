@@ -17,6 +17,9 @@
     NSString* _currentElementName;
     NSString* _resultType;
     NSInteger _totalResults;
+    NSString* _currentStringContent;
+     
+    BOOL _debugParser;
 }
 
 - (void)parser:(NSXMLParser *)parser didEndElement:(NSString *)elementName namespaceURI:(NSString *)namespaceURI qualifiedName:(NSString *)qName;

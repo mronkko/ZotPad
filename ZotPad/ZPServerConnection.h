@@ -12,6 +12,7 @@
 #import "OAuthConsumer.h"
 #import "OAToken.h"
 #import "ZPAuthenticationDialog.h"
+#import "ZPServerResponseXMLParser.h"
 
 @interface ZPServerConnection : NSObject{
     
@@ -28,7 +29,8 @@
     // Dialog that will show the Zotero login
     // TODO: Should this be located in the AppDelegate instead? 
     ZPAuthenticationDialog* _authenticationDialog;
-    
+ 
+    BOOL _debugServerConnection;
 }
 
 // This class is used as a singleton
@@ -47,5 +49,5 @@
 // Methods to get data from the server
 -(NSArray*) retrieveLibrariesFromServer;
 -(NSArray*) retrieveCollectionsForLibraryFromServer:(NSInteger)libraryID;
--(NSArray*) retrieveItemsFromLibrary:(NSInteger)libraryID collection:(NSString*)collectionKey searchString:(NSString*)searchString sortField:(NSString*)sortField sortDescending:(BOOL)sortIsDescending maxCount:(NSInteger)maxCount offset:(NSInteger)offset;
+-(ZPServerResponseXMLParser*) retrieveItemsFromLibrary:(NSInteger)libraryID collection:(NSString*)collectionKey searchString:(NSString*)searchString sortField:(NSString*)sortField sortDescending:(BOOL)sortIsDescending limit:(NSInteger)maxCount start:(NSInteger)offset;
 @end

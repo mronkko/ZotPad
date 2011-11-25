@@ -6,8 +6,9 @@
 //  Copyright (c) 2011 __MyCompanyName__. All rights reserved.
 //
 
+#import "ZPNavigatorNode.h"
 
-@interface ZPZoteroCollection : NSObject{
+@interface ZPZoteroCollection : NSObject <ZPNavigatorNode>{
     NSString* name;
     NSString* collectionKey;
     NSString* parentCollectionKey;

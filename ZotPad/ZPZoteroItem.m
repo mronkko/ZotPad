@@ -16,17 +16,10 @@
 @synthesize year;
 @synthesize libraryID;
 @synthesize hasChildren;
-@synthesize formattedCitation;
+@synthesize publishedIn;
 @synthesize itemType;
 @synthesize creatorSummary;
 @synthesize numChildren;
 @synthesize numTags;
-
--(void) setNumChildren:(NSString*)numChildren{
-    [self setNumChildren:[numChildren intValue]];
-}
--(void) setNumTags:(NSString*)numTags{
-    [self setNumTags:[numTags intValue]];
-}
 
 @end

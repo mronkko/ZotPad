@@ -8,20 +8,20 @@ CREATE TABLE IF NOT EXISTS collections (
     collectionName TEXT NOT NULL,
     parentCollectionID INT DEFAULT NULL,
     parentCollectionKey TEXT DEFAULT NULL,
-    dateAdded TIMESTAMP NOT NULL DEFAULT CURRENT_TIMESTAMP,
     dateModified TIMESTAMP NOT NULL DEFAULT CURRENT_TIMESTAMP,
-    clientDateModified TIMESTAMP NOT NULL DEFAULT CURRENT_TIMESTAMP,
     libraryID INT,
     key TEXT NOT NULL
 );
 
 CREATE TABLE IF NOT EXISTS items (
-    itemID INTEGER PRIMARY KEY,
+    itemID INTEGER PRIMARY KEY AUTOINCREMENT,
     itemTypeID INT NOT NULL,
-    dateAdded TIMESTAMP NOT NULL DEFAULT CURRENT_TIMESTAMP,
     dateModified TIMESTAMP NOT NULL DEFAULT CURRENT_TIMESTAMP,
-    clientDateModified TIMESTAMP NOT NULL DEFAULT CURRENT_TIMESTAMP,
     libraryID INT,
+    year INT,
+    authors TEXT,
+    title TEXT,
+    publishedIn TEXT,
     key TEXT NOT NULL,
     UNIQUE (libraryID, key)
 );

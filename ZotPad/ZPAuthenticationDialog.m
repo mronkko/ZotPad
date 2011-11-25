@@ -60,7 +60,7 @@
 - (BOOL)webView:(UIWebView *)webView shouldStartLoadWithRequest:(NSURLRequest *)request navigationType:(UIWebViewNavigationType)navigationType{
 
     NSString* urlString = [[request mainDocumentURL] absoluteString];
-    NSLog(urlString);
+    NSLog(@"%@",urlString);
     
     //If we are redirected to the front page, we do not need to show the web browser any more
     

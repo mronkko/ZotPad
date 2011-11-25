@@ -182,17 +182,6 @@
             <point key="canvasLocation" x="-390" y="686"/>
         </scene>
     </scenes>
-    <classes>
-        <class className="ZPDetailViewController" superclassName="UIViewController">
-            <source key="sourceIdentifier" type="project" relativePath="./Classes/ZPDetailViewController.h"/>
-            <relationships>
-                <relationship kind="outlet" name="itemTableView" candidateClass="UITableView"/>
-            </relationships>
-        </class>
-        <class className="ZPMasterViewController" superclassName="UITableViewController">
-            <source key="sourceIdentifier" type="project" relativePath="./Classes/ZPMasterViewController.h"/>
-        </class>
-    </classes>
     <simulatedMetricsContainer key="defaultSimulatedMetrics">
         <simulatedStatusBarMetrics key="statusBar" statusBarStyle="blackTranslucent"/>
         <simulatedOrientationMetrics key="orientation"/>

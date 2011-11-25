@@ -22,21 +22,27 @@
 #import <Foundation/Foundation.h>
 
 @interface ZPItemRetrieveOperation : NSOperation{
-    NSArray* itemIDs;
-    NSInteger libraryID;
-    NSString* collectionKey;
-    BOOL sortIsDescending;
-    NSString* searchString;
-    NSString* sortField;
+    NSMutableArray* _itemIDs;
+    NSInteger _libraryID;
+    NSString* _collectionKey;
+    BOOL _sortIsDescending;
+    NSString* _searchString;
+    NSString* _sortField;
+    BOOL _initial;
+    NSOperationQueue* _queue;
+    BOOL _notWithActiveView;
 }
 
-@property (retain) NSArray* itemIDs;
-@property NSInteger libraryID;
-@property (retain) NSString* collectionKey;
-@property BOOL sortIsDescending;
-@property (retain) NSString* searchString;
-@property (retain) NSString* sortField;
+-(id) initWithArray:(NSMutableArray*)itemArray library:(NSInteger)libraryID collection:(NSString*)collectionKey searchString:(NSString*)searchString sortField:(NSString*)sortField sortDescending:(BOOL)sortIsDescending queue:(NSOperationQueue*) queue;
 
--(id) initWithArray:(NSArray*)itemArray library:(NSInteger)libraryID collection:(NSString*)collectionKey searchString:(NSString*)searchString sortField:(NSString*)sortField sortDescending:(BOOL)sortIsDescending;
+-(void) markAsInitialRequestForCollection;
+
+/*
+ 
+ Calling this method tells the item retrieve operation that it is no longer workign for the active view
+ 
+ */
+
+-(void) markAsNotWithActiveView;
 
 @end

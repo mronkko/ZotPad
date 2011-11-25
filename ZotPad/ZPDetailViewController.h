@@ -15,10 +15,10 @@
     NSString* _sortField;
     BOOL _sortIsDescending;
     
-    NSArray* _itemIDsShown;
+    NSArray* _itemKeysShown;
   
     UITableView* itemTableView;
-    NSMutableDictionary* _cellCache;
+    NSCache* _cellCache;
 }
 
 - (void)configureView;

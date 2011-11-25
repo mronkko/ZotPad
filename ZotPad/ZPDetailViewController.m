@@ -28,6 +28,11 @@
 
 #pragma mark - Managing the detail item
 
+-(id) init{
+    self = [super init];
+    _cellCache = [[NSCache alloc] init];
+    return self;
+}
 - (void)didReceiveMemoryWarning
 {
     [super didReceiveMemoryWarning];
@@ -36,11 +41,11 @@
 
 - (NSInteger)tableView:(UITableView *)aTableView numberOfRowsInSection:(NSInteger)section {
     // Return the number of rows in the section. Initially there is no library selected, so we will just return an empty view
-    if(_itemIDsShown==nil){
+    if(_itemKeysShown==nil){
         return 0;
     }
     else{
-        return [_itemIDsShown count];
+        return [_itemKeysShown count];
     }
 }
 
@@ -57,7 +62,7 @@
     // Retrieve the item IDs if a library is selected. 
     
     if(_libraryID!=0){
-        self->_itemIDsShown = [[ZPDataLayer instance] getItemIDsForView: self];
+        self->_itemKeysShown = [[ZPDataLayer instance] getItemKeysForView: self];
         [self.itemTableView reloadData];
     }
 }
@@ -66,45 +71,53 @@
 
    
     
-    NSInteger itemID = [[_itemIDsShown objectAtIndex: indexPath.row]integerValue];
+    NSObject* keyObj = [_itemKeysShown objectAtIndex: indexPath.row];
 
     //It is possible that we do not yet have data for the full view. Sleep until we have it
     //More data is retrieved in the background
-    
-    while(itemID==0){
+
+    NSLog(@"Retrieving item for for %i",indexPath.row);
+
+    while(keyObj==[NSNull null]){
+        NSLog(@"Key not yet available, waiting for 500ms");
         [NSThread sleepForTimeInterval:.5];
-        itemID = [[_itemIDsShown objectAtIndex: indexPath.row]integerValue];
+        keyObj = [_itemKeysShown objectAtIndex: indexPath.row];
     }
     
-    //TODO: Implement purging of the cache
-    if(self->_cellCache==nil){
-        self->_cellCache = [NSMutableDictionary dictionary];
-    }
+    NSString* key= (NSString*) keyObj;
     
+    NSLog(@"Got key %@",key);
+
     
-    
-	UITableViewCell* cell = [self->_cellCache objectForKey:[NSNumber numberWithInteger:itemID]];
+	UITableViewCell* cell = [self->_cellCache objectForKey:key];
     
     if(cell==nil){
-        
+        NSLog(@"Not in cache, creating");
         cell = [tableView dequeueReusableCellWithIdentifier:@"ZoteroItemCell"];
         
-        //TODO: Change this to use ZPZoteroItem instances instead of NSDictionary instances
         
-        NSDictionary* itemFieldValues = [[ZPDataLayer instance] getFieldsForItem: itemID];
-        
+        ZPZoteroItem* item = [[ZPDataLayer instance] getItemByKey:key];
+
+        while(item==NULL){
+            NSLog(@"Item not yet available, waiting for 500ms");
+            [NSThread sleepForTimeInterval:.5];
+            item = [[ZPDataLayer instance] getItemByKey:key];
+        }
+
         UILabel *titleLabel = (UILabel *)[cell viewWithTag:1];
-        titleLabel.text = [itemFieldValues objectForKey:@"title"];
+        titleLabel.text = item.title;
         
         UILabel *authorsLabel = (UILabel *)[cell viewWithTag:2];
-        authorsLabel.text = [[[ZPDataLayer instance] getCreatorsForItem: itemID]componentsJoinedByString: @"; "];
+        authorsLabel.text = [NSString stringWithFormat:@"%@ (%i)",item.authors,item.year];
         
         UILabel *publicationLabel = (UILabel *)[cell viewWithTag:3];
         
         //TODO: Check this and consider presenting the full citation with HTLM format http://stackoverflow.com/questions/2261654/html-string-content-for-uilabel-and-textview
+        publicationLabel.text = [NSString stringWithFormat:@"(%i-%@) %@",indexPath.row,key, item.publishedIn];
+
         
-        publicationLabel.text = [NSString stringWithFormat:@"%@, vol %@, iss %@ (%@)",[itemFieldValues objectForKey:@"publicationTitle"],[itemFieldValues objectForKey:@"volume"],[itemFieldValues objectForKey:@"issue"],[itemFieldValues objectForKey:@"date"]];
-        
+        /*
+         
         //Check if the item has attachments and render a thumbnail from the first attachment PDF
         
         NSArray* attachmentFilePaths = [[ZPDataLayer instance] getAttachmentFilePathsForItem: itemID];
@@ -112,20 +125,18 @@
         if([attachmentFilePaths count] > 0 ){
             UIImageView* articleThumbnail = (UIImageView *) [cell viewWithTag:4];
             
-            NSLog([attachmentFilePaths objectAtIndex:0]);
+            NSLog(@"%@",[attachmentFilePaths objectAtIndex:0]);
             
             NSURL *pdfUrl = [NSURL fileURLWithPath:[attachmentFilePaths objectAtIndex:0]];
             CGPDFDocumentRef document = CGPDFDocumentCreateWithURL((__bridge_retained CFURLRef)pdfUrl);
             
-            /*
+            
+            //
+            // Renders a first page of a PDF as an image
+            //
+            // Source: http://stackoverflow.com/questions/5658993/creating-pdf-thumbnail-in-iphone
+            //
              
-             Renders a first page of a PDF as an image
-             
-             Source: http://stackoverflow.com/questions/5658993/creating-pdf-thumbnail-in-iphone
-             
-             
-             
-             */
             
             CGPDFPageRef pageRef = CGPDFDocumentGetPage(document, 1);
             CGRect pageRect = CGPDFPageGetBoxRect(pageRef, kCGPDFCropBox);
@@ -146,8 +157,8 @@
             
            
         }
-        
-       [self->_cellCache setObject:cell forKey:[NSNumber numberWithInteger:itemID]];
+        */
+       [_cellCache setObject:cell forKey:key];
     }
     return cell;
 }

@@ -7,6 +7,9 @@
 //
 
 #import "ZPItemCacheWriteOperation.h"
+#import "ZPDataLayer.h"
+#import "ZPZoteroItem.h"
+
 
 @implementation ZPItemCacheWriteOperation
 
@@ -16,8 +19,14 @@
     return self;
 }
 
--(void)main {
+-(void) main {
     if ( self.isCancelled ) return;
+    
+    NSEnumerator *e = [_items objectEnumerator];
+    id object;
+    while ((object = [e nextObject]) && ! self.isCancelled) {
+        [[ZPDataLayer instance] addItemToDatabase:(ZPZoteroItem*) object];
+    }
 }
 
 @end

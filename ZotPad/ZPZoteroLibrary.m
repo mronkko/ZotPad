@@ -22,5 +22,9 @@
     [self setName:title];
 }
 
+-(NSInteger) collectionID{
+    return 0;
+}
+
 
 @end
