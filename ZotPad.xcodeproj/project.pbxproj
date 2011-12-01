@@ -31,6 +31,7 @@
 		A72853FD147E31B600D3FE97 /* ZPZoteroCollection.m in Sources */ = {isa = PBXBuildFile; fileRef = A72853FC147E31B500D3FE97 /* ZPZoteroCollection.m */; };
 		A7285406147E55C100D3FE97 /* ZPItemCacheWriteOperation.m in Sources */ = {isa = PBXBuildFile; fileRef = A7285405147E55C000D3FE97 /* ZPItemCacheWriteOperation.m */; };
 		A737A461147C24A700174E16 /* ZPItemRetrieveOperation.m in Sources */ = {isa = PBXBuildFile; fileRef = A737A460147C24A700174E16 /* ZPItemRetrieveOperation.m */; };
+		A73D635114879D15007999F3 /* Settings.bundle in Resources */ = {isa = PBXBuildFile; fileRef = A73D635014879D15007999F3 /* Settings.bundle */; };
 		A74348D7147AB37A00DA6FC3 /* ZPAuthenticationDialog.m in Sources */ = {isa = PBXBuildFile; fileRef = A74348D6147AB37A00DA6FC3 /* ZPAuthenticationDialog.m */; };
 		A7692D84147D112D000C1A8F /* ZPZoteroItem.m in Sources */ = {isa = PBXBuildFile; fileRef = A7692D83147D112D000C1A8F /* ZPZoteroItem.m */; };
 		A786F7781476A56200B35B92 /* MainStoryboard_iPhone.storyboard in Resources */ = {isa = PBXBuildFile; fileRef = A786F7771476A56200B35B92 /* MainStoryboard_iPhone.storyboard */; };
@@ -250,6 +251,7 @@
 		A7285405147E55C000D3FE97 /* ZPItemCacheWriteOperation.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = ZPItemCacheWriteOperation.m; sourceTree = "<group>"; };
 		A737A45F147C24A600174E16 /* ZPItemRetrieveOperation.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = ZPItemRetrieveOperation.h; sourceTree = "<group>"; };
 		A737A460147C24A700174E16 /* ZPItemRetrieveOperation.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = ZPItemRetrieveOperation.m; sourceTree = "<group>"; };
+		A73D635014879D15007999F3 /* Settings.bundle */ = {isa = PBXFileReference; explicitFileType = wrapper.application; name = Settings.bundle; path = ../Settings.bundle; sourceTree = "<group>"; };
 		A74348D5147AB37A00DA6FC3 /* ZPAuthenticationDialog.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = ZPAuthenticationDialog.h; sourceTree = "<group>"; };
 		A74348D6147AB37A00DA6FC3 /* ZPAuthenticationDialog.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = ZPAuthenticationDialog.m; sourceTree = "<group>"; };
 		A7692D82147D112D000C1A8F /* ZPZoteroItem.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = ZPZoteroItem.h; sourceTree = "<group>"; };
@@ -457,6 +459,7 @@
 		A7200DDB14718DC0004347C9 /* Supporting Files */ = {
 			isa = PBXGroup;
 			children = (
+				A73D635014879D15007999F3 /* Settings.bundle */,
 				320B6C86F11D9990244A9730 /* Three20.bundle */,
 				A7200DDC14718DC0004347C9 /* ZotPad-Info.plist */,
 				A7200DDD14718DC0004347C9 /* InfoPlist.strings */,
@@ -797,6 +800,7 @@
 				A786F7781476A56200B35B92 /* MainStoryboard_iPhone.storyboard in Resources */,
 				A7A3F94D147AE0F200CA7266 /* Authenticate.xib in Resources */,
 				A7A3F950147BAB6C00CA7266 /* database.sql in Resources */,
+				A73D635114879D15007999F3 /* Settings.bundle in Resources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
