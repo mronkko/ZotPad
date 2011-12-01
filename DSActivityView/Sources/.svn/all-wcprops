@@ -1,0 +1,65 @@
+K 25
+svn:wc:ra_dav:version-url
+V 39
+/open/!svn/ver/7/DSActivityView/Sources
+END
+main.m
+K 25
+svn:wc:ra_dav:version-url
+V 46
+/open/!svn/ver/1/DSActivityView/Sources/main.m
+END
+AppDelegate.h
+K 25
+svn:wc:ra_dav:version-url
+V 53
+/open/!svn/ver/7/DSActivityView/Sources/AppDelegate.h
+END
+DSActivityView.h
+K 25
+svn:wc:ra_dav:version-url
+V 56
+/open/!svn/ver/7/DSActivityView/Sources/DSActivityView.h
+END
+DSActivityView_Prefix.pch
+K 25
+svn:wc:ra_dav:version-url
+V 65
+/open/!svn/ver/1/DSActivityView/Sources/DSActivityView_Prefix.pch
+END
+AppDelegate.m
+K 25
+svn:wc:ra_dav:version-url
+V 53
+/open/!svn/ver/7/DSActivityView/Sources/AppDelegate.m
+END
+RootViewController.h
+K 25
+svn:wc:ra_dav:version-url
+V 60
+/open/!svn/ver/7/DSActivityView/Sources/RootViewController.h
+END
+DSActivityView.m
+K 25
+svn:wc:ra_dav:version-url
+V 56
+/open/!svn/ver/7/DSActivityView/Sources/DSActivityView.m
+END
+DemoViewController.h
+K 25
+svn:wc:ra_dav:version-url
+V 60
+/open/!svn/ver/7/DSActivityView/Sources/DemoViewController.h
+END
+RootViewController.m
+K 25
+svn:wc:ra_dav:version-url
+V 60
+/open/!svn/ver/7/DSActivityView/Sources/RootViewController.m
+END
+DemoViewController.m
+K 25
+svn:wc:ra_dav:version-url
+V 60
+/open/!svn/ver/7/DSActivityView/Sources/DemoViewController.m
+END
