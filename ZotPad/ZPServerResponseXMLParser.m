@@ -88,39 +88,40 @@
                 ZPZoteroItem* item  = (ZPZoteroItem*) _currentParentElement;
                 
 
-                NSRange range = [string rangeOfString:item.title];
-
-                //Sometimes the title can contain characters that are not formatted properly by the CSL parser on Zotero server. In this case we will just 
-                //give up parsing it
                 
-                if(range.location!=NSNotFound){
-                    //If the citation starts with the title, there are no authors.
-                    if(range.location==0){
-                        //Anything after the first closing parenthesis is publication details
-                        range = [string rangeOfString:@")"];
-                        [item setPublishedIn:[string substringFromIndex:(range.location+1)]];
+                //If there are no authors.
+                if(item.creatorSummary==NULL){
+                    //Anything after the first closing parenthesis is publication details
+                    NSRange range = [string rangeOfString:@")"];
+                    [item setPublishedIn:[string substringFromIndex:(range.location+1)]];
+                }
+                else{
+                    
+                    //Anything before the first parenthesis is author unless it is in italic
+                   
+                    NSString* authors = (NSString*)[[string componentsSeparatedByString:@" ("] objectAtIndex:0];
+                    
+                    if([authors rangeOfString:@"<i>"].location != NSNotFound){
+                        [item setCreatorSummary:authors];
                     }
-                    else{
-                        //Anything before the first parenthesis is author
-                        NSString* authors = (NSString*)[[string componentsSeparatedByString:@" ("] objectAtIndex:0];
-                        [item setAuthors:authors];
-                        
+                    
+                    NSRange range = [string rangeOfString:item.title];
+                    
+                    //Sometimes the title can contain characters that are not formatted properly by the CSL parser on Zotero server. In this case we will just 
+                    //give up parsing it
+                    if(range.location!=NSNotFound){
                         //Anything after the first period after the title is publication details
                         NSInteger index = range.location+range.length;
-                        range = [string rangeOfString:@"." options:NULL range:NSMakeRange(index, ([string length]-index))];
+                        range = [string rangeOfString:@"." options:0 range:NSMakeRange(index, ([string length]-index))];
                         index = (range.location+2);
                         if(index<[string length]){
                             NSString* publishedIn = [string substringFromIndex:index];
                             [item setPublishedIn:publishedIn];
                         }
                     }
-                    
-                    //Trim spaces, periods, and commas from the beginning of the publication detail
-                    [item setPublishedIn:[item.publishedIn stringByTrimmingCharactersInSet:[NSCharacterSet characterSetWithCharactersInString:@"., "]]];
-                }
-                else{
-                    NSLog(@"Parse error: Could not find title (%@) in referece (%@)",item.title,string);
-                }
+                }    
+                //Trim spaces, periods, and commas from the beginning of the publication detail
+                [item setPublishedIn:[item.publishedIn stringByTrimmingCharactersInSet:[NSCharacterSet characterSetWithCharactersInString:@"., "]]];
             }
             //The rest are string and can be handled with selector
             else{

@@ -9,7 +9,7 @@
 #import "ZPItemCacheWriteOperation.h"
 #import "ZPDataLayer.h"
 #import "ZPZoteroItem.h"
-
+#import "ZPDetailViewController.h"
 
 @implementation ZPItemCacheWriteOperation
 
@@ -26,6 +26,12 @@
     id object;
     while ((object = [e nextObject]) && ! self.isCancelled) {
         [[ZPDataLayer instance] addItemToDatabase:(ZPZoteroItem*) object];
+        //TODO: Cache collection memberships
+        
+        //Notify the user interface that this item is now available
+        NSString* key = [(ZPZoteroItem*) object key];
+        ZPDetailViewController* controller=[ZPDetailViewController instance];
+        [controller notifyItemAvailable:key];
     }
 }
 

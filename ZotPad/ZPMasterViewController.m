@@ -39,11 +39,10 @@
 - (void)viewDidLoad
 {
     [super viewDidLoad];
-
+    
     if(! [[ZPServerConnection instance] authenticated]){
         [[ZPServerConnection instance] doAuthenticate: self];
     }    
-
 
     //If the current library is not defined, show a list of libraries
     if(self->_currentLibrary == 0){
@@ -109,7 +108,10 @@
     NSObject <ZPNavigatorNode>* node = [self->_content objectAtIndex: indexPath.row];
     self.detailViewController.libraryID = [node libraryID];
     self.detailViewController.collectionID = [node collectionID];
-    
+
+    //Clear search when changing collection. This is how Zotero behaves
+    [self.detailViewController clearSearch];
+     
     [self.detailViewController configureView];
     
 }

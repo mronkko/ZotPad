@@ -11,29 +11,27 @@
 
 
 @interface ZPZoteroItem : NSObject{
-    NSString* title;
-    NSString* key;
-    NSString* pubishedIn;
-    NSString* authors;
-    NSInteger year;
-    NSInteger libraryID;
-    NSString* itemType;
-    NSString* creatorSummary;
-    NSInteger numChildren;
-    NSInteger numTags;
+    NSString* _title;
+    NSString* _key;
+    NSString* _publishedIn;
+    NSString* _creatorSummary;
+    NSInteger _year;
+    NSInteger _libraryID;
+    NSString* _itemType;
+    NSInteger _numChildren;
+    NSInteger _numTags;
     
-    BOOL hasChildren;
+    BOOL _hasChildren;
 }
 
 @property (retain) NSString* title;
 @property (retain) NSString* key;
-@property (retain) NSString* authors;
+@property (retain) NSString* creatorSummary;
 @property (retain) NSString* publishedIn;
 @property (assign) NSInteger year;
 @property (assign) NSInteger libraryID;
 @property (assign) BOOL hasChildren;
 @property (retain) NSString* itemType;
-@property (retain) NSString* creatorSummary;
 @property (assign) NSInteger numChildren;
 @property (assign) NSInteger numTags;
 

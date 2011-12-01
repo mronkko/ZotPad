@@ -9,7 +9,7 @@
 #import "ZPAppDelegate.h"
 #import "ZPAuthenticationDialog.h"
 #import "ZPServerConnection.h"
-
+#import "ZPDataLayer.h"
 
 @implementation ZPAppDelegate
 
@@ -17,6 +17,10 @@
 
 - (BOOL)application:(UIApplication *)application didFinishLaunchingWithOptions:(NSDictionary *)launchOptions
 {
+    
+    // Update the list of libraries and collections from server
+    [[ZPDataLayer instance] updateLibrariesAndCollectionsFromServer];
+
     
     // Override point for customization after application launch.
     if ([[UIDevice currentDevice] userInterfaceIdiom] == UIUserInterfaceIdiomPad) {

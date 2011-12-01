@@ -61,7 +61,7 @@
 // Calls the methods for retrieving data
 
 -(void)main {
-
+    
     int offset;
     //Find offset by going through the item ID array
     for (offset = 0; offset < [_itemIDs count] && [_itemIDs objectAtIndex:offset] != [NSNull null]; offset++); 
@@ -81,8 +81,7 @@
         //Que an operation to cache these items
     
         [[ZPDataLayer instance] cacheZoteroItems:[parserResults parsedElements]];
-
-        
+              
         offset=offset+50;
 
         //Check if we still have items to retrieve
@@ -110,7 +109,6 @@
         }
         
     }
-    
 }
 
 @end

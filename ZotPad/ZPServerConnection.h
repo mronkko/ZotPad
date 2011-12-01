@@ -31,6 +31,8 @@
     ZPAuthenticationDialog* _authenticationDialog;
  
     BOOL _debugServerConnection;
+    
+    NSInteger _activeRequestCount;
 }
 
 // This class is used as a singleton
@@ -50,4 +52,7 @@
 -(NSArray*) retrieveLibrariesFromServer;
 -(NSArray*) retrieveCollectionsForLibraryFromServer:(NSInteger)libraryID;
 -(ZPServerResponseXMLParser*) retrieveItemsFromLibrary:(NSInteger)libraryID collection:(NSString*)collectionKey searchString:(NSString*)searchString sortField:(NSString*)sortField sortDescending:(BOOL)sortIsDescending limit:(NSInteger)maxCount start:(NSInteger)offset;
+-(void) startedServerRequest;
+-(void) finishedServerRequest;
+
 @end

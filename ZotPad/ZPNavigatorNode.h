@@ -10,4 +10,9 @@
 
 @protocol ZPNavigatorNode <NSObject>
 
+-(BOOL) hasChildren;
+-(NSInteger) libraryID;
+-(NSInteger) collectionID;
+-(NSString*) name;
+
 @end

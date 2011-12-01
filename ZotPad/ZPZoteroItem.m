@@ -10,16 +10,15 @@
 
 @implementation ZPZoteroItem
 
-@synthesize title;
-@synthesize key;
-@synthesize authors;
-@synthesize year;
-@synthesize libraryID;
-@synthesize hasChildren;
-@synthesize publishedIn;
-@synthesize itemType;
-@synthesize creatorSummary;
-@synthesize numChildren;
-@synthesize numTags;
+@synthesize title = _title;
+@synthesize key = _key;
+@synthesize creatorSummary = _creatorSummary;
+@synthesize year = _year;
+@synthesize libraryID = _libraryID;
+@synthesize hasChildren = _hasChildren;
+@synthesize publishedIn = _publishedIn;
+@synthesize itemType = _itemType;
+@synthesize numChildren = _numChildren;
+@synthesize numTags = _numTags;
 
 @end

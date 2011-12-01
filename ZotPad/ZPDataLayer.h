@@ -7,13 +7,13 @@
 //
 
 #import <Foundation/Foundation.h>
-#import <sqlite3.h>
 #import "ZPDetailViewController.h"
 #import "ZPItemRetrieveOperation.h"
 #import "ZPZoteroItem.h"
+#import "../FMDB/src/FMDatabase.h"
+#import "../FMDB/src/FMResultSet.h"
 
 @interface ZPDataLayer : NSObject {
-	sqlite3 *database;
     
     // Is the library and collection tree synced with the server
     BOOL _collectionTreeCached;
@@ -30,25 +30,37 @@
 
 
     // An operation que to fetch items in the background
-    NSOperationQueue* _itemRetrieveQueue;
+    NSOperationQueue* _serverRequestQueue;
 
     // An operation que to write items in the cache in the background
     NSOperationQueue* _itemCacheWriteQueue;
     
     NSString* _currentlyActiveCollectionKey;
+    NSInteger _currentlyActiveLibraryID;
     
     ZPItemRetrieveOperation* _mostRecentItemRetrieveOperation;
 
-    BOOL _debugDatabase;
+    BOOL _debugDataLayer;
+    
+    FMDatabase* _database;
 }
 
 // This class is used as a singleton
 + (ZPDataLayer*) instance;
 
+-(void) updateLibrariesAndCollectionsFromServer;
+
+//This is a private method that does the actual work for retrieving libraries and collections
+-(void) _updateLibrariesAndCollectionsFromServer;
+
 - (NSArray*) libraries;
 - (NSArray*) collections : (NSInteger)currentLibraryID currentCollection:(NSInteger)currentCollectionID;
 
 - (NSArray*) getItemKeysForView:(ZPDetailViewController*)view;
+
+//Retrieves the initial 15 items, called from getItemKeysForView and executed as operation
+- (void) _retrieveAndSetInitialKeysForView:(ZPDetailViewController*)view;
+
 - (ZPZoteroItem*) getItemByKey: (NSString*) key;
 - (NSDictionary*) getFieldsForItem: (NSInteger) itemID;
 - (NSArray*) getCreatorsForItem: (NSInteger) itemID;
@@ -59,11 +71,7 @@
 -(void) addItemToDatabase:(ZPZoteroItem*)item;
 
 -(NSString*) currentlyActiveCollectionKey;
+-(NSInteger) currentlyActiveLibraryID;
 
-
-// Helper functions to prepare and execute statements. All SQL queries should be done through these
-
--(sqlite3_stmt*) prepareStatement:(NSString*) sqlString;
--(void) executeStatement:(NSString*) sqlString;
 
 @end

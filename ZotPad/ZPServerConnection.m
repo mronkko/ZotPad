@@ -6,6 +6,9 @@
 //  Copyright (c) 2011 __MyCompanyName__. All rights reserved.
 //
 
+//TODO: Implement webdav client http://code.google.com/p/wtclient/
+
+
 #import "ZPAppDelegate.h"
 #import "ZPServerConnection.h"
 #import "OAuthConsumer.h"
@@ -24,11 +27,11 @@ static ZPServerConnection* _instance = nil;
     //Load the key from preferences
     
     NSUserDefaults* defaults = [NSUserDefaults standardUserDefaults];
-    self->_oauthkey = [defaults objectForKey:@"OAuthKey"];
-	self->_userID = [defaults objectForKey:@"userID"];
-    self->_username = [defaults objectForKey:@"username"];
-    
-    _debugServerConnection = TRUE;
+    _oauthkey = [defaults objectForKey:@"OAuthKey"];
+	_userID = [defaults objectForKey:@"userID"];
+    _username = [defaults objectForKey:@"username"];
+    _activeRequestCount = 0;
+    _debugServerConnection = FALSE;
     
     return self;
 }
@@ -90,6 +93,9 @@ static ZPServerConnection* _instance = nil;
     
     OADataFetcher *fetcher = [[OADataFetcher alloc] init];
     
+    [self startedServerRequest];
+
+
     if(token==nil){
         [fetcher fetchDataWithRequest:request
                          delegate:self
@@ -103,11 +109,14 @@ static ZPServerConnection* _instance = nil;
                         didFinishSelector:@selector(requestAccessToken:didFinishWithData:)
              
                           didFailSelector:@selector(requestAccessToken:didFailWithError:)];
-        }
+    }
 
 }
 
 - (void)requestTokenTicket:(OAServiceTicket *)ticket didFinishWithData:(NSData *)data {
+    
+    [self finishedServerRequest];
+
     if (ticket.didSucceed) {
         NSString *responseBody = [[NSString alloc] initWithData:data
                                                        encoding:NSUTF8StringEncoding];
@@ -124,6 +133,10 @@ static ZPServerConnection* _instance = nil;
 }
 
 - (void)requestAccessToken:(OAServiceTicket *)ticket didFinishWithData:(NSData *)data {
+    
+    [self finishedServerRequest];
+
+
     if (ticket.didSucceed) {
         NSString *responseBody = [[NSString alloc] initWithData:data
                                                        encoding:NSUTF8StringEncoding];
@@ -147,9 +160,6 @@ static ZPServerConnection* _instance = nil;
         [[NSUserDefaults standardUserDefaults] setValue:username forKey:@"username"];
         self->_username = username;
         
-        //Force update from server
-//TODO:        [(UITableViewController*) self->_sourceViewController reloadData];
-        
         //Dismiss the modal dialog
         [ self->_authenticationDialog dismissModalViewControllerAnimated:YES];
 
@@ -160,37 +170,57 @@ static ZPServerConnection* _instance = nil;
 }
 
 - (void)requestTokenTicket:(OAServiceTicket *)ticket didFailWithError:(NSError *)error {
+   
+    [self finishedServerRequest];
+
     NSLog(@"Error");
 }
 - (void)requestAccessToken:(OAServiceTicket *)ticket didFailWithError:(NSError *)error {
+
+    [self finishedServerRequest];
+
     NSLog(@"Error");
 }
+
 
 
 -(NSArray*) retrieveLibrariesFromServer{
         
     //Retrieve all libraries from the server
     
+
+    
+
     NSURL *fileURL = [NSURL URLWithString:[NSString stringWithFormat:@"https://api.zotero.org/users/%@/groups?key=%@&content=none",_userID,_oauthkey]];
+    
+    [self startedServerRequest];
+    
     NSXMLParser *parser = [[NSXMLParser alloc] initWithContentsOfURL:fileURL];
 
     ZPServerResponseXMLParser* parserDelegate =  [[ZPServerResponseXMLParser alloc] init];
     
     [parser setDelegate: parserDelegate];
     [parser parse];
-    
+
+    [self finishedServerRequest];
+
     NSArray* returnArray = [parserDelegate parsedElements];
     
     //If there is more data coming, retrieve it
     while([returnArray count] < parserDelegate.totalResults){
         fileURL = [NSURL URLWithString:[NSString stringWithFormat:@"https://api.zotero.org/users/%@/groups?key=%@&content=none&start=%i",
                                         _userID,_oauthkey,[returnArray count]]];
+
+        [self startedServerRequest];
+        
         parser = [[NSXMLParser alloc] initWithContentsOfURL:fileURL];
         
         parserDelegate =  [[ZPServerResponseXMLParser alloc] init];
         
         [parser setDelegate: parserDelegate];
         [parser parse];
+        
+        [self finishedServerRequest];
         
         returnArray=[returnArray arrayByAddingObjectsFromArray:parserDelegate.parsedElements];
     }
@@ -215,12 +245,16 @@ static ZPServerConnection* _instance = nil;
         NSLog(@"%@",[fileURL absoluteURL]);
     }
 
+    [self startedServerRequest];
+    
     NSXMLParser *parser = [[NSXMLParser alloc] initWithContentsOfURL:fileURL];
     
     ZPServerResponseXMLParser* parserDelegate =  [[ZPServerResponseXMLParser alloc] init];
     
     [parser setDelegate: parserDelegate];
     [parser parse];
+    
+    [self finishedServerRequest];
     
     NSArray* returnArray = [parserDelegate parsedElements];
     
@@ -234,12 +268,16 @@ static ZPServerConnection* _instance = nil;
             fileURL = [NSURL URLWithString:[NSString stringWithFormat:@"https://api.zotero.org/groups/%i/collections?key=%@&start=%i",libraryID,_oauthkey,[returnArray count]]];        
         }
 
+        [self startedServerRequest];
+        
         parser = [[NSXMLParser alloc] initWithContentsOfURL:fileURL];
         
         parserDelegate =  [[ZPServerResponseXMLParser alloc] init];
         
         [parser setDelegate: parserDelegate];
         [parser parse];
+        
+        [self finishedServerRequest];
         
         returnArray=[returnArray arrayByAddingObjectsFromArray:parserDelegate.parsedElements];
     }
@@ -262,7 +300,7 @@ Retrieves items from server and stores these in the database. Returns and array 
     
     NSString* urlString = @"https://api.zotero.org/";
     
-    if(libraryID==0){
+    if(libraryID==1){
         urlString = [NSString stringWithFormat:@"%@users/%@/",urlString,_userID];
     }
     else{
@@ -280,7 +318,8 @@ Retrieves items from server and stores these in the database. Returns and array 
     
     //Search
     if(searchString!=NULL && ! [searchString isEqualToString:@""]){
-        urlString = [NSString stringWithFormat:@"&q=%@",urlString,searchString];
+        urlString = [NSString stringWithFormat:@"%@&q=%@",urlString,[searchString stringByAddingPercentEscapesUsingEncoding:
+                                                                   NSASCIIStringEncoding]];
     }
     //Sort
     if(sortField!=NULL){
@@ -308,12 +347,16 @@ Retrieves items from server and stores these in the database. Returns and array 
     NSURL* fileURL = [NSURL URLWithString:urlString];        
     
     
+    [self startedServerRequest];
+    
     NSXMLParser *parser = [[NSXMLParser alloc] initWithContentsOfURL:fileURL];
     
     ZPServerResponseXMLParser* parserDelegate =  [[ZPServerResponseXMLParser alloc] init];
     
     [parser setDelegate: parserDelegate];
     [parser parse];
+    
+    [self finishedServerRequest];
     
     if(_debugServerConnection){
         NSLog(@"Response contained %i elements and we got %i",parserDelegate.totalResults,[[parserDelegate parsedElements] count]);
@@ -322,5 +365,20 @@ Retrieves items from server and stores these in the database. Returns and array 
     return parserDelegate;
     
 }
+
+-(void) startedServerRequest{
+    
+    _activeRequestCount++;
+    //First request starts the network indicator
+    if(_activeRequestCount==1) [[UIApplication sharedApplication] setNetworkActivityIndicatorVisible:YES];
+
+}
+-(void) finishedServerRequest{
+    
+    _activeRequestCount--;
+    //Last request hides the network indicator
+    if(_activeRequestCount==0) [[UIApplication sharedApplication] setNetworkActivityIndicatorVisible:NO];
+}
+
 
 @end
