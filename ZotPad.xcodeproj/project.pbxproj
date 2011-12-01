@@ -22,7 +22,6 @@
 		A7200DDF14718DC0004347C9 /* InfoPlist.strings in Resources */ = {isa = PBXBuildFile; fileRef = A7200DDD14718DC0004347C9 /* InfoPlist.strings */; };
 		A7200DE114718DC0004347C9 /* main.m in Sources */ = {isa = PBXBuildFile; fileRef = A7200DE014718DC0004347C9 /* main.m */; };
 		A7200DE514718DC0004347C9 /* ZPAppDelegate.m in Sources */ = {isa = PBXBuildFile; fileRef = A7200DE414718DC0004347C9 /* ZPAppDelegate.m */; };
-		A7200DE814718DC1004347C9 /* MainStoryboard_iPad.storyboard in Resources */ = {isa = PBXBuildFile; fileRef = A7200DE614718DC1004347C9 /* MainStoryboard_iPad.storyboard */; };
 		A7200DEB14718DC1004347C9 /* ZPMasterViewController.m in Sources */ = {isa = PBXBuildFile; fileRef = A7200DEA14718DC1004347C9 /* ZPMasterViewController.m */; };
 		A7200DEE14718DC1004347C9 /* ZPDetailViewController.m in Sources */ = {isa = PBXBuildFile; fileRef = A7200DED14718DC1004347C9 /* ZPDetailViewController.m */; };
 		A7200DF614718F44004347C9 /* ZPDataLayer.m in Sources */ = {isa = PBXBuildFile; fileRef = A7200DF514718F44004347C9 /* ZPDataLayer.m */; };
@@ -30,6 +29,7 @@
 		A72853F9147E319700D3FE97 /* ZPZoteroLibrary.m in Sources */ = {isa = PBXBuildFile; fileRef = A72853F8147E319600D3FE97 /* ZPZoteroLibrary.m */; };
 		A72853FD147E31B600D3FE97 /* ZPZoteroCollection.m in Sources */ = {isa = PBXBuildFile; fileRef = A72853FC147E31B500D3FE97 /* ZPZoteroCollection.m */; };
 		A7285406147E55C100D3FE97 /* ZPItemCacheWriteOperation.m in Sources */ = {isa = PBXBuildFile; fileRef = A7285405147E55C000D3FE97 /* ZPItemCacheWriteOperation.m */; };
+		A72C3CA71487C9DA00F6744E /* MainStoryboard_iPad.storyboard in Resources */ = {isa = PBXBuildFile; fileRef = A72C3CA61487C9DA00F6744E /* MainStoryboard_iPad.storyboard */; };
 		A737A461147C24A700174E16 /* ZPItemRetrieveOperation.m in Sources */ = {isa = PBXBuildFile; fileRef = A737A460147C24A700174E16 /* ZPItemRetrieveOperation.m */; };
 		A73D635114879D15007999F3 /* Settings.bundle in Resources */ = {isa = PBXBuildFile; fileRef = A73D635014879D15007999F3 /* Settings.bundle */; };
 		A74348D7147AB37A00DA6FC3 /* ZPAuthenticationDialog.m in Sources */ = {isa = PBXBuildFile; fileRef = A74348D6147AB37A00DA6FC3 /* ZPAuthenticationDialog.m */; };
@@ -235,7 +235,6 @@
 		A7200DE214718DC0004347C9 /* ZotPad-Prefix.pch */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = "ZotPad-Prefix.pch"; sourceTree = "<group>"; };
 		A7200DE314718DC0004347C9 /* ZPAppDelegate.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = ZPAppDelegate.h; sourceTree = "<group>"; };
 		A7200DE414718DC0004347C9 /* ZPAppDelegate.m */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.objc; path = ZPAppDelegate.m; sourceTree = "<group>"; };
-		A7200DE714718DC1004347C9 /* en */ = {isa = PBXFileReference; lastKnownFileType = file.storyboard; name = en; path = en.lproj/MainStoryboard_iPad.storyboard; sourceTree = "<group>"; };
 		A7200DE914718DC1004347C9 /* ZPMasterViewController.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = ZPMasterViewController.h; sourceTree = "<group>"; };
 		A7200DEA14718DC1004347C9 /* ZPMasterViewController.m */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.objc; path = ZPMasterViewController.m; sourceTree = "<group>"; };
 		A7200DEC14718DC1004347C9 /* ZPDetailViewController.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = ZPDetailViewController.h; sourceTree = "<group>"; };
@@ -249,6 +248,7 @@
 		A72853FC147E31B500D3FE97 /* ZPZoteroCollection.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = ZPZoteroCollection.m; sourceTree = "<group>"; };
 		A7285404147E55C000D3FE97 /* ZPItemCacheWriteOperation.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = ZPItemCacheWriteOperation.h; sourceTree = "<group>"; };
 		A7285405147E55C000D3FE97 /* ZPItemCacheWriteOperation.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = ZPItemCacheWriteOperation.m; sourceTree = "<group>"; };
+		A72C3CA61487C9DA00F6744E /* MainStoryboard_iPad.storyboard */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = file.storyboard; path = MainStoryboard_iPad.storyboard; sourceTree = "<group>"; };
 		A737A45F147C24A600174E16 /* ZPItemRetrieveOperation.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = ZPItemRetrieveOperation.h; sourceTree = "<group>"; };
 		A737A460147C24A700174E16 /* ZPItemRetrieveOperation.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = ZPItemRetrieveOperation.m; sourceTree = "<group>"; };
 		A73D635014879D15007999F3 /* Settings.bundle */ = {isa = PBXFileReference; explicitFileType = wrapper.application; name = Settings.bundle; path = ../Settings.bundle; sourceTree = "<group>"; };
@@ -483,7 +483,7 @@
 				A74348D6147AB37A00DA6FC3 /* ZPAuthenticationDialog.m */,
 				A7A3F94C147AE0F200CA7266 /* Authenticate.xib */,
 				A786F7771476A56200B35B92 /* MainStoryboard_iPhone.storyboard */,
-				A7200DE614718DC1004347C9 /* MainStoryboard_iPad.storyboard */,
+				A72C3CA61487C9DA00F6744E /* MainStoryboard_iPad.storyboard */,
 			);
 			name = "UI and delegate files";
 			sourceTree = "<group>";
@@ -796,11 +796,11 @@
 			files = (
 				320B6C86F11D9990244A9731 /* Three20.bundle in Resources */,
 				A7200DDF14718DC0004347C9 /* InfoPlist.strings in Resources */,
-				A7200DE814718DC1004347C9 /* MainStoryboard_iPad.storyboard in Resources */,
 				A786F7781476A56200B35B92 /* MainStoryboard_iPhone.storyboard in Resources */,
 				A7A3F94D147AE0F200CA7266 /* Authenticate.xib in Resources */,
 				A7A3F950147BAB6C00CA7266 /* database.sql in Resources */,
 				A73D635114879D15007999F3 /* Settings.bundle in Resources */,
+				A72C3CA71487C9DA00F6744E /* MainStoryboard_iPad.storyboard in Resources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
@@ -896,14 +896,6 @@
 				A7200DDE14718DC0004347C9 /* en */,
 			);
 			name = InfoPlist.strings;
-			sourceTree = "<group>";
-		};
-		A7200DE614718DC1004347C9 /* MainStoryboard_iPad.storyboard */ = {
-			isa = PBXVariantGroup;
-			children = (
-				A7200DE714718DC1004347C9 /* en */,
-			);
-			name = MainStoryboard_iPad.storyboard;
 			sourceTree = "<group>";
 		};
 /* End PBXVariantGroup section */
