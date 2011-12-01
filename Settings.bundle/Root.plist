@@ -8,7 +8,17 @@
 			<key>Type</key>
 			<string>PSGroupSpecifier</string>
 			<key>Title</key>
-			<string>ZotPad settings</string>
+			<string>Basic settings</string>
+		</dict>
+		<dict>
+			<key>Type</key>
+			<string>PSTitleValueSpecifier</string>
+			<key>DefaultValue</key>
+			<string>Not set</string>
+			<key>Title</key>
+			<string>Username</string>
+			<key>Key</key>
+			<string>username</string>
 		</dict>
 		<dict>
 			<key>Type</key>
@@ -34,7 +44,7 @@
 		</dict>
 		<dict>
 			<key>Key</key>
-			<string>cachesize</string>
+			<string>cachesizemax</string>
 			<key>DefaultValue</key>
 			<string>0.5</string>
 			<key>Type</key>
@@ -65,6 +75,108 @@
 			</array>
 		</dict>
 		<dict>
+			<key>Type</key>
+			<string>PSTitleValueSpecifier</string>
+			<key>Title</key>
+			<string>Current cache size</string>
+			<key>Key</key>
+			<string>cachesizecurrent</string>
+			<key>DefaultValue</key>
+			<string>Unavailable</string>
+		</dict>
+		<dict>
+			<key>FooterText</key>
+			<string>ZotPad will preemptively retrieve item data and attachments in the background. Adjusting these settings will affect how much bandwidth and disk space is used for this process. Smart caching will save bandwidth by limiting how often data is recached. Disabling smart caching and enabling preemptive cache for all data for all libraries is not recommended because it will force ZotPad to reload most of the data from Zotero server every time the application is started.</string>
+			<key>Type</key>
+			<string>PSGroupSpecifier</string>
+			<key>Title</key>
+			<string>Preemptive caching</string>
+		</dict>
+		<dict>
+			<key>Type</key>
+			<string>PSMultiValueSpecifier</string>
+			<key>Title</key>
+			<string>Item data</string>
+			<key>Key</key>
+			<string>preemptivecachemetadata</string>
+			<key>DefaultValue</key>
+			<string>activecollections</string>
+			<key>Titles</key>
+			<array>
+				<string>Off</string>
+				<string>Active collections</string>
+				<string>Active libraries</string>
+				<string>All libraries</string>
+			</array>
+			<key>Values</key>
+			<array>
+				<string>off</string>
+				<string>activecollections</string>
+				<string>activelibraries</string>
+				<string>alllibraries</string>
+			</array>
+		</dict>
+		<dict>
+			<key>Type</key>
+			<string>PSMultiValueSpecifier</string>
+			<key>Title</key>
+			<string>Attachment files</string>
+			<key>Key</key>
+			<string>preemptivecacheattachmentfiles</string>
+			<key>DefaultValue</key>
+			<string>activeitems</string>
+			<key>Titles</key>
+			<array>
+				<string>Off</string>
+				<string>Active items</string>
+				<string>Active collections</string>
+				<string>Active libraries</string>
+				<string>All libraries</string>
+			</array>
+			<key>Values</key>
+			<array>
+				<string>off</string>
+				<string>activeitems</string>
+				<string>activecollections</string>
+				<string>activelibraries</string>
+				<string>alllibraries</string>
+			</array>
+		</dict>
+		<dict>
+			<key>Values</key>
+			<array>
+				<string>off</string>
+				<string>activelibraries</string>
+				<string>alllibraries</string>
+			</array>
+			<key>Type</key>
+			<string>PSMultiValueSpecifier</string>
+			<key>Title</key>
+			<string>Collection memberships</string>
+			<key>Key</key>
+			<string>preemtptivecachecollections</string>
+			<key>DefaultValue</key>
+			<string>off</string>
+			<key>Titles</key>
+			<array>
+				<string>Off</string>
+				<string>Active libraries</string>
+				<string>All libraries</string>
+			</array>
+		</dict>
+		<dict>
+			<key>Type</key>
+			<string>PSToggleSwitchSpecifier</string>
+			<key>Title</key>
+			<string>Smart caching</string>
+			<key>Key</key>
+			<string>preemtivecachesmart</string>
+			<key>DefaultValue</key>
+			<true/>
+		</dict>
+		<dict>
+			<key>FooterText</key>
+			<string>These preferences will reset ZotPad data when it is next started.</string>
 			<key>Type</key>
 			<string>PSGroupSpecifier</string>
 			<key>Title</key>
