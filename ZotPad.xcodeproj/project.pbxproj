@@ -35,13 +35,12 @@
 		A74348D7147AB37A00DA6FC3 /* ZPAuthenticationDialog.m in Sources */ = {isa = PBXBuildFile; fileRef = A74348D6147AB37A00DA6FC3 /* ZPAuthenticationDialog.m */; };
 		A7692D84147D112D000C1A8F /* ZPZoteroItem.m in Sources */ = {isa = PBXBuildFile; fileRef = A7692D83147D112D000C1A8F /* ZPZoteroItem.m */; };
 		A786F7781476A56200B35B92 /* MainStoryboard_iPhone.storyboard in Resources */ = {isa = PBXBuildFile; fileRef = A786F7771476A56200B35B92 /* MainStoryboard_iPhone.storyboard */; };
-		A7A3F94D147AE0F200CA7266 /* Authenticate.xib in Resources */ = {isa = PBXBuildFile; fileRef = A7A3F94C147AE0F200CA7266 /* Authenticate.xib */; };
 		A7A3F950147BAB6C00CA7266 /* database.sql in Resources */ = {isa = PBXBuildFile; fileRef = A7A3F94F147BAB6C00CA7266 /* database.sql */; };
 		A7A3F953147BBCCB00CA7266 /* ZPServerResponseXMLParser.m in Sources */ = {isa = PBXBuildFile; fileRef = A7A3F952147BBCCA00CA7266 /* ZPServerResponseXMLParser.m */; };
 		A7A54B0B14878E4F00EBAD80 /* FMDatabase.m in Sources */ = {isa = PBXBuildFile; fileRef = A7A54B0614878E4F00EBAD80 /* FMDatabase.m */; settings = {COMPILER_FLAGS = "-fno-objc-arc"; }; };
 		A7A54B0C14878E4F00EBAD80 /* FMDatabaseAdditions.m in Sources */ = {isa = PBXBuildFile; fileRef = A7A54B0814878E4F00EBAD80 /* FMDatabaseAdditions.m */; settings = {COMPILER_FLAGS = "-fno-objc-arc"; }; };
 		A7A54B0D14878E4F00EBAD80 /* FMResultSet.m in Sources */ = {isa = PBXBuildFile; fileRef = A7A54B0A14878E4F00EBAD80 /* FMResultSet.m */; settings = {COMPILER_FLAGS = "-fno-objc-arc"; }; };
-		A7A54B1114878EE000EBAD80 /* DSActivityView.m in Sources */ = {isa = PBXBuildFile; fileRef = A7A54B1014878EE000EBAD80 /* DSActivityView.m */; settings = {COMPILER_FLAGS = "-fno-objc-arc"; }; };
+		A7A54B1114878EE000EBAD80 /* DSActivityView.m in Sources */ = {isa = PBXBuildFile; fileRef = A7A54B1014878EE000EBAD80 /* DSActivityView.m */; };
 		A7A7C9B1147A8144004D8756 /* ZPServerConnection.m in Sources */ = {isa = PBXBuildFile; fileRef = A7A7C9B0147A8144004D8756 /* ZPServerConnection.m */; };
 		A7A7C9F8147AA2EE004D8756 /* NSMutableURLRequest+Parameters.m in Sources */ = {isa = PBXBuildFile; fileRef = A7A7C9D0147AA2EE004D8756 /* NSMutableURLRequest+Parameters.m */; settings = {COMPILER_FLAGS = "-fno-objc-arc"; }; };
 		A7A7C9F9147AA2EE004D8756 /* NSString+URLEncoding.m in Sources */ = {isa = PBXBuildFile; fileRef = A7A7C9D2147AA2EE004D8756 /* NSString+URLEncoding.m */; settings = {COMPILER_FLAGS = "-fno-objc-arc"; }; };
@@ -63,6 +62,7 @@
 		A7A7CA0A147AA2EE004D8756 /* OATokenManager.m in Sources */ = {isa = PBXBuildFile; fileRef = A7A7C9F5147AA2EE004D8756 /* OATokenManager.m */; settings = {COMPILER_FLAGS = "-fno-objc-arc"; }; };
 		A7A7CA0D147AA329004D8756 /* Security.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = A7A7CA0C147AA329004D8756 /* Security.framework */; };
 		A7A7CA0F147AA33A004D8756 /* libxml2.dylib in Frameworks */ = {isa = PBXBuildFile; fileRef = A7A7CA0E147AA339004D8756 /* libxml2.dylib */; };
+		A7B5180B14880CE700806EED /* ZPAuthenticationProcess.m in Sources */ = {isa = PBXBuildFile; fileRef = A7B5180A14880CE700806EED /* ZPAuthenticationProcess.m */; };
 /* End PBXBuildFile section */
 
 /* Begin PBXContainerItemProxy section */
@@ -257,7 +257,6 @@
 		A7692D82147D112D000C1A8F /* ZPZoteroItem.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = ZPZoteroItem.h; sourceTree = "<group>"; };
 		A7692D83147D112D000C1A8F /* ZPZoteroItem.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = ZPZoteroItem.m; sourceTree = "<group>"; };
 		A786F7771476A56200B35B92 /* MainStoryboard_iPhone.storyboard */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = file.storyboard; path = MainStoryboard_iPhone.storyboard; sourceTree = "<group>"; };
-		A7A3F94C147AE0F200CA7266 /* Authenticate.xib */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = file.xib; path = Authenticate.xib; sourceTree = "<group>"; };
 		A7A3F94F147BAB6C00CA7266 /* database.sql */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = text; path = database.sql; sourceTree = "<group>"; };
 		A7A3F951147BBCCA00CA7266 /* ZPServerResponseXMLParser.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = ZPServerResponseXMLParser.h; sourceTree = "<group>"; };
 		A7A3F952147BBCCA00CA7266 /* ZPServerResponseXMLParser.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = ZPServerResponseXMLParser.m; sourceTree = "<group>"; };
@@ -313,6 +312,8 @@
 		A7A7C9F7147AA2EE004D8756 /* README */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = text; name = README; path = oauthconsumer/README; sourceTree = SOURCE_ROOT; };
 		A7A7CA0C147AA329004D8756 /* Security.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; name = Security.framework; path = System/Library/Frameworks/Security.framework; sourceTree = SDKROOT; };
 		A7A7CA0E147AA339004D8756 /* libxml2.dylib */ = {isa = PBXFileReference; lastKnownFileType = "compiled.mach-o.dylib"; name = libxml2.dylib; path = usr/lib/libxml2.dylib; sourceTree = SDKROOT; };
+		A7B5180914880CE600806EED /* ZPAuthenticationProcess.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = ZPAuthenticationProcess.h; sourceTree = "<group>"; };
+		A7B5180A14880CE700806EED /* ZPAuthenticationProcess.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = ZPAuthenticationProcess.m; sourceTree = "<group>"; };
 		A7CCFE8614865E5900570515 /* ZPNavigatorNode.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = ZPNavigatorNode.h; sourceTree = "<group>"; };
 /* End PBXFileReference section */
 
@@ -481,7 +482,6 @@
 				A7200DED14718DC1004347C9 /* ZPDetailViewController.m */,
 				A74348D5147AB37A00DA6FC3 /* ZPAuthenticationDialog.h */,
 				A74348D6147AB37A00DA6FC3 /* ZPAuthenticationDialog.m */,
-				A7A3F94C147AE0F200CA7266 /* Authenticate.xib */,
 				A786F7771476A56200B35B92 /* MainStoryboard_iPhone.storyboard */,
 				A72C3CA61487C9DA00F6744E /* MainStoryboard_iPad.storyboard */,
 			);
@@ -491,6 +491,8 @@
 		A72853FF147E343A00D3FE97 /* Data layer and server connection */ = {
 			isa = PBXGroup;
 			children = (
+				A7B5180914880CE600806EED /* ZPAuthenticationProcess.h */,
+				A7B5180A14880CE700806EED /* ZPAuthenticationProcess.m */,
 				A7200DF414718F44004347C9 /* ZPDataLayer.h */,
 				A7200DF514718F44004347C9 /* ZPDataLayer.m */,
 				A7A7C9AF147A8144004D8756 /* ZPServerConnection.h */,
@@ -797,7 +799,6 @@
 				320B6C86F11D9990244A9731 /* Three20.bundle in Resources */,
 				A7200DDF14718DC0004347C9 /* InfoPlist.strings in Resources */,
 				A786F7781476A56200B35B92 /* MainStoryboard_iPhone.storyboard in Resources */,
-				A7A3F94D147AE0F200CA7266 /* Authenticate.xib in Resources */,
 				A7A3F950147BAB6C00CA7266 /* database.sql in Resources */,
 				A73D635114879D15007999F3 /* Settings.bundle in Resources */,
 				A72C3CA71487C9DA00F6744E /* MainStoryboard_iPad.storyboard in Resources */,
@@ -846,6 +847,7 @@
 				A7A54B0C14878E4F00EBAD80 /* FMDatabaseAdditions.m in Sources */,
 				A7A54B0D14878E4F00EBAD80 /* FMResultSet.m in Sources */,
 				A7A54B1114878EE000EBAD80 /* DSActivityView.m in Sources */,
+				A7B5180B14880CE700806EED /* ZPAuthenticationProcess.m in Sources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};

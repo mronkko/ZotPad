@@ -31,7 +31,7 @@
 - (void)notifyDataAvailable;
 - (void)notifyItemAvailable:(NSString*) key;
 - (void)_refreshCellAtIndexPaths:(NSArray*)indexPath;
-
+- (void)makeBusy;
 
 @property (nonatomic, retain) IBOutlet UITableView* itemTableView;
 @property (nonatomic, retain) IBOutlet UISearchBar* searchBar;

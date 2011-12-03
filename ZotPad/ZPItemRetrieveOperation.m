@@ -69,7 +69,8 @@
     while( ! self.isCancelled) {
     
         ZPServerResponseXMLParser* parserResults = [[ZPServerConnection instance] retrieveItemsFromLibrary:_libraryID collection:_collectionKey searchString:_searchString sortField:_sortField sortDescending:_sortIsDescending limit:50 start:offset];
-    
+        
+        if(parserResults==NULL) return;
     
         //Fill in what we got from the parser 
     

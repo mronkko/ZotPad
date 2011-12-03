@@ -77,15 +77,25 @@ static ZPDetailViewController* _instance = nil;
     if(_libraryID!=0){
         _itemKeysShown = [[ZPDataLayer instance] getItemKeysForView: self];
         if(_itemKeysShown == NULL){
-            //If we are not already displaying an activity view, do so now
-            if(_activityView==NULL){
-                [self.itemTableView setUserInteractionEnabled:FALSE];
-                _activityView = [DSBezelActivityView newActivityViewForView:self.itemTableView];
-            }
+            [self makeBusy];
         }
         else{
             [self.itemTableView reloadData];
         }     
+    }
+}
+
+//If we are not already displaying an activity view, do so now
+
+- (void)makeBusy{
+    if(_activityView==NULL){
+        if([NSThread isMainThread]){
+        [self.itemTableView setUserInteractionEnabled:FALSE];
+        _activityView = [DSBezelActivityView newActivityViewForView:self.itemTableView];
+        }
+        else{
+            [self performSelectorOnMainThread:@selector(notifyDataAvailable) withObject:nil waitUntilDone:NO];
+        }   
     }
 }
 

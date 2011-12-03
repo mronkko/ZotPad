@@ -9,20 +9,20 @@
 #import "ZPAuthenticationDialog.h"
 #import "ZPServerConnection.h"
 #import "OAToken.h"
+#import "ZPDataLayer.h"
+#import "ZPAuthenticationProcess.h"
 
 @implementation ZPAuthenticationDialog
 
-@synthesize webView;
-@synthesize token;
 
-- (id)initWithNibName:(NSString *)nibNameOrNil bundle:(NSBundle *)nibBundleOrNil
-{
-    self = [super initWithNibName:nibNameOrNil bundle:nibBundleOrNil];
-    if (self) {
-        // Custom initialization
-    }
-    return self;
+@synthesize webView;
+
+static ZPAuthenticationDialog* _instance = nil;
+
++(ZPAuthenticationDialog*) instance {
+    return _instance;
 }
+
 
 - (void)didReceiveMemoryWarning
 {
@@ -43,7 +43,13 @@
 
 - (void)viewDidLoad {
     
-    NSString *urlAddress = [NSString stringWithFormat:@"https://www.zotero.org/oauth/authorize?oauth_token=%@",[self.token key]];
+    _instance = self;    
+}
+
+- (void)setKeyAndLoadZoteroSite:(NSString*) key{
+    NSLog(@"Starting loading Zotero website");
+    
+    NSString *urlAddress = [NSString stringWithFormat:@"https://www.zotero.org/oauth/authorize?oauth_token=%@",key];
     
     //Create a URL object.
     NSURL *url = [NSURL URLWithString:urlAddress];
@@ -54,9 +60,10 @@
     //Load the request in the UIWebView.
     [[self webView] loadRequest:requestObj];
     
+    
     NSLog(@"Done loading");
-}
 
+}
 - (BOOL)webView:(UIWebView *)webView shouldStartLoadWithRequest:(NSURLRequest *)request navigationType:(UIWebViewNavigationType)navigationType{
 
     NSString* urlString = [[request mainDocumentURL] absoluteString];
@@ -68,9 +75,10 @@
         
         //Get permanent key with the temporary key
         NSString* verifier=[[urlString componentsSeparatedByString:@"="] lastObject];
-        [self.token setValue:verifier forKey:@"verifier"];
-        [[ZPServerConnection instance] makeOAuthRequest:self.token];
         
+        [[ZPAuthenticationProcess instance] processVerifier:verifier];
+        [self dismissModalViewControllerAnimated:YES];
+            
         return FALSE;
     }
     else{
@@ -90,14 +98,20 @@
     [super viewDidUnload];
     // Release any retained subviews of the main view.
     // e.g. self.myOutlet = nil;
+    
+    _instance = NULL;
 }
 
 - (BOOL)shouldAutorotateToInterfaceOrientation:(UIInterfaceOrientation)interfaceOrientation
 {
     // Return YES for supported orientations
     // return (interfaceOrientation == UIInterfaceOrientationPortrait);
-    return (UIInterfaceOrientationIsLandscape(interfaceOrientation));
-    //return YES;
+    // return (UIInterfaceOrientationIsLandscape(interfaceOrientation));
+    return YES;
 }
+
+
+
+
 
 @end

@@ -7,20 +7,45 @@
 //
 
 #import "ZPAppDelegate.h"
-#import "ZPAuthenticationDialog.h"
 #import "ZPServerConnection.h"
 #import "ZPDataLayer.h"
+#import "ZPAuthenticationProcess.h"
 
 @implementation ZPAppDelegate
 
 @synthesize window = _window;
 
+
 - (BOOL)application:(UIApplication *)application didFinishLaunchingWithOptions:(NSDictionary *)launchOptions
 {
+    // If any of the reset options are set process these first
     
-    // Update the list of libraries and collections from server
-    [[ZPDataLayer instance] updateLibrariesAndCollectionsFromServer];
+    NSUserDefaults* defaults = [NSUserDefaults standardUserDefaults];
 
+    if([defaults boolForKey:@"resetusername"]){
+        NSLog(@"Reseting username");
+        [defaults removeObjectForKey:@"username"];
+        [defaults removeObjectForKey:@"userID"];
+        [defaults removeObjectForKey:@"OAuthKey"];
+        [defaults removeObjectForKey:@"resetusername"];
+    }
+
+    if([defaults boolForKey:@"resetitemdata"]){
+        NSLog(@"Reseting itemdata");
+        [defaults removeObjectForKey:@"resetitemdata"];
+        NSString *dbPath = [[NSSearchPathForDirectoriesInDomains(NSDocumentDirectory, NSUserDomainMask, YES) objectAtIndex:0] stringByAppendingPathComponent:@"zotpad.sqlite"];
+        [[NSFileManager defaultManager] removeItemAtPath: dbPath error:NULL];
+    }
+
+    if([defaults boolForKey:@"resetfiles"]){
+        NSLog(@"Reseting files");
+        [defaults removeObjectForKey:@"resetfiles"];
+        NSString *dbPath = [[NSSearchPathForDirectoriesInDomains(NSDocumentDirectory, NSUserDomainMask, YES) objectAtIndex:0] stringByAppendingPathComponent:@"storage"];
+        [[NSFileManager defaultManager] removeItemAtPath: dbPath error:NULL];
+    }
+
+    //Set up a background operation for retrieving data
+    //[[ZPDataLayer instance] updateLibrariesAndCollectionsFromServer];
     
     // Override point for customization after application launch.
     if ([[UIDevice currentDevice] userInterfaceIdiom] == UIUserInterfaceIdiomPad) {
@@ -70,6 +95,8 @@
      Save data if appropriate.
      See also applicationDidEnterBackground:.
      */
+    
+    
 }
 
 @end

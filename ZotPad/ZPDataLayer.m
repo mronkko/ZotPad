@@ -21,6 +21,9 @@
 #import "ZPServerConnection.h"
 #import "ZPServerResponseXMLParser.h"
 
+//User interface
+#import "ZPMasterViewController.h"
+
 //DB library
 #import "../FMDB/src/FMDatabase.h"
 #import "../FMDB/src/FMResultSet.h"
@@ -41,17 +44,12 @@ static ZPDataLayer* _instance = nil;
     
 
     NSError* error;
-    
-    /*
-    //Delete the file if it exists. This is just to always start with an empty cache while developing.
-    [[NSFileManager defaultManager] removeItemAtPath: dbPath error:&error];
-    NSLog(@"%@",error);
-    */
-    
+        
     _database = [FMDatabase databaseWithPath:dbPath];
     [_database open];
     [_database setTraceExecution:_debugDataLayer];
-    
+    [_database setLogsErrors:_debugDataLayer];
+     
     //Read the database structure from file and create the database
     
     NSStringEncoding encoding;
@@ -65,7 +63,7 @@ static ZPDataLayer* _instance = nil;
     NSEnumerator *e = [sqlStatements objectEnumerator];
     id sqlString;
     while (sqlString = [e nextObject]) {
-        [_database executeQuery:sqlString];
+        [_database executeUpdate:sqlString];
     }
     
     //Initialize OperationQueues for retrieving data from server and writing it to cache
@@ -119,10 +117,12 @@ static ZPDataLayer* _instance = nil;
 }
 
 -(void) _updateLibrariesAndCollectionsFromServer{
-
+    
+    
     NSLog(@"Loading group library information from server");
     NSArray* libraries = [[ZPServerConnection instance] retrieveLibrariesFromServer];
- 
+    if(libraries==NULL) return;
+    
     //Library IDs are stored on the server, so we can just drop the content of the library table and recreate it
     
     @synchronized(self){
@@ -158,6 +158,7 @@ static ZPDataLayer* _instance = nil;
         NSLog(@"Loading collections for group library '%@' from server",library.name);
         
         NSArray* collections = [[ZPServerConnection instance] retrieveCollectionsForLibraryFromServer:library.libraryID];
+        if(collections==NULL) return;
         
         NSEnumerator* e2 = [collections objectEnumerator];
 
@@ -186,6 +187,7 @@ static ZPDataLayer* _instance = nil;
     //Collections for My Library
     
     NSArray* collections = [[ZPServerConnection instance] retrieveCollectionsForLibraryFromServer:1];
+    if(collections==NULL) return;
     
     NSEnumerator* e2 = [collections objectEnumerator];
     
@@ -214,7 +216,7 @@ static ZPDataLayer* _instance = nil;
     NSString* key;
     while( key =(NSString*)[e3 nextObject]){
         @synchronized(self){
-            [_database executeUpdate:@"DELETE FROM collections WHERE key=?)",key];
+            [_database executeUpdate:@"DELETE FROM collections WHERE key=?",key];
         }
     }
     
@@ -226,7 +228,8 @@ static ZPDataLayer* _instance = nil;
     }
     
     //TODO: Clean up orphaned items
-
+    
+    [[ZPMasterViewController instance] notifyDataAvailable];
 }
 
 /*
@@ -360,8 +363,8 @@ static ZPDataLayer* _instance = nil;
     _currentlyActiveCollectionKey = collectionKey;
     _currentlyActiveLibraryID = view.libraryID;
      
-    // Start by deciding if we need to connect to the server or can use cache. We can rely on cache if this collection is completely cached already
-    // Check the possible values from the header file
+    // Start by deciding if we need to connect to the server or can use cache. We can rely on cache
+    // if this collection is completely cached already
     
     NSNumber* cacheStatus = [_collectionCacheStatus objectForKey:[NSNumber numberWithInt:view.collectionID]];
     
@@ -397,61 +400,67 @@ static ZPDataLayer* _instance = nil;
     
     ZPServerResponseXMLParser* parserResults = [[ZPServerConnection instance] retrieveItemsFromLibrary:libraryID collection:collectionKey searchString:searchString sortField:sortField sortDescending:sortDescending limit:15 start:0];
     
-    //Construct a return array
-    NSMutableArray* returnArray = [NSMutableArray arrayWithCapacity:[parserResults totalResults]];
-    
-    //Fill in what we got from the parser and pad with NULL
-    
-    for (int i = 0; i < [parserResults totalResults]; i++) {
-        if(i<[[parserResults parsedElements] count]){
-            ZPZoteroItem* item = (ZPZoteroItem*)[[parserResults parsedElements] objectAtIndex:i];
-            [returnArray addObject:[item key]];
-        }
-        else{
-            [returnArray addObject:[NSNull null]];
-        }
+    if(parserResults == NULL){
+        [view setItemKeysShown: [NSArray array]];
+        [view notifyDataAvailable];
     }
-    
-    //Que an operation to cache the results of the server response
-    //TODO: Consider if these initial items should be given higher priority. It is possible that there are other items already in the queue.
-    
-    [self cacheZoteroItems:[parserResults parsedElements]];
-    
-    //If the current collection has already been changed, do not queue any more retrievals
-    if(!(_currentlyActiveLibraryID==libraryID &&
-       ((collectionKey == NULL && _currentlyActiveCollectionKey == NULL) ||  
-       [ collectionKey isEqualToString:_currentlyActiveCollectionKey] ))) return;
-  
+    else{
+        //Construct a return array
+        NSMutableArray* returnArray = [NSMutableArray arrayWithCapacity:[parserResults totalResults]];
         
-    //Retrieve the rest of the items into the array
-    ZPItemRetrieveOperation* retrieveOperation = [[ZPItemRetrieveOperation alloc] initWithArray: returnArray library:libraryID collection:collectionKey searchString:searchString sortField:sortField sortDescending:sortDescending queue:_serverRequestQueue];
-    
-    
-    
-    //If this is the first time that we are using this collection, mark this operation as a cache operation if it does not have a search string or create a new operations without a search string
-    
-    NSNumber* cacheStatus = [_collectionCacheStatus objectForKey:[NSNumber numberWithInt:collectionID]];
-
-    if([cacheStatus intValue] != 1){
-        if (searchString== NULL || [searchString isEqualToString:@""] ){
-            [retrieveOperation markAsInitialRequestForCollection];
-            [_serverRequestQueue addOperation:retrieveOperation];
+        //Fill in what we got from the parser and pad with NULL
+        
+        for (int i = 0; i < [parserResults totalResults]; i++) {
+            if(i<[[parserResults parsedElements] count]){
+                ZPZoteroItem* item = (ZPZoteroItem*)[[parserResults parsedElements] objectAtIndex:i];
+                [returnArray addObject:[item key]];
+            }
+            else{
+                [returnArray addObject:[NSNull null]];
+            }
         }
-        else{
-            [_serverRequestQueue addOperation:retrieveOperation];
-            
-            //Start a new backround operation to retrieve all items in the colletion (the main request was filtered with sort)
-            ZPItemRetrieveOperation* retrieveOperationForCache = [[ZPItemRetrieveOperation alloc] initWithArray: [NSArray array] library:libraryID collection:collectionKey searchString:NULL sortField:NULL sortDescending:NO queue:_serverRequestQueue];
-            [retrieveOperationForCache markAsInitialRequestForCollection];
-            [_serverRequestQueue addOperation:retrieveOperationForCache];
+        
+        //Que an operation to cache the results of the server response
+        //TODO: Consider if these initial items should be given higher priority. It is possible that there are other items already in the queue.
+        
+        [self cacheZoteroItems:[parserResults parsedElements]];
+        
+        //If the current collection has already been changed, do not queue any more retrievals
+        if(!(_currentlyActiveLibraryID==libraryID &&
+             ((collectionKey == NULL && _currentlyActiveCollectionKey == NULL) ||  
+              [ collectionKey isEqualToString:_currentlyActiveCollectionKey] ))) return;
+        
+        
+        //Retrieve the rest of the items into the array
+        ZPItemRetrieveOperation* retrieveOperation = [[ZPItemRetrieveOperation alloc] initWithArray: returnArray library:libraryID collection:collectionKey searchString:searchString sortField:sortField sortDescending:sortDescending queue:_serverRequestQueue];
+        
+        
+        
+        //If this is the first time that we are using this collection, mark this operation as a cache operation if it does not have a search string or create a new operations without a search string
+        
+        NSNumber* cacheStatus = [_collectionCacheStatus objectForKey:[NSNumber numberWithInt:collectionID]];
+        
+        if([cacheStatus intValue] != 1){
+            if (searchString== NULL || [searchString isEqualToString:@""] ){
+                [retrieveOperation markAsInitialRequestForCollection];
+                [_serverRequestQueue addOperation:retrieveOperation];
+            }
+            else{
+                [_serverRequestQueue addOperation:retrieveOperation];
+                
+                //Start a new backround operation to retrieve all items in the colletion (the main request was filtered with sort)
+                ZPItemRetrieveOperation* retrieveOperationForCache = [[ZPItemRetrieveOperation alloc] initWithArray: [NSArray array] library:libraryID collection:collectionKey searchString:NULL sortField:NULL sortDescending:NO queue:_serverRequestQueue];
+                [retrieveOperationForCache markAsInitialRequestForCollection];
+                [_serverRequestQueue addOperation:retrieveOperationForCache];
+            }
+            // Mark that we have started retrieving things from the server 
+            [_collectionCacheStatus setValue:[NSNumber numberWithInt:1] forKey:[NSString stringWithFormat:@"%i",collectionID]];
         }
-        // Mark that we have started retrieving things from the server 
-        [_collectionCacheStatus setValue:[NSNumber numberWithInt:1] forKey:[NSNumber numberWithInt:collectionID]];
+        
+        [view setItemKeysShown: returnArray];
+        [view notifyDataAvailable];
+        
     }
-    
-    [view setItemKeysShown: returnArray];
-    [view notifyDataAvailable];
-    
 }
 
 -(NSString*) collectionKeyFromCollectionID:(NSInteger)collectionID{

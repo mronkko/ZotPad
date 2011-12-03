@@ -19,7 +19,13 @@
 @synthesize detailViewController = _detailViewController;
 @synthesize currentLibrary = _currentLibrary;
 @synthesize currentCollection = _currentCollection;
+@synthesize navigationTableView;
 
+static ZPMasterViewController* _instance = nil;
+
++ (ZPMasterViewController*) instance{
+    return _instance;
+}
 
 - (void)awakeFromNib
 {
@@ -34,16 +40,15 @@
     // Release any cached data, images, etc that aren't in use.
 }
 
+
 #pragma mark - View lifecycle
 
 - (void)viewDidLoad
 {
     [super viewDidLoad];
     
-    if(! [[ZPServerConnection instance] authenticated]){
-        [[ZPServerConnection instance] doAuthenticate: self];
-    }    
-
+    _instance= self;
+    
     //If the current library is not defined, show a list of libraries
     if(self->_currentLibrary == 0){
         self->_content = [[ZPDataLayer instance] libraries];
@@ -64,6 +69,26 @@
     return [self->_content count];
 }
 
+- (void)notifyDataAvailable{
+
+    if([NSThread isMainThread]){
+        //If we are showing the libraries view, reload the data
+        
+        //If the current library is not defined, show a list of libraries
+        if(self->_currentLibrary == 0){
+            self->_content = [[ZPDataLayer instance] libraries];
+        }
+        //If a library is chosen, show collections level collections for that library
+        else{
+            self->_content = [[ZPDataLayer instance] collections:self->_currentLibrary currentCollection:self->_currentCollection];        
+        }
+        
+        [navigationTableView reloadData];
+    }
+    else{
+        [self performSelectorOnMainThread:@selector(notifyDataAvailable) withObject:nil waitUntilDone:NO];
+    }
+}
 
 
 

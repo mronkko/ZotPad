@@ -34,4 +34,3 @@ CREATE TABLE IF NOT EXISTS collectionItems (
     FOREIGN KEY (collectionID) REFERENCES collections(collectionID),
     FOREIGN KEY (itemID) REFERENCES items(itemID)
 );
-

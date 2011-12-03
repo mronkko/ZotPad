@@ -11,14 +11,28 @@
 
 #import "ZPAppDelegate.h"
 #import "ZPServerConnection.h"
-#import "OAuthConsumer.h"
-#import "OAToken.h"
 #import "ZPAuthenticationDialog.h"
 #import "ZPServerResponseXMLParser.h"
+#import "ZPAuthenticationProcess.h"
+
+//Private methods
+
+@interface ZPServerConnection();
+    
+
+-(ZPServerResponseXMLParser*) makeServerRequest:(NSInteger)type withLibrary:(NSInteger)libraryID withCollection:(NSString*)collection withParameters:(NSDictionary*) parameters;
+
+@end
+
 
 @implementation ZPServerConnection
 
 static ZPServerConnection* _instance = nil;
+
+const NSInteger ZPServerConnectionRequestGroups = 1;
+const NSInteger ZPServerConnectionRequestCollections = 2;
+const NSInteger ZPServerConnectionRequestItems = 3;
+
 
 -(id)init
 {
@@ -26,17 +40,14 @@ static ZPServerConnection* _instance = nil;
     
     //Load the key from preferences
     
-    NSUserDefaults* defaults = [NSUserDefaults standardUserDefaults];
-    _oauthkey = [defaults objectForKey:@"OAuthKey"];
-	_userID = [defaults objectForKey:@"userID"];
-    _username = [defaults objectForKey:@"username"];
     _activeRequestCount = 0;
-    _debugServerConnection = FALSE;
+    _debugServerConnection = TRUE;
     
     return self;
 }
 
 /*
+
  Singleton accessor
  */
 
@@ -53,135 +64,109 @@ static ZPServerConnection* _instance = nil;
 
 - (BOOL) authenticated{
     
-    return(self->_oauthkey != nil);
+    return([[NSUserDefaults standardUserDefaults] objectForKey:@""] != nil);
     
 }
 
-// Client Key	4cb573ead72e5d84eab4
-// Client Secret	605a2a699d22dc4cce7f
-// Temporary Credential Request: https://www.zotero.org/oauth/request
-// Token Request URI: https://www.zotero.org/oauth/access
-// Resource Owner Authorization URI: https://www.zotero.org/oauth/authorize
-
-
-- (void) doAuthenticate:(UIViewController*) source{
-
-    self->_sourceViewController = source;
-    [self makeOAuthRequest: NULL];
+-(ZPServerResponseXMLParser*) makeServerRequest:(NSInteger)type withLibrary:(NSInteger)libraryID withCollection:(NSString*)collectionKey withParameters:(NSDictionary*) parameters{
     
-}
-
-- (void) makeOAuthRequest:(OAToken *) token {
-    OAConsumer *consumer = [[OAConsumer alloc] initWithKey:@"4cb573ead72e5d84eab4"
-                                                    secret:@"605a2a699d22dc4cce7f"];
     
-    NSURL *url;
-    
-    if(token==nil){
-        url= [NSURL URLWithString:@"https://www.zotero.org/oauth/request"];
-    }
-    else{
-        url= [NSURL URLWithString:@"https://www.zotero.org/oauth/access"];        
-    }
-    OAMutableURLRequest *request = [[OAMutableURLRequest alloc] initWithURL:url
-                                                                   consumer:consumer
-                                                                      token:token   // we don't have a Token yet
-                                                                      realm:nil   // our service provider doesn't specify a realm
-                                                          signatureProvider:nil]; // use the default method, HMAC-SHA1
-    
-    [request setHTTPMethod:@"POST"];
-    
-    OADataFetcher *fetcher = [[OADataFetcher alloc] init];
-    
-    [self startedServerRequest];
-
-
-    if(token==nil){
-        [fetcher fetchDataWithRequest:request
-                         delegate:self
-                didFinishSelector:@selector(requestTokenTicket:didFinishWithData:)
-     
-                  didFailSelector:@selector(requestTokenTicket:didFailWithError:)];
-    }
-    else{
-            [fetcher fetchDataWithRequest:request
-                                 delegate:self
-                        didFinishSelector:@selector(requestAccessToken:didFinishWithData:)
-             
-                          didFailSelector:@selector(requestAccessToken:didFailWithError:)];
-    }
-
-}
-
-- (void)requestTokenTicket:(OAServiceTicket *)ticket didFinishWithData:(NSData *)data {
-    
-    [self finishedServerRequest];
-
-    if (ticket.didSucceed) {
-        NSString *responseBody = [[NSString alloc] initWithData:data
-                                                       encoding:NSUTF8StringEncoding];
-        OAToken* requestToken = [[OAToken alloc] initWithHTTPResponseBody:responseBody];
-        
-        
-        NSLog(@"Starting authentication process");
-        self->_authenticationDialog = [[ZPAuthenticationDialog alloc] initWithNibName:@"Authenticate" bundle:nil];
-        [ self->_authenticationDialog setToken : requestToken];
-        [self->_sourceViewController presentModalViewController: self->_authenticationDialog animated:YES];
-
-    }
-    
-}
-
-- (void)requestAccessToken:(OAServiceTicket *)ticket didFinishWithData:(NSData *)data {
-    
-    [self finishedServerRequest];
-
-
-    if (ticket.didSucceed) {
-        NSString *responseBody = [[NSString alloc] initWithData:data
-                                                       encoding:NSUTF8StringEncoding];
-        OAToken* requestToken = [[OAToken alloc] initWithHTTPResponseBody:responseBody];
-        
-        
-        NSLog(@"Got access token");
-        
-        //Save the key to preferences
-        [[NSUserDefaults standardUserDefaults] setValue:[requestToken key] forKey:@"OAuthKey"];
-        self->_oauthkey = [requestToken key];
-        
-        //Save userID and username
-        NSArray* parts = [responseBody componentsSeparatedByString:@"&"];
-        
-        NSString* userID = [[[parts objectAtIndex:2]componentsSeparatedByString:@"="] objectAtIndex:1];
-        [[NSUserDefaults standardUserDefaults] setValue:userID forKey:@"userID"];
-        self->_userID = userID;
-        
-        NSString* username = [[[parts objectAtIndex:3]componentsSeparatedByString:@"="] objectAtIndex:1];
-        [[NSUserDefaults standardUserDefaults] setValue:username forKey:@"username"];
-        self->_username = username;
-        
-        //Dismiss the modal dialog
-        [ self->_authenticationDialog dismissModalViewControllerAnimated:YES];
-
-      
-        
-    }
-    
-}
-
-- (void)requestTokenTicket:(OAServiceTicket *)ticket didFailWithError:(NSError *)error {
+    NSData* responseData = NULL;
+    NSString* urlString;
    
-    [self finishedServerRequest];
+    NSString* oauthkey =  [[NSUserDefaults standardUserDefaults] objectForKey:@"OAuthKey"];
+    if(oauthkey!=NULL){
 
-    NSLog(@"Error");
+        if(libraryID==1 || libraryID == 0){
+            urlString = [NSString stringWithFormat:@"https://api.zotero.org/users/%@/",[[NSUserDefaults standardUserDefaults] objectForKey:@"userID"]];
+        }
+        else{
+            urlString = [NSString stringWithFormat:@"https://api.zotero.org/groups/%i/",libraryID];        
+        }
+        
+        
+        if(type==ZPServerConnectionRequestGroups){
+            urlString = [NSString stringWithFormat:@"%@groups?key=%@&content=none",urlString,oauthkey];
+        }
+        else if (type==ZPServerConnectionRequestCollections){
+            urlString = [NSString stringWithFormat:@"%@collections?key=%@",urlString,oauthkey];
+            
+        }
+        else if (type==ZPServerConnectionRequestItems){
+            
+            if(collectionKey!=NULL){
+                urlString = [NSString stringWithFormat:@"%@collections/%@/items?key=%@&format=atom",urlString,collectionKey,oauthkey];
+            }
+            else{
+                urlString = [NSString stringWithFormat:@"%@items/top?key=%@&format=atom",urlString,oauthkey];
+            }
+        }
+        
+        if(parameters!=NULL){
+            for(id key in parameters){
+                urlString = [NSString stringWithFormat:@"%@&%@=%@",urlString,key,[parameters objectForKey:key]];
+            }
+        }
+        
+        
+        _activeRequestCount++;
+
+        if(_debugServerConnection){
+            NSLog(@"Request started: %@ Active queries: %i",urlString,_activeRequestCount);
+        }
+
+        
+        //First request starts the network indicator
+        if(_activeRequestCount==1) [[UIApplication sharedApplication] setNetworkActivityIndicatorVisible:YES];
+        
+        NSURLRequest * urlRequest = [NSURLRequest requestWithURL:[NSURL URLWithString:urlString]];
+        NSURLResponse * response = nil;
+        NSError* error = nil;
+        responseData= [NSURLConnection sendSynchronousRequest:urlRequest returningResponse:&response error:&error];
+        
+        //If we receive a 403 (forbidden) error, delete the authorization key because we know that it is
+        //no longer valid.
+        if([(NSHTTPURLResponse*)response statusCode]==403){
+            NSLog(@"The authorization key is no longer valid.");
+            [[NSUserDefaults standardUserDefaults] removeObjectForKey:@"OAuthKey"];
+        }
+       
+        _activeRequestCount--;
+
+
+        if(_debugServerConnection && responseData==NULL){
+            NSLog(@"Request returned no results: %@ Active queries: %i",urlString,_activeRequestCount);            
+        }
+        //Last request hides the network indicator
+        if(_activeRequestCount==0) [[UIApplication sharedApplication] setNetworkActivityIndicatorVisible:NO];
+    }
+
+    if(responseData!=NULL){
+        NSXMLParser* parser = [[NSXMLParser alloc] initWithData:responseData];
+
+        ZPServerResponseXMLParser* parserDelegate =  [[ZPServerResponseXMLParser alloc] init];
+    
+        [parser setDelegate: parserDelegate];
+        [parser parse];
+
+        if(_debugServerConnection){
+            NSLog(@"Request returned %i/%i results: %@ Active queries: %i",[[parserDelegate parsedElements] count],[parserDelegate totalResults], urlString,_activeRequestCount);            
+        }
+
+
+        return parserDelegate;
+    }
+    else{
+        if(oauthkey==NULL){
+
+            //Initialize a new authentication process if there is currently not an ongoing one
+            if(![[ZPAuthenticationProcess instance] isActive]){
+                [[ZPAuthenticationProcess instance] startAuthentication];
+            }
+        }
+        return NULL;
+    }
 }
-- (void)requestAccessToken:(OAServiceTicket *)ticket didFailWithError:(NSError *)error {
-
-    [self finishedServerRequest];
-
-    NSLog(@"Error");
-}
-
 
 
 -(NSArray*) retrieveLibrariesFromServer{
@@ -189,39 +174,24 @@ static ZPServerConnection* _instance = nil;
     //Retrieve all libraries from the server
     
 
-    
-
-    NSURL *fileURL = [NSURL URLWithString:[NSString stringWithFormat:@"https://api.zotero.org/users/%@/groups?key=%@&content=none",_userID,_oauthkey]];
-    
-    [self startedServerRequest];
-    
-    NSXMLParser *parser = [[NSXMLParser alloc] initWithContentsOfURL:fileURL];
-
-    ZPServerResponseXMLParser* parserDelegate =  [[ZPServerResponseXMLParser alloc] init];
-    
-    [parser setDelegate: parserDelegate];
-    [parser parse];
-
-    [self finishedServerRequest];
+    ZPServerResponseXMLParser* parserDelegate =  [self makeServerRequest:ZPServerConnectionRequestGroups withLibrary:0 withCollection:NULL withParameters:NULL];
 
     NSArray* returnArray = [parserDelegate parsedElements];
+ 
+    if(parserDelegate == NULL) return NULL;
     
     //If there is more data coming, retrieve it
     while([returnArray count] < parserDelegate.totalResults){
-        fileURL = [NSURL URLWithString:[NSString stringWithFormat:@"https://api.zotero.org/users/%@/groups?key=%@&content=none&start=%i",
-                                        _userID,_oauthkey,[returnArray count]]];
 
-        [self startedServerRequest];
+        NSMutableDictionary* parameters=[[NSMutableDictionary alloc] initWithCapacity:1];
+        [parameters setObject:[NSString stringWithFormat:@"%i",[returnArray count]] forKey:@"start"];
+
+        ZPServerResponseXMLParser* parserDelegate =  [self makeServerRequest:ZPServerConnectionRequestGroups withLibrary:0 withCollection:NULL withParameters:parameters];
+
+        if(parserDelegate == NULL) return NULL;
         
-        parser = [[NSXMLParser alloc] initWithContentsOfURL:fileURL];
-        
-        parserDelegate =  [[ZPServerResponseXMLParser alloc] init];
-        
-        [parser setDelegate: parserDelegate];
-        [parser parse];
-        
-        [self finishedServerRequest];
-        
+        NSArray* returnArray = [parserDelegate parsedElements];
+
         returnArray=[returnArray arrayByAddingObjectsFromArray:parserDelegate.parsedElements];
     }
     
@@ -232,57 +202,26 @@ static ZPServerConnection* _instance = nil;
 
 -(NSArray*) retrieveCollectionsForLibraryFromServer:(NSInteger)libraryID{
     
-    NSURL *fileURL;
     
-    if(libraryID==1){
-        fileURL = [NSURL URLWithString:[NSString stringWithFormat:@"https://api.zotero.org/users/%@/collections?key=%@",_userID,_oauthkey]];
-    }
-    else{
-        fileURL = [NSURL URLWithString:[NSString stringWithFormat:@"https://api.zotero.org/groups/%i/collections?key=%@",libraryID,_oauthkey]];        
-    }
-    
-    if(_debugServerConnection){
-        NSLog(@"%@",[fileURL absoluteURL]);
-    }
+    ZPServerResponseXMLParser* parserDelegate =  [self makeServerRequest:ZPServerConnectionRequestCollections withLibrary:libraryID withCollection:NULL withParameters:NULL];
+    if(parserDelegate == NULL) return NULL;
 
-    [self startedServerRequest];
-    
-    NSXMLParser *parser = [[NSXMLParser alloc] initWithContentsOfURL:fileURL];
-    
-    ZPServerResponseXMLParser* parserDelegate =  [[ZPServerResponseXMLParser alloc] init];
-    
-    [parser setDelegate: parserDelegate];
-    [parser parse];
-    
-    [self finishedServerRequest];
-    
     NSArray* returnArray = [parserDelegate parsedElements];
     
     //If there is more data coming, retrieve it
     while([returnArray count] < parserDelegate.totalResults){
         
-        if(libraryID==1){
-            fileURL = [NSURL URLWithString:[NSString stringWithFormat:@"https://api.zotero.org/users/%@/collections?key=%@&start=%i",_userID,_oauthkey,[returnArray count]]];
-        }
-        else{
-            fileURL = [NSURL URLWithString:[NSString stringWithFormat:@"https://api.zotero.org/groups/%i/collections?key=%@&start=%i",libraryID,_oauthkey,[returnArray count]]];        
-        }
-
-        [self startedServerRequest];
+        NSMutableDictionary* parameters=[[NSMutableDictionary alloc] initWithCapacity:1];
+        [parameters setObject:[NSString stringWithFormat:@"%i",[returnArray count]] forKey:@"start"];
         
-        parser = [[NSXMLParser alloc] initWithContentsOfURL:fileURL];
+        ZPServerResponseXMLParser* parserDelegate =  [self makeServerRequest:ZPServerConnectionRequestCollections withLibrary:libraryID withCollection:NULL withParameters:parameters];
+        if(parserDelegate == NULL) return NULL;
         
-        parserDelegate =  [[ZPServerResponseXMLParser alloc] init];
-        
-        [parser setDelegate: parserDelegate];
-        [parser parse];
-        
-        [self finishedServerRequest];
+        NSArray* returnArray = [parserDelegate parsedElements];
         
         returnArray=[returnArray arrayByAddingObjectsFromArray:parserDelegate.parsedElements];
     }
-    
-    
+        
     return returnArray;
 }
 
@@ -296,89 +235,42 @@ Retrieves items from server and stores these in the database. Returns and array 
 
 -(ZPServerResponseXMLParser*) retrieveItemsFromLibrary:(NSInteger)libraryID collection:(NSString*)collectionKey searchString:(NSString*)searchString sortField:(NSString*)sortField sortDescending:(BOOL)sortIsDescending limit:(NSInteger)limit start:(NSInteger)start{
     
-    //We know that a view has changed, so we can cancel all existing item retrieving
+   
     
-    NSString* urlString = @"https://api.zotero.org/";
+    NSMutableDictionary* parameters=[[NSMutableDictionary alloc] initWithCapacity:10];
     
-    if(libraryID==1){
-        urlString = [NSString stringWithFormat:@"%@users/%@/",urlString,_userID];
-    }
-    else{
-        urlString = [NSString stringWithFormat:@"%@groups/%i/",urlString,libraryID];
-    }
-    
-    if(collectionKey!=NULL){
-        urlString = [NSString stringWithFormat:@"%@collections/%@/items",urlString,collectionKey];
-    }
-    else{
-        urlString = [NSString stringWithFormat:@"%@items/top",urlString];
-    }
-    
-    urlString = [NSString stringWithFormat:@"%@?key=%@&format=atom&content=bib&style=apa",urlString,_oauthkey];
-    
+    [parameters setObject:@"bib" forKey:@"content"];
+    [parameters setObject:@"apa" forKey:@"style"];
+
     //Search
     if(searchString!=NULL && ! [searchString isEqualToString:@""]){
-        urlString = [NSString stringWithFormat:@"%@&q=%@",urlString,[searchString stringByAddingPercentEscapesUsingEncoding:
-                                                                   NSASCIIStringEncoding]];
+        [parameters setObject:[searchString stringByAddingPercentEscapesUsingEncoding:
+                               NSASCIIStringEncoding] forKey:@"q"];
     }
     //Sort
     if(sortField!=NULL){
-        NSString* sortDirString;
+        [parameters setObject:sortField forKey:@"sort"];
+
         if(sortIsDescending){
-            sortDirString=@"desc";
+            [parameters setObject:@"desc" forKey:@"order"];
         }
         else{
-            sortDirString=@"asc";
+            [parameters setObject:@"asc" forKey:@"order"];
         }
-        
-        urlString =[NSString stringWithFormat:@"%@&order=%@&sort=%@",urlString,sortField,sortDirString];
     }
     if(start!=0){
-        urlString =[NSString stringWithFormat:@"%@&start=%i",urlString,start];
+        [parameters setObject:[NSString  stringWithFormat:@"%i",start] forKey:@"start"];
     }
     if(limit!=0){
-       urlString = [NSString stringWithFormat:@"%@&limit=%i",urlString,limit];
+        [parameters setObject:[NSString  stringWithFormat:@"%i",limit] forKey:@"limit"];
     }
     
-    if(_debugServerConnection){
-        NSLog(@"%@",urlString);
-    }
-    
-    NSURL* fileURL = [NSURL URLWithString:urlString];        
-    
-    
-    [self startedServerRequest];
-    
-    NSXMLParser *parser = [[NSXMLParser alloc] initWithContentsOfURL:fileURL];
-    
-    ZPServerResponseXMLParser* parserDelegate =  [[ZPServerResponseXMLParser alloc] init];
-    
-    [parser setDelegate: parserDelegate];
-    [parser parse];
-    
-    [self finishedServerRequest];
-    
-    if(_debugServerConnection){
-        NSLog(@"Response contained %i elements and we got %i",parserDelegate.totalResults,[[parserDelegate parsedElements] count]);
-    }
+    ZPServerResponseXMLParser* parserDelegate =  [self makeServerRequest:ZPServerConnectionRequestItems withLibrary:libraryID withCollection:collectionKey withParameters:parameters];
     
     return parserDelegate;
     
 }
 
--(void) startedServerRequest{
-    
-    _activeRequestCount++;
-    //First request starts the network indicator
-    if(_activeRequestCount==1) [[UIApplication sharedApplication] setNetworkActivityIndicatorVisible:YES];
-
-}
--(void) finishedServerRequest{
-    
-    _activeRequestCount--;
-    //Last request hides the network indicator
-    if(_activeRequestCount==0) [[UIApplication sharedApplication] setNetworkActivityIndicatorVisible:NO];
-}
 
 
 @end

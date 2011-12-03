@@ -17,10 +17,16 @@
     NSArray* _content;
     NSInteger _currentLibrary;
     NSInteger _currentCollection;
+    UITableView* navigationTableView;
 }
 
 @property (strong, nonatomic) ZPDetailViewController *detailViewController;
 @property NSInteger currentLibrary;
 @property NSInteger currentCollection;
+
+@property (nonatomic, retain) IBOutlet UITableView* navigationTableView;
+
++ (ZPMasterViewController*) instance;
+- (void)notifyDataAvailable;
 
 @end
