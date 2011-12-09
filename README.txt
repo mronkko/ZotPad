@@ -26,6 +26,8 @@ Support for tags, saved searches or editing items is currently not planned.
 
 3 TECHNICAL INFORMATION
 
+(This is most likely outdated. It will be updated when the first version is released) 
+
 ZotPad uses the Master-Detail application template from XCode 4.2. It uses the Zotero public server read API and server write API. OAuthConsumer library is used for initial authentication.
 
 ZotPad is not a standalone client in the same way as Zotero on a desktop computer, but an application that can be used to browse data on Zotero servers in online mode. However, because offline use is an important use case, ZotPad contains a cache of data present in the server. From the user interface, the cache is read only and there is no quarantee that it is consistent with the data on the Zotero server. Because of these two features, it is not necessary to sync the cache with the Zotero server in the same way as desktop Zotero does.

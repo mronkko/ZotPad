@@ -12,7 +12,6 @@
 @interface ZPAuthenticationDialog : UIViewController <UIApplicationDelegate, UIWebViewDelegate> {
     UIWebView* webView;
 
-
 }
 
 @property(nonatomic,retain) IBOutlet UIWebView *webView;

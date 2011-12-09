@@ -9,7 +9,8 @@
 #import "ZPItemCacheWriteOperation.h"
 #import "ZPDataLayer.h"
 #import "ZPZoteroItem.h"
-#import "ZPDetailViewController.h"
+#import "ZPItemListViewController.h"
+#import "ZPNavigationItemListViewController.h"
 
 @implementation ZPItemCacheWriteOperation
 
@@ -28,10 +29,15 @@
         [[ZPDataLayer instance] addItemToDatabase:(ZPZoteroItem*) object];
         //TODO: Cache collection memberships
         
+        //TODO: Implement the following and all other notifications using the
+        //observer pattern
+        
         //Notify the user interface that this item is now available
         NSString* key = [(ZPZoteroItem*) object key];
-        ZPDetailViewController* controller=[ZPDetailViewController instance];
+        ZPItemListViewController* controller=[ZPItemListViewController instance];
         [controller notifyItemAvailable:key];
+        if([ZPNavigationItemListViewController instance]!=NULL)
+            [[ZPNavigationItemListViewController instance] notifyItemAvailable:key];
     }
 }
 

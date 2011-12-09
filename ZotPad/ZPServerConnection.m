@@ -37,9 +37,7 @@ const NSInteger ZPServerConnectionRequestItems = 3;
 -(id)init
 {
     self = [super init];
-    
-    //Load the key from preferences
-    
+        
     _activeRequestCount = 0;
     _debugServerConnection = TRUE;
     
@@ -216,8 +214,6 @@ const NSInteger ZPServerConnectionRequestItems = 3;
         
         ZPServerResponseXMLParser* parserDelegate =  [self makeServerRequest:ZPServerConnectionRequestCollections withLibrary:libraryID withCollection:NULL withParameters:parameters];
         if(parserDelegate == NULL) return NULL;
-        
-        NSArray* returnArray = [parserDelegate parsedElements];
         
         returnArray=[returnArray arrayByAddingObjectsFromArray:parserDelegate.parsedElements];
     }

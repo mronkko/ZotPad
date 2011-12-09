@@ -12,6 +12,7 @@
 #import "ZPDataLayer.h"
 #import "ZPAuthenticationProcess.h"
 
+
 @implementation ZPAuthenticationDialog
 
 
@@ -43,7 +44,8 @@ static ZPAuthenticationDialog* _instance = nil;
 
 - (void)viewDidLoad {
     
-    _instance = self;    
+    _instance = self;
+
 }
 
 - (void)setKeyAndLoadZoteroSite:(NSString*) key{
@@ -59,7 +61,7 @@ static ZPAuthenticationDialog* _instance = nil;
     
     //Load the request in the UIWebView.
     [[self webView] loadRequest:requestObj];
-    
+
     
     NSLog(@"Done loading");
 

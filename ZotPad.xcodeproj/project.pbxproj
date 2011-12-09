@@ -23,7 +23,7 @@
 		A7200DE114718DC0004347C9 /* main.m in Sources */ = {isa = PBXBuildFile; fileRef = A7200DE014718DC0004347C9 /* main.m */; };
 		A7200DE514718DC0004347C9 /* ZPAppDelegate.m in Sources */ = {isa = PBXBuildFile; fileRef = A7200DE414718DC0004347C9 /* ZPAppDelegate.m */; };
 		A7200DEB14718DC1004347C9 /* ZPMasterViewController.m in Sources */ = {isa = PBXBuildFile; fileRef = A7200DEA14718DC1004347C9 /* ZPMasterViewController.m */; };
-		A7200DEE14718DC1004347C9 /* ZPDetailViewController.m in Sources */ = {isa = PBXBuildFile; fileRef = A7200DED14718DC1004347C9 /* ZPDetailViewController.m */; };
+		A7200DEE14718DC1004347C9 /* ZPItemListViewController.m in Sources */ = {isa = PBXBuildFile; fileRef = A7200DED14718DC1004347C9 /* ZPItemListViewController.m */; };
 		A7200DF614718F44004347C9 /* ZPDataLayer.m in Sources */ = {isa = PBXBuildFile; fileRef = A7200DF514718F44004347C9 /* ZPDataLayer.m */; };
 		A7200DF8147193C0004347C9 /* libsqlite3.dylib in Frameworks */ = {isa = PBXBuildFile; fileRef = A7200DF7147193C0004347C9 /* libsqlite3.dylib */; };
 		A72853F9147E319700D3FE97 /* ZPZoteroLibrary.m in Sources */ = {isa = PBXBuildFile; fileRef = A72853F8147E319600D3FE97 /* ZPZoteroLibrary.m */; };
@@ -34,7 +34,14 @@
 		A73D635114879D15007999F3 /* Settings.bundle in Resources */ = {isa = PBXBuildFile; fileRef = A73D635014879D15007999F3 /* Settings.bundle */; };
 		A74348D7147AB37A00DA6FC3 /* ZPAuthenticationDialog.m in Sources */ = {isa = PBXBuildFile; fileRef = A74348D6147AB37A00DA6FC3 /* ZPAuthenticationDialog.m */; };
 		A7692D84147D112D000C1A8F /* ZPZoteroItem.m in Sources */ = {isa = PBXBuildFile; fileRef = A7692D83147D112D000C1A8F /* ZPZoteroItem.m */; };
+		A776EE7C14908AE20087B8FA /* 72x72.png in Resources */ = {isa = PBXBuildFile; fileRef = A776EE7B14908AE20087B8FA /* 72x72.png */; };
+		A776EE7E14908AED0087B8FA /* 57x57.png in Resources */ = {isa = PBXBuildFile; fileRef = A776EE7D14908AED0087B8FA /* 57x57.png */; };
+		A776EE8014908AF30087B8FA /* 114x114.png in Resources */ = {isa = PBXBuildFile; fileRef = A776EE7F14908AF30087B8FA /* 114x114.png */; };
 		A786F7781476A56200B35B92 /* MainStoryboard_iPhone.storyboard in Resources */ = {isa = PBXBuildFile; fileRef = A786F7771476A56200B35B92 /* MainStoryboard_iPhone.storyboard */; };
+		A78B7F13149091B8008303BA /* Default-Landscape~ipad.png in Resources */ = {isa = PBXBuildFile; fileRef = A78B7F12149091B8008303BA /* Default-Landscape~ipad.png */; };
+		A78B7F1514909285008303BA /* Default-Portrait~ipad.png in Resources */ = {isa = PBXBuildFile; fileRef = A78B7F1414909285008303BA /* Default-Portrait~ipad.png */; };
+		A79ED823148B2683003EE77C /* ZPItemDetailViewController.m in Sources */ = {isa = PBXBuildFile; fileRef = A79ED822148B2683003EE77C /* ZPItemDetailViewController.m */; };
+		A79ED82C148B7405003EE77C /* ZPNavigationItemListViewController.m in Sources */ = {isa = PBXBuildFile; fileRef = A79ED82B148B7405003EE77C /* ZPNavigationItemListViewController.m */; };
 		A7A3F950147BAB6C00CA7266 /* database.sql in Resources */ = {isa = PBXBuildFile; fileRef = A7A3F94F147BAB6C00CA7266 /* database.sql */; };
 		A7A3F953147BBCCB00CA7266 /* ZPServerResponseXMLParser.m in Sources */ = {isa = PBXBuildFile; fileRef = A7A3F952147BBCCA00CA7266 /* ZPServerResponseXMLParser.m */; };
 		A7A54B0B14878E4F00EBAD80 /* FMDatabase.m in Sources */ = {isa = PBXBuildFile; fileRef = A7A54B0614878E4F00EBAD80 /* FMDatabase.m */; settings = {COMPILER_FLAGS = "-fno-objc-arc"; }; };
@@ -237,8 +244,8 @@
 		A7200DE414718DC0004347C9 /* ZPAppDelegate.m */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.objc; path = ZPAppDelegate.m; sourceTree = "<group>"; };
 		A7200DE914718DC1004347C9 /* ZPMasterViewController.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = ZPMasterViewController.h; sourceTree = "<group>"; };
 		A7200DEA14718DC1004347C9 /* ZPMasterViewController.m */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.objc; path = ZPMasterViewController.m; sourceTree = "<group>"; };
-		A7200DEC14718DC1004347C9 /* ZPDetailViewController.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = ZPDetailViewController.h; sourceTree = "<group>"; };
-		A7200DED14718DC1004347C9 /* ZPDetailViewController.m */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.objc; path = ZPDetailViewController.m; sourceTree = "<group>"; };
+		A7200DEC14718DC1004347C9 /* ZPItemListViewController.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = ZPItemListViewController.h; sourceTree = "<group>"; };
+		A7200DED14718DC1004347C9 /* ZPItemListViewController.m */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.objc; path = ZPItemListViewController.m; sourceTree = "<group>"; };
 		A7200DF414718F44004347C9 /* ZPDataLayer.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = ZPDataLayer.h; sourceTree = "<group>"; };
 		A7200DF514718F44004347C9 /* ZPDataLayer.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = ZPDataLayer.m; sourceTree = "<group>"; };
 		A7200DF7147193C0004347C9 /* libsqlite3.dylib */ = {isa = PBXFileReference; lastKnownFileType = "compiled.mach-o.dylib"; name = libsqlite3.dylib; path = usr/lib/libsqlite3.dylib; sourceTree = SDKROOT; };
@@ -256,7 +263,16 @@
 		A74348D6147AB37A00DA6FC3 /* ZPAuthenticationDialog.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = ZPAuthenticationDialog.m; sourceTree = "<group>"; };
 		A7692D82147D112D000C1A8F /* ZPZoteroItem.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = ZPZoteroItem.h; sourceTree = "<group>"; };
 		A7692D83147D112D000C1A8F /* ZPZoteroItem.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = ZPZoteroItem.m; sourceTree = "<group>"; };
+		A776EE7B14908AE20087B8FA /* 72x72.png */ = {isa = PBXFileReference; lastKnownFileType = image.png; name = 72x72.png; path = ../Icons/72x72.png; sourceTree = "<group>"; };
+		A776EE7D14908AED0087B8FA /* 57x57.png */ = {isa = PBXFileReference; lastKnownFileType = image.png; name = 57x57.png; path = ../Icons/57x57.png; sourceTree = "<group>"; };
+		A776EE7F14908AF30087B8FA /* 114x114.png */ = {isa = PBXFileReference; lastKnownFileType = image.png; name = 114x114.png; path = ../Icons/114x114.png; sourceTree = "<group>"; };
 		A786F7771476A56200B35B92 /* MainStoryboard_iPhone.storyboard */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = file.storyboard; path = MainStoryboard_iPhone.storyboard; sourceTree = "<group>"; };
+		A78B7F12149091B8008303BA /* Default-Landscape~ipad.png */ = {isa = PBXFileReference; lastKnownFileType = image.png; name = "Default-Landscape~ipad.png"; path = "../LaunchImages/Default-Landscape~ipad.png"; sourceTree = "<group>"; };
+		A78B7F1414909285008303BA /* Default-Portrait~ipad.png */ = {isa = PBXFileReference; lastKnownFileType = image.png; name = "Default-Portrait~ipad.png"; path = "../LaunchImages/Default-Portrait~ipad.png"; sourceTree = "<group>"; };
+		A79ED821148B2683003EE77C /* ZPItemDetailViewController.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = ZPItemDetailViewController.h; sourceTree = "<group>"; };
+		A79ED822148B2683003EE77C /* ZPItemDetailViewController.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = ZPItemDetailViewController.m; sourceTree = "<group>"; };
+		A79ED82A148B7404003EE77C /* ZPNavigationItemListViewController.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = ZPNavigationItemListViewController.h; sourceTree = "<group>"; };
+		A79ED82B148B7405003EE77C /* ZPNavigationItemListViewController.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = ZPNavigationItemListViewController.m; sourceTree = "<group>"; };
 		A7A3F94F147BAB6C00CA7266 /* database.sql */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = text; path = database.sql; sourceTree = "<group>"; };
 		A7A3F951147BBCCA00CA7266 /* ZPServerResponseXMLParser.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = ZPServerResponseXMLParser.h; sourceTree = "<group>"; };
 		A7A3F952147BBCCA00CA7266 /* ZPServerResponseXMLParser.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = ZPServerResponseXMLParser.m; sourceTree = "<group>"; };
@@ -460,6 +476,8 @@
 		A7200DDB14718DC0004347C9 /* Supporting Files */ = {
 			isa = PBXGroup;
 			children = (
+				A78B7F0F149090D2008303BA /* Launch images */,
+				A78B7F0A14908DFF008303BA /* AppIcons */,
 				A73D635014879D15007999F3 /* Settings.bundle */,
 				320B6C86F11D9990244A9730 /* Three20.bundle */,
 				A7200DDC14718DC0004347C9 /* ZotPad-Info.plist */,
@@ -478,8 +496,12 @@
 				A7200DE414718DC0004347C9 /* ZPAppDelegate.m */,
 				A7200DE914718DC1004347C9 /* ZPMasterViewController.h */,
 				A7200DEA14718DC1004347C9 /* ZPMasterViewController.m */,
-				A7200DEC14718DC1004347C9 /* ZPDetailViewController.h */,
-				A7200DED14718DC1004347C9 /* ZPDetailViewController.m */,
+				A7200DEC14718DC1004347C9 /* ZPItemListViewController.h */,
+				A7200DED14718DC1004347C9 /* ZPItemListViewController.m */,
+				A79ED82A148B7404003EE77C /* ZPNavigationItemListViewController.h */,
+				A79ED82B148B7405003EE77C /* ZPNavigationItemListViewController.m */,
+				A79ED821148B2683003EE77C /* ZPItemDetailViewController.h */,
+				A79ED822148B2683003EE77C /* ZPItemDetailViewController.m */,
 				A74348D5147AB37A00DA6FC3 /* ZPAuthenticationDialog.h */,
 				A74348D6147AB37A00DA6FC3 /* ZPAuthenticationDialog.m */,
 				A786F7771476A56200B35B92 /* MainStoryboard_iPhone.storyboard */,
@@ -519,6 +541,25 @@
 				A7692D83147D112D000C1A8F /* ZPZoteroItem.m */,
 			);
 			name = "Data objects";
+			sourceTree = "<group>";
+		};
+		A78B7F0A14908DFF008303BA /* AppIcons */ = {
+			isa = PBXGroup;
+			children = (
+				A776EE7F14908AF30087B8FA /* 114x114.png */,
+				A776EE7D14908AED0087B8FA /* 57x57.png */,
+				A776EE7B14908AE20087B8FA /* 72x72.png */,
+			);
+			name = AppIcons;
+			sourceTree = "<group>";
+		};
+		A78B7F0F149090D2008303BA /* Launch images */ = {
+			isa = PBXGroup;
+			children = (
+				A78B7F1414909285008303BA /* Default-Portrait~ipad.png */,
+				A78B7F12149091B8008303BA /* Default-Landscape~ipad.png */,
+			);
+			name = "Launch images";
 			sourceTree = "<group>";
 		};
 		A7A54B0414878E2600EBAD80 /* FMDB */ = {
@@ -802,6 +843,11 @@
 				A7A3F950147BAB6C00CA7266 /* database.sql in Resources */,
 				A73D635114879D15007999F3 /* Settings.bundle in Resources */,
 				A72C3CA71487C9DA00F6744E /* MainStoryboard_iPad.storyboard in Resources */,
+				A776EE7C14908AE20087B8FA /* 72x72.png in Resources */,
+				A776EE7E14908AED0087B8FA /* 57x57.png in Resources */,
+				A776EE8014908AF30087B8FA /* 114x114.png in Resources */,
+				A78B7F13149091B8008303BA /* Default-Landscape~ipad.png in Resources */,
+				A78B7F1514909285008303BA /* Default-Portrait~ipad.png in Resources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
@@ -815,7 +861,7 @@
 				A7200DE114718DC0004347C9 /* main.m in Sources */,
 				A7200DE514718DC0004347C9 /* ZPAppDelegate.m in Sources */,
 				A7200DEB14718DC1004347C9 /* ZPMasterViewController.m in Sources */,
-				A7200DEE14718DC1004347C9 /* ZPDetailViewController.m in Sources */,
+				A7200DEE14718DC1004347C9 /* ZPItemListViewController.m in Sources */,
 				A7200DF614718F44004347C9 /* ZPDataLayer.m in Sources */,
 				A7A7C9B1147A8144004D8756 /* ZPServerConnection.m in Sources */,
 				A7A7C9F8147AA2EE004D8756 /* NSMutableURLRequest+Parameters.m in Sources */,
@@ -848,6 +894,8 @@
 				A7A54B0D14878E4F00EBAD80 /* FMResultSet.m in Sources */,
 				A7A54B1114878EE000EBAD80 /* DSActivityView.m in Sources */,
 				A7B5180B14880CE700806EED /* ZPAuthenticationProcess.m in Sources */,
+				A79ED823148B2683003EE77C /* ZPItemDetailViewController.m in Sources */,
+				A79ED82C148B7405003EE77C /* ZPNavigationItemListViewController.m in Sources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};

@@ -7,7 +7,7 @@
 //
 
 #import <Foundation/Foundation.h>
-#import "ZPDetailViewController.h"
+#import "ZPItemListViewController.h"
 #import "ZPItemRetrieveOperation.h"
 #import "ZPZoteroItem.h"
 #import "../FMDB/src/FMDatabase.h"
@@ -56,10 +56,10 @@
 - (NSArray*) libraries;
 - (NSArray*) collections : (NSInteger)currentLibraryID currentCollection:(NSInteger)currentCollectionID;
 
-- (NSArray*) getItemKeysForView:(ZPDetailViewController*)view;
+- (NSArray*) getItemKeysForView:(ZPItemListViewController*)view;
 
 //Retrieves the initial 15 items, called from getItemKeysForView and executed as operation
-- (void) _retrieveAndSetInitialKeysForView:(ZPDetailViewController*)view;
+- (void) _retrieveAndSetInitialKeysForView:(ZPItemListViewController*)view;
 
 - (ZPZoteroItem*) getItemByKey: (NSString*) key;
 - (NSDictionary*) getFieldsForItem: (NSInteger) itemID;

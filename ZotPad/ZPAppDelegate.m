@@ -45,7 +45,7 @@
     }
 
     //Set up a background operation for retrieving data
-    //[[ZPDataLayer instance] updateLibrariesAndCollectionsFromServer];
+    [[ZPDataLayer instance] updateLibrariesAndCollectionsFromServer];
     
     // Override point for customization after application launch.
     if ([[UIDevice currentDevice] userInterfaceIdiom] == UIUserInterfaceIdiomPad) {

@@ -7,7 +7,7 @@
 //
 
 #import "ZPMasterViewController.h"
-#import "ZPDetailViewController.h"
+#import "ZPItemListViewController.h"
 #import "ZPDataLayer.h"
 #import "ZPServerConnection.h"
 #import "ZPAuthenticationDialog.h"
@@ -59,7 +59,7 @@ static ZPMasterViewController* _instance = nil;
     }
     
 	// Do any additional setup after loading the view, typically from a nib.
-    self.detailViewController = (ZPDetailViewController *)[[self.splitViewController.viewControllers lastObject] topViewController];
+    self.detailViewController = (ZPItemListViewController *)[[self.splitViewController.viewControllers lastObject] topViewController];
  
 }
 
@@ -156,7 +156,6 @@ static ZPMasterViewController* _instance = nil;
 	[self.navigationController pushViewController: subController animated: YES];
 	
 }
-
 - (void)viewDidUnload
 {
     [super viewDidUnload];
@@ -188,6 +187,7 @@ static ZPMasterViewController* _instance = nil;
 
 - (BOOL)shouldAutorotateToInterfaceOrientation:(UIInterfaceOrientation)interfaceOrientation
 {
+    
     // Return YES for supported orientations
     return YES;
 }

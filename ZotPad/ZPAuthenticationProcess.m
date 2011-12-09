@@ -36,8 +36,6 @@ static ZPAuthenticationProcess* _instance = nil;
     NSLog(@"Starting authentication process");
     _isActive = TRUE;
 
-    [self makeOAuthRequest: NULL];
-
     //If the UI is not yet visible, wait for it to become visible before proceeding.
         
     UIViewController* root = [UIApplication sharedApplication].delegate.window.rootViewController;        
@@ -46,11 +44,14 @@ static ZPAuthenticationProcess* _instance = nil;
         sleep(.1);
     }    
     
-//    [self performSelectorOnMainThread:@selector(showAuthenticationSeque) withObject:nil waitUntilDone:NO];
+    [self performSelectorOnMainThread:@selector(showAuthenticationSeque) withObject:nil waitUntilDone:NO];
 
 }
 
 -(void)showAuthenticationSeque{
+
+    [self makeOAuthRequest: NULL];
+
     UIViewController* root = [UIApplication sharedApplication].delegate.window.rootViewController;        
     [root performSegueWithIdentifier:@"AuthenticationSeque" sender:root];    
 }

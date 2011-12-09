@@ -7,10 +7,10 @@
 //
 
 #import <UIKit/UIKit.h>
-#import "ZPDetailViewController.h"
+#import "ZPItemListViewController.h"
 #import "ZPDataLayer.h"
 
-@class ZPDetailViewController;
+@class ZPItemListViewController;
 
 @interface ZPMasterViewController : UITableViewController{
     ZPDataLayer* _database;
@@ -19,8 +19,7 @@
     NSInteger _currentCollection;
     UITableView* navigationTableView;
 }
-
-@property (strong, nonatomic) ZPDetailViewController *detailViewController;
+@property (strong, nonatomic) ZPItemListViewController *detailViewController;
 @property NSInteger currentLibrary;
 @property NSInteger currentCollection;
 

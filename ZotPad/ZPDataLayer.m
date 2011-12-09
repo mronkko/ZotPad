@@ -347,7 +347,7 @@ static ZPDataLayer* _instance = nil;
  */
 
 
-- (NSArray*) getItemKeysForView:(ZPDetailViewController*)view{
+- (NSArray*) getItemKeysForView:(ZPItemListViewController*)view{
 
     //If we have an ongoing item retrieval in teh background, tell it that it can stop
     
@@ -382,7 +382,7 @@ static ZPDataLayer* _instance = nil;
     }
 }
 
-- (void) _retrieveAndSetInitialKeysForView:(ZPDetailViewController*)view{
+- (void) _retrieveAndSetInitialKeysForView:(ZPItemListViewController*)view{
 
     NSInteger collectionID=view.collectionID;
     NSInteger libraryID =  view.libraryID;
