@@ -70,6 +70,7 @@
 		A7A7CA0D147AA329004D8756 /* Security.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = A7A7CA0C147AA329004D8756 /* Security.framework */; };
 		A7A7CA0F147AA33A004D8756 /* libxml2.dylib in Frameworks */ = {isa = PBXBuildFile; fileRef = A7A7CA0E147AA339004D8756 /* libxml2.dylib */; };
 		A7B5180B14880CE700806EED /* ZPAuthenticationProcess.m in Sources */ = {isa = PBXBuildFile; fileRef = A7B5180A14880CE700806EED /* ZPAuthenticationProcess.m */; };
+		A7CC252F1493E14E00FDEAF4 /* iCarousel.m in Sources */ = {isa = PBXBuildFile; fileRef = A7CC252C1493E14D00FDEAF4 /* iCarousel.m */; settings = {COMPILER_FLAGS = " -fno-objc-arc"; }; };
 /* End PBXBuildFile section */
 
 /* Begin PBXContainerItemProxy section */
@@ -330,6 +331,8 @@
 		A7A7CA0E147AA339004D8756 /* libxml2.dylib */ = {isa = PBXFileReference; lastKnownFileType = "compiled.mach-o.dylib"; name = libxml2.dylib; path = usr/lib/libxml2.dylib; sourceTree = SDKROOT; };
 		A7B5180914880CE600806EED /* ZPAuthenticationProcess.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = ZPAuthenticationProcess.h; sourceTree = "<group>"; };
 		A7B5180A14880CE700806EED /* ZPAuthenticationProcess.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = ZPAuthenticationProcess.m; sourceTree = "<group>"; };
+		A7CC252B1493E14D00FDEAF4 /* iCarousel.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = iCarousel.h; sourceTree = "<group>"; };
+		A7CC252C1493E14D00FDEAF4 /* iCarousel.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = iCarousel.m; sourceTree = "<group>"; };
 		A7CCFE8614865E5900570515 /* ZPNavigatorNode.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = ZPNavigatorNode.h; sourceTree = "<group>"; };
 /* End PBXFileReference section */
 
@@ -441,6 +444,7 @@
 		A7200DD314718DC0004347C9 /* Frameworks */ = {
 			isa = PBXGroup;
 			children = (
+				A7CC252A1493E14D00FDEAF4 /* iCarousel */,
 				A7A7C9CD147AA2EE004D8756 /* OAuthConsumer */,
 				A7A54B0E14878ECD00EBAD80 /* DSActivityView */,
 				A7A54B0414878E2600EBAD80 /* FMDB */,
@@ -647,6 +651,16 @@
 			);
 			path = Crypto;
 			sourceTree = "<group>";
+		};
+		A7CC252A1493E14D00FDEAF4 /* iCarousel */ = {
+			isa = PBXGroup;
+			children = (
+				A7CC252B1493E14D00FDEAF4 /* iCarousel.h */,
+				A7CC252C1493E14D00FDEAF4 /* iCarousel.m */,
+			);
+			name = iCarousel;
+			path = iCarousel/iCarousel;
+			sourceTree = SOURCE_ROOT;
 		};
 /* End PBXGroup section */
 
@@ -896,6 +910,7 @@
 				A7B5180B14880CE700806EED /* ZPAuthenticationProcess.m in Sources */,
 				A79ED823148B2683003EE77C /* ZPItemDetailViewController.m in Sources */,
 				A79ED82C148B7405003EE77C /* ZPNavigationItemListViewController.m in Sources */,
+				A7CC252F1493E14E00FDEAF4 /* iCarousel.m in Sources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};

@@ -154,7 +154,7 @@
                         <autoresizingMask key="autoresizingMask" widthSizable="YES" heightSizable="YES"/>
                         <subviews>
                             <tableView clipsSubviews="YES" contentMode="scaleToFill" alwaysBounceVertical="YES" scrollEnabled="NO" showsHorizontalScrollIndicator="NO" showsVerticalScrollIndicator="NO" dataMode="prototypes" style="grouped" separatorStyle="singleLineEtched" allowsSelection="NO" rowHeight="44" sectionHeaderHeight="10" sectionFooterHeight="10" id="Qr8-AN-SJ9">
-                                <rect key="frame" x="0.0" y="395" width="723" height="309"/>
+                                <rect key="frame" x="0.0" y="602" width="723" height="102"/>
                                 <autoresizingMask key="autoresizingMask" heightSizable="YES"/>
                                 <color key="backgroundColor" cocoaTouchSystemColor="groupTableViewBackgroundColor"/>
                                 <simulatedOrientationMetrics key="simulatedOrientationMetrics" orientation="landscapeRight"/>
@@ -199,11 +199,24 @@
                                 <color key="textColor" cocoaTouchSystemColor="darkTextColor"/>
                                 <nil key="highlightedColor"/>
                             </label>
+                            <view tag="2" contentMode="scaleToFill" id="mJe-AV-5Qd" customClass="iCarousel">
+                                <rect key="frame" x="0.0" y="88" width="703" height="514"/>
+                                <autoresizingMask key="autoresizingMask" flexibleMaxX="YES" flexibleMaxY="YES"/>
+                                <color key="backgroundColor" white="1" alpha="1" colorSpace="custom" customColorSpace="calibratedWhite"/>
+                                <connections>
+                                    <outlet property="dataSource" destination="0zt-cp-Ihx" id="sGN-Da-Adl"/>
+                                    <outlet property="delegate" destination="0zt-cp-Ihx" id="p1b-vl-1KU"/>
+                                </connections>
+                            </view>
                         </subviews>
                         <simulatedOrientationMetrics key="simulatedOrientationMetrics" orientation="landscapeRight"/>
+                        <connections>
+                            <outlet property="delegate" destination="0zt-cp-Ihx" id="xQc-9p-2KZ"/>
+                        </connections>
                     </scrollView>
                     <navigationItem key="navigationItem" title="Item details" id="clQ-lV-4y4"/>
                     <connections>
+                        <outlet property="carousel" destination="mJe-AV-5Qd" id="qRY-hi-UQ8"/>
                         <outlet property="detailTableView" destination="Qr8-AN-SJ9" id="sT0-hI-XTg"/>
                     </connections>
                 </viewController>
@@ -388,6 +401,48 @@
             <point key="canvasLocation" x="-390" y="686"/>
         </scene>
     </scenes>
+    <classes>
+        <class className="ZPAuthenticationDialog" superclassName="UIViewController">
+            <source key="sourceIdentifier" type="project" relativePath="./Classes/ZPAuthenticationDialog.h"/>
+            <relationships>
+                <relationship kind="outlet" name="webView" candidateClass="UIWebView"/>
+            </relationships>
+        </class>
+        <class className="ZPItemDetailViewController" superclassName="UIViewController">
+            <source key="sourceIdentifier" type="project" relativePath="./Classes/ZPItemDetailViewController.h"/>
+            <relationships>
+                <relationship kind="outlet" name="carousel" candidateClass="iCarousel"/>
+                <relationship kind="outlet" name="detailTableView" candidateClass="UITableView"/>
+            </relationships>
+        </class>
+        <class className="ZPItemListViewController" superclassName="UIViewController">
+            <source key="sourceIdentifier" type="project" relativePath="./Classes/ZPItemListViewController.h"/>
+            <relationships>
+                <relationship kind="action" name="doSortCreator:"/>
+                <relationship kind="action" name="doSortDate:"/>
+                <relationship kind="action" name="doSortPublication:"/>
+                <relationship kind="action" name="doSortTitle:"/>
+                <relationship kind="outlet" name="searchBar" candidateClass="UISearchBar"/>
+                <relationship kind="outlet" name="tableView" candidateClass="UITableView"/>
+            </relationships>
+        </class>
+        <class className="ZPMasterViewController" superclassName="UITableViewController">
+            <source key="sourceIdentifier" type="project" relativePath="./Classes/ZPMasterViewController.h"/>
+            <relationships>
+                <relationship kind="outlet" name="navigationTableView" candidateClass="UITableView"/>
+            </relationships>
+        </class>
+        <class className="ZPNavigationItemListViewController" superclassName="UITableViewController">
+            <source key="sourceIdentifier" type="project" relativePath="./Classes/ZPNavigationItemListViewController.h"/>
+        </class>
+        <class className="iCarousel" superclassName="UIView">
+            <source key="sourceIdentifier" type="project" relativePath="./Classes/iCarousel.h"/>
+            <relationships>
+                <relationship kind="outlet" name="dataSource"/>
+                <relationship kind="outlet" name="delegate"/>
+            </relationships>
+        </class>
+    </classes>
     <simulatedMetricsContainer key="defaultSimulatedMetrics">
         <simulatedStatusBarMetrics key="statusBar" statusBarStyle="blackTranslucent"/>
         <simulatedOrientationMetrics key="orientation"/>
