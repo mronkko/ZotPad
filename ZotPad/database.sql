@@ -23,6 +23,7 @@ CREATE TABLE IF NOT EXISTS items (
     title TEXT,
     publishedIn TEXT,
     key TEXT NOT NULL,
+    fullCitation TEXT NOT NULL,
     UNIQUE (libraryID, key)
 );
 

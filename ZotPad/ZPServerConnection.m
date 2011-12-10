@@ -66,6 +66,23 @@ const NSInteger ZPServerConnectionRequestItems = 3;
     
 }
 
+/*
+
+ This will get the localized item types
+ https://api.zotero.org/itemTypes
+
+ This will get the localized fields for item type
+ https://api.zotero.org/itemFields?itemType=book
+ 
+ This will get a list of valid creator types
+ https://api.zotero.org/itemTypeCreatorTypes?itemType=book
+ 
+ This will get a template for a new item
+ https://api.zotero.org/items/new?itemType=book
+ 
+*/
+
+
 -(ZPServerResponseXMLParser*) makeServerRequest:(NSInteger)type withLibrary:(NSInteger)libraryID withCollection:(NSString*)collectionKey withParameters:(NSDictionary*) parameters{
     
     

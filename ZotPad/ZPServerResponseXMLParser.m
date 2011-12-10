@@ -87,6 +87,7 @@
                 
                 ZPZoteroItem* item  = (ZPZoteroItem*) _currentParentElement;
                 
+                [item setFullCitation:string];
 
                 
                 //If there are no authors.

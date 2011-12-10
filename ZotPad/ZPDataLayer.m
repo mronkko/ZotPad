@@ -513,7 +513,7 @@ static ZPDataLayer* _instance = nil;
             }
 
             
-            [_database executeUpdate:@"INSERT INTO items (itemTypeID,libraryID,year,authors,title,publishedIn,key) VALUES (0,?,?,?,?,?,?)",libraryID,year,item.creatorSummary,item.title,item.publishedIn,item.key];
+            [_database executeUpdate:@"INSERT INTO items (itemTypeID,libraryID,year,authors,title,publishedIn,key,fullCitation) VALUES (0,?,?,?,?,?,?,?)",libraryID,year,item.creatorSummary,item.title,item.publishedIn,item.key,item.fullCitation];
             
         }
     }
@@ -522,7 +522,7 @@ static ZPDataLayer* _instance = nil;
 - (ZPZoteroItem*) getItemByKey: (NSString*) key{
   
     @synchronized(self){
-        FMResultSet* resultSet = [_database executeQuery: @"SELECT itemTypeID,libraryID,year,authors,title,publishedIn,key FROM items WHERE key=? LIMIT 1",key];
+        FMResultSet* resultSet = [_database executeQuery: @"SELECT itemTypeID,libraryID,year,authors,title,publishedIn,key,fullCitation FROM items WHERE key=? LIMIT 1",key];
         
         ZPZoteroItem* item = NULL;
         
@@ -537,6 +537,7 @@ static ZPDataLayer* _instance = nil;
             NSString* publishedIn = [resultSet stringForColumnIndex:5];
             [item setPublishedIn:publishedIn];
             [item setKey:[resultSet stringForColumnIndex:6]];
+            [item setFullCitation:[resultSet stringForColumnIndex:7]];
         }
         
         return item;

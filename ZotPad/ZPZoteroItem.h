@@ -20,11 +20,13 @@
     NSString* _itemType;
     NSInteger _numChildren;
     NSInteger _numTags;
+    NSString* _fullCitation;
     
     BOOL _hasChildren;
 }
 
 @property (retain) NSString* title;
+@property (retain) NSString* fullCitation;
 @property (retain) NSString* key;
 @property (retain) NSString* creatorSummary;
 @property (retain) NSString* publishedIn;

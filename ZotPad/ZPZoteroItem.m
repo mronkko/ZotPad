@@ -11,6 +11,7 @@
 @implementation ZPZoteroItem
 
 @synthesize title = _title;
+@synthesize fullCitation = _fullCitation;
 @synthesize key = _key;
 @synthesize creatorSummary = _creatorSummary;
 @synthesize year = _year;
