@@ -10,3 +10,6 @@
 [submodule "OAuthConsumer"]
 	path = OAuthConsumer
 	url = https://github.com/jdg/oauthconsumer.git
+[submodule "iCarousel"]
+	path = iCarousel
+	url = https://github.com/nicklockwood/iCarousel.git
