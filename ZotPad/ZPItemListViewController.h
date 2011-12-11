@@ -10,7 +10,9 @@
 #import "../DSActivityView/Sources/DSActivityView.h"
 #import "Three20/Three20.h"
 
-@interface ZPDetailViewController : UIViewController <UISplitViewControllerDelegate, UITableViewDataSource, UITableViewDelegate, UISearchBarDelegate>{
+//TODO: Make this a UITableViewController instead of UIViewController
+
+@interface ZPItemListViewController : UIViewController <UISplitViewControllerDelegate, UITableViewDataSource, UITableViewDelegate, UISearchBarDelegate>{
     NSString* _searchString;
     NSInteger _collectionID;
     NSInteger _libraryID;
@@ -19,13 +21,13 @@
     
     NSArray* _itemKeysShown;
   
-    UITableView* itemTableView;
+    UITableView* tableView;
     NSCache* _cellCache;
     DSBezelActivityView* _activityView;
 }
 
 // This class is used as a singleton
-+ (ZPDetailViewController*) instance;
++ (ZPItemListViewController*) instance;
 
 - (void)configureView;
 - (void)notifyDataAvailable;
@@ -33,7 +35,7 @@
 - (void)_refreshCellAtIndexPaths:(NSArray*)indexPath;
 - (void)makeBusy;
 
-@property (nonatomic, retain) IBOutlet UITableView* itemTableView;
+@property (nonatomic, retain) IBOutlet UITableView* tableView;
 @property (nonatomic, retain) IBOutlet UISearchBar* searchBar;
 
 @property (retain) NSArray* itemKeysShown;

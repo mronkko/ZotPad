@@ -6,16 +6,17 @@
 //  Copyright (c) 2011 __MyCompanyName__. All rights reserved.
 //
 
-#import "ZPDetailViewController.h"
+#import "ZPItemListViewController.h"
+#import "ZPMasterViewController.h"
 #import "ZPDataLayer.h"
 #import <QuartzCore/QuartzCore.h>
 #import "../DSActivityView/Sources/DSActivityView.h"
 
-@interface ZPDetailViewController ()
+@interface ZPItemListViewController ()
 @property (strong, nonatomic) UIPopoverController *masterPopoverController;
 @end
 
-@implementation ZPDetailViewController
+@implementation ZPItemListViewController
 
 @synthesize collectionID = _collectionKey;
 @synthesize libraryID =  _libraryID;
@@ -25,13 +26,13 @@
 
 @synthesize masterPopoverController = _masterPopoverController;
 
-@synthesize itemTableView;
+@synthesize tableView;
 @synthesize searchBar;
 
 @synthesize itemKeysShown = _itemKeysShown;
 
 
-static ZPDetailViewController* _instance = nil;
+static ZPItemListViewController* _instance = nil;
 
 #pragma mark - Managing the detail item
 
@@ -42,7 +43,7 @@ static ZPDetailViewController* _instance = nil;
     return self;
 }
 
-+ (ZPDetailViewController*) instance{
++ (ZPItemListViewController*) instance{
     return _instance;
 }
 
@@ -63,7 +64,6 @@ static ZPDetailViewController* _instance = nil;
 }
 
 
-
 - (void)configureView
 {
     // Update the user interface for the detail item.
@@ -80,7 +80,7 @@ static ZPDetailViewController* _instance = nil;
             [self makeBusy];
         }
         else{
-            [self.itemTableView reloadData];
+            [self.tableView reloadData];
         }     
     }
 }
@@ -90,8 +90,8 @@ static ZPDetailViewController* _instance = nil;
 - (void)makeBusy{
     if(_activityView==NULL){
         if([NSThread isMainThread]){
-        [self.itemTableView setUserInteractionEnabled:FALSE];
-        _activityView = [DSBezelActivityView newActivityViewForView:self.itemTableView];
+        [self.tableView setUserInteractionEnabled:FALSE];
+        _activityView = [DSBezelActivityView newActivityViewForView:self.tableView];
         }
         else{
             [self performSelectorOnMainThread:@selector(notifyDataAvailable) withObject:nil waitUntilDone:NO];
@@ -106,9 +106,9 @@ static ZPDetailViewController* _instance = nil;
 - (void)notifyDataAvailable{
     
     if([NSThread isMainThread]){
-        [self.itemTableView reloadData];
+        [self.tableView reloadData];
         [DSBezelActivityView removeViewAnimated:YES];
-        [self.itemTableView setUserInteractionEnabled:TRUE];
+        [self.tableView setUserInteractionEnabled:TRUE];
         _activityView = NULL;
     }
     else{
@@ -120,7 +120,7 @@ static ZPDetailViewController* _instance = nil;
 - (void)notifyItemAvailable:(NSString*) key{
     
     
-    NSEnumerator *e = [[self.itemTableView indexPathsForVisibleRows] objectEnumerator];
+    NSEnumerator *e = [[self.tableView indexPathsForVisibleRows] objectEnumerator];
     
     NSIndexPath* indexPath;
     while ((indexPath = (NSIndexPath*) [e nextObject]) && indexPath.row <=[_itemKeysShown count]) {
@@ -135,7 +135,7 @@ static ZPDetailViewController* _instance = nil;
     }
 }
 - (void) _refreshCellAtIndexPaths:(NSArray*)indexPaths{
-    [self.itemTableView reloadRowsAtIndexPaths:indexPaths withRowAnimation:UITableViewRowAnimationFade];
+    [self.tableView reloadRowsAtIndexPaths:indexPaths withRowAnimation:UITableViewRowAnimationFade];
 
 }
 - (UITableViewCell *)tableView:(UITableView *)tableView cellForRowAtIndexPath:(NSIndexPath *)indexPath {
@@ -144,10 +144,6 @@ static ZPDetailViewController* _instance = nil;
     
     NSObject* keyObj = [_itemKeysShown objectAtIndex: indexPath.row];
 
-    //It is possible that we do not yet have data for the full view. Sleep until we have it
-    //More data is retrieved in the background
-
-   // NSLog(@"Retrieving item for for %i",indexPath.row);
 
     
     NSString* key;
@@ -163,7 +159,7 @@ static ZPDetailViewController* _instance = nil;
     
     if(cell==nil){
         
-        
+        //TODO: Set author and year to empty if not defined. 
         ZPZoteroItem* item=NULL;
         if(![key isEqualToString:@""]) item = [[ZPDataLayer instance] getItemByKey:key];
         
@@ -331,7 +327,7 @@ static ZPDetailViewController* _instance = nil;
 
 - (void)splitViewController:(UISplitViewController *)splitController willHideViewController:(UIViewController *)viewController withBarButtonItem:(UIBarButtonItem *)barButtonItem forPopoverController:(UIPopoverController *)popoverController
 {
-    barButtonItem.title = NSLocalizedString(@"Master", @"Master");
+    barButtonItem.title = NSLocalizedString(@"Libraries", @"Libraries");
     [self.navigationItem setLeftBarButtonItem:barButtonItem animated:YES];
     self.masterPopoverController = popoverController;
 }
