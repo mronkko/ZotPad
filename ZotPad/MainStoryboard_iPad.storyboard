@@ -22,7 +22,7 @@
         <scene sceneID="16">
             <objects>
                 <placeholder placeholderIdentifier="IBFirstResponder" id="15" sceneMemberID="firstResponder"/>
-                <viewController storyboardIdentifier="" title="Detail" id="4" customClass="ZPItemListViewController" sceneMemberID="viewController">
+                <viewController storyboardIdentifier="" title="Detail" id="4" customClass="ZPDetailedItemListViewController" sceneMemberID="viewController">
                     <view key="view" contentMode="scaleToFill" id="26">
                         <rect key="frame" x="0.0" y="64" width="703" height="704"/>
                         <autoresizingMask key="autoresizingMask" widthSizable="YES" heightSizable="YES"/>
@@ -32,7 +32,7 @@
                                 <autoresizingMask key="autoresizingMask" widthSizable="YES" heightSizable="YES"/>
                                 <color key="backgroundColor" white="1" alpha="1" colorSpace="calibratedWhite"/>
                                 <prototypes>
-                                    <tableViewCell contentMode="scaleToFill" selectionStyle="none" accessoryType="disclosureIndicator" hidesAccessoryWhenEditing="NO" indentationLevel="1" indentationWidth="0.0" reuseIdentifier="ZoteroItemCell" rowHeight="79" id="DlL-Ei-V6i">
+                                    <tableViewCell clipsSubviews="YES" contentMode="scaleToFill" selectionStyle="none" accessoryType="disclosureIndicator" hidesAccessoryWhenEditing="NO" indentationLevel="1" indentationWidth="0.0" reuseIdentifier="ZoteroItemCell" rowHeight="79" id="DlL-Ei-V6i">
                                         <rect key="frame" x="0.0" y="22" width="703" height="79"/>
                                         <autoresizingMask key="autoresizingMask"/>
                                         <view key="contentView" opaque="NO" clipsSubviews="YES" multipleTouchEnabled="YES" contentMode="center">
@@ -139,7 +139,8 @@
                     <navigationItem key="navigationItem" title="Items" id="52"/>
                     <connections>
                         <outlet property="searchBar" destination="5Lp-vc-vaz" id="j30-li-jVf"/>
-                        <outlet property="tableView" destination="J8S-Ym-8C6" id="gSY-tL-er6"/>
+                        <outlet property="tableView" destination="J8S-Ym-8C6" id="m5W-Om-e7X"/>
+                        <outlet property="view" destination="26" id="VwB-Lj-80j"/>
                     </connections>
                 </viewController>
             </objects>
@@ -278,7 +279,7 @@
         <scene sceneID="Zza-eC-TaA">
             <objects>
                 <placeholder placeholderIdentifier="IBFirstResponder" id="uuF-id-wBA" userLabel="First Responder" sceneMemberID="firstResponder"/>
-                <viewController storyboardIdentifier="NavigationItemListView" id="WCH-zk-FP7" customClass="ZPNavigationItemListViewController" sceneMemberID="viewController">
+                <viewController storyboardIdentifier="NavigationItemListView" id="WCH-zk-FP7" customClass="ZPSimpleItemListViewController" sceneMemberID="viewController">
                     <tableView key="view" clipsSubviews="YES" contentMode="scaleToFill" alwaysBounceVertical="YES" dataMode="prototypes" style="plain" rowHeight="44" sectionHeaderHeight="22" sectionFooterHeight="22" id="7zD-LX-EJk">
                         <rect key="frame" x="0.0" y="64" width="320" height="704"/>
                         <autoresizingMask key="autoresizingMask" widthSizable="YES" heightSizable="YES"/>
@@ -331,8 +332,14 @@
                                 <color key="backgroundColor" white="1" alpha="1" colorSpace="calibratedWhite"/>
                             </tableViewCell>
                         </prototypes>
+                        <connections>
+                            <outlet property="dataSource" destination="WCH-zk-FP7" id="HUB-zG-HnZ"/>
+                        </connections>
                     </tableView>
                     <navigationItem key="navigationItem" title="Items" id="fBK-CH-iUS"/>
+                    <connections>
+                        <outlet property="tableView" destination="7zD-LX-EJk" id="L4w-qT-rei"/>
+                    </connections>
                 </viewController>
             </objects>
             <point key="canvasLocation" x="1355" y="-178"/>
@@ -402,6 +409,47 @@
             <point key="canvasLocation" x="-390" y="686"/>
         </scene>
     </scenes>
+    <classes>
+        <class className="ZPAuthenticationDialog" superclassName="UIViewController">
+            <source key="sourceIdentifier" type="project" relativePath="./Classes/ZPAuthenticationDialog.h"/>
+            <relationships>
+                <relationship kind="outlet" name="webView" candidateClass="UIWebView"/>
+            </relationships>
+        </class>
+        <class className="ZPDetailedItemListViewController" superclassName="ZPSimpleItemListViewController">
+            <source key="sourceIdentifier" type="project" relativePath="./Classes/ZPDetailedItemListViewController.h"/>
+            <relationships>
+                <relationship kind="action" name="doSortCreator:"/>
+                <relationship kind="action" name="doSortDate:"/>
+                <relationship kind="action" name="doSortPublication:"/>
+                <relationship kind="action" name="doSortTitle:"/>
+                <relationship kind="outlet" name="searchBar" candidateClass="UISearchBar"/>
+            </relationships>
+        </class>
+        <class className="ZPItemDetailViewController" superclassName="UIViewController">
+            <source key="sourceIdentifier" type="project" relativePath="./Classes/ZPItemDetailViewController.h"/>
+            <relationships>
+                <relationship kind="outlet" name="carousel" candidateClass="iCarousel"/>
+                <relationship kind="outlet" name="detailTableView" candidateClass="UITableView"/>
+            </relationships>
+        </class>
+        <class className="ZPLibraryAndCollectionListViewController" superclassName="UITableViewController">
+            <source key="sourceIdentifier" type="project" relativePath="./Classes/ZPLibraryAndCollectionListViewController.h"/>
+        </class>
+        <class className="ZPSimpleItemListViewController" superclassName="UIViewController">
+            <source key="sourceIdentifier" type="project" relativePath="./Classes/ZPSimpleItemListViewController.h"/>
+            <relationships>
+                <relationship kind="outlet" name="tableView" candidateClass="UITableView"/>
+            </relationships>
+        </class>
+        <class className="iCarousel" superclassName="UIView">
+            <source key="sourceIdentifier" type="project" relativePath="./Classes/iCarousel.h"/>
+            <relationships>
+                <relationship kind="outlet" name="dataSource"/>
+                <relationship kind="outlet" name="delegate"/>
+            </relationships>
+        </class>
+    </classes>
     <simulatedMetricsContainer key="defaultSimulatedMetrics">
         <simulatedStatusBarMetrics key="statusBar" statusBarStyle="blackTranslucent"/>
         <simulatedOrientationMetrics key="orientation"/>

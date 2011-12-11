@@ -1,5 +1,5 @@
 //
-//  ZPMasterViewController.h
+//  ZPLibraryAndCollectionViewController.h
 //  ZotPad
 //
 //  Created by Rönkkö Mikko on 11/14/11.
@@ -7,23 +7,20 @@
 //
 
 #import <UIKit/UIKit.h>
-#import "ZPItemListViewController.h"
+#import "ZPDetailedItemListViewController.h"
 #import "ZPDataLayer.h"
 
-@class ZPItemListViewController;
+@class ZPDetailedItemListViewController;
 
 @interface ZPLibraryAndCollectionListViewController : UITableViewController{
     ZPDataLayer* _database;
     NSArray* _content;
     NSInteger _currentLibrary;
     NSInteger _currentCollection;
-    UITableView* navigationTableView;
 }
-@property (strong, nonatomic) ZPItemListViewController *detailViewController;
+@property (strong, nonatomic) ZPDetailedItemListViewController *detailViewController;
 @property NSInteger currentLibrary;
 @property NSInteger currentCollection;
-
-@property (nonatomic, retain) IBOutlet UITableView* navigationTableView;
 
 + (ZPLibraryAndCollectionListViewController*) instance;
 - (void)notifyDataAvailable;

@@ -38,7 +38,7 @@ static ZPDataLayer* _instance = nil;
 {
     self = [super init];
     
-    _debugDataLayer = FALSE;
+    _debugDataLayer = TRUE;
     
 	NSString *dbPath = [[NSSearchPathForDirectoriesInDomains(NSDocumentDirectory, NSUserDomainMask, YES) objectAtIndex:0] stringByAppendingPathComponent:@"zotpad.sqlite"];
     
@@ -65,6 +65,8 @@ static ZPDataLayer* _instance = nil;
     while (sqlString = [e nextObject]) {
         [_database executeUpdate:sqlString];
     }
+    
+    _itemObservers = [[NSMutableSet alloc] initWithCapacity:2];
     
     //Initialize OperationQueues for retrieving data from server and writing it to cache
     _serverRequestQueue = [[NSOperationQueue alloc] init];
@@ -142,6 +144,7 @@ static ZPDataLayer* _instance = nil;
         while([resultSet next]){
             [collectionKeys addObject:[resultSet stringForColumnIndex:0]];
         }
+        [resultSet close];
     }
     
     NSEnumerator* e = [libraries objectEnumerator];
@@ -254,6 +257,8 @@ static ZPDataLayer* _instance = nil;
     
         [thisLibrary setHasChildren:hasChildren];
         [returnArray addObject:thisLibrary];
+        [resultSet close];
+
 	}
     
     //Group libraries
@@ -275,6 +280,8 @@ static ZPDataLayer* _instance = nil;
             
             [returnArray addObject:thisLibrary];
         }
+        [resultSet close];
+
     }
 	return returnArray;
 }
@@ -333,6 +340,9 @@ static ZPDataLayer* _instance = nil;
             [returnArray addObject:thisCollection];
             
         }
+        [resultSet close];
+
+        
 	}
     
 	return returnArray;
@@ -347,7 +357,7 @@ static ZPDataLayer* _instance = nil;
  */
 
 
-- (NSArray*) getItemKeysForView:(ZPItemListViewController*)view{
+- (NSArray*) getItemKeysForSelection:(ZPDetailedItemListViewController*)view{
 
     //If we have an ongoing item retrieval in teh background, tell it that it can stop
     
@@ -382,7 +392,7 @@ static ZPDataLayer* _instance = nil;
     }
 }
 
-- (void) _retrieveAndSetInitialKeysForView:(ZPItemListViewController*)view{
+- (void) _retrieveAndSetInitialKeysForView:(ZPDetailedItemListViewController*)view{
 
     NSInteger collectionID=view.collectionID;
     NSInteger libraryID =  view.libraryID;
@@ -464,12 +474,16 @@ static ZPDataLayer* _instance = nil;
 }
 
 -(NSString*) collectionKeyFromCollectionID:(NSInteger)collectionID{
+    NSString* ret = NULL;
     @synchronized(self){
         //TODO: This could be optimized by loading the results in an array or dictionary instead of retrieving them from the database over and over 
         FMResultSet* resultSet = [_database executeQuery:@"SELECT key FROM collections WHERE collectionID = ? LIMIT 1",[NSNumber numberWithInt: collectionID]];
         [resultSet next];
-        return [resultSet stringForColumnIndex:0];
+        ret = [resultSet stringForColumnIndex:0];
+        [resultSet close];
+
     }
+    return ret;
 }
 
 -(void) cacheZoteroItems:(NSArray*)items {
@@ -488,8 +502,8 @@ static ZPDataLayer* _instance = nil;
 -(void) addItemToDatabase:(ZPZoteroItem*)item {
     
     @synchronized(self){
-    //TODO: Implement modifying already existing items if they are older than the new item
-    FMResultSet* resultSet = [_database executeQuery:[NSString stringWithFormat: @"SELECT dateModified, itemID FROM items WHERE key ='%@' LIMIT 1",item.key]];
+        //TODO: Implement modifying already existing items if they are older than the new item
+        FMResultSet* resultSet = [_database executeQuery:[NSString stringWithFormat: @"SELECT dateModified, itemID FROM items WHERE key ='%@' LIMIT 1",item.key]];
 
         if(! [resultSet next]){
             
@@ -516,15 +530,17 @@ static ZPDataLayer* _instance = nil;
             [_database executeUpdate:@"INSERT INTO items (itemTypeID,libraryID,year,authors,title,publishedIn,key,fullCitation) VALUES (0,?,?,?,?,?,?,?)",libraryID,year,item.creatorSummary,item.title,item.publishedIn,item.key,item.fullCitation];
             
         }
+        [resultSet close];
+
     }
 }
 
 - (ZPZoteroItem*) getItemByKey: (NSString*) key{
-  
+
+    ZPZoteroItem* item = NULL;
+    
     @synchronized(self){
         FMResultSet* resultSet = [_database executeQuery: @"SELECT itemTypeID,libraryID,year,authors,title,publishedIn,key,fullCitation FROM items WHERE key=? LIMIT 1",key];
-        
-        ZPZoteroItem* item = NULL;
         
         if ([resultSet next]) {
             
@@ -539,9 +555,11 @@ static ZPDataLayer* _instance = nil;
             [item setKey:[resultSet stringForColumnIndex:6]];
             [item setFullCitation:[resultSet stringForColumnIndex:7]];
         }
-        
-        return item;
+        [resultSet close];
     }
+    
+    return item;
+
 }
 
 
@@ -631,6 +649,26 @@ static ZPDataLayer* _instance = nil;
     
     return NULL;
 }    
+
+//Notifies all observers that a new item is available
+-(void) notifyItemBasicsAvailable:(NSString*)key{
+
+    NSEnumerator* e = [_itemObservers objectEnumerator];
+    NSObject* id;
+    
+    while( id= [e nextObject]) {
+        [(NSObject <ZPItemObserver>*) id notifyItemBasicsAvailable:key];
+    }
+}
+
+//Adds and removes observers
+-(void) registerItemObserver:(NSObject<ZPItemObserver>*)observer{
+    [_itemObservers addObject:observer];
+    
+}
+-(void) removeItemObserver:(NSObject<ZPItemObserver>*)observer{
+    [_itemObservers removeObject:observer];
+}
 
 
 @end

@@ -1,5 +1,5 @@
 //
-//  ZPMasterViewController.m
+//  ZPLibraryAndCollectionViewController.m
 //  ZotPad
 //
 //  Created by Rönkkö Mikko on 11/14/11.
@@ -7,7 +7,7 @@
 //
 
 #import "ZPLibraryAndCollectionListViewController.h"
-#import "ZPItemListViewController.h"
+#import "ZPDetailedItemListViewController.h"
 #import "ZPDataLayer.h"
 #import "ZPServerConnection.h"
 #import "ZPAuthenticationDialog.h"
@@ -19,7 +19,6 @@
 @synthesize detailViewController = _detailViewController;
 @synthesize currentLibrary = _currentLibrary;
 @synthesize currentCollection = _currentCollection;
-@synthesize navigationTableView;
 
 static ZPLibraryAndCollectionListViewController* _instance = nil;
 
@@ -59,7 +58,7 @@ static ZPLibraryAndCollectionListViewController* _instance = nil;
     }
     
 	// Do any additional setup after loading the view, typically from a nib.
-    self.detailViewController = (ZPItemListViewController *)[[self.splitViewController.viewControllers lastObject] topViewController];
+    self.detailViewController = (ZPDetailedItemListViewController *)[[self.splitViewController.viewControllers lastObject] topViewController];
  
 }
 
@@ -83,7 +82,7 @@ static ZPLibraryAndCollectionListViewController* _instance = nil;
             self->_content = [[ZPDataLayer instance] collections:self->_currentLibrary currentCollection:self->_currentCollection];        
         }
         
-        [navigationTableView reloadData];
+        [[self tableView] reloadData];
     }
     else{
         [self performSelectorOnMainThread:@selector(notifyDataAvailable) withObject:nil waitUntilDone:NO];

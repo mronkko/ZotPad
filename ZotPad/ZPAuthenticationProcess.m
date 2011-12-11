@@ -10,7 +10,7 @@
 #import "ZPAuthenticationDialog.h"
 #import "ZPDataLayer.h"
 #import "ZPServerConnection.h"
-#import "ZPMasterViewController.h"
+#import "ZPLibraryAndCollectionListViewController.h"
 
 @implementation ZPAuthenticationProcess
 

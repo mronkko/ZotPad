@@ -6,17 +6,17 @@
 //  Copyright (c) 2011 __MyCompanyName__. All rights reserved.
 //
 
-#import "ZPItemListViewController.h"
-#import "ZPMasterViewController.h"
+#import "ZPDetailedItemListViewController.h"
+#import "ZPLibraryAndCollectionListViewController.h"
 #import "ZPDataLayer.h"
 #import <QuartzCore/QuartzCore.h>
 #import "../DSActivityView/Sources/DSActivityView.h"
 
-@interface ZPItemListViewController ()
+@interface ZPDetailedItemListViewController ()
 @property (strong, nonatomic) UIPopoverController *masterPopoverController;
 @end
 
-@implementation ZPItemListViewController
+@implementation ZPDetailedItemListViewController
 
 @synthesize collectionID = _collectionKey;
 @synthesize libraryID =  _libraryID;
@@ -26,24 +26,19 @@
 
 @synthesize masterPopoverController = _masterPopoverController;
 
-@synthesize tableView;
 @synthesize searchBar;
 
-@synthesize itemKeysShown = _itemKeysShown;
-
-
-static ZPItemListViewController* _instance = nil;
+static ZPDetailedItemListViewController* _instance = nil;
 
 #pragma mark - Managing the detail item
 
 -(id) init{
     self = [super init];
-    _cellCache = [[NSCache alloc] init];
     
     return self;
 }
 
-+ (ZPItemListViewController*) instance{
++ (ZPDetailedItemListViewController*) instance{
     return _instance;
 }
 
@@ -53,16 +48,10 @@ static ZPItemListViewController* _instance = nil;
     // Release any cached data, images, etc that aren't in use.
 }
 
-- (NSInteger)tableView:(UITableView *)aTableView numberOfRowsInSection:(NSInteger)section {
-    // Return the number of rows in the section. Initially there is no library selected, so we will just return an empty view
-    if(_itemKeysShown==nil){
-        return 0;
-    }
-    else{
-        return [_itemKeysShown count];
-    }
-}
-
+/*
+ 
+ Configures the view  
+ */
 
 - (void)configureView
 {
@@ -75,7 +64,7 @@ static ZPItemListViewController* _instance = nil;
     // Retrieve the item IDs if a library is selected. 
     
     if(_libraryID!=0){
-        _itemKeysShown = [[ZPDataLayer instance] getItemKeysForView: self];
+        _itemKeysShown = [[ZPDataLayer instance] getItemKeysForSelection: self];
         if(_itemKeysShown == NULL){
             [self makeBusy];
         }
@@ -117,77 +106,31 @@ static ZPItemListViewController* _instance = nil;
     
 }
 
-- (void)notifyItemAvailable:(NSString*) key{
-    
-    
-    NSEnumerator *e = [[self.tableView indexPathsForVisibleRows] objectEnumerator];
-    
-    NSIndexPath* indexPath;
-    while ((indexPath = (NSIndexPath*) [e nextObject]) && indexPath.row <=[_itemKeysShown count]) {
-        if([key isEqualToString:[_itemKeysShown objectAtIndex:indexPath.row]]){
-            
-            //Tell this cell to update because it just got data
-            
-            [self performSelectorOnMainThread:@selector(_refreshCellAtIndexPaths:) withObject:[NSArray arrayWithObject:indexPath] waitUntilDone:NO];
-            
-            break;
-        }
-    }
-}
 - (void) _refreshCellAtIndexPaths:(NSArray*)indexPaths{
     [self.tableView reloadRowsAtIndexPaths:indexPaths withRowAnimation:UITableViewRowAnimationFade];
 
 }
+
 - (UITableViewCell *)tableView:(UITableView *)tableView cellForRowAtIndexPath:(NSIndexPath *)indexPath {
 
    
+    //This array contains NSStrings and NSNulls. Nulls mean that there is no data available yet
+    NSString* key = [_itemKeysShown objectAtIndex: indexPath.row];
     
-    NSObject* keyObj = [_itemKeysShown objectAtIndex: indexPath.row];
-
-
     
-    NSString* key;
-    if(keyObj==[NSNull null]){
-        key=@"";
-    }    
-    else{
-        key= (NSString*) keyObj;
-        //NSLog(@"Got key %@",key);
-    }    
+    UITableViewCell* cell = [_cellCache objectForKey:key];
     
-	UITableViewCell* cell = [self->_cellCache objectForKey:key];
     
     if(cell==nil){
         
-        //TODO: Set author and year to empty if not defined. 
-        ZPZoteroItem* item=NULL;
-        if(![key isEqualToString:@""]) item = [[ZPDataLayer instance] getItemByKey:key];
-        
-        if(item==NULL){
-            cell = [tableView dequeueReusableCellWithIdentifier:@"LoadingCell"];        
-        }
-        else{
+        cell = [super tableView:tableView cellForRowAtIndexPath:indexPath];
 
-            //NSLog(@"Not in cache, creating");
-            cell = [tableView dequeueReusableCellWithIdentifier:@"ZoteroItemCell"];
+        
+        if(key != [NSNull null]){
+
+            //If the cell contains an item, add publication details and thumbnail
             
-            UILabel *titleLabel = (UILabel *)[cell viewWithTag:1];
-            titleLabel.text = item.title;
-            
-            UILabel *authorsLabel = (UILabel *)[cell viewWithTag:2];
-            
-            //Show different things depending on what data we have
-            if(item.creatorSummary!=NULL){
-                if(item.year != 0){
-                    authorsLabel.text = [NSString stringWithFormat:@"%@ (%i)",item.creatorSummary,item.year];
-                }
-                else{
-                    authorsLabel.text = [NSString stringWithFormat:@"%@ (No date)",item.creatorSummary];
-                }
-            }    
-            else if(item.year != 0){
-                authorsLabel.text = [NSString stringWithFormat:@"No author (%i)",item.year];
-            }
+            ZPZoteroItem* item=[[ZPDataLayer instance] getItemByKey:key];
 
             //Publication as a formatted label
 
@@ -209,7 +152,9 @@ static ZPItemListViewController* _instance = nil;
                     break;
                 }
             }
-                  
+            //Get the authors label so that we can align publication details label with it
+            UILabel *authorsLabel = (UILabel *)[cell viewWithTag:2];
+            
             if(publishedInLabel == NULL){
                 CGRect frame = CGRectMake(CGRectGetMinX(authorsLabel.frame),CGRectGetMaxY(authorsLabel.frame),CGRectGetWidth(cell.frame)-CGRectGetMinX(authorsLabel.frame),CGRectGetHeight(cell.frame)-CGRectGetMaxY(authorsLabel.frame)-2);
                 publishedInLabel = [[TTStyledTextLabel alloc] 
@@ -267,7 +212,6 @@ static ZPItemListViewController* _instance = nil;
         }
         [_cellCache setObject:cell forKey:key];
     }
-    //Re-enable user interaction if it was disabled
     
     return cell;
 }
@@ -277,16 +221,14 @@ static ZPItemListViewController* _instance = nil;
 
 - (void)viewDidLoad
 {
-
-    
+   
     [super viewDidLoad];
     
-    // Store this instance as static variable so that we can access it through the class later
-    if(_instance == NULL){
-        _instance = self;
-    }
-
 	// Do any additional setup after loading the view, typically from a nib.
+
+    _instance = self;
+    
+
     [self configureView];
 }
 

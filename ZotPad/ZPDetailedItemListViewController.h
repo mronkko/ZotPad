@@ -9,36 +9,32 @@
 #import <UIKit/UIKit.h>
 #import "../DSActivityView/Sources/DSActivityView.h"
 #import "Three20/Three20.h"
+#import "ZPSimpleItemListViewController.h"
 
 //TODO: Make this a UITableViewController instead of UIViewController
 
-@interface ZPItemListViewController : UIViewController <UISplitViewControllerDelegate, UITableViewDataSource, UITableViewDelegate, UISearchBarDelegate>{
+@interface ZPDetailedItemListViewController : ZPSimpleItemListViewController <UISplitViewControllerDelegate, UISearchBarDelegate>{
     NSString* _searchString;
     NSInteger _collectionID;
     NSInteger _libraryID;
     NSString* _sortField;
     BOOL _sortDescending;
     
-    NSArray* _itemKeysShown;
-  
-    UITableView* tableView;
-    NSCache* _cellCache;
     DSBezelActivityView* _activityView;
 }
 
 // This class is used as a singleton
-+ (ZPItemListViewController*) instance;
++ (ZPDetailedItemListViewController*) instance;
 
 - (void)configureView;
-- (void)notifyDataAvailable;
-- (void)notifyItemAvailable:(NSString*) key;
 - (void)_refreshCellAtIndexPaths:(NSArray*)indexPath;
+
+// The first of these makes the view busy and the second tells that it has data, so that it can become active again.
+
 - (void)makeBusy;
+- (void)notifyDataAvailable;
 
-@property (nonatomic, retain) IBOutlet UITableView* tableView;
 @property (nonatomic, retain) IBOutlet UISearchBar* searchBar;
-
-@property (retain) NSArray* itemKeysShown;
 
 @property NSInteger collectionID;
 @property NSInteger libraryID;

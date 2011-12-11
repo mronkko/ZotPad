@@ -7,9 +7,11 @@
 //
 
 #import <Foundation/Foundation.h>
-#import "ZPItemListViewController.h"
+#import "ZPDetailedItemListViewController.h"
 #import "ZPItemRetrieveOperation.h"
 #import "ZPZoteroItem.h"
+#import "ZPItemObserver.h"
+
 #import "../FMDB/src/FMDatabase.h"
 #import "../FMDB/src/FMResultSet.h"
 
@@ -42,6 +44,8 @@
 
     BOOL _debugDataLayer;
     
+    NSMutableSet* _itemObservers;
+    
     FMDatabase* _database;
 }
 
@@ -56,10 +60,10 @@
 - (NSArray*) libraries;
 - (NSArray*) collections : (NSInteger)currentLibraryID currentCollection:(NSInteger)currentCollectionID;
 
-- (NSArray*) getItemKeysForView:(ZPItemListViewController*)view;
+- (NSArray*) getItemKeysForSelection:(ZPDetailedItemListViewController*)view;
 
 //Retrieves the initial 15 items, called from getItemKeysForView and executed as operation
-- (void) _retrieveAndSetInitialKeysForView:(ZPItemListViewController*)view;
+- (void) _retrieveAndSetInitialKeysForView:(ZPDetailedItemListViewController*)view;
 
 - (ZPZoteroItem*) getItemByKey: (NSString*) key;
 - (NSDictionary*) getFieldsForItem: (NSInteger) itemID;
@@ -73,5 +77,11 @@
 -(NSString*) currentlyActiveCollectionKey;
 -(NSInteger) currentlyActiveLibraryID;
 
+//Notifies all observers that a new item is available
+-(void) notifyItemBasicsAvailable:(NSString*)key;
+
+//Adds and removes observers
+-(void) registerItemObserver:(NSObject<ZPItemObserver>*)observer;
+-(void) removeItemObserver:(NSObject<ZPItemObserver>*)observer;
 
 @end

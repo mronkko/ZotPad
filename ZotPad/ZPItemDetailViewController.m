@@ -11,8 +11,8 @@
 
 #import "ZPItemDetailViewController.h"
 #import "ZPLibraryAndCollectionListViewController.h"
-#import "ZPNavigationItemListViewController.h"
-#import "ZPItemListViewController.h"
+#import "ZPSimpleItemListViewController.h"
+#import "ZPDetailedItemListViewController.h"
 #import "ZPDataLayer.h"
 
 
@@ -39,16 +39,6 @@
 
 - (void)viewWillAppear:(BOOL)animated
 {
-    // Get the selected row from the item list
-    NSIndexPath* indexPath = [[[ZPItemListViewController instance] tableView] indexPathForSelectedRow];
-    
-
-
-    // Get the key for the selected item 
-    NSString* currentItemKey = [[[ZPItemListViewController instance] itemKeysShown] objectAtIndex: indexPath.row]; 
-
-    _selectedItem = [[ZPDataLayer instance] getItemByKey: currentItemKey];
-
     
     //Configure the size of the title section
     //The positions and sizes are set programmatically because this is difficult to get right with Interface Builder
@@ -57,27 +47,22 @@
 
     UILabel *titleLabel = (UILabel *)[self.view viewWithTag:1];
     
-    TTStyledTextLabel* fullCitationLabel= [[TTStyledTextLabel alloc] 
+    _fullCitationLabel= [[TTStyledTextLabel alloc] 
                                            initWithFrame:CGRectMake(-1,0, 
                                                                     self.view.frame.size.width+2, 
                                                                     TITLE_VIEW_HEIGHT)];
     
-    [fullCitationLabel setFont:[titleLabel font]];
-    [fullCitationLabel setClipsToBounds:TRUE];
+    [_fullCitationLabel setFont:[titleLabel font]];
+    [_fullCitationLabel setClipsToBounds:TRUE];
     
     //Top, bottom, left, right
-    [fullCitationLabel setContentInset:UIEdgeInsetsMake(5,5,10,10)];
+    [_fullCitationLabel setContentInset:UIEdgeInsetsMake(5,5,10,10)];
     
-    TTStyledText* text = [TTStyledText textFromXHTML:[_selectedItem.fullCitation stringByReplacingOccurrencesOfString:@" & " 
-                                                                                                           withString:@" &amp; "] lineBreaks:YES URLs:NO];
-    [fullCitationLabel setText:text];
-    
-    
-    fullCitationLabel.layer.borderColor = [_detailTableView separatorColor].CGColor;
-    fullCitationLabel.layer.borderWidth = 1.0f;
+    _fullCitationLabel.layer.borderColor = [_detailTableView separatorColor].CGColor;
+    _fullCitationLabel.layer.borderWidth = 1.0f;
     
     //Clear the old content and add the title label
-    [[titleLabel superview] addSubview: fullCitationLabel];
+    [[titleLabel superview] addSubview: _fullCitationLabel];
     [titleLabel removeFromSuperview];
     
     
@@ -91,6 +76,50 @@
     attachmentView.layer.borderColor = [_detailTableView separatorColor].CGColor;
     attachmentView.layer.borderWidth = 1.0f;
     
+
+    // Get the selected row from the item list
+    NSIndexPath* indexPath = [[[ZPDetailedItemListViewController instance] tableView] indexPathForSelectedRow];
+    
+    // Get the key for the selected item 
+    NSString* currentItemKey = [[[ZPDetailedItemListViewController instance] itemKeysShown] objectAtIndex: indexPath.row]; 
+    
+    [self configureWithItemKey: currentItemKey];
+
+    
+    
+    //Show the item view in the navigator
+    _itemListController = [self.storyboard instantiateViewControllerWithIdentifier:@"NavigationItemListView"];
+    
+    [_itemListController setItemKeysShown:[[ZPDetailedItemListViewController instance] itemKeysShown]];
+    
+    _itemListController.navigationItem.hidesBackButton = YES;
+    
+    
+    [[[ZPLibraryAndCollectionListViewController instance] navigationController] pushViewController:_itemListController  animated:YES];
+
+	[super viewWillAppear:animated];
+    
+    //Set the selected row to match the current row
+    [[_itemListController tableView] selectRowAtIndexPath:indexPath animated:FALSE scrollPosition:UITableViewScrollPositionMiddle];
+
+    _detailTableView.scrollEnabled = FALSE;
+    
+    [_itemListController.tableView setDelegate: self];
+
+}
+
+-(void) configureWithItemKey:(NSString*)key{
+    
+    _selectedItem = [[ZPDataLayer instance] getItemByKey: key];
+    
+    
+
+    
+    TTStyledText* text = [TTStyledText textFromXHTML:[_selectedItem.fullCitation stringByReplacingOccurrencesOfString:@" & " 
+                                                                                                           withString:@" &amp; "] lineBreaks:YES URLs:NO];
+    [_fullCitationLabel setText:text];
+    
+    
     //Configure the size of the detail view table.
     
     [_detailTableView layoutIfNeeded];
@@ -102,20 +131,6 @@
     
     //Configure  the size of the UIScrollView
     [(UIScrollView*) self.view setContentSize:CGSizeMake(self.view.frame.size.width, TITLE_VIEW_HEIGHT + ATTACHMENT_VIEW_HEIGHT + [_detailTableView contentSize].height)];
-    
-    
-    
-    //Show the item view in the navigator
-    UITableViewController* itemListController = [self.storyboard instantiateViewControllerWithIdentifier:@"NavigationItemListView"];
-        
-    [[[ZPLibraryAndCollectionListViewController instance] navigationController] pushViewController:itemListController  animated:YES];
-
-	[super viewWillDisappear:animated];
-    
-    //Set the selected row to match the current row
-    [[itemListController tableView] selectRowAtIndexPath:indexPath animated:FALSE scrollPosition:UITableViewScrollPositionMiddle];
-
-    _detailTableView.scrollEnabled = FALSE;
     
 }
 
@@ -171,6 +186,32 @@
     
     
 	return ( cell );
+}
+
+/*
+    
+ This takes care of both the details table and table that constains the list of items in the navigator
+ 
+ */
+
+- (void)tableView:(UITableView *)aTableView didSelectRowAtIndexPath:(NSIndexPath *)indexPath {
+    
+    // Item details
+    
+    if(aTableView == _detailTableView){
+        
+    }
+    
+    // Navigator list view
+    
+    else{
+        
+        // Get the key for the selected item 
+        NSString* currentItemKey = [[_itemListController itemKeysShown] objectAtIndex: indexPath.row]; 
+        
+        [self configureWithItemKey: currentItemKey];
+        
+    }
 }
 
 

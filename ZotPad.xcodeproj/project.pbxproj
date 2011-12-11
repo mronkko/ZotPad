@@ -16,6 +16,7 @@
 		320CC833B8AF0ACFD35E6225 /* libThree20Style.a in Frameworks */ = {isa = PBXBuildFile; fileRef = 320CC833B8AF0ACFD35E6224 /* libThree20Style.a */; };
 		320D7DCCE32703ACAB9A45E5 /* libThree20.a in Frameworks */ = {isa = PBXBuildFile; fileRef = 320D7DCCE32703ACAB9A45E4 /* libThree20.a */; };
 		320F2C48872C2E2C4DF86205 /* libThree20UI.a in Frameworks */ = {isa = PBXBuildFile; fileRef = 320F2C48872C2E2C4DF86204 /* libThree20UI.a */; };
+		A716C0311494E77600BD6025 /* ZPOrderedDictionary.m in Sources */ = {isa = PBXBuildFile; fileRef = A716C0301494E77600BD6025 /* ZPOrderedDictionary.m */; };
 		A7200DD514718DC0004347C9 /* UIKit.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = A7200DD414718DC0004347C9 /* UIKit.framework */; };
 		A7200DD714718DC0004347C9 /* Foundation.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = A7200DD614718DC0004347C9 /* Foundation.framework */; };
 		A7200DD914718DC0004347C9 /* CoreGraphics.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = A7200DD814718DC0004347C9 /* CoreGraphics.framework */; };
@@ -23,7 +24,7 @@
 		A7200DE114718DC0004347C9 /* main.m in Sources */ = {isa = PBXBuildFile; fileRef = A7200DE014718DC0004347C9 /* main.m */; };
 		A7200DE514718DC0004347C9 /* ZPAppDelegate.m in Sources */ = {isa = PBXBuildFile; fileRef = A7200DE414718DC0004347C9 /* ZPAppDelegate.m */; };
 		A7200DEB14718DC1004347C9 /* ZPLibraryAndCollectionListViewController.m in Sources */ = {isa = PBXBuildFile; fileRef = A7200DEA14718DC1004347C9 /* ZPLibraryAndCollectionListViewController.m */; };
-		A7200DEE14718DC1004347C9 /* ZPItemListViewController.m in Sources */ = {isa = PBXBuildFile; fileRef = A7200DED14718DC1004347C9 /* ZPItemListViewController.m */; };
+		A7200DEE14718DC1004347C9 /* ZPDetailedItemListViewController.m in Sources */ = {isa = PBXBuildFile; fileRef = A7200DED14718DC1004347C9 /* ZPDetailedItemListViewController.m */; };
 		A7200DF614718F44004347C9 /* ZPDataLayer.m in Sources */ = {isa = PBXBuildFile; fileRef = A7200DF514718F44004347C9 /* ZPDataLayer.m */; };
 		A7200DF8147193C0004347C9 /* libsqlite3.dylib in Frameworks */ = {isa = PBXBuildFile; fileRef = A7200DF7147193C0004347C9 /* libsqlite3.dylib */; };
 		A72853F9147E319700D3FE97 /* ZPZoteroLibrary.m in Sources */ = {isa = PBXBuildFile; fileRef = A72853F8147E319600D3FE97 /* ZPZoteroLibrary.m */; };
@@ -41,7 +42,7 @@
 		A78B7F13149091B8008303BA /* Default-Landscape~ipad.png in Resources */ = {isa = PBXBuildFile; fileRef = A78B7F12149091B8008303BA /* Default-Landscape~ipad.png */; };
 		A78B7F1514909285008303BA /* Default-Portrait~ipad.png in Resources */ = {isa = PBXBuildFile; fileRef = A78B7F1414909285008303BA /* Default-Portrait~ipad.png */; };
 		A79ED823148B2683003EE77C /* ZPItemDetailViewController.m in Sources */ = {isa = PBXBuildFile; fileRef = A79ED822148B2683003EE77C /* ZPItemDetailViewController.m */; };
-		A79ED82C148B7405003EE77C /* ZPNavigationItemListViewController.m in Sources */ = {isa = PBXBuildFile; fileRef = A79ED82B148B7405003EE77C /* ZPNavigationItemListViewController.m */; };
+		A79ED82C148B7405003EE77C /* ZPSimpleItemListViewController.m in Sources */ = {isa = PBXBuildFile; fileRef = A79ED82B148B7405003EE77C /* ZPSimpleItemListViewController.m */; };
 		A7A3F950147BAB6C00CA7266 /* database.sql in Resources */ = {isa = PBXBuildFile; fileRef = A7A3F94F147BAB6C00CA7266 /* database.sql */; };
 		A7A3F953147BBCCB00CA7266 /* ZPServerResponseXMLParser.m in Sources */ = {isa = PBXBuildFile; fileRef = A7A3F952147BBCCA00CA7266 /* ZPServerResponseXMLParser.m */; };
 		A7A54B0B14878E4F00EBAD80 /* FMDatabase.m in Sources */ = {isa = PBXBuildFile; fileRef = A7A54B0614878E4F00EBAD80 /* FMDatabase.m */; settings = {COMPILER_FLAGS = "-fno-objc-arc"; }; };
@@ -233,6 +234,8 @@
 		320CC833B8AF0ACFD35E6220 /* Three20Style.xcodeproj */ = {isa = PBXFileReference; lastKnownFileType = "wrapper.pb-project"; name = Three20Style.xcodeproj; path = Three20/src/Three20Style/Three20Style.xcodeproj; sourceTree = SOURCE_ROOT; };
 		320D7DCCE32703ACAB9A45E0 /* Three20.xcodeproj */ = {isa = PBXFileReference; lastKnownFileType = "wrapper.pb-project"; name = Three20.xcodeproj; path = Three20/src/Three20/Three20.xcodeproj; sourceTree = SOURCE_ROOT; };
 		320F2C48872C2E2C4DF86200 /* Three20UI.xcodeproj */ = {isa = PBXFileReference; lastKnownFileType = "wrapper.pb-project"; name = Three20UI.xcodeproj; path = Three20/src/Three20UI/Three20UI.xcodeproj; sourceTree = SOURCE_ROOT; };
+		A716C02F1494E77600BD6025 /* ZPOrderedDictionary.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = ZPOrderedDictionary.h; sourceTree = "<group>"; };
+		A716C0301494E77600BD6025 /* ZPOrderedDictionary.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = ZPOrderedDictionary.m; sourceTree = "<group>"; };
 		A7200DD014718DC0004347C9 /* ZotPad.app */ = {isa = PBXFileReference; explicitFileType = wrapper.application; includeInIndex = 0; path = ZotPad.app; sourceTree = BUILT_PRODUCTS_DIR; };
 		A7200DD414718DC0004347C9 /* UIKit.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; name = UIKit.framework; path = System/Library/Frameworks/UIKit.framework; sourceTree = SDKROOT; };
 		A7200DD614718DC0004347C9 /* Foundation.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; name = Foundation.framework; path = System/Library/Frameworks/Foundation.framework; sourceTree = SDKROOT; };
@@ -243,10 +246,10 @@
 		A7200DE214718DC0004347C9 /* ZotPad-Prefix.pch */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = "ZotPad-Prefix.pch"; sourceTree = "<group>"; };
 		A7200DE314718DC0004347C9 /* ZPAppDelegate.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = ZPAppDelegate.h; sourceTree = "<group>"; };
 		A7200DE414718DC0004347C9 /* ZPAppDelegate.m */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.objc; path = ZPAppDelegate.m; sourceTree = "<group>"; };
-		A7200DE914718DC1004347C9 /* ZPLibraryAndCollectionListViewController.h */ = {isa = PBXFileReference; path = ZPLibraryAndCollectionListViewController.h; sourceTree = "<group>"; };
+		A7200DE914718DC1004347C9 /* ZPLibraryAndCollectionListViewController.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = ZPLibraryAndCollectionListViewController.h; sourceTree = "<group>"; };
 		A7200DEA14718DC1004347C9 /* ZPLibraryAndCollectionListViewController.m */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.objc; path = ZPLibraryAndCollectionListViewController.m; sourceTree = "<group>"; };
-		A7200DEC14718DC1004347C9 /* ZPItemListViewController.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = ZPItemListViewController.h; sourceTree = "<group>"; };
-		A7200DED14718DC1004347C9 /* ZPItemListViewController.m */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.objc; path = ZPItemListViewController.m; sourceTree = "<group>"; };
+		A7200DEC14718DC1004347C9 /* ZPDetailedItemListViewController.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = ZPDetailedItemListViewController.h; sourceTree = "<group>"; };
+		A7200DED14718DC1004347C9 /* ZPDetailedItemListViewController.m */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.objc; path = ZPDetailedItemListViewController.m; sourceTree = "<group>"; };
 		A7200DF414718F44004347C9 /* ZPDataLayer.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = ZPDataLayer.h; sourceTree = "<group>"; };
 		A7200DF514718F44004347C9 /* ZPDataLayer.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = ZPDataLayer.m; sourceTree = "<group>"; };
 		A7200DF7147193C0004347C9 /* libsqlite3.dylib */ = {isa = PBXFileReference; lastKnownFileType = "compiled.mach-o.dylib"; name = libsqlite3.dylib; path = usr/lib/libsqlite3.dylib; sourceTree = SDKROOT; };
@@ -272,8 +275,8 @@
 		A78B7F1414909285008303BA /* Default-Portrait~ipad.png */ = {isa = PBXFileReference; lastKnownFileType = image.png; name = "Default-Portrait~ipad.png"; path = "../LaunchImages/Default-Portrait~ipad.png"; sourceTree = "<group>"; };
 		A79ED821148B2683003EE77C /* ZPItemDetailViewController.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = ZPItemDetailViewController.h; sourceTree = "<group>"; };
 		A79ED822148B2683003EE77C /* ZPItemDetailViewController.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = ZPItemDetailViewController.m; sourceTree = "<group>"; };
-		A79ED82A148B7404003EE77C /* ZPNavigationItemListViewController.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = ZPNavigationItemListViewController.h; sourceTree = "<group>"; };
-		A79ED82B148B7405003EE77C /* ZPNavigationItemListViewController.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = ZPNavigationItemListViewController.m; sourceTree = "<group>"; };
+		A79ED82A148B7404003EE77C /* ZPSimpleItemListViewController.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = ZPSimpleItemListViewController.h; sourceTree = "<group>"; };
+		A79ED82B148B7405003EE77C /* ZPSimpleItemListViewController.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = ZPSimpleItemListViewController.m; sourceTree = "<group>"; };
 		A7A3F94F147BAB6C00CA7266 /* database.sql */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = text; path = database.sql; sourceTree = "<group>"; };
 		A7A3F951147BBCCA00CA7266 /* ZPServerResponseXMLParser.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = ZPServerResponseXMLParser.h; sourceTree = "<group>"; };
 		A7A3F952147BBCCA00CA7266 /* ZPServerResponseXMLParser.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = ZPServerResponseXMLParser.m; sourceTree = "<group>"; };
@@ -501,10 +504,10 @@
 				A7200DE414718DC0004347C9 /* ZPAppDelegate.m */,
 				A7200DE914718DC1004347C9 /* ZPLibraryAndCollectionListViewController.h */,
 				A7200DEA14718DC1004347C9 /* ZPLibraryAndCollectionListViewController.m */,
-				A7200DEC14718DC1004347C9 /* ZPItemListViewController.h */,
-				A7200DED14718DC1004347C9 /* ZPItemListViewController.m */,
-				A79ED82A148B7404003EE77C /* ZPNavigationItemListViewController.h */,
-				A79ED82B148B7405003EE77C /* ZPNavigationItemListViewController.m */,
+				A7200DEC14718DC1004347C9 /* ZPDetailedItemListViewController.h */,
+				A7200DED14718DC1004347C9 /* ZPDetailedItemListViewController.m */,
+				A79ED82A148B7404003EE77C /* ZPSimpleItemListViewController.h */,
+				A79ED82B148B7405003EE77C /* ZPSimpleItemListViewController.m */,
 				A79ED821148B2683003EE77C /* ZPItemDetailViewController.h */,
 				A79ED822148B2683003EE77C /* ZPItemDetailViewController.m */,
 				A74348D5147AB37A00DA6FC3 /* ZPAuthenticationDialog.h */,
@@ -545,6 +548,8 @@
 				A72853FC147E31B500D3FE97 /* ZPZoteroCollection.m */,
 				A7692D82147D112D000C1A8F /* ZPZoteroItem.h */,
 				A7692D83147D112D000C1A8F /* ZPZoteroItem.m */,
+				A716C02F1494E77600BD6025 /* ZPOrderedDictionary.h */,
+				A716C0301494E77600BD6025 /* ZPOrderedDictionary.m */,
 			);
 			name = "Data objects";
 			sourceTree = "<group>";
@@ -877,7 +882,7 @@
 				A7200DE114718DC0004347C9 /* main.m in Sources */,
 				A7200DE514718DC0004347C9 /* ZPAppDelegate.m in Sources */,
 				A7200DEB14718DC1004347C9 /* ZPLibraryAndCollectionListViewController.m in Sources */,
-				A7200DEE14718DC1004347C9 /* ZPItemListViewController.m in Sources */,
+				A7200DEE14718DC1004347C9 /* ZPDetailedItemListViewController.m in Sources */,
 				A7200DF614718F44004347C9 /* ZPDataLayer.m in Sources */,
 				A7A7C9B1147A8144004D8756 /* ZPServerConnection.m in Sources */,
 				A7A7C9F8147AA2EE004D8756 /* NSMutableURLRequest+Parameters.m in Sources */,
@@ -911,8 +916,9 @@
 				A7A54B1114878EE000EBAD80 /* DSActivityView.m in Sources */,
 				A7B5180B14880CE700806EED /* ZPAuthenticationProcess.m in Sources */,
 				A79ED823148B2683003EE77C /* ZPItemDetailViewController.m in Sources */,
-				A79ED82C148B7405003EE77C /* ZPNavigationItemListViewController.m in Sources */,
+				A79ED82C148B7405003EE77C /* ZPSimpleItemListViewController.m in Sources */,
 				A7CC252F1493E14E00FDEAF4 /* iCarousel.m in Sources */,
+				A716C0311494E77600BD6025 /* ZPOrderedDictionary.m in Sources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};

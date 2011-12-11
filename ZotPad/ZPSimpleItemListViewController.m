@@ -6,29 +6,24 @@
 //  Copyright (c) 2011 __MyCompanyName__. All rights reserved.
 //
 
-#import "ZPNavigationItemListViewController.h"
-#import "ZPItemListViewController.h"
+#import "ZPSimpleItemListViewController.h"
 #import "ZPZoteroItem.h"
 #import "ZPDataLayer.h"
 
 
 //TODO: Consider making a super class for this class and the ZPItemListView to avoid redundant code
 
-@implementation ZPNavigationItemListViewController
+@implementation ZPSimpleItemListViewController
 
-static ZPNavigationItemListViewController* _instance = nil;
+@synthesize itemKeysShown = _itemKeysShown;
+@synthesize tableView = _tableView;
 
 #pragma mark - Managing the detail item
 
 -(id) init{
     self = [super init];
     _cellCache = [[NSCache alloc] init];
-    _instance = self;                  
     return self;
-}
-
-+ (ZPNavigationItemListViewController*) instance{
-    return _instance;
 }
 
 - (void)didReceiveMemoryWarning
@@ -41,16 +36,9 @@ static ZPNavigationItemListViewController* _instance = nil;
     return [_itemKeysShown count];
 }
 
-/*
- When an item is selected, we need to update what is shown in the item detail view
- */
 
-- (void)tableView:(UITableView *)aTableView didSelectRowAtIndexPath:(NSIndexPath *)indexPath {
-        
-}
-
-
-- (void)notifyItemAvailable:(NSString*) key{
+// Tells an observer that basic citation information is available for items
+-(void) notifyItemBasicsAvailable:(NSString*) key{
     
     
     NSEnumerator *e = [[self.tableView indexPathsForVisibleRows] objectEnumerator];
@@ -78,11 +66,6 @@ static ZPNavigationItemListViewController* _instance = nil;
     
     NSObject* keyObj = [_itemKeysShown objectAtIndex: indexPath.row];
     
-    //It is possible that we do not yet have data for the full view. Sleep until we have it
-    //More data is retrieved in the background
-    
-    // NSLog(@"Retrieving item for for %i",indexPath.row);
-    
     
     NSString* key;
     if(keyObj==[NSNull null]){
@@ -90,10 +73,9 @@ static ZPNavigationItemListViewController* _instance = nil;
     }    
     else{
         key= (NSString*) keyObj;
-        //NSLog(@"Got key %@",key);
     }    
     
-	UITableViewCell* cell = [self->_cellCache objectForKey:key];
+	UITableViewCell* cell = [_cellCache objectForKey:key];
     
     if(cell==nil){
         
@@ -142,10 +124,6 @@ static ZPNavigationItemListViewController* _instance = nil;
 {
         
     [super viewDidLoad];
-    //We do not want the user to use the navigator to go back.
-    self.navigationItem.hidesBackButton = YES;
-
-    _itemKeysShown = [[ZPItemListViewController instance] itemKeysShown];
 
 }
 
@@ -164,11 +142,13 @@ static ZPNavigationItemListViewController* _instance = nil;
 - (void)viewDidAppear:(BOOL)animated
 {
     [super viewDidAppear:animated];
+    [[ZPDataLayer instance] registerItemObserver:self];
 }
 
 - (void)viewWillDisappear:(BOOL)animated
 {
 	[super viewWillDisappear:animated];
+    [[ZPDataLayer instance] removeItemObserver:self];
 }
 
 - (void)viewDidDisappear:(BOOL)animated

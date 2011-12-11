@@ -15,17 +15,15 @@
 @protocol ZPItemObserver <NSObject>
 
 @optional
-// Tells an observer that the array containing items for the visible item set has been updated
--(void) notifyItemKeysAvailableForVisibleSet;
 
 // Tells an observer that basic citation information is available for items
--(void) notifyItemBasicsAvailable:(NSArray*) keys;
+-(void) notifyItemBasicsAvailable:(NSString*) key;
 
 // Tells an observer that detailed citation information is available
--(void) notifyItemDetailsAvailable:(NSArray*) keys;
+-(void) notifyItemDetailsAvailable:(NSString*) key;
 
 // Tells an observer that information about attachments is available
--(void) notifyItemAttachmentInformationAvailable:(NSstring*) key;
+-(void) notifyItemAttachmentInformationAvailable:(NSString*) key;
 
 // Tells an observer that information about attachments is available
 -(void) notifyItemAttachmentFileAvailable:(NSString*) path;

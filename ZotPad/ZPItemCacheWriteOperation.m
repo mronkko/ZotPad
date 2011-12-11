@@ -9,8 +9,6 @@
 #import "ZPItemCacheWriteOperation.h"
 #import "ZPDataLayer.h"
 #import "ZPZoteroItem.h"
-#import "ZPItemListViewController.h"
-#import "ZPNavigationItemListViewController.h"
 
 @implementation ZPItemCacheWriteOperation
 
@@ -34,10 +32,7 @@
         
         //Notify the user interface that this item is now available
         NSString* key = [(ZPZoteroItem*) object key];
-        ZPItemListViewController* controller=[ZPItemListViewController instance];
-        [controller notifyItemAvailable:key];
-        if([ZPNavigationItemListViewController instance]!=NULL)
-            [[ZPNavigationItemListViewController instance] notifyItemAvailable:key];
+        [[ZPDataLayer instance] notifyItemBasicsAvailable:key];
     }
 }
 

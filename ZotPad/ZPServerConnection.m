@@ -39,7 +39,7 @@ const NSInteger ZPServerConnectionRequestItems = 3;
     self = [super init];
         
     _activeRequestCount = 0;
-    _debugServerConnection = TRUE;
+//    _debugServerConnection = TRUE;
     
     return self;
 }
