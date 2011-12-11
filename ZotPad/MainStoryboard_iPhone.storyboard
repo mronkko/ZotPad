@@ -22,7 +22,7 @@
         <scene sceneID="18">
             <objects>
                 <placeholder placeholderIdentifier="IBFirstResponder" id="17" sceneMemberID="firstResponder"/>
-                <tableViewController storyboardIdentifier="" title="Master" id="12" customClass="ZPMasterViewController" sceneMemberID="viewController">
+                <tableViewController storyboardIdentifier="" title="Master" id="12" customClass="ZPLibraryAndCollectionListViewController" sceneMemberID="viewController">
                     <tableView key="view" opaque="NO" clipsSubviews="YES" clearsContextBeforeDrawing="NO" contentMode="scaleToFill" alwaysBounceVertical="YES" showsHorizontalScrollIndicator="NO" dataMode="prototypes" style="plain" rowHeight="44" sectionHeaderHeight="22" sectionFooterHeight="22" id="13">
                         <rect key="frame" x="0.0" y="64" width="320" height="416"/>
                         <autoresizingMask key="autoresizingMask" widthSizable="YES" heightSizable="YES"/>
@@ -135,11 +135,6 @@
             <point key="canvasLocation" x="924" y="64"/>
         </scene>
     </scenes>
-    <classes>
-        <class className="ZPMasterViewController" superclassName="UITableViewController">
-            <source key="sourceIdentifier" type="project" relativePath="./Classes/ZPMasterViewController.h"/>
-        </class>
-    </classes>
     <simulatedMetricsContainer key="defaultSimulatedMetrics">
         <simulatedStatusBarMetrics key="statusBar"/>
         <simulatedOrientationMetrics key="orientation"/>

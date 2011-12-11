@@ -10,7 +10,7 @@
 //TODO: Change this to table view controller
 
 #import "ZPItemDetailViewController.h"
-#import "ZPMasterViewController.h"
+#import "ZPLibraryAndCollectionListViewController.h"
 #import "ZPNavigationItemListViewController.h"
 #import "ZPItemListViewController.h"
 #import "ZPDataLayer.h"
@@ -108,7 +108,7 @@
     //Show the item view in the navigator
     UITableViewController* itemListController = [self.storyboard instantiateViewControllerWithIdentifier:@"NavigationItemListView"];
         
-    [[[ZPMasterViewController instance] navigationController] pushViewController:itemListController  animated:YES];
+    [[[ZPLibraryAndCollectionListViewController instance] navigationController] pushViewController:itemListController  animated:YES];
 
 	[super viewWillDisappear:animated];
     
@@ -123,7 +123,7 @@
 {
     //Pop the item navigator away from the navigator.
     
-    [[[ZPMasterViewController instance] navigationController] popViewControllerAnimated:YES];
+    [[[ZPLibraryAndCollectionListViewController instance] navigationController] popViewControllerAnimated:YES];
     
     
 	[super viewWillDisappear:animated];

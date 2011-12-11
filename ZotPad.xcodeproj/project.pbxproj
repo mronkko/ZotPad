@@ -22,7 +22,7 @@
 		A7200DDF14718DC0004347C9 /* InfoPlist.strings in Resources */ = {isa = PBXBuildFile; fileRef = A7200DDD14718DC0004347C9 /* InfoPlist.strings */; };
 		A7200DE114718DC0004347C9 /* main.m in Sources */ = {isa = PBXBuildFile; fileRef = A7200DE014718DC0004347C9 /* main.m */; };
 		A7200DE514718DC0004347C9 /* ZPAppDelegate.m in Sources */ = {isa = PBXBuildFile; fileRef = A7200DE414718DC0004347C9 /* ZPAppDelegate.m */; };
-		A7200DEB14718DC1004347C9 /* ZPMasterViewController.m in Sources */ = {isa = PBXBuildFile; fileRef = A7200DEA14718DC1004347C9 /* ZPMasterViewController.m */; };
+		A7200DEB14718DC1004347C9 /* ZPLibraryAndCollectionListViewController.m in Sources */ = {isa = PBXBuildFile; fileRef = A7200DEA14718DC1004347C9 /* ZPLibraryAndCollectionListViewController.m */; };
 		A7200DEE14718DC1004347C9 /* ZPItemListViewController.m in Sources */ = {isa = PBXBuildFile; fileRef = A7200DED14718DC1004347C9 /* ZPItemListViewController.m */; };
 		A7200DF614718F44004347C9 /* ZPDataLayer.m in Sources */ = {isa = PBXBuildFile; fileRef = A7200DF514718F44004347C9 /* ZPDataLayer.m */; };
 		A7200DF8147193C0004347C9 /* libsqlite3.dylib in Frameworks */ = {isa = PBXBuildFile; fileRef = A7200DF7147193C0004347C9 /* libsqlite3.dylib */; };
@@ -243,8 +243,8 @@
 		A7200DE214718DC0004347C9 /* ZotPad-Prefix.pch */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = "ZotPad-Prefix.pch"; sourceTree = "<group>"; };
 		A7200DE314718DC0004347C9 /* ZPAppDelegate.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = ZPAppDelegate.h; sourceTree = "<group>"; };
 		A7200DE414718DC0004347C9 /* ZPAppDelegate.m */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.objc; path = ZPAppDelegate.m; sourceTree = "<group>"; };
-		A7200DE914718DC1004347C9 /* ZPMasterViewController.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = ZPMasterViewController.h; sourceTree = "<group>"; };
-		A7200DEA14718DC1004347C9 /* ZPMasterViewController.m */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.objc; path = ZPMasterViewController.m; sourceTree = "<group>"; };
+		A7200DE914718DC1004347C9 /* ZPLibraryAndCollectionListViewController.h */ = {isa = PBXFileReference; path = ZPLibraryAndCollectionListViewController.h; sourceTree = "<group>"; };
+		A7200DEA14718DC1004347C9 /* ZPLibraryAndCollectionListViewController.m */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.objc; path = ZPLibraryAndCollectionListViewController.m; sourceTree = "<group>"; };
 		A7200DEC14718DC1004347C9 /* ZPItemListViewController.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = ZPItemListViewController.h; sourceTree = "<group>"; };
 		A7200DED14718DC1004347C9 /* ZPItemListViewController.m */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.objc; path = ZPItemListViewController.m; sourceTree = "<group>"; };
 		A7200DF414718F44004347C9 /* ZPDataLayer.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = ZPDataLayer.h; sourceTree = "<group>"; };
@@ -334,6 +334,7 @@
 		A7CC252B1493E14D00FDEAF4 /* iCarousel.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = iCarousel.h; sourceTree = "<group>"; };
 		A7CC252C1493E14D00FDEAF4 /* iCarousel.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = iCarousel.m; sourceTree = "<group>"; };
 		A7CCFE8614865E5900570515 /* ZPNavigatorNode.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = ZPNavigatorNode.h; sourceTree = "<group>"; };
+		A7D4A1801494B1B700935847 /* ZPItemObserver.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = ZPItemObserver.h; sourceTree = "<group>"; };
 /* End PBXFileReference section */
 
 /* Begin PBXFrameworksBuildPhase section */
@@ -498,8 +499,8 @@
 			children = (
 				A7200DE314718DC0004347C9 /* ZPAppDelegate.h */,
 				A7200DE414718DC0004347C9 /* ZPAppDelegate.m */,
-				A7200DE914718DC1004347C9 /* ZPMasterViewController.h */,
-				A7200DEA14718DC1004347C9 /* ZPMasterViewController.m */,
+				A7200DE914718DC1004347C9 /* ZPLibraryAndCollectionListViewController.h */,
+				A7200DEA14718DC1004347C9 /* ZPLibraryAndCollectionListViewController.m */,
 				A7200DEC14718DC1004347C9 /* ZPItemListViewController.h */,
 				A7200DED14718DC1004347C9 /* ZPItemListViewController.m */,
 				A79ED82A148B7404003EE77C /* ZPNavigationItemListViewController.h */,
@@ -529,6 +530,7 @@
 				A737A460147C24A700174E16 /* ZPItemRetrieveOperation.m */,
 				A7A3F951147BBCCA00CA7266 /* ZPServerResponseXMLParser.h */,
 				A7A3F952147BBCCA00CA7266 /* ZPServerResponseXMLParser.m */,
+				A7D4A1801494B1B700935847 /* ZPItemObserver.h */,
 			);
 			name = "Data layer and server connection";
 			sourceTree = "<group>";
@@ -874,7 +876,7 @@
 			files = (
 				A7200DE114718DC0004347C9 /* main.m in Sources */,
 				A7200DE514718DC0004347C9 /* ZPAppDelegate.m in Sources */,
-				A7200DEB14718DC1004347C9 /* ZPMasterViewController.m in Sources */,
+				A7200DEB14718DC1004347C9 /* ZPLibraryAndCollectionListViewController.m in Sources */,
 				A7200DEE14718DC1004347C9 /* ZPItemListViewController.m in Sources */,
 				A7200DF614718F44004347C9 /* ZPDataLayer.m in Sources */,
 				A7A7C9B1147A8144004D8756 /* ZPServerConnection.m in Sources */,

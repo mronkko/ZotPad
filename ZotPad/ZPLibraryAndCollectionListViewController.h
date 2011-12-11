@@ -12,7 +12,7 @@
 
 @class ZPItemListViewController;
 
-@interface ZPMasterViewController : UITableViewController{
+@interface ZPLibraryAndCollectionListViewController : UITableViewController{
     ZPDataLayer* _database;
     NSArray* _content;
     NSInteger _currentLibrary;
@@ -25,7 +25,7 @@
 
 @property (nonatomic, retain) IBOutlet UITableView* navigationTableView;
 
-+ (ZPMasterViewController*) instance;
++ (ZPLibraryAndCollectionListViewController*) instance;
 - (void)notifyDataAvailable;
 
 @end

@@ -22,7 +22,7 @@
 #import "ZPServerResponseXMLParser.h"
 
 //User interface
-#import "ZPMasterViewController.h"
+#import "ZPLibraryAndCollectionListViewController.h"
 
 //DB library
 #import "../FMDB/src/FMDatabase.h"
@@ -229,7 +229,7 @@ static ZPDataLayer* _instance = nil;
     
     //TODO: Clean up orphaned items
     
-    [[ZPMasterViewController instance] notifyDataAvailable];
+    [[ZPLibraryAndCollectionListViewController instance] notifyDataAvailable];
 }
 
 /*

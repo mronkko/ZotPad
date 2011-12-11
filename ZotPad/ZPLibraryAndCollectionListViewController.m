@@ -6,7 +6,7 @@
 //  Copyright (c) 2011 __MyCompanyName__. All rights reserved.
 //
 
-#import "ZPMasterViewController.h"
+#import "ZPLibraryAndCollectionListViewController.h"
 #import "ZPItemListViewController.h"
 #import "ZPDataLayer.h"
 #import "ZPServerConnection.h"
@@ -14,16 +14,16 @@
 #import "ZPAppDelegate.h"
 #import "ZPNavigatorNode.h"
 
-@implementation ZPMasterViewController
+@implementation ZPLibraryAndCollectionListViewController
 
 @synthesize detailViewController = _detailViewController;
 @synthesize currentLibrary = _currentLibrary;
 @synthesize currentCollection = _currentCollection;
 @synthesize navigationTableView;
 
-static ZPMasterViewController* _instance = nil;
+static ZPLibraryAndCollectionListViewController* _instance = nil;
 
-+ (ZPMasterViewController*) instance{
++ (ZPLibraryAndCollectionListViewController*) instance{
     return _instance;
 }
 
@@ -147,7 +147,7 @@ static ZPMasterViewController* _instance = nil;
      Drill down to a library or collection
     */
     
-    ZPMasterViewController* subController = [[ZPMasterViewController alloc] initWithStyle: UITableViewStylePlain];
+    ZPLibraryAndCollectionListViewController* subController = [[ZPLibraryAndCollectionListViewController alloc] initWithStyle: UITableViewStylePlain];
 	subController.detailViewController = self.detailViewController;
     NSObject <ZPNavigatorNode>* selectedNode  = [self->_content objectAtIndex: indexPath.row];
 	subController.currentLibrary=[selectedNode libraryID];
