@@ -29,9 +29,26 @@ CREATE TABLE IF NOT EXISTS items (
 
 CREATE TABLE IF NOT EXISTS collectionItems (
     collectionID INT,
-    itemID INT,
+    itemKey TEXT,
     orderIndex INT DEFAULT 0,
     PRIMARY KEY (collectionID, itemID),
     FOREIGN KEY (collectionID) REFERENCES collections(collectionID),
     FOREIGN KEY (itemID) REFERENCES items(itemID)
 );
+
+CREATE TABLE creators (
+    itemKey TEXT NOT NULL,
+    order INT NOT NULL,
+    firstName TEXT,
+    lastName TEXT,
+    shortName TEXT,
+    creatorType TEXT NOT NULL,
+    fieldMode INT
+);
+
+CREATE TABLE fields (
+    itemKey TEXT NOT NULL,
+    fieldName TEXT NOT NULL,
+    fieldValue TeXT NOT NULL
+);
+        

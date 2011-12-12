@@ -23,6 +23,10 @@
     NSString* _fullCitation;
     
     BOOL _hasChildren;
+    NSArray* _creators;
+    NSArray* _attachments;
+    NSDictionary* _fields;
+    
 }
 
 @property (retain) NSString* title;
@@ -36,6 +40,10 @@
 @property (retain) NSString* itemType;
 @property (assign) NSInteger numChildren;
 @property (assign) NSInteger numTags;
+
+@property (retain) NSArray* attachments;
+@property (retain) NSArray* creators;
+@property (retain) NSDictionary* fields;
 
 
 @end

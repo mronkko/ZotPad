@@ -38,14 +38,14 @@
 
 
 // Tells an observer that basic citation information is available for items
--(void) notifyItemBasicsAvailable:(NSString*) key{
+-(void) notifyItemBasicsAvailable:(ZPZoteroItem*) item{
     
     
     NSEnumerator *e = [[self.tableView indexPathsForVisibleRows] objectEnumerator];
     
     NSIndexPath* indexPath;
     while ((indexPath = (NSIndexPath*) [e nextObject]) && indexPath.row <=[_itemKeysShown count]) {
-        if([key isEqualToString:[_itemKeysShown objectAtIndex:indexPath.row]]){
+        if([item.key isEqualToString:[_itemKeysShown objectAtIndex:indexPath.row]]){
             
             //Tell this cell to update because it just got data
             

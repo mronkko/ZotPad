@@ -19,14 +19,14 @@
 @implementation ZPItemRetrieveOperation
 
 
--(id) initWithArray:(NSMutableArray*)itemArray library:(NSInteger)libraryID collection:(NSString*)collectionKey searchString:(NSString*)searchString sortField:(NSString*)sortField sortDescending:(BOOL)sortIsDescending queue:(NSOperationQueue*) queue{
+-(id) initWithArray:(NSMutableArray*)itemArray library:(NSInteger)libraryID collection:(NSString*)collectionKey searchString:(NSString*)searchString OrderField:(NSString*)OrderField sortDescending:(BOOL)sortIsDescending queue:(NSOperationQueue*) queue{
     self = [super init];
 
     _itemIDs=itemArray;
     _libraryID=libraryID;
     _collectionKey=collectionKey;
     _searchString=searchString;
-    _sortField=sortField;
+    _OrderField=OrderField;
     _sortIsDescending=sortIsDescending;
     
     
@@ -68,7 +68,7 @@
     
     while( ! self.isCancelled) {
     
-        ZPServerResponseXMLParser* parserResults = [[ZPServerConnection instance] retrieveItemsFromLibrary:_libraryID collection:_collectionKey searchString:_searchString sortField:_sortField sortDescending:_sortIsDescending limit:50 start:offset];
+        ZPServerResponseXMLParser* parserResults = [[ZPServerConnection instance] retrieveItemsFromLibrary:_libraryID collection:_collectionKey searchString:_searchString orderField:_OrderField sortDescending:_sortIsDescending limit:50 start:offset];
         
         if(parserResults==NULL) return;
     
@@ -101,7 +101,7 @@
         
         else if(_initial && _queue!=NULL && ! [_collectionKey isEqualToString: [[ZPDataLayer instance] currentlyActiveCollectionKey]]) {
             if(offset > [_itemIDs count]/2){
-                ZPItemRetrieveOperation* operation = [[ZPItemRetrieveOperation alloc] initWithArray:_itemIDs library:_libraryID collection:_collectionKey searchString:_searchString sortField:_sortField sortDescending:_sortIsDescending queue:NULL];
+                ZPItemRetrieveOperation* operation = [[ZPItemRetrieveOperation alloc] initWithArray:_itemIDs library:_libraryID collection:_collectionKey searchString:_searchString OrderField:_OrderField sortDescending:_sortIsDescending queue:NULL];
                 [operation setQueuePriority:NSOperationQueuePriorityVeryLow];
                 [_queue addOperation:operation];
             }

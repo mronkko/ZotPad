@@ -10,6 +10,7 @@
 #import "ZPZoteroLibrary.h"
 #import "ZPZoteroCollection.h"
 #import "ZPZoteroItem.h"
+#import "SBJson.h"
 
 @implementation ZPServerResponseXMLParser
 
@@ -17,7 +18,6 @@
     self=[super init];
     _resultArray=[NSMutableArray array];
     
-        
     _debugParser=FALSE;
     
     return self;
@@ -57,6 +57,22 @@
         }
         else if([_currentElementName isEqualToString: @"zapi:totalResults"]){
             _totalResults = [string intValue];
+        }
+
+        
+        else if([_currentElementName isEqualToString: @"json"]){
+            //PARSE JSON CONTENT
+            NSDictionary* data = [string JSONValue];
+            
+            [(ZPZoteroItem*) _currentParentElement setCreators:[data objectForKey:@"creators"]];
+            
+            //TODO: Tags are include in the JSON, think how they should be processed. (This is for a future version)
+            
+            NSMutableDictionary* fields = [NSMutableDictionary dictionaryWithDictionary:data];
+            [fields removeObjectForKey:@"creators"];
+            [fields removeObjectForKey:@"tags"];
+            [(ZPZoteroItem*) _currentParentElement setFields:fields];
+
         }
         else if(_currentElementName != NULL){
             
@@ -166,8 +182,11 @@
             _currentElementName=@"fullCitation";
             _currentStringContent =@"";
         }
-        
-        
+        //Item as JSON content
+        else if([elementName isEqualToString:@"content"] && [@"application/json" isEqualToString:[attributeDict objectForKey:@"type"]]){
+            _currentElementName=@"json";
+            _currentStringContent =@"";
+        }
         //Elements that contain information as attributes
         
         
@@ -177,12 +196,18 @@
             NSString* selectorString=NULL;
             
             //The value is URL and we want to get the part after last /
-            NSString* value = [[(NSString*)[attributeDict objectForKey:@"href"] componentsSeparatedByString:@"/"]lastObject];
+            NSArray* parts= [(NSString*)[attributeDict objectForKey:@"href"] componentsSeparatedByString:@"/"];
             //Strip URL parameters
-            value = [[value componentsSeparatedByString:@"?"] objectAtIndex:0];    
+            NSString* value = [[[parts lastObject] componentsSeparatedByString:@"?"] objectAtIndex:0];    
             
             if([@"self" isEqualToString:(NSString*)[attributeDict objectForKey:@"rel"]]){
                 selectorString = @"setKey:";
+                
+                //Set the library ID
+                if([_resultType isEqualToString:@"ZPZoteroItem"] && [[parts objectAtIndex:3] isEqualToString:@"groups"]){
+                    [(ZPZoteroItem* )_currentParentElement setLibraryID:[[parts objectAtIndex:4] integerValue]];
+                }
+
             }
             else if([@"up" isEqualToString:(NSString*)[attributeDict objectForKey:@"rel"]]){
                 selectorString = @"setParentKey:";
@@ -207,6 +232,10 @@
         _currentStringContent =@"";
     }
     else if([elementName isEqualToString: @"entry"]){
+        //If there is no information about what class this entry is, assume that this was a request for single item
+        if(_resultType == NULL){
+            _resultType = @"ZPZoteroItem";
+        }
         _currentParentElement =  [[NSClassFromString(_resultType) alloc] init];
     }
     

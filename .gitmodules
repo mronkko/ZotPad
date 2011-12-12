@@ -13,3 +13,6 @@
 [submodule "iCarousel"]
 	path = iCarousel
 	url = https://github.com/nicklockwood/iCarousel.git
+[submodule "json-framework"]
+	path = json-framework
+	url = https://github.com/stig/json-framework/

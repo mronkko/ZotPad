@@ -1,3 +1,4 @@
+
 //
 //  ZPDataLayer.m
 //  ZotPad
@@ -5,6 +6,8 @@
 //  Created by Rönkkö Mikko on 11/14/11.
 //  Copyright (c) 2011 __MyCompanyName__. All rights reserved.
 //
+
+//TODO: Consider splitting this class into (maybe) three parts 1) General data layer, 2) Database operations, 3) Cache
 
 #import "ZPDataLayer.h"
 
@@ -29,7 +32,38 @@
 #import "../FMDB/src/FMResultSet.h"
 
 
+
+
+//Private methods 
+
+@interface ZPDataLayer ();
+//This is a private method that does the actual work for retrieving libraries and collections
+-(void) _updateLibrariesAndCollectionsFromServer;
+
+//Retrieves the initial 15 items, called from getItemKeysForView and executed as operation
+- (void) _retrieveAndSetInitialKeysForView:(ZPDetailedItemListViewController*)view;
+
+//Gets one item details and writes these to the database
+-(void) _updateItemDetailsFromServer:(ZPZoteroItem*) item;
+    
+//Extract data from item and write to database
+
+-(void) _writeItemCreatorsToDatabase:(ZPZoteroItem*)item;
+-(void) _writeItemFieldsToDatabase:(ZPZoteroItem*)item;
+        
+//- (NSArray*) getAttachmentFilePathsForItem: (NSInteger) itemID;
+
+
+@end
+
+
+
+
 @implementation ZPDataLayer
+
+@synthesize mostRecentItemRetriveOperation = _mostRecentItemRetrieveOperation;
+
+
 
 static ZPDataLayer* _instance = nil;
 
@@ -361,7 +395,6 @@ static ZPDataLayer* _instance = nil;
 
     //If we have an ongoing item retrieval in teh background, tell it that it can stop
     
-    
     [_mostRecentItemRetrieveOperation markAsNotWithActiveView];
     
     
@@ -374,7 +407,8 @@ static ZPDataLayer* _instance = nil;
     _currentlyActiveLibraryID = view.libraryID;
      
     // Start by deciding if we need to connect to the server or can use cache. We can rely on cache
-    // if this collection is completely cached already
+    // if this collection is completely cached already. Because there is no way to get information about
+    // modified collection memberships from Zotero read API, without  
     
     NSNumber* cacheStatus = [_collectionCacheStatus objectForKey:[NSNumber numberWithInt:view.collectionID]];
     
@@ -397,7 +431,7 @@ static ZPDataLayer* _instance = nil;
     NSInteger collectionID=view.collectionID;
     NSInteger libraryID =  view.libraryID;
     NSString* searchString = [view.searchString stringByTrimmingCharactersInSet:[NSCharacterSet whitespaceAndNewlineCharacterSet]];
-    NSString* sortField = view.sortField;
+    NSString* OrderField = view.OrderField;
     BOOL sortDescending = view.sortDescending;
 
     NSString* collectionKey = NULL;
@@ -408,7 +442,7 @@ static ZPDataLayer* _instance = nil;
     
     //Retrieve initial 15 items
     
-    ZPServerResponseXMLParser* parserResults = [[ZPServerConnection instance] retrieveItemsFromLibrary:libraryID collection:collectionKey searchString:searchString sortField:sortField sortDescending:sortDescending limit:15 start:0];
+    ZPServerResponseXMLParser* parserResults = [[ZPServerConnection instance] retrieveItemsFromLibrary:libraryID collection:collectionKey searchString:searchString orderField:OrderField sortDescending:sortDescending limit:15 start:0];
     
     if(parserResults == NULL){
         [view setItemKeysShown: [NSArray array]];
@@ -432,8 +466,10 @@ static ZPDataLayer* _instance = nil;
         
         //Que an operation to cache the results of the server response
         //TODO: Consider if these initial items should be given higher priority. It is possible that there are other items already in the queue.
-        
-        [self cacheZoteroItems:[parserResults parsedElements]];
+
+        NSArray* items = [parserResults parsedElements];
+                  
+        [self cacheZoteroItems:items];
         
         //If the current collection has already been changed, do not queue any more retrievals
         if(!(_currentlyActiveLibraryID==libraryID &&
@@ -442,7 +478,7 @@ static ZPDataLayer* _instance = nil;
         
         
         //Retrieve the rest of the items into the array
-        ZPItemRetrieveOperation* retrieveOperation = [[ZPItemRetrieveOperation alloc] initWithArray: returnArray library:libraryID collection:collectionKey searchString:searchString sortField:sortField sortDescending:sortDescending queue:_serverRequestQueue];
+        ZPItemRetrieveOperation* retrieveOperation = [[ZPItemRetrieveOperation alloc] initWithArray: returnArray library:libraryID collection:collectionKey searchString:searchString OrderField:OrderField sortDescending:sortDescending queue:_serverRequestQueue];
         
         
         
@@ -459,7 +495,7 @@ static ZPDataLayer* _instance = nil;
                 [_serverRequestQueue addOperation:retrieveOperation];
                 
                 //Start a new backround operation to retrieve all items in the colletion (the main request was filtered with sort)
-                ZPItemRetrieveOperation* retrieveOperationForCache = [[ZPItemRetrieveOperation alloc] initWithArray: [NSArray array] library:libraryID collection:collectionKey searchString:NULL sortField:NULL sortDescending:NO queue:_serverRequestQueue];
+                ZPItemRetrieveOperation* retrieveOperationForCache = [[ZPItemRetrieveOperation alloc] initWithArray: [NSArray array] library:libraryID collection:collectionKey searchString:NULL OrderField:NULL sortDescending:NO queue:_serverRequestQueue];
                 [retrieveOperationForCache markAsInitialRequestForCollection];
                 [_serverRequestQueue addOperation:retrieveOperationForCache];
             }
@@ -495,9 +531,7 @@ static ZPDataLayer* _instance = nil;
  
  Writes an item to the database if it does not already exist.
  
- //TODO: Convert this to a function taking array as input and then using one prepared statement for all insert.
- 
- */
+  */
 
 -(void) addItemToDatabase:(ZPZoteroItem*)item {
     
@@ -557,67 +591,146 @@ static ZPDataLayer* _instance = nil;
         }
         [resultSet close];
     }
-    
     return item;
-
 }
 
-
 /*
- Returns the creators (i.e. authors) for an item
+ 
+ Retrieves item details from the server and writes them in the database in the background
  
  */
 
-- (NSArray*) getCreatorsForItem: (NSInteger) itemID  {
+-(void) updateItemDetailsFromServer:(ZPZoteroItem*)item{
+    
+    NSInvocationOperation* retrieveOperation = [[NSInvocationOperation alloc] initWithTarget:self
+                                                                                    selector:@selector(_updateItemDetailsFromServer:) object:item];
 
-    /*
-    FMResultSet* resultSet = [_database executeQuery:[NSString stringWithFormat: @"SELECT firstName, lastName FROM itemCreators, creators, creatorData WHERE itemCreators.itemID = %i AND itemCreators.creatorID = creators.creatorID AND creators.creatorDataID = creatorData.creatorDataID ORDER BY itemCreators.orderIndex ASC",itemID]];
+    [retrieveOperation setQueuePriority:NSOperationQueuePriorityVeryHigh];
     
-    
-
-	NSMutableArray* returnArray = [[NSMutableArray alloc] init];
-    
-	while([resultSet next]) {
-		
-		
-		NSString *creatorName = [NSString stringWithFormat:@"%s, %s", [resultSet stringForColumnIndex:](selectstmt, 1), [resultSet stringForColumnIndex:](selectstmt, 0)];
-        
-        [returnArray addObject:creatorName];
-	}
-	
-	sqlite3_finalize(selectstmt);
-	
-	return returnArray;
-     */
-    
-    return NULL;
+    [_serverRequestQueue addOperation:retrieveOperation];
+    NSLog(@"Opertions in queue %i",[_serverRequestQueue operationCount]);
 }
 
-/*
- Returns the  fields for an item as a dictionary
- */
+-(void) _updateItemDetailsFromServer:(ZPZoteroItem*)item{
+    item = [[ZPServerConnection instance] retrieveSingleItemDetailsFromServer:item];
+    [self _writeItemFieldsToDatabase:item];
+    [self _writeItemCreatorsToDatabase:item];
+    
+    [self notifyItemDetailsAvailable:item];
 
-- (NSDictionary*) getFieldsForItem: (NSInteger) itemID  {
-    /*
-    FMResultSet* resultSet = [_database executeQuery:[NSString stringWithFormat: @"SELECT fieldName, value FROM itemData, fields, itemDataValues WHERE itemData.itemID = %i AND itemData.fieldID = fields.fieldID AND itemData.valueID = itemDataValues.valueID",itemID]];
+}
+
+-(void) _writeItemCreatorsToDatabase:(ZPZoteroItem*)item{
     
-	NSMutableDictionary* returnDictionary = [[NSMutableDictionary alloc] init];
-    
-	while([resultSet next]) {
+    //Creators
+    @synchronized(self){
+
+        //Drop all creators for this 
+        //TODO: This could be optimized so that it would work the same way as fields: only do changes that are required instead of dropping and recreating everything
+        [_database executeUpdate:@"DELETE FROM creators WHERE itemKey =?",item.key];
         
         
-		NSString *key = [[NSString alloc] initWithUTF8String:(const char *) [resultSet stringForColumnIndex:](selectstmt, 0)];
-        NSString *value = [[NSString alloc] initWithUTF8String:(const char *) [resultSet stringForColumnIndex:](selectstmt, 1)];
+        NSEnumerator* e = [item.creators objectEnumerator];
+        NSInteger order=1;
+        NSDictionary* creator;
         
-        [returnDictionary setObject:value forKey:key];
-	}
+        while(creator= [e nextObject]){
+            [_database executeUpdate:[NSString stringWithFormat: @"INSERT INTO creators (itemKey,order,firstName,lastName,shortName,creatorType) VALUES (?,?,?,?,?)",
+                                      item.key,order,[creator objectForKey:@"firstName"],[creator objectForKey:@"lastName"],
+                                      [creator objectForKey:@"shortName"],[creator objectForKey:@"creatorType"]]];
+            order++;
+        }
+    }
+}
+-(void) _writeItemFieldsToDatabase:(ZPZoteroItem*)item{
+
+     //Fields      
+    NSMutableDictionary* oldFields=[[NSMutableDictionary alloc] init];
     
-	sqlite3_finalize(selectstmt);
+    @synchronized(self){
+        FMResultSet* resultSet = [_database executeQuery:@"SELECT fieldName, fieldValue FROM fields WHERE itemKey = ? ",item.key];
+        
+        while([resultSet next]){
+            [oldFields setObject:[resultSet stringForColumnIndex:0] forKey:[resultSet stringForColumnIndex:1]];
+        }
+        [resultSet close];
+    }
     
-	return returnDictionary;
-     */
+    NSEnumerator* e = [item.fields keyEnumerator]; 
     
-    return NULL;
+    NSString* key;
+    
+    while(key=[e nextObject]){
+        NSString* oldValue = [oldFields objectForKey:key];
+        if(oldValue == NULL){
+            @synchronized(self){
+                [_database executeUpdate:@"INSERT INTO fields (fieldName, fieldValue, itemKey) VALUES (?,?,?)",key,[item.fields objectForKey:key],item.key];
+            }
+        }
+        else if (! [oldValue isEqualToString:[item.fields objectForKey:key]]){
+            @synchronized(self){
+                [_database executeUpdate:@"UPDATE fields SET fieldValue = ? WHERE fieldName=? AND itemKey = ? ",[item.fields objectForKey:key],key,item.key];
+            }
+        }
+        [oldFields removeObjectForKey:key];
+    }
+    
+    e = [oldFields keyEnumerator]; 
+
+    while(key=[e nextObject]){
+        @synchronized(self){
+            [_database executeUpdate:@"DELETE FROM fields WHERE fieldName = ? AND  itemKey = ?",key,item.key];
+        }
+    }
+
+}
+
+
+- (void) addCreatorsToItem: (ZPZoteroItem*) item {
+
+    @synchronized(self){
+        FMResultSet* resultSet = [_database executeQuery: @"SELECT firstName, lastName, shortName,creatorType, fieldMode FROM creators WHERE itemKey = ? ORDER BY order",item.key];
+        
+        NSMutableArray* creators = [[NSMutableArray alloc] init];
+
+        while([resultSet next]) {
+            NSMutableDictionary* creator = [[NSMutableDictionary alloc] init];
+
+            [creator setObject:[resultSet stringForColumnIndex:0] forKey:@"firstName"];
+            [creator setObject:[resultSet stringForColumnIndex:1] forKey:@"lastName"];
+            [creator setObject:[resultSet stringForColumnIndex:2] forKey:@"shortName"];
+            [creator setObject:[resultSet stringForColumnIndex:3] forKey:@"creatorType"];
+            
+            //TODO: Would this be needed at all?
+            //[creator setObject:[NSNumber numberWithInt:[resultSet intForColumnIndex:4]] forKey:@"fieldMode"];
+            
+            [creators addObject:creator];
+        }
+        
+        [resultSet close];
+        if([creators count]>0) item.creators = creators;
+        else item.creators = NULL;
+    }
+}
+
+
+
+- (void) addFieldsToItem: (ZPZoteroItem*) item  {
+
+    @synchronized(self){
+        FMResultSet* resultSet = [_database executeQuery: @"SELECT fieldName, fieldValue FROM fields WHERE itemKey = ? ",item.key];
+    
+        NSMutableDictionary* fields = [[NSMutableDictionary alloc] init];
+        while([resultSet next]) {
+            
+            [fields setObject:[resultSet stringForColumnIndex:0] forKey:[resultSet stringForColumnIndex:1]];
+        }
+    
+        [resultSet close];
+        
+        if([fields count]>0) item.fields = fields;
+        else item.fields = NULL;
+    }
 }
 
 
@@ -651,13 +764,40 @@ static ZPDataLayer* _instance = nil;
 }    
 
 //Notifies all observers that a new item is available
--(void) notifyItemBasicsAvailable:(NSString*)key{
+-(void) notifyItemBasicsAvailable:(ZPZoteroItem*)item{
 
     NSEnumerator* e = [_itemObservers objectEnumerator];
     NSObject* id;
     
     while( id= [e nextObject]) {
-        [(NSObject <ZPItemObserver>*) id notifyItemBasicsAvailable:key];
+        if([(NSObject <ZPItemObserver>*) id respondsToSelector:@selector(notifyItemBasicsAvailable:)]){
+            [(NSObject <ZPItemObserver>*) id notifyItemBasicsAvailable:item];
+        }
+    }
+}
+
+//Notifies all observers that a new item is available
+-(void) notifyItemDetailsAvailable:(ZPZoteroItem*)item{
+    
+    NSEnumerator* e = [_itemObservers objectEnumerator];
+    NSObject* id;
+    
+    while( id= [e nextObject]) {
+        if([(NSObject <ZPItemObserver>*) id respondsToSelector:@selector(notifyItemDetailsAvailable:)]){
+            [(NSObject <ZPItemObserver>*) id notifyItemDetailsAvailable:item];
+        }
+    }
+}
+
+-(void) notifyItemAttachmentsAvailable:(ZPZoteroItem*)item{
+    
+    NSEnumerator* e = [_itemObservers objectEnumerator];
+    NSObject* id;
+    
+    while( id= [e nextObject]) {
+        if([(NSObject <ZPItemObserver>*) id respondsToSelector:@selector(notifyItemAttachmentsAvailable:)]){
+            [(NSObject <ZPItemObserver>*) id notifyItemAttachmentsAvailable:item];
+        }
     }
 }
 
@@ -669,6 +809,7 @@ static ZPDataLayer* _instance = nil;
 -(void) removeItemObserver:(NSObject<ZPItemObserver>*)observer{
     [_itemObservers removeObject:observer];
 }
+
 
 
 @end

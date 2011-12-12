@@ -6,6 +6,7 @@
 //  Copyright (c) 2011 __MyCompanyName__. All rights reserved.
 //
 
+
 #import "ZPDetailedItemListViewController.h"
 #import "ZPLibraryAndCollectionListViewController.h"
 #import "ZPDataLayer.h"
@@ -21,7 +22,7 @@
 @synthesize collectionID = _collectionKey;
 @synthesize libraryID =  _libraryID;
 @synthesize searchString = _searchString;
-@synthesize sortField = _sortField;
+@synthesize OrderField = _OrderField;
 @synthesize sortDescending = _sortDescending;
 
 @synthesize masterPopoverController = _masterPopoverController;
@@ -283,12 +284,12 @@ static ZPDetailedItemListViewController* _instance = nil;
 
 #pragma mark - Actions
 
--(void) doSortField:(NSString*)value{
-    if([value isEqualToString: _sortField ]){
+-(void) doOrderField:(NSString*)value{
+    if([value isEqualToString: _OrderField ]){
         _sortDescending = !_sortDescending;
     }
     else{
-        _sortField = value;
+        _OrderField = value;
         _sortDescending = FALSE;
     }
     
@@ -296,19 +297,19 @@ static ZPDetailedItemListViewController* _instance = nil;
 }
 
 -(IBAction)doSortCreator:(id)sender{
-    [self doSortField:@"creator"];
+    [self doOrderField:@"creator"];
 }
 
 -(IBAction)doSortDate:(id)sender{
-    [self doSortField:@"date"];
+    [self doOrderField:@"date"];
 }
 
 -(IBAction)doSortTitle:(id)sender{
-    [self doSortField:@"title"];
+    [self doOrderField:@"title"];
 }
 
 -(IBAction)doSortPublication:(id)sender{
-    [self doSortField:@"publicationTitle"];
+    [self doOrderField:@"publicationTitle"];
 }
 
 -(void) clearSearch{

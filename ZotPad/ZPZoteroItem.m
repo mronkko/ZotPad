@@ -22,4 +22,11 @@
 @synthesize numChildren = _numChildren;
 @synthesize numTags = _numTags;
 
+
+@synthesize creators = _creators;
+@synthesize attachments = _attachments;
+@synthesize fields = _fields;
+
+
+
 @end

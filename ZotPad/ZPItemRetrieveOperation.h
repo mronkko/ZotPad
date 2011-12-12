@@ -27,13 +27,13 @@
     NSString* _collectionKey;
     BOOL _sortIsDescending;
     NSString* _searchString;
-    NSString* _sortField;
+    NSString* _OrderField;
     BOOL _initial;
     NSOperationQueue* _queue;
     BOOL _notWithActiveView;
 }
 
--(id) initWithArray:(NSMutableArray*)itemArray library:(NSInteger)libraryID collection:(NSString*)collectionKey searchString:(NSString*)searchString sortField:(NSString*)sortField sortDescending:(BOOL)sortIsDescending queue:(NSOperationQueue*) queue;
+-(id) initWithArray:(NSMutableArray*)itemArray library:(NSInteger)libraryID collection:(NSString*)collectionKey searchString:(NSString*)searchString OrderField:(NSString*)OrderField sortDescending:(BOOL)sortIsDescending queue:(NSOperationQueue*) queue;
 
 -(void) markAsInitialRequestForCollection;
 

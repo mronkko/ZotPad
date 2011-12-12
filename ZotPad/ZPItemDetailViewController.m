@@ -19,9 +19,15 @@
 #define TITLE_VIEW_HEIGHT 100
 #define ATTACHMENT_VIEW_HEIGHT 500
 
+@interface ZPItemDetailViewController();
+
+- (void)_reconfigureDetailTableView;
+
+@end
+
 @implementation ZPItemDetailViewController
 
-@synthesize selectedItem = _selectedItem;
+@synthesize selectedItem = _currentItem;
 @synthesize detailTableView = _detailTableView;
 @synthesize carousel = _carousel;
 
@@ -39,6 +45,8 @@
 
 - (void)viewWillAppear:(BOOL)animated
 {
+    
+    [[ZPDataLayer instance] registerItemObserver:self];
     
     //Configure the size of the title section
     //The positions and sizes are set programmatically because this is difficult to get right with Interface Builder
@@ -110,17 +118,27 @@
 
 -(void) configureWithItemKey:(NSString*)key{
     
-    _selectedItem = [[ZPDataLayer instance] getItemByKey: key];
+    _currentItem = [[ZPDataLayer instance] getItemByKey: key];
     
+    // If there is no detailed information available for this item, tell teh data layer to retrieve it
+    if(_currentItem.fields == NULL || _currentItem.attachments == NULL || _currentItem.creators == NULL){
+        [[ZPDataLayer instance] updateItemDetailsFromServer:_currentItem];
+    }
     
-
-    
-    TTStyledText* text = [TTStyledText textFromXHTML:[_selectedItem.fullCitation stringByReplacingOccurrencesOfString:@" & " 
+    TTStyledText* text = [TTStyledText textFromXHTML:[_currentItem.fullCitation stringByReplacingOccurrencesOfString:@" & " 
                                                                                                            withString:@" &amp; "] lineBreaks:YES URLs:NO];
     [_fullCitationLabel setText:text];
     
     
+    [self _reconfigureDetailTableView ];
+    
+}
+
+- (void)_reconfigureDetailTableView {
+    
     //Configure the size of the detail view table.
+
+    [_detailTableView reloadData];
     
     [_detailTableView layoutIfNeeded];
     
@@ -133,13 +151,13 @@
     [(UIScrollView*) self.view setContentSize:CGSizeMake(self.view.frame.size.width, TITLE_VIEW_HEIGHT + ATTACHMENT_VIEW_HEIGHT + [_detailTableView contentSize].height)];
     
 }
-
 - (void)viewWillDisappear:(BOOL)animated
 {
     //Pop the item navigator away from the navigator.
     
     [[[ZPLibraryAndCollectionListViewController instance] navigationController] popViewControllerAnimated:YES];
     
+    [[ZPDataLayer instance] removeItemObserver:self];
     
 	[super viewWillDisappear:animated];
 }
@@ -160,7 +178,31 @@
 }
 
 - (NSInteger)tableView:(UITableView *)aTableView numberOfRowsInSection:(NSInteger)section {
-    return 3;
+    //Item type and title
+    if(section==0){
+        return 2;
+    }
+    //Creators
+    if(section==1){
+        if(_currentItem.creators!=NULL){
+            return [_currentItem.creators count];
+        }
+        else{
+            return 0;
+        }
+    }
+    //Rest of the fields
+    if(section==2){
+        if(_currentItem.fields!=NULL){
+            //Two fields, itemType and title, are shown separately
+            return [_currentItem.fields count]-2;
+        }
+        else{
+            return 0;
+        }
+
+    }
+
 }
 
 
@@ -183,7 +225,53 @@
     }
     
     // Configure the cell
+
+    //TODO: resolve localization and  field order using the Zotero server
     
+    //Title and itemtype
+    if([indexPath indexAtPosition:0] == 0){
+        if(indexPath.row == 0){
+            cell.textLabel.text = @"Title";
+            cell.detailTextLabel.text = _currentItem.title;
+        }
+        if(indexPath.row == 1){
+            cell.textLabel.text = @"Item type";
+            cell.detailTextLabel.text = _currentItem.itemType;
+        }
+
+    }
+    //Creators
+    else if([indexPath indexAtPosition:0] == 1){
+        NSDictionary* creator=[_currentItem.creators objectAtIndex:indexPath.row];
+        cell.textLabel.text = [creator objectForKey:@"creatorType"];
+        
+        NSString* lastName = [creator objectForKey:@"lastName"];
+        if(lastName==NULL || [lastName isEqualToString:@""]){
+            cell.detailTextLabel.text = [creator objectForKey:@"shortName"];
+        }
+        else{
+            cell.detailTextLabel.text = [NSString stringWithFormat:@"%@ %@",[creator objectForKey:@"firstName"],lastName];
+        }
+    }
+    
+    //Reset of the fields
+    else{
+        NSEnumerator* e = [_currentItem.fields keyEnumerator]; 
+        
+        NSInteger index = -1;
+        NSString* key;
+        while(key = [e nextObject]){
+            if(! [key isEqualToString:@"itemType"] && ! [key isEqualToString:@"title"]){
+                index++;
+            }
+            
+            if(index==indexPath.row){
+                break;
+            }
+        }
+        cell.textLabel.text = key;
+        cell.detailTextLabel.text = [_currentItem.fields objectForKey:key];
+    }
     
 	return ( cell );
 }
@@ -214,6 +302,31 @@
     }
 }
 
+#pragma mark-
+#pragma mark Observer methods
+
+/*
+    These are called by data layer to notify that more information about an item has become available from the server
+ */
+
+-(void) notifyItemDetailsAvailable:(ZPZoteroItem*) item{
+    
+    //TODO: Modifying the DetailViewTable could be animated.
+    
+    if([item.key isEqualToString:_currentItem.key]){
+        _currentItem = item;
+        [self performSelectorOnMainThread:@selector( _reconfigureDetailTableView) withObject:nil waitUntilDone:NO];
+    }
+}
+
+-(void) notifyItemAttachmentInformationAvailable:(ZPZoteroItem*) item{
+    
+}
+
+-(void) notifyItemAttachmentFileAvailable:(ZPZoteroItem*) item{
+    
+}
+
 
 #pragma mark -
 #pragma mark iCarousel methods
@@ -227,8 +340,8 @@
 - (UIView *)carousel:(iCarousel *)carousel viewForItemAtIndex:(NSUInteger)index
 {
     //create a numbered view
-	UIView *view = [[UIView alloc] initWithFrame:CGRectMake(0, 0, 300, 400)];
-	UILabel *label = [[UILabel alloc] initWithFrame:view.bounds];
+	UIView* view = [[UIView alloc] initWithFrame:CGRectMake(0, 0, 300, 400)];
+	UILabel* label = [[UILabel alloc] initWithFrame:view.bounds];
 	label.text = [NSString stringWithFormat:@"Item %i",index];
 	label.backgroundColor = [UIColor clearColor];
 	label.textAlignment = UITextAlignmentCenter;

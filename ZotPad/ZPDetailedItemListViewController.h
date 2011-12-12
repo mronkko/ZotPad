@@ -17,7 +17,7 @@
     NSString* _searchString;
     NSInteger _collectionID;
     NSInteger _libraryID;
-    NSString* _sortField;
+    NSString* _OrderField;
     BOOL _sortDescending;
     
     DSBezelActivityView* _activityView;
@@ -41,12 +41,12 @@
 
 @property (copy) NSString* searchString;
 
-@property (copy) NSString* sortField;
+@property (copy) NSString* OrderField;
 @property BOOL sortDescending;
 
 -(void) clearSearch;
 
--(void) doSortField:(NSString*)value;
+-(void) doOrderField:(NSString*)value;
 
 -(IBAction)doSortCreator:(id)sender;
 -(IBAction)doSortTitle:(id)sender;

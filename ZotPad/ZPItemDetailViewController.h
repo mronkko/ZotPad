@@ -12,8 +12,8 @@
 #import "Three20/Three20.h"
 #import "ZPSimpleItemListViewController.h"
 
-@interface ZPItemDetailViewController : UIViewController <UITableViewDataSource, UITableViewDelegate, iCarouselDataSource, iCarouselDelegate>{
-    ZPZoteroItem* _selectedItem;
+@interface ZPItemDetailViewController : UIViewController <UITableViewDataSource, UITableViewDelegate, iCarouselDataSource, iCarouselDelegate, ZPItemObserver>{
+    ZPZoteroItem* _currentItem;
     UITableView* _detailTableView;
     iCarousel* _carousel;
     TTStyledTextLabel* _fullCitationLabel;

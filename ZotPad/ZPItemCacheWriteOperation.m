@@ -10,6 +10,8 @@
 #import "ZPDataLayer.h"
 #import "ZPZoteroItem.h"
 
+//TODO: Consider the tradeoffs of not having this as operation. It is only tens or hundreds of DB writes anyway.
+
 @implementation ZPItemCacheWriteOperation
 
 -(id) initWithZoteroItemArray:(NSArray*)items{
@@ -27,12 +29,9 @@
         [[ZPDataLayer instance] addItemToDatabase:(ZPZoteroItem*) object];
         //TODO: Cache collection memberships
         
-        //TODO: Implement the following and all other notifications using the
-        //observer pattern
-        
         //Notify the user interface that this item is now available
-        NSString* key = [(ZPZoteroItem*) object key];
-        [[ZPDataLayer instance] notifyItemBasicsAvailable:key];
+        
+        [[ZPDataLayer instance] notifyItemBasicsAvailable:(ZPZoteroItem*) object];
     }
 }
 

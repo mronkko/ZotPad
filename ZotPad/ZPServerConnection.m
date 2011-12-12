@@ -14,13 +14,14 @@
 #import "ZPAuthenticationDialog.h"
 #import "ZPServerResponseXMLParser.h"
 #import "ZPAuthenticationProcess.h"
+#import "ZPZoteroItem.h"
 
 //Private methods
 
 @interface ZPServerConnection();
     
 
--(ZPServerResponseXMLParser*) makeServerRequest:(NSInteger)type withLibrary:(NSInteger)libraryID withCollection:(NSString*)collection withParameters:(NSDictionary*) parameters;
+-(ZPServerResponseXMLParser*) makeServerRequest:(NSInteger)type withParameters:(NSDictionary*) parameters;
 
 @end
 
@@ -32,6 +33,8 @@ static ZPServerConnection* _instance = nil;
 const NSInteger ZPServerConnectionRequestGroups = 1;
 const NSInteger ZPServerConnectionRequestCollections = 2;
 const NSInteger ZPServerConnectionRequestItems = 3;
+const NSInteger ZPServerConnectionRequestItemsDetails = 4;
+const NSInteger ZPServerConnectionRequestSingleItemDetails = 5;
 
 
 -(id)init
@@ -39,7 +42,7 @@ const NSInteger ZPServerConnectionRequestItems = 3;
     self = [super init];
         
     _activeRequestCount = 0;
-//    _debugServerConnection = TRUE;
+    //_debugServerConnection = TRUE;
     
     return self;
 }
@@ -83,7 +86,7 @@ const NSInteger ZPServerConnectionRequestItems = 3;
 */
 
 
--(ZPServerResponseXMLParser*) makeServerRequest:(NSInteger)type withLibrary:(NSInteger)libraryID withCollection:(NSString*)collectionKey withParameters:(NSDictionary*) parameters{
+-(ZPServerResponseXMLParser*) makeServerRequest:(NSInteger)type withParameters:(NSDictionary*) parameters{
     
     
     NSData* responseData = NULL;
@@ -92,6 +95,8 @@ const NSInteger ZPServerConnectionRequestItems = 3;
     NSString* oauthkey =  [[NSUserDefaults standardUserDefaults] objectForKey:@"OAuthKey"];
     if(oauthkey!=NULL){
 
+        NSInteger libraryID = [(NSNumber*)[parameters objectForKey:@"libraryID"] integerValue];
+        
         if(libraryID==1 || libraryID == 0){
             urlString = [NSString stringWithFormat:@"https://api.zotero.org/users/%@/",[[NSUserDefaults standardUserDefaults] objectForKey:@"userID"]];
         }
@@ -107,8 +112,10 @@ const NSInteger ZPServerConnectionRequestItems = 3;
             urlString = [NSString stringWithFormat:@"%@collections?key=%@",urlString,oauthkey];
             
         }
+
         else if (type==ZPServerConnectionRequestItems){
-            
+            NSString* collectionKey = [parameters objectForKey:@"collectionKey"];
+
             if(collectionKey!=NULL){
                 urlString = [NSString stringWithFormat:@"%@collections/%@/items?key=%@&format=atom",urlString,collectionKey,oauthkey];
             }
@@ -116,10 +123,20 @@ const NSInteger ZPServerConnectionRequestItems = 3;
                 urlString = [NSString stringWithFormat:@"%@items/top?key=%@&format=atom",urlString,oauthkey];
             }
         }
-        
+        else if( type == ZPServerConnectionRequestSingleItemDetails){
+             NSString* itemKey = [parameters objectForKey:@"itemKey"];
+
+            urlString = [NSString stringWithFormat:@"%@items/%@?key=%@&format=atom",urlString,itemKey,oauthkey];
+        }
+                
         if(parameters!=NULL){
             for(id key in parameters){
-                urlString = [NSString stringWithFormat:@"%@&%@=%@",urlString,key,[parameters objectForKey:key]];
+                if(! [@"itemKey" isEqualToString: key] &&
+                   ! [@"collectionKey" isEqualToString: key] &&
+                   ! [@"libraryID" isEqualToString: key]) {
+                    urlString = [NSString stringWithFormat:@"%@&%@=%@",urlString,key,[parameters objectForKey:key]];
+                
+                }
             }
         }
         
@@ -165,7 +182,13 @@ const NSInteger ZPServerConnectionRequestItems = 3;
         [parser parse];
 
         if(_debugServerConnection){
+            //Iy is OK to get 1/0 here because queries that return a single results do not have totalResults
             NSLog(@"Request returned %i/%i results: %@ Active queries: %i",[[parserDelegate parsedElements] count],[parserDelegate totalResults], urlString,_activeRequestCount);            
+            
+            //If there are no results, dump the entire response so that we see what the problem was
+            if([[parserDelegate parsedElements] count] == 0){
+                NSLog([[NSString alloc] initWithData:responseData encoding:NSUTF8StringEncoding]);
+            }
         }
 
 
@@ -183,13 +206,27 @@ const NSInteger ZPServerConnectionRequestItems = 3;
     }
 }
 
+-(ZPZoteroItem*) retrieveSingleItemDetailsFromServer:(ZPZoteroItem*)item{
+
+    NSMutableDictionary* parameters = [NSMutableDictionary dictionaryWithObject:[NSNumber numberWithInt:item.libraryID ] forKey:@"libraryID"];
+    [parameters setObject:item.key forKey:@"itemKey"];
+    [parameters setObject:@"json" forKey:@"content"];
+    
+    ZPServerResponseXMLParser* parserDelegate =  [self makeServerRequest:ZPServerConnectionRequestSingleItemDetails withParameters:parameters];
+    
+    NSArray* parsedArray = [parserDelegate parsedElements];
+    
+    if(parserDelegate == NULL || [parsedArray count] == 0 ) return NULL;
+    
+    return [parsedArray objectAtIndex:0];   
+}
 
 -(NSArray*) retrieveLibrariesFromServer{
         
     //Retrieve all libraries from the server
     
 
-    ZPServerResponseXMLParser* parserDelegate =  [self makeServerRequest:ZPServerConnectionRequestGroups withLibrary:0 withCollection:NULL withParameters:NULL];
+    ZPServerResponseXMLParser* parserDelegate =  [self makeServerRequest:ZPServerConnectionRequestGroups withParameters:NULL];
 
     NSArray* returnArray = [parserDelegate parsedElements];
  
@@ -201,7 +238,7 @@ const NSInteger ZPServerConnectionRequestItems = 3;
         NSMutableDictionary* parameters=[[NSMutableDictionary alloc] initWithCapacity:1];
         [parameters setObject:[NSString stringWithFormat:@"%i",[returnArray count]] forKey:@"start"];
 
-        ZPServerResponseXMLParser* parserDelegate =  [self makeServerRequest:ZPServerConnectionRequestGroups withLibrary:0 withCollection:NULL withParameters:parameters];
+        ZPServerResponseXMLParser* parserDelegate =  [self makeServerRequest:ZPServerConnectionRequestGroups withParameters:parameters];
 
         if(parserDelegate == NULL) return NULL;
         
@@ -217,8 +254,9 @@ const NSInteger ZPServerConnectionRequestItems = 3;
 
 -(NSArray*) retrieveCollectionsForLibraryFromServer:(NSInteger)libraryID{
     
-    
-    ZPServerResponseXMLParser* parserDelegate =  [self makeServerRequest:ZPServerConnectionRequestCollections withLibrary:libraryID withCollection:NULL withParameters:NULL];
+    NSMutableDictionary* parameters = [NSMutableDictionary dictionaryWithObject:[NSNumber numberWithInt:libraryID ] forKey:@"libraryID"];
+
+    ZPServerResponseXMLParser* parserDelegate =  [self makeServerRequest:ZPServerConnectionRequestCollections withParameters:parameters];
     if(parserDelegate == NULL) return NULL;
 
     NSArray* returnArray = [parserDelegate parsedElements];
@@ -226,10 +264,9 @@ const NSInteger ZPServerConnectionRequestItems = 3;
     //If there is more data coming, retrieve it
     while([returnArray count] < parserDelegate.totalResults){
         
-        NSMutableDictionary* parameters=[[NSMutableDictionary alloc] initWithCapacity:1];
         [parameters setObject:[NSString stringWithFormat:@"%i",[returnArray count]] forKey:@"start"];
         
-        ZPServerResponseXMLParser* parserDelegate =  [self makeServerRequest:ZPServerConnectionRequestCollections withLibrary:libraryID withCollection:NULL withParameters:parameters];
+        ZPServerResponseXMLParser* parserDelegate =  [self makeServerRequest:ZPServerConnectionRequestCollections withParameters:parameters];
         if(parserDelegate == NULL) return NULL;
         
         returnArray=[returnArray arrayByAddingObjectsFromArray:parserDelegate.parsedElements];
@@ -246,11 +283,13 @@ Retrieves items from server and stores these in the database. Returns and array 
    
 */
 
--(ZPServerResponseXMLParser*) retrieveItemsFromLibrary:(NSInteger)libraryID collection:(NSString*)collectionKey searchString:(NSString*)searchString sortField:(NSString*)sortField sortDescending:(BOOL)sortIsDescending limit:(NSInteger)limit start:(NSInteger)start{
+-(ZPServerResponseXMLParser*) retrieveItemsFromLibrary:(NSInteger)libraryID collection:(NSString*)collectionKey searchString:(NSString*)searchString orderField:(NSString*)orderField sortDescending:(BOOL)sortIsDescending limit:(NSInteger)limit start:(NSInteger)start{
     
    
     
-    NSMutableDictionary* parameters=[[NSMutableDictionary alloc] initWithCapacity:10];
+    NSMutableDictionary* parameters = [NSMutableDictionary dictionaryWithObject:[NSNumber numberWithInt:libraryID ] forKey:@"libraryID"];
+
+    if(collectionKey!=NULL) [parameters setObject:collectionKey forKey:@"collectionKey"];
     
     [parameters setObject:@"bib" forKey:@"content"];
     [parameters setObject:@"apa" forKey:@"style"];
@@ -261,14 +300,14 @@ Retrieves items from server and stores these in the database. Returns and array 
                                NSASCIIStringEncoding] forKey:@"q"];
     }
     //Sort
-    if(sortField!=NULL){
-        [parameters setObject:sortField forKey:@"sort"];
+    if(orderField!=NULL){
+        [parameters setObject:orderField forKey:@"order"];
 
         if(sortIsDescending){
-            [parameters setObject:@"desc" forKey:@"order"];
+            [parameters setObject:@"desc" forKey:@"sort"];
         }
         else{
-            [parameters setObject:@"asc" forKey:@"order"];
+            [parameters setObject:@"asc" forKey:@"sort"];
         }
     }
     if(start!=0){
@@ -278,7 +317,7 @@ Retrieves items from server and stores these in the database. Returns and array 
         [parameters setObject:[NSString  stringWithFormat:@"%i",limit] forKey:@"limit"];
     }
     
-    ZPServerResponseXMLParser* parserDelegate =  [self makeServerRequest:ZPServerConnectionRequestItems withLibrary:libraryID withCollection:collectionKey withParameters:parameters];
+    ZPServerResponseXMLParser* parserDelegate =  [self makeServerRequest:ZPServerConnectionRequestItems withParameters:parameters];
     
     return parserDelegate;
     

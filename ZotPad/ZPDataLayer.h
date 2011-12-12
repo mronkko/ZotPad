@@ -52,36 +52,41 @@
 // This class is used as a singleton
 + (ZPDataLayer*) instance;
 
--(void) updateLibrariesAndCollectionsFromServer;
-
-//This is a private method that does the actual work for retrieving libraries and collections
--(void) _updateLibrariesAndCollectionsFromServer;
-
-- (NSArray*) libraries;
-- (NSArray*) collections : (NSInteger)currentLibraryID currentCollection:(NSInteger)currentCollectionID;
-
-- (NSArray*) getItemKeysForSelection:(ZPDetailedItemListViewController*)view;
-
-//Retrieves the initial 15 items, called from getItemKeysForView and executed as operation
-- (void) _retrieveAndSetInitialKeysForView:(ZPDetailedItemListViewController*)view;
-
-- (ZPZoteroItem*) getItemByKey: (NSString*) key;
-- (NSDictionary*) getFieldsForItem: (NSInteger) itemID;
-- (NSArray*) getCreatorsForItem: (NSInteger) itemID;
-- (NSArray*) getAttachmentFilePathsForItem: (NSInteger) itemID;
-- (NSString*) collectionKeyFromCollectionID:(NSInteger) collectionID;
-
--(void) cacheZoteroItems:(NSArray*)items;
--(void) addItemToDatabase:(ZPZoteroItem*)item;
-
+//Methods to get details of the current selection
+//TODO: Should these belong to the UI delegates instead? 
 -(NSString*) currentlyActiveCollectionKey;
 -(NSInteger) currentlyActiveLibraryID;
 
-//Notifies all observers that a new item is available
--(void) notifyItemBasicsAvailable:(NSString*)key;
+// Methods for explicitly requesting updated data from server
+-(void) updateLibrariesAndCollectionsFromServer;
+-(void) updateItemDetailsFromServer:(ZPZoteroItem*)item;
+
+// Methods for retrieving data from the data layer
+- (NSArray*) libraries;
+- (NSArray*) collections : (NSInteger)currentLibraryID currentCollection:(NSInteger)currentCollectionID;
+- (NSArray*) getItemKeysForSelection:(ZPDetailedItemListViewController*)view;
+- (ZPZoteroItem*) getItemByKey: (NSString*) key;
+
+//Add more data to an existing item. By default the getItemByKey do not populate fields or creators to save database operations
+- (void) addFieldsToItem: (ZPZoteroItem*) item;
+- (void) addCreatorsToItem: (ZPZoteroItem*) item;
+
+- (NSString*) collectionKeyFromCollectionID:(NSInteger) collectionID;
+
+// Methods for writing data to database
+-(void) cacheZoteroItems:(NSArray*)items;
+-(void) addItemToDatabase:(ZPZoteroItem*)item;
 
 //Adds and removes observers
 -(void) registerItemObserver:(NSObject<ZPItemObserver>*)observer;
 -(void) removeItemObserver:(NSObject<ZPItemObserver>*)observer;
+
+//Notifies all observers that a new item is available
+-(void) notifyItemBasicsAvailable:(ZPZoteroItem*)item;
+-(void) notifyItemDetailsAvailable:(ZPZoteroItem*)item;
+-(void) notifyItemAttachmentsAvailable:(ZPZoteroItem*)item;
+
+
+@property (retain) ZPItemRetrieveOperation* mostRecentItemRetriveOperation;
 
 @end

@@ -18,7 +18,9 @@
     NSString* _resultType;
     NSInteger _totalResults;
     NSString* _currentStringContent;
-     
+    
+    NSInteger _libraryID;
+    
     BOOL _debugParser;
 }
 

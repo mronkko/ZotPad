@@ -11,6 +11,7 @@
 #import <Foundation/Foundation.h>
 #import "ZPAuthenticationDialog.h"
 #import "ZPServerResponseXMLParser.h"
+#import "ZPZoteroItem.h"
 
 @interface ZPServerConnection : NSObject{
         
@@ -30,6 +31,8 @@
 // Methods to get data from the server
 -(NSArray*) retrieveLibrariesFromServer;
 -(NSArray*) retrieveCollectionsForLibraryFromServer:(NSInteger)libraryID;
--(ZPServerResponseXMLParser*) retrieveItemsFromLibrary:(NSInteger)libraryID collection:(NSString*)collectionKey searchString:(NSString*)searchString sortField:(NSString*)sortField sortDescending:(BOOL)sortIsDescending limit:(NSInteger)maxCount start:(NSInteger)offset;
+-(ZPServerResponseXMLParser*) retrieveItemsFromLibrary:(NSInteger)libraryID collection:(NSString*)collectionKey searchString:(NSString*)searchString orderField:(NSString*)orderField sortDescending:(BOOL)sortIsDescending limit:(NSInteger)maxCount start:(NSInteger)offset;
+
+-(ZPZoteroItem*) retrieveSingleItemDetailsFromServer:(ZPZoteroItem*)key;
 
 @end

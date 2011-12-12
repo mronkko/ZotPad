@@ -11,21 +11,21 @@
 //
 
 #import <Foundation/Foundation.h>
-
+#import "ZPZoteroItem.h"
 @protocol ZPItemObserver <NSObject>
 
 @optional
 
 // Tells an observer that basic citation information is available for items
--(void) notifyItemBasicsAvailable:(NSString*) key;
+-(void) notifyItemBasicsAvailable:(ZPZoteroItem*) item;
 
 // Tells an observer that detailed citation information is available
--(void) notifyItemDetailsAvailable:(NSString*) key;
+-(void) notifyItemDetailsAvailable:(ZPZoteroItem*) item;
 
 // Tells an observer that information about attachments is available
--(void) notifyItemAttachmentInformationAvailable:(NSString*) key;
+-(void) notifyItemAttachmentsAvailable:(ZPZoteroItem*) item;
 
 // Tells an observer that information about attachments is available
--(void) notifyItemAttachmentFileAvailable:(NSString*) path;
+-(void) notifyItemAttachmentFileAvailable:(ZPZoteroItem*) item;
 
 @end
