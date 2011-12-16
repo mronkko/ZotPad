@@ -17,7 +17,7 @@
 		320D7DCCE32703ACAB9A45E5 /* libThree20.a in Frameworks */ = {isa = PBXBuildFile; fileRef = 320D7DCCE32703ACAB9A45E4 /* libThree20.a */; };
 		320F2C48872C2E2C4DF86205 /* libThree20UI.a in Frameworks */ = {isa = PBXBuildFile; fileRef = 320F2C48872C2E2C4DF86204 /* libThree20UI.a */; };
 		A7025019149B0BB1004F2AAB /* ZPDatabase.m in Sources */ = {isa = PBXBuildFile; fileRef = A7025018149B0BB1004F2AAB /* ZPDatabase.m */; };
-		A702501D149B33E1004F2AAB /* ZPCache.m in Sources */ = {isa = PBXBuildFile; fileRef = A702501C149B33E1004F2AAB /* ZPCache.m */; };
+		A702501D149B33E1004F2AAB /* ZPCacheController.m in Sources */ = {isa = PBXBuildFile; fileRef = A702501C149B33E1004F2AAB /* ZPCacheController.m */; };
 		A716C0371494E9DF00BD6025 /* ZPZoteroAttachment.m in Sources */ = {isa = PBXBuildFile; fileRef = A716C0361494E9DE00BD6025 /* ZPZoteroAttachment.m */; };
 		A716C0511495131F00BD6025 /* NSObject+SBJson.m in Sources */ = {isa = PBXBuildFile; fileRef = A716C0391495131E00BD6025 /* NSObject+SBJson.m */; };
 		A716C0521495131F00BD6025 /* SBJsonParser.m in Sources */ = {isa = PBXBuildFile; fileRef = A716C03C1495131E00BD6025 /* SBJsonParser.m */; };
@@ -250,8 +250,8 @@
 		A7025017149B0BB1004F2AAB /* ZPDatabase.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = ZPDatabase.h; sourceTree = "<group>"; };
 		A7025018149B0BB1004F2AAB /* ZPDatabase.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = ZPDatabase.m; sourceTree = "<group>"; };
 		A702501A149B2D6D004F2AAB /* ZPLibraryObserver.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = ZPLibraryObserver.h; sourceTree = "<group>"; };
-		A702501B149B33E1004F2AAB /* ZPCache.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = ZPCache.h; sourceTree = "<group>"; };
-		A702501C149B33E1004F2AAB /* ZPCache.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = ZPCache.m; sourceTree = "<group>"; };
+		A702501B149B33E1004F2AAB /* ZPCacheController.h */ = {isa = PBXFileReference; fileEncoding = 4; path = ZPCacheController.h; sourceTree = "<group>"; };
+		A702501C149B33E1004F2AAB /* ZPCacheController.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = ZPCacheController.m; sourceTree = "<group>"; };
 		A716C0351494E9DE00BD6025 /* ZPZoteroAttachment.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = ZPZoteroAttachment.h; sourceTree = "<group>"; };
 		A716C0361494E9DE00BD6025 /* ZPZoteroAttachment.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = ZPZoteroAttachment.m; sourceTree = "<group>"; };
 		A716C0381495131E00BD6025 /* NSObject+SBJson.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; name = "NSObject+SBJson.h"; path = "json-framework/Classes/NSObject+SBJson.h"; sourceTree = "<group>"; };
@@ -599,8 +599,8 @@
 				A7B5180A14880CE700806EED /* ZPAuthenticationProcess.m */,
 				A7200DF414718F44004347C9 /* ZPDataLayer.h */,
 				A7200DF514718F44004347C9 /* ZPDataLayer.m */,
-				A702501B149B33E1004F2AAB /* ZPCache.h */,
-				A702501C149B33E1004F2AAB /* ZPCache.m */,
+				A702501B149B33E1004F2AAB /* ZPCacheController.h */,
+				A702501C149B33E1004F2AAB /* ZPCacheController.m */,
 				A7025017149B0BB1004F2AAB /* ZPDatabase.h */,
 				A7025018149B0BB1004F2AAB /* ZPDatabase.m */,
 				A7A7C9AF147A8144004D8756 /* ZPServerConnection.h */,
@@ -1008,7 +1008,7 @@
 				A716C05B1495131F00BD6025 /* SBJsonUTF8Stream.m in Sources */,
 				A716C05C1495131F00BD6025 /* SBJsonWriter.m in Sources */,
 				A7025019149B0BB1004F2AAB /* ZPDatabase.m in Sources */,
-				A702501D149B33E1004F2AAB /* ZPCache.m in Sources */,
+				A702501D149B33E1004F2AAB /* ZPCacheController.m in Sources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
