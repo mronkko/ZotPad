@@ -69,15 +69,8 @@
 - (NSArray*) getItemKeysForSelection:(ZPDetailedItemListViewController*)view;
 - (ZPZoteroItem*) getItemByKey: (NSString*) key;
 
-//Add more data to an existing item. By default the getItemByKey do not populate fields or creators to save database operations
-- (void) addFieldsToItem: (ZPZoteroItem*) item;
-- (void) addCreatorsToItem: (ZPZoteroItem*) item;
-
-- (NSString*) collectionKeyFromCollectionID:(NSInteger) collectionID;
-
 // Methods for writing data to database
 -(void) cacheZoteroItems:(NSArray*)items;
--(void) addItemToDatabase:(ZPZoteroItem*)item;
 
 //Adds and removes observers
 -(void) registerItemObserver:(NSObject<ZPItemObserver>*)observer;

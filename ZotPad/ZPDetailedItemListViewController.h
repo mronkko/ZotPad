@@ -15,7 +15,7 @@
 
 @interface ZPDetailedItemListViewController : ZPSimpleItemListViewController <UISplitViewControllerDelegate, UISearchBarDelegate>{
     NSString* _searchString;
-    NSInteger _collectionID;
+    NSString* _collectionKey;
     NSInteger _libraryID;
     NSString* _OrderField;
     BOOL _sortDescending;
@@ -36,7 +36,8 @@
 
 @property (nonatomic, retain) IBOutlet UISearchBar* searchBar;
 
-@property NSInteger collectionID;
+@property (nonatomic, retain) NSString* collectionKey;
+
 @property NSInteger libraryID;
 
 @property (copy) NSString* searchString;

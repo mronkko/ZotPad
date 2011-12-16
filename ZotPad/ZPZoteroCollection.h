@@ -13,7 +13,6 @@
     NSString* collectionKey;
     NSString* parentCollectionKey;
     NSInteger libraryID;
-    NSInteger collectionID; 
     BOOL hasChildren;
 }
 
@@ -21,7 +20,6 @@
 @property (retain) NSString* collectionKey;
 @property (retain) NSString* parentCollectionKey;
 @property (assign) NSInteger libraryID;
-@property (assign) NSInteger collectionID; 
 @property (assign) BOOL hasChildren;
 
 // An alias for setCollectionKey

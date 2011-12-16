@@ -17,7 +17,6 @@
 #import "ZPZoteroItem.h"
 
 //Operations
-#import "ZPItemCacheWriteOperation.h"
 #import "ZPItemRetrieveOperation.h"
 
 //Server connection
@@ -45,12 +44,6 @@
 //Gets one item details and writes these to the database
 -(void) _updateItemDetailsFromServer:(ZPZoteroItem*) item;
     
-//Extract data from item and write to database
-
--(void) _writeItemCreatorsToDatabase:(ZPZoteroItem*)item;
--(void) _writeItemFieldsToDatabase:(ZPZoteroItem*)item;
-        
-//- (NSArray*) getAttachmentFilePathsForItem: (NSInteger) itemID;
 
 
 @end
@@ -145,7 +138,7 @@ static ZPDataLayer* _instance = nil;
         
         [[ZPDatabase instance] addOrUpdateCollections:collections forLibrary:library.libraryID];
 
-        [[ZPLibraryAndCollectionListViewController instance] notifyDataAvailable];
+        [self notifyLibraryWithCollectionsAvailable:library];
         
     }
     
@@ -154,10 +147,8 @@ static ZPDataLayer* _instance = nil;
     NSArray* collections = [[ZPServerConnection instance] retrieveCollectionsForLibraryFromServer:1];
     if(collections==NULL) return;
     [[ZPDatabase instance] addOrUpdateCollections:collections forLibrary:1];
-    
-    
-    
-    [[ZPLibraryAndCollectionListViewController instance] notifyDataAvailable];
+        
+    [self notifyLibraryWithCollectionsAvailable:library];
 }
 
 /*
@@ -178,9 +169,9 @@ static ZPDataLayer* _instance = nil;
  
  */
 
-- (NSArray*) collections : (NSInteger)currentLibraryID currentCollection:(NSInteger)currentCollectionID {
+- (NSArray*) collections : (NSInteger)currentLibraryID currentCollection:(NSInteger)currentcollectionKey {
 	
-    return [[ZPDatabase instance] collections:currentLibraryID currentCollection:currentCollectionID];
+    return [[ZPDatabase instance] collections:currentLibraryID currentCollection:currentcollectionKey];
 
 }
 
@@ -200,19 +191,14 @@ static ZPDataLayer* _instance = nil;
     [_mostRecentItemRetrieveOperation markAsNotWithActiveView];
     
     
-    NSString* collectionKey = NULL;
-    if(view.collectionID!=0){
-        collectionKey = [self collectionKeyFromCollectionID:view.collectionID];
-    }
-
-    _currentlyActiveCollectionKey = collectionKey;
+    _currentlyActiveCollectionKey = view.collectionKey;
     _currentlyActiveLibraryID = view.libraryID;
      
     // Start by deciding if we need to connect to the server or can use cache. We can rely on cache
     // if this collection is completely cached already. Because there is no way to get information about
     // modified collection memberships from Zotero read API, without  
     
-    NSNumber* cacheStatus = [_collectionCacheStatus objectForKey:[NSNumber numberWithInt:view.collectionID]];
+    NSNumber* cacheStatus = [_collectionCacheStatus objectForKey:view.collectionKey];
     
     if( cacheStatus == NULL || [cacheStatus intValue] != 2 ){
         NSInvocationOperation* retrieveOperation = [[NSInvocationOperation alloc] initWithTarget:self
@@ -230,17 +216,11 @@ static ZPDataLayer* _instance = nil;
 
 - (void) _retrieveAndSetInitialKeysForView:(ZPDetailedItemListViewController*)view{
 
-    NSInteger collectionID=view.collectionID;
+    NSString* collectionKey=view.collectionKey;
     NSInteger libraryID =  view.libraryID;
     NSString* searchString = [view.searchString stringByTrimmingCharactersInSet:[NSCharacterSet whitespaceAndNewlineCharacterSet]];
     NSString* OrderField = view.OrderField;
     BOOL sortDescending = view.sortDescending;
-
-    NSString* collectionKey = NULL;
-
-    if(collectionID!=0){
-        collectionKey = [self collectionKeyFromCollectionID:view.collectionID];
-    }
     
     //Retrieve initial 15 items
     
@@ -286,7 +266,7 @@ static ZPDataLayer* _instance = nil;
         
         //If this is the first time that we are using this collection, mark this operation as a cache operation if it does not have a search string or create a new operations without a search string
         
-        NSNumber* cacheStatus = [_collectionCacheStatus objectForKey:[NSNumber numberWithInt:collectionID]];
+        NSNumber* cacheStatus = [_collectionCacheStatus objectForKey:collectionKey];
         
         if([cacheStatus intValue] != 1){
             if (searchString== NULL || [searchString isEqualToString:@""] ){
@@ -302,7 +282,7 @@ static ZPDataLayer* _instance = nil;
                 [_serverRequestQueue addOperation:retrieveOperationForCache];
             }
             // Mark that we have started retrieving things from the server 
-            [_collectionCacheStatus setValue:[NSNumber numberWithInt:1] forKey:[NSString stringWithFormat:@"%i",collectionID]];
+            [_collectionCacheStatus setValue:[NSNumber numberWithInt:1] forKey:[NSString stringWithFormat:@"%i",collectionKey]];
         }
         
         [view setItemKeysShown: returnArray];
@@ -312,8 +292,19 @@ static ZPDataLayer* _instance = nil;
 }
 
 -(void) cacheZoteroItems:(NSArray*)items {
-    ZPItemCacheWriteOperation* cacheWriteOperation = [[ZPItemCacheWriteOperation alloc] initWithZoteroItemArray:items];
-    [_itemCacheWriteQueue addOperation:cacheWriteOperation];
+ 
+    NSEnumerator *e = [items objectEnumerator];
+    ZPZoteroItem* item;
+
+    while (item = (ZPZoteroItem*) [e nextObject]) {
+        [[ZPDatabase instance] addItemToDatabase:item];
+
+        //Notify the user interface that this item is now available
+        [self notifyItemBasicsAvailable:item];
+    }
+    
+    //TODO: Cache collection memberships
+    
 }
 
 
@@ -341,8 +332,8 @@ static ZPDataLayer* _instance = nil;
 
 -(void) _updateItemDetailsFromServer:(ZPZoteroItem*)item{
     item = [[ZPServerConnection instance] retrieveSingleItemDetailsFromServer:item];
-    [self _writeItemFieldsToDatabase:item];
-    [self _writeItemCreatorsToDatabase:item];
+    [[ZPDatabase instance] writeItemFieldsToDatabase:item];
+    [[ZPDatabase instance] writeItemCreatorsToDatabase:item];
     
     [self notifyItemDetailsAvailable:item];
 

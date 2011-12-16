@@ -19,7 +19,7 @@
 
 @implementation ZPDetailedItemListViewController
 
-@synthesize collectionID = _collectionKey;
+@synthesize collectionKey = _collectionKey;
 @synthesize libraryID =  _libraryID;
 @synthesize searchString = _searchString;
 @synthesize OrderField = _OrderField;
@@ -116,10 +116,10 @@ static ZPDetailedItemListViewController* _instance = nil;
 
    
     //This array contains NSStrings and NSNulls. Nulls mean that there is no data available yet
-    NSString* key = [_itemKeysShown objectAtIndex: indexPath.row];
+    NSObject* keyObj = [_itemKeysShown objectAtIndex: indexPath.row];
     
     
-    UITableViewCell* cell = [_cellCache objectForKey:key];
+    UITableViewCell* cell = [_cellCache objectForKey:keyObj];
     
     
     if(cell==nil){
@@ -127,11 +127,11 @@ static ZPDetailedItemListViewController* _instance = nil;
         cell = [super tableView:tableView cellForRowAtIndexPath:indexPath];
 
         
-        if(key != [NSNull null]){
+        if(keyObj != [NSNull null]){
 
             //If the cell contains an item, add publication details and thumbnail
             
-            ZPZoteroItem* item=[[ZPDataLayer instance] getItemByKey:key];
+            ZPZoteroItem* item=[[ZPDataLayer instance] getItemByKey:(NSString*)keyObj];
 
             //Publication as a formatted label
 
@@ -211,7 +211,7 @@ static ZPDetailedItemListViewController* _instance = nil;
              }
              */
         }
-        [_cellCache setObject:cell forKey:key];
+        [_cellCache setObject:cell forKey:keyObj];
     }
     
     return cell;

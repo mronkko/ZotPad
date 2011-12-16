@@ -187,7 +187,7 @@ const NSInteger ZPServerConnectionRequestSingleItemDetails = 5;
             
             //If there are no results, dump the entire response so that we see what the problem was
             if([[parserDelegate parsedElements] count] == 0){
-                NSLog([[NSString alloc] initWithData:responseData encoding:NSUTF8StringEncoding]);
+                NSLog(@"%@",[[NSString alloc] initWithData:responseData encoding:NSUTF8StringEncoding]);
             }
         }
 

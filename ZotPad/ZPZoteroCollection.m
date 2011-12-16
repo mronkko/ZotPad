@@ -14,7 +14,6 @@
 @synthesize libraryID;
 @synthesize collectionKey;
 @synthesize parentCollectionKey;
-@synthesize collectionID;
 @synthesize hasChildren;
 
 

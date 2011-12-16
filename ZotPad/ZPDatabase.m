@@ -28,7 +28,7 @@ static ZPDatabase* _instance = nil;
 {
     self = [super init];
     
-    _debugDatabase = FALSE;
+    _debugDatabase = TRUE;
     
 	NSString *dbPath = [[NSSearchPathForDirectoriesInDomains(NSDocumentDirectory, NSUserDomainMask, YES) objectAtIndex:0] stringByAppendingPathComponent:@"zotpad.sqlite"];
     
@@ -115,7 +115,7 @@ static ZPDatabase* _instance = nil;
         [collectionKeys removeObject:collection.collectionKey];
         
         NSNumber* libraryIDobj = NULL;
-        if(libraryID == 1) libraryIDobj = [NSNumber numberWithInt:libraryID];
+        if(libraryID != 1) libraryIDobj = [NSNumber numberWithInt:libraryID];
         
         @synchronized(self){
             if(count == [collectionKeys count]){
@@ -143,15 +143,10 @@ static ZPDatabase* _instance = nil;
     // Resolve parent IDs based on parent keys
     // A nested subquery is needed to rename columns because SQLite does not support table aliases in update statement
 
-    // TODO: Refactor so that collectionKeys are used instead of collectionIDs
+    // TODO: Refactor so that collectionKeys are used instead of collectionKeys
 
 }
 
-
-//Extract data from item and write to database
-
--(void) writeItemCreatorsToDatabase:(ZPZoteroItem*)item;
--(void) writeItemFieldsToDatabase:(ZPZoteroItem*)item;
 
 
 // Methods for retrieving data from the data layer
@@ -165,7 +160,7 @@ static ZPDatabase* _instance = nil;
     
     //Check if there are collections in my library
     @synchronized(self){
-        FMResultSet* resultSet = [_database executeQuery:@"SELECT collectionID FROM collections WHERE libraryID IS NULL LIMIT 1"];
+        FMResultSet* resultSet = [_database executeQuery:@"SELECT key FROM collections WHERE libraryID IS NULL LIMIT 1"];
         BOOL hasChildren  =[resultSet next];
         
         [thisLibrary setHasChildren:hasChildren];
@@ -199,7 +194,7 @@ static ZPDatabase* _instance = nil;
 	return returnArray;
 }
 
-- (NSArray*) collections : (NSInteger)currentLibraryID currentCollection:(NSInteger)currentCollectionID {
+- (NSArray*) collections : (NSInteger)currentLibraryID currentCollection:(NSInteger)currentCollectionKey {
 	
     
     NSString* libraryCondition;
@@ -214,18 +209,18 @@ static ZPDatabase* _instance = nil;
         libraryCondition = [NSString stringWithFormat:@"libraryID = %i",currentLibraryID];
     }
     
-    if(currentCollectionID == 0){
+    if(currentCollectionKey == 0){
         //Collection key is used here insted of collection ID because it is more reliable.
         collectionCondition= @"parentCollectionKey IS NULL";
     }
     else{
-        collectionCondition = [NSString stringWithFormat:@"parentCollectionID = %i",currentCollectionID];
+        collectionCondition = [NSString stringWithFormat:@"parentCollectionKey = %i",currentCollectionKey];
     }
     
     NSMutableArray* returnArray;
     
 	@synchronized(self){
-        FMResultSet* resultSet = [_database executeQuery:[NSString stringWithFormat:@"SELECT collectionID, collectionName, collectionID IN (SELECT DISTINCT parentCollectionID FROM collections WHERE %@) AS hasChildren FROM collections WHERE %@ AND %@",libraryCondition,libraryCondition,collectionCondition]];
+        FMResultSet* resultSet = [_database executeQuery:[NSString stringWithFormat:@"SELECT key, collectionName, collectionKey IN (SELECT DISTINCT parentCollectionKey FROM collections WHERE %@) AS hasChildren FROM collections WHERE %@ AND %@",libraryCondition,libraryCondition,collectionCondition]];
         
         
         
@@ -233,15 +228,12 @@ static ZPDatabase* _instance = nil;
         
         while([resultSet next]) {
             
-            NSInteger collectionID = [resultSet intForColumnIndex:0];
-            NSString *name = [resultSet stringForColumnIndex:1];
-            BOOL hasChildren = [resultSet intForColumnIndex:2];
             
             ZPZoteroCollection* thisCollection = [[ZPZoteroCollection alloc] init];
             [thisCollection setLibraryID : currentLibraryID];
-            [thisCollection setCollectionID : collectionID];
-            [thisCollection setName : name];
-            [thisCollection setHasChildren:hasChildren];
+            [thisCollection setCollectionKey : [resultSet stringForColumnIndex:0]];
+            [thisCollection setName : [resultSet stringForColumnIndex:1]];
+            [thisCollection setHasChildren:(BOOL) [resultSet intForColumnIndex:2]];
             
             [returnArray addObject:thisCollection];
             
@@ -266,9 +258,13 @@ static ZPDatabase* _instance = nil;
     
     @synchronized(self){
         //TODO: Implement modifying already existing items if they are older than the new item
-        FMResultSet* resultSet = [_database executeQuery:[NSString stringWithFormat: @"SELECT dateModified, itemID FROM items WHERE key ='%@' LIMIT 1",item.key]];
+        FMResultSet* resultSet = [_database executeQuery:[NSString stringWithFormat: @"SELECT dateModified FROM items WHERE key ='%@' LIMIT 1",item.key]];
+
+        BOOL found = [resultSet next];
+
+        [resultSet close];
         
-        if(! [resultSet next]){
+        if(! found ){
             
             //TODO: implement item types
             //TODO: implement dateModified
@@ -293,14 +289,11 @@ static ZPDatabase* _instance = nil;
             [_database executeUpdate:@"INSERT INTO items (itemTypeID,libraryID,year,authors,title,publishedIn,key,fullCitation) VALUES (0,?,?,?,?,?,?,?)",libraryID,year,item.creatorSummary,item.title,item.publishedIn,item.key,item.fullCitation];
             
         }
-        [resultSet close];
         
     }
 }
 
 - (ZPZoteroItem*) getItemByKey: (NSString*) key{
-    
-    return [[ZPDatabase instance] getItemByKey:key];
     
     ZPZoteroItem* item = NULL;
     

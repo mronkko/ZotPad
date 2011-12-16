@@ -16,12 +16,12 @@
 @interface ZPLibraryAndCollectionListViewController : UITableViewController <ZPLibraryObserver>{
     ZPDataLayer* _database;
     NSArray* _content;
-    NSInteger _currentLibrary;
-    NSInteger _currentCollection;
+    NSInteger _currentLibraryID;
+    NSString* _currentCollectionKey;
 }
 @property (strong, nonatomic) ZPDetailedItemListViewController *detailViewController;
-@property NSInteger currentLibrary;
-@property NSInteger currentCollection;
+@property NSInteger currentLibraryID;
+@property (retain, nonatomic) NSString* currentCollectionKey;
 
 + (ZPLibraryAndCollectionListViewController*) instance;
 

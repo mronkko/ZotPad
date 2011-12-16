@@ -22,8 +22,12 @@
     [self setName:title];
 }
 
--(NSInteger) collectionID{
-    return 0;
+/*
+ This is required for conforming to the ZPNavigatorNode protocol
+*/
+
+-(NSString*) collectionKey{
+    return NULL;
 }
 
 

@@ -39,7 +39,6 @@
 - (void) getFieldsForItemKey: (NSString*) key;
 - (void) getCreatorsForItemKey: (NSString*) key;
 
-- (NSString*) collectionKeyFromCollectionID:(NSInteger) collectionID;
 
 // Methods for writing data to database
 -(void) addItemToDatabase:(ZPZoteroItem*)item;

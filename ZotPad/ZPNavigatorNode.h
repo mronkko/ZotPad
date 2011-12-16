@@ -12,7 +12,7 @@
 
 -(BOOL) hasChildren;
 -(NSInteger) libraryID;
--(NSInteger) collectionID;
+-(NSString*) collectionKey;
 -(NSString*) name;
 
 @end
