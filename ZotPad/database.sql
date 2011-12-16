@@ -1,12 +1,30 @@
+/*
+
+Creates the DB used by ZotPad. Although zotero database was used as a
+reference when designing the DB, this DB is consiredably more simple.
+
+All data entities that have identifiers use key strings that are received
+from the Zotero server. The only exception is libraries, that receive
+integer ids from the server. 
+
+TODO: Add indices and keys
+
+*/
+
+/*
+
+Group is the same as library. My library is not stored, because it will
+always exists. My library has id 1.
+
+*/
+
 CREATE TABLE IF NOT EXISTS groups ( 
     groupID INTEGER PRIMARY KEY,
     name TEXT NOT NULL
 );
 
 CREATE TABLE IF NOT EXISTS collections (
-    collectionID INTEGER PRIMARY KEY AUTOINCREMENT,
     collectionName TEXT NOT NULL,
-    parentCollectionID INT DEFAULT NULL,
     parentCollectionKey TEXT DEFAULT NULL,
     dateModified TIMESTAMP NOT NULL DEFAULT CURRENT_TIMESTAMP,
     libraryID INT,
@@ -14,7 +32,6 @@ CREATE TABLE IF NOT EXISTS collections (
 );
 
 CREATE TABLE IF NOT EXISTS items (
-    itemID INTEGER PRIMARY KEY AUTOINCREMENT,
     itemTypeID INT NOT NULL,
     dateModified TIMESTAMP NOT NULL DEFAULT CURRENT_TIMESTAMP,
     libraryID INT,
@@ -28,11 +45,11 @@ CREATE TABLE IF NOT EXISTS items (
 );
 
 CREATE TABLE IF NOT EXISTS collectionItems (
-    collectionID INT,
+    collectionKey TEXT,
     itemKey TEXT,
     orderIndex INT DEFAULT 0,
-    PRIMARY KEY (collectionID, itemID),
-    FOREIGN KEY (collectionID) REFERENCES collections(collectionID),
+    PRIMARY KEY (collectionKey, itemID),
+    FOREIGN KEY (collectionKey) REFERENCES collections(collectionKey),
     FOREIGN KEY (itemID) REFERENCES items(itemID)
 );
 

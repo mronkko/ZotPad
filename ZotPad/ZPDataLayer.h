@@ -11,6 +11,7 @@
 #import "ZPItemRetrieveOperation.h"
 #import "ZPZoteroItem.h"
 #import "ZPItemObserver.h"
+#import "ZPLibraryObserver.h"
 
 #import "../FMDB/src/FMDatabase.h"
 #import "../FMDB/src/FMResultSet.h"
@@ -45,6 +46,7 @@
     BOOL _debugDataLayer;
     
     NSMutableSet* _itemObservers;
+    NSMutableSet* _libraryObservers;
     
     FMDatabase* _database;
 }
@@ -81,11 +83,14 @@
 -(void) registerItemObserver:(NSObject<ZPItemObserver>*)observer;
 -(void) removeItemObserver:(NSObject<ZPItemObserver>*)observer;
 
-//Notifies all observers that a new item is available
+-(void) registerLibraryObserver:(NSObject<ZPLibraryObserver>*)observer;
+-(void) removeLibraryObserver:(NSObject<ZPLibraryObserver>*)observer;
+
+//Notifies all observers that a new data are available
 -(void) notifyItemBasicsAvailable:(ZPZoteroItem*)item;
 -(void) notifyItemDetailsAvailable:(ZPZoteroItem*)item;
 -(void) notifyItemAttachmentsAvailable:(ZPZoteroItem*)item;
-
+-(void) notifyLibraryWithCollectionsAvailable:(ZPZoteroLibrary*) library;
 
 @property (retain) ZPItemRetrieveOperation* mostRecentItemRetriveOperation;
 

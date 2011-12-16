@@ -13,6 +13,7 @@
 #import "ZPAuthenticationDialog.h"
 #import "ZPAppDelegate.h"
 #import "ZPNavigatorNode.h"
+#import "ZPZoteroLibrary.h"
 
 @implementation ZPLibraryAndCollectionListViewController
 
@@ -68,11 +69,13 @@ static ZPLibraryAndCollectionListViewController* _instance = nil;
     return [self->_content count];
 }
 
-- (void)notifyDataAvailable{
+//TODO: Instead of realoding everything, this method should just add or update the library that it receives
 
+-(void) notifyLibraryWithCollectionsAvailable:(ZPZoteroLibrary*) library{
+  
     if([NSThread isMainThread]){
         //If we are showing the libraries view, reload the data
-        
+
         //If the current library is not defined, show a list of libraries
         if(self->_currentLibrary == 0){
             self->_content = [[ZPDataLayer instance] libraries];

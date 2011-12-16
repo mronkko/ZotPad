@@ -27,9 +27,8 @@
 //User interface
 #import "ZPLibraryAndCollectionListViewController.h"
 
-//DB library
-#import "../FMDB/src/FMDatabase.h"
-#import "../FMDB/src/FMResultSet.h"
+//DB and DB library
+#import "ZPDatabase.h"
 
 
 
@@ -73,33 +72,7 @@ static ZPDataLayer* _instance = nil;
     self = [super init];
     
     _debugDataLayer = TRUE;
-    
-	NSString *dbPath = [[NSSearchPathForDirectoriesInDomains(NSDocumentDirectory, NSUserDomainMask, YES) objectAtIndex:0] stringByAppendingPathComponent:@"zotpad.sqlite"];
-    
-
-    NSError* error;
         
-    _database = [FMDatabase databaseWithPath:dbPath];
-    [_database open];
-    [_database setTraceExecution:_debugDataLayer];
-    [_database setLogsErrors:_debugDataLayer];
-     
-    //Read the database structure from file and create the database
-    
-    NSStringEncoding encoding;
-    
-    NSString *sqlFile = [NSString stringWithContentsOfFile:[[NSBundle mainBundle]
-                                                            pathForResource:@"database"
-                                                            ofType:@"sql"] usedEncoding:&encoding error:&error];
-    
-    NSArray *sqlStatements = [sqlFile componentsSeparatedByString:@";"];
-    
-    NSEnumerator *e = [sqlStatements objectEnumerator];
-    id sqlString;
-    while (sqlString = [e nextObject]) {
-        [_database executeUpdate:sqlString];
-    }
-    
     _itemObservers = [[NSMutableSet alloc] initWithCapacity:2];
     
     //Initialize OperationQueues for retrieving data from server and writing it to cache
@@ -159,112 +132,30 @@ static ZPDataLayer* _instance = nil;
     NSArray* libraries = [[ZPServerConnection instance] retrieveLibrariesFromServer];
     if(libraries==NULL) return;
     
-    //Library IDs are stored on the server, so we can just drop the content of the library table and recreate it
-    
-    @synchronized(self){
-        [_database executeUpdate:@"DELETE FROM groups"];
-    }
-    //Collections IDs are not stored in the server, but are local and because of this we cannot juts drop the collections.
-    //Retrieve a list of collection keys so that we know which collections already exist
-    
-    
-    NSMutableArray* collectionKeys;
-    
-    @synchronized(self){
-        FMResultSet* resultSet=[_database executeQuery:@"SELECT key FROM collections"];
-
-        collectionKeys =[[NSMutableArray alloc] init];
-
-        while([resultSet next]){
-            [collectionKeys addObject:[resultSet stringForColumnIndex:0]];
-        }
-        [resultSet close];
-    }
+    [[ZPDatabase instance] addOrUpdateLibraries:libraries];
     
     NSEnumerator* e = [libraries objectEnumerator];
     
     ZPZoteroLibrary* library;
     
     while ( library = (ZPZoteroLibrary*) [e nextObject]) {
-        
-        NSNumber* libraryID = [NSNumber numberWithInt:library.libraryID];
-        @synchronized(self){
-            [_database executeUpdate:@"INSERT INTO groups (groupID, name) VALUES (?, ?)",libraryID,library.name];
-        }  
-        
-        NSLog(@"Loading collections for group library '%@' from server",library.name);
-        
+             
         NSArray* collections = [[ZPServerConnection instance] retrieveCollectionsForLibraryFromServer:library.libraryID];
         if(collections==NULL) return;
         
-        NSEnumerator* e2 = [collections objectEnumerator];
+        [[ZPDatabase instance] addOrUpdateCollections:collections forLibrary:library.libraryID];
 
-        ZPZoteroCollection* collection;
-        while( collection =(ZPZoteroCollection*)[e2 nextObject]){
-            
-            //Insert or update
-            NSInteger count= [collectionKeys count];
-            [collectionKeys removeObject:collection.collectionKey];
-            
-            NSNumber* libraryID = [NSNumber numberWithInt:library.libraryID];
-            
-            @synchronized(self){
-                if(count == [collectionKeys count]){
-
-                    [_database executeUpdate:@"INSERT INTO collections (collectionName, key, libraryID, parentCollectionKey) VALUES (?,?,?,?)",collection.name,collection.collectionKey,libraryID,collection.parentCollectionKey];
-                }
-                else{
-                    [_database executeUpdate:@"UPDATE collections SET collectionName=?, libraryID=?, parentCollectionKey=? WHERE key=?",collection.name,libraryID,collection.parentCollectionKey ,collection.collectionKey];
-                }
-            }
+        [[ZPLibraryAndCollectionListViewController instance] notifyDataAvailable];
         
-        }
     }
     
     //Collections for My Library
     
     NSArray* collections = [[ZPServerConnection instance] retrieveCollectionsForLibraryFromServer:1];
     if(collections==NULL) return;
+    [[ZPDatabase instance] addOrUpdateCollections:collections forLibrary:1];
     
-    NSEnumerator* e2 = [collections objectEnumerator];
     
-    ZPZoteroCollection* collection;
-    while( collection =(ZPZoteroCollection*)[e2 nextObject]){
-        
-        //Insert or update
-        NSInteger count= [collectionKeys count];
-        [collectionKeys removeObject:collection.collectionKey];
-        
-        @synchronized(self){
-            if(count == [collectionKeys count]){
-            
-                [_database executeUpdate:@"INSERT INTO collections (collectionName, key, parentCollectionKey) VALUES (?,?,?)",collection.name,collection.collectionKey,collection.parentCollectionKey ];
-            }
-            else{
-                [_database executeUpdate:@"UPDATE collections SET collectionName=?, libraryID=NULL, parentCollectionKey=? WHERE key=?",collection.name,collection.parentCollectionKey ,collection.collectionKey];
-            }
-        }
-    }
-
-    // Delete collections that no longer exist
-    
-    NSEnumerator* e3 = [collectionKeys objectEnumerator];
-    
-    NSString* key;
-    while( key =(NSString*)[e3 nextObject]){
-        @synchronized(self){
-            [_database executeUpdate:@"DELETE FROM collections WHERE key=?",key];
-        }
-    }
-    
-    // Resolve parent IDs based on parent keys
-    // A nested subquery is needed to rename columns because SQLite does not support table aliases in update statement
-    
-    @synchronized(self){
-        [_database executeUpdate:@"UPDATE collections SET parentCollectionID = (SELECT A FROM (SELECT collectionID as A, key AS B FROM collections) WHERE B=parentCollectionKey)"];
-    }
-    
-    //TODO: Clean up orphaned items
     
     [[ZPLibraryAndCollectionListViewController instance] notifyDataAvailable];
 }
@@ -277,47 +168,7 @@ static ZPDataLayer* _instance = nil;
 
 - (NSArray*) libraries {
 	
-    NSMutableArray *returnArray = [[NSMutableArray alloc] init];
-    
-       
-	ZPZoteroLibrary* thisLibrary = [[ZPZoteroLibrary alloc] init];
-    [thisLibrary setLibraryID : 1];
-	[thisLibrary setTitle: @"My Library"];
-    
-    //Check if there are collections in my library
-    @synchronized(self){
-        FMResultSet* resultSet = [_database executeQuery:@"SELECT collectionID FROM collections WHERE libraryID IS NULL LIMIT 1"];
-        BOOL hasChildren  =[resultSet next];
-    
-        [thisLibrary setHasChildren:hasChildren];
-        [returnArray addObject:thisLibrary];
-        [resultSet close];
-
-	}
-    
-    //Group libraries
-    @synchronized(self){
-    
-        FMResultSet* resultSet = [_database executeQuery:@"SELECT groupID, name, groupID IN (SELECT DISTINCT libraryID from collections) AS hasChildren FROM groups"];
-		
-        
-        while([resultSet next]) {
-            
-            NSInteger libraryID = [resultSet intForColumnIndex:0];
-            NSString* name = [resultSet stringForColumnIndex:1];
-            BOOL hasChildren = [resultSet boolForColumnIndex:2];
-            
-            ZPZoteroLibrary* thisLibrary = [[ZPZoteroLibrary alloc] init];
-            [thisLibrary setLibraryID : libraryID];
-            [thisLibrary setName: name];
-            [thisLibrary setHasChildren:hasChildren];
-            
-            [returnArray addObject:thisLibrary];
-        }
-        [resultSet close];
-
-    }
-	return returnArray;
+    return [[ZPDatabase instance] libraries];
 }
 
 
@@ -329,57 +180,8 @@ static ZPDataLayer* _instance = nil;
 
 - (NSArray*) collections : (NSInteger)currentLibraryID currentCollection:(NSInteger)currentCollectionID {
 	
+    return [[ZPDatabase instance] collections:currentLibraryID currentCollection:currentCollectionID];
 
-    NSString* libraryCondition;
-    NSString* collectionCondition;
-    
-    //My library is coded as 1 in ZotPad and is NULL in the database.
-    
-    if(currentLibraryID == 1){
-        libraryCondition = @"libraryID IS NULL";
-    }
-    else{
-        libraryCondition = [NSString stringWithFormat:@"libraryID = %i",currentLibraryID];
-    }
-
-    if(currentCollectionID == 0){
-        //Collection key is used here insted of collection ID because it is more reliable.
-        collectionCondition= @"parentCollectionKey IS NULL";
-    }
-    else{
-        collectionCondition = [NSString stringWithFormat:@"parentCollectionID = %i",currentCollectionID];
-    }
-    
-    NSMutableArray* returnArray;
-    
-	@synchronized(self){
-        FMResultSet* resultSet = [_database executeQuery:[NSString stringWithFormat:@"SELECT collectionID, collectionName, collectionID IN (SELECT DISTINCT parentCollectionID FROM collections WHERE %@) AS hasChildren FROM collections WHERE %@ AND %@",libraryCondition,libraryCondition,collectionCondition]];
-	
-    
-	
-        returnArray = [[NSMutableArray alloc] init];
-        
-        while([resultSet next]) {
-            
-            NSInteger collectionID = [resultSet intForColumnIndex:0];
-            NSString *name = [resultSet stringForColumnIndex:1];
-            BOOL hasChildren = [resultSet intForColumnIndex:2];
-            
-            ZPZoteroCollection* thisCollection = [[ZPZoteroCollection alloc] init];
-            [thisCollection setLibraryID : currentLibraryID];
-            [thisCollection setCollectionID : collectionID];
-            [thisCollection setName : name];
-            [thisCollection setHasChildren:hasChildren];
-            
-            [returnArray addObject:thisCollection];
-            
-        }
-        [resultSet close];
-
-        
-	}
-    
-	return returnArray;
 }
 
 
@@ -509,89 +311,15 @@ static ZPDataLayer* _instance = nil;
     }
 }
 
--(NSString*) collectionKeyFromCollectionID:(NSInteger)collectionID{
-    NSString* ret = NULL;
-    @synchronized(self){
-        //TODO: This could be optimized by loading the results in an array or dictionary instead of retrieving them from the database over and over 
-        FMResultSet* resultSet = [_database executeQuery:@"SELECT key FROM collections WHERE collectionID = ? LIMIT 1",[NSNumber numberWithInt: collectionID]];
-        [resultSet next];
-        ret = [resultSet stringForColumnIndex:0];
-        [resultSet close];
-
-    }
-    return ret;
-}
-
 -(void) cacheZoteroItems:(NSArray*)items {
     ZPItemCacheWriteOperation* cacheWriteOperation = [[ZPItemCacheWriteOperation alloc] initWithZoteroItemArray:items];
     [_itemCacheWriteQueue addOperation:cacheWriteOperation];
 }
 
-/*
- 
- Writes an item to the database if it does not already exist.
- 
-  */
-
--(void) addItemToDatabase:(ZPZoteroItem*)item {
-    
-    @synchronized(self){
-        //TODO: Implement modifying already existing items if they are older than the new item
-        FMResultSet* resultSet = [_database executeQuery:[NSString stringWithFormat: @"SELECT dateModified, itemID FROM items WHERE key ='%@' LIMIT 1",item.key]];
-
-        if(! [resultSet next]){
-            
-            //TODO: implement item types
-            //TODO: implement dateModified
-            
-            NSNumber* year;
-            if(item.year!=0){
-                year=[NSNumber numberWithInt:item.year];
-            }
-            else{
-                year=NULL;
-            }
-
-            NSNumber* libraryID;
-            if(item.libraryID!=0){
-                libraryID=[NSNumber numberWithInt:item.libraryID];
-            }
-            else{
-                libraryID=NULL;
-            }
-
-            
-            [_database executeUpdate:@"INSERT INTO items (itemTypeID,libraryID,year,authors,title,publishedIn,key,fullCitation) VALUES (0,?,?,?,?,?,?,?)",libraryID,year,item.creatorSummary,item.title,item.publishedIn,item.key,item.fullCitation];
-            
-        }
-        [resultSet close];
-
-    }
-}
 
 - (ZPZoteroItem*) getItemByKey: (NSString*) key{
 
-    ZPZoteroItem* item = NULL;
-    
-    @synchronized(self){
-        FMResultSet* resultSet = [_database executeQuery: @"SELECT itemTypeID,libraryID,year,authors,title,publishedIn,key,fullCitation FROM items WHERE key=? LIMIT 1",key];
-        
-        if ([resultSet next]) {
-            
-            item = [[ZPZoteroItem alloc] init];
-            //TODO: Implement item type
-            [item setLibraryID:[resultSet intForColumnIndex:1]];
-            [item setYear:[resultSet intForColumnIndex:2]];
-            [item setCreatorSummary:[resultSet stringForColumnIndex:3]];
-            [item setTitle:[resultSet stringForColumnIndex:4]];
-            NSString* publishedIn = [resultSet stringForColumnIndex:5];
-            [item setPublishedIn:publishedIn];
-            [item setKey:[resultSet stringForColumnIndex:6]];
-            [item setFullCitation:[resultSet stringForColumnIndex:7]];
-        }
-        [resultSet close];
-    }
-    return item;
+    return [[ZPDatabase instance] getItemByKey:key];
 }
 
 /*
@@ -619,149 +347,6 @@ static ZPDataLayer* _instance = nil;
     [self notifyItemDetailsAvailable:item];
 
 }
-
--(void) _writeItemCreatorsToDatabase:(ZPZoteroItem*)item{
-    
-    //Creators
-    @synchronized(self){
-
-        //Drop all creators for this 
-        //TODO: This could be optimized so that it would work the same way as fields: only do changes that are required instead of dropping and recreating everything
-        [_database executeUpdate:@"DELETE FROM creators WHERE itemKey =?",item.key];
-        
-        
-        NSEnumerator* e = [item.creators objectEnumerator];
-        NSInteger order=1;
-        NSDictionary* creator;
-        
-        while(creator= [e nextObject]){
-            [_database executeUpdate:[NSString stringWithFormat: @"INSERT INTO creators (itemKey,order,firstName,lastName,shortName,creatorType) VALUES (?,?,?,?,?)",
-                                      item.key,order,[creator objectForKey:@"firstName"],[creator objectForKey:@"lastName"],
-                                      [creator objectForKey:@"shortName"],[creator objectForKey:@"creatorType"]]];
-            order++;
-        }
-    }
-}
--(void) _writeItemFieldsToDatabase:(ZPZoteroItem*)item{
-
-     //Fields      
-    NSMutableDictionary* oldFields=[[NSMutableDictionary alloc] init];
-    
-    @synchronized(self){
-        FMResultSet* resultSet = [_database executeQuery:@"SELECT fieldName, fieldValue FROM fields WHERE itemKey = ? ",item.key];
-        
-        while([resultSet next]){
-            [oldFields setObject:[resultSet stringForColumnIndex:0] forKey:[resultSet stringForColumnIndex:1]];
-        }
-        [resultSet close];
-    }
-    
-    NSEnumerator* e = [item.fields keyEnumerator]; 
-    
-    NSString* key;
-    
-    while(key=[e nextObject]){
-        NSString* oldValue = [oldFields objectForKey:key];
-        if(oldValue == NULL){
-            @synchronized(self){
-                [_database executeUpdate:@"INSERT INTO fields (fieldName, fieldValue, itemKey) VALUES (?,?,?)",key,[item.fields objectForKey:key],item.key];
-            }
-        }
-        else if (! [oldValue isEqualToString:[item.fields objectForKey:key]]){
-            @synchronized(self){
-                [_database executeUpdate:@"UPDATE fields SET fieldValue = ? WHERE fieldName=? AND itemKey = ? ",[item.fields objectForKey:key],key,item.key];
-            }
-        }
-        [oldFields removeObjectForKey:key];
-    }
-    
-    e = [oldFields keyEnumerator]; 
-
-    while(key=[e nextObject]){
-        @synchronized(self){
-            [_database executeUpdate:@"DELETE FROM fields WHERE fieldName = ? AND  itemKey = ?",key,item.key];
-        }
-    }
-
-}
-
-
-- (void) addCreatorsToItem: (ZPZoteroItem*) item {
-
-    @synchronized(self){
-        FMResultSet* resultSet = [_database executeQuery: @"SELECT firstName, lastName, shortName,creatorType, fieldMode FROM creators WHERE itemKey = ? ORDER BY order",item.key];
-        
-        NSMutableArray* creators = [[NSMutableArray alloc] init];
-
-        while([resultSet next]) {
-            NSMutableDictionary* creator = [[NSMutableDictionary alloc] init];
-
-            [creator setObject:[resultSet stringForColumnIndex:0] forKey:@"firstName"];
-            [creator setObject:[resultSet stringForColumnIndex:1] forKey:@"lastName"];
-            [creator setObject:[resultSet stringForColumnIndex:2] forKey:@"shortName"];
-            [creator setObject:[resultSet stringForColumnIndex:3] forKey:@"creatorType"];
-            
-            //TODO: Would this be needed at all?
-            //[creator setObject:[NSNumber numberWithInt:[resultSet intForColumnIndex:4]] forKey:@"fieldMode"];
-            
-            [creators addObject:creator];
-        }
-        
-        [resultSet close];
-        if([creators count]>0) item.creators = creators;
-        else item.creators = NULL;
-    }
-}
-
-
-
-- (void) addFieldsToItem: (ZPZoteroItem*) item  {
-
-    @synchronized(self){
-        FMResultSet* resultSet = [_database executeQuery: @"SELECT fieldName, fieldValue FROM fields WHERE itemKey = ? ",item.key];
-    
-        NSMutableDictionary* fields = [[NSMutableDictionary alloc] init];
-        while([resultSet next]) {
-            
-            [fields setObject:[resultSet stringForColumnIndex:0] forKey:[resultSet stringForColumnIndex:1]];
-        }
-    
-        [resultSet close];
-        
-        if([fields count]>0) item.fields = fields;
-        else item.fields = NULL;
-    }
-}
-
-
-- (NSArray*) getAttachmentFilePathsForItem: (NSInteger) itemID{
-
-    /*
-    FMResultSet* resultSet =[_database executeQuery:[NSString stringWithFormat: @"SELECT key, path FROM itemAttachments ia, items i WHERE ia.sourceItemID=%i AND ia.linkMode=1 AND ia.mimeType='application/pdf' AND i.itemID=ia.itemID;",itemID]];
-        
-    
-    NSMutableArray* returnArray = [[NSMutableArray alloc] init];
-    
-    NSString *documentsDirectory = [NSSearchPathForDirectoriesInDomains(NSDocumentDirectory, NSUserDomainMask, YES) objectAtIndex:0];
-
-        
-    while([resultSet next]) {
-            
-        //Remove the storage: from the beginning of the filename
-        NSString *attachmentPath = [NSString stringWithFormat:@"%@/storage/%s/%@", documentsDirectory, [resultSet stringForColumnIndex:](selectstmt, 0), [[[NSString alloc] initWithUTF8String:(const char *) [resultSet stringForColumnIndex:](selectstmt, 1)]substringFromIndex: 8]];
-        
-        NSLog(@"%@",attachmentPath);
-        
-        [returnArray addObject:attachmentPath];
-    }
-        
-    sqlite3_finalize(selectstmt);
-        
-    return returnArray;
-    */
-    
-    return NULL;
-}    
 
 //Notifies all observers that a new item is available
 -(void) notifyItemBasicsAvailable:(ZPZoteroItem*)item{
@@ -801,6 +386,17 @@ static ZPDataLayer* _instance = nil;
     }
 }
 
+-(void) notifyLibraryWithCollectionsAvailable:(ZPZoteroLibrary*) library{
+    NSEnumerator* e = [_libraryObservers objectEnumerator];
+    NSObject* id;
+    
+    while( id= [e nextObject]) {
+        [(NSObject <ZPLibraryObserver>*) id notifyLibraryWithCollectionsAvailable:library];
+    }
+    
+}
+
+
 //Adds and removes observers
 -(void) registerItemObserver:(NSObject<ZPItemObserver>*)observer{
     [_itemObservers addObject:observer];
@@ -810,6 +406,12 @@ static ZPDataLayer* _instance = nil;
     [_itemObservers removeObject:observer];
 }
 
-
+-(void) registerLibraryObserver:(NSObject<ZPLibraryObserver>*)observer{
+    [_libraryObservers addObject:observer];
+    
+}
+-(void) removeLibraryObserver:(NSObject<ZPLibraryObserver>*)observer{
+    [_libraryObservers removeObject:observer];
+}
 
 @end

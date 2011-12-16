@@ -9,10 +9,11 @@
 #import <UIKit/UIKit.h>
 #import "ZPDetailedItemListViewController.h"
 #import "ZPDataLayer.h"
+#import "ZPLibraryObserver.h"
 
 @class ZPDetailedItemListViewController;
 
-@interface ZPLibraryAndCollectionListViewController : UITableViewController{
+@interface ZPLibraryAndCollectionListViewController : UITableViewController <ZPLibraryObserver>{
     ZPDataLayer* _database;
     NSArray* _content;
     NSInteger _currentLibrary;
@@ -23,6 +24,5 @@
 @property NSInteger currentCollection;
 
 + (ZPLibraryAndCollectionListViewController*) instance;
-- (void)notifyDataAvailable;
 
 @end

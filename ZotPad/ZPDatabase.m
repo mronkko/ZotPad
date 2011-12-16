@@ -144,11 +144,6 @@ static ZPDatabase* _instance = nil;
     // A nested subquery is needed to rename columns because SQLite does not support table aliases in update statement
 
     // TODO: Refactor so that collectionKeys are used instead of collectionIDs
-    
-    @synchronized(self){
-        [_database executeUpdate:@"UPDATE collections SET parentCollectionID = (SELECT A FROM (SELECT collectionID as A, key AS B FROM collections) WHERE B=parentCollectionKey)"];
-    }
-    
 
 }
 
@@ -259,15 +254,220 @@ static ZPDatabase* _instance = nil;
 	return returnArray;
 }
 
-- (ZPZoteroItem*) getItemByKey: (NSString*) key;
-
 //Add more data to an existing item. By default the getItemByKey do not populate fields or creators to save database operations
-- (void) getFieldsForItemKey: (NSString*) key;
-- (void) getCreatorsForItemKey: (NSString*) key;
+- (void) getFieldsForItemKey: (NSString*) key{
 
-- (NSString*) collectionKeyFromCollectionID:(NSInteger) collectionID;
+}
+- (void) getCreatorsForItemKey: (NSString*) key{
 
-// Methods for writing data to database
--(void) addItemToDatabase:(ZPZoteroItem*)item;
+}
+
+-(void) addItemToDatabase:(ZPZoteroItem*)item {
+    
+    @synchronized(self){
+        //TODO: Implement modifying already existing items if they are older than the new item
+        FMResultSet* resultSet = [_database executeQuery:[NSString stringWithFormat: @"SELECT dateModified, itemID FROM items WHERE key ='%@' LIMIT 1",item.key]];
+        
+        if(! [resultSet next]){
+            
+            //TODO: implement item types
+            //TODO: implement dateModified
+            
+            NSNumber* year;
+            if(item.year!=0){
+                year=[NSNumber numberWithInt:item.year];
+            }
+            else{
+                year=NULL;
+            }
+            
+            NSNumber* libraryID;
+            if(item.libraryID!=0){
+                libraryID=[NSNumber numberWithInt:item.libraryID];
+            }
+            else{
+                libraryID=NULL;
+            }
+            
+            
+            [_database executeUpdate:@"INSERT INTO items (itemTypeID,libraryID,year,authors,title,publishedIn,key,fullCitation) VALUES (0,?,?,?,?,?,?,?)",libraryID,year,item.creatorSummary,item.title,item.publishedIn,item.key,item.fullCitation];
+            
+        }
+        [resultSet close];
+        
+    }
+}
+
+- (ZPZoteroItem*) getItemByKey: (NSString*) key{
+    
+    return [[ZPDatabase instance] getItemByKey:key];
+    
+    ZPZoteroItem* item = NULL;
+    
+    @synchronized(self){
+        FMResultSet* resultSet = [_database executeQuery: @"SELECT itemTypeID,libraryID,year,authors,title,publishedIn,key,fullCitation FROM items WHERE key=? LIMIT 1",key];
+        
+        if ([resultSet next]) {
+            
+            item = [[ZPZoteroItem alloc] init];
+            //TODO: Implement item type
+            [item setLibraryID:[resultSet intForColumnIndex:1]];
+            [item setYear:[resultSet intForColumnIndex:2]];
+            [item setCreatorSummary:[resultSet stringForColumnIndex:3]];
+            [item setTitle:[resultSet stringForColumnIndex:4]];
+            NSString* publishedIn = [resultSet stringForColumnIndex:5];
+            [item setPublishedIn:publishedIn];
+            [item setKey:[resultSet stringForColumnIndex:6]];
+            [item setFullCitation:[resultSet stringForColumnIndex:7]];
+        }
+        [resultSet close];
+    }
+    return item;
+}
+
+-(void) writeItemCreatorsToDatabase:(ZPZoteroItem*)item{
+    
+    //Creators
+    @synchronized(self){
+        
+        //Drop all creators for this 
+        //TODO: This could be optimized so that it would work the same way as fields: only do changes that are required instead of dropping and recreating everything
+        [_database executeUpdate:@"DELETE FROM creators WHERE itemKey =?",item.key];
+        
+        
+        NSEnumerator* e = [item.creators objectEnumerator];
+        NSInteger order=1;
+        NSDictionary* creator;
+        
+        while(creator= [e nextObject]){
+            [_database executeUpdate:[NSString stringWithFormat: @"INSERT INTO creators (itemKey,order,firstName,lastName,shortName,creatorType) VALUES (?,?,?,?,?)",
+                                      item.key,order,[creator objectForKey:@"firstName"],[creator objectForKey:@"lastName"],
+                                      [creator objectForKey:@"shortName"],[creator objectForKey:@"creatorType"]]];
+            order++;
+        }
+    }
+}
+-(void) writeItemFieldsToDatabase:(ZPZoteroItem*)item{
+    
+    //Fields      
+    NSMutableDictionary* oldFields=[[NSMutableDictionary alloc] init];
+    
+    @synchronized(self){
+        FMResultSet* resultSet = [_database executeQuery:@"SELECT fieldName, fieldValue FROM fields WHERE itemKey = ? ",item.key];
+        
+        while([resultSet next]){
+            [oldFields setObject:[resultSet stringForColumnIndex:0] forKey:[resultSet stringForColumnIndex:1]];
+        }
+        [resultSet close];
+    }
+    
+    NSEnumerator* e = [item.fields keyEnumerator]; 
+    
+    NSString* key;
+    
+    while(key=[e nextObject]){
+        NSString* oldValue = [oldFields objectForKey:key];
+        if(oldValue == NULL){
+            @synchronized(self){
+                [_database executeUpdate:@"INSERT INTO fields (fieldName, fieldValue, itemKey) VALUES (?,?,?)",key,[item.fields objectForKey:key],item.key];
+            }
+        }
+        else if (! [oldValue isEqualToString:[item.fields objectForKey:key]]){
+            @synchronized(self){
+                [_database executeUpdate:@"UPDATE fields SET fieldValue = ? WHERE fieldName=? AND itemKey = ? ",[item.fields objectForKey:key],key,item.key];
+            }
+        }
+        [oldFields removeObjectForKey:key];
+    }
+    
+    e = [oldFields keyEnumerator]; 
+    
+    while(key=[e nextObject]){
+        @synchronized(self){
+            [_database executeUpdate:@"DELETE FROM fields WHERE fieldName = ? AND  itemKey = ?",key,item.key];
+        }
+    }
+    
+}
+
+
+- (void) addCreatorsToItem: (ZPZoteroItem*) item {
+    
+    @synchronized(self){
+        FMResultSet* resultSet = [_database executeQuery: @"SELECT firstName, lastName, shortName,creatorType, fieldMode FROM creators WHERE itemKey = ? ORDER BY order",item.key];
+        
+        NSMutableArray* creators = [[NSMutableArray alloc] init];
+        
+        while([resultSet next]) {
+            NSMutableDictionary* creator = [[NSMutableDictionary alloc] init];
+            
+            [creator setObject:[resultSet stringForColumnIndex:0] forKey:@"firstName"];
+            [creator setObject:[resultSet stringForColumnIndex:1] forKey:@"lastName"];
+            [creator setObject:[resultSet stringForColumnIndex:2] forKey:@"shortName"];
+            [creator setObject:[resultSet stringForColumnIndex:3] forKey:@"creatorType"];
+            
+            //TODO: Would this be needed at all?
+            //[creator setObject:[NSNumber numberWithInt:[resultSet intForColumnIndex:4]] forKey:@"fieldMode"];
+            
+            [creators addObject:creator];
+        }
+        
+        [resultSet close];
+        if([creators count]>0) item.creators = creators;
+        else item.creators = NULL;
+    }
+}
+
+
+
+- (void) addFieldsToItem: (ZPZoteroItem*) item  {
+    
+    @synchronized(self){
+        FMResultSet* resultSet = [_database executeQuery: @"SELECT fieldName, fieldValue FROM fields WHERE itemKey = ? ",item.key];
+        
+        NSMutableDictionary* fields = [[NSMutableDictionary alloc] init];
+        while([resultSet next]) {
+            
+            [fields setObject:[resultSet stringForColumnIndex:0] forKey:[resultSet stringForColumnIndex:1]];
+        }
+        
+        [resultSet close];
+        
+        if([fields count]>0) item.fields = fields;
+        else item.fields = NULL;
+    }
+}
+
+
+/*
+
+- (NSArray*) getAttachmentFilePathsForItem: (NSInteger) itemID{
+    
+     FMResultSet* resultSet =[_database executeQuery:[NSString stringWithFormat: @"SELECT key, path FROM itemAttachments ia, items i WHERE ia.sourceItemID=%i AND ia.linkMode=1 AND ia.mimeType='application/pdf' AND i.itemID=ia.itemID;",itemID]];
+     
+     
+     NSMutableArray* returnArray = [[NSMutableArray alloc] init];
+     
+     NSString *documentsDirectory = [NSSearchPathForDirectoriesInDomains(NSDocumentDirectory, NSUserDomainMask, YES) objectAtIndex:0];
+     
+     
+     while([resultSet next]) {
+     
+     //Remove the storage: from the beginning of the filename
+     NSString *attachmentPath = [NSString stringWithFormat:@"%@/storage/%s/%@", documentsDirectory, [resultSet stringForColumnIndex:](selectstmt, 0), [[[NSString alloc] initWithUTF8String:(const char *) [resultSet stringForColumnIndex:](selectstmt, 1)]substringFromIndex: 8]];
+     
+     NSLog(@"%@",attachmentPath);
+     
+     [returnArray addObject:attachmentPath];
+     }
+     
+     sqlite3_finalize(selectstmt);
+     
+     return returnArray;
+    
+    return NULL;
+}    
+ */
+
 
 @end

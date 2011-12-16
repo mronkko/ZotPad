@@ -12,6 +12,8 @@
 #import "ZPZoteroItem.h"
 #import "SBJson.h"
 
+//TODO: parse this from collections <zapi:numItems>0</zapi:numItems>
+
 @implementation ZPServerResponseXMLParser
 
 - (id) init{
