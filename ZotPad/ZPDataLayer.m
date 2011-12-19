@@ -7,24 +7,18 @@
 //  Copyright (c) 2011 __MyCompanyName__. All rights reserved.
 //
 
-//TODO: Consider splitting this class into (maybe) three parts 1) General data layer, 2) Database operations, 3) Cache
-
 #import "ZPDataLayer.h"
 
 //Data objects
 #import "ZPZoteroLibrary.h"
 #import "ZPZoteroCollection.h"
 #import "ZPZoteroItem.h"
-
-//Operations
-#import "ZPItemRetrieveOperation.h"
+//Cache
+#import "ZPCacheController.h"
 
 //Server connection
 #import "ZPServerConnection.h"
 #import "ZPServerResponseXMLParser.h"
-
-//User interface
-#import "ZPLibraryAndCollectionListViewController.h"
 
 //DB and DB library
 #import "ZPDatabase.h"
@@ -35,12 +29,9 @@
 //Private methods 
 
 @interface ZPDataLayer ();
-//This is a private method that does the actual work for retrieving libraries and collections
--(void) _updateLibrariesAndCollectionsFromServer;
 
-//Retrieves the initial 15 items, called from getItemKeysForView and executed as operation
-- (void) _retrieveAndSetInitialKeysForView:(ZPDetailedItemListViewController*)view;
-
+//Retrieves 50 items at a time from the server, called from getItemKeysForView and executed as operation
+- (void) _doAdHocItemRetrieval:(NSArray*) targetItemKeyArray;
 //Gets one item details and writes these to the database
 -(void) _updateItemDetailsFromServer:(ZPZoteroItem*) item;
     
@@ -49,12 +40,7 @@
 @end
 
 
-
-
 @implementation ZPDataLayer
-
-@synthesize mostRecentItemRetriveOperation = _mostRecentItemRetrieveOperation;
-
 
 
 static ZPDataLayer* _instance = nil;
@@ -67,15 +53,9 @@ static ZPDataLayer* _instance = nil;
     _debugDataLayer = TRUE;
         
     _itemObservers = [[NSMutableSet alloc] initWithCapacity:2];
+    _libraryObservers = [[NSMutableSet alloc] initWithCapacity:3];
     
-    //Initialize OperationQueues for retrieving data from server and writing it to cache
     _serverRequestQueue = [[NSOperationQueue alloc] init];
-    _itemCacheWriteQueue = [[NSOperationQueue alloc] init];
-    
-    _collectionTreeCached = FALSE;
-    _collectionCacheStatus = [[NSMutableDictionary alloc] init];
-    
-  
     
 	return self;
 }
@@ -91,65 +71,6 @@ static ZPDataLayer* _instance = nil;
     return _instance;
 }
 
-/*
- 
- Returns the key to the most recently used collection. Used in prioritizing item retrieve operations.
- 
- */
-
--(NSString*) currentlyActiveCollectionKey{
-    return _currentlyActiveCollectionKey;
-
-}
--(NSInteger) currentlyActiveLibraryID{
-    return _currentlyActiveLibraryID;
-    
-}
-
-/*
- Updates the local cache for libraries and collections and retrieves this data from the server
- */
-
--(void) updateLibrariesAndCollectionsFromServer{
-    NSInvocationOperation* retrieveOperation = [[NSInvocationOperation alloc] initWithTarget:self
-                                                                         selector:@selector(_updateLibrariesAndCollectionsFromServer) object:NULL];
-    [_serverRequestQueue addOperation:retrieveOperation];
-    NSLog(@"Opertions in queue %i",[_serverRequestQueue operationCount]);
-
-}
-
--(void) _updateLibrariesAndCollectionsFromServer{
-    
-    
-    NSLog(@"Loading group library information from server");
-    NSArray* libraries = [[ZPServerConnection instance] retrieveLibrariesFromServer];
-    if(libraries==NULL) return;
-    
-    [[ZPDatabase instance] addOrUpdateLibraries:libraries];
-    
-    NSEnumerator* e = [libraries objectEnumerator];
-    
-    ZPZoteroLibrary* library;
-    
-    while ( library = (ZPZoteroLibrary*) [e nextObject]) {
-             
-        NSArray* collections = [[ZPServerConnection instance] retrieveCollectionsForLibraryFromServer:library.libraryID];
-        if(collections==NULL) return;
-        
-        [[ZPDatabase instance] addOrUpdateCollections:collections forLibrary:library.libraryID];
-
-        [self notifyLibraryWithCollectionsAvailable:library];
-        
-    }
-    
-    //Collections for My Library
-    
-    NSArray* collections = [[ZPServerConnection instance] retrieveCollectionsForLibraryFromServer:1];
-    if(collections==NULL) return;
-    [[ZPDatabase instance] addOrUpdateCollections:collections forLibrary:1];
-        
-    [self notifyLibraryWithCollectionsAvailable:library];
-}
 
 /*
  
@@ -169,9 +90,9 @@ static ZPDataLayer* _instance = nil;
  
  */
 
-- (NSArray*) collections : (NSInteger)currentLibraryID currentCollection:(NSInteger)currentcollectionKey {
+- (NSArray*) collectionsForLibrary : (NSNumber*)currentLibraryID withParentCollection:(NSString*)currentcollectionKey {
 	
-    return [[ZPDatabase instance] collections:currentLibraryID currentCollection:currentcollectionKey];
+    return [[ZPDatabase instance] collectionsForLibrary:currentLibraryID withParentCollection:currentcollectionKey];
 
 }
 
@@ -184,134 +105,43 @@ static ZPDataLayer* _instance = nil;
  */
 
 
-- (NSArray*) getItemKeysForSelection:(ZPDetailedItemListViewController*)view{
+- (NSArray*) getItemKeysFromCacheForLibrary:(NSNumber*)libraryID collection:(NSString*)collectionKey searchString:(NSString*)searchString orderField:(NSString*)OrderField sortDescending:(BOOL)sortDescending{
+    //TODO: Implement
+    return NULL;
+}
 
-    //If we have an ongoing item retrieval in teh background, tell it that it can stop
+- (NSArray*) getItemKeysFromServerForLibrary:(NSNumber*)libraryID collection:(NSString*)collectionKey searchString:(NSString*)searchString orderField:(NSString*)OrderField sortDescending:(BOOL)sortDescending{
+
+    [[ZPCacheController instance] setCurrentLibrary:libraryID];
+    [[ZPCacheController instance] setCurrentCollection:collectionKey];
     
-    [_mostRecentItemRetrieveOperation markAsNotWithActiveView];
+    //Reset the ad hoc itemlist
+    _adHocItemKeys = NULL;
     
-    
-    _currentlyActiveCollectionKey = view.collectionKey;
-    _currentlyActiveLibraryID = view.libraryID;
-     
-    // Start by deciding if we need to connect to the server or can use cache. We can rely on cache
-    // if this collection is completely cached already. Because there is no way to get information about
-    // modified collection memberships from Zotero read API, without  
-    
-    NSNumber* cacheStatus = [_collectionCacheStatus objectForKey:view.collectionKey];
-    
-    if( cacheStatus == NULL || [cacheStatus intValue] != 2 ){
-        NSInvocationOperation* retrieveOperation = [[NSInvocationOperation alloc] initWithTarget:self
-                                                                                        selector:@selector(_retrieveAndSetInitialKeysForView:) object:view];
-        [retrieveOperation setQueuePriority:NSOperationQueuePriorityVeryHigh];
-        [_serverRequestQueue addOperation:retrieveOperation];
-        NSLog(@"Opertions in queue %i",[_serverRequestQueue operationCount]);
-        return NULL;
+        
+    //If there is no search or sort condition, we can reuse the item retrieval operations from cache controller
+    if(searchString == NULL && OrderField == NULL){
+        return [[ZPCacheController instance] cachedItemKeysForCollection:collectionKey libraryID:libraryID];
     }
+    
     else{
-        //TODO: Get the items from cache
-        return NULL;
+        //Do add hoc retrieve that is not stored in cache 
+        _adHocItemKeys = [NSMutableArray array];
+        _adHocItemKeysOffset=0;
+        
+        _adHocCollectionKey=collectionKey;
+        _adHocLibraryID=libraryID;
+        _adHocOrderField=OrderField;
+        _adHocSearchString=searchString;
+        _adHocSortDescending=sortDescending;
+        
+        [self queueAdHocItemRetrieval];
+        return _adHocItemKeys;
     }
-}
 
-- (void) _retrieveAndSetInitialKeysForView:(ZPDetailedItemListViewController*)view{
-
-    NSString* collectionKey=view.collectionKey;
-    NSInteger libraryID =  view.libraryID;
-    NSString* searchString = [view.searchString stringByTrimmingCharactersInSet:[NSCharacterSet whitespaceAndNewlineCharacterSet]];
-    NSString* OrderField = view.OrderField;
-    BOOL sortDescending = view.sortDescending;
-    
-    //Retrieve initial 15 items
-    
-    ZPServerResponseXMLParser* parserResults = [[ZPServerConnection instance] retrieveItemsFromLibrary:libraryID collection:collectionKey searchString:searchString orderField:OrderField sortDescending:sortDescending limit:15 start:0];
-    
-    if(parserResults == NULL){
-        [view setItemKeysShown: [NSArray array]];
-        [view notifyDataAvailable];
-    }
-    else{
-        //Construct a return array
-        NSMutableArray* returnArray = [NSMutableArray arrayWithCapacity:[parserResults totalResults]];
-        
-        //Fill in what we got from the parser and pad with NULL
-        
-        for (int i = 0; i < [parserResults totalResults]; i++) {
-            if(i<[[parserResults parsedElements] count]){
-                ZPZoteroItem* item = (ZPZoteroItem*)[[parserResults parsedElements] objectAtIndex:i];
-                [returnArray addObject:[item key]];
-            }
-            else{
-                [returnArray addObject:[NSNull null]];
-            }
-        }
-        
-        //Que an operation to cache the results of the server response
-        //TODO: Consider if these initial items should be given higher priority. It is possible that there are other items already in the queue.
-
-        NSArray* items = [parserResults parsedElements];
-                  
-        [self cacheZoteroItems:items];
-        
-        //If the current collection has already been changed, do not queue any more retrievals
-        if(!(_currentlyActiveLibraryID==libraryID &&
-             ((collectionKey == NULL && _currentlyActiveCollectionKey == NULL) ||  
-              [ collectionKey isEqualToString:_currentlyActiveCollectionKey] ))) return;
-        
-        
-        //Retrieve the rest of the items into the array
-        ZPItemRetrieveOperation* retrieveOperation = [[ZPItemRetrieveOperation alloc] initWithArray: returnArray library:libraryID collection:collectionKey searchString:searchString OrderField:OrderField sortDescending:sortDescending queue:_serverRequestQueue];
-        
-        
-        
-        //If this is the first time that we are using this collection, mark this operation as a cache operation if it does not have a search string or create a new operations without a search string
-        
-        NSNumber* cacheStatus = [_collectionCacheStatus objectForKey:collectionKey];
-        
-        if([cacheStatus intValue] != 1){
-            if (searchString== NULL || [searchString isEqualToString:@""] ){
-                [retrieveOperation markAsInitialRequestForCollection];
-                [_serverRequestQueue addOperation:retrieveOperation];
-            }
-            else{
-                [_serverRequestQueue addOperation:retrieveOperation];
-                
-                //Start a new backround operation to retrieve all items in the colletion (the main request was filtered with sort)
-                ZPItemRetrieveOperation* retrieveOperationForCache = [[ZPItemRetrieveOperation alloc] initWithArray: [NSArray array] library:libraryID collection:collectionKey searchString:NULL OrderField:NULL sortDescending:NO queue:_serverRequestQueue];
-                [retrieveOperationForCache markAsInitialRequestForCollection];
-                [_serverRequestQueue addOperation:retrieveOperationForCache];
-            }
-            // Mark that we have started retrieving things from the server 
-            [_collectionCacheStatus setValue:[NSNumber numberWithInt:1] forKey:[NSString stringWithFormat:@"%i",collectionKey]];
-        }
-        
-        [view setItemKeysShown: returnArray];
-        [view notifyDataAvailable];
-        
-    }
-}
-
--(void) cacheZoteroItems:(NSArray*)items {
- 
-    NSEnumerator *e = [items objectEnumerator];
-    ZPZoteroItem* item;
-
-    while (item = (ZPZoteroItem*) [e nextObject]) {
-        [[ZPDatabase instance] addItemToDatabase:item];
-
-        //Notify the user interface that this item is now available
-        [self notifyItemBasicsAvailable:item];
-    }
-    
-    //TODO: Cache collection memberships
-    
 }
 
 
-- (ZPZoteroItem*) getItemByKey: (NSString*) key{
-
-    return [[ZPDatabase instance] getItemByKey:key];
-}
 
 /*
  
@@ -319,15 +149,56 @@ static ZPDataLayer* _instance = nil;
  
  */
 
+-(void) queueAdHocItemRetrieval{
+    
+    NSInvocationOperation* retrieveOperation = [[NSInvocationOperation alloc] initWithTarget:self
+                                                                                    selector:@selector(_doAdHocItemRetrieval:) object:_adHocItemKeys];
+    
+    [_serverRequestQueue addOperation:retrieveOperation];
+}
+
+- (void) _doAdHocItemRetrieval:(NSMutableArray*) targetItemKeyArray{
+ 
+    
+    //Retrieve initial 15 items
+    
+    ZPServerResponseXMLParser* parserResults = [[ZPServerConnection instance] retrieveItemsFromLibrary:_adHocLibraryID collection:_adHocCollectionKey
+                                                                                          searchString:_adHocSearchString orderField:_adHocOrderField
+                                                                                        sortDescending:_adHocSortDescending limit:15+(_adHocItemKeysOffset>0)*35 start:_adHocItemKeysOffset];
+    //If we are still showing this list, process the results
+    if(targetItemKeyArray==_adHocItemKeys && parserResults!=NULL){
+        
+        //If the ad hoc array is empty, fill it with appropriate number of nulls
+        if([targetItemKeyArray count] ==0){
+            for(NSInteger i=0;i<[parserResults totalResults];++i){
+                [targetItemKeyArray addObject:[NSNull null]];
+            }
+        }
+        for(ZPZoteroItem* item in [parserResults parsedElements]){
+            [[ZPDatabase instance] addItemToDatabase:item];
+            [targetItemKeyArray replaceObjectAtIndex:_adHocItemKeysOffset withObject:item];
+            _adHocItemKeysOffset++;
+
+        }
+        [self notifyItemKeyArrayUpdated:_adHocItemKeys];
+        //If there is more data coming, que a new retrieval
+        if(_adHocItemKeysOffset<[parserResults totalResults] & targetItemKeyArray==_adHocItemKeys) [self queueAdHocItemRetrieval];
+    }
+
+}
+
+- (ZPZoteroItem*) getItemByKey: (NSString*) key{
+    
+    return [[ZPDatabase instance] getItemByKey:key];
+}
+
+
 -(void) updateItemDetailsFromServer:(ZPZoteroItem*)item{
     
     NSInvocationOperation* retrieveOperation = [[NSInvocationOperation alloc] initWithTarget:self
                                                                                     selector:@selector(_updateItemDetailsFromServer:) object:item];
-
-    [retrieveOperation setQueuePriority:NSOperationQueuePriorityVeryHigh];
-    
+  
     [_serverRequestQueue addOperation:retrieveOperation];
-    NSLog(@"Opertions in queue %i",[_serverRequestQueue operationCount]);
 }
 
 -(void) _updateItemDetailsFromServer:(ZPZoteroItem*)item{
@@ -336,6 +207,19 @@ static ZPDataLayer* _instance = nil;
     [[ZPDatabase instance] writeItemCreatorsToDatabase:item];
     
     [self notifyItemDetailsAvailable:item];
+
+}
+
+-(void) notifyItemKeyArrayUpdated:(NSArray*)itemKeyArray{
+
+    NSEnumerator* e = [_itemObservers objectEnumerator];
+    NSObject* id;
+    
+    while( id= [e nextObject]) {
+        if([(NSObject <ZPItemObserver>*) id respondsToSelector:@selector(notifyItemKeyArrayUpdated:)]){
+            [(NSObject <ZPItemObserver>*) id notifyItemKeyArrayUpdated:itemKeyArray];
+        }
+    }
 
 }
 
@@ -376,6 +260,7 @@ static ZPDataLayer* _instance = nil;
         }
     }
 }
+
 
 -(void) notifyLibraryWithCollectionsAvailable:(ZPZoteroLibrary*) library{
     NSEnumerator* e = [_libraryObservers objectEnumerator];

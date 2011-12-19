@@ -8,6 +8,7 @@ from the Zotero server. The only exception is libraries, that receive
 integer ids from the server. 
 
 TODO: Add indices and keys
+TODO: Create triggers 
 
 */
 
@@ -20,13 +21,16 @@ always exists. My library has id 1.
 
 CREATE TABLE IF NOT EXISTS groups ( 
     groupID INTEGER PRIMARY KEY,
-    name TEXT NOT NULL
+    title TEXT NOT NULL,
+    lastCompletedCacheTimestamp TEXT DEFAULT NULL
 );
 
+INSERT INTO groups (groupid, title) VALUES (1,"My Library");
+
 CREATE TABLE IF NOT EXISTS collections (
-    collectionName TEXT NOT NULL,
+    title TEXT NOT NULL,
     parentCollectionKey TEXT DEFAULT NULL,
-    dateModified TIMESTAMP NOT NULL DEFAULT CURRENT_TIMESTAMP,
+    lastCompletedCacheTimestamp TEXT DEFAULT NULL,
     libraryID INT,
     key TEXT NOT NULL
 );
@@ -47,15 +51,14 @@ CREATE TABLE IF NOT EXISTS items (
 CREATE TABLE IF NOT EXISTS collectionItems (
     collectionKey TEXT,
     itemKey TEXT,
-    orderIndex INT DEFAULT 0,
-    PRIMARY KEY (collectionKey, itemID),
+    PRIMARY KEY (collectionKey, itemKey),
     FOREIGN KEY (collectionKey) REFERENCES collections(collectionKey),
-    FOREIGN KEY (itemID) REFERENCES items(itemID)
+    FOREIGN KEY (itemKey) REFERENCES items(itemKey)
 );
 
 CREATE TABLE creators (
     itemKey TEXT NOT NULL,
-    order INT NOT NULL,
+    "order" INT NOT NULL,
     firstName TEXT,
     lastName TEXT,
     shortName TEXT,

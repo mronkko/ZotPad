@@ -38,7 +38,7 @@ static ZPDatabase* _instance = nil;
     _database = [FMDatabase databaseWithPath:dbPath];
     [_database open];
     [_database setTraceExecution:_debugDatabase];
-    [_database setLogsErrors:_debugDatabase];
+    [_database setLogsErrors:TRUE];
     
     //Read the database structure from file and create the database
     
@@ -83,19 +83,19 @@ static ZPDatabase* _instance = nil;
     
         while ( library = (ZPZoteroLibrary*) [e nextObject]) {
         
-            NSNumber* libraryID = [NSNumber numberWithInt:library.libraryID];
-            [_database executeUpdate:@"INSERT INTO groups (groupID, name) VALUES (?, ?)",libraryID,library.name];
+            NSNumber* libraryID = library.libraryID;
+            [_database executeUpdate:@"INSERT INTO groups (groupID, title) VALUES (?, ?)",libraryID,library.title];
         }  
     }
 }
 
 
--(void) addOrUpdateCollections:(NSArray*)collections forLibrary:(NSInteger)libraryID{
+-(void) addOrUpdateCollections:(NSArray*)collections forLibrary:(NSNumber*)libraryID{
 
     NSMutableArray* collectionKeys;
     
     @synchronized(self){
-        FMResultSet* resultSet=[_database executeQuery:@"SELECT key FROM collections WHERE libraryID = ?",[NSNumber numberWithInt:libraryID]];
+        FMResultSet* resultSet=[_database executeQuery:@"SELECT key FROM collections WHERE libraryID = ?",libraryID];
         
         collectionKeys =[[NSMutableArray alloc] init];
         
@@ -113,17 +113,14 @@ static ZPDatabase* _instance = nil;
         //Insert or update
         NSInteger count= [collectionKeys count];
         [collectionKeys removeObject:collection.collectionKey];
-        
-        NSNumber* libraryIDobj = NULL;
-        if(libraryID != 1) libraryIDobj = [NSNumber numberWithInt:libraryID];
-        
+                
         @synchronized(self){
             if(count == [collectionKeys count]){
                 
-                [_database executeUpdate:@"INSERT INTO collections (collectionName, key, libraryID, parentCollectionKey) VALUES (?,?,?,?)",collection.name,collection.collectionKey,libraryIDobj,collection.parentCollectionKey];
+                [_database executeUpdate:@"INSERT INTO collections (title, key, libraryID, parentCollectionKey,lastCompletedCacheTimestamp) VALUES (?,?,?,?,?)",collection.title,collection.collectionKey,libraryID,collection.parentCollectionKey,collection.lastCompletedCacheTimestamp];
             }
             else{
-                [_database executeUpdate:@"UPDATE collections SET collectionName=?, libraryID=?, parentCollectionKey=? WHERE key=?",collection.name,libraryIDobj,collection.parentCollectionKey ,collection.collectionKey];
+                [_database executeUpdate:@"UPDATE collections SET title=?, libraryID=?, parentCollectionKey=?,lastCompletedCacheTimestamp=? WHERE key=?",collection.title,libraryID,collection.parentCollectionKey ,collection.lastCompletedCacheTimestamp,collection.collectionKey];
             }
         }
         
@@ -139,40 +136,49 @@ static ZPDatabase* _instance = nil;
             [_database executeUpdate:@"DELETE FROM collections WHERE key=?",key];
         }
     }
-    
-    // Resolve parent IDs based on parent keys
-    // A nested subquery is needed to rename columns because SQLite does not support table aliases in update statement
-
-    // TODO: Refactor so that collectionKeys are used instead of collectionKeys
-
 }
 
+
+// These remove items from the cache
+- (void) removeItemsNotInArray:(NSArray*)itemKeys fromCollection:(NSString*)collectionKey inLibrary:(NSNumber*)libraryID{
+    @synchronized(self){
+        //This might generate a too long query
+        [_database executeUpdate:[NSString stringWithFormat:@"DELETE FROM collectionItems WHERE collectionKey = ? AND itemKey NOT IN ('@%')",
+                                                           [itemKeys componentsJoinedByString:@"', '"]],collectionKey];
+    }
+
+}
+/*
+ Attachments are purged elsewhere
+ */
+- (void) deleteItemsNotInArray:(NSArray*)itemKeys fromLibrary:(NSNumber*)libraryID{
+    @synchronized(self){
+        //This might generate a too long query
+        [_database executeUpdate:[NSString stringWithFormat:@"DELETE FROM items WHERE libraryID = ? AND key NOT IN ('@%')",
+                                  [itemKeys componentsJoinedByString:@"', '"]],libraryID];
+    }
+}
+
+- (void) setUpdatedTimeStampForCollection:(NSString*)collectionKey toValue:(NSString*)updatedTimeStamp{
+    @synchronized(self){
+        [_database executeUpdate:@"UPDATE collections SET lastCompletedCacheTimestamp = ? WHERE key = ?",updatedTimeStamp,collectionKey];
+    }
+}
+- (void) setUpdatedTimeStampForLibrary:(NSNumber*)libraryID toValue:(NSString*)updatedTimeStamp{
+    @synchronized(self){
+        [_database executeUpdate:@"UPDATE groups SET lastCompletedCacheTimestamp = ? WHERE groupID = ?",updatedTimeStamp,libraryID];
+    }
+}
 
 
 // Methods for retrieving data from the data layer
 - (NSArray*) libraries{
     NSMutableArray *returnArray = [[NSMutableArray alloc] init];
     
-    
-	ZPZoteroLibrary* thisLibrary = [[ZPZoteroLibrary alloc] init];
-    [thisLibrary setLibraryID : 1];
-	[thisLibrary setTitle: @"My Library"];
-    
-    //Check if there are collections in my library
-    @synchronized(self){
-        FMResultSet* resultSet = [_database executeQuery:@"SELECT key FROM collections WHERE libraryID IS NULL LIMIT 1"];
-        BOOL hasChildren  =[resultSet next];
-        
-        [thisLibrary setHasChildren:hasChildren];
-        [returnArray addObject:thisLibrary];
-        [resultSet close];
-        
-	}
-    
     //Group libraries
     @synchronized(self){
         
-        FMResultSet* resultSet = [_database executeQuery:@"SELECT groupID, name, groupID IN (SELECT DISTINCT libraryID from collections) AS hasChildren FROM groups"];
+        FMResultSet* resultSet = [_database executeQuery:@"SELECT groupID, title,  groupID IN (SELECT DISTINCT libraryID from collections) AS hasChildren, lastCompletedCacheTimestamp FROM groups"];
 		
         
         while([resultSet next]) {
@@ -181,11 +187,10 @@ static ZPDatabase* _instance = nil;
             NSString* name = [resultSet stringForColumnIndex:1];
             BOOL hasChildren = [resultSet boolForColumnIndex:2];
             
-            ZPZoteroLibrary* thisLibrary = [[ZPZoteroLibrary alloc] init];
-            [thisLibrary setLibraryID : libraryID];
-            [thisLibrary setName: name];
+            ZPZoteroLibrary* thisLibrary = [ZPZoteroLibrary ZPZoteroLibraryWithID:[NSNumber numberWithInt:libraryID]];
+            [thisLibrary setTitle: name];
             [thisLibrary setHasChildren:hasChildren];
-            
+            [thisLibrary setLastCompletedCacheTimestamp:[resultSet stringForColumnIndex:3]];
             [returnArray addObject:thisLibrary];
         }
         [resultSet close];
@@ -194,33 +199,20 @@ static ZPDatabase* _instance = nil;
 	return returnArray;
 }
 
-- (NSArray*) collections : (NSInteger)currentLibraryID currentCollection:(NSInteger)currentCollectionKey {
+- (NSArray*) collectionsForLibrary : (NSNumber*)libraryID withParentCollection:(NSString*)collectionKey {
 	
     
-    NSString* libraryCondition;
-    NSString* collectionCondition;
-    
-    //My library is coded as 1 in ZotPad and is NULL in the database.
-    
-    if(currentLibraryID == 1){
-        libraryCondition = @"libraryID IS NULL";
-    }
-    else{
-        libraryCondition = [NSString stringWithFormat:@"libraryID = %i",currentLibraryID];
-    }
-    
-    if(currentCollectionKey == 0){
-        //Collection key is used here insted of collection ID because it is more reliable.
-        collectionCondition= @"parentCollectionKey IS NULL";
-    }
-    else{
-        collectionCondition = [NSString stringWithFormat:@"parentCollectionKey = %i",currentCollectionKey];
-    }
     
     NSMutableArray* returnArray;
     
 	@synchronized(self){
-        FMResultSet* resultSet = [_database executeQuery:[NSString stringWithFormat:@"SELECT key, collectionName, collectionKey IN (SELECT DISTINCT parentCollectionKey FROM collections WHERE %@) AS hasChildren FROM collections WHERE %@ AND %@",libraryCondition,libraryCondition,collectionCondition]];
+        
+        FMResultSet* resultSet;
+        if(collectionKey == NULL)
+            resultSet= [_database executeQuery:@"SELECT key, title, key IN (SELECT DISTINCT parentCollectionKey FROM collections WHERE libraryID=?) AS hasChildren, lastCompletedCacheTimestamp FROM collections WHERE libraryID=? AND parentCollectionKey IS NULL",libraryID,libraryID];
+        
+        else
+            resultSet= [_database executeQuery:@"SELECT key, title, key IN (SELECT DISTINCT parentCollectionKey FROM collections WHERE libraryID=?) AS hasChildren, lastCompletedCacheTimestamp FROM collections WHERE libraryID=? AND parentCollectionKey = ?",libraryID,libraryID,collectionKey];
         
         
         
@@ -229,11 +221,11 @@ static ZPDatabase* _instance = nil;
         while([resultSet next]) {
             
             
-            ZPZoteroCollection* thisCollection = [[ZPZoteroCollection alloc] init];
-            [thisCollection setLibraryID : currentLibraryID];
-            [thisCollection setCollectionKey : [resultSet stringForColumnIndex:0]];
-            [thisCollection setName : [resultSet stringForColumnIndex:1]];
+            ZPZoteroCollection* thisCollection = [ZPZoteroCollection ZPZoteroCollectionWithKey:[resultSet stringForColumnIndex:0]];
+            [thisCollection setLibraryID : libraryID];
+            [thisCollection setTitle : [resultSet stringForColumnIndex:1]];
             [thisCollection setHasChildren:(BOOL) [resultSet intForColumnIndex:2]];
+            [thisCollection setLastCompletedCacheTimestamp:[resultSet stringForColumnIndex:3]];
             
             [returnArray addObject:thisCollection];
             
@@ -246,6 +238,32 @@ static ZPDatabase* _instance = nil;
 	return returnArray;
 }
 
+
+- (NSArray*) allCollectionsForLibrary:(NSNumber*)libraryID{	
+
+    NSMutableArray* returnArray;
+    
+    //TODO: Refactor: Make a method that takes a row from resulset and then creates an object from it.
+    // resultDict method in FMResultSet is probably useful for this
+    
+	@synchronized(self){
+        FMResultSet* resultSet = [_database executeQuery:@"SELECT key, lastCompletedCacheTimestamp FROM collections WHERE libraryID=?",libraryID];
+        
+        
+        
+        returnArray = [[NSMutableArray alloc] init];
+        
+        while([resultSet next]) {
+            ZPZoteroCollection* thisCollection = [ZPZoteroCollection ZPZoteroCollectionWithKey:[resultSet stringForColumnIndex:0]];
+            [thisCollection setLastCompletedCacheTimestamp:[resultSet stringForColumnIndex:1]];
+            [returnArray addObject:thisCollection];
+            
+        }
+        [resultSet close];
+	}
+    
+	return returnArray;
+}
 //Add more data to an existing item. By default the getItemByKey do not populate fields or creators to save database operations
 - (void) getFieldsForItemKey: (NSString*) key{
 
@@ -258,7 +276,7 @@ static ZPDatabase* _instance = nil;
     
     @synchronized(self){
         //TODO: Implement modifying already existing items if they are older than the new item
-        FMResultSet* resultSet = [_database executeQuery:[NSString stringWithFormat: @"SELECT dateModified FROM items WHERE key ='%@' LIMIT 1",item.key]];
+        FMResultSet* resultSet = [_database executeQuery: @"SELECT dateModified FROM items WHERE key =? LIMIT 1",item.key];
 
         BOOL found = [resultSet next];
 
@@ -293,6 +311,13 @@ static ZPDatabase* _instance = nil;
     }
 }
 
+// Records a new collection membership
+-(void) addItem:(ZPZoteroItem*)item toCollection:(NSString*)collectionKey{
+    //TODO: Make this check if an item exists in a collection before running this
+    [_database executeUpdate:@"INSERT INTO collectionItems (collectionKey, itemKey) VALUES (?,?)",collectionKey,item.key];
+}
+
+
 - (ZPZoteroItem*) getItemByKey: (NSString*) key{
     
     ZPZoteroItem* item = NULL;
@@ -302,7 +327,7 @@ static ZPDatabase* _instance = nil;
         
         if ([resultSet next]) {
             
-            item = [[ZPZoteroItem alloc] init];
+            item = [ZPZoteroItem ZPZoteroItemWithKey:[resultSet stringForColumnIndex:6]];
             //TODO: Implement item type
             [item setLibraryID:[resultSet intForColumnIndex:1]];
             [item setYear:[resultSet intForColumnIndex:2]];
@@ -310,7 +335,6 @@ static ZPDatabase* _instance = nil;
             [item setTitle:[resultSet stringForColumnIndex:4]];
             NSString* publishedIn = [resultSet stringForColumnIndex:5];
             [item setPublishedIn:publishedIn];
-            [item setKey:[resultSet stringForColumnIndex:6]];
             [item setFullCitation:[resultSet stringForColumnIndex:7]];
         }
         [resultSet close];
@@ -333,9 +357,9 @@ static ZPDatabase* _instance = nil;
         NSDictionary* creator;
         
         while(creator= [e nextObject]){
-            [_database executeUpdate:[NSString stringWithFormat: @"INSERT INTO creators (itemKey,order,firstName,lastName,shortName,creatorType) VALUES (?,?,?,?,?)",
+            [_database executeUpdate:@"INSERT INTO creators (itemKey,\"order\",firstName,lastName,shortName,creatorType) VALUES (?,?,?,?,?)",
                                       item.key,order,[creator objectForKey:@"firstName"],[creator objectForKey:@"lastName"],
-                                      [creator objectForKey:@"shortName"],[creator objectForKey:@"creatorType"]]];
+                                      [creator objectForKey:@"shortName"],[creator objectForKey:@"creatorType"]];
             order++;
         }
     }
@@ -387,7 +411,7 @@ static ZPDatabase* _instance = nil;
 - (void) addCreatorsToItem: (ZPZoteroItem*) item {
     
     @synchronized(self){
-        FMResultSet* resultSet = [_database executeQuery: @"SELECT firstName, lastName, shortName,creatorType, fieldMode FROM creators WHERE itemKey = ? ORDER BY order",item.key];
+        FMResultSet* resultSet = [_database executeQuery: @"SELECT firstName, lastName, shortName,creatorType, fieldMode FROM creators WHERE itemKey = ? ORDER BY \"order\"",item.key];
         
         NSMutableArray* creators = [[NSMutableArray alloc] init];
         
@@ -429,6 +453,54 @@ static ZPDatabase* _instance = nil;
         if([fields count]>0) item.fields = fields;
         else item.fields = NULL;
     }
+}
+
+- (NSArray*) getItemKeysForLibrary:(NSNumber*)libraryID collection:(NSString*)collectionKey
+                      searchString:(NSString*)searchString orderField:(NSString*)OrderField sortDescending:(BOOL)sortDescending{
+
+    NSMutableArray* keys = [[NSMutableArray alloc] init];
+
+    //Build the SQL query as a string first. This currently searches only in the full citation.
+
+    NSString* sql = @"SELECT item.itemKey FROM items";
+    
+    if(collectionKey!=NULL)
+        sql=[sql stringByAppendingFormat:@", collectionItems"];
+
+    if(searchString != NULL)
+        sql=[sql stringByAppendingFormat:@", fields"];
+    
+    //Conditions
+
+    sql=[sql stringByAppendingFormat:@" WHERE libraryID = %@",libraryID];
+
+    if(collectionKey!=NULL)
+        sql=[sql stringByAppendingFormat:@" AND collectionItems.collectionKey = %@ and collectionItems.itemKey = item.itemKey",collectionKey];
+
+    if(searchString != NULL){
+        //TODO: Handle quotes
+        NSArray* searchArray = [searchString componentsSeparatedByString:@" "];
+        
+        sql=[sql stringByAppendingFormat:@" AND field.itemKey = item.itemKey AND (field.fieldValue LIKE '\%%@\%)'",[searchArray componentsJoinedByString:@"%' OR field.fieldValue LIKE '%"]];
+    }
+    
+    if(OrderField!=NULL){
+        if(sortDescending)
+            sql=[sql stringByAppendingFormat:@" ORDER BY item.%@ DESC",OrderField];
+        else
+            sql=[sql stringByAppendingFormat:@" ORDER BY item.%@ ASC",OrderField];
+    }
+    
+    @synchronized(self){
+        FMResultSet* resultSet;
+        
+        resultSet = [_database executeQuery: sql];
+        
+        
+        while([resultSet next]) [keys addObject:[resultSet stringForColumnIndex:0]];
+    }
+
+    return keys;
 }
 
 

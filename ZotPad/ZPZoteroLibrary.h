@@ -6,26 +6,13 @@
 //  Copyright (c) 2011 __MyCompanyName__. All rights reserved.
 //
 
-#import "ZPNavigatorNode.h"
+#import <Foundation/Foundation.h>
+#import "ZPZoteroItemContainer.h"
 
-@interface ZPZoteroLibrary : NSObject <ZPNavigatorNode> {
-    NSString* name;
-    NSInteger libraryID;
-    //Does the library have any collections
-    BOOL hasChildren;
+@interface ZPZoteroLibrary : ZPZoteroItemContainer {
 }
 
-@property (retain) NSString* name;
-@property (assign) NSInteger libraryID;
-@property (assign) BOOL hasChildren;
++(ZPZoteroLibrary*) ZPZoteroLibraryWithID:(NSNumber*) libraryID;
 
-// An aliases used by parser
-- (void) setKey:(NSString*)key;
-- (void) setTitle:(NSString*)title;
-
-// Needed for the ZPNavigatorNode protocol
-- (NSInteger)collectionID;
 
 @end
-
-

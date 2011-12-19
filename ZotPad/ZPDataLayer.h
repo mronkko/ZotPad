@@ -2,75 +2,57 @@
 //  ZPDataLayer.h
 //  ZotPad
 //
+//  This class takes care of managing the cache and coordinating data request from the UI.
+//
+//
 //  Created by Rönkkö Mikko on 11/14/11.
 //  Copyright (c) 2011 __MyCompanyName__. All rights reserved.
 //
 
 #import <Foundation/Foundation.h>
 #import "ZPDetailedItemListViewController.h"
-#import "ZPItemRetrieveOperation.h"
 #import "ZPZoteroItem.h"
 #import "ZPItemObserver.h"
 #import "ZPLibraryObserver.h"
-
-#import "../FMDB/src/FMDatabase.h"
-#import "../FMDB/src/FMResultSet.h"
+#import "ZPZoteroLibrary.h"
+#import "ZPZoteroCollection.h"
 
 @interface ZPDataLayer : NSObject {
     
-    // Is the library and collection tree synced with the server
-    BOOL _collectionTreeCached;
+    NSMutableArray* _adHocItemKeys;
+    NSInteger _adHocItemKeysOffset;
+    NSNumber* _adHocLibraryID;
+    NSString* _adHocCollectionKey;
+    NSString* _adHocOrderField;
+    BOOL _adHocSortDescending;
+    NSString* _adHocSearchString;
     
-    // Status for cached collection content
-    // 0 or null = no cache
-    // 1 = cache started
-    // 2 = item IDs and item basic information cached
-    // 3 = item details cached 
-    // 4 = child items cached
-
-    
-    NSMutableDictionary* _collectionCacheStatus;
-
-
-    // An operation que to fetch items in the background
-    NSOperationQueue* _serverRequestQueue;
-
-    // An operation que to write items in the cache in the background
-    NSOperationQueue* _itemCacheWriteQueue;
-    
-    NSString* _currentlyActiveCollectionKey;
-    NSInteger _currentlyActiveLibraryID;
-    
-    ZPItemRetrieveOperation* _mostRecentItemRetrieveOperation;
-
     BOOL _debugDataLayer;
     
     NSMutableSet* _itemObservers;
     NSMutableSet* _libraryObservers;
     
-    FMDatabase* _database;
+    //Queut for ad hoc retrievals
+    NSOperationQueue* _serverRequestQueue;
 }
 
 // This class is used as a singleton
 + (ZPDataLayer*) instance;
 
-//Methods to get details of the current selection
-//TODO: Should these belong to the UI delegates instead? 
--(NSString*) currentlyActiveCollectionKey;
--(NSInteger) currentlyActiveLibraryID;
-
 // Methods for explicitly requesting updated data from server
--(void) updateLibrariesAndCollectionsFromServer;
 -(void) updateItemDetailsFromServer:(ZPZoteroItem*)item;
 
 // Methods for retrieving data from the data layer
 - (NSArray*) libraries;
-- (NSArray*) collections : (NSInteger)currentLibraryID currentCollection:(NSInteger)currentCollectionID;
-- (NSArray*) getItemKeysForSelection:(ZPDetailedItemListViewController*)view;
+- (NSArray*) collectionsForLibrary : (NSNumber*)currentLibraryID withParentCollection:(NSString*)currentCollectionKey;
+- (NSArray*) getItemKeysFromCacheForLibrary:(NSNumber*)libraryID collection:(NSString*)collectionKey
+                        searchString:(NSString*)searchString orderField:(NSString*)OrderField sortDescending:(BOOL)sortDescending;
+
+- (NSArray*) getItemKeysFromServerForLibrary:(NSNumber*)libraryID collection:(NSString*)collectionKey
+                               searchString:(NSString*)searchString orderField:(NSString*)OrderField sortDescending:(BOOL)sortDescending;
+
 - (ZPZoteroItem*) getItemByKey: (NSString*) key;
 
-// Methods for writing data to database
--(void) cacheZoteroItems:(NSArray*)items;
 
 //Adds and removes observers
 -(void) registerItemObserver:(NSObject<ZPItemObserver>*)observer;
@@ -80,11 +62,14 @@
 -(void) removeLibraryObserver:(NSObject<ZPLibraryObserver>*)observer;
 
 //Notifies all observers that a new data are available
+-(void) notifyItemKeyArrayUpdated:(NSArray*)itemKeyArray;
 -(void) notifyItemBasicsAvailable:(ZPZoteroItem*)item;
 -(void) notifyItemDetailsAvailable:(ZPZoteroItem*)item;
 -(void) notifyItemAttachmentsAvailable:(ZPZoteroItem*)item;
 -(void) notifyLibraryWithCollectionsAvailable:(ZPZoteroLibrary*) library;
 
-@property (retain) ZPItemRetrieveOperation* mostRecentItemRetriveOperation;
+-(void) queueAdHocItemRetrieval;
+
+
 
 @end

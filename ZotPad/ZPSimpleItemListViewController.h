@@ -16,13 +16,14 @@
 
 @interface ZPSimpleItemListViewController : UIViewController <UITableViewDataSource, ZPItemObserver>{
     NSCache* _cellCache;
-    NSArray* _itemKeysShown;
+    NSMutableArray* _itemKeysShown;
+    NSArray* _itemKeysFromServer;
     UITableView* _tableView;
 }
 
 @property (retain) IBOutlet UITableView* tableView;
 @property (retain) NSArray* itemKeysShown;
+@property (retain) NSArray* itemKeysFromServer;
 
-- (void)_refreshCellAtIndexPaths:(NSArray*)indexPath;
 
 @end

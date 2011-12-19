@@ -10,16 +10,27 @@
 
 @implementation ZPZoteroLibrary
 
-@synthesize name;
-@synthesize libraryID;
-@synthesize hasChildren;
+static NSCache* _objectCache = NULL;
 
-- (void) setKey:(NSString*)key{
-    [self setLibraryID:[key intValue]];
++(ZPZoteroLibrary*) ZPZoteroLibraryWithID:(NSNumber*) libraryID{
+
+    if(libraryID == NULL)
+        [NSException raise:@"ID is null" format:@"ZPZoteroLibrary cannot be instantiated with NULL ID"];
+
+    if(_objectCache == NULL) _objectCache = [[NSCache alloc] init];
+  
+    ZPZoteroLibrary* obj= [_objectCache objectForKey:libraryID];
+    
+    if(obj==NULL){
+        obj= [[ZPZoteroLibrary alloc] init];
+        obj->_libraryID=libraryID;
+        [_objectCache setObject:obj  forKey:libraryID];
+    }
+    return obj;
 }
 
-- (void) setTitle:(NSString*)title{
-    [self setName:title];
+- (NSNumber*) libraryID{
+    return _libraryID;
 }
 
 /*

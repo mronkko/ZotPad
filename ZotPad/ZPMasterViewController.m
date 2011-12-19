@@ -1,28 +1,29 @@
 //
-//  ZPLibraryAndCollectionViewController.m
+//  ZPMasterViewController.m
 //  ZotPad
 //
 //  Created by Rönkkö Mikko on 11/14/11.
 //  Copyright (c) 2011 __MyCompanyName__. All rights reserved.
 //
 
-#import "ZPLibraryAndCollectionListViewController.h"
-#import "ZPDetailedItemListViewController.h"
+#import "ZPMasterViewController.h"
+#import "ZPItemListViewController.h"
 #import "ZPDataLayer.h"
 #import "ZPServerConnection.h"
 #import "ZPAuthenticationDialog.h"
 #import "ZPAppDelegate.h"
-#import "ZPZoteroLibrary.h"
+#import "ZPNavigatorNode.h"
 
-@implementation ZPLibraryAndCollectionListViewController
+@implementation ZPMasterViewController
 
 @synthesize detailViewController = _detailViewController;
-@synthesize currentLibraryID = _currentLibraryID;
-@synthesize currentCollectionKey = _currentCollectionKey;
+@synthesize currentLibrary = _currentLibrary;
+@synthesize currentCollection = _currentCollection;
+@synthesize navigationTableView;
 
-static ZPLibraryAndCollectionListViewController* _instance = nil;
+static ZPMasterViewController* _instance = nil;
 
-+ (ZPLibraryAndCollectionListViewController*) instance{
++ (ZPMasterViewController*) instance{
     return _instance;
 }
 
@@ -49,16 +50,16 @@ static ZPLibraryAndCollectionListViewController* _instance = nil;
     _instance= self;
     
     //If the current library is not defined, show a list of libraries
-    if(self->_currentLibraryID == 0){
+    if(self->_currentLibrary == 0){
         self->_content = [[ZPDataLayer instance] libraries];
     }
     //If a library is chosen, show collections level collections for that library
     else{
-        self->_content = [[ZPDataLayer instance] collectionsForLibrary:self->_currentLibraryID withParentCollection:self->_currentCollectionKey];        
+        self->_content = [[ZPDataLayer instance] collections:self->_currentLibrary currentCollection:self->_currentCollection];        
     }
     
 	// Do any additional setup after loading the view, typically from a nib.
-    self.detailViewController = (ZPDetailedItemListViewController *)[[self.splitViewController.viewControllers lastObject] topViewController];
+    self.detailViewController = (ZPItemListViewController *)[[self.splitViewController.viewControllers lastObject] topViewController];
  
 }
 
@@ -68,26 +69,24 @@ static ZPLibraryAndCollectionListViewController* _instance = nil;
     return [self->_content count];
 }
 
-//TODO: Instead of realoding everything, this method should just add or update the library that it receives
+- (void)notifyDataAvailable{
 
--(void) notifyLibraryWithCollectionsAvailable:(ZPZoteroLibrary*) library{
-  
     if([NSThread isMainThread]){
         //If we are showing the libraries view, reload the data
-
+        
         //If the current library is not defined, show a list of libraries
-        if(self->_currentLibraryID == 0){
+        if(self->_currentLibrary == 0){
             self->_content = [[ZPDataLayer instance] libraries];
         }
         //If a library is chosen, show collections level collections for that library
         else{
-            self->_content = [[ZPDataLayer instance] collectionsForLibrary:self->_currentLibraryID withParentCollection:self->_currentCollectionKey];        
+            self->_content = [[ZPDataLayer instance] collections:self->_currentLibrary currentCollection:self->_currentCollection];        
         }
         
-        [[self tableView] reloadData];
+        [navigationTableView reloadData];
     }
     else{
-        [self performSelectorOnMainThread:@selector( notifyLibraryWithCollectionsAvailable:) withObject:library waitUntilDone:NO];
+        [self performSelectorOnMainThread:@selector(notifyDataAvailable) withObject:nil waitUntilDone:NO];
     }
 }
 
@@ -109,7 +108,7 @@ static ZPLibraryAndCollectionListViewController* _instance = nil;
     }
     
     // Configure the cell.
-	ZPZoteroItemContainer* node = [self->_content objectAtIndex: indexPath.row];
+	NSObject <ZPNavigatorNode>* node = [self->_content objectAtIndex: indexPath.row];
 	if ( [node hasChildren])
 	{
 		cell.accessoryType = UITableViewCellAccessoryDetailDisclosureButton;
@@ -119,7 +118,7 @@ static ZPLibraryAndCollectionListViewController* _instance = nil;
 		cell.accessoryType = UITableViewCellAccessoryNone;
 	}
 	
-    cell.textLabel.text = [node title];
+    cell.textLabel.text = [node name];
     
 	return ( cell );
 }
@@ -131,9 +130,9 @@ static ZPLibraryAndCollectionListViewController* _instance = nil;
      When a row is selected, set the detail view controller's library and collection and refresh
      */
     
-   ZPZoteroItemContainer* node = [self->_content objectAtIndex: indexPath.row];
+    NSObject <ZPNavigatorNode>* node = [self->_content objectAtIndex: indexPath.row];
     self.detailViewController.libraryID = [node libraryID];
-    self.detailViewController.collectionKey = [node collectionKey];
+    self.detailViewController.collectionID = [node collectionID];
 
     //Clear search when changing collection. This is how Zotero behaves
     [self.detailViewController clearSearch];
@@ -148,11 +147,11 @@ static ZPLibraryAndCollectionListViewController* _instance = nil;
      Drill down to a library or collection
     */
     
-    ZPLibraryAndCollectionListViewController* subController = [[ZPLibraryAndCollectionListViewController alloc] initWithStyle: UITableViewStylePlain];
+    ZPMasterViewController* subController = [[ZPMasterViewController alloc] initWithStyle: UITableViewStylePlain];
 	subController.detailViewController = self.detailViewController;
-    ZPZoteroItemContainer* selectedNode  = [self->_content objectAtIndex: indexPath.row];
-	subController.currentLibraryID=[selectedNode libraryID];
-	subController.currentCollectionKey=[selectedNode collectionKey];
+    NSObject <ZPNavigatorNode>* selectedNode  = [self->_content objectAtIndex: indexPath.row];
+	subController.currentLibrary=[selectedNode libraryID];
+	subController.currentCollection=[selectedNode collectionID];
 	
 	[self.navigationController pushViewController: subController animated: YES];
 	
@@ -172,13 +171,12 @@ static ZPLibraryAndCollectionListViewController* _instance = nil;
 
 - (void)viewDidAppear:(BOOL)animated
 {
-    [[ZPDataLayer instance] registerLibraryObserver:self];
     [super viewDidAppear:animated];
+        
 }
 
 - (void)viewWillDisappear:(BOOL)animated
 {
-    [[ZPDataLayer instance] removeLibraryObserver:self];
 	[super viewWillDisappear:animated];
 }
 

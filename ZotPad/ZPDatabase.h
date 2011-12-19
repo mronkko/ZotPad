@@ -22,18 +22,16 @@
 
 
 -(void) addOrUpdateLibraries:(NSArray*)libraries;
--(void) addOrUpdateCollections:(NSArray*)collections forLibrary:(NSInteger)libraryID;
-
-//Extract data from item and write to database
-
--(void) writeItemCreatorsToDatabase:(ZPZoteroItem*)item;
--(void) writeItemFieldsToDatabase:(ZPZoteroItem*)item;
+-(void) addOrUpdateCollections:(NSArray*)collections forLibrary:(NSNumber*)libraryID;
 
 
 // Methods for retrieving data from the data layer
 - (NSArray*) libraries;
-- (NSArray*) collections : (NSInteger)currentLibraryID currentCollection:(NSInteger)currentCollectionID;
+- (NSArray*) collectionsForLibrary : (NSNumber*)currentLibraryID withParentCollection:(NSString*)currentCollectionKey;
+- (NSArray*) allCollectionsForLibrary: (NSNumber*)libraryID;
 - (ZPZoteroItem*) getItemByKey: (NSString*) key;
+- (NSArray*) getItemKeysForLibrary:(NSNumber*)libraryID collection:(NSString*)collectionKey
+                      searchString:(NSString*)searchString orderField:(NSString*)OrderField sortDescending:(BOOL)sortDescending;
 
 //Add more data to an existing item. By default the getItemByKey do not populate fields or creators to save database operations
 - (void) getFieldsForItemKey: (NSString*) key;
@@ -42,5 +40,20 @@
 
 // Methods for writing data to database
 -(void) addItemToDatabase:(ZPZoteroItem*)item;
+
+// Records a new collection membership
+-(void) addItem:(ZPZoteroItem*)item toCollection:(NSString*)collectionKey;
+
+//Extract data from item and write to database
+
+-(void) writeItemCreatorsToDatabase:(ZPZoteroItem*)item;
+-(void) writeItemFieldsToDatabase:(ZPZoteroItem*)item;
+
+// These remove items from the cache
+- (void) removeItemsNotInArray:(NSArray*)itemKeys fromCollection:(NSString*)collectionKey inLibrary:(NSNumber*)libraryID;
+- (void) deleteItemsNotInArray:(NSArray*)itemKeys fromLibrary:(NSNumber*)libraryID;
+
+- (void) setUpdatedTimeStampForCollection:(NSString*)collectionKey toValue:(NSString*)updatedTimeStamp;
+- (void) setUpdatedTimeStampForLibrary:(NSNumber*)libraryID toValue:(NSString*)updatedTimeStamp;
 
 @end

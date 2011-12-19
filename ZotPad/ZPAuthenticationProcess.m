@@ -8,7 +8,7 @@
 
 #import "ZPAuthenticationProcess.h"
 #import "ZPAuthenticationDialog.h"
-#import "ZPDataLayer.h"
+#import "ZPCacheController.h"
 #import "ZPServerConnection.h"
 #import "ZPLibraryAndCollectionListViewController.h"
 
@@ -155,7 +155,7 @@ static ZPAuthenticationProcess* _instance = nil;
         _username = username;
         
         //Tell the application to start updating libraries and collections from server
-        [[ZPDataLayer instance] updateLibrariesAndCollectionsFromServer];
+        [[ZPCacheController instance] updateLibrariesAndCollectionsFromServer];
 
         //We do not need the instance any more
         _instance = NULL; 

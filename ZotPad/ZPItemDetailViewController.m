@@ -202,7 +202,8 @@
         }
 
     }
-
+    //This should not happen
+    return 0;
 }
 
 

@@ -110,10 +110,10 @@
 			</array>
 			<key>Values</key>
 			<array>
-				<string>off</string>
-				<string>activecollections</string>
-				<string>activelibraries</string>
-				<string>alllibraries</string>
+				<integer>0</integer>
+				<integer>1</integer>
+				<integer>2</integer>
+				<integer>3</integer>
 			</array>
 		</dict>
 		<dict>
@@ -141,38 +141,6 @@
 				<string>activelibraries</string>
 				<string>alllibraries</string>
 			</array>
-		</dict>
-		<dict>
-			<key>Values</key>
-			<array>
-				<string>off</string>
-				<string>activelibraries</string>
-				<string>alllibraries</string>
-			</array>
-			<key>Type</key>
-			<string>PSMultiValueSpecifier</string>
-			<key>Title</key>
-			<string>Collection memberships</string>
-			<key>Key</key>
-			<string>preemtptivecachecollections</string>
-			<key>DefaultValue</key>
-			<string>off</string>
-			<key>Titles</key>
-			<array>
-				<string>Off</string>
-				<string>Active libraries</string>
-				<string>All libraries</string>
-			</array>
-		</dict>
-		<dict>
-			<key>Type</key>
-			<string>PSToggleSwitchSpecifier</string>
-			<key>Title</key>
-			<string>Smart caching</string>
-			<key>Key</key>
-			<string>preemtivecachesmart</string>
-			<key>DefaultValue</key>
-			<true/>
 		</dict>
 		<dict>
 			<key>FooterText</key>

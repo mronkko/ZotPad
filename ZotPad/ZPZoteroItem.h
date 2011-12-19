@@ -31,7 +31,6 @@
 
 @property (retain) NSString* title;
 @property (retain) NSString* fullCitation;
-@property (retain) NSString* key;
 @property (retain) NSString* creatorSummary;
 @property (retain) NSString* publishedIn;
 @property (assign) NSInteger year;
@@ -45,5 +44,7 @@
 @property (retain) NSArray* creators;
 @property (retain) NSDictionary* fields;
 
++(ZPZoteroItem*) ZPZoteroItemWithKey:(NSString*) key;
+-(NSString*)key;
 
 @end

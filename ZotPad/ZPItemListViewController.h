@@ -13,35 +13,42 @@
 
 //TODO: Make this a UITableViewController instead of UIViewController
 
-@interface ZPDetailedItemListViewController : ZPSimpleItemListViewController <UISplitViewControllerDelegate, UISearchBarDelegate>{
+@interface ZPItemListViewController : ZPSimpleItemListViewController <UISplitViewControllerDelegate, UISearchBarDelegate>{
     NSString* _searchString;
-    NSString* _collectionKey;
-    NSNumber* _libraryID;
-    NSString* _OrderField;
+    NSInteger _collectionID;
+    NSInteger _libraryID;
+    NSString* _sortField;
     BOOL _sortDescending;
     
+    UITableView* tableView;
     DSBezelActivityView* _activityView;
 }
 
 // This class is used as a singleton
-+ (ZPDetailedItemListViewController*) instance;
++ (ZPItemListViewController*) instance;
 
 - (void)configureView;
+- (void)notifyDataAvailable;
+- (void)notifyItemAvailable:(NSString*) key;
+- (void)_refreshCellAtIndexPaths:(NSArray*)indexPath;
+- (void)makeBusy;
 
+@property (nonatomic, retain) IBOutlet UITableView* tableView;
 @property (nonatomic, retain) IBOutlet UISearchBar* searchBar;
 
-@property (nonatomic, retain) NSString* collectionKey;
+@property (retain) NSArray* itemKeysShown;
 
-@property (nonatomic, retain) NSNumber* libraryID;
+@property NSInteger collectionID;
+@property NSInteger libraryID;
 
 @property (copy) NSString* searchString;
 
-@property (copy) NSString* orderField;
+@property (copy) NSString* sortField;
 @property BOOL sortDescending;
 
 -(void) clearSearch;
 
--(void) doOrderField:(NSString*)value;
+-(void) doSortField:(NSString*)value;
 
 -(IBAction)doSortCreator:(id)sender;
 -(IBAction)doSortTitle:(id)sender;

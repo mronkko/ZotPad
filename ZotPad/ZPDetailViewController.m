@@ -6,40 +6,43 @@
 //  Copyright (c) 2011 __MyCompanyName__. All rights reserved.
 //
 
-
-#import "ZPDetailedItemListViewController.h"
-#import "ZPLibraryAndCollectionListViewController.h"
+#import "ZPDetailViewController.h"
 #import "ZPDataLayer.h"
 #import <QuartzCore/QuartzCore.h>
 #import "../DSActivityView/Sources/DSActivityView.h"
 
-@interface ZPDetailedItemListViewController ()
+@interface ZPDetailViewController ()
 @property (strong, nonatomic) UIPopoverController *masterPopoverController;
 @end
 
-@implementation ZPDetailedItemListViewController
+@implementation ZPDetailViewController
 
-@synthesize collectionKey = _collectionKey;
+@synthesize collectionID = _collectionKey;
 @synthesize libraryID =  _libraryID;
 @synthesize searchString = _searchString;
-@synthesize orderField = _OrderField;
+@synthesize sortField = _sortField;
 @synthesize sortDescending = _sortDescending;
 
 @synthesize masterPopoverController = _masterPopoverController;
 
+@synthesize itemTableView;
 @synthesize searchBar;
 
-static ZPDetailedItemListViewController* _instance = nil;
+@synthesize itemKeysShown = _itemKeysShown;
+
+
+static ZPDetailViewController* _instance = nil;
 
 #pragma mark - Managing the detail item
 
 -(id) init{
     self = [super init];
+    _cellCache = [[NSCache alloc] init];
     
     return self;
 }
 
-+ (ZPDetailedItemListViewController*) instance{
++ (ZPDetailViewController*) instance{
     return _instance;
 }
 
@@ -49,10 +52,17 @@ static ZPDetailedItemListViewController* _instance = nil;
     // Release any cached data, images, etc that aren't in use.
 }
 
-/*
- 
- Configures the view  
- */
+- (NSInteger)tableView:(UITableView *)aTableView numberOfRowsInSection:(NSInteger)section {
+    // Return the number of rows in the section. Initially there is no library selected, so we will just return an empty view
+    if(_itemKeysShown==nil){
+        return 0;
+    }
+    else{
+        return [_itemKeysShown count];
+    }
+}
+
+
 
 - (void)configureView
 {
@@ -65,34 +75,124 @@ static ZPDetailedItemListViewController* _instance = nil;
     // Retrieve the item IDs if a library is selected. 
     
     if(_libraryID!=0){
-        _itemKeysShown = [NSMutableArray arrayWithArray: [[ZPDataLayer instance] getItemKeysFromCacheForLibrary:self.libraryID collection:self.collectionKey
-                                                          searchString:[self.searchString stringByTrimmingCharactersInSet:[NSCharacterSet whitespaceAndNewlineCharacterSet]]orderField:self.orderField sortDescending:self.sortDescending]];
-        _itemKeysFromServer = [[ZPDataLayer instance] getItemKeysFromServerForLibrary:self.libraryID collection:self.collectionKey
-                                                          searchString:[self.searchString stringByTrimmingCharactersInSet:[NSCharacterSet whitespaceAndNewlineCharacterSet]]orderField:self.orderField sortDescending:self.sortDescending];
+        _itemKeysShown = [[ZPDataLayer instance] getItemKeysForView: self];
+        if(_itemKeysShown == NULL){
+            [self makeBusy];
+        }
+        else{
+            [self.itemTableView reloadData];
+        }     
+    }
+}
+
+//If we are not already displaying an activity view, do so now
+/*
+- (void)makeBusy{
+    if(_activityView==NULL){
+        if([NSThread isMainThread]){
+        [self.itemTableView setUserInteractionEnabled:FALSE];
+        _activityView = [DSBezelActivityView newActivityViewForView:self.itemTableView];
+        }
+        else{
+            [self performSelectorOnMainThread:@selector(notifyDataAvailable) withObject:nil waitUntilDone:NO];
+        }   
     }
 }
 
 
+
+- (void)notifyDataAvailable{
+    
+    if([NSThread isMainThread]){
+        [self.itemTableView reloadData];
+        [DSBezelActivityView removeViewAnimated:YES];
+        [self.itemTableView setUserInteractionEnabled:TRUE];
+        _activityView = NULL;
+    }
+    else{
+        [self performSelectorOnMainThread:@selector(notifyDataAvailable) withObject:nil waitUntilDone:NO];
+    }
+    
+}
+
+- (void)notifyItemAvailable:(NSString*) key{
+    
+    
+    NSEnumerator *e = [[self.itemTableView indexPathsForVisibleRows] objectEnumerator];
+    
+    NSIndexPath* indexPath;
+    while ((indexPath = (NSIndexPath*) [e nextObject]) && indexPath.row <=[_itemKeysShown count]) {
+        if([key isEqualToString:[_itemKeysShown objectAtIndex:indexPath.row]]){
+            
+            //Tell this cell to update because it just got data
+            
+            [self performSelectorOnMainThread:@selector(_refreshCellAtIndexPaths:) withObject:[NSArray arrayWithObject:indexPath] waitUntilDone:NO];
+            
+            break;
+        }
+    }
+}
+- (void) _refreshCellAtIndexPaths:(NSArray*)indexPaths{
+    [self.itemTableView reloadRowsAtIndexPaths:indexPaths withRowAnimation:UITableViewRowAnimationFade];
+
+}
+
+*/
+
 - (UITableViewCell *)tableView:(UITableView *)tableView cellForRowAtIndexPath:(NSIndexPath *)indexPath {
 
    
-    //This array contains NSStrings and NSNulls. Nulls mean that there is no data available yet
+    
     NSObject* keyObj = [_itemKeysShown objectAtIndex: indexPath.row];
+
+    //It is possible that we do not yet have data for the full view. Sleep until we have it
+    //More data is retrieved in the background
+
+   // NSLog(@"Retrieving item for for %i",indexPath.row);
+
     
+    NSString* key;
+    if(keyObj==[NSNull null]){
+        key=@"";
+    }    
+    else{
+        key= (NSString*) keyObj;
+        //NSLog(@"Got key %@",key);
+    }    
     
-    UITableViewCell* cell = [_cellCache objectForKey:keyObj];
-    
+	UITableViewCell* cell = [self->_cellCache objectForKey:key];
     
     if(cell==nil){
         
-        cell = [super tableView:tableView cellForRowAtIndexPath:indexPath];
-
         
-        if(keyObj != [NSNull null]){
+        ZPZoteroItem* item=NULL;
+        if(![key isEqualToString:@""]) item = [[ZPDataLayer instance] getItemByKey:key];
+        
+        if(item==NULL){
+            cell = [tableView dequeueReusableCellWithIdentifier:@"LoadingCell"];        
+        }
+        else{
 
-            //If the cell contains an item, add publication details and thumbnail
+            //NSLog(@"Not in cache, creating");
+            cell = [tableView dequeueReusableCellWithIdentifier:@"ZoteroItemCell"];
             
-            ZPZoteroItem* item=[[ZPDataLayer instance] getItemByKey:(NSString*)keyObj];
+            UILabel *titleLabel = (UILabel *)[cell viewWithTag:1];
+            titleLabel.text = item.title;
+            
+            UILabel *authorsLabel = (UILabel *)[cell viewWithTag:2];
+            
+            //Show different things depending on what data we have
+            if(item.creatorSummary!=NULL){
+                if(item.year != 0){
+                    authorsLabel.text = [NSString stringWithFormat:@"%@ (%i)",item.creatorSummary,item.year];
+                }
+                else{
+                    authorsLabel.text = [NSString stringWithFormat:@"%@ (No date)",item.creatorSummary];
+                }
+            }    
+            else if(item.year != 0){
+                authorsLabel.text = [NSString stringWithFormat:@"No author (%i)",item.year];
+            }
 
             //Publication as a formatted label
 
@@ -114,9 +214,7 @@ static ZPDetailedItemListViewController* _instance = nil;
                     break;
                 }
             }
-            //Get the authors label so that we can align publication details label with it
-            UILabel *authorsLabel = (UILabel *)[cell viewWithTag:2];
-            
+                  
             if(publishedInLabel == NULL){
                 CGRect frame = CGRectMake(CGRectGetMinX(authorsLabel.frame),CGRectGetMaxY(authorsLabel.frame),CGRectGetWidth(cell.frame)-CGRectGetMinX(authorsLabel.frame),CGRectGetHeight(cell.frame)-CGRectGetMaxY(authorsLabel.frame)-2);
                 publishedInLabel = [[TTStyledTextLabel alloc] 
@@ -172,8 +270,9 @@ static ZPDetailedItemListViewController* _instance = nil;
              }
              */
         }
-        [_cellCache setObject:cell forKey:keyObj];
+        [_cellCache setObject:cell forKey:key];
     }
+    //Re-enable user interaction if it was disabled
     
     return cell;
 }
@@ -183,14 +282,16 @@ static ZPDetailedItemListViewController* _instance = nil;
 
 - (void)viewDidLoad
 {
-   
+
+    
     [super viewDidLoad];
     
+    // Store this instance as static variable so that we can access it through the class later
+    if(_instance == NULL){
+        _instance = self;
+    }
+
 	// Do any additional setup after loading the view, typically from a nib.
-
-    _instance = self;
-    
-
     [self configureView];
 }
 
@@ -231,7 +332,7 @@ static ZPDetailedItemListViewController* _instance = nil;
 
 - (void)splitViewController:(UISplitViewController *)splitController willHideViewController:(UIViewController *)viewController withBarButtonItem:(UIBarButtonItem *)barButtonItem forPopoverController:(UIPopoverController *)popoverController
 {
-    barButtonItem.title = NSLocalizedString(@"Libraries", @"Libraries");
+    barButtonItem.title = NSLocalizedString(@"Master", @"Master");
     [self.navigationItem setLeftBarButtonItem:barButtonItem animated:YES];
     self.masterPopoverController = popoverController;
 }
@@ -245,12 +346,12 @@ static ZPDetailedItemListViewController* _instance = nil;
 
 #pragma mark - Actions
 
--(void) doOrderField:(NSString*)value{
-    if([value isEqualToString: _OrderField ]){
+-(void) doSortField:(NSString*)value{
+    if([value isEqualToString: _sortField ]){
         _sortDescending = !_sortDescending;
     }
     else{
-        _OrderField = value;
+        _sortField = value;
         _sortDescending = FALSE;
     }
     
@@ -258,19 +359,19 @@ static ZPDetailedItemListViewController* _instance = nil;
 }
 
 -(IBAction)doSortCreator:(id)sender{
-    [self doOrderField:@"creator"];
+    [self doSortField:@"creator"];
 }
 
 -(IBAction)doSortDate:(id)sender{
-    [self doOrderField:@"date"];
+    [self doSortField:@"date"];
 }
 
 -(IBAction)doSortTitle:(id)sender{
-    [self doOrderField:@"title"];
+    [self doSortField:@"title"];
 }
 
 -(IBAction)doSortPublication:(id)sender{
-    [self doOrderField:@"publicationTitle"];
+    [self doSortField:@"publicationTitle"];
 }
 
 -(void) clearSearch{

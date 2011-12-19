@@ -6,28 +6,17 @@
 //  Copyright (c) 2011 __MyCompanyName__. All rights reserved.
 //
 
-#import "ZPNavigatorNode.h"
+#import <Foundation/Foundation.h>
+#import "ZPZoteroItemContainer.h"
 
-@interface ZPZoteroCollection : NSObject <ZPNavigatorNode>{
-    NSString* name;
-    NSString* collectionKey;
-    NSString* parentCollectionKey;
-    NSInteger libraryID;
-    BOOL hasChildren;
+@interface ZPZoteroCollection : ZPZoteroItemContainer{
+    NSString* _parentCollectionKey;
 }
+@property (retain, nonatomic) NSString* parentCollectionKey;
 
-@property (retain) NSString* name;
-@property (retain) NSString* collectionKey;
-@property (retain) NSString* parentCollectionKey;
-@property (assign) NSInteger libraryID;
-@property (assign) BOOL hasChildren;
+-(NSString*) collectionKey;
 
-// An alias for setCollectionKey
-- (void) setKey:(NSString*)key;
++(ZPZoteroCollection*) ZPZoteroCollectionWithKey:(NSString*) key;
 
-// An alias for setParentCollectionKey
-- (void) setParentKey:(NSString*)key;
-
-- (void) setTitle:(NSString*)title;
 
 @end

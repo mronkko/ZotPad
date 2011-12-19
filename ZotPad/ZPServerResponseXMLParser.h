@@ -10,24 +10,26 @@
 
 @interface ZPServerResponseXMLParser : NSObject <NSXMLParserDelegate>{
     NSMutableArray* _resultArray;
-
-    //Either a ZPNavigatorNode or ZPZoteroItem
-    NSObject* _currentParentElement;
-    
-    NSString* _currentElementName;
-    NSString* _resultType;
+    NSMutableDictionary* _temporaryFieldStorage;
     NSInteger _totalResults;
     NSString* _currentStringContent;
-    
-    NSInteger _libraryID;
-    
     BOOL _debugParser;
+    BOOL _insideEntry;
+    NSObject* _currentElement;
+    NSString* _updateTimeStamp;
 }
+
 
 - (void)parser:(NSXMLParser *)parser didEndElement:(NSString *)elementName namespaceURI:(NSString *)namespaceURI qualifiedName:(NSString *)qName;
 - (void)parser:(NSXMLParser *)parser didStartElement:(NSString *)elementName namespaceURI:(NSString *)namespaceURI qualifiedName:(NSString *)qualifiedName attributes:(NSDictionary *)attributeDict;
 - (void)parser:(NSXMLParser *)parser foundCharacters:(NSString *)string;
+
 - (NSInteger) totalResults;
 - (NSArray*) parsedElements;
+- (NSString*) updateTimeStamp;
+
+- (void) _setField:(NSString*)field toValue:(NSString*)value;
+- (void) _initNewElementWithID:(NSString*)id;
+- (void) _processTemporaryFieldStorage;
 
 @end
