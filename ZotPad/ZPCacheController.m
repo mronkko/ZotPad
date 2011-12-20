@@ -75,6 +75,7 @@
 
 
 @interface ZPCacheController (){
+    NSMutableArray* _currentlyActiveRetrievals;
 }
 
 -(void) _checkQueues;
@@ -83,13 +84,16 @@
 -(BOOL) _checkIfNeedsMoreItemsAndQueue:(NSObject*) key;
 -(void) _doItemRetrieval:(ZPCacheControllerData*) data;
 -(void) _checkIfCacheRefreshNeededAndQueue:(ZPCacheControllerData*)data;
--(void) _queueCacheRefreshWithItemContainer:(ZPZoteroItemContainer*)object;
+
+-(ZPCacheControllerData*) _cacheControllerDataObjectForZoteroItemContainer:(ZPZoteroItemContainer*)object;
 -(void) _queueCacheRefreshWithCacheControllerData:(ZPCacheControllerData*)object;
+
 -(void) _cleanUpCompletedWithKey:(NSObject*)key;
 -(void) _updateLibrariesAndCollectionsFromServer;
 
 // Refreshes collections and libraries from server
 - (ZPZoteroCollection*) _getRefreshedCollection:(NSString*)collectionKey fromLibrary:(NSNumber*)libraryID;
+- (ZPZoteroLibrary*) _getRefreshedLibrary:(NSNumber*)libraryID;
 
 @end
 
@@ -120,7 +124,9 @@ static ZPCacheController* _instance = nil;
     
     _cacheDataObjects = [[NSMutableDictionary alloc] init];
 
-        
+    
+    _currentlyActiveRetrievals = [NSMutableArray arrayWithCapacity:10];
+    
 	return self;
 }
 
@@ -166,27 +172,35 @@ static ZPCacheController* _instance = nil;
     @synchronized(self){
         if([_serverRequestQueue operationCount] <= [_serverRequestQueue maxConcurrentOperationCount]){
             
+            BOOL retrieving = FALSE;
             
             //If we have root of a library visible, prioritize it 
             if(_currentlyActiveLibraryID !=NULL && _currentlyActiveCollectionKey == NULL && [_libraryIDsToCache containsObject:_currentlyActiveLibraryID]){
-                if ([self _checkIfNeedsMoreItemsAndQueue:_currentlyActiveLibraryID]) return;
+                retrieving =  ([self _checkIfNeedsMoreItemsAndQueue:_currentlyActiveLibraryID]);             
             }
             
             //Otherwise, prioritize the visible collection 
-            if(_currentlyActiveCollectionKey !=NULL && [_collectionKeysToCache containsObject:_currentlyActiveCollectionKey]){
-                if ([self _checkIfNeedsMoreItemsAndQueue:_currentlyActiveCollectionKey]) return;
+            if(! retrieving && _currentlyActiveCollectionKey !=NULL && [_collectionKeysToCache containsObject:_currentlyActiveCollectionKey]){
+                retrieving =  ([self _checkIfNeedsMoreItemsAndQueue:_currentlyActiveCollectionKey]);
             }
             
             //If the active views do not have items to retrieve, retrieve items for the first library in the queue
             
             
-            for(NSObject* key in _libraryIDsToCache){
-                if ([self _checkIfNeedsMoreItemsAndQueue:key]) return;
+            if(! retrieving) for(NSObject* key in _libraryIDsToCache){
+                if ([self _checkIfNeedsMoreItemsAndQueue:key]){
+                    retrieving = TRUE;
+                    break;
+                }
             }
             
-            for(NSObject* key in _collectionKeysToCache){
-                if ([self _checkIfNeedsMoreItemsAndQueue:key]) return;
+            if(! retrieving) for(NSObject* key in _collectionKeysToCache){
+                retrieving = TRUE;
+                break;
             }
+            
+            //Check if we can schedule a new operation immediately.
+            if(retrieving) [self _checkQueues];
             
         }
     }
@@ -197,11 +211,18 @@ static ZPCacheController* _instance = nil;
  */
 
 -(BOOL) _checkIfNeedsMoreItemsAndQueue:(NSObject*) key{
-    
+
+
+    //Only one retrieval at a time
+    if([_currentlyActiveRetrievals containsObject:key]) return false;
+
     ZPCacheControllerData* data = [_cacheDataObjects objectForKey:key];
+    
 
     if((data.offset < data.totalItems) || (data.totalItems == NUMBER_OF_ITEMS_NOT_YET_KNOWN)){
         
+        
+        [_currentlyActiveRetrievals addObject:key];
         NSOperation* retrieveOperation = [[NSInvocationOperation alloc] initWithTarget:self                                                                                           selector:@selector(_doItemRetrieval:) object:[data copyWithZone:NULL]];
 
         [_serverRequestQueue addOperation:retrieveOperation];
@@ -236,10 +257,15 @@ static ZPCacheController* _instance = nil;
                                                                                         sortDescending:FALSE limit:NUMBER_OF_ITEMS_TO_RETRIEVE
                                                                                                  start:data.offset];
 
+    //Mark that this is no longer retrieving data
+    if(data.collectionKey == NULL)
+        [_currentlyActiveRetrievals removeObject:data.libraryID];
+    else
+        [_currentlyActiveRetrievals removeObject:data.collectionKey];
+        
     //Only process on response at a time
     
-    //TODO: The updated-timestamp does not seem to work like I expected to. The logic below for update timestamp needs to be reconsidered.
-    
+   
     @synchronized(self){
         
         //First possibility is that we do not know when the server data was last updated (such as when doing a first retrieval for a library)
@@ -267,7 +293,10 @@ static ZPCacheController* _instance = nil;
 
         }
 
+        /*
         
+         DO NOT REMOVE THIS CODE THAT IS COMMENTED OUT. THIS IS TO HANDLE THE CASE THAT THE DATA HAS CHANGED ON THE SERVER WHILE WE ARE RETRIEVING IT
+         
         //The first thing we need to check is that the time stamp in these results
         //equals the time stamp in the original data. If not, it means that the
         //data has changed on the server while we are retrieving this and 
@@ -275,6 +304,7 @@ static ZPCacheController* _instance = nil;
         //
         // Note that there can be several operations already progress for a collection
         // that has become invalid.
+        
         
         if(![[parserResults updateTimeStamp] isEqualToString:data.updatedTimeStamp]){
             
@@ -306,7 +336,8 @@ static ZPCacheController* _instance = nil;
         
         
         else{
-            
+         */
+        
             if(data.totalItems == NUMBER_OF_ITEMS_NOT_YET_KNOWN){
                 data.totalItems = parserResults.totalResults;
             
@@ -332,7 +363,7 @@ static ZPCacheController* _instance = nil;
             [[ZPDataLayer instance] notifyItemKeyArrayUpdated:data.itemKeys];
             
             //Is the container now completely cached? 
-            if([data.itemKeys count] == data.totalItems && data.totalItems != NUMBER_OF_ITEMS_NOT_YET_KNOWN){
+            if([data.itemKeys lastObject] != [NSNull null]){
                 if(data.collectionKey==NULL){
                     [[ZPDatabase instance] deleteItemsNotInArray:data.itemKeys fromLibrary:data.libraryID]; 
                     [[ZPDatabase instance] setUpdatedTimeStampForLibrary:data.libraryID toValue:data.updatedTimeStamp];
@@ -343,7 +374,7 @@ static ZPCacheController* _instance = nil;
                 }
                 
             }
-        }
+        //}
     }
     
     [self _checkQueues];
@@ -356,6 +387,10 @@ static ZPCacheController* _instance = nil;
     
     data.offset=0;
     
+    while([data.itemKeys count]< data.totalItems){
+        [data.itemKeys addObject:[NSNull null]];
+    }
+
     if(data.collectionKey == NULL){
         [_libraryIDsToCache insertObject:data.libraryID atIndex:0];
         [_cacheDataObjects setObject:data forKey:data.libraryID];
@@ -374,34 +409,39 @@ static ZPCacheController* _instance = nil;
      ZPZoteroItemContainer* container;
 
     if(data.collectionKey == NULL){
-        //There is no way to know if a library has been updated on the server except start retrieving data from it
-        [self _queueCacheRefreshWithCacheControllerData:data];
+        container = [self _getRefreshedLibrary:data.libraryID];
     }
     else{
-        //For collections, we can check the time stamp from the collections list
-        
         container = [self _getRefreshedCollection:data.collectionKey fromLibrary:data.libraryID];
-        
-        if(! [container.serverTimeStamp isEqualToString:container.lastCompletedCacheTimestamp]){
-            
-            data.updatedTimeStamp = [container serverTimeStamp];
-            
-            [self _queueCacheRefreshWithCacheControllerData:data];
-        }
     }
+
     
+    if(! [container.serverTimeStamp isEqualToString:container.lastCompletedCacheTimestamp]){
+        
+        data.updatedTimeStamp = [container serverTimeStamp];
+        data.totalItems = container.numItems;
+        data.targetZoteroItemContainer = container;
+        [self _queueCacheRefreshWithCacheControllerData:data];
+    }
 }
 
--(void) _queueCacheRefreshWithItemContainer:(ZPZoteroItemContainer*)object{
+/*
+ 
+ This is called
+ 
+ */
+
+-(ZPCacheControllerData*) _cacheControllerDataObjectForZoteroItemContainer:(ZPZoteroItemContainer*)object{
     
     ZPCacheControllerData* data = [[ZPCacheControllerData alloc] init];
     data.libraryID = [object libraryID];
     data.collectionKey = [object collectionKey];
+    data.totalItems = object.numItems;
     data.itemKeys = [NSMutableArray array];
     data.updatedTimeStamp = [object serverTimeStamp];
     data.targetZoteroItemContainer = object;
     
-    [self _queueCacheRefreshWithCacheControllerData:data];
+    return data;
 }
     
     
@@ -451,6 +491,10 @@ static ZPCacheController* _instance = nil;
     return [[ZPServerConnection instance] retrieveCollection:collectionKey fromLibrary:libraryID];
 }
 
+- (ZPZoteroLibrary*) _getRefreshedLibrary:(NSNumber*)libraryID{
+    return [[ZPServerConnection instance] retrieveLibrary:libraryID];
+
+}
 
 -(void) setCurrentCollection:(NSString*) collectionKey{
     _currentlyActiveCollectionKey = collectionKey;
@@ -484,14 +528,17 @@ static ZPCacheController* _instance = nil;
         if(! ([library.serverTimeStamp isEqualToString: library.lastCompletedCacheTimestamp ] || 
               [_libraryIDsToCache containsObject:[library libraryID]])){
             
-            [self _queueCacheRefreshWithItemContainer:library];
+            //Retrieve the number of top level items
+            library = [[ZPServerConnection instance] retrieveLibrary:library.libraryID];
+            
+            [self _queueCacheRefreshWithCacheControllerData:[self _cacheControllerDataObjectForZoteroItemContainer:library]];
             
             //Retrieve all collections for this library and add them to cache
             for(ZPZoteroCollection* collection in [[ZPDatabase instance] allCollectionsForLibrary:library.libraryID]){
                 
                 if (! ([collection.serverTimeStamp isEqualToString:collection.lastCompletedCacheTimestamp] || 
                        [_collectionKeysToCache containsObject:[collection collectionKey]])){
-                    [self _queueCacheRefreshWithItemContainer:collection];
+                    [self _queueCacheRefreshWithCacheControllerData:[self _cacheControllerDataObjectForZoteroItemContainer:collection]];
                 }
             }
         }

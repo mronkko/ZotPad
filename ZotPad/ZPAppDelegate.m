@@ -31,12 +31,12 @@
         [defaults removeObjectForKey:@"resetusername"];
     }
 
-//    if([defaults boolForKey:@"resetitemdata"]){
+    if([defaults boolForKey:@"resetitemdata"]){
         NSLog(@"Reseting itemdata");
         [defaults removeObjectForKey:@"resetitemdata"];
         NSString *dbPath = [[NSSearchPathForDirectoriesInDomains(NSDocumentDirectory, NSUserDomainMask, YES) objectAtIndex:0] stringByAppendingPathComponent:@"zotpad.sqlite"];
         [[NSFileManager defaultManager] removeItemAtPath: dbPath error:NULL];
-//    }
+    }
 
     if([defaults boolForKey:@"resetfiles"]){
         NSLog(@"Reseting files");

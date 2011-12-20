@@ -46,10 +46,10 @@
 - (NSArray*) libraries;
 - (NSArray*) collectionsForLibrary : (NSNumber*)currentLibraryID withParentCollection:(NSString*)currentCollectionKey;
 - (NSArray*) getItemKeysFromCacheForLibrary:(NSNumber*)libraryID collection:(NSString*)collectionKey
-                        searchString:(NSString*)searchString orderField:(NSString*)OrderField sortDescending:(BOOL)sortDescending;
+                        searchString:(NSString*)searchString orderField:(NSString*)orderField sortDescending:(BOOL)sortDescending;
 
 - (NSArray*) getItemKeysFromServerForLibrary:(NSNumber*)libraryID collection:(NSString*)collectionKey
-                               searchString:(NSString*)searchString orderField:(NSString*)OrderField sortDescending:(BOOL)sortDescending;
+                               searchString:(NSString*)searchString orderField:(NSString*)orderField sortDescending:(BOOL)sortDescending;
 
 - (ZPZoteroItem*) getItemByKey: (NSString*) key;
 

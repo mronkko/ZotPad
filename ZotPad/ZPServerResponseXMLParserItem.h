@@ -12,7 +12,7 @@
     BOOL _bibContent;
     BOOL _jsonContent;
 }
--(void) setValue:(id)value forKey:(NSString *)key;
+- (void) _setField:(NSString*)field toValue:(NSString*)value;
 - (void)parser:(NSXMLParser *)parser didStartElement:(NSString *)elementName namespaceURI:(NSString *)namespaceURI qualifiedName:(NSString *)qualifiedName attributes:(NSDictionary *)attributeDict;
 - (void)parser:(NSXMLParser *)parser didEndElement:(NSString *)elementName namespaceURI:(NSString *)namespaceURI qualifiedName:(NSString *)qName;
 

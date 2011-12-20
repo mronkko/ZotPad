@@ -17,6 +17,7 @@
     BOOL _insideEntry;
     NSObject* _currentElement;
     NSString* _updateTimeStamp;
+    NSNumber* _libraryID;
 }
 
 

@@ -19,6 +19,7 @@
     NSMutableArray* _itemKeysShown;
     NSArray* _itemKeysFromServer;
     UITableView* _tableView;
+    
 }
 
 @property (retain) IBOutlet UITableView* tableView;

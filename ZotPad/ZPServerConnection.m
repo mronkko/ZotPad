@@ -19,6 +19,7 @@
 #import "ZPAuthenticationProcess.h"
 #import "ZPZoteroItem.h"
 #import "ZPZoteroCollection.h"
+#import "ZPZoteroLibrary.h"
 
 //Private methods
 
@@ -228,7 +229,7 @@ const NSInteger ZPServerConnectionRequestSingleItemDetails = 6;
 
 -(ZPZoteroItem*) retrieveSingleItemDetailsFromServer:(ZPZoteroItem*)item{
 
-    NSMutableDictionary* parameters = [NSMutableDictionary dictionaryWithObject:[NSNumber numberWithInt:item.libraryID ] forKey:@"libraryID"];
+    NSMutableDictionary* parameters = [NSMutableDictionary dictionaryWithObject:item.libraryID forKey:@"libraryID"];
     [parameters setObject:item.key forKey:@"itemKey"];
     [parameters setObject:@"json" forKey:@"content"];
     
@@ -300,10 +301,13 @@ const NSInteger ZPServerConnectionRequestSingleItemDetails = 6;
     NSMutableDictionary* parameters = [NSMutableDictionary dictionaryWithObject:libraryID forKey:@"libraryID"];
     [parameters setValue:collectionKey forKey:@"collectionKey"];
     
-    ZPServerResponseXMLParser* parserDelegate =  [self makeServerRequest:ZPServerConnectionRequestCollections withParameters:parameters];
+    ZPServerResponseXMLParser* parserDelegate =  [self makeServerRequest:ZPServerConnectionRequestSingleCollection withParameters:parameters];
     if(parserDelegate == NULL) return NULL;
     
-    return [[parserDelegate parsedElements] objectAtIndex:0];
+    ZPZoteroCollection* collection= [[parserDelegate parsedElements] objectAtIndex:0];
+    collection.libraryID = libraryID;
+    
+    return  collection;
 
 }
 
@@ -352,6 +356,19 @@ Retrieves items from server and stores these in the database. Returns and array 
     
     return parserDelegate;
     
+}
+
+/*
+ Retrieves the time updated and number of top level items for a library.
+ */
+-(ZPZoteroLibrary*)retrieveLibrary:(NSNumber*) libraryID{
+    ZPServerResponseXMLParser* parserDelegate = [self retrieveItemsFromLibrary:libraryID collection:NULL searchString:NULL orderField:NULL sortDescending:FALSE limit:1 start:0];
+    
+    ZPZoteroLibrary* library = [ZPZoteroLibrary ZPZoteroLibraryWithID:libraryID];
+    library.serverTimeStamp = parserDelegate.updateTimeStamp;
+    library.numItems = parserDelegate.totalResults;
+    
+    return library;
 }
 
 

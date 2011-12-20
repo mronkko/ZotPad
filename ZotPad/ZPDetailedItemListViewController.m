@@ -22,7 +22,7 @@
 @synthesize collectionKey = _collectionKey;
 @synthesize libraryID =  _libraryID;
 @synthesize searchString = _searchString;
-@synthesize orderField = _OrderField;
+@synthesize orderField = _orderField;
 @synthesize sortDescending = _sortDescending;
 
 @synthesize masterPopoverController = _masterPopoverController;
@@ -35,7 +35,6 @@ static ZPDetailedItemListViewController* _instance = nil;
 
 -(id) init{
     self = [super init];
-    
     return self;
 }
 
@@ -56,19 +55,29 @@ static ZPDetailedItemListViewController* _instance = nil;
 
 - (void)configureView
 {
-    // Update the user interface for the detail item.
-    
-    if (self.masterPopoverController != nil) {
-        [self.masterPopoverController dismissPopoverAnimated:YES];
+
+    if([NSThread isMainThread]){
+        // Update the user interface for the detail item.
+        
+        if (self.masterPopoverController != nil) {
+            [self.masterPopoverController dismissPopoverAnimated:YES];
+        }
+        
+        // Retrieve the item IDs if a library is selected. 
+        
+        if(_libraryID!=0){
+            //TODO: Sort based on modified time by default so that the order will be the same that we will receive from the server.
+            
+            _itemKeysShown = [NSMutableArray arrayWithArray: [[ZPDataLayer instance] getItemKeysFromCacheForLibrary:self.libraryID collection:self.collectionKey
+                                                                                                       searchString:[self.searchString stringByTrimmingCharactersInSet:[NSCharacterSet whitespaceAndNewlineCharacterSet]]orderField:self.orderField sortDescending:self.sortDescending]];
+            _itemKeysFromServer = [[ZPDataLayer instance] getItemKeysFromServerForLibrary:self.libraryID collection:self.collectionKey
+                                                                             searchString:[self.searchString stringByTrimmingCharactersInSet:[NSCharacterSet whitespaceAndNewlineCharacterSet]]orderField:self.orderField sortDescending:self.sortDescending];
+            
+            [_tableView reloadData];
+        }
     }
-    
-    // Retrieve the item IDs if a library is selected. 
-    
-    if(_libraryID!=0){
-        _itemKeysShown = [NSMutableArray arrayWithArray: [[ZPDataLayer instance] getItemKeysFromCacheForLibrary:self.libraryID collection:self.collectionKey
-                                                          searchString:[self.searchString stringByTrimmingCharactersInSet:[NSCharacterSet whitespaceAndNewlineCharacterSet]]orderField:self.orderField sortDescending:self.sortDescending]];
-        _itemKeysFromServer = [[ZPDataLayer instance] getItemKeysFromServerForLibrary:self.libraryID collection:self.collectionKey
-                                                          searchString:[self.searchString stringByTrimmingCharactersInSet:[NSCharacterSet whitespaceAndNewlineCharacterSet]]orderField:self.orderField sortDescending:self.sortDescending];
+    else{
+        [self performSelectorOnMainThread:@selector(configureView) withObject:NULL waitUntilDone:FALSE];
     }
 }
 
@@ -246,11 +255,11 @@ static ZPDetailedItemListViewController* _instance = nil;
 #pragma mark - Actions
 
 -(void) doOrderField:(NSString*)value{
-    if([value isEqualToString: _OrderField ]){
+    if([value isEqualToString: _orderField ]){
         _sortDescending = !_sortDescending;
     }
     else{
-        _OrderField = value;
+        _orderField = value;
         _sortDescending = FALSE;
     }
     

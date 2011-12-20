@@ -89,6 +89,22 @@
             }
             
         }
+        else if (! _insideEntry && [elementName isEqualToString: @"link" ]){
+
+            if([@"self" isEqualToString:(NSString*)[attributeDict objectForKey:@"rel"]]){
+
+                //The value is URL and we want to get the part after last /
+                NSArray* parts= [(NSString*)[attributeDict objectForKey:@"href"] componentsSeparatedByString:@"/"];
+            
+                
+                if([[parts objectAtIndex:3] isEqualToString:@"users"]){
+                    _libraryID = [NSNumber numberWithInt:1];
+                }
+                else{
+                    _libraryID = [NSNumber numberWithInt:[[parts objectAtIndex:4] intValue]];
+                }
+            }
+        }
     }
 }
 

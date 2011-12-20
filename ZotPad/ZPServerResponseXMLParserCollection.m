@@ -14,6 +14,7 @@
 
 - (void) _initNewElementWithID:(NSString*)id{
     _currentElement = [ZPZoteroCollection ZPZoteroCollectionWithKey:id];
+    [(ZPZoteroCollection*)_currentElement setLibraryID:_libraryID];
     [super _processTemporaryFieldStorage];
 }
 
@@ -24,10 +25,20 @@
  */
 
 - (void) _setField:(NSString*)field toValue:(NSString*)value{
-    
-    if([field isEqualToString:@"updated"]) field =@"ServerTimeStamp";
-    
-    [super _setField:field toValue:value];
+  
+    if (_currentElement == NULL){ 
+        [super _setField:field toValue:value];
+    }
+    else if([field isEqualToString:@"updated"]){
+        [(ZPZoteroCollection*) _currentElement setServerTimeStamp:value];
+    }
+    else if([field isEqualToString:@"zapi:numItems"]){
+        [(ZPZoteroCollection*) _currentElement setNumItems:[value intValue]];
+    }
+    else{
+        [super _setField:field toValue:value];
+    }
+
 }
 
 

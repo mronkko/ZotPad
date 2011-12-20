@@ -16,7 +16,7 @@
     NSString* _publishedIn;
     NSString* _creatorSummary;
     NSInteger _year;
-    NSInteger _libraryID;
+    NSNumber* _libraryID;
     NSString* _itemType;
     NSInteger _numChildren;
     NSInteger _numTags;
@@ -34,7 +34,7 @@
 @property (retain) NSString* creatorSummary;
 @property (retain) NSString* publishedIn;
 @property (assign) NSInteger year;
-@property (assign) NSInteger libraryID;
+@property (retain) NSNumber* libraryID;
 @property (assign) BOOL hasChildren;
 @property (retain) NSString* itemType;
 @property (assign) NSInteger numChildren;

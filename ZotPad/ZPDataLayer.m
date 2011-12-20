@@ -105,12 +105,11 @@ static ZPDataLayer* _instance = nil;
  */
 
 
-- (NSArray*) getItemKeysFromCacheForLibrary:(NSNumber*)libraryID collection:(NSString*)collectionKey searchString:(NSString*)searchString orderField:(NSString*)OrderField sortDescending:(BOOL)sortDescending{
-    //TODO: Implement
-    return NULL;
+- (NSArray*) getItemKeysFromCacheForLibrary:(NSNumber*)libraryID collection:(NSString*)collectionKey searchString:(NSString*)searchString orderField:(NSString*)orderField sortDescending:(BOOL)sortDescending{
+    return [[ZPDatabase instance] getItemKeysForLibrary:libraryID collection:collectionKey searchString:searchString orderField:orderField sortDescending:sortDescending];
 }
 
-- (NSArray*) getItemKeysFromServerForLibrary:(NSNumber*)libraryID collection:(NSString*)collectionKey searchString:(NSString*)searchString orderField:(NSString*)OrderField sortDescending:(BOOL)sortDescending{
+- (NSArray*) getItemKeysFromServerForLibrary:(NSNumber*)libraryID collection:(NSString*)collectionKey searchString:(NSString*)searchString orderField:(NSString*)orderField sortDescending:(BOOL)sortDescending{
 
     [[ZPCacheController instance] setCurrentLibrary:libraryID];
     [[ZPCacheController instance] setCurrentCollection:collectionKey];
@@ -120,7 +119,7 @@ static ZPDataLayer* _instance = nil;
     
         
     //If there is no search or sort condition, we can reuse the item retrieval operations from cache controller
-    if(searchString == NULL && OrderField == NULL){
+    if(searchString == NULL && orderField == NULL){
         return [[ZPCacheController instance] cachedItemKeysForCollection:collectionKey libraryID:libraryID];
     }
     
@@ -131,7 +130,7 @@ static ZPDataLayer* _instance = nil;
         
         _adHocCollectionKey=collectionKey;
         _adHocLibraryID=libraryID;
-        _adHocOrderField=OrderField;
+        _adHocOrderField=orderField;
         _adHocSearchString=searchString;
         _adHocSortDescending=sortDescending;
         

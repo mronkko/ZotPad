@@ -28,7 +28,7 @@ static ZPDatabase* _instance = nil;
 {
     self = [super init];
     
-    _debugDatabase = TRUE;
+    _debugDatabase = FALSE;
     
 	NSString *dbPath = [[NSSearchPathForDirectoriesInDomains(NSDocumentDirectory, NSUserDomainMask, YES) objectAtIndex:0] stringByAppendingPathComponent:@"zotpad.sqlite"];
     
@@ -143,7 +143,7 @@ static ZPDatabase* _instance = nil;
 - (void) removeItemsNotInArray:(NSArray*)itemKeys fromCollection:(NSString*)collectionKey inLibrary:(NSNumber*)libraryID{
     @synchronized(self){
         //This might generate a too long query
-        [_database executeUpdate:[NSString stringWithFormat:@"DELETE FROM collectionItems WHERE collectionKey = ? AND itemKey NOT IN ('@%')",
+        [_database executeUpdate:[NSString stringWithFormat:@"DELETE FROM collectionItems WHERE collectionKey = ? AND itemKey NOT IN ('%@')",
                                                            [itemKeys componentsJoinedByString:@"', '"]],collectionKey];
     }
 
@@ -154,7 +154,7 @@ static ZPDatabase* _instance = nil;
 - (void) deleteItemsNotInArray:(NSArray*)itemKeys fromLibrary:(NSNumber*)libraryID{
     @synchronized(self){
         //This might generate a too long query
-        [_database executeUpdate:[NSString stringWithFormat:@"DELETE FROM items WHERE libraryID = ? AND key NOT IN ('@%')",
+        [_database executeUpdate:[NSString stringWithFormat:@"DELETE FROM items WHERE libraryID = ? AND key NOT IN ('%@')",
                                   [itemKeys componentsJoinedByString:@"', '"]],libraryID];
     }
 }
@@ -295,16 +295,8 @@ static ZPDatabase* _instance = nil;
                 year=NULL;
             }
             
-            NSNumber* libraryID;
-            if(item.libraryID!=0){
-                libraryID=[NSNumber numberWithInt:item.libraryID];
-            }
-            else{
-                libraryID=NULL;
-            }
             
-            
-            [_database executeUpdate:@"INSERT INTO items (itemTypeID,libraryID,year,authors,title,publishedIn,key,fullCitation) VALUES (0,?,?,?,?,?,?,?)",libraryID,year,item.creatorSummary,item.title,item.publishedIn,item.key,item.fullCitation];
+            [_database executeUpdate:@"INSERT INTO items (itemTypeID,libraryID,year,authors,title,publishedIn,key,fullCitation) VALUES (0,?,?,?,?,?,?,?)",item.libraryID,year,item.creatorSummary,item.title,item.publishedIn,item.key,item.fullCitation];
             
         }
         
@@ -329,7 +321,7 @@ static ZPDatabase* _instance = nil;
             
             item = [ZPZoteroItem ZPZoteroItemWithKey:[resultSet stringForColumnIndex:6]];
             //TODO: Implement item type
-            [item setLibraryID:[resultSet intForColumnIndex:1]];
+            [item setLibraryID:[NSNumber numberWithInt:[resultSet intForColumnIndex:1]]];
             [item setYear:[resultSet intForColumnIndex:2]];
             [item setCreatorSummary:[resultSet stringForColumnIndex:3]];
             [item setTitle:[resultSet stringForColumnIndex:4]];
@@ -456,13 +448,13 @@ static ZPDatabase* _instance = nil;
 }
 
 - (NSArray*) getItemKeysForLibrary:(NSNumber*)libraryID collection:(NSString*)collectionKey
-                      searchString:(NSString*)searchString orderField:(NSString*)OrderField sortDescending:(BOOL)sortDescending{
+                      searchString:(NSString*)searchString orderField:(NSString*)orderField sortDescending:(BOOL)sortDescending{
 
     NSMutableArray* keys = [[NSMutableArray alloc] init];
 
     //Build the SQL query as a string first. This currently searches only in the full citation.
 
-    NSString* sql = @"SELECT item.itemKey FROM items";
+    NSString* sql = @"SELECT items.key FROM items";
     
     if(collectionKey!=NULL)
         sql=[sql stringByAppendingFormat:@", collectionItems"];
@@ -475,20 +467,20 @@ static ZPDatabase* _instance = nil;
     sql=[sql stringByAppendingFormat:@" WHERE libraryID = %@",libraryID];
 
     if(collectionKey!=NULL)
-        sql=[sql stringByAppendingFormat:@" AND collectionItems.collectionKey = %@ and collectionItems.itemKey = item.itemKey",collectionKey];
+        sql=[sql stringByAppendingFormat:@" AND collectionItems.collectionKey = %@ and collectionItems.itemKey = items.key",collectionKey];
 
     if(searchString != NULL){
         //TODO: Handle quotes
         NSArray* searchArray = [searchString componentsSeparatedByString:@" "];
         
-        sql=[sql stringByAppendingFormat:@" AND field.itemKey = item.itemKey AND (field.fieldValue LIKE '\%%@\%)'",[searchArray componentsJoinedByString:@"%' OR field.fieldValue LIKE '%"]];
+        sql=[sql stringByAppendingFormat:@" AND field.itemKey = items.key AND (field.fieldValue LIKE '\%%@\%)'",[searchArray componentsJoinedByString:@"%' OR field.fieldValue LIKE '%"]];
     }
     
-    if(OrderField!=NULL){
+    if(orderField!=NULL){
         if(sortDescending)
-            sql=[sql stringByAppendingFormat:@" ORDER BY item.%@ DESC",OrderField];
+            sql=[sql stringByAppendingFormat:@" ORDER BY items.%@ DESC",orderField];
         else
-            sql=[sql stringByAppendingFormat:@" ORDER BY item.%@ ASC",OrderField];
+            sql=[sql stringByAppendingFormat:@" ORDER BY items.%@ ASC",orderField];
     }
     
     @synchronized(self){

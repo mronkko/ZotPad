@@ -17,7 +17,7 @@
     NSString* _searchString;
     NSString* _collectionKey;
     NSNumber* _libraryID;
-    NSString* _OrderField;
+    NSString* _orderField;
     BOOL _sortDescending;
     
     DSBezelActivityView* _activityView;

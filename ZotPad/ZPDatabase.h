@@ -31,7 +31,7 @@
 - (NSArray*) allCollectionsForLibrary: (NSNumber*)libraryID;
 - (ZPZoteroItem*) getItemByKey: (NSString*) key;
 - (NSArray*) getItemKeysForLibrary:(NSNumber*)libraryID collection:(NSString*)collectionKey
-                      searchString:(NSString*)searchString orderField:(NSString*)OrderField sortDescending:(BOOL)sortDescending;
+                      searchString:(NSString*)searchString orderField:(NSString*)orderField sortDescending:(BOOL)sortDescending;
 
 //Add more data to an existing item. By default the getItemByKey do not populate fields or creators to save database operations
 - (void) getFieldsForItemKey: (NSString*) key;
