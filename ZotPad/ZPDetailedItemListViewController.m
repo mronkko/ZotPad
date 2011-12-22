@@ -68,10 +68,11 @@ static ZPDetailedItemListViewController* _instance = nil;
         if(_libraryID!=0){
             //TODO: Sort based on modified time by default so that the order will be the same that we will receive from the server.
             
-            _itemKeysShown = [NSMutableArray arrayWithArray: [[ZPDataLayer instance] getItemKeysFromCacheForLibrary:self.libraryID collection:self.collectionKey
-                                                                                                       searchString:[self.searchString stringByTrimmingCharactersInSet:[NSCharacterSet whitespaceAndNewlineCharacterSet]]orderField:self.orderField sortDescending:self.sortDescending]];
-            _itemKeysFromServer = [[ZPDataLayer instance] getItemKeysFromServerForLibrary:self.libraryID collection:self.collectionKey
-                                                                             searchString:[self.searchString stringByTrimmingCharactersInSet:[NSCharacterSet whitespaceAndNewlineCharacterSet]]orderField:self.orderField sortDescending:self.sortDescending];
+            [self setItemKeysShownArray:
+             [NSMutableArray arrayWithArray: [[ZPDataLayer instance] getItemKeysFromCacheForLibrary:self.libraryID collection:self.collectionKey
+                                                                                                       searchString:[self.searchString stringByTrimmingCharactersInSet:[NSCharacterSet whitespaceAndNewlineCharacterSet]]orderField:self.orderField sortDescending:self.sortDescending]]
+              itemKeysFromServerArray:[[ZPDataLayer instance] getItemKeysFromServerForLibrary:self.libraryID collection:self.collectionKey
+                                                                                 searchString:[self.searchString stringByTrimmingCharactersInSet:[NSCharacterSet whitespaceAndNewlineCharacterSet]]orderField:self.orderField sortDescending:self.sortDescending]];
             
             [_tableView reloadData];
         }

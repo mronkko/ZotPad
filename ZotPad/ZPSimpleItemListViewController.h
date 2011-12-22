@@ -18,13 +18,14 @@
     NSCache* _cellCache;
     NSMutableArray* _itemKeysShown;
     NSArray* _itemKeysFromServer;
+    NSInteger _itemKeysFromServerIndex;
     UITableView* _tableView;
     
 }
 
 @property (retain) IBOutlet UITableView* tableView;
 @property (retain) NSArray* itemKeysShown;
-@property (retain) NSArray* itemKeysFromServer;
 
+-(void) setItemKeysShownArray:(NSMutableArray*)itemKeysShown itemKeysFromServerArray:(NSArray*)itemKeysFromServer;
 
 @end

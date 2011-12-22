@@ -275,8 +275,8 @@ static ZPDatabase* _instance = nil;
 -(void) addItemToDatabase:(ZPZoteroItem*)item {
     
     @synchronized(self){
-        //TODO: Implement modifying already existing items if they are older than the new item
-        FMResultSet* resultSet = [_database executeQuery: @"SELECT dateModified FROM items WHERE key =? LIMIT 1",item.key];
+        //TODO: Implement modifying already existing items if they are older (lastTimestamp) nthan the new item
+        FMResultSet* resultSet = [_database executeQuery: @"SELECT lastTimestamp FROM items WHERE key =? LIMIT 1",item.key];
 
         BOOL found = [resultSet next];
 
@@ -285,7 +285,6 @@ static ZPDatabase* _instance = nil;
         if(! found ){
             
             //TODO: implement item types
-            //TODO: implement dateModified
             
             NSNumber* year;
             if(item.year!=0){
@@ -296,7 +295,7 @@ static ZPDatabase* _instance = nil;
             }
             
             
-            [_database executeUpdate:@"INSERT INTO items (itemTypeID,libraryID,year,authors,title,publishedIn,key,fullCitation) VALUES (0,?,?,?,?,?,?,?)",item.libraryID,year,item.creatorSummary,item.title,item.publishedIn,item.key,item.fullCitation];
+            [_database executeUpdate:@"INSERT INTO items (itemTypeID,libraryID,year,authors,title,publishedIn,key,fullCitation,lastTimestamp) VALUES (0,?,?,?,?,?,?,?,?)",item.libraryID,year,item.creatorSummary,item.title,item.publishedIn,item.key,item.fullCitation,item.lastTimestamp];
             
         }
         
@@ -315,7 +314,7 @@ static ZPDatabase* _instance = nil;
     ZPZoteroItem* item = NULL;
     
     @synchronized(self){
-        FMResultSet* resultSet = [_database executeQuery: @"SELECT itemTypeID,libraryID,year,authors,title,publishedIn,key,fullCitation FROM items WHERE key=? LIMIT 1",key];
+        FMResultSet* resultSet = [_database executeQuery: @"SELECT itemTypeID,libraryID,year,authors,title,publishedIn,key,fullCitation,lastTimestamp FROM items WHERE key=? LIMIT 1",key];
         
         if ([resultSet next]) {
             
@@ -328,6 +327,8 @@ static ZPDatabase* _instance = nil;
             NSString* publishedIn = [resultSet stringForColumnIndex:5];
             [item setPublishedIn:publishedIn];
             [item setFullCitation:[resultSet stringForColumnIndex:7]];
+            [item setLastTimestamp:[resultSet stringForColumnIndex:8]];
+
         }
         [resultSet close];
     }
@@ -350,7 +351,7 @@ static ZPDatabase* _instance = nil;
         
         while(creator= [e nextObject]){
             [_database executeUpdate:@"INSERT INTO creators (itemKey,\"order\",firstName,lastName,shortName,creatorType) VALUES (?,?,?,?,?)",
-                                      item.key,order,[creator objectForKey:@"firstName"],[creator objectForKey:@"lastName"],
+                                      item.key,[NSNumber numberWithInt:order],[creator objectForKey:@"firstName"],[creator objectForKey:@"lastName"],
                                       [creator objectForKey:@"shortName"],[creator objectForKey:@"creatorType"]];
             order++;
         }
@@ -481,6 +482,9 @@ static ZPDatabase* _instance = nil;
             sql=[sql stringByAppendingFormat:@" ORDER BY items.%@ DESC",orderField];
         else
             sql=[sql stringByAppendingFormat:@" ORDER BY items.%@ ASC",orderField];
+    }
+    else{
+        sql=[sql stringByAppendingFormat:@" ORDER BY items.lastTimestamp DESC"];
     }
     
     @synchronized(self){

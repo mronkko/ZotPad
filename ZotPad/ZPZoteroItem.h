@@ -26,6 +26,7 @@
     NSArray* _creators;
     NSArray* _attachments;
     NSDictionary* _fields;
+    NSString* _lastTimestamp;
     
 }
 
@@ -39,6 +40,8 @@
 @property (retain) NSString* itemType;
 @property (assign) NSInteger numChildren;
 @property (assign) NSInteger numTags;
+@property (retain) NSString* lastTimestamp;
+
 
 @property (retain) NSArray* attachments;
 @property (retain) NSArray* creators;

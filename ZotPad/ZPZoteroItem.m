@@ -20,7 +20,7 @@
 @synthesize itemType = _itemType;
 @synthesize numChildren = _numChildren;
 @synthesize numTags = _numTags;
-
+@synthesize lastTimestamp = _lastTimestamp;
 
 @synthesize creators = _creators;
 @synthesize attachments = _attachments;

@@ -345,6 +345,12 @@ Retrieves items from server and stores these in the database. Returns and array 
             [parameters setObject:@"asc" forKey:@"sort"];
         }
     }
+    //Get the most recent first by default
+    else{
+        [parameters setObject:@"dateModified" forKey:@"order"];
+        [parameters setObject:@"desc" forKey:@"sort"];
+    }
+
     if(start!=0){
         [parameters setObject:[NSString  stringWithFormat:@"%i",start] forKey:@"start"];
     }

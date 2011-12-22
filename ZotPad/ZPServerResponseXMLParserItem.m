@@ -121,6 +121,9 @@
     else if([key isEqualToString: @"zapi:year"]){
         [(ZPZoteroItem*) _currentElement setYear:[value intValue]];
     }
+    else if([key isEqualToString:@"updated"]){
+        [(ZPZoteroItem*) _currentElement setLastTimestamp:value];
+    }
     else{
         [super _setField:key toValue:value];
     }

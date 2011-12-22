@@ -45,6 +45,7 @@ CREATE TABLE IF NOT EXISTS items (
     publishedIn TEXT,
     key TEXT NOT NULL,
     fullCitation TEXT NOT NULL,
+    lastTimestamp TEXT DEFAULT NULL,
     UNIQUE (libraryID, key)
 );
 

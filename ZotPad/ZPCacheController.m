@@ -294,19 +294,11 @@ static ZPCacheController* _instance = nil;
         }
 
         /*
-        
-         DO NOT REMOVE THIS CODE THAT IS COMMENTED OUT. THIS IS TO HANDLE THE CASE THAT THE DATA HAS CHANGED ON THE SERVER WHILE WE ARE RETRIEVING IT
          
-        //The first thing we need to check is that the time stamp in these results
-        //equals the time stamp in the original data. If not, it means that the
-        //data has changed on the server while we are retrieving this and 
-        //the retrieval needs to be restarted
-        //
-        // Note that there can be several operations already progress for a collection
-        // that has become invalid.
-        
-        
-        if(![[parserResults updateTimeStamp] isEqualToString:data.updatedTimeStamp]){
+        //If the number of total rows in the set has changed, we need to reschedule this retrieval
+        //This is extremely rare, but possible
+         
+        if(![[parserResults updateTimeStamp] != data.totalItems]){
             
             //First possibility is that we do not know when the server data was last updated (such as when doing a first retrieval for a library)
             
