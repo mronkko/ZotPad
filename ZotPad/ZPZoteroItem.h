@@ -25,6 +25,7 @@
     BOOL _hasChildren;
     NSArray* _creators;
     NSArray* _attachments;
+    NSArray* _notes;
     NSDictionary* _fields;
     NSString* _lastTimestamp;
     
@@ -42,7 +43,7 @@
 @property (assign) NSInteger numTags;
 @property (retain) NSString* lastTimestamp;
 
-
+@property (retain) NSArray* notes;
 @property (retain) NSArray* attachments;
 @property (retain) NSArray* creators;
 @property (retain) NSDictionary* fields;

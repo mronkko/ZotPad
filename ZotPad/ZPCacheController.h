@@ -8,16 +8,17 @@
 
 #import <Foundation/Foundation.h>
 #import "ZPLibraryObserver.h"
+#import "ZPAttachmentObserver.h"
 
 
-
-@interface ZPCacheController : NSObject <ZPLibraryObserver>{
+@interface ZPCacheController : NSObject <ZPLibraryObserver, ZPAttachmentObserver>{
     
     //These two arrays contain a list of IDs/Keys that will be cached
     
     NSMutableArray* _libraryIDsToCache;
     NSMutableArray* _collectionKeysToCache;
-    NSMutableArray* _itemKeysForAttachmentsToCache;
+
+    NSMutableArray* _filesToDownload;
     
     NSMutableDictionary* _cacheDataObjects;
     

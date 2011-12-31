@@ -13,6 +13,9 @@
 #import "ZPZoteroLibrary.h"
 #import "ZPZoteroCollection.h"
 #import "ZPZoteroItem.h"
+#import "ZPZoteroAttachment.h"
+#import "ZPZoteroNote.h"
+
 //Cache
 #import "ZPCacheController.h"
 
@@ -54,6 +57,7 @@ static ZPDataLayer* _instance = nil;
         
     _itemObservers = [[NSMutableSet alloc] initWithCapacity:2];
     _libraryObservers = [[NSMutableSet alloc] initWithCapacity:3];
+    _attachmentObservers = [[NSMutableSet alloc] initWithCapacity:2];
     
     _serverRequestQueue = [[NSOperationQueue alloc] init];
     
@@ -161,9 +165,9 @@ static ZPDataLayer* _instance = nil;
     
     //Retrieve initial 15 items
     
-    ZPServerResponseXMLParser* parserResults = [[ZPServerConnection instance] retrieveItemsFromLibrary:_adHocLibraryID collection:_adHocCollectionKey
+    ZPServerResponseXMLParser* parserResults = [[ZPServerConnection instance] retrieveItemsFromLibrary:_adHocLibraryID collection:_adHocCollectionKey 
                                                                                           searchString:_adHocSearchString orderField:_adHocOrderField
-                                                                                        sortDescending:_adHocSortDescending limit:15+(_adHocItemKeysOffset>0)*35 start:_adHocItemKeysOffset];
+                                                                                        sortDescending:_adHocSortDescending limit:15+(_adHocItemKeysOffset>0)*35 start:_adHocItemKeysOffset getItemDetails:TRUE];
     //If we are still showing this list, process the results
     if(targetItemKeyArray==_adHocItemKeys && parserResults!=NULL){
         
@@ -204,6 +208,14 @@ static ZPDataLayer* _instance = nil;
     item = [[ZPServerConnection instance] retrieveSingleItemDetailsFromServer:item];
     [[ZPDatabase instance] writeItemFieldsToDatabase:item];
     [[ZPDatabase instance] writeItemCreatorsToDatabase:item];
+    
+    for(ZPZoteroAttachment* attachment in item.attachments){
+        [[ZPDatabase instance] addAttachmentToDatabase:attachment];
+    }
+    for(ZPZoteroNote* note in item.notes){
+        [[ZPDatabase instance] addNoteToDatabase:note];
+    }
+    
     
     [self notifyItemDetailsAvailable:item];
 
@@ -272,6 +284,17 @@ static ZPDataLayer* _instance = nil;
 }
 
 
+-(void) notifyAttachmentDownloadCompleted:(ZPZoteroAttachment*) attachment{
+    NSEnumerator* e = [_attachmentObservers objectEnumerator];
+    NSObject* id;
+    
+    while( id= [e nextObject]) {
+        [(NSObject <ZPAttachmentObserver>*) id notifyAttachmentDownloadCompleted:attachment];
+    }
+    
+}
+
+
 //Adds and removes observers
 -(void) registerItemObserver:(NSObject<ZPItemObserver>*)observer{
     [_itemObservers addObject:observer];
@@ -288,5 +311,17 @@ static ZPDataLayer* _instance = nil;
 -(void) removeLibraryObserver:(NSObject<ZPLibraryObserver>*)observer{
     [_libraryObservers removeObject:observer];
 }
+
+
+
+-(void) registerAttachmentObserver:(NSObject<ZPAttachmentObserver>*)observer{
+    [_attachmentObservers addObject:observer];
+}
+
+-(void) removeAttachmentObserver:(NSObject<ZPAttachmentObserver>*)observer{
+    [_attachmentObservers removeObject:observer];
+}
+
+
 
 @end

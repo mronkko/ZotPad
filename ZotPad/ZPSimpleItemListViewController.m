@@ -91,7 +91,7 @@
         
         @synchronized(self){
 
-            while([_itemKeysFromServer objectAtIndex:_itemKeysFromServerIndex] != [NSNull null]){
+            while(_itemKeysFromServerIndex < [_itemKeysFromServer count] && [_itemKeysFromServer objectAtIndex:_itemKeysFromServerIndex] !=[NSNull null]){
                 [self performSelectorOnMainThread:@selector(updateTableViewWithUpdatedItemKeyArray) withObject:NULL waitUntilDone:TRUE];
 
                 //TODO: Figure out a better way for the following hack
@@ -101,6 +101,7 @@
                 [NSThread sleepForTimeInterval:.2];
             }
         }
+       
     }
 }
 
@@ -149,12 +150,6 @@
                 if(DEBUG_ITEM_LIST) NSLog(@"Inserting %@ at %i",keyFromServer,_itemKeysFromServerIndex);
                 [_itemKeysShown insertObject:keyFromServer atIndex:_itemKeysFromServerIndex];
                 [_tableView insertRowsAtIndexPaths:[NSArray arrayWithObject:[NSIndexPath indexPathForRow:_itemKeysFromServerIndex inSection:0]] withRowAnimation:UITableViewRowAnimationAutomatic];
-                //If this caused the visible items become too long, remove items from the end
-                while([_itemKeysFromServer count]<[_itemKeysShown count]){
-                    if(DEBUG_ITEM_LIST) NSLog(@"Removing extra from end");
-                    [_itemKeysShown removeLastObject];
-                    [_tableView deleteRowsAtIndexPaths:[NSArray arrayWithObject:[NSIndexPath indexPathForRow:[_itemKeysShown count] inSection:0]] withRowAnimation:UITableViewRowAnimationAutomatic];
-                }
                 counter++;
                 
             }
@@ -170,6 +165,15 @@
                 counter++;
             }
         }
+        
+        //If modifications have caused the visible items become too long, remove items from the end
+        
+        while([_itemKeysFromServer count]<[_itemKeysShown count]){
+            if(DEBUG_ITEM_LIST) NSLog(@"Removing extra from end");
+            [_itemKeysShown removeLastObject];
+            [_tableView deleteRowsAtIndexPaths:[NSArray arrayWithObject:[NSIndexPath indexPathForRow:[_itemKeysShown count] inSection:0]] withRowAnimation:UITableViewRowAnimationAutomatic];
+        }
+
         _itemKeysFromServerIndex++;
     }
     

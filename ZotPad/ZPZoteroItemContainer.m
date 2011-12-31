@@ -14,7 +14,7 @@
 @synthesize libraryID =_libraryID;
 @synthesize hasChildren=_hasChildren;
 @synthesize lastCompletedCacheTimestamp = _lastCompletedCacheTimestamp;
-@synthesize serverTimeStamp = _serverTimestamp;
+@synthesize serverTimestamp = _serverTimestamp;
 @synthesize numItems = _numItems;
 
 -(NSString*) collectionKey{

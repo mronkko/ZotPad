@@ -30,7 +30,7 @@
         [super _setField:field toValue:value];
     }
     else if([field isEqualToString:@"updated"]){
-        [(ZPZoteroCollection*) _currentElement setServerTimeStamp:value];
+        [(ZPZoteroCollection*) _currentElement setServerTimestamp:value];
     }
     else if([field isEqualToString:@"zapi:numItems"]){
         [(ZPZoteroCollection*) _currentElement setNumItems:[value intValue]];

@@ -16,8 +16,9 @@
     BOOL _debugParser;
     BOOL _insideEntry;
     NSObject* _currentElement;
-    NSString* _updateTimeStamp;
+    NSString* _updateTimestamp;
     NSNumber* _libraryID;
+    NSString* _currentID;
 }
 
 
@@ -27,7 +28,7 @@
 
 - (NSInteger) totalResults;
 - (NSArray*) parsedElements;
-- (NSString*) updateTimeStamp;
+- (NSString*) updateTimestamp;
 
 - (void) _setField:(NSString*)field toValue:(NSString*)value;
 - (void) _initNewElementWithID:(NSString*)id;

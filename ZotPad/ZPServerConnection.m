@@ -20,6 +20,11 @@
 #import "ZPZoteroItem.h"
 #import "ZPZoteroCollection.h"
 #import "ZPZoteroLibrary.h"
+#import "ZPZoteroNote.h"
+#import "ZPZoteroAttachment.h"
+#import "ZPDataLayer.h"
+
+#import "ASIHTTPRequest.h"
 
 //Private methods
 
@@ -39,9 +44,9 @@ const NSInteger ZPServerConnectionRequestGroups = 1;
 const NSInteger ZPServerConnectionRequestCollections = 2;
 const NSInteger ZPServerConnectionRequestSingleCollection = 3;
 const NSInteger ZPServerConnectionRequestItems = 4;
-const NSInteger ZPServerConnectionRequestItemsDetails = 5;
-const NSInteger ZPServerConnectionRequestSingleItemDetails = 6;
-
+const NSInteger ZPServerConnectionRequestItemsAndChildren = 5;
+const NSInteger ZPServerConnectionRequestSingleItem = 6;
+const NSInteger ZPServerConnectionRequestSingleItemChildren = 7;
 
 -(id)init
 {
@@ -49,7 +54,9 @@ const NSInteger ZPServerConnectionRequestSingleItemDetails = 6;
         
     _activeRequestCount = 0;
     _debugServerConnection = TRUE;
-    
+    _attachmentFileDataObjectsByConnection = [NSMutableDictionary dictionary];
+    _attachmentObjectsByConnection = [NSMutableDictionary dictionary];
+
     return self;
 }
 
@@ -73,6 +80,37 @@ const NSInteger ZPServerConnectionRequestSingleItemDetails = 6;
     
     return([[NSUserDefaults standardUserDefaults] objectForKey:@""] != nil);
     
+}
+
+-(NSData*) _retrieveDataFromServer:(NSString*)urlString{
+    _activeRequestCount++;
+    
+    if(_debugServerConnection){
+        NSLog(@"Request started: %@ Active queries: %i",urlString,_activeRequestCount);
+    }
+    
+    
+    //First request starts the network indicator
+    if(_activeRequestCount==1) [[UIApplication sharedApplication] setNetworkActivityIndicatorVisible:YES];
+    
+    NSURLRequest * urlRequest = [NSURLRequest requestWithURL:[NSURL URLWithString:urlString]];
+    NSURLResponse * response = nil;
+    NSError* error = nil;
+    NSData* responseData= [NSURLConnection sendSynchronousRequest:urlRequest returningResponse:&response error:&error];
+
+    //If we receive a 403 (forbidden) error, delete the authorization key because we know that it is
+    //no longer valid.
+    if([(NSHTTPURLResponse*)response statusCode]==403){
+        NSLog(@"The authorization key is no longer valid.");
+        [[NSUserDefaults standardUserDefaults] removeObjectForKey:@"OAuthKey"];
+    }
+    
+    _activeRequestCount--;
+    
+    //Last request hides the network indicator
+    if(_activeRequestCount==0) [[UIApplication sharedApplication] setNetworkActivityIndicatorVisible:NO];
+
+    return responseData;
 }
 
 /*
@@ -131,10 +169,21 @@ const NSInteger ZPServerConnectionRequestSingleItemDetails = 6;
                 urlString = [NSString stringWithFormat:@"%@items/top?key=%@&format=atom",urlString,oauthkey];
             }
         }
-        else if( type == ZPServerConnectionRequestSingleItemDetails){
+        else if (type==ZPServerConnectionRequestItemsAndChildren){
+            NSString* collectionKey = [parameters objectForKey:@"collectionKey"];
+            NSAssert(collectionKey==NULL,@"Cannot request child items for collection");
+            urlString = [NSString stringWithFormat:@"%@items?key=%@&format=atom",urlString,oauthkey];
+        }
+
+        else if( type == ZPServerConnectionRequestSingleItem){
              NSString* itemKey = [parameters objectForKey:@"itemKey"];
 
             urlString = [NSString stringWithFormat:@"%@items/%@?key=%@&format=atom",urlString,itemKey,oauthkey];
+        }
+        else if( type == ZPServerConnectionRequestSingleItemChildren){
+            NSString* itemKey = [parameters objectForKey:@"itemKey"];
+            
+            urlString = [NSString stringWithFormat:@"%@items/%@/children?key=%@&format=atom",urlString,itemKey,oauthkey];
         }
                 
         if(parameters!=NULL){
@@ -142,49 +191,20 @@ const NSInteger ZPServerConnectionRequestSingleItemDetails = 6;
                 if(! [@"itemKey" isEqualToString: key] &&
                    ! [@"collectionKey" isEqualToString: key] &&
                    ! [@"libraryID" isEqualToString: key]) {
-                    urlString = [NSString stringWithFormat:@"%@&%@=%@",urlString,key,[parameters objectForKey:key]];
+                    urlString = [NSString stringWithFormat:@"%@&%@=%@",urlString,key,[[parameters objectForKey:key] stringByAddingPercentEscapesUsingEncoding:
+                                                                                      NSASCIIStringEncoding]];
                 
                 }
             }
         }
         
-        
-        _activeRequestCount++;
-
-        if(_debugServerConnection){
-            NSLog(@"Request started: %@ Active queries: %i",urlString,_activeRequestCount);
-        }
-
-        
-        //First request starts the network indicator
-        if(_activeRequestCount==1) [[UIApplication sharedApplication] setNetworkActivityIndicatorVisible:YES];
-        
-        NSURLRequest * urlRequest = [NSURLRequest requestWithURL:[NSURL URLWithString:urlString]];
-        NSURLResponse * response = nil;
-        NSError* error = nil;
-        responseData= [NSURLConnection sendSynchronousRequest:urlRequest returningResponse:&response error:&error];
-        
-        //If we receive a 403 (forbidden) error, delete the authorization key because we know that it is
-        //no longer valid.
-        if([(NSHTTPURLResponse*)response statusCode]==403){
-            NSLog(@"The authorization key is no longer valid.");
-            [[NSUserDefaults standardUserDefaults] removeObjectForKey:@"OAuthKey"];
-        }
-       
-        _activeRequestCount--;
-
-
-        if(_debugServerConnection && responseData==NULL){
-            NSLog(@"Request returned no results: %@ Active queries: %i",urlString,_activeRequestCount);            
-        }
-        //Last request hides the network indicator
-        if(_activeRequestCount==0) [[UIApplication sharedApplication] setNetworkActivityIndicatorVisible:NO];
+        responseData = [self _retrieveDataFromServer:urlString];
     }
 
     if(responseData!=NULL){
         NSXMLParser* parser = [[NSXMLParser alloc] initWithData:responseData];
 
-        ZPServerResponseXMLParser* parserDelegate;
+        ZPServerResponseXMLParser* parserDelegate = NULL;
         //Choose the parser based on what we expect to receive
         
         if(type==ZPServerConnectionRequestGroups){
@@ -193,7 +213,7 @@ const NSInteger ZPServerConnectionRequestSingleItemDetails = 6;
         else if (type==ZPServerConnectionRequestCollections || type == ZPServerConnectionRequestSingleCollection){
             parserDelegate =  [[ZPServerResponseXMLParserCollection alloc] init];    
         }
-        else if (type==ZPServerConnectionRequestItems || type == ZPServerConnectionRequestSingleItemDetails){
+        else if (type==ZPServerConnectionRequestItems || type == ZPServerConnectionRequestSingleItem || type== ZPServerConnectionRequestItemsAndChildren || type== ZPServerConnectionRequestSingleItemChildren){
             parserDelegate =  [[ZPServerResponseXMLParserItem alloc] init];    
         }
         
@@ -233,13 +253,44 @@ const NSInteger ZPServerConnectionRequestSingleItemDetails = 6;
     [parameters setObject:item.key forKey:@"itemKey"];
     [parameters setObject:@"json" forKey:@"content"];
     
-    ZPServerResponseXMLParser* parserDelegate =  [self makeServerRequest:ZPServerConnectionRequestSingleItemDetails withParameters:parameters];
+    ZPServerResponseXMLParser* parserDelegate =  [self makeServerRequest:ZPServerConnectionRequestSingleItem withParameters:parameters];
     
     NSArray* parsedArray = [parserDelegate parsedElements];
     
     if(parserDelegate == NULL || [parsedArray count] == 0 ) return NULL;
     
-    return [parsedArray objectAtIndex:0];   
+    item = [parsedArray objectAtIndex:0];   
+
+    //Request attachments for the single item
+
+    if(item.numChildren >0){
+        [parameters setObject:@"none" forKey:@"content"];
+        parserDelegate =  [self makeServerRequest:ZPServerConnectionRequestSingleItemChildren withParameters:parameters];
+        
+        NSMutableArray* attachments = NULL;
+        NSMutableArray* notes = NULL;
+        
+        for(NSObject* child in [parserDelegate parsedElements] ){
+            if([child isKindOfClass:[ZPZoteroAttachment class]]){
+                if(attachments == NULL) attachments = [NSMutableArray array];
+                
+                //For now only add attachments that have download URLs on the Zotero server.
+                if([(ZPZoteroAttachment*) child attachmentURL] != NULL) [attachments addObject:child];
+            }
+            else if([child isKindOfClass:[ZPZoteroNote class]]){
+                if(notes == NULL) notes = [NSMutableArray array];
+                [notes addObject:child];
+            }
+        }
+        
+        if(notes != NULL) item.notes = notes;
+        else item.notes = [NSArray array];
+        
+        if(attachments != NULL) item.attachments = attachments;
+        else item.attachments = [NSArray array];
+    
+    }
+    return item;
 }
 
 -(NSArray*) retrieveLibrariesFromServer{
@@ -318,17 +369,22 @@ Retrieves items from server and stores these in the database. Returns and array 
    
 */
 
--(ZPServerResponseXMLParser*) retrieveItemsFromLibrary:(NSNumber*)libraryID collection:(NSString*)collectionKey searchString:(NSString*)searchString orderField:(NSString*)orderField sortDescending:(BOOL)sortIsDescending limit:(NSInteger)limit start:(NSInteger)start{
+-(ZPServerResponseXMLParser*) retrieveItemsFromLibrary:(NSNumber*)libraryID collection:(NSString*)collectionKey searchString:(NSString*)searchString orderField:(NSString*)orderField sortDescending:(BOOL)sortIsDescending limit:(NSInteger)limit start:(NSInteger)start getItemDetails:(BOOL)getItemDetails {
     
-   
     
     NSMutableDictionary* parameters = [NSMutableDictionary dictionaryWithObject:libraryID  forKey:@"libraryID"];
 
     if(collectionKey!=NULL) [parameters setObject:collectionKey forKey:@"collectionKey"];
     
-    [parameters setObject:@"bib" forKey:@"content"];
-    [parameters setObject:@"apa" forKey:@"style"];
-
+    if(getItemDetails){
+//        [parameters setObject:@"bib,json" forKey:@"content"];
+        [parameters setObject:@"bib" forKey:@"content"];
+        [parameters setObject:@"apa" forKey:@"style"];
+    }
+    else{
+        [parameters setObject:@"none" forKey:@"content"];
+    }
+    
     //Search
     if(searchString!=NULL && ! [searchString isEqualToString:@""]){
         [parameters setObject:[searchString stringByAddingPercentEscapesUsingEncoding:
@@ -364,19 +420,70 @@ Retrieves items from server and stores these in the database. Returns and array 
     
 }
 
-/*
- Retrieves the time updated and number of top level items for a library.
- */
--(ZPZoteroLibrary*)retrieveLibrary:(NSNumber*) libraryID{
-    ZPServerResponseXMLParser* parserDelegate = [self retrieveItemsFromLibrary:libraryID collection:NULL searchString:NULL orderField:NULL sortDescending:FALSE limit:1 start:0];
+-(ZPServerResponseXMLParser*) retrieveNotesAndAttachmentsFromLibrary:(NSNumber*)libraryID limit:(NSInteger)limit start:(NSInteger)start{
     
-    ZPZoteroLibrary* library = [ZPZoteroLibrary ZPZoteroLibraryWithID:libraryID];
-    library.serverTimeStamp = parserDelegate.updateTimeStamp;
-    library.numItems = parserDelegate.totalResults;
+    NSMutableDictionary* parameters = [NSMutableDictionary dictionaryWithObject:libraryID  forKey:@"libraryID"];
     
-    return library;
+    [parameters setObject:@"none" forKey:@"content"];
+    //Get the most recent first by default
+    [parameters setObject:@"dateModified" forKey:@"order"];
+    [parameters setObject:@"desc" forKey:@"sort"];
+    [parameters setObject:@"attachment || note" forKey:@"itemType"];
+    
+    if(start!=0){
+        [parameters setObject:[NSString  stringWithFormat:@"%i",start] forKey:@"start"];
+    }
+    if(limit!=0){
+        [parameters setObject:[NSString  stringWithFormat:@"%i",limit] forKey:@"limit"];
+    }
+    
+    ZPServerResponseXMLParser* parserDelegate =  [self makeServerRequest:ZPServerConnectionRequestItemsAndChildren withParameters:parameters];
+    
+    return parserDelegate;
+    
 }
 
+/*
+
+ Methods for dowloading files
+ 
+ */
+
+-(void) downloadAttachment:(ZPZoteroAttachment*)attachment{
+    
+    //TODO: Notify the UI that  we are starting a download to show a progress indicator
+    
+    NSString* oauthkey =  [[NSUserDefaults standardUserDefaults] objectForKey:@"OAuthKey"];
+
+    NSURL* url = [NSURL URLWithString:[NSString stringWithFormat:@"%@?key=%@", attachment.attachmentURL,oauthkey]];
+    ASIHTTPRequest *request = [ASIHTTPRequest requestWithURL:url];
+    [request setDownloadDestinationPath:[attachment getFileSystemPath]];
+    
+
+    _activeRequestCount++;
+    
+    if(_debugServerConnection){
+        NSLog(@"File download started (%@) : %@ Active queries: %i",attachment.attachmentTitle, attachment.attachmentURL,_activeRequestCount);
+    }
+    
+    //First request starts the network indicator
+    if(_activeRequestCount==1) [[UIApplication sharedApplication] setNetworkActivityIndicatorVisible:YES];
+    
+    [request startSynchronous];
+    
+    _activeRequestCount--;
+    
+    if(_debugServerConnection){
+        NSLog(@"File download completed (%@) : %@ Active queries: %i",attachment.attachmentTitle,attachment.attachmentURL,_activeRequestCount);
+    }
+    
+    //First request starts the network indicator
+    if(_activeRequestCount==0) [[UIApplication sharedApplication] setNetworkActivityIndicatorVisible:NO];
+    
+    //We need to do this in a different thread so that the current thread does not count towards the operations count
+    [[ZPDataLayer instance] performSelectorInBackground:@selector(notifyAttachmentDownloadCompleted:) withObject:attachment];
+
+}
 
 
 @end

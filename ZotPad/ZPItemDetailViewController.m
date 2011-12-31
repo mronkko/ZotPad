@@ -6,22 +6,25 @@
 //  Copyright (c) 2011 __MyCompanyName__. All rights reserved.
 //
 
-
-//TODO: Change this to table view controller
+//For showing file thumbnails
+#import <QuickLook/QuickLook.h>
 
 #import "ZPItemDetailViewController.h"
 #import "ZPLibraryAndCollectionListViewController.h"
 #import "ZPSimpleItemListViewController.h"
 #import "ZPDetailedItemListViewController.h"
 #import "ZPDataLayer.h"
-
+#import "ZPUIUtils.h"
 
 #define TITLE_VIEW_HEIGHT 100
 #define ATTACHMENT_VIEW_HEIGHT 500
 
+#define ATTACHMENT_IMAGE_HEIGHT 400
+#define ATTACHMENT_IMAGE_WIDTH 283
+
 @interface ZPItemDetailViewController();
 
-- (void)_reconfigureDetailTableView;
+- (void) _reconfigureDetailTableViewAndAttachments;
 
 @end
 
@@ -36,29 +39,39 @@
 - (void)viewDidLoad
 {
     [super viewDidLoad];
+
+    [[ZPDataLayer instance] registerItemObserver:self];
     
+    
+    
+    // Get the selected row from the item list
+    NSIndexPath* indexPath = [[[ZPDetailedItemListViewController instance] tableView] indexPathForSelectedRow];
+    
+    // Get the key for the selected item 
+    NSString* currentItemKey = [[[ZPDetailedItemListViewController instance] itemKeysShown] objectAtIndex: indexPath.row]; 
+    
+    [self configureWithItemKey: currentItemKey];
+
     //configure carousel
     _carousel.type = iCarouselTypeCoverFlow2;
+    [_carousel reloadData];
 
-    NSLog(@"Item detail view loaded");
 }
 
 - (void)viewWillAppear:(BOOL)animated
 {
     
-    [[ZPDataLayer instance] registerItemObserver:self];
-    
     //Configure the size of the title section
     //The positions and sizes are set programmatically because this is difficult to get right with Interface Builder
     
     //The view must overflow 1 pixel on both sides to hide side borders
-
+    
     UILabel *titleLabel = (UILabel *)[self.view viewWithTag:1];
     
     _fullCitationLabel= [[TTStyledTextLabel alloc] 
-                                           initWithFrame:CGRectMake(-1,0, 
-                                                                    self.view.frame.size.width+2, 
-                                                                    TITLE_VIEW_HEIGHT)];
+                         initWithFrame:CGRectMake(-1,0, 
+                                                  self.view.frame.size.width+2, 
+                                                  TITLE_VIEW_HEIGHT)];
     
     [_fullCitationLabel setFont:[titleLabel font]];
     [_fullCitationLabel setClipsToBounds:TRUE];
@@ -78,22 +91,12 @@
     
     UIView* attachmentView = [self.view viewWithTag:2];
     [attachmentView setFrame:CGRectMake(-1,TITLE_VIEW_HEIGHT-1, 
-                                                   self.view.frame.size.width+2, 
-                                                   ATTACHMENT_VIEW_HEIGHT+1)];
-
+                                        self.view.frame.size.width+2, 
+                                        ATTACHMENT_VIEW_HEIGHT+1)];
+    
     attachmentView.layer.borderColor = [_detailTableView separatorColor].CGColor;
     attachmentView.layer.borderWidth = 1.0f;
-    
 
-    // Get the selected row from the item list
-    NSIndexPath* indexPath = [[[ZPDetailedItemListViewController instance] tableView] indexPathForSelectedRow];
-    
-    // Get the key for the selected item 
-    NSString* currentItemKey = [[[ZPDetailedItemListViewController instance] itemKeysShown] objectAtIndex: indexPath.row]; 
-    
-    [self configureWithItemKey: currentItemKey];
-
-    
     
     //Show the item view in the navigator
     _itemListController = [self.storyboard instantiateViewControllerWithIdentifier:@"NavigationItemListView"];
@@ -106,6 +109,9 @@
     [[[ZPLibraryAndCollectionListViewController instance] navigationController] pushViewController:_itemListController  animated:YES];
 
 	[super viewWillAppear:animated];
+
+    // Get the selected row from the item list
+    NSIndexPath* indexPath = [[[ZPDetailedItemListViewController instance] tableView] indexPathForSelectedRow];
     
     //Set the selected row to match the current row
     [[_itemListController tableView] selectRowAtIndexPath:indexPath animated:FALSE scrollPosition:UITableViewScrollPositionMiddle];
@@ -130,11 +136,11 @@
     [_fullCitationLabel setText:text];
     
     
-    [self _reconfigureDetailTableView ];
+    [self _reconfigureDetailTableViewAndAttachments ];
     
 }
 
-- (void)_reconfigureDetailTableView {
+- (void)_reconfigureDetailTableViewAndAttachments {
     
     //Configure the size of the detail view table.
 
@@ -146,6 +152,9 @@
                                           TITLE_VIEW_HEIGHT + ATTACHMENT_VIEW_HEIGHT, 
                                           self.view.frame.size.width, 
                                           [_detailTableView contentSize].height)];
+   
+    //TODO: possibly do this only 
+    [_carousel reloadData];
     
     //Configure  the size of the UIScrollView
     [(UIScrollView*) self.view setContentSize:CGSizeMake(self.view.frame.size.width, TITLE_VIEW_HEIGHT + ATTACHMENT_VIEW_HEIGHT + [_detailTableView contentSize].height)];
@@ -316,7 +325,7 @@
     
     if([item.key isEqualToString:_currentItem.key]){
         _currentItem = item;
-        [self performSelectorOnMainThread:@selector( _reconfigureDetailTableView) withObject:nil waitUntilDone:NO];
+        [self performSelectorOnMainThread:@selector( _reconfigureDetailTableViewAndAttachments) withObject:nil waitUntilDone:NO];
     }
 }
 
@@ -334,22 +343,61 @@
 
 - (NSUInteger)numberOfItemsInCarousel:(iCarousel *)carousel
 {
-    return 5;
+    if(_currentItem.attachments == NULL) return 0;
+    else return [_currentItem.attachments count];
 }
 
+
+- (NSUInteger) numberOfVisibleItemsInCarousel:(iCarousel*)carousel{
+    NSInteger numItems = [carousel numberOfItems];
+    return MAX(numItems,5);
+}
 
 - (UIView *)carousel:(iCarousel *)carousel viewForItemAtIndex:(NSUInteger)index
 {
-    //create a numbered view
-	UIView* view = [[UIView alloc] initWithFrame:CGRectMake(0, 0, 300, 400)];
-	UILabel* label = [[UILabel alloc] initWithFrame:view.bounds];
-	label.text = [NSString stringWithFormat:@"Item %i",index];
-	label.backgroundColor = [UIColor clearColor];
-	label.textAlignment = UITextAlignmentCenter;
-	label.font = [label.font fontWithSize:50];
-	[view addSubview:label];
+    ZPZoteroAttachment* attachment = [_currentItem.attachments objectAtIndex:index];
+    BOOL fileAvailable =  [[NSFileManager defaultManager] fileExistsAtPath:[attachment getFileSystemPath]];
+    
+    UIView* view;    
+    if(fileAvailable && [attachment.attachmentType isEqualToString:@"application/pdf"]){
+        view = [ZPUIUtils renderThumbnailFromPDFFile:[attachment getFileSystemPath] maxHeight:ATTACHMENT_IMAGE_HEIGHT maxWidth:ATTACHMENT_IMAGE_WIDTH];
+    }
+    else{
+        
+        view =[[UIView alloc] initWithFrame:CGRectMake(0, 0, ATTACHMENT_IMAGE_WIDTH, ATTACHMENT_IMAGE_HEIGHT)];
+
+        UILabel* label = [[UILabel alloc] initWithFrame:CGRectMake(10, 10, ATTACHMENT_IMAGE_WIDTH-10, ATTACHMENT_IMAGE_HEIGHT-10)];
+
+        NSString* extraInfo;
+        if(fileAvailable){
+            extraInfo = [@"Preview not supported for " stringByAppendingString:attachment.attachmentType];
+        }
+        else{
+            extraInfo = @"Not downloaded";
+        }
+        label.text = [NSString stringWithFormat:@"%@ (%@)", attachment.attachmentTitle, extraInfo];
+
+        label.backgroundColor = [UIColor whiteColor];
+        label.textAlignment = UITextAlignmentCenter;
+        label.lineBreakMode = UILineBreakModeWordWrap;
+        label.numberOfLines = 10;
+
+        [view addSubview:label];
+    }
+    view.backgroundColor = [UIColor whiteColor];
+    view.layer.borderWidth = 2.0f;
+
 	return view;
 }
 
+#pragma mark -
+#pragma mark QuickLook delegate methods
 
+- (NSInteger) numberOfPreviewItemsInPreviewController: (QLPreviewController *) controller 
+{
+    return 1;
+}
+- (id <QLPreviewItem>) previewController: (QLPreviewController *) controller previewItemAtIndex: (NSInteger) index{
+    return NULL;
+}
 @end

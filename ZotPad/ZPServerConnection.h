@@ -14,14 +14,16 @@
 #import "ZPZoteroItem.h"
 #import "ZPZoteroCollection.h"
 #import "ZPZoteroLibrary.h"
+#import "ZPZoteroAttachment.h"
+
 
 @interface ZPServerConnection : NSObject{
         
-    // Dialog that will show the Zotero login
- 
     BOOL _debugServerConnection;
-    
     NSInteger _activeRequestCount;
+    
+    NSMutableDictionary* _attachmentFileDataObjectsByConnection;
+    NSMutableDictionary* _attachmentObjectsByConnection;
 }
 
 // This class is used as a singleton
@@ -34,13 +36,16 @@
 -(NSArray*) retrieveLibrariesFromServer;
 -(NSArray*) retrieveCollectionsForLibraryFromServer:(NSNumber*)libraryID;
 
+-(ZPServerResponseXMLParser*) retrieveItemsFromLibrary:(NSNumber*)libraryID collection:(NSString*)collectionKey searchString:(NSString*)searchString orderField:(NSString*)orderField sortDescending:(BOOL)sortIsDescending limit:(NSInteger)maxCount start:(NSInteger)offset getItemDetails:(BOOL)getItemDetails;
 
--(ZPZoteroCollection*) retrieveCollection:(NSString*)collectionKey fromLibrary:(NSNumber*)libraryID;
-//Retrieves the update timestamp and number of top level items
--(ZPZoteroLibrary*)retrieveLibrary:(NSNumber*) libraryID;
-
--(ZPServerResponseXMLParser*) retrieveItemsFromLibrary:(NSNumber*)libraryID collection:(NSString*)collectionKey searchString:(NSString*)searchString orderField:(NSString*)orderField sortDescending:(BOOL)sortIsDescending limit:(NSInteger)maxCount start:(NSInteger)offset;
+-(ZPServerResponseXMLParser*) retrieveNotesAndAttachmentsFromLibrary:(NSNumber*)libraryID limit:(NSInteger)maxCount start:(NSInteger)offset;
 
 -(ZPZoteroItem*) retrieveSingleItemDetailsFromServer:(ZPZoteroItem*)key;
+-(void) downloadAttachment:(ZPZoteroAttachment*)attachment;
+
+- (void)connection:(NSURLConnection *)connection didReceiveResponse:(NSURLResponse *)response;
+- (void)connection:(NSURLConnection *)connection didReceiveData:(NSData *)data;
+- (void)connection:(NSURLConnection *)connection didFailWithError:(NSError *)error;
+- (void)connectionDidFinishLoading:(NSURLConnection *)connection;
 
 @end

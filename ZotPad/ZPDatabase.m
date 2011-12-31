@@ -14,6 +14,8 @@
 #import "ZPZoteroLibrary.h"
 #import "ZPZoteroCollection.h"
 #import "ZPZoteroItem.h"
+#import "ZPZoteroNote.h"
+#import "ZPZoteroAttachment.h"
 
 //DB library
 #import "../FMDB/src/FMDatabase.h"
@@ -28,7 +30,7 @@ static ZPDatabase* _instance = nil;
 {
     self = [super init];
     
-    _debugDatabase = FALSE;
+//    _debugDatabase = TRUE;
     
 	NSString *dbPath = [[NSSearchPathForDirectoriesInDomains(NSDocumentDirectory, NSUserDomainMask, YES) objectAtIndex:0] stringByAppendingPathComponent:@"zotpad.sqlite"];
     
@@ -159,14 +161,14 @@ static ZPDatabase* _instance = nil;
     }
 }
 
-- (void) setUpdatedTimeStampForCollection:(NSString*)collectionKey toValue:(NSString*)updatedTimeStamp{
+- (void) setUpdatedTimestampForCollection:(NSString*)collectionKey toValue:(NSString*)updatedTimestamp{
     @synchronized(self){
-        [_database executeUpdate:@"UPDATE collections SET lastCompletedCacheTimestamp = ? WHERE key = ?",updatedTimeStamp,collectionKey];
+        [_database executeUpdate:@"UPDATE collections SET lastCompletedCacheTimestamp = ? WHERE key = ?",updatedTimestamp,collectionKey];
     }
 }
-- (void) setUpdatedTimeStampForLibrary:(NSNumber*)libraryID toValue:(NSString*)updatedTimeStamp{
+- (void) setUpdatedTimestampForLibrary:(NSNumber*)libraryID toValue:(NSString*)updatedTimestamp{
     @synchronized(self){
-        [_database executeUpdate:@"UPDATE groups SET lastCompletedCacheTimestamp = ? WHERE groupID = ?",updatedTimeStamp,libraryID];
+        [_database executeUpdate:@"UPDATE groups SET lastCompletedCacheTimestamp = ? WHERE groupID = ?",updatedTimestamp,libraryID];
     }
 }
 
@@ -264,13 +266,7 @@ static ZPDatabase* _instance = nil;
     
 	return returnArray;
 }
-//Add more data to an existing item. By default the getItemByKey do not populate fields or creators to save database operations
-- (void) getFieldsForItemKey: (NSString*) key{
 
-}
-- (void) getCreatorsForItemKey: (NSString*) key{
-
-}
 
 -(void) addItemToDatabase:(ZPZoteroItem*)item {
     
@@ -302,11 +298,50 @@ static ZPDatabase* _instance = nil;
     }
 }
 
+-(void) addNoteToDatabase:(ZPZoteroNote*)note{
+    
+    @synchronized(self){
+        //TODO: Implement modifying already existing items if they are older (lastTimestamp) nthan the new note
+        FMResultSet* resultSet = [_database executeQuery: @"SELECT lastTimestamp FROM notes WHERE key =? LIMIT 1",note.key];
+        
+        BOOL found = [resultSet next];
+        
+        [resultSet close];
+        
+        if(! found ){
+            [_database executeUpdate:@"INSERT INTO notes (key,parentItemKey,lastTimestamp) VALUES (?,?,?)",note.key,note.parentItemKey,note.lastTimestamp];
+        }
+    }
+}
+
+-(void) addAttachmentToDatabase:(ZPZoteroAttachment*)attachment{
+    
+    @synchronized(self){
+        //TODO: Implement modifying already existing items if they are older (lastTimestamp) nthan the new item
+        FMResultSet* resultSet = [_database executeQuery: @"SELECT lastTimestamp FROM attachments WHERE key =? LIMIT 1",attachment.key];
+        
+        BOOL found = [resultSet next];
+        
+        [resultSet close];
+        
+        if(! found ){
+            
+         
+            [_database executeUpdate:@"INSERT INTO attachments (key,parentItemKey,lastTimestamp,attachmentURL,attachmentType,attachmentTitle,attachmentLength) VALUES (?,?,?,?,?,?,?)",
+             attachment.key,attachment.parentItemKey,attachment.lastTimestamp,attachment.attachmentURL,attachment.attachmentType,attachment.attachmentTitle,[NSNumber numberWithInt: attachment.attachmentLength]];
+            
+        }
+    }
+}
+
+
 // Records a new collection membership
 -(void) addItem:(ZPZoteroItem*)item toCollection:(NSString*)collectionKey{
     //TODO: Make this check if an item exists in a collection before running this
     [_database executeUpdate:@"INSERT INTO collectionItems (collectionKey, itemKey) VALUES (?,?)",collectionKey,item.key];
 }
+
+
 
 
 - (ZPZoteroItem*) getItemByKey: (NSString*) key{
@@ -350,7 +385,7 @@ static ZPDatabase* _instance = nil;
         NSDictionary* creator;
         
         while(creator= [e nextObject]){
-            [_database executeUpdate:@"INSERT INTO creators (itemKey,\"order\",firstName,lastName,shortName,creatorType) VALUES (?,?,?,?,?)",
+            [_database executeUpdate:@"INSERT INTO creators (itemKey,\"order\",firstName,lastName,shortName,creatorType) VALUES (?,?,?,?,?,?)",
                                       item.key,[NSNumber numberWithInt:order],[creator objectForKey:@"firstName"],[creator objectForKey:@"lastName"],
                                       [creator objectForKey:@"shortName"],[creator objectForKey:@"creatorType"]];
             order++;
@@ -448,6 +483,54 @@ static ZPDatabase* _instance = nil;
     }
 }
 
+- (void) addAttachmentsToItem: (ZPZoteroItem*) item  {
+    
+    @synchronized(self){
+        FMResultSet* resultSet = [_database executeQuery: @"SELECT key,lastTimestamp,attachmentURL,attachmentType,attachmentTitle,attachmentLength FROM attachments WHERE parentItemKey = ? ",item.key];
+        
+        NSMutableArray* attachments = [[NSMutableArray alloc] init];
+        while([resultSet next]) {
+            ZPZoteroAttachment* attachment = [ZPZoteroAttachment ZPZoteroAttachmentWithKey:[resultSet stringForColumnIndex:0]];
+            attachment.lastTimestamp = [resultSet stringForColumnIndex:1];
+            attachment.attachmentURL = [resultSet stringForColumnIndex:2];
+            attachment.attachmentType = [resultSet stringForColumnIndex:3];
+            attachment.attachmentTitle = [resultSet stringForColumnIndex:4];
+            attachment.attachmentLength = [resultSet intForColumnIndex:5];
+            attachment.parentItemKey = item.key;
+            
+            [attachments addObject:attachment];
+            
+        }
+        
+        [resultSet close];
+        
+        item.attachments = attachments;
+
+    }
+}
+
+- (void) addNotesToItem: (ZPZoteroItem*) item  {
+    
+    @synchronized(self){
+        FMResultSet* resultSet = [_database executeQuery: @"SELECT key,lastTimestamp FROM attachments WHERE parentItemKey = ? ",item.key];
+        
+        NSMutableArray* notes = [[NSMutableArray alloc] init];
+        while([resultSet next]) {
+            ZPZoteroNote* note = [ZPZoteroNote ZPZoteroNoteWithKey:[resultSet stringForColumnIndex:0]];
+            note.lastTimestamp = [resultSet stringForColumnIndex:1];
+            note.parentItemKey = item.key;
+            
+            [notes addObject:note];
+            
+        }
+        
+        [resultSet close];
+        
+        item.notes = notes;
+        
+    }
+}
+
 - (NSArray*) getItemKeysForLibrary:(NSNumber*)libraryID collection:(NSString*)collectionKey
                       searchString:(NSString*)searchString orderField:(NSString*)orderField sortDescending:(BOOL)sortDescending{
 
@@ -498,37 +581,5 @@ static ZPDatabase* _instance = nil;
 
     return keys;
 }
-
-
-/*
-
-- (NSArray*) getAttachmentFilePathsForItem: (NSInteger) itemID{
-    
-     FMResultSet* resultSet =[_database executeQuery:[NSString stringWithFormat: @"SELECT key, path FROM itemAttachments ia, items i WHERE ia.sourceItemID=%i AND ia.linkMode=1 AND ia.mimeType='application/pdf' AND i.itemID=ia.itemID;",itemID]];
-     
-     
-     NSMutableArray* returnArray = [[NSMutableArray alloc] init];
-     
-     NSString *documentsDirectory = [NSSearchPathForDirectoriesInDomains(NSDocumentDirectory, NSUserDomainMask, YES) objectAtIndex:0];
-     
-     
-     while([resultSet next]) {
-     
-     //Remove the storage: from the beginning of the filename
-     NSString *attachmentPath = [NSString stringWithFormat:@"%@/storage/%s/%@", documentsDirectory, [resultSet stringForColumnIndex:](selectstmt, 0), [[[NSString alloc] initWithUTF8String:(const char *) [resultSet stringForColumnIndex:](selectstmt, 1)]substringFromIndex: 8]];
-     
-     NSLog(@"%@",attachmentPath);
-     
-     [returnArray addObject:attachmentPath];
-     }
-     
-     sqlite3_finalize(selectstmt);
-     
-     return returnArray;
-    
-    return NULL;
-}    
- */
-
 
 @end

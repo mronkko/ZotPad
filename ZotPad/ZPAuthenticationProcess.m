@@ -14,6 +14,7 @@
 
 @implementation ZPAuthenticationProcess
 
+//TODO: If a user desides to use the UIWebView to navigate away from the login page, it becomes impossible to go back. Implement a check to see if the user is on a right page and if not, load the reight page
 
 static ZPAuthenticationProcess* _instance = nil;
 

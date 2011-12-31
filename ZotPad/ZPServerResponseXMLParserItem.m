@@ -8,6 +8,9 @@
 
 #import "ZPServerResponseXMLParserItem.h"
 #import "ZPZoteroItem.h"
+#import "ZPZoteroAttachment.h"
+#import "ZPZoteroNote.h"
+
 #import "SBJson.h"
 
 @implementation ZPServerResponseXMLParserItem
@@ -48,7 +51,7 @@
     if(_currentElement == NULL){
         [super _setField:key toValue:value];
     }
-    else if([key isEqualToString: @"json"]){
+    else if([key isEqualToString: @"json"] && [_currentElement isKindOfClass:[ZPZoteroItem class]]){
         //PARSE JSON CONTENT
         NSDictionary* data = [value JSONValue];
         
@@ -62,7 +65,7 @@
         [(ZPZoteroItem*) _currentElement setFields:fields];
         
     }
-    else if(key==@"fullCitation"){
+    else if(key==@"fullCitation" && [_currentElement isKindOfClass:[ZPZoteroItem class]]){
         
         /*
          
@@ -112,25 +115,40 @@
         //Trim spaces, periods, and commas from the beginning of the publication detail
         [item setPublishedIn:[item.publishedIn stringByTrimmingCharactersInSet:[NSCharacterSet characterSetWithCharactersInString:@"., "]]];
     }
-    else if([key isEqualToString: @"zapi:numTags"]){
+    else if([key isEqualToString: @"zapi:numTags"] && [_currentElement isKindOfClass:[ZPZoteroItem class]]){
         [(ZPZoteroItem*) _currentElement setNumTags:[value intValue]];
     }
-    else if([key isEqualToString: @"zapi:numChildren"]){
+    else if([key isEqualToString: @"zapi:numChildren"] && [_currentElement isKindOfClass:[ZPZoteroItem class]]){
         [(ZPZoteroItem*) _currentElement setNumChildren:[value intValue]];
     }
-    else if([key isEqualToString: @"zapi:year"]){
+    else if([key isEqualToString: @"zapi:year"] && [_currentElement isKindOfClass:[ZPZoteroItem class]]){
         [(ZPZoteroItem*) _currentElement setYear:[value intValue]];
     }
     else if([key isEqualToString:@"updated"]){
-        [(ZPZoteroItem*) _currentElement setLastTimestamp:value];
+        [super _setField:@"LastTimestamp" toValue:value];
+    }
+    else if([key isEqualToString:@"AttachmentLength"]&& [_currentElement isKindOfClass:[ZPZoteroAttachment class]]){
+        [(ZPZoteroAttachment*) _currentElement setAttachmentLength:[value intValue]];
     }
     else{
         [super _setField:key toValue:value];
     }
 }
 - (void) _initNewElementWithID:(NSString*)id{
-    _currentElement = [ZPZoteroItem ZPZoteroItemWithKey:id];
-    [(ZPZoteroItem*)_currentElement setLibraryID:_libraryID];
+    //Choose what to create based on the item type 
+    NSString* itemType = [_temporaryFieldStorage objectForKey:@"zapi:itemType"];
+    
+    if([itemType isEqualToString:@"attachment"]){
+        _currentElement = [ZPZoteroAttachment ZPZoteroAttachmentWithKey:id];
+    }
+    else if([itemType isEqualToString:@"note"]){
+        //Notes are really note implemented yet
+        _currentElement = [ZPZoteroNote ZPZoteroNoteWithKey:id];
+    }
+    else{
+        _currentElement = [ZPZoteroItem ZPZoteroItemWithKey:id];
+        [(ZPZoteroItem*)_currentElement setLibraryID:_libraryID];
+    }
     [super _processTemporaryFieldStorage];
 }
 

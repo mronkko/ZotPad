@@ -26,7 +26,7 @@
 @property (assign) BOOL hasChildren;
 
 @property (retain) NSString* lastCompletedCacheTimestamp;
-@property (retain) NSString* serverTimeStamp;
+@property (retain) NSString* serverTimestamp;
 
 -(NSString*) collectionKey;
 

@@ -16,3 +16,6 @@
 [submodule "json-framework"]
 	path = json-framework
 	url = https://github.com/stig/json-framework/
+[submodule "asi-http-request"]
+	path = asi-http-request
+	url = https://github.com/pokeb/asi-http-request.git

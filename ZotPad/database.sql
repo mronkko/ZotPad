@@ -49,6 +49,24 @@ CREATE TABLE IF NOT EXISTS items (
     UNIQUE (libraryID, key)
 );
 
+CREATE TABLE IF NOT EXISTS notes (
+    parentItemKey TEXT NOT NULL,
+    key TEXT NOT NULL,
+    lastTimestamp TEXT NOT NULL,
+    PRIMARY KEY (key)
+);
+
+CREATE TABLE IF NOT EXISTS attachments (
+    parentItemKey TEXT NOT NULL,
+    key TEXT NOT NULL,
+    lastTimestamp TEXT NOT NULL,
+    attachmentURL TEXT NOT NULL,
+    attachmentType TEXT NOT NULL,
+    attachmentTitle TEXT NOT NULL,
+    attachmentLength TEXT NOT NULL,
+    PRIMARY KEY (key)
+);
+
 CREATE TABLE IF NOT EXISTS collectionItems (
     collectionKey TEXT,
     itemKey TEXT,
@@ -57,7 +75,7 @@ CREATE TABLE IF NOT EXISTS collectionItems (
     FOREIGN KEY (itemKey) REFERENCES items(itemKey)
 );
 
-CREATE TABLE creators (
+CREATE TABLE  IF NOT EXISTS creators (
     itemKey TEXT NOT NULL,
     "order" INT NOT NULL,
     firstName TEXT,
@@ -67,7 +85,7 @@ CREATE TABLE creators (
     fieldMode INT
 );
 
-CREATE TABLE fields (
+CREATE TABLE  IF NOT EXISTS  fields (
     itemKey TEXT NOT NULL,
     fieldName TEXT NOT NULL,
     fieldValue TeXT NOT NULL

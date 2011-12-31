@@ -150,7 +150,7 @@
             <objects>
                 <placeholder placeholderIdentifier="IBFirstResponder" id="yVr-5j-UP4" userLabel="First Responder" sceneMemberID="firstResponder"/>
                 <viewController id="0zt-cp-Ihx" customClass="ZPItemDetailViewController" sceneMemberID="viewController">
-                    <scrollView key="view" clipsSubviews="YES" multipleTouchEnabled="YES" contentMode="scaleToFill" alwaysBounceVertical="YES" id="XDb-bN-A9s">
+                    <scrollView key="view" clipsSubviews="YES" multipleTouchEnabled="YES" contentMode="scaleToFill" alwaysBounceVertical="YES" showsHorizontalScrollIndicator="NO" id="XDb-bN-A9s">
                         <rect key="frame" x="0.0" y="64" width="703" height="704"/>
                         <autoresizingMask key="autoresizingMask" widthSizable="YES" heightSizable="YES"/>
                         <subviews>

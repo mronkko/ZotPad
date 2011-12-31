@@ -20,6 +20,7 @@
 //    _debugParser=TRUE;
     _currentStringContent = @"";
     _insideEntry=FALSE;
+    _currentID=NULL; 
     
     return self;
 
@@ -40,13 +41,17 @@
         }
         //Only the updated field that is for the whole request
         if(!_insideEntry && [elementName isEqualToString: @"updated"]){
-            if(_updateTimeStamp != NULL){
-                [NSException raise:@"Zotero server response parser exception" format:@"We got a second time stamp. The first was %@ and the second %@.",_updateTimeStamp,_currentStringContent];
+            if(_updateTimestamp != NULL){
+                [NSException raise:@"Zotero server response parser exception" format:@"We got a second time stamp. The first was %@ and the second %@.",_updateTimestamp,_currentStringContent];
             }
-            _updateTimeStamp = _currentStringContent;
+            _updateTimestamp = _currentStringContent;
         }
         else if([elementName isEqualToString: @"entry"]){
+            
+            [self _initNewElementWithID:_currentID];
+            [self _processTemporaryFieldStorage];
             [_resultArray addObject:_currentElement];
+            
             _currentElement = NULL;
             _insideEntry = FALSE;
             
@@ -82,11 +87,18 @@
             NSString* value = [[[parts lastObject] componentsSeparatedByString:@"?"] objectAtIndex:0];    
             
             if([@"self" isEqualToString:(NSString*)[attributeDict objectForKey:@"rel"]]){
-                [self _initNewElementWithID:value];
+                _currentID = value;
             }
             else if([@"up" isEqualToString:(NSString*)[attributeDict objectForKey:@"rel"]]){
                 [self _setField:@"ParentKey" toValue:value];
             }
+            else if([@"enclosure" isEqualToString:(NSString*)[attributeDict objectForKey:@"rel"]]){
+                [self _setField:@"AttachmentURL" toValue:[attributeDict objectForKey:@"href"]];
+                [self _setField:@"AttachmentType" toValue:[attributeDict objectForKey:@"type"]];
+                [self _setField:@"AttachmentTitle" toValue:[attributeDict objectForKey:@"title"]];
+                [self _setField:@"AttachmentLength" toValue:[attributeDict objectForKey:@"length"]];
+            }
+
             
         }
         else if (! _insideEntry && [elementName isEqualToString: @"link" ]){
@@ -121,8 +133,8 @@
     return _totalResults;
 }
 
-- (NSString*) updateTimeStamp{
-    return _updateTimeStamp;
+- (NSString*) updateTimestamp{
+    return _updateTimestamp;
 }
 
 

@@ -6,13 +6,17 @@
 //  Copyright (c) 2011 __MyCompanyName__. All rights reserved.
 //
 
+//For showing file thumbnails
+#import <QuickLook/QuickLook.h>
+
 #import <UIKit/UIKit.h>
 #import "ZPZoteroItem.h"
+#import "ZPAttachmentObserver.h"
 #import "iCarousel.h"
 #import "Three20/Three20.h"
 #import "ZPSimpleItemListViewController.h"
 
-@interface ZPItemDetailViewController : UIViewController <UITableViewDataSource, UITableViewDelegate, iCarouselDataSource, iCarouselDelegate, ZPItemObserver>{
+@interface ZPItemDetailViewController : UIViewController <UITableViewDataSource, UITableViewDelegate, iCarouselDataSource, iCarouselDelegate, ZPItemObserver, ZPAttachmentObserver, QLPreviewControllerDataSource>{
     ZPZoteroItem* _currentItem;
     UITableView* _detailTableView;
     iCarousel* _carousel;

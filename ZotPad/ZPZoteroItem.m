@@ -24,6 +24,7 @@
 
 @synthesize creators = _creators;
 @synthesize attachments = _attachments;
+@synthesize notes = _notes;
 @synthesize fields = _fields;
 
 

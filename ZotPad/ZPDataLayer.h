@@ -12,8 +12,10 @@
 #import <Foundation/Foundation.h>
 #import "ZPDetailedItemListViewController.h"
 #import "ZPZoteroItem.h"
+#import "ZPZoteroAttachment.h"
 #import "ZPItemObserver.h"
 #import "ZPLibraryObserver.h"
+#import "ZPAttachmentObserver.h"
 #import "ZPZoteroLibrary.h"
 #import "ZPZoteroCollection.h"
 
@@ -31,6 +33,7 @@
     
     NSMutableSet* _itemObservers;
     NSMutableSet* _libraryObservers;
+    NSMutableSet* _attachmentObservers;
     
     //Queut for ad hoc retrievals
     NSOperationQueue* _serverRequestQueue;
@@ -61,12 +64,20 @@
 -(void) registerLibraryObserver:(NSObject<ZPLibraryObserver>*)observer;
 -(void) removeLibraryObserver:(NSObject<ZPLibraryObserver>*)observer;
 
+-(void) registerAttachmentObserver:(NSObject<ZPAttachmentObserver>*)observer;
+-(void) removeAttachmentObserver:(NSObject<ZPAttachmentObserver>*)observer;
+
 //Notifies all observers that a new data are available
+//TODO: Clean up those that are not currently used
 -(void) notifyItemKeyArrayUpdated:(NSArray*)itemKeyArray;
 -(void) notifyItemBasicsAvailable:(ZPZoteroItem*)item;
 -(void) notifyItemDetailsAvailable:(ZPZoteroItem*)item;
 -(void) notifyItemAttachmentsAvailable:(ZPZoteroItem*)item;
+
 -(void) notifyLibraryWithCollectionsAvailable:(ZPZoteroLibrary*) library;
+
+-(void) notifyAttachmentDownloadProgress:(ZPZoteroAttachment*) attachment downloaded:(NSInteger)downloaded expectedLength:(NSInteger) expectedLength;
+-(void) notifyAttachmentDownloadCompleted:(ZPZoteroAttachment*) attachment;
 
 -(void) queueAdHocItemRetrieval;
 
