@@ -8,7 +8,7 @@
 
 
 #import <Foundation/Foundation.h>
-
+#import "ZPZoteroAttachment.h"
 
 @interface ZPZoteroItem : NSObject{
     NSString* _title;
@@ -50,5 +50,8 @@
 
 +(ZPZoteroItem*) ZPZoteroItemWithKey:(NSString*) key;
 -(NSString*)key;
+
+-(ZPZoteroAttachment*) firstExistingAttachment;
+-(NSArray*) allExistingAttachments;
 
 @end

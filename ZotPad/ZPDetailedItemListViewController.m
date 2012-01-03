@@ -10,8 +10,8 @@
 #import "ZPDetailedItemListViewController.h"
 #import "ZPLibraryAndCollectionListViewController.h"
 #import "ZPDataLayer.h"
-#import <QuartzCore/QuartzCore.h>
 #import "../DSActivityView/Sources/DSActivityView.h"
+#import "ZPFileThumbnailAndQuicklookController.h"
 
 @interface ZPDetailedItemListViewController ()
 @property (strong, nonatomic) UIPopoverController *masterPopoverController;
@@ -139,48 +139,36 @@ static ZPDetailedItemListViewController* _instance = nil;
                                                                                                     withString:@" &amp; "] lineBreaks:YES URLs:NO];
             [publishedInLabel setText:text];
             
-            /*
-             
+
+            UIView* articleThumbnailHolder = (UIView *) [cell viewWithTag:4];
+
+            //Remove all subviews
+            for (UIView *view in  articleThumbnailHolder.subviews) {
+                [view removeFromSuperview];
+            }
+            
              //Check if the item has attachments and render a thumbnail from the first attachment PDF
              
-             NSArray* attachmentFilePaths = [[ZPDataLayer instance] getAttachmentFilePathsForItem: itemID];
-             
-             if([attachmentFilePaths count] > 0 ){
-             UIImageView* articleThumbnail = (UIImageView *) [cell viewWithTag:4];
-             
-             NSLog(@"%@",[attachmentFilePaths objectAtIndex:0]);
-             
-             NSURL *pdfUrl = [NSURL fileURLWithPath:[attachmentFilePaths objectAtIndex:0]];
-             CGPDFDocumentRef document = CGPDFDocumentCreateWithURL((__bridge_retained CFURLRef)pdfUrl);
-             
-             
-             //
-             // Renders a first page of a PDF as an image
-             //
-             // Source: http://stackoverflow.com/questions/5658993/creating-pdf-thumbnail-in-iphone
-             //
-             
-             
-             CGPDFPageRef pageRef = CGPDFDocumentGetPage(document, 1);
-             CGRect pageRect = CGPDFPageGetBoxRect(pageRef, kCGPDFCropBox);
-             
-             UIGraphicsBeginImageContext(pageRect.size);
-             CGContextRef context = UIGraphicsGetCurrentContext();
-             CGContextTranslateCTM(context, CGRectGetMinX(pageRect),CGRectGetMaxY(pageRect));
-             CGContextScaleCTM(context, 1, -1);  
-             CGContextTranslateCTM(context, -(pageRect.origin.x), -(pageRect.origin.y));
-             CGContextDrawPDFPage(context, pageRef);
-             
-             UIImage *finalImage = UIGraphicsGetImageFromCurrentImageContext();
-             UIGraphicsEndImageContext();
-             
-             articleThumbnail.image = finalImage;
-             [articleThumbnail.layer setBorderColor: [[UIColor blackColor] CGColor]];
-             [articleThumbnail.layer setBorderWidth: 2.0];
-             
-             
-             }
-             */
+            if(item.attachments !=NULL){
+                NSString* path = NULL;
+                ZPZoteroAttachment* attachment = [item firstExistingAttachment];
+                path = [attachment fileSystemPath];
+                
+                if(path!=NULL){
+                    
+                    
+                    ZPFileThumbnailAndQuicklookController* buttonController = [[ZPFileThumbnailAndQuicklookController alloc]
+                                                                               initWithItem:item viewController:self maxHeight:articleThumbnailHolder.frame.size.height
+                                                                               maxWidth:articleThumbnailHolder.frame.size.width];
+
+                    [articleThumbnailHolder addSubview:[buttonController thumbnailAsUIButton]];
+                    
+ 
+                    
+                    
+
+                }
+            }
         }
         [_cellCache setObject:cell forKey:keyObj];
     }

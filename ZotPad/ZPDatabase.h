@@ -42,6 +42,14 @@
 - (void) addNotesToItem: (ZPZoteroItem*) item;
 - (void) addAttachmentsToItem: (ZPZoteroItem*) item;
 
+//Returns an attachment whose file we will delete next when cache is full
+- (ZPZoteroAttachment*) getOldestCachedAttachment;
+- (void) updateViewedTimestamp:(ZPZoteroAttachment*)attachment;
+
+- (NSString*) getLocalizationStringWithKey:(NSString*) key type:(NSString*) type locale:(NSString*) locale;
+
+
+
 // Methods for writing data to database
 -(void) addItemToDatabase:(ZPZoteroItem*)item;
 -(void) addNoteToDatabase:(ZPZoteroNote*)note;

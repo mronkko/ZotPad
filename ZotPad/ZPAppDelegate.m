@@ -12,6 +12,9 @@
 #import "ZPCacheController.h"
 #import "ZPAuthenticationProcess.h"
 
+//Remove this
+#import "ZPServerResponseXMLParserItem.h"
+
 @implementation ZPAppDelegate
 
 @synthesize window = _window;
@@ -19,6 +22,7 @@
 
 - (BOOL)application:(UIApplication *)application didFinishLaunchingWithOptions:(NSDictionary *)launchOptions
 {
+    
     // If any of the reset options are set process these first
     
     NSUserDefaults* defaults = [NSUserDefaults standardUserDefaults];
@@ -41,8 +45,15 @@
     if([defaults boolForKey:@"resetfiles"]){
         NSLog(@"Reseting files");
         [defaults removeObjectForKey:@"resetfiles"];
-        NSString *dbPath = [[NSSearchPathForDirectoriesInDomains(NSDocumentDirectory, NSUserDomainMask, YES) objectAtIndex:0] stringByAppendingPathComponent:@"storage"];
-        [[NSFileManager defaultManager] removeItemAtPath: dbPath error:NULL];
+
+        NSString* _documentsDirectory = [NSSearchPathForDirectoriesInDomains(NSDocumentDirectory, NSUserDomainMask, YES)  objectAtIndex:0];
+        NSArray *directoryContent = [[NSFileManager defaultManager] contentsOfDirectoryAtPath:_documentsDirectory error:NULL];
+        
+        for (NSString* _documentFilePath in directoryContent) {
+            if(! [@"zotpad.sqlite" isEqualToString: _documentFilePath]){
+                [[NSFileManager defaultManager] removeItemAtPath:[_documentsDirectory stringByAppendingPathComponent:_documentFilePath] error:NULL];
+            }
+        }
     }
 
     //Set up a background operation for retrieving data

@@ -37,7 +37,6 @@
 - (void) _doAdHocItemRetrieval:(NSArray*) targetItemKeyArray;
 //Gets one item details and writes these to the database
 -(void) _updateItemDetailsFromServer:(ZPZoteroItem*) item;
-    
 
 
 @end
@@ -60,6 +59,7 @@ static ZPDataLayer* _instance = nil;
     _attachmentObservers = [[NSMutableSet alloc] initWithCapacity:2];
     
     _serverRequestQueue = [[NSOperationQueue alloc] init];
+    
     
 	return self;
 }
@@ -192,7 +192,9 @@ static ZPDataLayer* _instance = nil;
 
 - (ZPZoteroItem*) getItemByKey: (NSString*) key{
     
-    return [[ZPDatabase instance] getItemByKey:key];
+    ZPZoteroItem* item=[[ZPDatabase instance] getItemByKey:key];
+    [[ZPDatabase instance] addAttachmentsToItem:item];
+    return item;
 }
 
 

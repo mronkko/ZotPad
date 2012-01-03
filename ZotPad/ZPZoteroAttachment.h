@@ -33,6 +33,7 @@
 
 // An alias for setParentItemKey
 - (void) setParentKey:(NSString*)key;
-- (NSString*) getFileSystemPath;
+- (NSString*) fileSystemPath;
+- (BOOL) fileExists;
 
 @end

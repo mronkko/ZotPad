@@ -52,5 +52,26 @@ static NSCache* _objectCache = NULL;
     return _key;
 }
 
+-(ZPZoteroAttachment*) firstExistingAttachment{
+
+    for(ZPZoteroAttachment* attachment in _attachments){
+        if([attachment fileExists]){
+            return attachment;
+        }
+    }
+    return NULL;
+}
+
+-(NSArray*) allExistingAttachments{
+    NSMutableArray* returnArray = [NSMutableArray arrayWithCapacity:[_attachments count]];
+
+    for(ZPZoteroAttachment* attachment in _attachments){
+        if([attachment fileExists]){
+            [returnArray addObject:attachment];
+        }
+    }
+    
+    return returnArray;
+}
 
 @end

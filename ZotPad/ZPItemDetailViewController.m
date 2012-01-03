@@ -6,23 +6,22 @@
 //  Copyright (c) 2011 __MyCompanyName__. All rights reserved.
 //
 
-//For showing file thumbnails
-#import <QuickLook/QuickLook.h>
-
 #import "ZPItemDetailViewController.h"
 #import "ZPLibraryAndCollectionListViewController.h"
 #import "ZPSimpleItemListViewController.h"
 #import "ZPDetailedItemListViewController.h"
 #import "ZPDataLayer.h"
-#import "ZPUIUtils.h"
+#import "ZPLocalization.h"
+#import "ZPFileThumbnailAndQuicklookController.h"
 
-#define TITLE_VIEW_HEIGHT 100
-#define ATTACHMENT_VIEW_HEIGHT 500
+#define ATTACHMENT_VIEW_HEIGHT 700
 
-#define ATTACHMENT_IMAGE_HEIGHT 400
-#define ATTACHMENT_IMAGE_WIDTH 283
+#define ATTACHMENT_IMAGE_HEIGHT 600
+#define ATTACHMENT_IMAGE_WIDTH 423
 
 @interface ZPItemDetailViewController();
+
+//@property (strong, nonatomic) UIPopoverController *masterPopoverController;
 
 - (void) _reconfigureDetailTableViewAndAttachments;
 
@@ -51,7 +50,7 @@
     NSString* currentItemKey = [[[ZPDetailedItemListViewController instance] itemKeysShown] objectAtIndex: indexPath.row]; 
     
     [self configureWithItemKey: currentItemKey];
-
+  
     //configure carousel
     _carousel.type = iCarouselTypeCoverFlow2;
     [_carousel reloadData];
@@ -61,44 +60,17 @@
 - (void)viewWillAppear:(BOOL)animated
 {
     
-    //Configure the size of the title section
-    //The positions and sizes are set programmatically because this is difficult to get right with Interface Builder
-    
-    //The view must overflow 1 pixel on both sides to hide side borders
-    
-    UILabel *titleLabel = (UILabel *)[self.view viewWithTag:1];
-    
-    _fullCitationLabel= [[TTStyledTextLabel alloc] 
-                         initWithFrame:CGRectMake(-1,0, 
-                                                  self.view.frame.size.width+2, 
-                                                  TITLE_VIEW_HEIGHT)];
-    
-    [_fullCitationLabel setFont:[titleLabel font]];
-    [_fullCitationLabel setClipsToBounds:TRUE];
-    
-    //Top, bottom, left, right
-    [_fullCitationLabel setContentInset:UIEdgeInsetsMake(5,5,10,10)];
-    
-    _fullCitationLabel.layer.borderColor = [_detailTableView separatorColor].CGColor;
-    _fullCitationLabel.layer.borderWidth = 1.0f;
-    
-    //Clear the old content and add the title label
-    [[titleLabel superview] addSubview: _fullCitationLabel];
-    [titleLabel removeFromSuperview];
-    
     
     //Configure attachment section. Attachment section will be always shown even if there are no attachments
     
     UIView* attachmentView = [self.view viewWithTag:2];
-    [attachmentView setFrame:CGRectMake(-1,TITLE_VIEW_HEIGHT-1, 
-                                        self.view.frame.size.width+2, 
-                                        ATTACHMENT_VIEW_HEIGHT+1)];
+    [attachmentView setFrame:CGRectMake(0,0, 
+                                        self.view.frame.size.width,
+                                        ATTACHMENT_VIEW_HEIGHT)];
     
-    attachmentView.layer.borderColor = [_detailTableView separatorColor].CGColor;
-    attachmentView.layer.borderWidth = 1.0f;
-
     
     //Show the item view in the navigator
+  
     _itemListController = [self.storyboard instantiateViewControllerWithIdentifier:@"NavigationItemListView"];
     
     [_itemListController setItemKeysShown:[[ZPDetailedItemListViewController instance] itemKeysShown]];
@@ -122,6 +94,36 @@
 
 }
 
+
+/*
+//This works, but looks ugly
+ - (void)didRotateFromInterfaceOrientation:(UIInterfaceOrientation)fromInterfaceOrientation{
+     UIView* attachmentView = [self.view viewWithTag:2];
+     [attachmentView setFrame:CGRectMake(0,0, 
+                                         self.view.frame.size.width,
+                                         ATTACHMENT_VIEW_HEIGHT)];  
+     [_detailTableView setFrame:CGRectMake(0, 
+                                           ATTACHMENT_VIEW_HEIGHT, 
+                                           self.view.frame.size.width, 
+                                           [_detailTableView contentSize].height)];
+ 
+}
+*/
+
+
+- (void)willRotateToInterfaceOrientation:(UIInterfaceOrientation)toInterfaceOrientation duration:(NSTimeInterval)duration{
+    UIView* attachmentView = [self.view viewWithTag:2];
+    [attachmentView setAutoresizingMask:UIViewAutoresizingFlexibleWidth];
+    [_detailTableView setAutoresizingMask:UIViewAutoresizingFlexibleWidth];
+}
+
+- (BOOL)shouldAutorotateToInterfaceOrientation:(UIInterfaceOrientation)interfaceOrientation
+{
+    // Return YES for supported orientations
+    return YES;
+}
+
+
 -(void) configureWithItemKey:(NSString*)key{
     
     _currentItem = [[ZPDataLayer instance] getItemByKey: key];
@@ -131,33 +133,43 @@
         [[ZPDataLayer instance] updateItemDetailsFromServer:_currentItem];
     }
     
-    TTStyledText* text = [TTStyledText textFromXHTML:[_currentItem.fullCitation stringByReplacingOccurrencesOfString:@" & " 
-                                                                                                           withString:@" &amp; "] lineBreaks:YES URLs:NO];
-    [_fullCitationLabel setText:text];
-    
     
     [self _reconfigureDetailTableViewAndAttachments ];
     
+    if(_currentItem.creatorSummary!=NULL && ! [_currentItem.creatorSummary isEqualToString:@""]){
+        if(_currentItem.year!=0){
+            self.navigationItem.title=[NSString stringWithFormat:@"%@ (%i) %@",_currentItem.creatorSummary,_currentItem.year,_currentItem.title];
+        }
+        else{
+            self.navigationItem.title=[NSString stringWithFormat:@"%@ (no date) %@",_currentItem.creatorSummary,_currentItem.title];;
+        }
+    }
+    else{
+        self.navigationItem.title=_currentItem.title;
+    }
+    
+    _previewController = [[ZPFileThumbnailAndQuicklookController alloc] initWithItem:_currentItem viewController:self maxHeight:ATTACHMENT_IMAGE_HEIGHT maxWidth:ATTACHMENT_IMAGE_WIDTH];
+
 }
 
 - (void)_reconfigureDetailTableViewAndAttachments {
     
     //Configure the size of the detail view table.
-
+    
     [_detailTableView reloadData];
     
     [_detailTableView layoutIfNeeded];
     
     [_detailTableView setFrame:CGRectMake(0, 
-                                          TITLE_VIEW_HEIGHT + ATTACHMENT_VIEW_HEIGHT, 
+                                          [self.view viewWithTag:2].frame.size.height, 
                                           self.view.frame.size.width, 
                                           [_detailTableView contentSize].height)];
    
-    //TODO: possibly do this only 
+    //TODO: possibly do this only if needed
     [_carousel reloadData];
     
     //Configure  the size of the UIScrollView
-    [(UIScrollView*) self.view setContentSize:CGSizeMake(self.view.frame.size.width, TITLE_VIEW_HEIGHT + ATTACHMENT_VIEW_HEIGHT + [_detailTableView contentSize].height)];
+    [(UIScrollView*) self.view setContentSize:CGSizeMake(self.view.frame.size.width, [self.view viewWithTag:2].frame.size.height + [_detailTableView contentSize].height)];
     
 }
 - (void)viewWillDisappear:(BOOL)animated
@@ -236,7 +248,6 @@
     
     // Configure the cell
 
-    //TODO: resolve localization and  field order using the Zotero server
     
     //Title and itemtype
     if([indexPath indexAtPosition:0] == 0){
@@ -246,7 +257,7 @@
         }
         if(indexPath.row == 1){
             cell.textLabel.text = @"Item type";
-            cell.detailTextLabel.text = _currentItem.itemType;
+            cell.detailTextLabel.text = [ZPLocalization getLocalizationStringWithKey:_currentItem.itemType  type:@"itemType" locale:NULL];
         }
 
     }
@@ -279,7 +290,8 @@
                 break;
             }
         }
-        cell.textLabel.text = key;
+        cell.textLabel.text = [ZPLocalization getLocalizationStringWithKey:key  type:@"field" locale:NULL];
+
         cell.detailTextLabel.text = [_currentItem.fields objectForKey:key];
     }
     
@@ -341,6 +353,14 @@
 #pragma mark -
 #pragma mark iCarousel methods
 
+//Show the currently selected item in quicklook if tapped
+
+- (void)carousel:(iCarousel *)carousel didSelectItemAtIndex:(NSInteger)index{
+    if([carousel currentItemIndex] == index){
+        [_previewController openInQuickLookWithAttachment:[[_currentItem attachments] objectAtIndex:index]];
+    }
+}
+
 - (NSUInteger)numberOfItemsInCarousel:(iCarousel *)carousel
 {
     if(_currentItem.attachments == NULL) return 0;
@@ -349,55 +369,70 @@
 
 
 - (NSUInteger) numberOfVisibleItemsInCarousel:(iCarousel*)carousel{
-    NSInteger numItems = [carousel numberOfItems];
-    return MAX(numItems,5);
+    NSInteger numItems = [self numberOfItemsInCarousel:carousel];
+    NSInteger ret=  MAX(numItems,5);
+    return ret;
 }
 
 - (UIView *)carousel:(iCarousel *)carousel viewForItemAtIndex:(NSUInteger)index
 {
-    ZPZoteroAttachment* attachment = [_currentItem.attachments objectAtIndex:index];
-    BOOL fileAvailable =  [[NSFileManager defaultManager] fileExistsAtPath:[attachment getFileSystemPath]];
+    UIView* view = [_previewController thumbnailAsUIImageView:index];
     
-    UIView* view;    
-    if(fileAvailable && [attachment.attachmentType isEqualToString:@"application/pdf"]){
-        view = [ZPUIUtils renderThumbnailFromPDFFile:[attachment getFileSystemPath] maxHeight:ATTACHMENT_IMAGE_HEIGHT maxWidth:ATTACHMENT_IMAGE_WIDTH];
-    }
-    else{
-        
-        view =[[UIView alloc] initWithFrame:CGRectMake(0, 0, ATTACHMENT_IMAGE_WIDTH, ATTACHMENT_IMAGE_HEIGHT)];
-
-        UILabel* label = [[UILabel alloc] initWithFrame:CGRectMake(10, 10, ATTACHMENT_IMAGE_WIDTH-10, ATTACHMENT_IMAGE_HEIGHT-10)];
-
-        NSString* extraInfo;
-        if(fileAvailable){
+    NSString* extraInfo;
+    ZPZoteroAttachment* attachment = [_currentItem.attachments objectAtIndex:index];
+    
+    if(![attachment fileExists] && ![attachment.attachmentType isEqualToString:@"application/pdf"]){
+        if([attachment fileExists]){
             extraInfo = [@"Preview not supported for " stringByAppendingString:attachment.attachmentType];
         }
         else{
             extraInfo = @"Not downloaded";
         }
-        label.text = [NSString stringWithFormat:@"%@ (%@)", attachment.attachmentTitle, extraInfo];
-
-        label.backgroundColor = [UIColor whiteColor];
-        label.textAlignment = UITextAlignmentCenter;
-        label.lineBreakMode = UILineBreakModeWordWrap;
-        label.numberOfLines = 10;
-
-        [view addSubview:label];
     }
-    view.backgroundColor = [UIColor whiteColor];
-    view.layer.borderWidth = 2.0f;
+    
+    //Add information over the thumbnail
+    
+    UILabel* label = [[UILabel alloc] init];
+    
+    if(extraInfo!=NULL) label.text = [NSString stringWithFormat:@"%@ (%@)", attachment.attachmentTitle, extraInfo];
+    else label.text = [NSString stringWithFormat:@"%@", attachment.attachmentTitle];
+    
+    label.textColor = [UIColor whiteColor];
+    label.backgroundColor = [UIColor clearColor];
+    label.textAlignment = UITextAlignmentCenter;
+    label.lineBreakMode = UILineBreakModeWordWrap;
+    label.numberOfLines = 5;
+    label.frame=CGRectMake(50, 200, ATTACHMENT_IMAGE_WIDTH-100, ATTACHMENT_IMAGE_HEIGHT-400);
+    
+    UIView* background = [[UIView alloc] init];
+    background.frame=CGRectMake(40, 190, ATTACHMENT_IMAGE_WIDTH-80, ATTACHMENT_IMAGE_HEIGHT-380);
+    background.backgroundColor=[UIColor blackColor];
+    background.alpha = 0.5;
+    background.layer.cornerRadius = 8;
 
-	return view;
+    [view addSubview:background];
+    [view addSubview:label];
+    
+    return view;
 }
 
 #pragma mark -
-#pragma mark QuickLook delegate methods
+/*
 
-- (NSInteger) numberOfPreviewItemsInPreviewController: (QLPreviewController *) controller 
+#pragma mark - Split view
+
+- (void)splitViewController:(UISplitViewController *)splitController willHideViewController:(UIViewController *)viewController withBarButtonItem:(UIBarButtonItem *)barButtonItem forPopoverController:(UIPopoverController *)popoverController
 {
-    return 1;
+    barButtonItem.title = NSLocalizedString(@"Libraries", @"Libraries");
+    [self.navigationItem setLeftBarButtonItem:barButtonItem animated:YES];
+    self.masterPopoverController = popoverController;
 }
-- (id <QLPreviewItem>) previewController: (QLPreviewController *) controller previewItemAtIndex: (NSInteger) index{
-    return NULL;
+
+- (void)splitViewController:(UISplitViewController *)splitController willShowViewController:(UIViewController *)viewController invalidatingBarButtonItem:(UIBarButtonItem *)barButtonItem
+{
+    // Called when the view is shown again in the split view, invalidating the button and popover controller.
+    [self.navigationItem setLeftBarButtonItem:nil animated:YES];
+    self.masterPopoverController = nil;
 }
+*/
 @end

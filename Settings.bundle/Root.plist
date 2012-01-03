@@ -86,11 +86,11 @@
 		</dict>
 		<dict>
 			<key>FooterText</key>
-			<string>ZotPad will preemptively retrieve item data and attachments in the background. Adjusting these settings will affect how much bandwidth and disk space is used for this process. Smart caching will save bandwidth by limiting how often data is recached. Disabling smart caching and enabling preemptive cache for all data for all libraries is not recommended because it will force ZotPad to reload most of the data from Zotero server every time the application is started.</string>
+			<string>ZotPad will preemptively retrieve item data and attachments in the background. Adjusting these settings will affect how much bandwidth and disk space is used for this process. </string>
 			<key>Type</key>
 			<string>PSGroupSpecifier</string>
 			<key>Title</key>
-			<string>Preemptive caching</string>
+			<string>Preemptive cache</string>
 		</dict>
 		<dict>
 			<key>Type</key>

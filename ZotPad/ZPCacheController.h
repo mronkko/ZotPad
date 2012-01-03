@@ -29,7 +29,9 @@
     
     NSString* _currentlyActiveCollectionKey;
     NSNumber* _currentlyActiveLibraryID;
-    
+
+    unsigned long long int _sizeOfDocumentsFolder;
+
 }
 
 

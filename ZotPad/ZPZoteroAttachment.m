@@ -46,7 +46,7 @@ static NSCache* _objectCache = NULL;
     [self setParentItemKey:key];    
 }
 
-- (NSString*) getFileSystemPath{
+- (NSString*) fileSystemPath{
     
     NSRange lastPeriod = [_attachmentTitle rangeOfString:@"." options:NSBackwardsSearch];
     NSString *path = [_attachmentTitle stringByReplacingCharactersInRange:lastPeriod
@@ -55,4 +55,7 @@ static NSCache* _objectCache = NULL;
 
 }
 
+-(BOOL) fileExists{
+    return ([[NSFileManager defaultManager] fileExistsAtPath:[self fileSystemPath]]);
+}
 @end

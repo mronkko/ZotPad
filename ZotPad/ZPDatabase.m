@@ -8,6 +8,9 @@
 //  Copyright (c) 2011 __MyCompanyName__. All rights reserved.
 //
 
+#include <sys/xattr.h>
+
+
 #import "ZPDatabase.h"
 
 //Data objects
@@ -38,6 +41,13 @@ static ZPDatabase* _instance = nil;
     NSError* error;
     
     _database = [FMDatabase databaseWithPath:dbPath];
+    
+    //Prevent backing up of DB
+    const char* filePath = [dbPath fileSystemRepresentation];
+    const char* attrName = "com.apple.MobileBackup";
+    u_int8_t attrValue = 1;
+    setxattr(filePath, attrName, &attrValue, sizeof(attrValue), 0, 0);
+
     [_database open];
     [_database setTraceExecution:_debugDatabase];
     [_database setLogsErrors:TRUE];
@@ -280,7 +290,7 @@ static ZPDatabase* _instance = nil;
         
         if(! found ){
             
-            //TODO: implement item types
+            //TODO: consider how standalone notes and attachments should be implemented properly
             
             NSNumber* year;
             if(item.year!=0){
@@ -291,7 +301,7 @@ static ZPDatabase* _instance = nil;
             }
             
             
-            [_database executeUpdate:@"INSERT INTO items (itemTypeID,libraryID,year,authors,title,publishedIn,key,fullCitation,lastTimestamp) VALUES (0,?,?,?,?,?,?,?,?)",item.libraryID,year,item.creatorSummary,item.title,item.publishedIn,item.key,item.fullCitation,item.lastTimestamp];
+            [_database executeUpdate:@"INSERT INTO items (itemType,libraryID,year,authors,title,publishedIn,key,fullCitation,lastTimestamp) VALUES (?,?,?,?,?,?,?,?,?)",item.itemType,item.libraryID,year,item.creatorSummary,item.title,item.publishedIn,item.key,item.fullCitation,item.lastTimestamp];
             
         }
         
@@ -299,37 +309,41 @@ static ZPDatabase* _instance = nil;
 }
 
 -(void) addNoteToDatabase:(ZPZoteroNote*)note{
-    
-    @synchronized(self){
-        //TODO: Implement modifying already existing items if they are older (lastTimestamp) nthan the new note
-        FMResultSet* resultSet = [_database executeQuery: @"SELECT lastTimestamp FROM notes WHERE key =? LIMIT 1",note.key];
-        
-        BOOL found = [resultSet next];
-        
-        [resultSet close];
-        
-        if(! found ){
-            [_database executeUpdate:@"INSERT INTO notes (key,parentItemKey,lastTimestamp) VALUES (?,?,?)",note.key,note.parentItemKey,note.lastTimestamp];
+    //For now ignore standalone notes
+    if(note.parentItemKey !=NULL){
+        @synchronized(self){
+            //TODO: Implement modifying already existing items if they are older (lastTimestamp) nthan the new note
+            FMResultSet* resultSet = [_database executeQuery: @"SELECT lastTimestamp FROM notes WHERE key =? LIMIT 1",note.key];
+            
+            BOOL found = [resultSet next];
+            
+            [resultSet close];
+            
+            if(! found ){
+                [_database executeUpdate:@"INSERT INTO notes (key,parentItemKey,lastTimestamp) VALUES (?,?,?)",note.key,note.parentItemKey,note.lastTimestamp];
+            }
         }
     }
 }
 
 -(void) addAttachmentToDatabase:(ZPZoteroAttachment*)attachment{
-    
-    @synchronized(self){
-        //TODO: Implement modifying already existing items if they are older (lastTimestamp) nthan the new item
-        FMResultSet* resultSet = [_database executeQuery: @"SELECT lastTimestamp FROM attachments WHERE key =? LIMIT 1",attachment.key];
-        
-        BOOL found = [resultSet next];
-        
-        [resultSet close];
-        
-        if(! found ){
+    //For now ingnore standalone attachments
+    if(attachment.parentItemKey != NULL){
+        @synchronized(self){
+            //TODO: Implement modifying already existing items if they are older (lastTimestamp) nthan the new item
+            FMResultSet* resultSet = [_database executeQuery: @"SELECT lastTimestamp FROM attachments WHERE key =? LIMIT 1",attachment.key];
             
-         
-            [_database executeUpdate:@"INSERT INTO attachments (key,parentItemKey,lastTimestamp,attachmentURL,attachmentType,attachmentTitle,attachmentLength) VALUES (?,?,?,?,?,?,?)",
-             attachment.key,attachment.parentItemKey,attachment.lastTimestamp,attachment.attachmentURL,attachment.attachmentType,attachment.attachmentTitle,[NSNumber numberWithInt: attachment.attachmentLength]];
+            BOOL found = [resultSet next];
             
+            [resultSet close];
+            
+            if(! found ){
+                
+                
+                [_database executeUpdate:@"INSERT INTO attachments (key,parentItemKey,lastTimestamp,attachmentURL,attachmentType,attachmentTitle,attachmentLength) VALUES (?,?,?,?,?,?,?)",
+                 attachment.key,attachment.parentItemKey,attachment.lastTimestamp,attachment.attachmentURL,attachment.attachmentType,attachment.attachmentTitle,[NSNumber numberWithInt: attachment.attachmentLength]];
+                
+            }
         }
     }
 }
@@ -349,12 +363,13 @@ static ZPDatabase* _instance = nil;
     ZPZoteroItem* item = NULL;
     
     @synchronized(self){
-        FMResultSet* resultSet = [_database executeQuery: @"SELECT itemTypeID,libraryID,year,authors,title,publishedIn,key,fullCitation,lastTimestamp FROM items WHERE key=? LIMIT 1",key];
+        FMResultSet* resultSet = [_database executeQuery: @"SELECT itemType,libraryID,year,authors,title,publishedIn,key,fullCitation,lastTimestamp FROM items WHERE key=? LIMIT 1",key];
         
         if ([resultSet next]) {
             
             item = [ZPZoteroItem ZPZoteroItemWithKey:[resultSet stringForColumnIndex:6]];
             //TODO: Implement item type
+            [item setItemType:[resultSet stringForColumnIndex:0]];
             [item setLibraryID:[NSNumber numberWithInt:[resultSet intForColumnIndex:1]]];
             [item setYear:[resultSet intForColumnIndex:2]];
             [item setCreatorSummary:[resultSet stringForColumnIndex:3]];
@@ -509,6 +524,33 @@ static ZPDatabase* _instance = nil;
     }
 }
 
+- (ZPZoteroAttachment*) getOldestCachedAttachment{
+    
+    @synchronized(self){
+        FMResultSet* resultSet = [_database executeQuery: @"SELECT key,lastTimestamp,attachmentURL,attachmentType,attachmentTitle,attachmentLength FROM attachments ORDER BY CASE WHEN lastViewed IS NULL THEN 0 ELSE 1 end, lastViewed ASC, lastTimestamp ASC LIMIT 1"];
+        
+        [resultSet next];
+        
+        ZPZoteroAttachment* attachment = [ZPZoteroAttachment ZPZoteroAttachmentWithKey:[resultSet stringForColumnIndex:0]];
+        attachment.lastTimestamp = [resultSet stringForColumnIndex:1];
+        attachment.attachmentURL = [resultSet stringForColumnIndex:2];
+        attachment.attachmentType = [resultSet stringForColumnIndex:3];
+        attachment.attachmentTitle = [resultSet stringForColumnIndex:4];
+        attachment.attachmentLength = [resultSet intForColumnIndex:5];
+        [resultSet close];
+        
+        return attachment;
+    }
+
+}
+
+- (void) updateViewedTimestamp:(ZPZoteroAttachment*)attachment{
+    @synchronized(self){
+        [_database executeUpdate:@"UPDATE attachments SET lastViewed = datetime('now') where key = ? ",attachment.key];
+    }
+}
+
+
 - (void) addNotesToItem: (ZPZoteroItem*) item  {
     
     @synchronized(self){
@@ -580,6 +622,22 @@ static ZPDatabase* _instance = nil;
     }
 
     return keys;
+}
+
+- (NSString*) getLocalizationStringWithKey:(NSString*) key type:(NSString*) type locale:(NSString*) locale{
+   
+    @synchronized(self){
+        FMResultSet* resultSet = [_database executeQuery: @"SELECT value FROM localization WHERE  type = ? AND key =? ",type,key];
+        
+        [resultSet next];
+        
+        NSString* ret = [resultSet stringForColumnIndex:0];
+        
+        [resultSet close];
+        
+        return ret;
+    }
+
 }
 
 @end

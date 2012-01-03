@@ -193,15 +193,8 @@
                                     <outlet property="delegate" destination="0zt-cp-Ihx" id="cKN-7a-ZKQ"/>
                                 </connections>
                             </tableView>
-                            <label opaque="NO" clipsSubviews="YES" userInteractionEnabled="NO" tag="1" contentMode="left" text="Full citation comes here" textAlignment="center" lineBreakMode="tailTruncation" minimumFontSize="10" id="H37-YZ-sHD">
-                                <rect key="frame" x="0.0" y="0.0" width="703" height="70"/>
-                                <autoresizingMask key="autoresizingMask" flexibleMaxX="YES" flexibleMaxY="YES"/>
-                                <fontDescription key="fontDescription" type="system" pointSize="17"/>
-                                <color key="textColor" cocoaTouchSystemColor="darkTextColor"/>
-                                <nil key="highlightedColor"/>
-                            </label>
                             <view tag="2" contentMode="scaleToFill" id="mJe-AV-5Qd" customClass="iCarousel">
-                                <rect key="frame" x="0.0" y="70" width="703" height="533"/>
+                                <rect key="frame" x="0.0" y="0.0" width="703" height="603"/>
                                 <autoresizingMask key="autoresizingMask" flexibleMaxX="YES" flexibleMaxY="YES"/>
                                 <color key="backgroundColor" white="1" alpha="1" colorSpace="custom" customColorSpace="calibratedWhite"/>
                                 <connections>

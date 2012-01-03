@@ -10,17 +10,23 @@
 #import "ZPZoteroItem.h"
 #import "ZPDataLayer.h"
 
-#define DEBUG_ITEM_LIST 1
+#define DEBUG_ITEM_LIST 0
 
 #define SIZE_OF_TABLEVIEW_UPDATE_BATCH 5
 
 @interface ZPSimpleItemListViewController ();
 
+@property (strong, nonatomic) UIPopoverController *masterPopoverController;
 -(void) updateTableViewWithUpdatedItemKeyArray;
 
 @end
 
+
+
+
 @implementation ZPSimpleItemListViewController
+
+@synthesize masterPopoverController = _masterPopoverController;
 
 @synthesize itemKeysShown = _itemKeysShown;
 //@synthesize itemKeysFromServer = _itemKeysFromServer;

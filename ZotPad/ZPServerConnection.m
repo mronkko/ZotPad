@@ -6,6 +6,9 @@
 //  Copyright (c) 2011 __MyCompanyName__. All rights reserved.
 //
 
+
+#include <sys/xattr.h>
+
 //TODO: Implement webdav client http://code.google.com/p/wtclient/
 
 
@@ -53,7 +56,7 @@ const NSInteger ZPServerConnectionRequestSingleItemChildren = 7;
     self = [super init];
         
     _activeRequestCount = 0;
-    _debugServerConnection = TRUE;
+//    _debugServerConnection = TRUE;
     _attachmentFileDataObjectsByConnection = [NSMutableDictionary dictionary];
     _attachmentObjectsByConnection = [NSMutableDictionary dictionary];
 
@@ -374,6 +377,9 @@ Retrieves items from server and stores these in the database. Returns and array 
     
     NSMutableDictionary* parameters = [NSMutableDictionary dictionaryWithObject:libraryID  forKey:@"libraryID"];
 
+    //Do not retrieve standalone notes or attachments
+    [parameters setObject:@"-attachment || note" forKey:@"itemType"];
+
     if(collectionKey!=NULL) [parameters setObject:collectionKey forKey:@"collectionKey"];
     
     if(getItemDetails){
@@ -457,7 +463,7 @@ Retrieves items from server and stores these in the database. Returns and array 
 
     NSURL* url = [NSURL URLWithString:[NSString stringWithFormat:@"%@?key=%@", attachment.attachmentURL,oauthkey]];
     ASIHTTPRequest *request = [ASIHTTPRequest requestWithURL:url];
-    [request setDownloadDestinationPath:[attachment getFileSystemPath]];
+    [request setDownloadDestinationPath:[attachment fileSystemPath]];
     
 
     _activeRequestCount++;
@@ -470,6 +476,13 @@ Retrieves items from server and stores these in the database. Returns and array 
     if(_activeRequestCount==1) [[UIApplication sharedApplication] setNetworkActivityIndicatorVisible:YES];
     
     [request startSynchronous];
+    
+    //Set this file as not cached
+    const char* filePath = [[attachment fileSystemPath] fileSystemRepresentation];
+    const char* attrName = "com.apple.MobileBackup";
+    u_int8_t attrValue = 1;
+    setxattr(filePath, attrName, &attrValue, sizeof(attrValue), 0, 0);
+
     
     _activeRequestCount--;
     

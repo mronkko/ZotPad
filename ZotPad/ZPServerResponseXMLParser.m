@@ -93,10 +93,17 @@
                 [self _setField:@"ParentKey" toValue:value];
             }
             else if([@"enclosure" isEqualToString:(NSString*)[attributeDict objectForKey:@"rel"]]){
-                [self _setField:@"AttachmentURL" toValue:[attributeDict objectForKey:@"href"]];
-                [self _setField:@"AttachmentType" toValue:[attributeDict objectForKey:@"type"]];
-                [self _setField:@"AttachmentTitle" toValue:[attributeDict objectForKey:@"title"]];
-                [self _setField:@"AttachmentLength" toValue:[attributeDict objectForKey:@"length"]];
+                
+                //For now only use enclosures that point to a file
+                NSString* type=[attributeDict objectForKey:@"type"];
+                NSString* length=[attributeDict objectForKey:@"length"];
+                
+                if(type!=NULL && length!=NULL){
+                    [self _setField:@"AttachmentURL" toValue:[attributeDict objectForKey:@"href"]];
+                    [self _setField:@"AttachmentType" toValue:type];
+                    [self _setField:@"AttachmentTitle" toValue:[attributeDict objectForKey:@"title"]];
+                    [self _setField:@"AttachmentLength" toValue:length];
+                }
             }
 
             

@@ -90,6 +90,13 @@
 
 - (void) _doNoteAndAttachmentRetrieval:(ZPCacheControllerData*)data;
 
+
+- (unsigned long long int) _documentsFolderSize;
+- (void) _scanAndSetSizeOfDocumentsFolder;
+- (void) _updateCacheSizePreference;
+- (void) _cleanUpCache;
+- (void) _updateCacheSizeAfterAddingAttachment:(ZPZoteroAttachment*)attachment;
+
 @end
 
 @implementation ZPCacheController
@@ -125,7 +132,11 @@ static ZPCacheController* _instance = nil;
     
     [[ZPDataLayer instance] registerAttachmentObserver:self];
     
-	return self;
+    _sizeOfDocumentsFolder = 0;
+    [self performSelectorInBackground:@selector(_scanAndSetSizeOfDocumentsFolder) withObject:NULL];
+	
+    
+    return self;
 }
 
 /*
@@ -378,7 +389,7 @@ static ZPCacheController* _instance = nil;
 
 -(void) _checkIfExistsAndQueueForDownload:(ZPZoteroAttachment*)attachment{
     //Check if the file exists
-    if (![[NSFileManager defaultManager] fileExistsAtPath:[attachment getFileSystemPath]]){
+    if (![[NSFileManager defaultManager] fileExistsAtPath:[attachment fileSystemPath]]){
         [_filesToDownload addObject:attachment]; 
     }
     
@@ -557,7 +568,78 @@ static ZPCacheController* _instance = nil;
 }
 
 -(void) notifyAttachmentDownloadCompleted:(ZPZoteroAttachment*) attachment{
+    [self _updateCacheSizeAfterAddingAttachment:attachment];
     [self _checkQueues];
+}
+
+
+- (void) _scanAndSetSizeOfDocumentsFolder{
+    _sizeOfDocumentsFolder = [self _documentsFolderSize];
+    
+    [self _updateCacheSizePreference];
+}
+
+- (void) _updateCacheSizePreference{
+    
+    NSUserDefaults* defaults = [NSUserDefaults standardUserDefaults];
+    
+    //Smaller than one gigabyte
+    if(_sizeOfDocumentsFolder < 1073741824){
+        float temp = _sizeOfDocumentsFolder/1048576;
+        [defaults setObject:[NSString stringWithFormat:@"%i MB",temp] forKey:@"cachesizecurrent"];
+        
+    }
+    else{
+        NSString* temp = [NSString stringWithFormat:@".1f",_sizeOfDocumentsFolder/1073741824];
+        [defaults setObject:[NSString stringWithFormat:@"%@ GB",temp] forKey:@"cachesizecurrent"];
+    }
+    
+}
+
+/*
+ 
+ Source: http://stackoverflow.com/questions/2188469/calculate-the-size-of-a-folder
+ 
+ */
+
+- (unsigned long long int) _documentsFolderSize {
+
+    NSString* _documentsDirectory = [NSSearchPathForDirectoriesInDomains(NSDocumentDirectory, NSUserDomainMask, YES)  objectAtIndex:0];
+    NSArray *directoryContent = [[NSFileManager defaultManager] contentsOfDirectoryAtPath:_documentsDirectory error:NULL];
+
+    unsigned long long int _documentsFolderSize = 0;
+    
+    for (NSString* _documentFilePath in directoryContent) {
+        NSDictionary *_documentFileAttributes = [[NSFileManager defaultManager] fileAttributesAtPath:[_documentsDirectory stringByAppendingPathComponent:_documentFilePath] traverseLink:YES];
+        _documentsFolderSize += [_documentFileAttributes fileSize];
+    }
+    
+    return _documentsFolderSize;
+}
+
+- (void) _updateCacheSizeAfterAddingAttachment:(ZPZoteroAttachment*)attachment{
+    if(_sizeOfDocumentsFolder!=0){
+        
+        NSUserDefaults* defaults = [NSUserDefaults standardUserDefaults];
+        NSInteger maxCacheSize = [[defaults objectForKey:@"cachesizemax"] intValue];
+        _sizeOfDocumentsFolder = _sizeOfDocumentsFolder + attachment.attachmentLength;
+        if(_sizeOfDocumentsFolder>=maxCacheSize) [self _cleanUpCache];
+        [self _updateCacheSizePreference];
+    }
+}
+
+- (void) _cleanUpCache{
+    
+    NSUserDefaults* defaults = [NSUserDefaults standardUserDefaults];
+    float maxCacheSize = [[defaults objectForKey:@"cachesizemax"] floatValue] * 1073741824;
+
+    //Delete attachment files until the size of the cache is below the maximum size
+    while(_sizeOfDocumentsFolder>=maxCacheSize){
+        ZPZoteroAttachment* attachment = [[ZPDatabase instance] getOldestCachedAttachment];
+        [[NSFileManager defaultManager] removeItemAtPath: [attachment fileSystemPath] error: NULL];
+        _sizeOfDocumentsFolder = _sizeOfDocumentsFolder - attachment.attachmentLength;
+    }
+
 }
 
 

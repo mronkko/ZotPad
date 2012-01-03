@@ -37,6 +37,7 @@
     
     //Queut for ad hoc retrievals
     NSOperationQueue* _serverRequestQueue;
+    
 }
 
 // This class is used as a singleton
@@ -67,8 +68,9 @@
 -(void) registerAttachmentObserver:(NSObject<ZPAttachmentObserver>*)observer;
 -(void) removeAttachmentObserver:(NSObject<ZPAttachmentObserver>*)observer;
 
+
 //Notifies all observers that a new data are available
-//TODO: Clean up those that are not currently used
+//TODO: Clean up methods that are not currently used
 -(void) notifyItemKeyArrayUpdated:(NSArray*)itemKeyArray;
 -(void) notifyItemBasicsAvailable:(ZPZoteroItem*)item;
 -(void) notifyItemDetailsAvailable:(ZPZoteroItem*)item;
@@ -80,7 +82,6 @@
 -(void) notifyAttachmentDownloadCompleted:(ZPZoteroAttachment*) attachment;
 
 -(void) queueAdHocItemRetrieval;
-
 
 
 @end
