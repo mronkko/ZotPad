@@ -210,7 +210,12 @@ const NSInteger ZPServerConnectionRequestTopLevelKeys = 9;
             NSString* stringData = [[NSString alloc] initWithData:responseData
                                                      encoding:NSUTF8StringEncoding];
             parserDelegate = [[ZPServerResponseXMLParser alloc] init];
-            [parserDelegate setParsedElements:[stringData componentsSeparatedByCharactersInSet:[NSCharacterSet whitespaceAndNewlineCharacterSet]]];
+            NSMutableArray* itemKeys = [NSMutableArray arrayWithArray:[stringData componentsSeparatedByCharactersInSet:[NSCharacterSet whitespaceAndNewlineCharacterSet]]];
+            
+            //The last can be empty, so need so be removed
+            if([[itemKeys lastObject] isEqualToString:@""]) [itemKeys removeLastObject];
+
+            [parserDelegate setParsedElements:itemKeys];
         }
         
         

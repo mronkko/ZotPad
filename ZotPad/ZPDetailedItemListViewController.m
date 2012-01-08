@@ -65,17 +65,19 @@ static ZPDetailedItemListViewController* _instance = nil;
         // Retrieve the item IDs if a library is selected. 
         
         if(_libraryID!=0){
+
+            //This is required because a background thread might be modefying the table
              @synchronized(_tableView){
                  _itemKeysNotInCache = [NSMutableArray array];
                  _itemKeysShown = [NSMutableArray array];
-
-                 //TODO: Investigate why a relaodsection call a bit below causes a crash. Then uncomment these both.
-                 //[_tableView reloadSections:[NSIndexSet indexSetWithIndex:0] withRowAnimation:UITableViewRowAnimationAutomatic];
-                 [_tableView reloadData];
-
-                 [self _makeBusy];
-                 [self performSelectorInBackground:@selector(_configureCachedKeys) withObject:nil];
              }
+
+            //TODO: Investigate why a relaodsection call a bit below causes a crash. Then uncomment these both.
+            //[_tableView reloadSections:[NSIndexSet indexSetWithIndex:0] withRowAnimation:UITableViewRowAnimationAutomatic];
+            [_tableView reloadData];
+            
+            [self _makeBusy];
+            [self performSelectorInBackground:@selector(_configureCachedKeys) withObject:nil];
         }
     }
     else{

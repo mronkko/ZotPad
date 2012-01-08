@@ -151,13 +151,14 @@ static ZPCacheController* _instance = nil;
         
         //If we found a non-empty que, queue item retrival
         if(keyArray != NULL && [keyArray count]>0){
-            
-            NSRange range = NSMakeRange(0, MIN(50,[keyArray count]));
-            NSArray* keysToRetrieve = [keyArray subarrayWithRange:range];
+            NSArray* keysToRetrieve;
+            @synchronized(keyArray){
+                NSRange range = NSMakeRange(0, MIN(50,[keyArray count]));
+                keysToRetrieve = [keyArray subarrayWithRange:range];
 
-            //Remove the items that we are retrieving
-            [keyArray removeObjectsInRange:range];
-
+                //Remove the items that we are retrieving
+                [keyArray removeObjectsInRange:range];
+            }
 
             //Create an invocation
             SEL selector = @selector(_doItemRetrieval:fromLibrary:);
@@ -357,23 +358,24 @@ static ZPCacheController* _instance = nil;
 }
 
 -(void) _addToItemQueue:(NSArray*)itemKeys libraryID:(NSNumber*)libraryID priority:(BOOL)priority{
-    
+
     NSMutableArray* targetArray = [_itemKeysToRetrieve objectForKey:libraryID];
     if(targetArray == NULL){
         targetArray = [NSMutableArray array];
         [_itemKeysToRetrieve setObject:targetArray forKey:libraryID];               
     }
     
-    if(priority){
-        [targetArray removeObjectsInArray:itemKeys];
-        [targetArray insertObjects:itemKeys atIndexes:[NSIndexSet indexSetWithIndexesInRange:NSMakeRange(0,[itemKeys count])]];
+    @synchronized(targetArray){
+        if(priority){
+            [targetArray removeObjectsInArray:itemKeys];
+            [targetArray insertObjects:itemKeys atIndexes:[NSIndexSet indexSetWithIndexesInRange:NSMakeRange(0,[itemKeys count])]];
+        }
+        else{
+            NSMutableArray* checkedKeys= [NSMutableArray arrayWithArray: itemKeys];
+            [checkedKeys removeObjectsInArray:targetArray];
+            [targetArray addObjectsFromArray:checkedKeys];
+        }
     }
-    else{
-        NSMutableArray* checkedKeys= [NSMutableArray arrayWithArray: itemKeys];
-        [checkedKeys removeObjectsInArray:targetArray];
-        [targetArray addObjectsFromArray:checkedKeys];
-    }
-
 }
 
 
