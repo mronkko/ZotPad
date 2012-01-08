@@ -64,17 +64,18 @@ static ZPDetailedItemListViewController* _instance = nil;
                 
         // Retrieve the item IDs if a library is selected. 
         
-        if(_libraryID!=0){            
-            _itemKeysNotInCache = [NSMutableArray array];
-            _itemKeysShown = [NSMutableArray array];
+        if(_libraryID!=0){
+             @synchronized(_tableView){
+                 _itemKeysNotInCache = [NSMutableArray array];
+                 _itemKeysShown = [NSMutableArray array];
 
-            //TODO: Investigate why a relaodsection call a bit below causes a crash. Then uncomment these both.
-            //[_tableView reloadSections:[NSIndexSet indexSetWithIndex:0] withRowAnimation:UITableViewRowAnimationAutomatic];
-            [_tableView reloadData];
+                 //TODO: Investigate why a relaodsection call a bit below causes a crash. Then uncomment these both.
+                 //[_tableView reloadSections:[NSIndexSet indexSetWithIndex:0] withRowAnimation:UITableViewRowAnimationAutomatic];
+                 [_tableView reloadData];
 
-            [self _makeBusy];
-            [self performSelectorInBackground:@selector(_configureCachedKeys) withObject:nil];
-            
+                 [self _makeBusy];
+                 [self performSelectorInBackground:@selector(_configureCachedKeys) withObject:nil];
+             }
         }
     }
     else{
@@ -314,7 +315,7 @@ static ZPDetailedItemListViewController* _instance = nil;
 }
 
 -(IBAction)doSortDate:(id)sender{
-    [self doOrderField:@"date"];
+    [self doOrderField:@"year"];
 }
 
 -(IBAction)doSortTitle:(id)sender{
@@ -322,7 +323,7 @@ static ZPDetailedItemListViewController* _instance = nil;
 }
 
 -(IBAction)doSortPublication:(id)sender{
-    [self doOrderField:@"publicationTitle"];
+    [self doOrderField:@"publishedIn"];
 }
 
 -(void) clearSearch{

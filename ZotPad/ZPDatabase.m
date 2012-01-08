@@ -314,12 +314,12 @@ static ZPDatabase* _instance = nil;
             
                        
             
-            [_database executeUpdate:@"INSERT INTO items (itemType,libraryID,year,authors,title,publishedIn,key,fullCitation,lastTimestamp) VALUES (?,?,?,?,?,?,?,?,?)",item.itemType,item.libraryID,year,item.creatorSummary,item.title,item.publishedIn,item.key,item.fullCitation,item.lastTimestamp];
+            [_database executeUpdate:@"INSERT INTO items (itemType,libraryID,year,creator,title,publishedIn,key,fullCitation,lastTimestamp) VALUES (?,?,?,?,?,?,?,?,?)",item.itemType,item.libraryID,year,item.creatorSummary,item.title,item.publishedIn,item.key,item.fullCitation,item.lastTimestamp];
             
         }
         //TODO: consider how the time stamp could be used to determine if fields need to be updated
         else if(! [item.lastTimestamp isEqualToString: timestamp]){
-            [_database executeUpdate:@"UPDATE items SET itemType = ?, libraryID = ?, year = ?,authors =? ,title = ?,publishedIn = ?,fullCitation =?,lastTimestamp = ? WHERE key = ?",item.itemType,item.libraryID,year,item.creatorSummary,item.title,item.publishedIn,item.fullCitation,item.lastTimestamp,item.key];
+            [_database executeUpdate:@"UPDATE items SET itemType = ?, libraryID = ?, year = ?,creator =? ,title = ?,publishedIn = ?,fullCitation =?,lastTimestamp = ? WHERE key = ?",item.itemType,item.libraryID,year,item.creatorSummary,item.title,item.publishedIn,item.fullCitation,item.lastTimestamp,item.key];
         }
         
     }
@@ -380,7 +380,7 @@ static ZPDatabase* _instance = nil;
     ZPZoteroItem* item = NULL;
     
     @synchronized(self){
-        FMResultSet* resultSet = [_database executeQuery: @"SELECT itemType,libraryID,year,authors,title,publishedIn,key,fullCitation,lastTimestamp FROM items WHERE key=? LIMIT 1",key];
+        FMResultSet* resultSet = [_database executeQuery: @"SELECT itemType,libraryID,year,creator,title,publishedIn,key,fullCitation,lastTimestamp FROM items WHERE key=? LIMIT 1",key];
         
         if ([resultSet next]) {
             

@@ -89,7 +89,9 @@
         }
         else if([_itemKeysShown indexOfObject:item.key]){
             //Update the row only if the full citation for this item has changed 
-            [self performSelectorOnMainThread:@selector(_updateRowForItem:) withObject:item waitUntilDone:YES];
+            @synchronized(_tableView){
+                if([_itemKeysShown indexOfObject:item.key]) [self performSelectorOnMainThread:@selector(_updateRowForItem:) withObject:item waitUntilDone:YES];
+            }
         }
     }    
 }
@@ -142,19 +144,27 @@
             else{
                 //Before movign we need to do all the other table operations
                 if([insertIndices count]>0) {
-                    [self performSelectorOnMainThread:@selector(_performRowInsertions:) withObject:insertIndices waitUntilDone:TRUE];
+                    @synchronized(_tableView){
+                        if(thisItemKeys != _itemKeysShown) return;
+                        [self performSelectorOnMainThread:@selector(_performRowInsertions:) withObject:insertIndices waitUntilDone:TRUE];
+                    }
                     [insertIndices removeAllObjects];
                 }
                 if([reloadIndices count]>0){
-                    [self performSelectorOnMainThread:@selector(_performRowReloads:) withObject:reloadIndices waitUntilDone:TRUE];
+                    @synchronized(_tableView){
+                        if(thisItemKeys != _itemKeysShown) return;
+                        [self performSelectorOnMainThread:@selector(_performRowReloads:) withObject:reloadIndices waitUntilDone:TRUE];
+                    }
                     [reloadIndices removeAllObjects];
                 }
                 
                 [thisItemKeys removeObjectAtIndex:oldIndex];
                 [thisItemKeys insertObject:newKey atIndex:index];
                 NSArray* paramArray = [NSArray arrayWithObjects:[NSIndexPath indexPathForRow:oldIndex inSection:0],[NSIndexPath indexPathForRow:index inSection:0],nil];
-                [self performSelectorOnMainThread:@selector(_performRowMoveFromFirstIndexToSecond:) withObject:paramArray waitUntilDone:TRUE];
-                
+                @synchronized(_tableView){
+                    if(thisItemKeys != _itemKeysShown) return;
+                    [self performSelectorOnMainThread:@selector(_performRowMoveFromFirstIndexToSecond:) withObject:paramArray waitUntilDone:TRUE];
+                }
             }
         }
         index++;
@@ -167,11 +177,19 @@
         [thisItemKeys addObject:[NSNull null]];
     }
     
-    if([insertIndices count]>0) [self performSelectorOnMainThread:@selector(_performRowInsertions:) withObject:insertIndices waitUntilDone:TRUE];
+    if([insertIndices count]>0){
+        @synchronized(_tableView){
+            if(thisItemKeys != _itemKeysShown) return;
+            [self performSelectorOnMainThread:@selector(_performRowInsertions:) withObject:insertIndices waitUntilDone:TRUE];
+        }
+    }
     
-    
-    if([reloadIndices count]>0) [self performSelectorOnMainThread:@selector(_performRowReloads:) withObject:reloadIndices waitUntilDone:TRUE];
-    
+    if([reloadIndices count]>0){
+        @synchronized(_tableView){
+            if(thisItemKeys != _itemKeysShown) return;
+            [self performSelectorOnMainThread:@selector(_performRowReloads:) withObject:reloadIndices waitUntilDone:TRUE];
+        }
+    }
     //If modifications have caused the visible items become too long, remove items from the end
     NSMutableArray* deleteIndices = [NSMutableArray array];   
     while([thisItemKeys count]>([_itemKeysNotInCache count] + [newKeys count])){
@@ -179,8 +197,12 @@
         [thisItemKeys removeLastObject];
         [deleteIndices addObject:[NSIndexPath indexPathForRow:[thisItemKeys count] inSection:0]];
     }
-    if([deleteIndices count] >0) [self performSelectorOnMainThread:@selector(_performRowDeletions:) withObject:deleteIndices waitUntilDone:YES];
-    
+    if([deleteIndices count] >0){
+        @synchronized(_tableView){
+            if(thisItemKeys != _itemKeysShown) return;
+            [self performSelectorOnMainThread:@selector(_performRowDeletions:) withObject:deleteIndices waitUntilDone:YES];
+        }
+    }
     NSLog(@"End updating the table rows");
 }
 
@@ -200,7 +222,6 @@
 -(void) _updateRowForItem:(ZPZoteroItem*)item{
     [_cellCache removeObjectForKey:item.key];
     [_tableView reloadRowsAtIndexPaths:[NSArray arrayWithObject:[NSIndexPath indexPathForRow:[_itemKeysShown indexOfObject:item.key] inSection:0]] withRowAnimation:_animations];
-
 }
 
 #pragma mark -

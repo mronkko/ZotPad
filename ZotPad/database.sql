@@ -40,7 +40,7 @@ CREATE TABLE IF NOT EXISTS items (
     dateModified TIMESTAMP NOT NULL DEFAULT CURRENT_TIMESTAMP,
     libraryID INT,
     year INT,
-    authors TEXT,
+    creator TEXT,
     title TEXT,
     publishedIn TEXT,
     key TEXT NOT NULL,
