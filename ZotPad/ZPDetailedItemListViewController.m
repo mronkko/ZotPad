@@ -76,7 +76,7 @@ static ZPDetailedItemListViewController* _instance = nil;
             //[_tableView reloadSections:[NSIndexSet indexSetWithIndex:0] withRowAnimation:UITableViewRowAnimationAutomatic];
             [_tableView reloadData];
             
-            [self _makeBusy];
+            
             [self performSelectorInBackground:@selector(_configureCachedKeys) withObject:nil];
         }
     }
@@ -101,8 +101,8 @@ static ZPDetailedItemListViewController* _instance = nil;
     // Queue an operation to retrieve all item keys that belong to this collection but are not found in cache. 
     [self performSelectorInBackground:@selector(_configureUncachedKeys:) withObject:_itemKeysShown];
     
-    if([_itemKeysShown count] > 0){
-        [self performSelectorOnMainThread:@selector(_makeAvailable) withObject:NULL waitUntilDone:YES];
+    if([_itemKeysShown count] == 0){
+        [self performSelectorOnMainThread:@selector(_makeBusy) withObject:NULL waitUntilDone:YES];
     }
     
 }

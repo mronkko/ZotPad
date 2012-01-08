@@ -103,8 +103,11 @@
     NSArray* newKeys = [[ZPDataLayer instance] getItemKeysFromCacheForLibrary:self.libraryID collection:self.collectionKey
                                                                  searchString:[self.searchString stringByTrimmingCharactersInSet:[NSCharacterSet whitespaceAndNewlineCharacterSet]]orderField:self.orderField sortDescending:self.sortDescending];
     
-    
-    [_itemKeysNotInCache removeObjectsInArray:newKeys];
+  
+    @synchronized(_tableView){
+        if(thisItemKeys != _itemKeysShown) return;
+        [_itemKeysNotInCache removeObjectsInArray:newKeys];
+    }
     
     NSLog(@"Beging updating the table rows");
     
