@@ -68,7 +68,8 @@ static ZPDetailedItemListViewController* _instance = nil;
             _itemKeysNotInCache = [NSMutableArray array];
             _itemKeysShown = [NSMutableArray array];
 
-            [_tableView reloadSections:[NSIndexSet indexSetWithIndex:0] withRowAnimation:UITableViewRowAnimationAutomatic];
+            //TODO: Investigate why a relaodsection call a bit below causes a crash. Then uncomment these both.
+            //[_tableView reloadSections:[NSIndexSet indexSetWithIndex:0] withRowAnimation:UITableViewRowAnimationAutomatic];
             [_tableView reloadData];
 
             [self _makeBusy];
@@ -109,7 +110,7 @@ static ZPDetailedItemListViewController* _instance = nil;
 
 - (void)_makeAvailable{
     [DSBezelActivityView removeViewAnimated:YES];
-    //TODO: Uncommenting thic causes the thread to crash. Investigate why.
+    //TODO: Uncommenting thic causes the thread to crash. Investigate why. After this uncomment also the reload sections earlier.
     //[_tableView reloadSections:[NSIndexSet indexSetWithIndex:0] withRowAnimation:UITableViewRowAnimationAutomatic];
     [_tableView reloadData];
     [_tableView setUserInteractionEnabled:TRUE];
