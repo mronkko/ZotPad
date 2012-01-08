@@ -26,15 +26,13 @@
 //DB and DB library
 #import "ZPDatabase.h"
 
-
+#import "ZPLogger.h"
 
 
 //Private methods 
 
 @interface ZPDataLayer ();
 
-//Retrieves 50 items at a time from the server, called from getItemKeysForView and executed as operation
-- (void) _doAdHocItemRetrieval:(NSArray*) targetItemKeyArray;
 //Gets one item details and writes these to the database
 -(void) _updateItemDetailsFromServer:(ZPZoteroItem*) item;
 
@@ -52,8 +50,6 @@ static ZPDataLayer* _instance = nil;
 {
     self = [super init];
     
-    _debugDataLayer = TRUE;
-        
     _itemObservers = [[NSMutableSet alloc] initWithCapacity:2];
     _libraryObservers = [[NSMutableSet alloc] initWithCapacity:3];
     _attachmentObservers = [[NSMutableSet alloc] initWithCapacity:2];
@@ -110,85 +106,12 @@ static ZPDataLayer* _instance = nil;
 
 
 - (NSArray*) getItemKeysFromCacheForLibrary:(NSNumber*)libraryID collection:(NSString*)collectionKey searchString:(NSString*)searchString orderField:(NSString*)orderField sortDescending:(BOOL)sortDescending{
+    [[ZPCacheController instance] setCurrentLibrary:libraryID];
     return [[ZPDatabase instance] getItemKeysForLibrary:libraryID collection:collectionKey searchString:searchString orderField:orderField sortDescending:sortDescending];
 }
 
-- (NSArray*) getItemKeysFromServerForLibrary:(NSNumber*)libraryID collection:(NSString*)collectionKey searchString:(NSString*)searchString orderField:(NSString*)orderField sortDescending:(BOOL)sortDescending{
-
-    [[ZPCacheController instance] setCurrentLibrary:libraryID];
-    [[ZPCacheController instance] setCurrentCollection:collectionKey];
-    
-    //Reset the ad hoc itemlist
-    _adHocItemKeys = NULL;
-    
-        
-    //If there is no search or sort condition, we can reuse the item retrieval operations from cache controller
-    if(searchString == NULL && orderField == NULL){
-        return [[ZPCacheController instance] cachedItemKeysForCollection:collectionKey libraryID:libraryID];
-    }
-    
-    else{
-        //Do add hoc retrieve that is not stored in cache 
-        _adHocItemKeys = [NSMutableArray array];
-        _adHocItemKeysOffset=0;
-        
-        _adHocCollectionKey=collectionKey;
-        _adHocLibraryID=libraryID;
-        _adHocOrderField=orderField;
-        _adHocSearchString=searchString;
-        _adHocSortDescending=sortDescending;
-        
-        [self queueAdHocItemRetrieval];
-        return _adHocItemKeys;
-    }
-
-}
 
 
-
-/*
- 
- Retrieves item details from the server and writes them in the database in the background
- 
- */
-
--(void) queueAdHocItemRetrieval{
-    
-    NSInvocationOperation* retrieveOperation = [[NSInvocationOperation alloc] initWithTarget:self
-                                                                                    selector:@selector(_doAdHocItemRetrieval:) object:_adHocItemKeys];
-    
-    [_serverRequestQueue addOperation:retrieveOperation];
-}
-
-- (void) _doAdHocItemRetrieval:(NSMutableArray*) targetItemKeyArray{
- 
-    
-    //Retrieve initial 15 items
-    
-    ZPServerResponseXMLParser* parserResults = [[ZPServerConnection instance] retrieveItemsFromLibrary:_adHocLibraryID collection:_adHocCollectionKey 
-                                                                                          searchString:_adHocSearchString orderField:_adHocOrderField
-                                                                                        sortDescending:_adHocSortDescending limit:15+(_adHocItemKeysOffset>0)*35 start:_adHocItemKeysOffset getItemDetails:TRUE];
-    //If we are still showing this list, process the results
-    if(targetItemKeyArray==_adHocItemKeys && parserResults!=NULL){
-        
-        //If the ad hoc array is empty, fill it with appropriate number of nulls
-        if([targetItemKeyArray count] ==0){
-            for(NSInteger i=0;i<[parserResults totalResults];++i){
-                [targetItemKeyArray addObject:[NSNull null]];
-            }
-        }
-        for(ZPZoteroItem* item in [parserResults parsedElements]){
-            [[ZPDatabase instance] addItemToDatabase:item];
-            [targetItemKeyArray replaceObjectAtIndex:_adHocItemKeysOffset withObject:item];
-            _adHocItemKeysOffset++;
-
-        }
-        [self notifyItemKeyArrayUpdated:_adHocItemKeys];
-        //If there is more data coming, que a new retrieval
-        if(_adHocItemKeysOffset<[parserResults totalResults] & targetItemKeyArray==_adHocItemKeys) [self queueAdHocItemRetrieval];
-    }
-
-}
 
 - (ZPZoteroItem*) getItemByKey: (NSString*) key{
     
@@ -219,45 +142,22 @@ static ZPDataLayer* _instance = nil;
     }
     
     
-    [self notifyItemDetailsAvailable:item];
+    [self notifyItemAvailable:item];
 
 }
 
--(void) notifyItemKeyArrayUpdated:(NSArray*)itemKeyArray{
 
-    NSEnumerator* e = [_itemObservers objectEnumerator];
-    NSObject* id;
-    
-    while( id= [e nextObject]) {
-        if([(NSObject <ZPItemObserver>*) id respondsToSelector:@selector(notifyItemKeyArrayUpdated:)]){
-            [(NSObject <ZPItemObserver>*) id notifyItemKeyArrayUpdated:itemKeyArray];
-        }
-    }
 
-}
 
 //Notifies all observers that a new item is available
--(void) notifyItemBasicsAvailable:(ZPZoteroItem*)item{
-
-    NSEnumerator* e = [_itemObservers objectEnumerator];
-    NSObject* id;
-    
-    while( id= [e nextObject]) {
-        if([(NSObject <ZPItemObserver>*) id respondsToSelector:@selector(notifyItemBasicsAvailable:)]){
-            [(NSObject <ZPItemObserver>*) id notifyItemBasicsAvailable:item];
-        }
-    }
-}
-
-//Notifies all observers that a new item is available
--(void) notifyItemDetailsAvailable:(ZPZoteroItem*)item{
+-(void) notifyItemAvailable:(ZPZoteroItem*)item{
     
     NSEnumerator* e = [_itemObservers objectEnumerator];
     NSObject* id;
     
     while( id= [e nextObject]) {
-        if([(NSObject <ZPItemObserver>*) id respondsToSelector:@selector(notifyItemDetailsAvailable:)]){
-            [(NSObject <ZPItemObserver>*) id notifyItemDetailsAvailable:item];
+        if([(NSObject <ZPItemObserver>*) id respondsToSelector:@selector(notifyItemAvailable:)]){
+            [(NSObject <ZPItemObserver>*) id notifyItemAvailable:item];
         }
     }
 }

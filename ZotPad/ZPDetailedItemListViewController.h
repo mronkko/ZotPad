@@ -14,12 +14,6 @@
 //TODO: Make this a UITableViewController instead of UIViewController
 
 @interface ZPDetailedItemListViewController : ZPSimpleItemListViewController <UISplitViewControllerDelegate, UISearchBarDelegate>{
-    NSString* _searchString;
-    NSString* _collectionKey;
-    NSNumber* _libraryID;
-    NSString* _orderField;
-    BOOL _sortDescending;
-    
     DSBezelActivityView* _activityView;
 }
 
@@ -30,14 +24,6 @@
 
 @property (nonatomic, retain) IBOutlet UISearchBar* searchBar;
 
-@property (nonatomic, retain) NSString* collectionKey;
-
-@property (nonatomic, retain) NSNumber* libraryID;
-
-@property (copy) NSString* searchString;
-
-@property (copy) NSString* orderField;
-@property BOOL sortDescending;
 
 -(void) clearSearch;
 

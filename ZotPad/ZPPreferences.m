@@ -7,7 +7,7 @@
 //
 
 #import "ZPPreferences.h"
-
+#import "ZPLogger.h"
 @implementation ZPPreferences
 
 static ZPPreferences* _instance = nil;
@@ -16,7 +16,6 @@ static ZPPreferences* _instance = nil;
     self = [super init];
 
     _metadataCacheLevel = [[NSUserDefaults standardUserDefaults] integerForKey:@"preemptivecachemetadata"];
-    _smartCache = [[NSUserDefaults standardUserDefaults] boolForKey:@"smartcache"];
     
     return self;
 }
@@ -45,10 +44,7 @@ static ZPPreferences* _instance = nil;
     return _metadataCacheLevel >=2;
 }
 -(BOOL) cacheActiveCollection{
-    return _metadataCacheLevel >=2;
-}
--(BOOL) smartCache{
-    return _smartCache;
+    return _metadataCacheLevel >=1;
 }
 
 

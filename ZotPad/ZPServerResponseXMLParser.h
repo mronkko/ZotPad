@@ -13,7 +13,6 @@
     NSMutableDictionary* _temporaryFieldStorage;
     NSInteger _totalResults;
     NSString* _currentStringContent;
-    BOOL _debugParser;
     BOOL _insideEntry;
     NSObject* _currentElement;
     NSString* _updateTimestamp;
@@ -21,13 +20,14 @@
     NSString* _currentID;
 }
 
+@property (retain) NSArray* parsedElements;
+
 
 - (void)parser:(NSXMLParser *)parser didEndElement:(NSString *)elementName namespaceURI:(NSString *)namespaceURI qualifiedName:(NSString *)qName;
 - (void)parser:(NSXMLParser *)parser didStartElement:(NSString *)elementName namespaceURI:(NSString *)namespaceURI qualifiedName:(NSString *)qualifiedName attributes:(NSDictionary *)attributeDict;
 - (void)parser:(NSXMLParser *)parser foundCharacters:(NSString *)string;
 
 - (NSInteger) totalResults;
-- (NSArray*) parsedElements;
 - (NSString*) updateTimestamp;
 
 - (void) _setField:(NSString*)field toValue:(NSString*)value;

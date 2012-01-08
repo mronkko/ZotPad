@@ -152,7 +152,6 @@ static ZPItemListViewController* _instance = nil;
     }    
     else{
         key= (NSString*) keyObj;
-        //NSLog(@"Got key %@",key);
     }    
     
 	UITableViewCell* cell = [self->_cellCache objectForKey:key];
@@ -168,7 +167,6 @@ static ZPItemListViewController* _instance = nil;
         }
         else{
 
-            //NSLog(@"Not in cache, creating");
             cell = [tableView dequeueReusableCellWithIdentifier:@"ZoteroItemCell"];
             
             UILabel *titleLabel = (UILabel *)[cell viewWithTag:1];

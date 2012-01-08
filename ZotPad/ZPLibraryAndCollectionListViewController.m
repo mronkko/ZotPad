@@ -14,6 +14,8 @@
 #import "ZPAppDelegate.h"
 #import "ZPZoteroLibrary.h"
 
+#import "ZPLogger.h"
+
 @implementation ZPLibraryAndCollectionListViewController
 
 @synthesize detailViewController = _detailViewController;
@@ -73,6 +75,8 @@ static ZPLibraryAndCollectionListViewController* _instance = nil;
 -(void) notifyLibraryWithCollectionsAvailable:(ZPZoteroLibrary*) library{
   
     if([NSThread isMainThread]){
+        
+        NSIndexPath* selected = [[self tableView] indexPathForSelectedRow];
         //If we are showing the libraries view, reload the data
 
         //If the current library is not defined, show a list of libraries
@@ -85,6 +89,7 @@ static ZPLibraryAndCollectionListViewController* _instance = nil;
         }
         
         [[self tableView] reloadData];
+        if(selected!=NULL) [[self tableView] selectRowAtIndexPath:selected animated:FALSE scrollPosition:UITableViewScrollPositionNone];
     }
     else{
         [self performSelectorOnMainThread:@selector( notifyLibraryWithCollectionsAvailable:) withObject:library waitUntilDone:NO];

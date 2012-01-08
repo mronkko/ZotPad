@@ -17,7 +17,6 @@
 @interface ZPDatabase : NSObject{
      
     FMDatabase* _database;
-    BOOL _debugDatabase;
 }
 
 // This class is used as a singleton
@@ -42,8 +41,10 @@
 - (void) addNotesToItem: (ZPZoteroItem*) item;
 - (void) addAttachmentsToItem: (ZPZoteroItem*) item;
 
-//Returns an attachment whose file we will delete next when cache is full
-- (ZPZoteroAttachment*) getOldestCachedAttachment;
+//Return a list of all attachment paths ordered by priority for removel
+- (NSArray*) getCachedAttachmentPaths;
+
+
 - (void) updateViewedTimestamp:(ZPZoteroAttachment*)attachment;
 
 - (NSString*) getLocalizationStringWithKey:(NSString*) key type:(NSString*) type locale:(NSString*) locale;

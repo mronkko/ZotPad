@@ -24,6 +24,7 @@
 #import "../FMDB/src/FMDatabase.h"
 #import "../FMDB/src/FMResultSet.h"
 
+#import "ZPLogger.h"
 
 @implementation ZPDatabase
 
@@ -33,9 +34,11 @@ static ZPDatabase* _instance = nil;
 {
     self = [super init];
     
-//    _debugDatabase = TRUE;
     
 	NSString *dbPath = [[NSSearchPathForDirectoriesInDomains(NSDocumentDirectory, NSUserDomainMask, YES) objectAtIndex:0] stringByAppendingPathComponent:@"zotpad.sqlite"];
+    
+
+    BOOL recreateDB = ! [[NSFileManager defaultManager] fileExistsAtPath:dbPath];
     
     
     NSError* error;
@@ -49,25 +52,33 @@ static ZPDatabase* _instance = nil;
     setxattr(filePath, attrName, &attrValue, sizeof(attrValue), 0, 0);
 
     [_database open];
-    [_database setTraceExecution:_debugDatabase];
+    
+    //Changing these two will affect how much info is printed in log
+    [_database setTraceExecution:FALSE];
     [_database setLogsErrors:TRUE];
     
     //Read the database structure from file and create the database
-    
-    NSStringEncoding encoding;
-    
-    NSString *sqlFile = [NSString stringWithContentsOfFile:[[NSBundle mainBundle]
-                                                            pathForResource:@"database"
-                                                            ofType:@"sql"] usedEncoding:&encoding error:&error];
-    
-    NSArray *sqlStatements = [sqlFile componentsSeparatedByString:@";"];
-    
-    NSEnumerator *e = [sqlStatements objectEnumerator];
-    id sqlString;
-    while (sqlString = [e nextObject]) {
-        [_database executeUpdate:sqlString];
+
+    if(recreateDB){
+
+        NSLog(@"Recreating database because it was missing");
+        NSStringEncoding encoding;
+        
+        NSString *sqlFile = [NSString stringWithContentsOfFile:[[NSBundle mainBundle]
+                                                                pathForResource:@"database"
+                                                                ofType:@"sql"] usedEncoding:&encoding error:&error];
+        
+        NSArray *sqlStatements = [sqlFile componentsSeparatedByString:@";"];
+        
+        NSEnumerator *e = [sqlStatements objectEnumerator];
+        id sqlString;
+        while (sqlString = [e nextObject]) {
+            [_database executeUpdate:sqlString];
+        }
+        
+        NSLog(@"Done recreating database");
+
     }
-    
     
 	return self;
 }
@@ -86,7 +97,8 @@ static ZPDatabase* _instance = nil;
 -(void) addOrUpdateLibraries:(NSArray*)libraries{
     
     @synchronized(self){
-        [_database executeUpdate:@"DELETE FROM groups"];
+        //Delete everything but leave my library
+        [_database executeUpdate:@"DELETE FROM groups WHERE groupID != 1"];
     
     
         NSEnumerator* e = [libraries objectEnumerator];
@@ -285,24 +297,29 @@ static ZPDatabase* _instance = nil;
         FMResultSet* resultSet = [_database executeQuery: @"SELECT lastTimestamp FROM items WHERE key =? LIMIT 1",item.key];
 
         BOOL found = [resultSet next];
-
+        NSString* timestamp = [resultSet stringForColumnIndex:0];
+        
         [resultSet close];
+        
+        NSNumber* year;
+        if(item.year!=0){
+            year=[NSNumber numberWithInt:item.year];
+        }
+        else{
+            year=NULL;
+        }
+
         
         if(! found ){
             
-            //TODO: consider how standalone notes and attachments should be implemented properly
-            
-            NSNumber* year;
-            if(item.year!=0){
-                year=[NSNumber numberWithInt:item.year];
-            }
-            else{
-                year=NULL;
-            }
-            
+                       
             
             [_database executeUpdate:@"INSERT INTO items (itemType,libraryID,year,authors,title,publishedIn,key,fullCitation,lastTimestamp) VALUES (?,?,?,?,?,?,?,?,?)",item.itemType,item.libraryID,year,item.creatorSummary,item.title,item.publishedIn,item.key,item.fullCitation,item.lastTimestamp];
             
+        }
+        //TODO: consider how the time stamp could be used to determine if fields need to be updated
+        else if(! [item.lastTimestamp isEqualToString: timestamp]){
+            [_database executeUpdate:@"UPDATE items SET itemType = ?, libraryID = ?, year = ?,authors =? ,title = ?,publishedIn = ?,fullCitation =?,lastTimestamp = ? WHERE key = ?",item.itemType,item.libraryID,year,item.creatorSummary,item.title,item.publishedIn,item.fullCitation,item.lastTimestamp,item.key];
         }
         
     }
@@ -524,22 +541,31 @@ static ZPDatabase* _instance = nil;
     }
 }
 
-- (ZPZoteroAttachment*) getOldestCachedAttachment{
+- (NSArray*) getCachedAttachmentPaths{
     
     @synchronized(self){
-        FMResultSet* resultSet = [_database executeQuery: @"SELECT key,lastTimestamp,attachmentURL,attachmentType,attachmentTitle,attachmentLength FROM attachments ORDER BY CASE WHEN lastViewed IS NULL THEN 0 ELSE 1 end, lastViewed ASC, lastTimestamp ASC LIMIT 1"];
         
-        [resultSet next];
+        NSMutableArray* returnArray = [NSMutableArray array];
         
-        ZPZoteroAttachment* attachment = [ZPZoteroAttachment ZPZoteroAttachmentWithKey:[resultSet stringForColumnIndex:0]];
-        attachment.lastTimestamp = [resultSet stringForColumnIndex:1];
-        attachment.attachmentURL = [resultSet stringForColumnIndex:2];
-        attachment.attachmentType = [resultSet stringForColumnIndex:3];
-        attachment.attachmentTitle = [resultSet stringForColumnIndex:4];
-        attachment.attachmentLength = [resultSet intForColumnIndex:5];
+        FMResultSet* resultSet = [_database executeQuery: @"SELECT key,lastTimestamp,attachmentURL,attachmentType,attachmentTitle,attachmentLength FROM attachments ORDER BY CASE WHEN lastViewed IS NULL THEN 0 ELSE 1 end, lastViewed ASC, lastTimestamp ASC"];
+        
+        while([resultSet next]){
+            ZPZoteroAttachment* attachment = [ZPZoteroAttachment ZPZoteroAttachmentWithKey:[resultSet stringForColumnIndex:0]];
+            attachment.lastTimestamp = [resultSet stringForColumnIndex:1];
+            attachment.attachmentURL = [resultSet stringForColumnIndex:2];
+            attachment.attachmentType = [resultSet stringForColumnIndex:3];
+            attachment.attachmentTitle = [resultSet stringForColumnIndex:4];
+            attachment.attachmentLength = [resultSet intForColumnIndex:5];
+            
+            //If this attachment does have a file, add it to the list that we return;
+            if(attachment.fileExists){
+                [returnArray addObject:attachment.fileSystemPath];
+            }
+        }
+
         [resultSet close];
         
-        return attachment;
+        return returnArray;
     }
 
 }

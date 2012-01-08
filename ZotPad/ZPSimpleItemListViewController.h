@@ -16,16 +16,33 @@
 
 @interface ZPSimpleItemListViewController : UIViewController <UITableViewDataSource, ZPItemObserver>{
     NSCache* _cellCache;
+    
     NSMutableArray* _itemKeysShown;
-    NSArray* _itemKeysFromServer;
-    NSInteger _itemKeysFromServerIndex;
+    NSMutableArray* _itemKeysNotInCache;
+
     UITableView* _tableView;
     
+    NSString*_searchString;
+    NSString*_collectionKey;
+    NSNumber* _libraryID;
+    NSString* _orderField;
+    BOOL _sortDescending;
+    
+    NSInteger _animations;
 }
 
-@property (retain) IBOutlet UITableView* tableView;
-@property (retain) NSArray* itemKeysShown;
+- (void)configureWithItemListController:(ZPSimpleItemListViewController*)controller;
 
--(void) setItemKeysShownArray:(NSMutableArray*)itemKeysShown itemKeysFromServerArray:(NSArray*)itemKeysFromServer;
+// Needed by sub class, so need sto be here
+- (void) _performTableUpdates;
+
+@property (nonatomic, retain) IBOutlet UITableView* tableView;
+@property (nonatomic, retain) NSArray* itemKeysShown;
+
+@property (nonatomic, retain) NSString* collectionKey;
+@property (nonatomic, retain) NSNumber* libraryID;
+@property (nonatomic, retain) NSString* searchString;
+@property (nonatomic, retain) NSString* orderField;
+@property BOOL sortDescending;
 
 @end

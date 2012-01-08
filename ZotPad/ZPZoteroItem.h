@@ -8,7 +8,10 @@
 
 
 #import <Foundation/Foundation.h>
-#import "ZPZoteroAttachment.h"
+
+//ZPZoteroAttachment imports this file, so we cannot import it to avoid a circular dependency
+//See this http://stackoverflow.com/questions/322597/class-vs-import/323510#323510
+@class ZPZoteroAttachment;
 
 @interface ZPZoteroItem : NSObject{
     NSString* _title;
@@ -28,7 +31,9 @@
     NSArray* _notes;
     NSDictionary* _fields;
     NSString* _lastTimestamp;
-    
+
+    BOOL _needsToBeWrittenToCache;
+
 }
 
 @property (retain) NSString* title;
@@ -48,9 +53,11 @@
 @property (retain) NSArray* creators;
 @property (retain) NSDictionary* fields;
 
++(BOOL) existsInCache:(NSString*) key;
 +(ZPZoteroItem*) ZPZoteroItemWithKey:(NSString*) key;
 -(NSString*)key;
-
+-(BOOL) needsToBeWrittenToCache;
+-(void) clearNeedsToBeWrittenToCache;
 -(ZPZoteroAttachment*) firstExistingAttachment;
 -(NSArray*) allExistingAttachments;
 

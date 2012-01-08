@@ -19,7 +19,6 @@
 
 @interface ZPServerConnection : NSObject{
         
-    BOOL _debugServerConnection;
     NSInteger _activeRequestCount;
     
     NSMutableDictionary* _attachmentFileDataObjectsByConnection;
@@ -36,16 +35,17 @@
 -(NSArray*) retrieveLibrariesFromServer;
 -(NSArray*) retrieveCollectionsForLibraryFromServer:(NSNumber*)libraryID;
 
--(ZPServerResponseXMLParser*) retrieveItemsFromLibrary:(NSNumber*)libraryID collection:(NSString*)collectionKey searchString:(NSString*)searchString orderField:(NSString*)orderField sortDescending:(BOOL)sortIsDescending limit:(NSInteger)maxCount start:(NSInteger)offset getItemDetails:(BOOL)getItemDetails;
+-(NSArray*) retrieveItemsFromLibrary:(NSNumber*)libraryID itemKeys:(NSArray*)keys;
 
--(ZPServerResponseXMLParser*) retrieveNotesAndAttachmentsFromLibrary:(NSNumber*)libraryID limit:(NSInteger)maxCount start:(NSInteger)offset;
+-(NSArray*) retrieveItemsFromLibrary:(NSNumber*)libraryID limit:(NSInteger)limit offset:(NSInteger)offest;
+-(NSArray*) retrieveKeysInContainer:(NSNumber*)libraryID collectionKey:(NSString*)key;
+-(NSString*) retrieveTimestampForContainer:(NSNumber*)libraryID collectionKey:(NSString*)key;
+-(NSArray*) retrieveNoteAndAttachmentKeysFromLibrary:(NSNumber*)libraryID;
 
--(ZPZoteroItem*) retrieveSingleItemDetailsFromServer:(ZPZoteroItem*)key;
+//This retrieves single item details and notes and attachments associated with that item
+-(ZPZoteroItem*) retrieveSingleItemDetailsFromServer:(ZPZoteroItem*)item;
+
 -(void) downloadAttachment:(ZPZoteroAttachment*)attachment;
 
-- (void)connection:(NSURLConnection *)connection didReceiveResponse:(NSURLResponse *)response;
-- (void)connection:(NSURLConnection *)connection didReceiveData:(NSData *)data;
-- (void)connection:(NSURLConnection *)connection didFailWithError:(NSError *)error;
-- (void)connectionDidFinishLoading:(NSURLConnection *)connection;
 
 @end

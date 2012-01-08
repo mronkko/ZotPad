@@ -10,20 +10,22 @@
 #import "ZPDetailedItemListViewController.h"
 #import "ZPLibraryAndCollectionListViewController.h"
 #import "ZPDataLayer.h"
+#import "ZPCacheController.h"
 #import "../DSActivityView/Sources/DSActivityView.h"
 #import "ZPFileThumbnailAndQuicklookController.h"
 
+#import "ZPLogger.h"
+
 @interface ZPDetailedItemListViewController ()
+- (void) _configureUncachedKeys:(NSArray*)itemKeyList;
+- (void)_makeBusy;
+- (void)_makeAvailable;
+- (void) _configureCachedKeys;
+
 @property (strong, nonatomic) UIPopoverController *masterPopoverController;
 @end
 
 @implementation ZPDetailedItemListViewController
-
-@synthesize collectionKey = _collectionKey;
-@synthesize libraryID =  _libraryID;
-@synthesize searchString = _searchString;
-@synthesize orderField = _orderField;
-@synthesize sortDescending = _sortDescending;
 
 @synthesize masterPopoverController = _masterPopoverController;
 
@@ -48,14 +50,10 @@ static ZPDetailedItemListViewController* _instance = nil;
     // Release any cached data, images, etc that aren't in use.
 }
 
-/*
- 
- Configures the view  
- */
 
 - (void)configureView
 {
-
+    
     if([NSThread isMainThread]){
         // Update the user interface for the detail item.
         
@@ -63,25 +61,80 @@ static ZPDetailedItemListViewController* _instance = nil;
             [self.masterPopoverController dismissPopoverAnimated:YES];
         }
         
+                
         // Retrieve the item IDs if a library is selected. 
         
-        if(_libraryID!=0){
-            //TODO: Sort based on modified time by default so that the order will be the same that we will receive from the server.
-            
-            [self setItemKeysShownArray:
-             [NSMutableArray arrayWithArray: [[ZPDataLayer instance] getItemKeysFromCacheForLibrary:self.libraryID collection:self.collectionKey
-                                                                                                       searchString:[self.searchString stringByTrimmingCharactersInSet:[NSCharacterSet whitespaceAndNewlineCharacterSet]]orderField:self.orderField sortDescending:self.sortDescending]]
-              itemKeysFromServerArray:[[ZPDataLayer instance] getItemKeysFromServerForLibrary:self.libraryID collection:self.collectionKey
-                                                                                 searchString:[self.searchString stringByTrimmingCharactersInSet:[NSCharacterSet whitespaceAndNewlineCharacterSet]]orderField:self.orderField sortDescending:self.sortDescending]];
-            
+        if(_libraryID!=0){            
+            _itemKeysNotInCache = [NSMutableArray array];
+            _itemKeysShown = [NSMutableArray array];
+
+            [_tableView reloadSections:[NSIndexSet indexSetWithIndex:0] withRowAnimation:UITableViewRowAnimationAutomatic];
             [_tableView reloadData];
+
+            [self _makeBusy];
+            [self performSelectorInBackground:@selector(_configureCachedKeys) withObject:nil];
+            
         }
     }
     else{
         [self performSelectorOnMainThread:@selector(configureView) withObject:NULL waitUntilDone:FALSE];
     }
 }
+//If we are not already displaying an activity view, do so now
 
+- (void)_makeBusy{
+    if(_activityView==NULL){
+        [_tableView setUserInteractionEnabled:FALSE];
+        _activityView = [DSBezelActivityView newActivityViewForView:_tableView];
+    }
+}
+
+- (void) _configureCachedKeys{
+
+    _itemKeysShown = [NSMutableArray arrayWithArray: [[ZPDataLayer instance] getItemKeysFromCacheForLibrary:self.libraryID collection:self.collectionKey
+                                                                                               searchString:[self.searchString stringByTrimmingCharactersInSet:[NSCharacterSet whitespaceAndNewlineCharacterSet]]orderField:self.orderField sortDescending:self.sortDescending]];
+    
+    // Queue an operation to retrieve all item keys that belong to this collection but are not found in cache. 
+    [self performSelectorInBackground:@selector(_configureUncachedKeys:) withObject:_itemKeysShown];
+    
+    if([_itemKeysShown count] > 0){
+        [self performSelectorOnMainThread:@selector(_makeAvailable) withObject:NULL waitUntilDone:YES];
+    }
+    
+}
+
+/*
+ Called from data layer to notify that there is data for this view and it can be shown
+ */
+
+- (void)_makeAvailable{
+    [DSBezelActivityView removeViewAnimated:YES];
+    //TODO: Uncommenting thic causes the thread to crash. Investigate why.
+    //[_tableView reloadSections:[NSIndexSet indexSetWithIndex:0] withRowAnimation:UITableViewRowAnimationAutomatic];
+    [_tableView reloadData];
+    [_tableView setUserInteractionEnabled:TRUE];
+    _activityView = NULL;
+}
+
+- (void) _configureUncachedKeys:(NSArray*)itemKeyList{
+    
+    NSArray* uncachedItems = [[ZPCacheController instance] uncachedItemKeysForLibrary:_libraryID collection:_collectionKey];
+    //Only update the uncached keys if we are still showing the same item key list
+    if(itemKeyList==_itemKeysShown){
+        [_itemKeysNotInCache addObjectsFromArray:uncachedItems];
+        if([_itemKeysShown count] ==0){
+            [self _performTableUpdates];
+            [self performSelectorOnMainThread:@selector(_makeAvailable) withObject:NULL waitUntilDone:YES];
+        }
+        else{
+            [self _performTableUpdates];
+
+        }
+        [[ZPDataLayer instance] registerItemObserver:self];
+
+    }
+    
+}
 
 - (UITableViewCell *)tableView:(UITableView *)tableView cellForRowAtIndexPath:(NSIndexPath *)indexPath {
 

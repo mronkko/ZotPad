@@ -41,5 +41,12 @@ static NSCache* _objectCache = NULL;
     return NULL;
 }
 
+- (BOOL)isEqual:(id)anObject{
+    if([anObject isKindOfClass:[self class]]){
+        return [[(ZPZoteroLibrary*) anObject libraryID] isEqualToNumber:_libraryID];
+    }
+        else return FALSE;
+}
+
 
 @end

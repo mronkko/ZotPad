@@ -7,10 +7,9 @@
 //
 
 #import <Foundation/Foundation.h>
+#import "ZPZoteroItem.h"
 
-@interface ZPZoteroAttachment : NSObject{
-    NSString* _key;
-    NSString* _lastTimestamp;
+@interface ZPZoteroAttachment : ZPZoteroItem{
     NSString* _parentItemKey;
     
     
@@ -20,7 +19,6 @@
     NSInteger _attachmentLength;
 }
 
-@property (retain) NSString* lastTimestamp;
 @property (retain) NSString* parentItemKey;
 @property (retain) NSString* attachmentURL;
 @property (retain) NSString* attachmentType;
@@ -29,7 +27,6 @@
 
 
 +(ZPZoteroAttachment*) ZPZoteroAttachmentWithKey:(NSString*) key;
--(NSString*)key;
 
 // An alias for setParentItemKey
 - (void) setParentKey:(NSString*)key;

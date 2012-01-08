@@ -7,19 +7,16 @@
 //
 
 #import <Foundation/Foundation.h>
+#import "ZPZoteroItem.h"
 
-@interface ZPZoteroNote : NSObject{
-    NSString* _key;
-    NSString* _lastTimestamp;
+@interface ZPZoteroNote : ZPZoteroItem{
     NSString* _parentItemKey;
 }
 
-@property (retain) NSString* lastTimestamp;
 @property (retain) NSString* parentItemKey;
 
 
 +(ZPZoteroNote*) ZPZoteroNoteWithKey:(NSString*) key;
--(NSString*)key;
 
 // An alias for setParentItemKey
 - (void) setParentKey:(NSString*)key;

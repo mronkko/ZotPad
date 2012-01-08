@@ -12,6 +12,7 @@
 #import "ZPDataLayer.h"
 #import "ZPAuthenticationProcess.h"
 
+#import "ZPLogger.h"
 
 @implementation ZPAuthenticationDialog
 

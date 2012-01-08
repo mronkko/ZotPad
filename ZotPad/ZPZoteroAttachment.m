@@ -10,7 +10,6 @@
 
 @implementation ZPZoteroAttachment
 
-@synthesize lastTimestamp = _lastTimestamp;
 @synthesize parentItemKey = _parentItemKey;
 @synthesize attachmentURL = _attachmentURL;
 @synthesize attachmentType = _attachmentType;
@@ -37,9 +36,6 @@ static NSCache* _objectCache = NULL;
     return obj;
 }
 
--(NSString*)key{
-    return _key;
-}
 
 // An alias for setParentCollectionKey
 - (void) setParentKey:(NSString*)key{

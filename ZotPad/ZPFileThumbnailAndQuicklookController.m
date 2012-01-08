@@ -13,6 +13,8 @@
 #import <MobileCoreServices/MobileCoreServices.h>
 #import <QuartzCore/QuartzCore.h>
 
+#import "ZPLogger.h"
+
 @interface ZPFileThumbnailAndQuicklookController()
 
 -(UIImage*) _renderThumbnailFromPDFFile:(NSString*)filename;

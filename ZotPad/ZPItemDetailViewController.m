@@ -14,6 +14,8 @@
 #import "ZPLocalization.h"
 #import "ZPFileThumbnailAndQuicklookController.h"
 
+#import "ZPLogger.h"
+
 #define ATTACHMENT_VIEW_HEIGHT 700
 
 #define ATTACHMENT_IMAGE_HEIGHT 600
@@ -73,7 +75,7 @@
   
     _itemListController = [self.storyboard instantiateViewControllerWithIdentifier:@"NavigationItemListView"];
     
-    [_itemListController setItemKeysShown:[[ZPDetailedItemListViewController instance] itemKeysShown]];
+    [_itemListController configureWithItemListController:[ZPDetailedItemListViewController instance]];
     
     _itemListController.navigationItem.hidesBackButton = YES;
     
@@ -331,9 +333,7 @@
     These are called by data layer to notify that more information about an item has become available from the server
  */
 
--(void) notifyItemDetailsAvailable:(ZPZoteroItem*) item{
-    
-    //TODO: Modifying the DetailViewTable could be animated.
+-(void) notifyItemAvailable:(ZPZoteroItem*) item{
     
     if([item.key isEqualToString:_currentItem.key]){
         _currentItem = item;
@@ -341,11 +341,12 @@
     }
 }
 
--(void) notifyItemAttachmentInformationAvailable:(ZPZoteroItem*) item{
+-(void) notifyItemAttachmentsAvailable:(ZPZoteroItem *)item{
     
 }
+    
 
--(void) notifyItemAttachmentFileAvailable:(ZPZoteroItem*) item{
+-(void) notifyAttachmentDownloadCompleted:(ZPZoteroAttachment*) attachment{
     
 }
 
@@ -417,22 +418,5 @@
 }
 
 #pragma mark -
-/*
 
-#pragma mark - Split view
-
-- (void)splitViewController:(UISplitViewController *)splitController willHideViewController:(UIViewController *)viewController withBarButtonItem:(UIBarButtonItem *)barButtonItem forPopoverController:(UIPopoverController *)popoverController
-{
-    barButtonItem.title = NSLocalizedString(@"Libraries", @"Libraries");
-    [self.navigationItem setLeftBarButtonItem:barButtonItem animated:YES];
-    self.masterPopoverController = popoverController;
-}
-
-- (void)splitViewController:(UISplitViewController *)splitController willShowViewController:(UIViewController *)viewController invalidatingBarButtonItem:(UIBarButtonItem *)barButtonItem
-{
-    // Called when the view is shown again in the split view, invalidating the button and popover controller.
-    [self.navigationItem setLeftBarButtonItem:nil animated:YES];
-    self.masterPopoverController = nil;
-}
-*/
 @end

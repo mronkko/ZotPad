@@ -103,6 +103,7 @@
 		A7CC252F1493E14E00FDEAF4 /* iCarousel.m in Sources */ = {isa = PBXBuildFile; fileRef = A7CC252C1493E14D00FDEAF4 /* iCarousel.m */; settings = {COMPILER_FLAGS = " -fno-objc-arc"; }; };
 		A7D3C08014AEDE7B00DB975D /* QuickLook.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = A7D3C07F14AEDE7B00DB975D /* QuickLook.framework */; };
 		A7D3C08314AEE71000DB975D /* ZPLocalization.m in Sources */ = {isa = PBXBuildFile; fileRef = A7D3C08214AEE70F00DB975D /* ZPLocalization.m */; };
+		A7F72BC114B984920059617D /* ZPLogger.m in Sources */ = {isa = PBXBuildFile; fileRef = A7F72BC014B984920059617D /* ZPLogger.m */; };
 /* End PBXBuildFile section */
 
 /* Begin PBXContainerItemProxy section */
@@ -359,7 +360,7 @@
 		A78B7F1414909285008303BA /* Default-Portrait~ipad.png */ = {isa = PBXFileReference; lastKnownFileType = image.png; name = "Default-Portrait~ipad.png"; path = "../LaunchImages/Default-Portrait~ipad.png"; sourceTree = "<group>"; };
 		A79299C1149E0CFE000F8B42 /* ZPZoteroItemContainer.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = ZPZoteroItemContainer.h; sourceTree = "<group>"; };
 		A79299C2149E0CFE000F8B42 /* ZPZoteroItemContainer.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = ZPZoteroItemContainer.m; sourceTree = "<group>"; };
-		A793153C14B185E800E1ABF0 /* ZPFileThumbnailAndQuicklookController.h */ = {isa = PBXFileReference; fileEncoding = 4; path = ZPFileThumbnailAndQuicklookController.h; sourceTree = "<group>"; };
+		A793153C14B185E800E1ABF0 /* ZPFileThumbnailAndQuicklookController.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = ZPFileThumbnailAndQuicklookController.h; sourceTree = "<group>"; };
 		A793153D14B185E800E1ABF0 /* ZPFileThumbnailAndQuicklookController.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = ZPFileThumbnailAndQuicklookController.m; sourceTree = "<group>"; };
 		A79ED821148B2683003EE77C /* ZPItemDetailViewController.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = ZPItemDetailViewController.h; sourceTree = "<group>"; };
 		A79ED822148B2683003EE77C /* ZPItemDetailViewController.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = ZPItemDetailViewController.m; sourceTree = "<group>"; };
@@ -428,6 +429,8 @@
 		A7D3C08114AEE70F00DB975D /* ZPLocalization.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = ZPLocalization.h; sourceTree = "<group>"; };
 		A7D3C08214AEE70F00DB975D /* ZPLocalization.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = ZPLocalization.m; sourceTree = "<group>"; };
 		A7D4A1801494B1B700935847 /* ZPItemObserver.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = ZPItemObserver.h; sourceTree = "<group>"; };
+		A7F72BBF14B984920059617D /* ZPLogger.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = ZPLogger.h; sourceTree = "<group>"; };
+		A7F72BC014B984920059617D /* ZPLogger.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = ZPLogger.m; sourceTree = "<group>"; };
 /* End PBXFileReference section */
 
 /* Begin PBXFrameworksBuildPhase section */
@@ -646,6 +649,8 @@
 		A7200DDB14718DC0004347C9 /* Supporting Files */ = {
 			isa = PBXGroup;
 			children = (
+				A7F72BBF14B984920059617D /* ZPLogger.h */,
+				A7F72BC014B984920059617D /* ZPLogger.m */,
 				A78B7F0F149090D2008303BA /* Launch images */,
 				A78B7F0A14908DFF008303BA /* AppIcons */,
 				A73D635014879D15007999F3 /* Settings.bundle */,
@@ -662,18 +667,15 @@
 		A72853FE147E33F400D3FE97 /* UI and delegate files */ = {
 			isa = PBXGroup;
 			children = (
+				A7B678AA14B84DBB003311ED /* ItemLists */,
 				A7D3C08114AEE70F00DB975D /* ZPLocalization.h */,
 				A7D3C08214AEE70F00DB975D /* ZPLocalization.m */,
 				A7200DE314718DC0004347C9 /* ZPAppDelegate.h */,
 				A7200DE414718DC0004347C9 /* ZPAppDelegate.m */,
 				A7200DE914718DC1004347C9 /* ZPLibraryAndCollectionListViewController.h */,
 				A7200DEA14718DC1004347C9 /* ZPLibraryAndCollectionListViewController.m */,
-				A7200DEC14718DC1004347C9 /* ZPDetailedItemListViewController.h */,
-				A7200DED14718DC1004347C9 /* ZPDetailedItemListViewController.m */,
 				A793153C14B185E800E1ABF0 /* ZPFileThumbnailAndQuicklookController.h */,
 				A793153D14B185E800E1ABF0 /* ZPFileThumbnailAndQuicklookController.m */,
-				A79ED82A148B7404003EE77C /* ZPSimpleItemListViewController.h */,
-				A79ED82B148B7405003EE77C /* ZPSimpleItemListViewController.m */,
 				A79ED821148B2683003EE77C /* ZPItemDetailViewController.h */,
 				A79ED822148B2683003EE77C /* ZPItemDetailViewController.m */,
 				A74348D5147AB37A00DA6FC3 /* ZPAuthenticationDialog.h */,
@@ -843,6 +845,17 @@
 				A7A7C9DB147AA2EE004D8756 /* sha1.h */,
 			);
 			path = Crypto;
+			sourceTree = "<group>";
+		};
+		A7B678AA14B84DBB003311ED /* ItemLists */ = {
+			isa = PBXGroup;
+			children = (
+				A7200DEC14718DC1004347C9 /* ZPDetailedItemListViewController.h */,
+				A7200DED14718DC1004347C9 /* ZPDetailedItemListViewController.m */,
+				A79ED82A148B7404003EE77C /* ZPSimpleItemListViewController.h */,
+				A79ED82B148B7405003EE77C /* ZPSimpleItemListViewController.m */,
+			);
+			name = ItemLists;
 			sourceTree = "<group>";
 		};
 		A7CC252A1493E14D00FDEAF4 /* iCarousel */ = {
@@ -1131,6 +1144,7 @@
 				A76D3C8D14AD9FB5000C3ED9 /* ASIInputStream.m in Sources */,
 				A7D3C08314AEE71000DB975D /* ZPLocalization.m in Sources */,
 				A793153E14B185E800E1ABF0 /* ZPFileThumbnailAndQuicklookController.m in Sources */,
+				A7F72BC114B984920059617D /* ZPLogger.m in Sources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};

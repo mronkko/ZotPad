@@ -10,7 +10,6 @@
 
 @implementation ZPZoteroNote
 
-@synthesize lastTimestamp = _lastTimestamp;
 @synthesize parentItemKey = _parentItemKey;
 
 
@@ -34,9 +33,6 @@ static NSCache* _objectCache = NULL;
     return obj;
 }
 
--(NSString*)key{
-    return _key;
-}
 
 // An alias for setParentCollectionKey
 - (void) setParentKey:(NSString*)key{

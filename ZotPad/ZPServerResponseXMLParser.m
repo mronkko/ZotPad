@@ -7,17 +7,18 @@
 //
 
 #import "ZPServerResponseXMLParser.h"
+#import "ZPLogger.h"
 
 //TODO: parse this from collections <zapi:numItems>0</zapi:numItems>
 
 @implementation ZPServerResponseXMLParser
 
+@synthesize parsedElements = _resultArray;
 
 - (id) init{
     self=[super init];
     _resultArray=[NSMutableArray array];
     _temporaryFieldStorage =[NSMutableDictionary dictionary];
-//    _debugParser=TRUE;
     _currentStringContent = @"";
     _insideEntry=FALSE;
     _currentID=NULL; 
@@ -29,7 +30,7 @@
 
 - (void)parser:(NSXMLParser *)parser didEndElement:(NSString *)elementName namespaceURI:(NSString *)namespaceURI qualifiedName:(NSString *)qName{
     
-    if(_debugParser) NSLog(@"Parser finished element %@ with content %@",elementName,_currentStringContent);
+    NSLog(@"Parser finished element %@ with content %@",elementName,_currentStringContent);
     
     // HTML elements ( <i> ) in the formatted citation
     if([elementName isEqualToString:@"i"]){
@@ -65,7 +66,7 @@
 
 - (void)parser:(NSXMLParser *)parser didStartElement:(NSString *)elementName namespaceURI:(NSString *)namespaceURI qualifiedName:(NSString *)qualifiedName attributes:(NSDictionary *)attributeDict{
 
-    if(_debugParser) NSLog(@"Parser starting element %@",elementName);
+    NSLog(@"Parser starting element %@",elementName);
 
     // HTML elements ( <i> ) inthe formatted citation
 
@@ -133,9 +134,6 @@
     _currentStringContent =[_currentStringContent stringByAppendingString:string];
 }
 
-- (NSArray*) parsedElements{
-    return _resultArray;
-}
 - (NSInteger) totalResults{
     return _totalResults;
 }

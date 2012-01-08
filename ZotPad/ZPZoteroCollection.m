@@ -40,5 +40,11 @@ static NSCache* _objectCache = NULL;
     [self setParentCollectionKey:key];    
 }
                                    
+- (BOOL)isEqual:(id)anObject{
+    if([anObject isKindOfClass:[self class]]){
+        return [[(ZPZoteroCollection*) anObject collectionKey] isEqualToString: _key];
+    }
+    else return FALSE;
+}
 
 @end

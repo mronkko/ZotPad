@@ -17,6 +17,5 @@
 -(BOOL) cacheAllLibraries;
 -(BOOL) cacheActiveLibrary;
 -(BOOL) cacheActiveCollection;
--(BOOL) smartCache;
 
 @end

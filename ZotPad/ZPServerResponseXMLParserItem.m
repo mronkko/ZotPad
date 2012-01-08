@@ -10,6 +10,7 @@
 #import "ZPZoteroItem.h"
 #import "ZPZoteroAttachment.h"
 #import "ZPZoteroNote.h"
+#import "ZPDatabase.h"
 
 #import "SBJson.h"
 
@@ -37,7 +38,7 @@
             _bibContent=TRUE;
         }
         //Item as JSON content
-        else if([elementName isEqualToString:@"content"] && [@"application/json" isEqualToString:[attributeDict objectForKey:@"type"]]){
+        else if([elementName isEqualToString:@"zapi:subcontent"] && [@"json" isEqualToString:[attributeDict objectForKey:@"zapi:type"]]){
             _jsonContent=TRUE;
         }
     }
@@ -85,7 +86,7 @@
         if(item.creatorSummary==NULL){
             //Anything after the first closing parenthesis is publication details
             NSRange range = [value rangeOfString:@")"];
-            [item setPublishedIn:[value substringFromIndex:(range.location+1)]];
+            if(range.location != NSNotFound) [item setPublishedIn:[value substringFromIndex:(range.location+1)]];
         }
         else{
             
@@ -146,7 +147,15 @@
         _currentElement = [ZPZoteroNote ZPZoteroNoteWithKey:id];
     }
     else{
-        _currentElement = [ZPZoteroItem ZPZoteroItemWithKey:id];
+        //IF the item does not exist in the in-memory cache, attempt to load it from the disk cache 
+        if([ZPZoteroItem existsInCache:id]){
+            _currentElement = [ZPZoteroItem ZPZoteroItemWithKey:id];
+        }
+        else{
+            _currentElement = [[ZPDatabase instance] getItemByKey:id];
+            if(_currentElement == NULL) _currentElement = [ZPZoteroItem ZPZoteroItemWithKey:id];
+            [(ZPZoteroItem*)_currentElement clearNeedsToBeWrittenToCache];
+        }
         [(ZPZoteroItem*)_currentElement setLibraryID:_libraryID];
     }
     [super _processTemporaryFieldStorage];

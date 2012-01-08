@@ -21,15 +21,6 @@
 
 @interface ZPDataLayer : NSObject {
     
-    NSMutableArray* _adHocItemKeys;
-    NSInteger _adHocItemKeysOffset;
-    NSNumber* _adHocLibraryID;
-    NSString* _adHocCollectionKey;
-    NSString* _adHocOrderField;
-    BOOL _adHocSortDescending;
-    NSString* _adHocSearchString;
-    
-    BOOL _debugDataLayer;
     
     NSMutableSet* _itemObservers;
     NSMutableSet* _libraryObservers;
@@ -52,8 +43,6 @@
 - (NSArray*) getItemKeysFromCacheForLibrary:(NSNumber*)libraryID collection:(NSString*)collectionKey
                         searchString:(NSString*)searchString orderField:(NSString*)orderField sortDescending:(BOOL)sortDescending;
 
-- (NSArray*) getItemKeysFromServerForLibrary:(NSNumber*)libraryID collection:(NSString*)collectionKey
-                               searchString:(NSString*)searchString orderField:(NSString*)orderField sortDescending:(BOOL)sortDescending;
 
 - (ZPZoteroItem*) getItemByKey: (NSString*) key;
 
@@ -70,18 +59,14 @@
 
 
 //Notifies all observers that a new data are available
-//TODO: Clean up methods that are not currently used
--(void) notifyItemKeyArrayUpdated:(NSArray*)itemKeyArray;
--(void) notifyItemBasicsAvailable:(ZPZoteroItem*)item;
--(void) notifyItemDetailsAvailable:(ZPZoteroItem*)item;
+-(void) notifyItemAvailable:(ZPZoteroItem*)item;
 -(void) notifyItemAttachmentsAvailable:(ZPZoteroItem*)item;
 
 -(void) notifyLibraryWithCollectionsAvailable:(ZPZoteroLibrary*) library;
 
--(void) notifyAttachmentDownloadProgress:(ZPZoteroAttachment*) attachment downloaded:(NSInteger)downloaded expectedLength:(NSInteger) expectedLength;
 -(void) notifyAttachmentDownloadCompleted:(ZPZoteroAttachment*) attachment;
 
--(void) queueAdHocItemRetrieval;
+
 
 
 @end

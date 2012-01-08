@@ -145,11 +145,6 @@ static ZPDetailViewController* _instance = nil;
     
     NSObject* keyObj = [_itemKeysShown objectAtIndex: indexPath.row];
 
-    //It is possible that we do not yet have data for the full view. Sleep until we have it
-    //More data is retrieved in the background
-
-   // NSLog(@"Retrieving item for for %i",indexPath.row);
-
     
     NSString* key;
     if(keyObj==[NSNull null]){
@@ -157,7 +152,6 @@ static ZPDetailViewController* _instance = nil;
     }    
     else{
         key= (NSString*) keyObj;
-        //NSLog(@"Got key %@",key);
     }    
     
 	UITableViewCell* cell = [self->_cellCache objectForKey:key];
@@ -173,7 +167,6 @@ static ZPDetailViewController* _instance = nil;
         }
         else{
 
-            //NSLog(@"Not in cache, creating");
             cell = [tableView dequeueReusableCellWithIdentifier:@"ZoteroItemCell"];
             
             UILabel *titleLabel = (UILabel *)[cell viewWithTag:1];

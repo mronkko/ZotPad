@@ -7,15 +7,12 @@
 //
 
 #import "ZPAppDelegate.h"
-#import "ZPServerConnection.h"
-#import "ZPDataLayer.h"
 #import "ZPCacheController.h"
-#import "ZPAuthenticationProcess.h"
+#import "ZPLogger.h"
 
-//Remove this
-#import "ZPServerResponseXMLParserItem.h"
 
 @implementation ZPAppDelegate
+
 
 @synthesize window = _window;
 
@@ -24,6 +21,8 @@
 {
     
     // If any of the reset options are set process these first
+    
+    //TODO: Do not access defaults directly, but do so through ZPPreference
     
     NSUserDefaults* defaults = [NSUserDefaults standardUserDefaults];
 
@@ -66,6 +65,7 @@
         splitViewController.delegate = (id)navigationController.topViewController;
     }
     
+    NSLog(@"Started");
     
     return YES;
 }

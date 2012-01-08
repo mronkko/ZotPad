@@ -15,21 +15,15 @@
     
     //These two arrays contain a list of IDs/Keys that will be cached
     
-    NSMutableArray* _libraryIDsToCache;
-    NSMutableArray* _collectionKeysToCache;
-
+    NSMutableDictionary* _itemKeysToRetrieve;
+    NSMutableArray* _containersToCache;
     NSMutableArray* _filesToDownload;
-    
-    NSMutableDictionary* _cacheDataObjects;
     
     // An operation que to fetch items in the background
     NSOperationQueue* _serverRequestQueue;
     NSOperationQueue* _fileDownloadQueue;
-    
-    
-    NSString* _currentlyActiveCollectionKey;
-    NSNumber* _currentlyActiveLibraryID;
 
+    
     unsigned long long int _sizeOfDocumentsFolder;
 
 }
@@ -41,13 +35,11 @@
 -(void) activate;
 
 // These methods tell the cache that the user is currently viewing something
--(void) setCurrentCollection:(NSString*) collectionKey;
+//-(void) setCurrentCollection:(NSString*) collectionKey;
 -(void) setCurrentLibrary:(NSNumber*) libraryID;
--(void) setCurrentItem:(NSString*) itemKey;
+//-(void) setCurrentItem:(NSString*) itemKey;
 -(void) updateLibrariesAndCollectionsFromServer;
 
-// Request status of cache
--(NSArray*) cachedItemKeysForCollection:(NSString*)collectionKey libraryID:(NSNumber*)libraryID; 
-
+-(NSArray*) uncachedItemKeysForLibrary:(NSNumber*) libraryId collection:(NSString*) collectionKey;
 
 @end

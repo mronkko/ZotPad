@@ -16,19 +16,12 @@
 
 @optional
 
-// Tells an observer that basic citation information is available for items
--(void) notifyItemBasicsAvailable:(ZPZoteroItem*) item;
-
 // Tells an observer that detailed citation information is available
--(void) notifyItemDetailsAvailable:(ZPZoteroItem*) item;
+-(void) notifyItemAvailable:(ZPZoteroItem*) item;
 
 // Tells an observer that information about attachments is available
 -(void) notifyItemAttachmentsAvailable:(ZPZoteroItem*) item;
 
-// Tells an observer that information about attachments is available
--(void) notifyItemAttachmentFileAvailable:(ZPZoteroItem*) item;
 
-// Tells an observer that new keys have been added to an array
--(void) notifyItemKeyArrayUpdated:(NSArray*)itemKeyArray;
 
 @end
