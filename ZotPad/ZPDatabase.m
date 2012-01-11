@@ -167,6 +167,21 @@ static ZPDatabase* _instance = nil;
     }
 }
 
+-(BOOL) doesItemKey:(NSString*)itemKey belongToCollection:(NSString*) collectionKey{
+    @synchronized(self){
+        
+        FMResultSet* resultSet = [_database executeQuery:@"SELECT itemKey FROM collectionItems WHERE itemKey = ? AND collectionKey = ?",itemKey,collectionKey];
+		
+        BOOL ret = [resultSet next];
+            
+        [resultSet close];
+        
+        return ret;
+        
+    }
+
+}
+
 
 // These remove items from the cache
 - (void) removeItemsNotInArray:(NSArray*)itemKeys fromCollection:(NSString*)collectionKey inLibrary:(NSNumber*)libraryID{
@@ -483,9 +498,9 @@ static ZPDatabase* _instance = nil;
         while([resultSet next]) {
             NSMutableDictionary* creator = [[NSMutableDictionary alloc] init];
             
-            [creator setObject:[resultSet stringForColumnIndex:0] forKey:@"firstName"];
-            [creator setObject:[resultSet stringForColumnIndex:1] forKey:@"lastName"];
-            [creator setObject:[resultSet stringForColumnIndex:2] forKey:@"shortName"];
+            if([resultSet stringForColumnIndex:0]!=NULL) [creator setObject:[resultSet stringForColumnIndex:0] forKey:@"firstName"];
+            if([resultSet stringForColumnIndex:1]!=NULL) [creator setObject:[resultSet stringForColumnIndex:1] forKey:@"lastName"];
+            if([resultSet stringForColumnIndex:2]!=NULL) [creator setObject:[resultSet stringForColumnIndex:2] forKey:@"shortName"];
             [creator setObject:[resultSet stringForColumnIndex:3] forKey:@"creatorType"];
             
             //TODO: Would this be needed at all?
@@ -495,8 +510,7 @@ static ZPDatabase* _instance = nil;
         }
         
         [resultSet close];
-        if([creators count]>0) item.creators = creators;
-        else item.creators = NULL;
+        item.creators = creators;
     }
 }
 
@@ -510,7 +524,7 @@ static ZPDatabase* _instance = nil;
         NSMutableDictionary* fields = [[NSMutableDictionary alloc] init];
         while([resultSet next]) {
             
-            [fields setObject:[resultSet stringForColumnIndex:0] forKey:[resultSet stringForColumnIndex:1]];
+            [fields setObject:[resultSet stringForColumnIndex:1] forKey:[resultSet stringForColumnIndex:0]];
         }
         
         [resultSet close];
@@ -552,7 +566,7 @@ static ZPDatabase* _instance = nil;
         
         NSMutableArray* returnArray = [NSMutableArray array];
         
-        FMResultSet* resultSet = [_database executeQuery: @"SELECT key,lastTimestamp,attachmentURL,attachmentType,attachmentTitle,attachmentLength FROM attachments ORDER BY CASE WHEN lastViewed IS NULL THEN 0 ELSE 1 end, lastViewed ASC, lastTimestamp ASC"];
+        FMResultSet* resultSet = [_database executeQuery: @"SELECT key,lastTimestamp,attachmentURL,attachmentType,attachmentTitle,attachmentLength,parentItemKey FROM attachments ORDER BY CASE WHEN lastViewed IS NULL THEN 0 ELSE 1 end, lastViewed ASC, lastTimestamp ASC"];
         
         while([resultSet next]){
             ZPZoteroAttachment* attachment = [ZPZoteroAttachment ZPZoteroAttachmentWithKey:[resultSet stringForColumnIndex:0]];
@@ -561,6 +575,7 @@ static ZPDatabase* _instance = nil;
             attachment.attachmentType = [resultSet stringForColumnIndex:3];
             attachment.attachmentTitle = [resultSet stringForColumnIndex:4];
             attachment.attachmentLength = [resultSet intForColumnIndex:5];
+            attachment.parentItemKey = [resultSet stringForColumnIndex:6];
             
             //If this attachment does have a file, add it to the list that we return;
             if(attachment.fileExists){
@@ -573,6 +588,43 @@ static ZPDatabase* _instance = nil;
         return returnArray;
     }
 
+}
+
+- (NSArray*) getAttachmentThatNeedToBeDownloadedInLibrary:(NSNumber*)libraryID collection:(NSString*)collectionKey{
+    @synchronized(self){
+
+        NSMutableArray* returnArray = [NSMutableArray array];
+
+        FMResultSet* resultSet;
+        
+        if(collectionKey==NULL){
+            resultSet= [_database executeQuery: @"SELECT attachments.key,attachments.lastTimestamp,attachmentURL,attachmentType,attachmentTitle,attachmentLength,parentItemKey FROM attachments, items WHERE parentItemKey = items.key AND items.libraryID = ? ORDER BY attachments.lastTimestamp DESC",libraryID];
+        }
+        else{
+            resultSet= [_database executeQuery: @"SELECT attachments.key,attachments.lastTimestamp,attachmentURL,attachmentType,attachmentTitle,attachmentLength,parentItemKey FROM attachments, collectionItems WHERE parentItemKey = itemsKey AND collectionKey = ? ORDER BY attachments.lastTimestamp DESC",collectionKey];
+        }
+        
+        while([resultSet next]){
+            ZPZoteroAttachment* attachment = [ZPZoteroAttachment ZPZoteroAttachmentWithKey:[resultSet stringForColumnIndex:0]];
+            attachment.lastTimestamp = [resultSet stringForColumnIndex:1];
+            attachment.attachmentURL = [resultSet stringForColumnIndex:2];
+            attachment.attachmentType = [resultSet stringForColumnIndex:3];
+            attachment.attachmentTitle = [resultSet stringForColumnIndex:4];
+            attachment.attachmentLength = [resultSet intForColumnIndex:5];
+            attachment.parentItemKey = [resultSet stringForColumnIndex:6];
+            
+            //If this attachment does have a file, add it to the list that we return;
+            if(! attachment.fileExists){
+                [returnArray addObject:attachment];
+            }
+        }
+        
+        [resultSet close];
+
+        return returnArray;
+
+    }
+    
 }
 
 - (void) updateViewedTimestamp:(ZPZoteroAttachment*)attachment{

@@ -59,23 +59,41 @@ static ZPPreferences* _instance = nil;
     [[NSUserDefaults standardUserDefaults] registerDefaults:defaultsToRegister];
 
     _metadataCacheLevel = [[NSUserDefaults standardUserDefaults] integerForKey:@"preemptivecachemetadata"];
+    _attachmentsCacheLevel = [[NSUserDefaults standardUserDefaults] integerForKey:@"preemptivecacheattachmentfiles"];
     _mode = [[NSUserDefaults standardUserDefaults] integerForKey:@"mode"];
-
+    _maxCacheSize = [[NSUserDefaults standardUserDefaults] floatForKey:@"cachesizemax"]*1073741824;
+    
     NSLog(@"NSUserDefaults dump: %@",[[NSUserDefaults standardUserDefaults] dictionaryRepresentation]);
 }
-//        "preemptivecachemetadata" "off" "activecollections" "activelibraries" "alllibraries"
-//        "preemptivecacheattachmentfiles" "off" "activeitems" "activecollections" "activelibraries" "alllibraries"
 
 
--(BOOL) cacheAllLibraries{
+-(NSInteger) maxCacheSize{
+    return _maxCacheSize;
+}
+
+-(BOOL) cacheMetadataAllLibraries{
     return _metadataCacheLevel >=3;
 }
 
--(BOOL) cacheActiveLibrary{
+-(BOOL) cacheMetadataActiveLibrary{
     return _metadataCacheLevel >=2;
 }
--(BOOL) cacheActiveCollection{
+-(BOOL) cacheMetadataActiveCollection{
     return _metadataCacheLevel >=1;
+}
+
+-(BOOL) cacheAttachmentsAllLibraries{
+    return _attachmentsCacheLevel >=4;
+}
+
+-(BOOL) cacheAttachmentsActiveLibrary{
+    return _attachmentsCacheLevel >=3;
+}
+-(BOOL) cacheAttachmentsActiveCollection{
+    return _attachmentsCacheLevel >=2;
+}
+-(BOOL) cacheAttachmentsActiveItem{
+    return _attachmentsCacheLevel >=1;
 }
 
 -(BOOL) useCache{

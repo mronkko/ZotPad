@@ -36,6 +36,7 @@
                       searchString:(NSString*)searchString orderField:(NSString*)orderField sortDescending:(BOOL)sortDescending;
 
 
+
 - (void) addCreatorsToItem: (ZPZoteroItem*) item;
 - (void) addFieldsToItem: (ZPZoteroItem*) item;
 - (void) addNotesToItem: (ZPZoteroItem*) item;
@@ -44,12 +45,14 @@
 //Return a list of all attachment paths ordered by priority for removel
 - (NSArray*) getCachedAttachmentPaths;
 
+//Return a list of all attachment paths priority for retrieval
+- (NSArray*) getAttachmentThatNeedToBeDownloadedInLibrary:(NSNumber*)libraryID collection:(NSString*)collectionKey;
 
 - (void) updateViewedTimestamp:(ZPZoteroAttachment*)attachment;
 
 - (NSString*) getLocalizationStringWithKey:(NSString*) key type:(NSString*) type locale:(NSString*) locale;
 
-
+-(BOOL) doesItemKey:(NSString*)itemKey belongToCollection:(NSString*) collectionKey;
 
 // Methods for writing data to database
 -(void) addItemToDatabase:(ZPZoteroItem*)item;

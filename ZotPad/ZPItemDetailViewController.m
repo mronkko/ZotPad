@@ -16,7 +16,7 @@
 
 #import "ZPLogger.h"
 
-#define ATTACHMENT_VIEW_HEIGHT 700
+#define ATTACHMENT_VIEW_HEIGHT 680
 
 #define ATTACHMENT_IMAGE_HEIGHT 600
 #define ATTACHMENT_IMAGE_WIDTH 423
@@ -42,6 +42,8 @@
     [super viewDidLoad];
 
     [[ZPDataLayer instance] registerItemObserver:self];
+
+    _detailTableView.scrollEnabled = FALSE;
     
     
     
@@ -55,12 +57,10 @@
   
     //configure carousel
     _carousel.type = iCarouselTypeCoverFlow2;
-    [_carousel reloadData];
-
-}
-
-- (void)viewWillAppear:(BOOL)animated
-{
+    
+    //Show the item view in the navigator
+    _itemListController = [self.storyboard instantiateViewControllerWithIdentifier:@"NavigationItemListView"];
+    _itemListController.navigationItem.hidesBackButton = YES;
     
     
     //Configure attachment section. Attachment section will be always shown even if there are no attachments
@@ -69,48 +69,29 @@
     [attachmentView setFrame:CGRectMake(0,0, 
                                         self.view.frame.size.width,
                                         ATTACHMENT_VIEW_HEIGHT)];
-    
-    
-    //Show the item view in the navigator
-  
-    _itemListController = [self.storyboard instantiateViewControllerWithIdentifier:@"NavigationItemListView"];
-    
-    [_itemListController configureWithItemListController:[ZPDetailedItemListViewController instance]];
-    
-    _itemListController.navigationItem.hidesBackButton = YES;
-    
-    
-    [[[ZPLibraryAndCollectionListViewController instance] navigationController] pushViewController:_itemListController  animated:YES];
 
-	[super viewWillAppear:animated];
+
+}
+
+- (void)viewWillAppear:(BOOL)animated
+{
+    
+
+    [super viewWillAppear:animated];
 
     // Get the selected row from the item list
     NSIndexPath* indexPath = [[[ZPDetailedItemListViewController instance] tableView] indexPathForSelectedRow];
-    
+
+    // Set the navigation controller
+    [_itemListController configureWithItemListController:[ZPDetailedItemListViewController instance]];
+
+
     //Set the selected row to match the current row
     [[_itemListController tableView] selectRowAtIndexPath:indexPath animated:FALSE scrollPosition:UITableViewScrollPositionMiddle];
+    [[[ZPLibraryAndCollectionListViewController instance] navigationController] pushViewController:_itemListController  animated:YES];
 
-    _detailTableView.scrollEnabled = FALSE;
-    
     [_itemListController.tableView setDelegate: self];
-
 }
-
-
-/*
-//This works, but looks ugly
- - (void)didRotateFromInterfaceOrientation:(UIInterfaceOrientation)fromInterfaceOrientation{
-     UIView* attachmentView = [self.view viewWithTag:2];
-     [attachmentView setFrame:CGRectMake(0,0, 
-                                         self.view.frame.size.width,
-                                         ATTACHMENT_VIEW_HEIGHT)];  
-     [_detailTableView setFrame:CGRectMake(0, 
-                                           ATTACHMENT_VIEW_HEIGHT, 
-                                           self.view.frame.size.width, 
-                                           [_detailTableView contentSize].height)];
- 
-}
-*/
 
 
 - (void)willRotateToInterfaceOrientation:(UIInterfaceOrientation)toInterfaceOrientation duration:(NSTimeInterval)duration{
@@ -129,13 +110,9 @@
 -(void) configureWithItemKey:(NSString*)key{
     
     _currentItem = [[ZPDataLayer instance] getItemByKey: key];
+    [[ZPDataLayer instance] updateItemDetailsFromServer:_currentItem];
     
-    // If there is no detailed information available for this item, tell teh data layer to retrieve it
-    if(_currentItem.fields == NULL || _currentItem.attachments == NULL || _currentItem.creators == NULL){
-        [[ZPDataLayer instance] updateItemDetailsFromServer:_currentItem];
-    }
-    
-    
+        
     [self _reconfigureDetailTableViewAndAttachments ];
     
     if(_currentItem.creatorSummary!=NULL && ! [_currentItem.creatorSummary isEqualToString:@""]){
@@ -163,15 +140,13 @@
     [_detailTableView layoutIfNeeded];
     
     [_detailTableView setFrame:CGRectMake(0, 
-                                          [self.view viewWithTag:2].frame.size.height, 
+                                          ATTACHMENT_VIEW_HEIGHT, 
                                           self.view.frame.size.width, 
                                           [_detailTableView contentSize].height)];
-   
-    //TODO: possibly do this only if needed
     [_carousel reloadData];
     
     //Configure  the size of the UIScrollView
-    [(UIScrollView*) self.view setContentSize:CGSizeMake(self.view.frame.size.width, [self.view viewWithTag:2].frame.size.height + [_detailTableView contentSize].height)];
+    [(UIScrollView*) self.view setContentSize:CGSizeMake(self.view.frame.size.width, ATTACHMENT_VIEW_HEIGHT + [_detailTableView contentSize].height)];
     
 }
 - (void)viewWillDisappear:(BOOL)animated
@@ -292,8 +267,8 @@
                 break;
             }
         }
+        
         cell.textLabel.text = [ZPLocalization getLocalizationStringWithKey:key  type:@"field" locale:NULL];
-
         cell.detailTextLabel.text = [_currentItem.fields objectForKey:key];
     }
     
@@ -321,7 +296,7 @@
         // Get the key for the selected item 
         NSString* currentItemKey = [[_itemListController itemKeysShown] objectAtIndex: indexPath.row]; 
         
-        [self configureWithItemKey: currentItemKey];
+        if(currentItemKey != [NSNull null]) [self configureWithItemKey: currentItemKey];
         
     }
 }
@@ -336,7 +311,8 @@
 -(void) notifyItemAvailable:(ZPZoteroItem*) item{
     
     if([item.key isEqualToString:_currentItem.key]){
-        _currentItem = item;
+        //Retrive dta from DB
+         _currentItem = [[ZPDataLayer instance] getItemByKey: item.key];
         [self performSelectorOnMainThread:@selector( _reconfigureDetailTableViewAndAttachments) withObject:nil waitUntilDone:NO];
     }
 }

@@ -10,16 +10,25 @@
 
 @interface ZPPreferences : NSObject{
     NSInteger _metadataCacheLevel;
+    NSInteger _attachmentsCacheLevel;
     NSInteger _mode;
+    NSInteger _maxCacheSize;
 }
 
 +(ZPPreferences*) instance;
--(BOOL) cacheAllLibraries;
--(BOOL) cacheActiveLibrary;
--(BOOL) cacheActiveCollection;
+-(BOOL) cacheMetadataAllLibraries;
+-(BOOL) cacheMetadataActiveLibrary;
+-(BOOL) cacheMetadataActiveCollection;
+
+-(BOOL) cacheAttachmentsAllLibraries;
+-(BOOL) cacheAttachmentsActiveLibrary;
+-(BOOL) cacheAttachmentsActiveCollection;
+-(BOOL) cacheAttachmentsActiveItem;
 
 -(BOOL) useCache;
 -(BOOL) online;
+
+-(NSInteger) maxCacheSize;
 
 -(void) reload;
 

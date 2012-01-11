@@ -33,8 +33,6 @@
 
 @interface ZPDataLayer ();
 
-//Gets one item details and writes these to the database
--(void) _updateItemDetailsFromServer:(ZPZoteroItem*) item;
 
 
 @end
@@ -106,7 +104,6 @@ static ZPDataLayer* _instance = nil;
 
 
 - (NSArray*) getItemKeysFromCacheForLibrary:(NSNumber*)libraryID collection:(NSString*)collectionKey searchString:(NSString*)searchString orderField:(NSString*)orderField sortDescending:(BOOL)sortDescending{
-    [[ZPCacheController instance] setCurrentLibrary:libraryID];
     return [[ZPDatabase instance] getItemKeysForLibrary:libraryID collection:collectionKey searchString:searchString orderField:orderField sortDescending:sortDescending];
 }
 
@@ -117,35 +114,20 @@ static ZPDataLayer* _instance = nil;
     
     ZPZoteroItem* item=[[ZPDatabase instance] getItemByKey:key];
     [[ZPDatabase instance] addAttachmentsToItem:item];
+    [[ZPDatabase instance] addCreatorsToItem:item];
+    [[ZPDatabase instance] addFieldsToItem:item];
+
+    if(item.creators ==NULL) [NSException raise:@"Creators cannot be null" format:@"Reading an item (%@) from database resulted in null creators. "];
+    if(item.fields ==NULL || [item.fields count]==0) [NSException raise:@"Fields cannot be null or empty" format:@"Reading an item (%@) from database resulted in null or empty fields."];
+
     return item;
 }
 
 
 -(void) updateItemDetailsFromServer:(ZPZoteroItem*)item{
     
-    NSInvocationOperation* retrieveOperation = [[NSInvocationOperation alloc] initWithTarget:self
-                                                                                    selector:@selector(_updateItemDetailsFromServer:) object:item];
-  
-    [_serverRequestQueue addOperation:retrieveOperation];
+    [[ZPCacheController instance] refreshActiveItem:item];
 }
-
--(void) _updateItemDetailsFromServer:(ZPZoteroItem*)item{
-    item = [[ZPServerConnection instance] retrieveSingleItemDetailsFromServer:item];
-    [[ZPDatabase instance] writeItemFieldsToDatabase:item];
-    [[ZPDatabase instance] writeItemCreatorsToDatabase:item];
-    
-    for(ZPZoteroAttachment* attachment in item.attachments){
-        [[ZPDatabase instance] addAttachmentToDatabase:attachment];
-    }
-    for(ZPZoteroNote* note in item.notes){
-        [[ZPDatabase instance] addNoteToDatabase:note];
-    }
-    
-    
-    [self notifyItemAvailable:item];
-
-}
-
 
 
 

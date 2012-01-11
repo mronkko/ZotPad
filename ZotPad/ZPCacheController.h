@@ -36,10 +36,11 @@
 
 // These methods tell the cache that the user is currently viewing something
 //-(void) setCurrentCollection:(NSString*) collectionKey;
--(void) setCurrentLibrary:(NSNumber*) libraryID;
+//-(void) setCurrentLibrary:(NSNumber*) libraryID;
 //-(void) setCurrentItem:(NSString*) itemKey;
 -(void) updateLibrariesAndCollectionsFromServer;
 
+-(void) refreshActiveItem:(ZPZoteroItem*) item;
 -(NSArray*) uncachedItemKeysForLibrary:(NSNumber*)libraryID collection:(NSString*)collectionKey searchString:(NSString*)searchString orderField:(NSString*)orderField sortDescending:(BOOL)sortDescending;
 
 @end

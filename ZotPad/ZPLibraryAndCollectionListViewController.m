@@ -13,8 +13,13 @@
 #import "ZPAuthenticationDialog.h"
 #import "ZPAppDelegate.h"
 #import "ZPZoteroLibrary.h"
-
+#import "ZPCacheController.h"
 #import "ZPLogger.h"
+
+@interface ZPLibraryAndCollectionListViewController();
+-(void) _refreshLibrariesAndCollections;
+@end
+
 
 @implementation ZPLibraryAndCollectionListViewController
 
@@ -50,13 +55,14 @@ static ZPLibraryAndCollectionListViewController* _instance = nil;
     
     _instance= self;
     
-/*
     _activityIndicator = [[UIActivityIndicatorView alloc] initWithFrame:CGRectMake(0,0,20, 20)];
-    [_activityIndicator stopAnimating];
+    [_activityIndicator startAnimating];
     [_activityIndicator hidesWhenStopped];
     UIBarButtonItem* barButton = [[UIBarButtonItem alloc] initWithCustomView:_activityIndicator];
     self.navigationItem.rightBarButtonItem = barButton;
-*/
+
+    [self performSelectorInBackground:@selector(_refreshLibrariesAndCollections) withObject:NULL];
+
     //If the current library is not defined, show a list of libraries
     if(self->_currentLibraryID == 0){
         self->_content = [[ZPDataLayer instance] libraries];
@@ -77,8 +83,12 @@ static ZPLibraryAndCollectionListViewController* _instance = nil;
     return [self->_content count];
 }
 
+-(void) _refreshLibrariesAndCollections {
+    [_activityIndicator startAnimating];
+    [[ZPCacheController instance] updateLibrariesAndCollectionsFromServer];
+    [_activityIndicator stopAnimating];
+}
 //TODO: Instead of realoding everything, this method should just add or update the library that it receives
-//TODO: There should be an UIActivityIndicatorView spinning on top right corner when library and collection data are loaded from the server
 
 -(void) notifyLibraryWithCollectionsAvailable:(ZPZoteroLibrary*) library{
   
@@ -207,42 +217,5 @@ static ZPLibraryAndCollectionListViewController* _instance = nil;
     return YES;
 }
 
-/*
-// Override to support conditional editing of the table view.
-- (BOOL)tableView:(UITableView *)tableView canEditRowAtIndexPath:(NSIndexPath *)indexPath
-{
-    // Return NO if you do not want the specified item to be editable.
-    return YES;
-}
-*/
-
-/*
-// Override to support editing the table view.
-- (void)tableView:(UITableView *)tableView commitEditingStyle:(UITableViewCellEditingStyle)editingStyle forRowAtIndexPath:(NSIndexPath *)indexPath
-{
-    if (editingStyle == UITableViewCellEditingStyleDelete) {
-        // Delete the row from the data source.
-        [tableView deleteRowsAtIndexPaths:[NSArray arrayWithObject:indexPath] withRowAnimation:UITableViewRowAnimationFade];
-    } else if (editingStyle == UITableViewCellEditingStyleInsert) {
-        // Create a new instance of the appropriate class, insert it into the array, and add a new row to the table view.
-    }   
-}
-*/
-
-/*
-// Override to support rearranging the table view.
-- (void)tableView:(UITableView *)tableView moveRowAtIndexPath:(NSIndexPath *)fromIndexPath toIndexPath:(NSIndexPath *)toIndexPath
-{
-}
-*/
-
-/*
-// Override to support conditional rearranging of the table view.
-- (BOOL)tableView:(UITableView *)tableView canMoveRowAtIndexPath:(NSIndexPath *)indexPath
-{
-    // Return NO if you do not want the item to be re-orderable.
-    return YES;
-}
-*/
 
 @end

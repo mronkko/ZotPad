@@ -94,18 +94,14 @@
 			<key>Key</key>
 			<string>preemptivecachemetadata</string>
 			<key>DefaultValue</key>
-			<string>activecollections</string>
+			<integer>2</integer>
 			<key>Titles</key>
 			<array>
-				<string>Off</string>
-				<string>Active collections</string>
 				<string>Active libraries</string>
 				<string>All libraries</string>
 			</array>
 			<key>Values</key>
 			<array>
-				<integer>0</integer>
-				<integer>1</integer>
 				<integer>2</integer>
 				<integer>3</integer>
 			</array>
@@ -118,7 +114,7 @@
 			<key>Key</key>
 			<string>preemptivecacheattachmentfiles</string>
 			<key>DefaultValue</key>
-			<string>activeitems</string>
+			<integer>2</integer>
 			<key>Titles</key>
 			<array>
 				<string>Off</string>
@@ -129,11 +125,11 @@
 			</array>
 			<key>Values</key>
 			<array>
-				<string>off</string>
-				<string>activeitems</string>
-				<string>activecollections</string>
-				<string>activelibraries</string>
-				<string>alllibraries</string>
+				<integer>0</integer>
+				<integer>1</integer>
+				<integer>2</integer>
+				<integer>3</integer>
+				<integer>4</integer>
 			</array>
 		</dict>
 		<dict>

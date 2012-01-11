@@ -96,118 +96,124 @@
 
 -(void) _performTableUpdates{
     
-    NSMutableArray* thisItemKeys = _itemKeysShown;
-    
-    NSArray* newKeys = [[ZPDataLayer instance] getItemKeysFromCacheForLibrary:self.libraryID collection:self.collectionKey
-                                                                 searchString:[self.searchString stringByTrimmingCharactersInSet:[NSCharacterSet whitespaceAndNewlineCharacterSet]]orderField:self.orderField sortDescending:self.sortDescending];
-    
-  
-    @synchronized(_tableView){
-        if(thisItemKeys != _itemKeysShown) return;
-        [_itemKeysNotInCache removeObjectsInArray:newKeys];
-    }
-    
-    NSLog(@"Beging updating the table rows");
-    
-    NSInteger index=0;
-    NSMutableArray* reloadIndices = [NSMutableArray array];
-    NSMutableArray* insertIndices = [NSMutableArray array];
-    
-    for(NSString* newKey in newKeys){
-
-        //If there is a new set of items loaded, return without performing any updates. 
-        if(thisItemKeys != _itemKeysShown) return;
+    //Only one thread at a time
+    @synchronized(self){
+        NSMutableArray* thisItemKeys = _itemKeysShown;
         
-        if([thisItemKeys count] == index){
-            NSLog(@"Adding item %@ at %i",newKey,index);
-            [thisItemKeys addObject:newKey];
-            [insertIndices addObject:[NSIndexPath indexPathForRow:index inSection:0]];
+        NSArray* newKeys = [[ZPDataLayer instance] getItemKeysFromCacheForLibrary:self.libraryID collection:self.collectionKey
+                                                                     searchString:[self.searchString stringByTrimmingCharactersInSet:[NSCharacterSet whitespaceAndNewlineCharacterSet]]orderField:self.orderField sortDescending:self.sortDescending];
+        
+        
+        @synchronized(_tableView){
+            if(thisItemKeys != _itemKeysShown) return;
+            [_itemKeysNotInCache removeObjectsInArray:newKeys];
         }
-        else if([thisItemKeys objectAtIndex:index] == [NSNull null]){
-            NSLog(@"Replacing NULL with %@ at %i",newKey,index);
-            [thisItemKeys replaceObjectAtIndex:index withObject:newKey];
-            [reloadIndices addObject:[NSIndexPath indexPathForRow:index inSection:0]];
-        }
-        //There is something in the way, so we need to either insert or move
-        else if(![newKey isEqualToString:[thisItemKeys objectAtIndex:index]]){
+        
+        NSLog(@"Beging updating the table rows");
+        
+        NSInteger index=0;
+        NSMutableArray* reloadIndices = [NSMutableArray array];
+        NSMutableArray* insertIndices = [NSMutableArray array];
+        
+        for(NSString* newKey in newKeys){
             
-            //We found that a shown key does not match the data on server
+            //If there is a new set of items loaded, return without performing any updates. 
+            if(thisItemKeys != _itemKeysShown) return;
             
-            NSInteger oldIndex = [thisItemKeys indexOfObject:newKey];
-            
-            //If the new data cannot be found in the view, insert it
-            if(oldIndex==NSNotFound){
-                NSLog(@"Inserting %@ at %i",newKey,index);
-                [thisItemKeys insertObject:newKey atIndex:index];
+            if([thisItemKeys count] == index){
+                NSLog(@"Adding item %@ at %i",newKey,index);
+                [thisItemKeys addObject:newKey];
                 [insertIndices addObject:[NSIndexPath indexPathForRow:index inSection:0]];
             }
-            //Else move it
-            else{
-                //Before movign we need to do all the other table operations
-                if([insertIndices count]>0) {
-                    @synchronized(_tableView){
-                        if(thisItemKeys != _itemKeysShown) return;
-                        [self performSelectorOnMainThread:@selector(_performRowInsertions:) withObject:insertIndices waitUntilDone:TRUE];
-                    }
-                    [insertIndices removeAllObjects];
-                }
-                if([reloadIndices count]>0){
-                    @synchronized(_tableView){
-                        if(thisItemKeys != _itemKeysShown) return;
-                        [self performSelectorOnMainThread:@selector(_performRowReloads:) withObject:reloadIndices waitUntilDone:TRUE];
-                    }
-                    [reloadIndices removeAllObjects];
-                }
+            else if([thisItemKeys objectAtIndex:index] == [NSNull null]){
+                NSLog(@"Replacing NULL with %@ at %i",newKey,index);
+                [thisItemKeys replaceObjectAtIndex:index withObject:newKey];
+                [reloadIndices addObject:[NSIndexPath indexPathForRow:index inSection:0]];
+            }
+            //There is something in the way, so we need to either insert or move
+            else if(![newKey isEqualToString:[thisItemKeys objectAtIndex:index]]){
                 
-                [thisItemKeys removeObjectAtIndex:oldIndex];
-                [thisItemKeys insertObject:newKey atIndex:index];
-                NSArray* paramArray = [NSArray arrayWithObjects:[NSIndexPath indexPathForRow:oldIndex inSection:0],[NSIndexPath indexPathForRow:index inSection:0],nil];
-                @synchronized(_tableView){
-                    if(thisItemKeys != _itemKeysShown) return;
-                    [self performSelectorOnMainThread:@selector(_performRowMoveFromFirstIndexToSecond:) withObject:paramArray waitUntilDone:TRUE];
+                //We found that a shown key does not match the data on server
+                
+                NSInteger oldIndex = [thisItemKeys indexOfObject:newKey];
+                
+                //If the new data cannot be found in the view, insert it
+                if(oldIndex==NSNotFound){
+                    NSLog(@"Inserting %@ at %i",newKey,index);
+                    [thisItemKeys insertObject:newKey atIndex:index];
+                    [insertIndices addObject:[NSIndexPath indexPathForRow:index inSection:0]];
+                }
+                //Else move it
+                else{
+                    //Before movign we need to do all the other table operations
+                    if([insertIndices count]>0) {
+                        @synchronized(_tableView){
+                            if(thisItemKeys != _itemKeysShown) return;
+                            [self performSelectorOnMainThread:@selector(_performRowInsertions:) withObject:insertIndices waitUntilDone:TRUE];
+                        }
+                        [insertIndices removeAllObjects];
+                    }
+                    if([reloadIndices count]>0){
+                        @synchronized(_tableView){
+                            if(thisItemKeys != _itemKeysShown) return;
+                            [self performSelectorOnMainThread:@selector(_performRowReloads:) withObject:reloadIndices waitUntilDone:TRUE];
+                        }
+                        [reloadIndices removeAllObjects];
+                    }
+                    
+                    [thisItemKeys removeObjectAtIndex:oldIndex];
+                    [thisItemKeys insertObject:newKey atIndex:index];
+                    NSArray* paramArray = [NSArray arrayWithObjects:[NSIndexPath indexPathForRow:oldIndex inSection:0],[NSIndexPath indexPathForRow:index inSection:0],nil];
+                    @synchronized(_tableView){
+                        if(thisItemKeys != _itemKeysShown) return;
+                        [self performSelectorOnMainThread:@selector(_performRowMoveFromFirstIndexToSecond:) withObject:paramArray waitUntilDone:TRUE];
+                    }
                 }
             }
+            index++;
         }
-        index++;
-    }
-    
-    //Add empty rows to the end if there are still unknown rows
-    while([thisItemKeys count]<([_itemKeysNotInCache count] + [newKeys count])){
-        NSLog(@"Padding with null %i (Unknown keys: %i, Known keys: %i)",[thisItemKeys count],[_itemKeysNotInCache count],[newKeys count]);
-        [insertIndices addObject:[NSIndexPath indexPathForRow:[thisItemKeys count] inSection:0]];
-        [thisItemKeys addObject:[NSNull null]];
-    }
-    
-    if([insertIndices count]>0){
-        @synchronized(_tableView){
-            if(thisItemKeys != _itemKeysShown) return;
-            [self performSelectorOnMainThread:@selector(_performRowInsertions:) withObject:insertIndices waitUntilDone:TRUE];
+        
+        //Add empty rows to the end if there are still unknown rows
+        while([thisItemKeys count]<([_itemKeysNotInCache count] + [newKeys count])){
+            NSLog(@"Padding with null %i (Unknown keys: %i, Known keys: %i)",[thisItemKeys count],[_itemKeysNotInCache count],[newKeys count]);
+            [insertIndices addObject:[NSIndexPath indexPathForRow:[thisItemKeys count] inSection:0]];
+            [thisItemKeys addObject:[NSNull null]];
         }
-    }
-    
-    if([reloadIndices count]>0){
-        @synchronized(_tableView){
-            if(thisItemKeys != _itemKeysShown) return;
-            [self performSelectorOnMainThread:@selector(_performRowReloads:) withObject:reloadIndices waitUntilDone:TRUE];
+        
+        if([insertIndices count]>0){
+            @synchronized(_tableView){
+                if(thisItemKeys != _itemKeysShown) return;
+                [self performSelectorOnMainThread:@selector(_performRowInsertions:) withObject:insertIndices waitUntilDone:TRUE];
+            }
         }
-    }
-    //If modifications have caused the visible items become too long, remove items from the end
-    NSMutableArray* deleteIndices = [NSMutableArray array];   
-    while([thisItemKeys count]>([_itemKeysNotInCache count] + [newKeys count])){
-        NSLog(@"Removing extra from end %i (Unknown keys: %i, Known keys: %i)",[thisItemKeys count],[_itemKeysNotInCache count],[newKeys count]);
-        [thisItemKeys removeLastObject];
-        [deleteIndices addObject:[NSIndexPath indexPathForRow:[thisItemKeys count] inSection:0]];
-    }
-    if([deleteIndices count] >0){
-        @synchronized(_tableView){
-            if(thisItemKeys != _itemKeysShown) return;
-            [self performSelectorOnMainThread:@selector(_performRowDeletions:) withObject:deleteIndices waitUntilDone:YES];
+        
+        if([reloadIndices count]>0){
+            @synchronized(_tableView){
+                if(thisItemKeys != _itemKeysShown) return;
+                [self performSelectorOnMainThread:@selector(_performRowReloads:) withObject:reloadIndices waitUntilDone:TRUE];
+            }
         }
+        //If modifications have caused the visible items become too long, remove items from the end
+        NSMutableArray* deleteIndices = [NSMutableArray array];   
+        while([thisItemKeys count]>([_itemKeysNotInCache count] + [newKeys count])){
+            NSLog(@"Removing extra from end %i (Unknown keys: %i, Known keys: %i)",[thisItemKeys count],[_itemKeysNotInCache count],[newKeys count]);
+            [thisItemKeys removeLastObject];
+            [deleteIndices addObject:[NSIndexPath indexPathForRow:[thisItemKeys count] inSection:0]];
+        }
+        if([deleteIndices count] >0){
+            @synchronized(_tableView){
+                if(thisItemKeys != _itemKeysShown) return;
+                [self performSelectorOnMainThread:@selector(_performRowDeletions:) withObject:deleteIndices waitUntilDone:YES];
+            }
+        }
+        NSLog(@"End updating the table rows");
+        
+        if([_itemKeysNotInCache count] == 0) [_activityIndicator stopAnimating];
+        
+        //Sleep for a while to allow other events to execute. Without this sleep the UI can become jerky
+        //TODO: Try to optimize the code so that this would not be needed
+        [NSThread sleepForTimeInterval:.2];
     }
-    NSLog(@"End updating the table rows");
-    
-    if([_itemKeysNotInCache count] == 0) [_activityIndicator stopAnimating];
-
 }
 
 -(void) _performRowReloads:(NSArray*)indexPaths{

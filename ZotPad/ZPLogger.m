@@ -32,7 +32,7 @@ void ZPLog(NSObject* source,int line,NSString* format, ...){
 //        [debugClasses addObject:@"ZPCacheController"];
 //        [debugClasses addObject:@"ZPAppDelegate"];
 //        [debugClasses addObject:@"ZPDatabase"];
-        [debugClasses addObject:@"ZPAuthenticationDialog"];
+//        [debugClasses addObject:@"ZPAuthenticationDialog"];
         
     }
 
@@ -40,7 +40,7 @@ void ZPLog(NSObject* source,int line,NSString* format, ...){
     NSString* name = NSStringFromClass([source class]);
     if(! [name hasPrefix:@"ZP"] || [debugClasses containsObject:name]){
         
-        NSTimeInterval milliseconds = ([timeWhenAppStarted timeIntervalSinceNow] * 1000);
+        NSTimeInterval milliseconds = -([timeWhenAppStarted timeIntervalSinceNow] * 1000);
 //        NSString* logPrefix = [NSString stringWithFormat:@"%i - %@:%i ",milliseconds,name,line];
         NSString* logPrefix = [NSString stringWithFormat:@"\n\n%f - ",milliseconds];
         logPrefix = [logPrefix stringByAppendingString:name];
