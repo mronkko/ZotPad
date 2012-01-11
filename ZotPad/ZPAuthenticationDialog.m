@@ -11,6 +11,7 @@
 #import "OAToken.h"
 #import "ZPDataLayer.h"
 #import "ZPAuthenticationProcess.h"
+#import "../DSActivityView/Sources/DSActivityView.h"
 
 #import "ZPLogger.h"
 
@@ -36,17 +37,15 @@ static ZPAuthenticationDialog* _instance = nil;
 
 #pragma mark - View lifecycle
 
-/*
-// Implement loadView to create a view hierarchy programmatically, without using a nib.
-- (void)loadView
-{
-}
-*/
+
 
 - (void)viewDidLoad {
     
     _instance = self;
-
+    //Add a loading indicator
+    _activityView = [DSBezelActivityView newActivityViewForView:webView];
+    [[self webView] setUserInteractionEnabled:FALSE];
+    
 }
 
 - (void)setKeyAndLoadZoteroSite:(NSString*) key{
@@ -69,32 +68,51 @@ static ZPAuthenticationDialog* _instance = nil;
 }
 - (BOOL)webView:(UIWebView *)webView shouldStartLoadWithRequest:(NSURLRequest *)request navigationType:(UIWebViewNavigationType)navigationType{
 
+    //These are valid URL prefixes in the authentication workflow and should be loaded
+    NSArray* validURLs = [NSArray arrayWithObjects:@"https://www.zotero.org/oauth/authorize?oauth_token=",
+                          @"https://www.zotero.org/settings/keys/new?oauth=1&oauth_token=",
+                          @"https://www.zotero.org/?oauth_token=",
+                          @"https://www.zotero.org/user/logout",
+                          @"https://www.zotero.org/user/login",nil];
+    
+
     NSString* urlString = [[request mainDocumentURL] absoluteString];
-    NSLog(@"%@",urlString);
     
     //If we are redirected to the front page, we do not need to show the web browser any more
     
-    if([urlString hasPrefix:@"https://www.zotero.org/?"]){
+    if([urlString hasPrefix:@"https://www.zotero.org/?oauth_token="]){
         
         //Get permanent key with the temporary key
         NSString* verifier=[[urlString componentsSeparatedByString:@"="] lastObject];
-        
-        [[ZPAuthenticationProcess instance] processVerifier:verifier];
+
         [self dismissModalViewControllerAnimated:YES];
+
+        [[ZPAuthenticationProcess instance] processVerifier:verifier];
             
         return FALSE;
     }
+    //Loop through the white list and load the url if it should be loaded
     else{
-        return TRUE;
+        NSString* validURL;
+        for(validURL in validURLs){
+            if([urlString hasPrefix:validURL]) return TRUE;
+        }
+    }
+
+    NSLog(@"URL %@ is not whitelisted in the authentication sequence",urlString);
+    return FALSE;
+}
+
+- (void)webViewDidStartLoad:(UIWebView *)webView{
+    
+}
+- (void)webViewDidFinishLoad:(UIWebView *)webView{
+    if(_activityView != NULL){
+        [DSBezelActivityView removeViewAnimated:YES];
+        [[self webView] setUserInteractionEnabled:TRUE];
+        _activityView = NULL;
     }
 }
-/*
-// Implement viewDidLoad to do additional setup after loading the view, typically from a nib.
-- (void)viewDidLoad
-{
-    [super viewDidLoad];
-}
-*/
 
 - (void)viewDidUnload
 {

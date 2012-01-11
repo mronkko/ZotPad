@@ -30,7 +30,7 @@
 #import "ASIHTTPRequest.h"
 
 #import "ZPLogger.h"
-
+#import "ZPPreferences.h"
 //Private methods
 
 @interface ZPServerConnection();
@@ -68,14 +68,18 @@ const NSInteger ZPServerConnectionRequestTopLevelKeys = 9;
 
 /*
 
- Singleton accessor
+ Singleton accessor. If ZotPad is offline, return null to prevent accessing the server.
+ 
  */
 
 +(ZPServerConnection*) instance {
-    if(_instance == NULL){
-        _instance = [[ZPServerConnection alloc] init];
+    if([[ZPPreferences instance] online]){
+        if(_instance == NULL){
+            _instance = [[ZPServerConnection alloc] init];
+        }
+        return _instance;
     }
-    return _instance;
+    else return NULL;
 }
 
 /*
@@ -438,6 +442,40 @@ const NSInteger ZPServerConnectionRequestTopLevelKeys = 9;
     return parserDelegate.parsedElements;
     
 }
+
+-(NSArray*) retrieveKeysInContainer:(NSNumber*)libraryID collection:(NSString*)collectionKey searchString:(NSString*)searchString orderField:(NSString*)orderField sortDescending:(BOOL)sortDescending{
+    
+    NSMutableDictionary* parameters = [NSMutableDictionary dictionaryWithObject:libraryID  forKey:@"libraryID"];
+    if(collectionKey!=NULL) [parameters setValue:collectionKey forKey:@"collectionKey"];
+    
+    //Search
+    if(searchString!=NULL && ! [searchString isEqualToString:@""]){
+        [parameters setObject:[searchString stringByAddingPercentEscapesUsingEncoding:
+                               NSASCIIStringEncoding] forKey:@"q"];
+    }
+    //Sort
+    if(orderField!=NULL){
+        [parameters setObject:orderField forKey:@"order"];
+        
+        if(sortDescending){
+            [parameters setObject:@"desc" forKey:@"sort"];
+        }
+        else{
+            [parameters setObject:@"asc" forKey:@"sort"];
+        }
+    }
+    //Get the most recent first by default
+    else{
+        [parameters setObject:@"dateModified" forKey:@"order"];
+        [parameters setObject:@"desc" forKey:@"sort"];
+    }
+    
+    ZPServerResponseXMLParser* parserDelegate =  [self makeServerRequest:ZPServerConnectionRequestTopLevelKeys withParameters:parameters];
+    
+    return parserDelegate.parsedElements;
+    
+}
+
 -(NSString*) retrieveTimestampForContainer:(NSNumber*)libraryID collectionKey:(NSString*)key{
     
     NSMutableDictionary* parameters = [NSMutableDictionary dictionaryWithObject:libraryID  forKey:@"libraryID"];

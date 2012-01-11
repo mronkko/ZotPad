@@ -18,10 +18,15 @@
     NSArray* _content;
     NSNumber* _currentLibraryID;
     NSString* _currentCollectionKey;
+    UIActivityIndicatorView* _activityIndicator;
+    
 }
+
 @property (strong, nonatomic) ZPDetailedItemListViewController *detailViewController;
 @property (retain, nonatomic) NSNumber* currentLibraryID;
 @property (retain, nonatomic) NSString* currentCollectionKey;
+
+// TODO: refactor the code so that this does not need a singleton
 
 + (ZPLibraryAndCollectionListViewController*) instance;
 

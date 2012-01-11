@@ -18,7 +18,6 @@
 #import "ZPZoteroNote.h"
 #import "ZPLogger.h"
 
-
 #define NUMBER_OF_ITEMS_TO_RETRIEVE 50
 
 
@@ -318,7 +317,7 @@ static ZPCacheController* _instance = nil;
     [self _checkQueues];
 }
 
--(NSArray*) uncachedItemKeysForLibrary:(NSNumber*) libraryID collection:(NSString*) collectionKey{
+-(NSArray*) uncachedItemKeysForLibrary:(NSNumber*)libraryID collection:(NSString*)collectionKey searchString:(NSString*)searchString orderField:(NSString*)orderField sortDescending:(BOOL)sortDescending{
 
     //First get the list of items in this container 
 
@@ -437,8 +436,8 @@ static ZPCacheController* _instance = nil;
 
 
 -(void) _updateLibrariesAndCollectionsFromServer{
-
-    
+     
+    //My library  
     NSArray* collections = [[ZPServerConnection instance] retrieveCollectionsForLibraryFromServer:[NSNumber numberWithInt:1]];
     if(collections!=NULL){
         [[ZPDatabase instance] addOrUpdateCollections:collections forLibrary:[NSNumber numberWithInt:1]];

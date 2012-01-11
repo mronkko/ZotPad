@@ -7,10 +7,12 @@
 //
 
 #import <UIKit/UIKit.h>
+#import "../DSActivityView/Sources/DSActivityView.h"
 
 
 @interface ZPAuthenticationDialog : UIViewController <UIApplicationDelegate, UIWebViewDelegate> {
     UIWebView* webView;
+    DSActivityView* _activityView;
 
 }
 

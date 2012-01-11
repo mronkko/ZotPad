@@ -17,7 +17,8 @@
     DSBezelActivityView* _activityView;
 }
 
-// This class is used as a singleton
+// This class is used as a singleton. 
+// TODO: refactor the code so that this does not need a singleton
 + (ZPDetailedItemListViewController*) instance;
 
 - (void)configureView;

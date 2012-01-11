@@ -24,6 +24,8 @@
 #import "../FMDB/src/FMDatabase.h"
 #import "../FMDB/src/FMResultSet.h"
 
+#import "ZPPreferences.h"
+
 #import "ZPLogger.h"
 
 @implementation ZPDatabase
@@ -84,14 +86,17 @@ static ZPDatabase* _instance = nil;
 }
 
 /*
- Singleton accessor
+ Singleton accessor. If ZotPad is set to not use cache, prevent accessing this boject by returning NULL
  */
 
 +(ZPDatabase*) instance {
-    if(_instance == NULL){
-        _instance = [[ZPDatabase alloc] init];
+    if([[ZPPreferences instance] useCache]){
+        if(_instance == NULL){
+            _instance = [[ZPDatabase alloc] init];
+        }
+        return _instance;
     }
-    return _instance;
+    else return NULL;
 }
 
 -(void) addOrUpdateLibraries:(NSArray*)libraries{

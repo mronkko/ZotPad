@@ -65,8 +65,11 @@ static ZPDetailedItemListViewController* _instance = nil;
         // Retrieve the item IDs if a library is selected. 
         
         if(_libraryID!=0){
-
-            //This is required because a background thread might be modefying the table
+            
+            [_activityIndicator startAnimating];
+            
+            
+            //This is required because a background thread might be modifying the table
              @synchronized(_tableView){
                  _itemKeysNotInCache = [NSMutableArray array];
                  _itemKeysShown = [NSMutableArray array];
@@ -94,9 +97,16 @@ static ZPDetailedItemListViewController* _instance = nil;
 }
 
 - (void) _configureCachedKeys{
-
-    _itemKeysShown = [NSMutableArray arrayWithArray: [[ZPDataLayer instance] getItemKeysFromCacheForLibrary:self.libraryID collection:self.collectionKey
-                                                                                               searchString:[self.searchString stringByTrimmingCharactersInSet:[NSCharacterSet whitespaceAndNewlineCharacterSet]]orderField:self.orderField sortDescending:self.sortDescending]];
+    
+    NSMutableArray* array = [NSMutableArray arrayWithArray: [[ZPDataLayer instance] getItemKeysFromCacheForLibrary:self.libraryID collection:self.collectionKey
+                                                                                                      searchString:[self.searchString stringByTrimmingCharactersInSet:[NSCharacterSet whitespaceAndNewlineCharacterSet]]orderField:self.orderField sortDescending:self.sortDescending]];
+    @synchronized(_tableView){
+        _itemKeysShown = array;
+        
+        //TODO: Uncommenting thic causes the thread to crash. Investigate why. After this uncomment also the reload sections earlier.
+        //[_tableView reloadSections:[NSIndexSet indexSetWithIndex:0] withRowAnimation:UITableViewRowAnimationAutomatic];
+        [_tableView reloadData];
+    }
     
     // Queue an operation to retrieve all item keys that belong to this collection but are not found in cache. 
     [self performSelectorInBackground:@selector(_configureUncachedKeys:) withObject:_itemKeysShown];
@@ -113,16 +123,15 @@ static ZPDetailedItemListViewController* _instance = nil;
 
 - (void)_makeAvailable{
     [DSBezelActivityView removeViewAnimated:YES];
-    //TODO: Uncommenting thic causes the thread to crash. Investigate why. After this uncomment also the reload sections earlier.
-    //[_tableView reloadSections:[NSIndexSet indexSetWithIndex:0] withRowAnimation:UITableViewRowAnimationAutomatic];
-    [_tableView reloadData];
+
     [_tableView setUserInteractionEnabled:TRUE];
     _activityView = NULL;
 }
 
 - (void) _configureUncachedKeys:(NSArray*)itemKeyList{
     
-    NSArray* uncachedItems = [[ZPCacheController instance] uncachedItemKeysForLibrary:_libraryID collection:_collectionKey];
+    NSArray* uncachedItems = [[ZPCacheController instance] uncachedItemKeysForLibrary:self.libraryID collection:self.collectionKey                                                                          searchString:[self.searchString stringByTrimmingCharactersInSet:[NSCharacterSet whitespaceAndNewlineCharacterSet]]orderField:self.orderField sortDescending:self.sortDescending];
+    
     //Only update the uncached keys if we are still showing the same item key list
     if(itemKeyList==_itemKeysShown){
         [_itemKeysNotInCache addObjectsFromArray:uncachedItems];
@@ -244,7 +253,7 @@ static ZPDetailedItemListViewController* _instance = nil;
 	// Do any additional setup after loading the view, typically from a nib.
 
     _instance = self;
-    
+
 
     [self configureView];
 }

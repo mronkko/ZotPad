@@ -31,13 +31,11 @@
 
 @synthesize itemKeysShown = _itemKeysShown;
 @synthesize tableView = _tableView;
-
 @synthesize collectionKey = _collectionKey;
 @synthesize libraryID =  _libraryID;
 @synthesize searchString = _searchString;
 @synthesize orderField = _orderField;
 @synthesize sortDescending = _sortDescending;
-
 
 #pragma mark - Managing the detail item
 
@@ -207,6 +205,9 @@
         }
     }
     NSLog(@"End updating the table rows");
+    
+    if([_itemKeysNotInCache count] == 0) [_activityIndicator stopAnimating];
+
 }
 
 -(void) _performRowReloads:(NSArray*)indexPaths{
@@ -307,6 +308,13 @@
 {
         
     [super viewDidLoad];
+    
+    //Set up activity indicator. 
+    _activityIndicator = [[UIActivityIndicatorView alloc] initWithFrame:CGRectMake(0,0,20, 20)];
+    [_activityIndicator stopAnimating];
+    [_activityIndicator hidesWhenStopped];
+    UIBarButtonItem* barButton = [[UIBarButtonItem alloc] initWithCustomView:_activityIndicator];
+    self.navigationItem.rightBarButtonItem = barButton;
 
 }
 
@@ -320,6 +328,15 @@
 - (void)viewWillAppear:(BOOL)animated
 {
     [super viewWillAppear:animated];
+    
+    //If there are more items coming, make this active
+    if([_itemKeysNotInCache count] >0){
+        [_activityIndicator startAnimating];
+    }
+    else{
+        [_activityIndicator stopAnimating];
+    }
+
 }
 
 - (void)viewDidAppear:(BOOL)animated

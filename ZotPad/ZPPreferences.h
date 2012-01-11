@@ -10,12 +10,17 @@
 
 @interface ZPPreferences : NSObject{
     NSInteger _metadataCacheLevel;
-    BOOL _smartCache;
+    NSInteger _mode;
 }
 
 +(ZPPreferences*) instance;
 -(BOOL) cacheAllLibraries;
 -(BOOL) cacheActiveLibrary;
 -(BOOL) cacheActiveCollection;
+
+-(BOOL) useCache;
+-(BOOL) online;
+
+-(void) reload;
 
 @end

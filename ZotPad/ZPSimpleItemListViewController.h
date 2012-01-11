@@ -21,19 +21,18 @@
     NSMutableArray* _itemKeysNotInCache;
 
     UITableView* _tableView;
-    
     NSString*_searchString;
     NSString*_collectionKey;
     NSNumber* _libraryID;
     NSString* _orderField;
     BOOL _sortDescending;
-    
+    UIActivityIndicatorView* _activityIndicator;
     NSInteger _animations;
 }
 
 - (void)configureWithItemListController:(ZPSimpleItemListViewController*)controller;
 
-// Needed by sub class, so need sto be here
+// Needed by sub class, so needs to be here
 - (void) _performTableUpdates;
 
 @property (nonatomic, retain) IBOutlet UITableView* tableView;

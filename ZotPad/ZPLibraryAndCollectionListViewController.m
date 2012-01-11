@@ -50,6 +50,13 @@ static ZPLibraryAndCollectionListViewController* _instance = nil;
     
     _instance= self;
     
+/*
+    _activityIndicator = [[UIActivityIndicatorView alloc] initWithFrame:CGRectMake(0,0,20, 20)];
+    [_activityIndicator stopAnimating];
+    [_activityIndicator hidesWhenStopped];
+    UIBarButtonItem* barButton = [[UIBarButtonItem alloc] initWithCustomView:_activityIndicator];
+    self.navigationItem.rightBarButtonItem = barButton;
+*/
     //If the current library is not defined, show a list of libraries
     if(self->_currentLibraryID == 0){
         self->_content = [[ZPDataLayer instance] libraries];
@@ -71,6 +78,7 @@ static ZPLibraryAndCollectionListViewController* _instance = nil;
 }
 
 //TODO: Instead of realoding everything, this method should just add or update the library that it receives
+//TODO: There should be an UIActivityIndicatorView spinning on top right corner when library and collection data are loaded from the server
 
 -(void) notifyLibraryWithCollectionsAvailable:(ZPZoteroLibrary*) library{
   

@@ -40,6 +40,6 @@
 //-(void) setCurrentItem:(NSString*) itemKey;
 -(void) updateLibrariesAndCollectionsFromServer;
 
--(NSArray*) uncachedItemKeysForLibrary:(NSNumber*) libraryId collection:(NSString*) collectionKey;
+-(NSArray*) uncachedItemKeysForLibrary:(NSNumber*)libraryID collection:(NSString*)collectionKey searchString:(NSString*)searchString orderField:(NSString*)orderField sortDescending:(BOOL)sortDescending;
 
 @end
