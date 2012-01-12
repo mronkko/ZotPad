@@ -54,7 +54,7 @@
 @property (retain) NSDictionary* fields;
 
 +(BOOL) existsInCache:(NSString*) key;
-+(ZPZoteroItem*) ZPZoteroItemWithKey:(NSString*) key;
++(ZPZoteroItem*) retrieveOrInitializeWithKey:(NSString*) key;
 -(NSString*)key;
 -(BOOL) needsToBeWrittenToCache;
 -(void) clearNeedsToBeWrittenToCache;

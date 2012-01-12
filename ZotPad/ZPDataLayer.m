@@ -109,21 +109,6 @@ static ZPDataLayer* _instance = nil;
 
 
 
-
-- (ZPZoteroItem*) getItemByKey: (NSString*) key{
-    
-    ZPZoteroItem* item=[[ZPDatabase instance] getItemByKey:key];
-    [[ZPDatabase instance] addAttachmentsToItem:item];
-    [[ZPDatabase instance] addCreatorsToItem:item];
-    [[ZPDatabase instance] addFieldsToItem:item];
-
-    if(item.creators ==NULL) [NSException raise:@"Creators cannot be null" format:@"Reading an item (%@) from database resulted in null creators. "];
-    if(item.fields ==NULL || [item.fields count]==0) [NSException raise:@"Fields cannot be null or empty" format:@"Reading an item (%@) from database resulted in null or empty fields."];
-
-    return item;
-}
-
-
 -(void) updateItemDetailsFromServer:(ZPZoteroItem*)item{
     
     [[ZPCacheController instance] refreshActiveItem:item];

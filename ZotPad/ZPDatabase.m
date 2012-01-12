@@ -364,23 +364,21 @@ static ZPDatabase* _instance = nil;
 }
 
 -(void) addAttachmentToDatabase:(ZPZoteroAttachment*)attachment{
-    //For now ingnore standalone attachments
-    if(attachment.parentItemKey != NULL){
-        @synchronized(self){
-            //TODO: Implement modifying already existing items if they are older (lastTimestamp) nthan the new item
-            FMResultSet* resultSet = [_database executeQuery: @"SELECT lastTimestamp FROM attachments WHERE key =? LIMIT 1",attachment.key];
+
+    @synchronized(self){
+        //TODO: Implement modifying already existing items if they are older (lastTimestamp) nthan the new item
+        FMResultSet* resultSet = [_database executeQuery: @"SELECT lastTimestamp FROM attachments WHERE key =? LIMIT 1",attachment.key];
+        
+        BOOL found = [resultSet next];
+        
+        [resultSet close];
+        
+        if(! found ){
             
-            BOOL found = [resultSet next];
             
-            [resultSet close];
+            [_database executeUpdate:@"INSERT INTO attachments (key,parentItemKey,lastTimestamp,attachmentURL,attachmentType,attachmentTitle,attachmentLength) VALUES (?,?,?,?,?,?,?)",
+             attachment.key,attachment.parentItemKey,attachment.lastTimestamp,attachment.attachmentURL,attachment.attachmentType,attachment.attachmentTitle,[NSNumber numberWithInt: attachment.attachmentLength]];
             
-            if(! found ){
-                
-                
-                [_database executeUpdate:@"INSERT INTO attachments (key,parentItemKey,lastTimestamp,attachmentURL,attachmentType,attachmentTitle,attachmentLength) VALUES (?,?,?,?,?,?,?)",
-                 attachment.key,attachment.parentItemKey,attachment.lastTimestamp,attachment.attachmentURL,attachment.attachmentType,attachment.attachmentTitle,[NSNumber numberWithInt: attachment.attachmentLength]];
-                
-            }
         }
     }
 }
@@ -389,23 +387,22 @@ static ZPDatabase* _instance = nil;
 // Records a new collection membership
 -(void) addItem:(ZPZoteroItem*)item toCollection:(NSString*)collectionKey{
     //TODO: Make this check if an item exists in a collection before running this
-    [_database executeUpdate:@"INSERT INTO collectionItems (collectionKey, itemKey) VALUES (?,?)",collectionKey,item.key];
+    @synchronized(self){
+        [_database executeUpdate:@"INSERT INTO collectionItems (collectionKey, itemKey) VALUES (?,?)",collectionKey,item.key];
+
+    }
 }
 
 
 
 
-- (ZPZoteroItem*) getItemByKey: (NSString*) key{
-    
-    ZPZoteroItem* item = NULL;
+- (void) addBasicToItem:(ZPZoteroItem *)item{
     
     @synchronized(self){
-        FMResultSet* resultSet = [_database executeQuery: @"SELECT itemType,libraryID,year,creator,title,publishedIn,key,fullCitation,lastTimestamp FROM items WHERE key=? LIMIT 1",key];
+        FMResultSet* resultSet = [_database executeQuery: @"SELECT itemType,libraryID,year,creator,title,publishedIn,key,fullCitation,lastTimestamp FROM items WHERE key=? LIMIT 1",item.key];
         
         if ([resultSet next]) {
             
-            item = [ZPZoteroItem ZPZoteroItemWithKey:[resultSet stringForColumnIndex:6]];
-            //TODO: Implement item type
             [item setItemType:[resultSet stringForColumnIndex:0]];
             [item setLibraryID:[NSNumber numberWithInt:[resultSet intForColumnIndex:1]]];
             [item setYear:[resultSet intForColumnIndex:2]];
@@ -419,7 +416,6 @@ static ZPDatabase* _instance = nil;
         }
         [resultSet close];
     }
-    return item;
 }
 
 -(void) writeItemCreatorsToDatabase:(ZPZoteroItem*)item{
@@ -541,7 +537,7 @@ static ZPDatabase* _instance = nil;
         
         NSMutableArray* attachments = [[NSMutableArray alloc] init];
         while([resultSet next]) {
-            ZPZoteroAttachment* attachment = [ZPZoteroAttachment ZPZoteroAttachmentWithKey:[resultSet stringForColumnIndex:0]];
+            ZPZoteroAttachment* attachment = ( ZPZoteroAttachment*) [ZPZoteroAttachment retrieveOrInitializeWithKey:[resultSet stringForColumnIndex:0]];
             attachment.lastTimestamp = [resultSet stringForColumnIndex:1];
             attachment.attachmentURL = [resultSet stringForColumnIndex:2];
             attachment.attachmentType = [resultSet stringForColumnIndex:3];
@@ -569,7 +565,7 @@ static ZPDatabase* _instance = nil;
         FMResultSet* resultSet = [_database executeQuery: @"SELECT key,lastTimestamp,attachmentURL,attachmentType,attachmentTitle,attachmentLength,parentItemKey FROM attachments ORDER BY CASE WHEN lastViewed IS NULL THEN 0 ELSE 1 end, lastViewed ASC, lastTimestamp ASC"];
         
         while([resultSet next]){
-            ZPZoteroAttachment* attachment = [ZPZoteroAttachment ZPZoteroAttachmentWithKey:[resultSet stringForColumnIndex:0]];
+            ZPZoteroAttachment* attachment = [ZPZoteroAttachment retrieveOrInitializeWithKey:[resultSet stringForColumnIndex:0]];
             attachment.lastTimestamp = [resultSet stringForColumnIndex:1];
             attachment.attachmentURL = [resultSet stringForColumnIndex:2];
             attachment.attachmentType = [resultSet stringForColumnIndex:3];
@@ -605,7 +601,7 @@ static ZPDatabase* _instance = nil;
         }
         
         while([resultSet next]){
-            ZPZoteroAttachment* attachment = [ZPZoteroAttachment ZPZoteroAttachmentWithKey:[resultSet stringForColumnIndex:0]];
+            ZPZoteroAttachment* attachment = [ZPZoteroAttachment retrieveOrInitializeWithKey:[resultSet stringForColumnIndex:0]];
             attachment.lastTimestamp = [resultSet stringForColumnIndex:1];
             attachment.attachmentURL = [resultSet stringForColumnIndex:2];
             attachment.attachmentType = [resultSet stringForColumnIndex:3];
@@ -641,7 +637,7 @@ static ZPDatabase* _instance = nil;
         
         NSMutableArray* notes = [[NSMutableArray alloc] init];
         while([resultSet next]) {
-            ZPZoteroNote* note = [ZPZoteroNote ZPZoteroNoteWithKey:[resultSet stringForColumnIndex:0]];
+            ZPZoteroNote* note = (ZPZoteroNote*) [ZPZoteroNote retrieveOrInitializeWithKey:[resultSet stringForColumnIndex:0]];
             note.lastTimestamp = [resultSet stringForColumnIndex:1];
             note.parentItemKey = item.key;
             

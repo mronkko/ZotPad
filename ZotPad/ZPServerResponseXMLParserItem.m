@@ -140,24 +140,17 @@
     NSString* itemType = [_temporaryFieldStorage objectForKey:@"zapi:itemType"];
     
     if([itemType isEqualToString:@"attachment"]){
-        _currentElement = [ZPZoteroAttachment ZPZoteroAttachmentWithKey:id];
+        _currentElement = [ZPZoteroAttachment retrieveOrInitializeWithKey:id];
     }
     else if([itemType isEqualToString:@"note"]){
         //Notes are really note implemented yet
-        _currentElement = [ZPZoteroNote ZPZoteroNoteWithKey:id];
+        _currentElement = [ZPZoteroNote retrieveOrInitializeWithKey:id];
     }
     else{
         //IF the item does not exist in the in-memory cache, attempt to load it from the disk cache 
-        if([ZPZoteroItem existsInCache:id]){
-            _currentElement = [ZPZoteroItem ZPZoteroItemWithKey:id];
-        }
-        else{
-            _currentElement = [[ZPDatabase instance] getItemByKey:id];
-            if(_currentElement == NULL) _currentElement = [ZPZoteroItem ZPZoteroItemWithKey:id];
-            [(ZPZoteroItem*)_currentElement clearNeedsToBeWrittenToCache];
-        }
-        [(ZPZoteroItem*)_currentElement setLibraryID:_libraryID];
+        _currentElement = [ZPZoteroItem retrieveOrInitializeWithKey:id];
     }
+    [(ZPZoteroItem*)_currentElement setLibraryID:_libraryID];
     [super _processTemporaryFieldStorage];
 }
 

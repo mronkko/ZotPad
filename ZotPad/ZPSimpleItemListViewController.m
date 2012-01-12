@@ -71,7 +71,7 @@
 
     @synchronized(self){
         
-        if([_itemKeysNotInCache indexOfObject:item.key]){
+        if([_itemKeysNotInCache containsObject:item.key]){
             [_itemKeysNotInCache removeObject:item.key];
             
             NSLog(@"Item keys not in cache deacreased to %i after removing key %@",[_itemKeysNotInCache count],item.key);
@@ -85,7 +85,7 @@
                 [self _performTableUpdates];
             }
         }
-        else if([_itemKeysShown indexOfObject:item.key]){
+        else if([_itemKeysShown containsObject:item.key]){
             //Update the row only if the full citation for this item has changed 
             @synchronized(_tableView){
                 if([_itemKeysShown indexOfObject:item.key]) [self performSelectorOnMainThread:@selector(_updateRowForItem:) withObject:item waitUntilDone:YES];
@@ -268,7 +268,7 @@
         
         
         ZPZoteroItem* item=NULL;
-        if(![key isEqualToString:@""]) item = [[ZPDataLayer instance] getItemByKey:key];
+        if(![key isEqualToString:@""]) item = [ZPZoteroItem retrieveOrInitializeWithKey:key];
         
         if(item==NULL){
             cell = [tableView dequeueReusableCellWithIdentifier:@"LoadingCell"];        

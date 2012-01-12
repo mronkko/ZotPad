@@ -109,7 +109,7 @@
 
 -(void) configureWithItemKey:(NSString*)key{
     
-    _currentItem = [[ZPDataLayer instance] getItemByKey: key];
+    _currentItem = [ZPZoteroItem retrieveOrInitializeWithKey: key];
     [[ZPDataLayer instance] updateItemDetailsFromServer:_currentItem];
     
         
@@ -312,7 +312,7 @@
     
     if([item.key isEqualToString:_currentItem.key]){
         //Retrive dta from DB
-         _currentItem = [[ZPDataLayer instance] getItemByKey: item.key];
+        _currentItem = item;
         [self performSelectorOnMainThread:@selector( _reconfigureDetailTableViewAndAttachments) withObject:nil waitUntilDone:NO];
     }
 }

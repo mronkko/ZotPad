@@ -10,36 +10,28 @@
 
 @implementation ZPZoteroAttachment
 
-@synthesize parentItemKey = _parentItemKey;
+
 @synthesize attachmentURL = _attachmentURL;
 @synthesize attachmentType = _attachmentType;
 @synthesize attachmentTitle = _attachmentTitle;
 @synthesize attachmentLength = _attachmentLength;
 
-static NSCache* _objectCache = NULL;
-
-+(ZPZoteroAttachment*) ZPZoteroAttachmentWithKey:(NSString*) key{
-    
-    if(key == NULL)
-        [NSException raise:@"Key is null" format:@"ZPZoteroAttachment cannot be instantiated with NULL key"];
-    
-    
-    if(_objectCache == NULL) _objectCache = [[NSCache alloc] init];
-    
-    ZPZoteroAttachment* obj= [_objectCache objectForKey:key];
-    
-    if(obj==NULL){
-        obj= [[ZPZoteroAttachment alloc] init];
-        obj->_key=key;
-        [_objectCache setObject:obj  forKey:key];
-    }
-    return obj;
-}
-
 
 // An alias for setParentCollectionKey
 - (void) setParentKey:(NSString*)key{
     [self setParentItemKey:key];    
+}
+
+- (void) setParentItemKey:(NSString*)key{
+    _parentItemKey = key; 
+}
+- (NSString*) parentItemKey{
+    if(_parentItemKey == NULL){
+        return _key;
+    }
+    else{
+        return _parentItemKey;
+    }
 }
 
 - (NSString*) fileSystemPath{
@@ -55,3 +47,4 @@ static NSCache* _objectCache = NULL;
     return ([[NSFileManager defaultManager] fileExistsAtPath:[self fileSystemPath]]);
 }
 @end
+

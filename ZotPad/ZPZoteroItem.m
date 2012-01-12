@@ -8,6 +8,7 @@
 
 #import "ZPZoteroItem.h"
 #import "ZPZoteroAttachment.h"
+#import "ZPDatabase.h"
 
 @implementation ZPZoteroItem
 
@@ -22,10 +23,6 @@
 @synthesize numChildren = _numChildren;
 @synthesize numTags = _numTags;
 
-@synthesize creators = _creators;
-@synthesize attachments = _attachments;
-@synthesize notes = _notes;
-@synthesize fields = _fields;
 
 //Timestamp uses a custom setter because it is used to determine if the item needs to be written in cache
 
@@ -59,10 +56,12 @@ static NSCache* _objectCache = NULL;
         
 }
 
-+(ZPZoteroItem*) ZPZoteroItemWithKey:(NSString*) key{
++(id) retrieveOrInitializeWithKey:(NSString*) key{
     
     if(key == NULL)
         [NSException raise:@"Key is null" format:@"ZPZoteroItem cannot be instantiated with NULL key"];
+    if([key isEqualToString:@""])
+        [NSException raise:@"Key is empty" format:@"ZPZoteroItem cannot be instantiated with empty key"];
 
     
     if(_objectCache == NULL) _objectCache = [[NSCache alloc] init];
@@ -70,9 +69,14 @@ static NSCache* _objectCache = NULL;
     ZPZoteroItem* obj= [_objectCache objectForKey:key];
     
     if(obj==NULL){
-        obj= [[ZPZoteroItem alloc] init];
+        obj= [[self alloc] init];
         obj->_key=key;
         obj->_needsToBeWrittenToCache = FALSE;
+        
+        //Retrieve data for this item from DB
+        [[ZPDatabase instance] addBasicToItem:obj] ;
+
+        
         [_objectCache setObject:obj  forKey:key];
     }
     return obj;
@@ -81,6 +85,50 @@ static NSCache* _objectCache = NULL;
 -(NSString*)key{
     return _key;
 }
+
+- (NSArray*) creators{
+    if(_creators == NULL){
+        [[ZPDatabase instance] addCreatorsToItem:self];
+        if(_creators ==NULL) [NSException raise:@"Creators cannot be null" format:@"Reading an item (%@) from database resulted in null creators. "];
+    }
+    return _creators;
+}
+- (void) setCreators:(NSArray*)creators{
+    _creators = creators;
+}
+
+- (NSArray*) attachments{
+    if(_attachments == NULL){
+        [[ZPDatabase instance] addAttachmentsToItem:self];
+    }
+    return _attachments;
+}
+- (void) setAttachments:(NSArray *)attachments{
+    _attachments = attachments;
+}
+
+- (NSDictionary*) fields{
+    if(_fields == NULL){
+        [[ZPDatabase instance] addFieldsToItem:self];
+    }
+    return  _fields;
+}
+
+- (void) setFields:(NSDictionary*)fields{
+    _fields = fields;
+}
+
+- (NSArray*) notes{
+    if(_notes == NULL){
+        //TODO: Implement notes
+        //[[ZPDatabase instance] addNotesItem:self];
+    }
+    return _notes;
+}
+- (void) setNotes:(NSArray*)notes{
+    _notes = notes;
+}
+
 
 -(ZPZoteroAttachment*) firstExistingAttachment{
 

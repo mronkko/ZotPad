@@ -168,7 +168,7 @@ static ZPDetailedItemListViewController* _instance = nil;
 
             //If the cell contains an item, add publication details and thumbnail
             
-            ZPZoteroItem* item=[[ZPDataLayer instance] getItemByKey:(NSString*)keyObj];
+            ZPZoteroItem* item=[ZPZoteroItem retrieveOrInitializeWithKey:(NSString*)keyObj];
 
             //Publication as a formatted label
 

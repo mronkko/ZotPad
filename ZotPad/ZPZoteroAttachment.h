@@ -26,8 +26,6 @@
 @property (assign) NSInteger attachmentLength;
 
 
-+(ZPZoteroAttachment*) ZPZoteroAttachmentWithKey:(NSString*) key;
-
 // An alias for setParentItemKey
 - (void) setParentKey:(NSString*)key;
 - (NSString*) fileSystemPath;

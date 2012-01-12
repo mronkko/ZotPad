@@ -31,7 +31,6 @@
 - (NSArray*) libraries;
 - (NSArray*) collectionsForLibrary : (NSNumber*)currentLibraryID withParentCollection:(NSString*)currentCollectionKey;
 - (NSArray*) allCollectionsForLibrary: (NSNumber*)libraryID;
-- (ZPZoteroItem*) getItemByKey: (NSString*) key;
 - (NSArray*) getItemKeysForLibrary:(NSNumber*)libraryID collection:(NSString*)collectionKey
                       searchString:(NSString*)searchString orderField:(NSString*)orderField sortDescending:(BOOL)sortDescending;
 
@@ -41,6 +40,8 @@
 - (void) addFieldsToItem: (ZPZoteroItem*) item;
 - (void) addNotesToItem: (ZPZoteroItem*) item;
 - (void) addAttachmentsToItem: (ZPZoteroItem*) item;
+- (void) addBasicToItem:(ZPZoteroItem *)item;
+
 
 //Return a list of all attachment paths ordered by priority for removel
 - (NSArray*) getCachedAttachmentPaths;

@@ -160,7 +160,7 @@ static ZPDetailViewController* _instance = nil;
         
         
         ZPZoteroItem* item=NULL;
-        if(![key isEqualToString:@""]) item = [[ZPDataLayer instance] getItemByKey:key];
+        if(![key isEqualToString:@""]) item = [ZPZoteroItem retrieveOrInitializeWithKey:key];
         
         if(item==NULL){
             cell = [tableView dequeueReusableCellWithIdentifier:@"LoadingCell"];        

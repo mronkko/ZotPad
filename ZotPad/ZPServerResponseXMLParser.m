@@ -51,6 +51,9 @@
             
             [self _initNewElementWithID:_currentID];
             [self _processTemporaryFieldStorage];
+            //Current element MUST have a libraryID
+            if([_currentElement performSelector:@selector(libraryID)] == NULL) [NSException raise:@"Data object is missing library ID" format:@"All data objects must have library ID. Object with missing Library ID: %@",_currentElement];
+                
             [_resultArray addObject:_currentElement];
             
             _currentElement = NULL;
@@ -89,6 +92,15 @@
             
             if([@"self" isEqualToString:(NSString*)[attributeDict objectForKey:@"rel"]]){
                 _currentID = value;
+                
+                //The value is URL and we want to get the part after last /
+                if([[parts objectAtIndex:3] isEqualToString:@"users"]){
+                    _libraryID = [NSNumber numberWithInt:1];
+                }
+                else{
+                    _libraryID = [NSNumber numberWithInt:[[parts objectAtIndex:4] intValue]];
+                }
+
             }
             else if([@"up" isEqualToString:(NSString*)[attributeDict objectForKey:@"rel"]]){
                 [self _setField:@"ParentKey" toValue:value];
@@ -104,24 +116,6 @@
                     [self _setField:@"AttachmentType" toValue:type];
                     [self _setField:@"AttachmentTitle" toValue:[attributeDict objectForKey:@"title"]];
                     [self _setField:@"AttachmentLength" toValue:length];
-                }
-            }
-
-            
-        }
-        else if (! _insideEntry && [elementName isEqualToString: @"link" ]){
-
-            if([@"self" isEqualToString:(NSString*)[attributeDict objectForKey:@"rel"]]){
-
-                //The value is URL and we want to get the part after last /
-                NSArray* parts= [(NSString*)[attributeDict objectForKey:@"href"] componentsSeparatedByString:@"/"];
-            
-                
-                if([[parts objectAtIndex:3] isEqualToString:@"users"]){
-                    _libraryID = [NSNumber numberWithInt:1];
-                }
-                else{
-                    _libraryID = [NSNumber numberWithInt:[[parts objectAtIndex:4] intValue]];
                 }
             }
         }

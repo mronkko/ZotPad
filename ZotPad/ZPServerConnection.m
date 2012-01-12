@@ -193,7 +193,8 @@ const NSInteger ZPServerConnectionRequestTopLevelKeys = 9;
         if(parameters!=NULL){
             for(id key in parameters){
                 if(! [@"collectionKey" isEqualToString: key] &&
-                   ! [@"libraryID" isEqualToString: key]) {
+                   ! [@"libraryID" isEqualToString: key] &&
+                   ! ((type == ZPServerConnectionRequestSingleItemChildren || type == ZPServerConnectionRequestSingleItem) && [@"itemKey" isEqualToString:key])) {
                     urlString = [NSString stringWithFormat:@"%@&%@=%@",urlString,key,[[parameters objectForKey:key] stringByAddingPercentEscapesUsingEncoding:
                                                                                       NSASCIIStringEncoding]];
                 

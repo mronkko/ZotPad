@@ -217,8 +217,6 @@ static ZPCacheController* _instance = nil;
         
         [item clearNeedsToBeWrittenToCache];
         
-        [[ZPDatabase instance] addItemToDatabase:item];
-
         //If this is an attachement item, store the attachment information
         
         if([item isKindOfClass:[ZPZoteroAttachment class]]){       
@@ -249,6 +247,7 @@ static ZPCacheController* _instance = nil;
         else{
             if(item.creators ==NULL) [NSException raise:@"Creators cannot be null" format:@"Attempted to write an item (%@) with null creators to database. This is most likely a bug in API response parser."];
             if(item.fields ==NULL || [item.fields count]==0) [NSException raise:@"Fields cannot be null or empty" format:@"Attempted to write an item (%@) with null or empty fields to database. This is most likely a bug in API response parser."];
+            [[ZPDatabase instance] addItemToDatabase:item];
             [[ZPDatabase instance] writeItemFieldsToDatabase:item];
             [[ZPDatabase instance] writeItemCreatorsToDatabase:item];
         }
@@ -269,7 +268,7 @@ static ZPCacheController* _instance = nil;
     //Is it a library or a collection
     NSString* collectionKey = NULL;
     NSNumber* libraryID = NULL;
-    if([container isKindOfClass:[NSNumber class]]){
+    if([container isKindOfClass:[ZPZoteroLibrary class]]){
         libraryID = [(ZPZoteroLibrary*)container libraryID];
     }
     else{
@@ -292,20 +291,21 @@ static ZPCacheController* _instance = nil;
         //Get items that have the timestamp set to later than the modification time of this library.
         NSString* lastTimestamp = [ZPZoteroLibrary ZPZoteroLibraryWithID:libraryID].lastCompletedCacheTimestamp;
         
-        if(lastTimestamp!=NULL){
-            //Retrieve items as long as we have items that have time stamp greater than this timestamp
-            NSInteger offset=0;
-            while(TRUE){
-                NSArray* items= [[ZPServerConnection instance] retrieveItemsFromLibrary:libraryID limit:NUMBER_OF_ITEMS_TO_RETRIEVE offset:offset];
-                for(ZPZoteroItem* item in items){
-                    if([lastTimestamp compare: item.lastTimestamp] == NSOrderedAscending) [self _cacheItemIfNeeded:item];
-                    else goto outer;
+        //Retrieve items as long as we have items that have time stamp greater than this timestamp
+        NSInteger offset=0;
+        while(TRUE){
+            NSArray* items= [[ZPServerConnection instance] retrieveItemsFromLibrary:libraryID limit:NUMBER_OF_ITEMS_TO_RETRIEVE offset:offset];
+            for(ZPZoteroItem* item in items){
+                if(lastTimestamp==NULL || 
+                   [lastTimestamp compare: item.lastTimestamp] == NSOrderedAscending){
+                    [self _cacheItemIfNeeded:item];   
                 }
-                if([items count] < NUMBER_OF_ITEMS_TO_RETRIEVE ) goto outer;
-                offset = offset + NUMBER_OF_ITEMS_TO_RETRIEVE;
+                else goto outer;
             }
-        outer:; 
+            if([items count] < NUMBER_OF_ITEMS_TO_RETRIEVE ) goto outer;
+            offset = offset + NUMBER_OF_ITEMS_TO_RETRIEVE;
         }
+    outer:; 
         
         [[ZPDatabase instance] setUpdatedTimestampForLibrary:libraryID toValue:[[ZPServerConnection instance] retrieveTimestampForContainer:libraryID collectionKey:NULL]];
         
@@ -389,16 +389,30 @@ static ZPCacheController* _instance = nil;
 }
 
 -(void) _checkIfAttachmentExistsAndQueueForDownload:(ZPZoteroAttachment*)attachment{
-    if((attachment.parentItemKey == _activeItemKey && [[ZPPreferences instance] cacheAttachmentsActiveItem]) ||
-       (attachment.libraryID == _activeLibraryID && [[ZPPreferences instance] cacheAttachmentsActiveLibrary]) ||
-       [[ZPPreferences instance] cacheAttachmentsAllLibraries]){
-        [_filesToDownload removeObject:attachment];
-        [_filesToDownload insertObject:attachment atIndex:0];
-        NSLog(@"Queuing attachment download to %@, number of files in queue %i",attachment.fileSystemPath,[_filesToDownload count]);
-
-    }
-    else if([[ZPPreferences instance] cacheAttachmentsActiveCollection]){
-        if([[ZPDatabase instance] doesItemKey:attachment.parentItemKey belongToCollection:_activeCollectionKey]){
+    
+    if(! attachment.fileExists){
+        BOOL doCache=false;
+        //Cache based on preferences
+        if([[ZPPreferences instance] cacheAttachmentsAllLibraries]){
+            doCache = true;
+        }
+        else if([[ZPPreferences instance] cacheAttachmentsActiveLibrary]){
+            doCache = (attachment.libraryID == _activeLibraryID);
+            
+        }
+        else if([[ZPPreferences instance] cacheAttachmentsActiveCollection]){
+            if([attachment.libraryID isEqualToNumber:_activeLibraryID] && _activeCollectionKey == NULL){
+                doCache=true;
+            }
+            else if([[ZPDatabase instance] doesItemKey:attachment.parentItemKey belongToCollection:_activeCollectionKey]){
+                doCache = true;
+            }
+        }
+        else if([[ZPPreferences instance] cacheAttachmentsActiveItem]){
+            doCache =( attachment.parentItemKey == _activeItemKey);
+        }
+        
+        if(doCache){
             [_filesToDownload removeObject:attachment];
             [_filesToDownload insertObject:attachment atIndex:0];
             NSLog(@"Queuing attachment download to %@, number of files in queue %i",attachment.fileSystemPath,[_filesToDownload count]);

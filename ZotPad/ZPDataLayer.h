@@ -44,7 +44,6 @@
                         searchString:(NSString*)searchString orderField:(NSString*)orderField sortDescending:(BOOL)sortDescending;
 
 
-- (ZPZoteroItem*) getItemByKey: (NSString*) key;
 
 
 //Adds and removes observers

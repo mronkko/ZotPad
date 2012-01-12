@@ -16,8 +16,6 @@
 @property (retain) NSString* parentItemKey;
 
 
-+(ZPZoteroNote*) ZPZoteroNoteWithKey:(NSString*) key;
-
 // An alias for setParentItemKey
 - (void) setParentKey:(NSString*)key;
 
