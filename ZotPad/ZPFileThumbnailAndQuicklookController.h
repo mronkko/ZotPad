@@ -25,7 +25,7 @@
 -(void) buttonTapped;
 -(void) openInQuickLookWithAttachment:(ZPZoteroAttachment*) attachment;
 
--(UIButton*) thumbnailAsUIButton;
--(UIImageView*) thumbnailAsUIImageView:(NSInteger) index;
+-(void) configureButton:(UIButton*) button;
+-(void) configurePreview:(UIView*) view withAttachment:(ZPZoteroAttachment*)attachment;
 
 @end

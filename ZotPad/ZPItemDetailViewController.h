@@ -22,7 +22,8 @@
     iCarousel* _carousel;
     ZPSimpleItemListViewController* _itemListController;
     ZPFileThumbnailAndQuicklookController* _previewController;
-    
+    NSMutableArray* _carouselViews;
+    UIAlertView* _progressAlert;
 }
 
 @property (nonatomic, retain) IBOutlet iCarousel* carousel;

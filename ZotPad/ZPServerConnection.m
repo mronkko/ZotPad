@@ -444,7 +444,7 @@ const NSInteger ZPServerConnectionRequestTopLevelKeys = 9;
     
 }
 
--(NSArray*) retrieveKeysInContainer:(NSNumber*)libraryID collection:(NSString*)collectionKey searchString:(NSString*)searchString orderField:(NSString*)orderField sortDescending:(BOOL)sortDescending{
+-(NSArray*) retrieveKeysInContainer:(NSNumber*)libraryID collectionKey:(NSString*)collectionKey searchString:(NSString*)searchString orderField:(NSString*)orderField sortDescending:(BOOL)sortDescending{
     
     NSMutableDictionary* parameters = [NSMutableDictionary dictionaryWithObject:libraryID  forKey:@"libraryID"];
     if(collectionKey!=NULL) [parameters setValue:collectionKey forKey:@"collectionKey"];
@@ -500,11 +500,13 @@ const NSInteger ZPServerConnectionRequestTopLevelKeys = 9;
  Methods for dowloading files
  
  */
-
 -(void) downloadAttachment:(ZPZoteroAttachment*)attachment{
-    
-    //TODO: Notify the UI that  we are starting a download to show a progress indicator
-    
+    [self downloadAttachment:attachment withUIProgressView:NULL];
+}
+
+
+-(void) downloadAttachment:(ZPZoteroAttachment*)attachment withUIProgressView:(UIProgressView*) progressView{
+        
     NSString* oauthkey =  [[NSUserDefaults standardUserDefaults] objectForKey:@"OAuthKey"];
 
     NSURL* url = [NSURL URLWithString:[NSString stringWithFormat:@"%@?key=%@", attachment.attachmentURL,oauthkey]];
@@ -518,7 +520,14 @@ const NSInteger ZPServerConnectionRequestTopLevelKeys = 9;
     
     //First request starts the network indicator
     if(_activeRequestCount==1) [[UIApplication sharedApplication] setNetworkActivityIndicatorVisible:YES];
-    
+
+    if(progressView!=NULL){
+        [request setDownloadProgressDelegate:progressView];
+    }
+    else{
+        //No need to track progress for background downloads
+        request.showAccurateProgress=FALSE;
+    }
     [request startSynchronous];
     
     //Set this file as not cached

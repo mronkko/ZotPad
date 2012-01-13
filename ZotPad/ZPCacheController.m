@@ -43,7 +43,9 @@
 
 -(void) _checkIfContainerNeedsCacheRefreshAndQueue:(NSNumber*) libraryID collectionKey:(NSString*)collectionKey;
 -(void) _checkIfAttachmentExistsAndQueueForDownload:(ZPZoteroAttachment*)attachment;
--(void) _queueAttachmentsFromActiveViewForDownload;
+
+//TODO: refactor this method
+-(void) _checkIfAttachmenstExistAndQueueForDownload:(NSArray*)parentKeys;
 
 - (unsigned long long int) _documentsFolderSize;
 - (void) _scanAndSetSizeOfDocumentsFolder;
@@ -69,7 +71,7 @@ static ZPCacheController* _instance = nil;
     [_serverRequestQueue setMaxConcurrentOperationCount:4];
 
     _fileDownloadQueue  = [[NSOperationQueue alloc] init];
-    [_fileDownloadQueue  setMaxConcurrentOperationCount:1];
+    [_fileDownloadQueue  setMaxConcurrentOperationCount:2];
     
     //These collections contain things that we need to cache. These have been checked so that we know that they are either missing or outdated
     
@@ -120,10 +122,10 @@ static ZPCacheController* _instance = nil;
 
 -(void) _checkDownloadQueue{
     @synchronized(_fileDownloadQueue){
-        if([_fileDownloadQueue operationCount] == 0 && [_filesToDownload count] >0){
+        if([_fileDownloadQueue operationCount] < [_fileDownloadQueue maxConcurrentOperationCount] && [_filesToDownload count] >0){
             ZPZoteroAttachment* attachment = [_filesToDownload objectAtIndex:0];
             [_filesToDownload removeObjectAtIndex:0];
-            
+            NSLog(@"Queueing download %@ files in queue %i", attachment.attachmentTitle ,[_filesToDownload count]);
             NSOperation* downloadOperation = [[NSInvocationOperation alloc] initWithTarget:[ZPServerConnection instance] selector:@selector(downloadAttachment:) object:attachment];
             
             [_fileDownloadQueue addOperation:downloadOperation];
@@ -345,13 +347,21 @@ static ZPCacheController* _instance = nil;
 }
 
 
+
 -(NSArray*) uncachedItemKeysForLibrary:(NSNumber*)libraryID collection:(NSString*)collectionKey searchString:(NSString*)searchString orderField:(NSString*)orderField sortDescending:(BOOL)sortDescending{
+
+    
+    //First get the list of items in this item list
+
+    NSMutableArray* itemKeys = [NSMutableArray arrayWithArray:[[ZPServerConnection instance] retrieveKeysInContainer:libraryID collectionKey:collectionKey searchString:searchString orderField:orderField sortDescending:sortDescending]];
+    
+    //TODO: refactor this into a more logical place
 
     if(! [libraryID isEqual:_activeLibraryID] && ! [[ZPPreferences instance] cacheAttachmentsAllLibraries] ){
         [_filesToDownload removeAllObjects];
         NSLog(@"Clearing download queue because library changed and preferences do not indicate that all libraries should be downloaded");
     }
-                                                            
+    
     //Store the libraryID and collectionKEy
     _activeLibraryID = libraryID;
     
@@ -363,29 +373,39 @@ static ZPCacheController* _instance = nil;
     _activeCollectionKey = collectionKey;
     
     //Queue everything that we have for this library / collection for download
+    
     if([[ZPPreferences instance] cacheAttachmentsActiveCollection]){
-        [self _queueAttachmentsFromActiveViewForDownload];
+        [self performSelectorInBackground:@selector(_checkIfAttachmenstExistAndQueueForDownload:) withObject:[NSArray arrayWithArray:itemKeys]];
     }
+     
+     
+    //End of part that needs to be refactored
     
-    
-    
-    //First get the list of items in this container 
-
-    NSMutableArray* itemKeys = [NSMutableArray arrayWithArray:[[ZPServerConnection instance] retrieveKeysInContainer:libraryID collectionKey:collectionKey]];
-
-    NSArray* cachedKeys = [[ZPDatabase instance] getItemKeysForLibrary:libraryID collection:collectionKey searchString:NULL orderField:NULL sortDescending:FALSE];
+    NSArray* cachedKeys = [[ZPDatabase instance] getItemKeysForLibrary:libraryID collectionKey:collectionKey searchString:searchString orderField:orderField sortDescending:sortDescending];
     
     [itemKeys removeObjectsInArray:cachedKeys];
     
     //Add this into the queue if there are any uncached items
     if([itemKeys count]>0){
         [self _addToItemQueue:itemKeys libraryID:libraryID priority:YES];
-        //TODO: This could be optimized a little. Since we have the container members already, we could just write them to database directly instead of forcing a new retrieval by placing the container into quue
         if(collectionKey!=NULL) [self _addToContainerQueue:[ZPZoteroCollection ZPZoteroCollectionWithKey:collectionKey]  priority:YES];
         else [self _addToContainerQueue:[ZPZoteroLibrary ZPZoteroLibraryWithID: libraryID] priority:YES];
-        [self _checkQueues];
     }
+
+    [self _checkQueues];
+
     return itemKeys;
+}
+
+-(void) _checkIfAttachmenstExistAndQueueForDownload:(NSArray*)parentKeys{
+    //These have already been checked to not have downloaded files and have been sorted by priority
+
+    for(NSString* key in parentKeys){
+        ZPZoteroItem* item = [ZPZoteroItem retrieveOrInitializeWithKey:key];
+        for(ZPZoteroAttachment* attachment in item.attachments){
+            [self _checkIfAttachmentExistsAndQueueForDownload:attachment];
+        }    
+    }
 }
 
 -(void) _checkIfAttachmentExistsAndQueueForDownload:(ZPZoteroAttachment*)attachment{
@@ -401,7 +421,7 @@ static ZPCacheController* _instance = nil;
             
         }
         else if([[ZPPreferences instance] cacheAttachmentsActiveCollection]){
-            if([attachment.libraryID isEqualToNumber:_activeLibraryID] && _activeCollectionKey == NULL){
+            if([[ZPZoteroItem retrieveOrInitializeWithKey:attachment.parentItemKey].libraryID isEqualToNumber:_activeLibraryID] && _activeCollectionKey == NULL){
                 doCache=true;
             }
             else if([[ZPDatabase instance] doesItemKey:attachment.parentItemKey belongToCollection:_activeCollectionKey]){
@@ -416,19 +436,9 @@ static ZPCacheController* _instance = nil;
             [_filesToDownload removeObject:attachment];
             [_filesToDownload insertObject:attachment atIndex:0];
             NSLog(@"Queuing attachment download to %@, number of files in queue %i",attachment.fileSystemPath,[_filesToDownload count]);
+
+            [self _checkQueues];
         }
-    }
-}
-
--(void) _queueAttachmentsFromActiveViewForDownload{
-    
-    //These have already been checked to not have downloaded files and have been sorted by priority
-    NSArray* attachments = [[ZPDatabase instance] getAttachmentThatNeedToBeDownloadedInLibrary:_activeLibraryID collection:_activeCollectionKey];
-
-    for(ZPZoteroAttachment* attachment in [attachments reverseObjectEnumerator]){
-        [_filesToDownload removeObject:attachment];
-        [_filesToDownload insertObject:attachment atIndex:0];
-        NSLog(@"Queuing attachment download to %@, number of files in queue %i",attachment.fileSystemPath,[_filesToDownload count]);
     }
 }
 
@@ -566,13 +576,13 @@ static ZPCacheController* _instance = nil;
     
     //Smaller than one gigabyte
     if(_sizeOfDocumentsFolder < 1073741824){
-        float temp = _sizeOfDocumentsFolder/1048576;
+        NSInteger temp = _sizeOfDocumentsFolder/1048576;
         [defaults setObject:[NSString stringWithFormat:@"%i MB",temp] forKey:@"cachesizecurrent"];
         
     }
     else{
-        NSString* temp = [NSString stringWithFormat:@".1f",_sizeOfDocumentsFolder/1073741824];
-        [defaults setObject:[NSString stringWithFormat:@"%@ GB",temp] forKey:@"cachesizecurrent"];
+        float temp = ((float)_sizeOfDocumentsFolder)/1073741824;
+        [defaults setObject:[NSString stringWithFormat:@"%.1f GB",temp] forKey:@"cachesizecurrent"];
     }
     
 }

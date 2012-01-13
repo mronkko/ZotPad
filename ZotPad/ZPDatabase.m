@@ -609,10 +609,7 @@ static ZPDatabase* _instance = nil;
             attachment.attachmentLength = [resultSet intForColumnIndex:5];
             attachment.parentItemKey = [resultSet stringForColumnIndex:6];
             
-            //If this attachment does have a file, add it to the list that we return;
-            if(! attachment.fileExists){
-                [returnArray addObject:attachment];
-            }
+            [returnArray addObject:attachment];
         }
         
         [resultSet close];
@@ -652,14 +649,14 @@ static ZPDatabase* _instance = nil;
     }
 }
 
-- (NSArray*) getItemKeysForLibrary:(NSNumber*)libraryID collection:(NSString*)collectionKey
+- (NSArray*) getItemKeysForLibrary:(NSNumber*)libraryID collectionKey:(NSString*)collectionKey
                       searchString:(NSString*)searchString orderField:(NSString*)orderField sortDescending:(BOOL)sortDescending{
 
     NSMutableArray* keys = [[NSMutableArray alloc] init];
 
     //Build the SQL query as a string first. This currently searches only in the full citation.
 
-    NSString* sql = @"SELECT items.key FROM items";
+    NSString* sql = @"SELECT DISTINCT items.key FROM items";
     
     if(collectionKey!=NULL)
         sql=[sql stringByAppendingFormat:@", collectionItems"];
@@ -675,10 +672,9 @@ static ZPDatabase* _instance = nil;
         sql=[sql stringByAppendingFormat:@" AND collectionItems.collectionKey = %@ and collectionItems.itemKey = items.key",collectionKey];
 
     if(searchString != NULL){
-        //TODO: Handle quotes
-        NSArray* searchArray = [searchString componentsSeparatedByString:@" "];
+        //TODO: Make a more feature rich search query
         
-        sql=[sql stringByAppendingFormat:@" AND field.itemKey = items.key AND (field.fieldValue LIKE '\%%@\%)'",[searchArray componentsJoinedByString:@"%' OR field.fieldValue LIKE '%"]];
+        sql=[sql stringByAppendingFormat:@" AND fields.itemKey = items.key AND (fields.fieldValue LIKE '%%%@%%')",searchString];
     }
     
     if(orderField!=NULL){
@@ -690,6 +686,8 @@ static ZPDatabase* _instance = nil;
     else{
         sql=[sql stringByAppendingFormat:@" ORDER BY items.lastTimestamp DESC"];
     }
+    
+    NSLog(@"Retrieving item list from local cache with SQL: %@",sql);
     
     @synchronized(self){
         FMResultSet* resultSet;

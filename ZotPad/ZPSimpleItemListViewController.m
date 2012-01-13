@@ -231,7 +231,10 @@
 
 -(void) _updateRowForItem:(ZPZoteroItem*)item{
     [_cellCache removeObjectForKey:item.key];
-    [_tableView reloadRowsAtIndexPaths:[NSArray arrayWithObject:[NSIndexPath indexPathForRow:[_itemKeysShown indexOfObject:item.key] inSection:0]] withRowAnimation:_animations];
+    NSIndexPath* indexPath = [NSIndexPath indexPathForRow:[_itemKeysShown indexOfObject:item.key] inSection:0];
+    BOOL reselect = [[_tableView indexPathForSelectedRow] isEqual:indexPath];
+    [_tableView reloadRowsAtIndexPaths:[NSArray arrayWithObject:indexPath ] withRowAnimation:_animations];
+    if(reselect) [_tableView selectRowAtIndexPath:indexPath animated:NO scrollPosition:UITableViewScrollPositionNone];
 }
 
 #pragma mark -
@@ -317,7 +320,6 @@
     
     //Set up activity indicator. 
     _activityIndicator = [[UIActivityIndicatorView alloc] initWithFrame:CGRectMake(0,0,20, 20)];
-    [_activityIndicator stopAnimating];
     [_activityIndicator hidesWhenStopped];
     UIBarButtonItem* barButton = [[UIBarButtonItem alloc] initWithCustomView:_activityIndicator];
     self.navigationItem.rightBarButtonItem = barButton;
@@ -335,6 +337,12 @@
 {
     [super viewWillAppear:animated];
     
+}
+
+- (void)viewDidAppear:(BOOL)animated
+{
+    [super viewDidAppear:animated];
+    
     //If there are more items coming, make this active
     if([_itemKeysNotInCache count] >0){
         [_activityIndicator startAnimating];
@@ -343,11 +351,6 @@
         [_activityIndicator stopAnimating];
     }
 
-}
-
-- (void)viewDidAppear:(BOOL)animated
-{
-    [super viewDidAppear:animated];
 }
 
 - (void)viewWillDisappear:(BOOL)animated

@@ -13,7 +13,7 @@
 #import "ZPDataLayer.h"
 #import "ZPLocalization.h"
 #import "ZPFileThumbnailAndQuicklookController.h"
-
+#import "ZPServerConnection.h"
 #import "ZPLogger.h"
 
 #define ATTACHMENT_VIEW_HEIGHT 680
@@ -22,10 +22,9 @@
 #define ATTACHMENT_IMAGE_WIDTH 423
 
 @interface ZPItemDetailViewController();
-
-//@property (strong, nonatomic) UIPopoverController *masterPopoverController;
-
 - (void) _reconfigureDetailTableViewAndAttachments;
+- (void) _downloadWithProgressAlert:(ZPZoteroAttachment *)attachment;
+- (void) _downloadAttachment:(ZPZoteroAttachment *)attachment withUIProgressView:(UIProgressView*) progressView;
 
 @end
 
@@ -42,21 +41,15 @@
     [super viewDidLoad];
 
     [[ZPDataLayer instance] registerItemObserver:self];
+    [[ZPDataLayer instance] registerAttachmentObserver:self];
 
     _detailTableView.scrollEnabled = FALSE;
     
-    
-    
-    // Get the selected row from the item list
-    NSIndexPath* indexPath = [[[ZPDetailedItemListViewController instance] tableView] indexPathForSelectedRow];
-    
-    // Get the key for the selected item 
-    NSString* currentItemKey = [[[ZPDetailedItemListViewController instance] itemKeysShown] objectAtIndex: indexPath.row]; 
-    
-    [self configureWithItemKey: currentItemKey];
+
   
     //configure carousel
     _carousel.type = iCarouselTypeCoverFlow2;
+    _carouselViews = [[NSMutableArray alloc] init];
     
     //Show the item view in the navigator
     _itemListController = [self.storyboard instantiateViewControllerWithIdentifier:@"NavigationItemListView"];
@@ -79,18 +72,29 @@
 
     [super viewWillAppear:animated];
 
+
     // Get the selected row from the item list
     NSIndexPath* indexPath = [[[ZPDetailedItemListViewController instance] tableView] indexPathForSelectedRow];
-
+    
+    // Get the key for the selected item 
+    NSString* currentItemKey = [[[ZPDetailedItemListViewController instance] itemKeysShown] objectAtIndex: indexPath.row]; 
+    
     // Set the navigation controller
     [_itemListController configureWithItemListController:[ZPDetailedItemListViewController instance]];
-
-
-    //Set the selected row to match the current row
-    [[_itemListController tableView] selectRowAtIndexPath:indexPath animated:FALSE scrollPosition:UITableViewScrollPositionMiddle];
+    
     [[[ZPLibraryAndCollectionListViewController instance] navigationController] pushViewController:_itemListController  animated:YES];
-
+    
     [_itemListController.tableView setDelegate: self];
+
+    [self configureWithItemKey: currentItemKey];
+
+}
+
+- (void)viewDidAppear:(BOOL)animated
+{
+    [super viewDidAppear:animated];
+    
+
 }
 
 
@@ -111,7 +115,14 @@
     
     _currentItem = [ZPZoteroItem retrieveOrInitializeWithKey: key];
     [[ZPDataLayer instance] updateItemDetailsFromServer:_currentItem];
+
+    // Get the selected row from the item list
+    NSUInteger indexArr[] = {0,[_itemListController.itemKeysShown indexOfObject:key]};
+    NSIndexPath* indexPath = [NSIndexPath indexPathWithIndexes:indexArr length:2];
     
+    //Set the selected row to match the current row
+    [[_itemListController tableView] selectRowAtIndexPath:indexPath animated:FALSE scrollPosition:UITableViewScrollPositionMiddle];
+
         
     [self _reconfigureDetailTableViewAndAttachments ];
     
@@ -143,6 +154,16 @@
                                           ATTACHMENT_VIEW_HEIGHT, 
                                           self.view.frame.size.width, 
                                           [_detailTableView contentSize].height)];
+    
+    [_carouselViews removeAllObjects];
+    
+    ZPZoteroAttachment* attachment;
+    for (attachment in _currentItem.attachments) {
+        UIView* view = [[UIView alloc] initWithFrame:CGRectMake(0, 0, ATTACHMENT_IMAGE_WIDTH, ATTACHMENT_IMAGE_HEIGHT)];
+        [_carouselViews addObject:view];
+        [_previewController configurePreview:view withAttachment:attachment];
+    }
+
     [_carousel reloadData];
     
     //Configure  the size of the UIScrollView
@@ -275,12 +296,6 @@
 	return ( cell );
 }
 
-/*
-    
- This takes care of both the details table and table that constains the list of items in the navigator
- 
- */
-
 - (void)tableView:(UITableView *)aTableView didSelectRowAtIndexPath:(NSIndexPath *)indexPath {
     
     // Item details
@@ -301,6 +316,53 @@
     }
 }
 
+
+#pragma mark-
+#pragma mark Item downloading
+
+- (void) _downloadWithProgressAlert:(ZPZoteroAttachment *)attachment {
+    
+    _progressAlert = [[UIAlertView alloc] initWithTitle: [NSString stringWithFormat:@"Downloading (%i KB)",attachment.attachmentLength/1024]
+                                                message: nil
+                                               delegate: self
+                                      cancelButtonTitle: nil
+                                      otherButtonTitles: nil];
+    
+    // Create the progress bar and add it to the alert
+    UIProgressView *progressView = [[UIProgressView alloc] initWithFrame:CGRectMake(30.0f, 80.0f, 225.0f, 90.0f)];
+    [_progressAlert addSubview:progressView];
+    [progressView setProgressViewStyle: UIProgressViewStyleBar];
+    [_progressAlert show];
+    
+    //Create an invocation
+    SEL selector = @selector(_downloadAttachment:withUIProgressView:);
+    
+    NSMethodSignature* signature = [[self class] instanceMethodSignatureForSelector:selector];
+    NSInvocation* invocation  = [NSInvocation invocationWithMethodSignature:signature];
+    [invocation setTarget:self];
+    [invocation setSelector:selector];
+    
+    //Set arguments
+    [invocation setArgument:&attachment atIndex:2];
+    [invocation setArgument:&progressView atIndex:3];
+    
+    [invocation performSelectorInBackground:@selector(invoke) withObject:NULL];
+}
+
+- (void) _downloadAttachment:(ZPZoteroAttachment *)attachment withUIProgressView:(UIProgressView*) progressView {
+    [[ZPServerConnection instance] downloadAttachment:attachment withUIProgressView:progressView];
+    [_progressAlert dismissWithClickedButtonIndex:0 animated:YES];
+    [_previewController performSelectorOnMainThread:@selector(openInQuickLookWithAttachment:) withObject:attachment waitUntilDone:NO];
+}
+
+
+/*
+    
+ This takes care of both the details table and table that constains the list of items in the navigator
+ 
+ */
+
+
 #pragma mark-
 #pragma mark Observer methods
 
@@ -311,19 +373,21 @@
 -(void) notifyItemAvailable:(ZPZoteroItem*) item{
     
     if([item.key isEqualToString:_currentItem.key]){
-        //Retrive dta from DB
+        //Retrive data from DB
         _currentItem = item;
         [self performSelectorOnMainThread:@selector( _reconfigureDetailTableViewAndAttachments) withObject:nil waitUntilDone:NO];
     }
 }
 
--(void) notifyItemAttachmentsAvailable:(ZPZoteroItem *)item{
-    
-}
-    
-
 -(void) notifyAttachmentDownloadCompleted:(ZPZoteroAttachment*) attachment{
-    
+    ZPZoteroAttachment* thisAttachment;
+    NSInteger index=0;
+    for(thisAttachment in _currentItem.attachments){
+        if([attachment isEqual:thisAttachment]){
+            [_previewController configurePreview:[_carouselViews objectAtIndex:index] withAttachment:attachment];
+        }
+        index++;
+    }
 }
 
 
@@ -334,8 +398,19 @@
 
 - (void)carousel:(iCarousel *)carousel didSelectItemAtIndex:(NSInteger)index{
     if([carousel currentItemIndex] == index){
-        [_previewController openInQuickLookWithAttachment:[[_currentItem attachments] objectAtIndex:index]];
+        
+        
+        ZPZoteroAttachment* attachment = [[_currentItem attachments] objectAtIndex:index];
+        
+        if(! attachment.fileExists) [self _downloadWithProgressAlert:attachment];
+        else [_previewController openInQuickLookWithAttachment:attachment];
     }
+}
+
+
+
+- (NSUInteger)numberOfPlaceholdersInCarousel:(iCarousel *)carousel{
+    return 0;
 }
 
 - (NSUInteger)numberOfItemsInCarousel:(iCarousel *)carousel
@@ -353,44 +428,8 @@
 
 - (UIView *)carousel:(iCarousel *)carousel viewForItemAtIndex:(NSUInteger)index
 {
-    UIView* view = [_previewController thumbnailAsUIImageView:index];
     
-    NSString* extraInfo;
-    ZPZoteroAttachment* attachment = [_currentItem.attachments objectAtIndex:index];
-    
-    if(![attachment fileExists] && ![attachment.attachmentType isEqualToString:@"application/pdf"]){
-        if([attachment fileExists]){
-            extraInfo = [@"Preview not supported for " stringByAppendingString:attachment.attachmentType];
-        }
-        else{
-            extraInfo = @"Not downloaded";
-        }
-    }
-    
-    //Add information over the thumbnail
-    
-    UILabel* label = [[UILabel alloc] init];
-    
-    if(extraInfo!=NULL) label.text = [NSString stringWithFormat:@"%@ (%@)", attachment.attachmentTitle, extraInfo];
-    else label.text = [NSString stringWithFormat:@"%@", attachment.attachmentTitle];
-    
-    label.textColor = [UIColor whiteColor];
-    label.backgroundColor = [UIColor clearColor];
-    label.textAlignment = UITextAlignmentCenter;
-    label.lineBreakMode = UILineBreakModeWordWrap;
-    label.numberOfLines = 5;
-    label.frame=CGRectMake(50, 200, ATTACHMENT_IMAGE_WIDTH-100, ATTACHMENT_IMAGE_HEIGHT-400);
-    
-    UIView* background = [[UIView alloc] init];
-    background.frame=CGRectMake(40, 190, ATTACHMENT_IMAGE_WIDTH-80, ATTACHMENT_IMAGE_HEIGHT-380);
-    background.backgroundColor=[UIColor blackColor];
-    background.alpha = 0.5;
-    background.layer.cornerRadius = 8;
-
-    [view addSubview:background];
-    [view addSubview:label];
-    
-    return view;
+    return [_carouselViews objectAtIndex:index];
 }
 
 #pragma mark -

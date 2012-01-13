@@ -73,11 +73,12 @@ static ZPDetailedItemListViewController* _instance = nil;
              @synchronized(_tableView){
                  _itemKeysNotInCache = [NSMutableArray array];
                  _itemKeysShown = [NSMutableArray array];
+                 //TODO: Investigate why a relaodsection call a bit below causes a crash. Then uncomment these both.
+                 //[_tableView reloadSections:[NSIndexSet indexSetWithIndex:0] withRowAnimation:UITableViewRowAnimationAutomatic];
+                 [_tableView reloadData];
              }
 
-            //TODO: Investigate why a relaodsection call a bit below causes a crash. Then uncomment these both.
-            //[_tableView reloadSections:[NSIndexSet indexSetWithIndex:0] withRowAnimation:UITableViewRowAnimationAutomatic];
-            [_tableView reloadData];
+
             
             
             [self performSelectorInBackground:@selector(_configureCachedKeys) withObject:nil];
@@ -222,15 +223,15 @@ static ZPDetailedItemListViewController* _instance = nil;
                 
                 if(path!=NULL){
                     
+                    UIButton* button = [[UIButton alloc] init];
+                    
+                    [articleThumbnailHolder addSubview:button];
                     
                     ZPFileThumbnailAndQuicklookController* buttonController = [[ZPFileThumbnailAndQuicklookController alloc]
                                                                                initWithItem:item viewController:self maxHeight:articleThumbnailHolder.frame.size.height
                                                                                maxWidth:articleThumbnailHolder.frame.size.width];
 
-                    [articleThumbnailHolder addSubview:[buttonController thumbnailAsUIButton]];
-                    
- 
-                    
+                    [buttonController configureButton:button];
                     
 
                 }
