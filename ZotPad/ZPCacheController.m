@@ -122,7 +122,7 @@ static ZPCacheController* _instance = nil;
 
 -(void) _checkDownloadQueue{
     @synchronized(_fileDownloadQueue){
-        if([_fileDownloadQueue operationCount] < [_fileDownloadQueue maxConcurrentOperationCount] && [_filesToDownload count] >0){
+        while([_fileDownloadQueue operationCount] < [_fileDownloadQueue maxConcurrentOperationCount] && [_filesToDownload count] >0){
             ZPZoteroAttachment* attachment = [_filesToDownload objectAtIndex:0];
             [_filesToDownload removeObjectAtIndex:0];
             NSLog(@"Queueing download %@ files in queue %i", attachment.attachmentTitle ,[_filesToDownload count]);
@@ -136,7 +136,7 @@ static ZPCacheController* _instance = nil;
 
 -(void) _checkMetadataQueue{
     
-    if([_serverRequestQueue operationCount] <= [_serverRequestQueue maxConcurrentOperationCount]){
+    while([_serverRequestQueue operationCount] <= [_serverRequestQueue maxConcurrentOperationCount]){
         
         
         //Choose the queue the active library or choose a first non-empty queue
@@ -180,7 +180,7 @@ static ZPCacheController* _instance = nil;
         //If there are no items, start retrieving collection memberships
         if([_containersToCache count]>0){
 
-            NSOperation* retrieveOperation = [[NSInvocationOperation alloc] initWithTarget:self                                                                                           selector:@selector(_doContainerRetrieval:) object:[_containersToCache objectAtIndex:0]];
+            NSOperation* retrieveOperation = [[NSInvocationOperation alloc] initWithTarget:self selector:@selector(_doContainerRetrieval:) object:[_containersToCache objectAtIndex:0]];
             
             //Remove the items that we are retrieving
             [_containersToCache removeObjectAtIndex:0];
