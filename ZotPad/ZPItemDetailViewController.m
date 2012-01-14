@@ -22,7 +22,8 @@
 #define ATTACHMENT_IMAGE_WIDTH 423
 
 @interface ZPItemDetailViewController();
-- (void) _reconfigureDetailTableViewAndAttachments;
+- (void) _reconfigureDetailTableView;
+- (void) _reconfigureAttachmentsCarousel;
 - (void) _downloadWithProgressAlert:(ZPZoteroAttachment *)attachment;
 - (void) _downloadAttachment:(ZPZoteroAttachment *)attachment withUIProgressView:(UIProgressView*) progressView;
 
@@ -62,6 +63,13 @@
     [attachmentView setFrame:CGRectMake(0,0, 
                                         self.view.frame.size.width,
                                         ATTACHMENT_VIEW_HEIGHT)];
+    
+    //Configure activity indicator.
+    _activityIndicator = [[UIActivityIndicatorView alloc] initWithFrame:CGRectMake(0,0,20, 20)];
+    [_activityIndicator hidesWhenStopped];
+    UIBarButtonItem* barButton = [[UIBarButtonItem alloc] initWithCustomView:_activityIndicator];
+    self.navigationItem.rightBarButtonItem = barButton;
+
 
 
 }
@@ -114,6 +122,7 @@
 -(void) configureWithItemKey:(NSString*)key{
     
     _currentItem = [ZPZoteroItem retrieveOrInitializeWithKey: key];
+    [_activityIndicator startAnimating];
     [[ZPDataLayer instance] updateItemDetailsFromServer:_currentItem];
 
     // Get the selected row from the item list
@@ -124,7 +133,8 @@
     [[_itemListController tableView] selectRowAtIndexPath:indexPath animated:FALSE scrollPosition:UITableViewScrollPositionMiddle];
 
         
-    [self _reconfigureDetailTableViewAndAttachments ];
+    [self _reconfigureDetailTableView];
+    [self _reconfigureAttachmentsCarousel];
     
     if(_currentItem.creatorSummary!=NULL && ! [_currentItem.creatorSummary isEqualToString:@""]){
         if(_currentItem.year!=0){
@@ -142,7 +152,21 @@
 
 }
 
-- (void)_reconfigureDetailTableViewAndAttachments {
+-(void) _reconfigureAttachmentsCarousel{
+    
+    [_carouselViews removeAllObjects];
+    
+    ZPZoteroAttachment* attachment;
+    for (attachment in _currentItem.attachments) {
+        UIView* view = [[UIView alloc] initWithFrame:CGRectMake(0, 0, ATTACHMENT_IMAGE_WIDTH, ATTACHMENT_IMAGE_HEIGHT)];
+        [_carouselViews addObject:view];
+        [_previewController configurePreview:view withAttachment:attachment];
+    }
+    
+    [_carousel reloadData];
+    
+}
+- (void)_reconfigureDetailTableView{
     
     //Configure the size of the detail view table.
     
@@ -154,20 +178,12 @@
                                           ATTACHMENT_VIEW_HEIGHT, 
                                           self.view.frame.size.width, 
                                           [_detailTableView contentSize].height)];
-    
-    [_carouselViews removeAllObjects];
-    
-    ZPZoteroAttachment* attachment;
-    for (attachment in _currentItem.attachments) {
-        UIView* view = [[UIView alloc] initWithFrame:CGRectMake(0, 0, ATTACHMENT_IMAGE_WIDTH, ATTACHMENT_IMAGE_HEIGHT)];
-        [_carouselViews addObject:view];
-        [_previewController configurePreview:view withAttachment:attachment];
-    }
 
-    [_carousel reloadData];
     
     //Configure  the size of the UIScrollView
     [(UIScrollView*) self.view setContentSize:CGSizeMake(self.view.frame.size.width, ATTACHMENT_VIEW_HEIGHT + [_detailTableView contentSize].height)];
+    
+    
     
 }
 - (void)viewWillDisappear:(BOOL)animated
@@ -373,9 +389,12 @@
 -(void) notifyItemAvailable:(ZPZoteroItem*) item{
     
     if([item.key isEqualToString:_currentItem.key]){
-        //Retrive data from DB
         _currentItem = item;
-        [self performSelectorOnMainThread:@selector( _reconfigureDetailTableViewAndAttachments) withObject:nil waitUntilDone:NO];
+        [_activityIndicator startAnimating];
+        [self performSelectorOnMainThread:@selector( _reconfigureAttachmentsCarousel) withObject:nil waitUntilDone:YES];
+        [self performSelectorOnMainThread:@selector( _reconfigureDetailTableView) withObject:nil waitUntilDone:YES];
+        [_activityIndicator stopAnimating];
+
     }
 }
 
@@ -384,7 +403,11 @@
     NSInteger index=0;
     for(thisAttachment in _currentItem.attachments){
         if([attachment isEqual:thisAttachment]){
+            //It is possible that we have new items from this view
+            [_activityIndicator startAnimating];
+            if([_carouselViews count] <= index) [self performSelectorOnMainThread:@selector( _reconfigureAttachmentsCarousel) withObject:nil waitUntilDone:YES];
             [_previewController configurePreview:[_carouselViews objectAtIndex:index] withAttachment:attachment];
+            [_activityIndicator stopAnimating];
         }
         index++;
     }

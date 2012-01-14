@@ -69,8 +69,8 @@
 
 -(void) notifyItemAvailable:(ZPZoteroItem *)item{
 
-    @synchronized(self){
-        
+    @synchronized(_itemKeysShown){
+
         if([_itemKeysNotInCache containsObject:item.key]){
             [_itemKeysNotInCache removeObject:item.key];
             
@@ -85,6 +85,7 @@
                 [self _performTableUpdates];
             }
         }
+        //TODO: What if this is mutated?
         else if([_itemKeysShown containsObject:item.key]){
             //Update the row only if the full citation for this item has changed 
             @synchronized(_tableView){
@@ -232,9 +233,8 @@
 -(void) _updateRowForItem:(ZPZoteroItem*)item{
     [_cellCache removeObjectForKey:item.key];
     NSIndexPath* indexPath = [NSIndexPath indexPathForRow:[_itemKeysShown indexOfObject:item.key] inSection:0];
-    BOOL reselect = [[_tableView indexPathForSelectedRow] isEqual:indexPath];
-    [_tableView reloadRowsAtIndexPaths:[NSArray arrayWithObject:indexPath ] withRowAnimation:_animations];
-    if(reselect) [_tableView selectRowAtIndexPath:indexPath animated:NO scrollPosition:UITableViewScrollPositionNone];
+    //Do not reload cell if it is selected
+    if(! [[_tableView indexPathForSelectedRow] isEqual:indexPath]) [_tableView selectRowAtIndexPath:indexPath animated:NO scrollPosition:UITableViewScrollPositionNone];
 }
 
 #pragma mark -

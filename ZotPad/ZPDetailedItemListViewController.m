@@ -216,25 +216,17 @@ static ZPDetailedItemListViewController* _instance = nil;
             
              //Check if the item has attachments and render a thumbnail from the first attachment PDF
              
-            if(item.attachments !=NULL){
-                NSString* path = NULL;
-                ZPZoteroAttachment* attachment = [item firstExistingAttachment];
-                path = [attachment fileSystemPath];
+            if([item.attachments count] > 0){
+
+                UIButton* button = [[UIButton alloc] init];
+                [articleThumbnailHolder addSubview:button];
+                button.frame = articleThumbnailHolder.frame;
                 
-                if(path!=NULL){
-                    
-                    UIButton* button = [[UIButton alloc] init];
-                    
-                    [articleThumbnailHolder addSubview:button];
-                    
-                    ZPFileThumbnailAndQuicklookController* buttonController = [[ZPFileThumbnailAndQuicklookController alloc]
-                                                                               initWithItem:item viewController:self maxHeight:articleThumbnailHolder.frame.size.height
-                                                                               maxWidth:articleThumbnailHolder.frame.size.width];
-
-                    [buttonController configureButton:button];
-                    
-
-                }
+                ZPFileThumbnailAndQuicklookController* buttonController = [[ZPFileThumbnailAndQuicklookController alloc]
+                                                                           initWithItem:item viewController:self maxHeight:articleThumbnailHolder.frame.size.height
+                                                                           maxWidth:articleThumbnailHolder.frame.size.width];
+                [buttonController configureButton:button];
+                
             }
         }
         [_cellCache setObject:cell forKey:keyObj];

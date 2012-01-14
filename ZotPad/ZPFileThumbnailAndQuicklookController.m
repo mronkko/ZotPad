@@ -21,7 +21,8 @@
 
 -(UIImage*) _renderThumbnailFromPDFFile:(NSString*)filename;
 -(CGRect)_getDimensionsWithImage:(UIImage*) image; 
--(UIImage*) _getImage:(NSInteger) index;
+-(UIImage*) _getFiletypeImage:(ZPZoteroAttachment*)attachment;
+
 -(void) _configureButton:(UIButton*) button;
 -(void) _configurePreview:(UIView*) view withAttachment:(ZPZoteroAttachment*)attachment;
 -(void) _configurePreviewLabel:(UIView*)view withAttachment:(ZPZoteroAttachment*)attachment;
@@ -33,12 +34,21 @@
 @implementation ZPFileThumbnailAndQuicklookController
 
 static NSOperationQueue* _buttonRenderQueue;
+static NSOperationQueue* _imageRenderQueue;
+static NSCache* _fileTypeImageCache;
 
 -(id) initWithItem:(ZPZoteroItem*)item viewController:(UIViewController*) viewController maxHeight:(NSInteger)maxHeight maxWidth:(NSInteger)maxWidth{
     
     if(_buttonRenderQueue == NULL){
         _buttonRenderQueue = [[NSOperationQueue alloc] init];
-        [_buttonRenderQueue setMaxConcurrentOperationCount:1];
+        [_buttonRenderQueue setMaxConcurrentOperationCount:3];
+    }
+    if(_imageRenderQueue == NULL){
+        _imageRenderQueue = [[NSOperationQueue alloc] init];
+        [_imageRenderQueue setMaxConcurrentOperationCount:3];
+    }
+    if(_fileTypeImageCache == NULL){
+        _fileTypeImageCache = [[NSCache alloc] init];
     }
     
     self = [super init];
@@ -96,16 +106,16 @@ static NSOperationQueue* _buttonRenderQueue;
 
 }
 
--(UIImage*) _getImage:(NSInteger)index{
+-(UIImage*) _getFiletypeImage:(ZPZoteroAttachment*)attachment{
 
-    ZPZoteroAttachment* attachment = [_item.attachments objectAtIndex:index];
-                                    
-    UIImage* image;
     
-    if([attachment fileExists] && [attachment.attachmentType isEqualToString:@"application/pdf"]){
-        image = [self _renderThumbnailFromPDFFile:[attachment fileSystemPath]];
-    }
-    else{
+    NSString* key = [NSString stringWithFormat:@"%@%ix%i",attachment.attachmentType,_maxHeight,_maxWidth];
+    
+    UIImage* image = [_fileTypeImageCache objectForKey:key];
+    
+    if(image==NULL){
+        NSLog(@"Getting file type image for %@ (%ix%i)",attachment.attachmentType,_maxHeight,_maxWidth);
+        
         // Source: http://stackoverflow.com/questions/5876895/using-built-in-icons-for-mime-type-or-uti-type-in-ios
         
         //Need to initialize this way or the doc controller doesn't work
@@ -118,16 +128,21 @@ static NSOperationQueue* _buttonRenderQueue;
         
         //Tell the doc controller what UTI type we want
         docController.UTI = uti;
-
+        
         //Get the largest image that can fit
-
+        
         for(UIImage* icon in docController.icons) {
+            
             if(icon.size.width<_maxWidth && icon.size.height<_maxHeight) image=icon;
             else{
                 if(image==NULL) image=icon;
                 break;   
             }
         }
+
+        NSLog(@"Using image with size ( %f x %f )",image.size.width,image.size.height);
+
+        [_fileTypeImageCache setObject:image forKey:key];
     }
 
     return image;
@@ -136,18 +151,32 @@ static NSOperationQueue* _buttonRenderQueue;
 //TODO: Consider recycling the uibutton and uiimageview objects
 
 -(void) configureButton:(UIButton*) button{
+
+    //We can cancel everything in the image render queue because images are not show
+    [_imageRenderQueue cancelAllOperations];
     
-    NSOperation* operation = [[NSInvocationOperation alloc] initWithTarget:self selector:@selector(_configureButton:) object:button];
-    [_buttonRenderQueue addOperation:operation];
+    ZPZoteroAttachment* attachment = [_item.attachments objectAtIndex:0];
+    UIImage* image = [self _getFiletypeImage:attachment];
+    [button setImage:image forState:UIControlStateNormal];
+    [button setNeedsDisplay];
+    
+
+    if([attachment fileExists] && [attachment.attachmentType isEqualToString:@"application/pdf"]){
+        //NSOperation* operation = [[NSInvocationOperation alloc] initWithTarget:self selector:@selector(_configureButton:) object:button];
+        //[_buttonRenderQueue addOperation:operation];
+    }
+
 }
 
 -(void) _configureButton:(UIButton*) button{
 
+    ZPZoteroAttachment* attachment = [_item.attachments objectAtIndex:0];
     UIImage* image;
-    if([button superview] != nil) image  = [self _getImage:0];
+    if([button superview] != nil && attachment.fileExists) image  = [self _renderThumbnailFromPDFFile:attachment.fileSystemPath];
     if([button superview] != nil){
         [button setImage:image forState:UIControlStateNormal];
         button.frame=[self _getDimensionsWithImage:image];
+        button.layer.borderWidth = 1.0f;
         [button setNeedsDisplay];
     }
     
@@ -193,31 +222,40 @@ static NSOperationQueue* _buttonRenderQueue;
 
 -(void) configurePreview:(UIView*)view withAttachment:(ZPZoteroAttachment*)attachment{
     
+    //We can cancel everything in the image render queue because images are not show
+    [_buttonRenderQueue cancelAllOperations];
+
     for(UIView* subview in view.subviews){
         [subview removeFromSuperview];
     }
-
-    [self _configurePreviewLabel:view withAttachment:attachment];
     view.layer.borderWidth = 2.0f;
     view.backgroundColor = [UIColor whiteColor];
+
+    UIImageView* imageView = [[UIImageView alloc] initWithImage:[self _getFiletypeImage:attachment]];
+    [view addSubview:imageView];
+    imageView.center = view.center;
+    
+    [self _configurePreviewLabel:view withAttachment:attachment];
     
     
     //Render an image 
     
     //Create an invocation
-    SEL selector = @selector(_configurePreview:withAttachment:);
-    NSMethodSignature* signature = [[self class] instanceMethodSignatureForSelector:selector];
-    NSInvocation* invocation  = [NSInvocation invocationWithMethodSignature:signature];
-    [invocation setTarget:self];
-    [invocation setSelector:selector];
-    
-    //Set arguments
-    [invocation setArgument:&view atIndex:2];
-    [invocation setArgument:&attachment atIndex:3];
-    
-    //Create operation and queue it for background retrieval
-    NSOperation* operation = [[NSInvocationOperation alloc] initWithInvocation:invocation];
-    [_buttonRenderQueue addOperation:operation];
+    if(attachment.fileExists && [attachment.attachmentType isEqualToString:@"application/pdf"]){
+        SEL selector = @selector(_configurePreview:withAttachment:);
+        NSMethodSignature* signature = [[self class] instanceMethodSignatureForSelector:selector];
+        NSInvocation* invocation  = [NSInvocation invocationWithMethodSignature:signature];
+        [invocation setTarget:self];
+        [invocation setSelector:selector];
+        
+        //Set arguments
+        [invocation setArgument:&view atIndex:2];
+        [invocation setArgument:&attachment atIndex:3];
+        
+        //Create operation and queue it for background retrieval
+        NSOperation* operation = [[NSInvocationOperation alloc] initWithInvocation:invocation];
+        [_buttonRenderQueue addOperation:operation];
+    }
 }
 
 -(void) _configurePreview:(UIView*)view withAttachment:(ZPZoteroAttachment*)attachment{
@@ -225,8 +263,8 @@ static NSOperationQueue* _buttonRenderQueue;
     //Render images
     
     UIImage* image;
-    NSInteger index = [_item.attachments indexOfObject:attachment];
-    if([view superview] != nil && index!=NSNotFound) image  = [self _getImage:index];
+    if([view superview] != nil && attachment.fileExists && [attachment.attachmentType isEqualToString:@"application/pdf"]) image  = [self _renderThumbnailFromPDFFile:attachment.fileSystemPath];
+
     if([view superview] != nil){
         
         UIView* subview;
@@ -237,16 +275,14 @@ static NSOperationQueue* _buttonRenderQueue;
 
         UIImageView* imageView = [[UIImageView alloc] initWithImage:image];
 
-        if([attachment fileExists] && [attachment.attachmentType isEqualToString:@"application/pdf"]){
-            view.layer.frame = [self _getDimensionsWithImage:image];
-            imageView.layer.frame = [self _getDimensionsWithImage:image];
-            [view setNeedsLayout];
-        }
+        view.layer.frame = [self _getDimensionsWithImage:image];
+        imageView.layer.frame = [self _getDimensionsWithImage:image];
+        [view setNeedsLayout];
         
         [view addSubview:imageView];
-        //Add the subviews back
+        //Add the subviews back, but not the imageview
         for(subview in subviews){
-            [view addSubview:subview];
+            if(! [subview isKindOfClass:[UIImageView class]]) [view addSubview:subview];
         }
         [view setNeedsDisplay];
         [[(ZPItemDetailViewController*) _viewController carousel] reloadItemAtIndex:[_item.attachments indexOfObject:attachment] animated:YES];

@@ -217,8 +217,8 @@ const NSInteger ZPServerConnectionRequestTopLevelKeys = 9;
             parserDelegate = [[ZPServerResponseXMLParser alloc] init];
             NSMutableArray* itemKeys = [NSMutableArray arrayWithArray:[stringData componentsSeparatedByCharactersInSet:[NSCharacterSet whitespaceAndNewlineCharacterSet]]];
             
-            //The last can be empty, so need so be removed
-            if([[itemKeys lastObject] isEqualToString:@""]) [itemKeys removeLastObject];
+            //It is possible that we get empty keys at the end
+            while([[itemKeys lastObject] isEqualToString:@""]) [itemKeys removeLastObject];
 
             [parserDelegate setParsedElements:itemKeys];
         }
@@ -451,8 +451,9 @@ const NSInteger ZPServerConnectionRequestTopLevelKeys = 9;
     
     //Search
     if(searchString!=NULL && ! [searchString isEqualToString:@""]){
-        [parameters setObject:[searchString stringByAddingPercentEscapesUsingEncoding:
-                               NSASCIIStringEncoding] forKey:@"q"];
+        //TODO: Fix umlauts (ö ä etc)
+        NSString* encodedString = [searchString stringByAddingPercentEscapesUsingEncoding:NSUTF8StringEncoding] ;
+        [parameters setObject:encodedString forKey:@"q"];
     }
     //Sort
     if(orderField!=NULL){

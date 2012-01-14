@@ -355,6 +355,8 @@ static ZPCacheController* _instance = nil;
 
     NSMutableArray* itemKeys = [NSMutableArray arrayWithArray:[[ZPServerConnection instance] retrieveKeysInContainer:libraryID collectionKey:collectionKey searchString:searchString orderField:orderField sortDescending:sortDescending]];
     
+    //Remove items that we have in the cache
+    
     //TODO: refactor this into a more logical place
 
     if(! [libraryID isEqual:_activeLibraryID] && ! [[ZPPreferences instance] cacheAttachmentsAllLibraries] ){

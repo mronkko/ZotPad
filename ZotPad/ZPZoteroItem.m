@@ -68,7 +68,9 @@ static NSCache* _objectCache = NULL;
     
     ZPZoteroItem* obj= [_objectCache objectForKey:key];
     
-    if(obj==NULL){
+    //It is possible that subclasses of this class have already been instantiated with this key, so we need to reinstantiate the object
+    
+    if(obj==NULL || ! [obj isKindOfClass:[self class]]){
         obj= [[self alloc] init];
         obj->_key=key;
         obj->_needsToBeWrittenToCache = FALSE;
