@@ -114,10 +114,8 @@ static ZPCacheController* _instance = nil;
 
 -(void) _checkQueues{
 
-    @synchronized(self){      
-        [self _checkDownloadQueue];
-        [self _checkMetadataQueue];
-    }
+    [self _checkDownloadQueue];
+    [self _checkMetadataQueue];
 }
 
 -(void) _checkDownloadQueue{
@@ -136,61 +134,60 @@ static ZPCacheController* _instance = nil;
 
 -(void) _checkMetadataQueue{
     
-    while([_serverRequestQueue operationCount] <= [_serverRequestQueue maxConcurrentOperationCount]){
-        
-        
-        //Choose the queue the active library or choose a first non-empty queue
-        NSMutableArray* keyArray = [_itemKeysToRetrieve objectForKey:_activeLibraryID];
-        NSEnumerator* e = [_itemKeysToRetrieve keyEnumerator];
-        NSNumber* libraryID = _activeLibraryID;
-        
-        while((keyArray == NULL || [keyArray count]==0) && (libraryID = [e nextObject])) keyArray = [_itemKeysToRetrieve objectForKey:keyArray];
-        
-        //If we found a non-empty que, queue item retrival
-        if(keyArray != NULL && [keyArray count]>0){
-            NSArray* keysToRetrieve;
-            @synchronized(keyArray){
-                NSRange range = NSMakeRange(0, MIN(50,[keyArray count]));
-                keysToRetrieve = [keyArray subarrayWithRange:range];
-
-                //Remove the items that we are retrieving
-                [keyArray removeObjectsInRange:range];
+    @synchronized(_serverRequestQueue){
+        while([_serverRequestQueue operationCount] <= [_serverRequestQueue maxConcurrentOperationCount]){
+            
+            
+            //Choose the queue the active library or choose a first non-empty queue
+            NSMutableArray* keyArray = [_itemKeysToRetrieve objectForKey:_activeLibraryID];
+            NSEnumerator* e = [_itemKeysToRetrieve keyEnumerator];
+            NSNumber* libraryID = _activeLibraryID;
+            
+            while((keyArray == NULL || [keyArray count]==0) && (libraryID = [e nextObject])) keyArray = [_itemKeysToRetrieve objectForKey:keyArray];
+            
+            //If we found a non-empty que, queue item retrival
+            if(keyArray != NULL && [keyArray count]>0){
+                NSArray* keysToRetrieve;
+                @synchronized(keyArray){
+                    NSRange range = NSMakeRange(0, MIN(50,[keyArray count]));
+                    keysToRetrieve = [keyArray subarrayWithRange:range];
+                    
+                    //Remove the items that we are retrieving
+                    [keyArray removeObjectsInRange:range];
+                }
+                
+                //Create an invocation
+                SEL selector = @selector(_doItemRetrieval:fromLibrary:);
+                NSMethodSignature* signature = [[self class] instanceMethodSignatureForSelector:selector];
+                NSInvocation* invocation  = [NSInvocation invocationWithMethodSignature:signature];
+                [invocation setTarget:self];
+                [invocation setSelector:selector];
+                
+                //Set arguments
+                [invocation setArgument:&keysToRetrieve atIndex:2];
+                [invocation setArgument:&libraryID atIndex:3];
+                
+                //Create operation and queue it for background retrieval
+                NSOperation* retrieveOperation = [[NSInvocationOperation alloc] initWithInvocation:invocation];
+                [_serverRequestQueue addOperation:retrieveOperation];
+                
             }
-
-            //Create an invocation
-            SEL selector = @selector(_doItemRetrieval:fromLibrary:);
-            NSMethodSignature* signature = [[self class] instanceMethodSignatureForSelector:selector];
-            NSInvocation* invocation  = [NSInvocation invocationWithMethodSignature:signature];
-            [invocation setTarget:self];
-            [invocation setSelector:selector];
             
-            //Set arguments
-            [invocation setArgument:&keysToRetrieve atIndex:2];
-            [invocation setArgument:&libraryID atIndex:3];
             
-            //Create operation and queue it for background retrieval
-            NSOperation* retrieveOperation = [[NSInvocationOperation alloc] initWithInvocation:invocation];
-            [_serverRequestQueue addOperation:retrieveOperation];
-
-            [self _checkQueues];
-            return;
+            //If there are no items, start retrieving collection memberships
+            else if([_containersToCache count]>0){
+                
+                NSOperation* retrieveOperation = [[NSInvocationOperation alloc] initWithTarget:self selector:@selector(_doContainerRetrieval:) object:[_containersToCache objectAtIndex:0]];
+                
+                //Remove the items that we are retrieving
+                [_containersToCache removeObjectAtIndex:0];
+                
+                [_serverRequestQueue addOperation:retrieveOperation];
+                
+            } 
+            else break;
+            
         }
-        
-        
-        //If there are no items, start retrieving collection memberships
-        if([_containersToCache count]>0){
-
-            NSOperation* retrieveOperation = [[NSInvocationOperation alloc] initWithTarget:self selector:@selector(_doContainerRetrieval:) object:[_containersToCache objectAtIndex:0]];
-            
-            //Remove the items that we are retrieving
-            [_containersToCache removeObjectAtIndex:0];
-            
-             [_serverRequestQueue addOperation:retrieveOperation];
-            
-            [self _checkQueues];
-            return;
-        }
-        
     }
 }
 
@@ -229,7 +226,7 @@ static ZPCacheController* _instance = nil;
                 [self _checkIfAttachmentExistsAndQueueForDownload:attachment];
             }
             //Standalone attachments
-            if(attachment.parentItemKey==NULL){
+            if(attachment.parentItemKey==attachment.key){
                 [[ZPDatabase instance] addItemToDatabase:attachment];
             }
             
@@ -240,7 +237,7 @@ static ZPCacheController* _instance = nil;
             [[ZPDatabase instance] addNoteToDatabase:note];
             
             //Standalone notes
-            if(note.parentItemKey==NULL){
+            if(note.parentItemKey==note.key){
                 [[ZPDatabase instance] addItemToDatabase:note];
             }
             

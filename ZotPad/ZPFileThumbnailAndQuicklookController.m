@@ -13,15 +13,26 @@
 #import <MobileCoreServices/MobileCoreServices.h>
 #import <QuartzCore/QuartzCore.h>
 #import "ZPItemDetailViewController.h"
+#import "ZPServerConnection.h"
 
 #import "ZPLogger.h"
 
-@interface ZPFileThumbnailAndQuicklookController()
+
+#define USE_THUMBNAILS_FOR_PDFS 0
+
+
+@interface ZPFileThumbnailAndQuicklookController(){
+    ZPZoteroAttachment* _currentAttachment;
+}
     
 
 -(UIImage*) _renderThumbnailFromPDFFile:(NSString*)filename;
 -(CGRect)_getDimensionsWithImage:(UIImage*) image; 
 -(UIImage*) _getFiletypeImage:(ZPZoteroAttachment*)attachment;
+
+- (void) _downloadWithProgressAlert:(ZPZoteroAttachment *)attachment;
+- (void) _downloadAttachment:(ZPZoteroAttachment *)attachment withUIProgressView:(UIProgressView*) progressView progressAlert:(UIAlertView*)progressAlert;
+
 
 -(void) _configureButton:(UIButton*) button;
 -(void) _configurePreview:(UIView*) view withAttachment:(ZPZoteroAttachment*)attachment;
@@ -60,8 +71,18 @@ static NSCache* _fileTypeImageCache;
     return self;
 }
 
--(void) buttonTapped{
-    [self openInQuickLookWithAttachment:[_item firstExistingAttachment]];
+-(void) buttonTapped:(id)sender{
+    
+    //Get the table cell.
+    UITableViewCell* cell = (UITableViewCell* )[[sender superview] superview];
+    
+    //Get the row of this cell
+    NSInteger row = [[(ZPSimpleItemListViewController*) _viewController tableView] indexPathForCell:cell].row;
+    
+    ZPZoteroItem* item = [ZPZoteroItem retrieveOrInitializeWithKey:[[(ZPSimpleItemListViewController*) _viewController itemKeysShown] objectAtIndex:row]];
+    
+    _currentAttachment = [item.attachments objectAtIndex:0];
+    [self openInQuickLookWithAttachment:_currentAttachment];
 }
 
 #pragma mark QuickLook delegate methods
@@ -82,18 +103,21 @@ static NSCache* _fileTypeImageCache;
 
 -(void) openInQuickLookWithAttachment:(ZPZoteroAttachment*) attachment{
 
-    QLPreviewController *quicklook = [[QLPreviewController alloc] init];
-    [quicklook setDataSource:self];
-    [quicklook setCurrentPreviewItemIndex:[[_item allExistingAttachments] indexOfObject:attachment]];
-    
-    UIViewController* root = [UIApplication sharedApplication].delegate.window.rootViewController;       
-    [root presentModalViewController:quicklook animated:YES];
-
-    //Mark these items as recently viewed
-    for(ZPZoteroAttachment* attachment in [_item allExistingAttachments]){
-        [[ZPDatabase instance] updateViewedTimestamp:attachment];
+    if(! attachment.fileExists) [self _downloadWithProgressAlert:attachment];
+    else {
+        
+        QLPreviewController *quicklook = [[QLPreviewController alloc] init];
+        [quicklook setDataSource:self];
+        _item = [ZPZoteroItem retrieveOrInitializeWithKey:attachment.parentItemKey];
+        [quicklook setCurrentPreviewItemIndex:[[_item allExistingAttachments] indexOfObject:attachment]];
+        UIViewController* root = [UIApplication sharedApplication].delegate.window.rootViewController;       
+        [root presentModalViewController:quicklook animated:YES];
+        
+        //Mark these items as recently viewed
+        for(ZPZoteroAttachment* attachment in [_item allExistingAttachments]){
+            [[ZPDatabase instance] updateViewedTimestamp:attachment];
+        }
     }
-    //resignFirstResponder
 }
 
 -(CGRect)_getDimensionsWithImage:(UIImage*) image{    
@@ -150,21 +174,23 @@ static NSCache* _fileTypeImageCache;
 
 //TODO: Consider recycling the uibutton and uiimageview objects
 
--(void) configureButton:(UIButton*) button{
+-(void) configureButton:(UIButton*) button withAttachment:(ZPZoteroAttachment*)attachment{
 
     //We can cancel everything in the image render queue because images are not show
     [_imageRenderQueue cancelAllOperations];
     
-    ZPZoteroAttachment* attachment = [_item.attachments objectAtIndex:0];
     UIImage* image = [self _getFiletypeImage:attachment];
     [button setImage:image forState:UIControlStateNormal];
     [button setNeedsDisplay];
     
-
-    if([attachment fileExists] && [attachment.attachmentType isEqualToString:@"application/pdf"]){
-        //NSOperation* operation = [[NSInvocationOperation alloc] initWithTarget:self selector:@selector(_configureButton:) object:button];
-        //[_buttonRenderQueue addOperation:operation];
+    [button addTarget:self action:@selector(buttonTapped:) 
+     forControlEvents:UIControlEventTouchUpInside];
+    
+    if(USE_THUMBNAILS_FOR_PDFS && [attachment fileExists] && [attachment.attachmentType isEqualToString:@"application/pdf"]){
+        NSOperation* operation = [[NSInvocationOperation alloc] initWithTarget:self selector:@selector(_configureButton:) object:button];
+        [_buttonRenderQueue addOperation:operation];
     }
+     
 
 }
 
@@ -181,6 +207,47 @@ static NSCache* _fileTypeImageCache;
     }
     
 }
+
+#pragma mark Item downloading
+
+- (void) _downloadWithProgressAlert:(ZPZoteroAttachment *)attachment {
+    
+    UIAlertView* progressAlert;
+
+    progressAlert = [[UIAlertView alloc] initWithTitle: [NSString stringWithFormat:@"Downloading (%i KB)",attachment.attachmentLength/1024]
+                                                message: nil
+                                               delegate: self
+                                      cancelButtonTitle: nil
+                                      otherButtonTitles: nil];
+    
+    // Create the progress bar and add it to the alert
+    UIProgressView *progressView = [[UIProgressView alloc] initWithFrame:CGRectMake(30.0f, 80.0f, 225.0f, 90.0f)];
+    [progressAlert addSubview:progressView];
+    [progressView setProgressViewStyle: UIProgressViewStyleBar];
+    [progressAlert show];
+    
+    //Create an invocation
+    SEL selector = @selector(_downloadAttachment:withUIProgressView:progressAlert:);
+    
+    NSMethodSignature* signature = [[self class] instanceMethodSignatureForSelector:selector];
+    NSInvocation* invocation  = [NSInvocation invocationWithMethodSignature:signature];
+    [invocation setTarget:self];
+    [invocation setSelector:selector];
+    
+    //Set arguments
+    [invocation setArgument:&attachment atIndex:2];
+    [invocation setArgument:&progressView atIndex:3];
+    [invocation setArgument:&progressAlert atIndex:4];
+    
+    [invocation performSelectorInBackground:@selector(invoke) withObject:NULL];
+}
+
+- (void) _downloadAttachment:(ZPZoteroAttachment *)attachment withUIProgressView:(UIProgressView*) progressView progressAlert:(UIAlertView*)progressAlert{
+    [[ZPServerConnection instance] downloadAttachment:attachment withUIProgressView:progressView];
+    [progressAlert dismissWithClickedButtonIndex:0 animated:YES];
+    [self performSelectorOnMainThread:@selector(openInQuickLookWithAttachment:) withObject:attachment waitUntilDone:NO];
+}
+
 
 -(void) _configurePreviewLabel:(UIView*)view withAttachment:(ZPZoteroAttachment*)attachment{
 

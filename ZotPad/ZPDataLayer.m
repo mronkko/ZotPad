@@ -127,16 +127,16 @@ static ZPDataLayer* _instance = nil;
             [(NSObject <ZPItemObserver>*) id notifyItemAvailable:item];
         }
     }
-}
-
--(void) notifyItemAttachmentsAvailable:(ZPZoteroItem*)item{
-    
-    NSEnumerator* e = [_itemObservers objectEnumerator];
-    NSObject* id;
-    
-    while( id= [e nextObject]) {
-        if([(NSObject <ZPItemObserver>*) id respondsToSelector:@selector(notifyItemAttachmentsAvailable:)]){
-            [(NSObject <ZPItemObserver>*) id notifyItemAttachmentsAvailable:item];
+    //If this is a subitem, notify about the parent
+    if([item respondsToSelector:@selector(parentItemKey)]){
+        NSString* parentKey = (NSString*)[item performSelector:@selector(parentItemKey)];
+        if(![parentKey isEqualToString:item.key]){
+            ZPZoteroItem* parentItem = [ZPZoteroItem retrieveOrInitializeWithKey:parentKey];
+            if([item isKindOfClass:[ZPZoteroAttachment class]]){
+                //Refresh the attachments of parent and notify that it was updated
+                [[ZPDatabase instance] addAttachmentsToItem:parentItem];
+                [self notifyItemAvailable:parentItem];
+            }
         }
     }
 }

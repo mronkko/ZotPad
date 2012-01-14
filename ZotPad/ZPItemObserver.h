@@ -19,9 +19,6 @@
 // Tells an observer that detailed citation information is available
 -(void) notifyItemAvailable:(ZPZoteroItem*) item;
 
-// Tells an observer that information about attachments is available
--(void) notifyItemAttachmentsAvailable:(ZPZoteroItem*) item;
-
 
 
 @end

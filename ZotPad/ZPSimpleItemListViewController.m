@@ -87,7 +87,7 @@
         else if([_itemKeysShown containsObject:item.key]){
             //Update the row only if the full citation for this item has changed 
             @synchronized(_tableView){
-                if([_itemKeysShown indexOfObject:item.key]) [self performSelectorOnMainThread:@selector(_updateRowForItem:) withObject:item waitUntilDone:YES];
+                [self performSelectorOnMainThread:@selector(_updateRowForItem:) withObject:item waitUntilDone:YES];
             }
         }
     }    
@@ -207,7 +207,7 @@
     [_cellCache removeObjectForKey:item.key];
     NSIndexPath* indexPath = [NSIndexPath indexPathForRow:[_itemKeysShown indexOfObject:item.key] inSection:0];
     //Do not reload cell if it is selected
-    if(! [[_tableView indexPathForSelectedRow] isEqual:indexPath]) [_tableView selectRowAtIndexPath:indexPath animated:NO scrollPosition:UITableViewScrollPositionNone];
+    if(! [[_tableView indexPathForSelectedRow] isEqual:indexPath]) [_tableView reloadRowsAtIndexPaths:[NSArray arrayWithObject:indexPath] withRowAnimation:_animations];
 }
 
 #pragma mark -

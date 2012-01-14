@@ -196,7 +196,7 @@ const NSInteger ZPServerConnectionRequestTopLevelKeys = 9;
                    ! [@"libraryID" isEqualToString: key] &&
                    ! ((type == ZPServerConnectionRequestSingleItemChildren || type == ZPServerConnectionRequestSingleItem) && [@"itemKey" isEqualToString:key])) {
                     urlString = [NSString stringWithFormat:@"%@&%@=%@",urlString,key,[[parameters objectForKey:key] stringByAddingPercentEscapesUsingEncoding:
-                                                                                      NSASCIIStringEncoding]];
+                                                                                      NSUTF8StringEncoding]];
                 
                 }
             }
@@ -451,9 +451,7 @@ const NSInteger ZPServerConnectionRequestTopLevelKeys = 9;
     
     //Search
     if(searchString!=NULL && ! [searchString isEqualToString:@""]){
-        //TODO: Fix umlauts (ö ä etc)
-        NSString* encodedString = [searchString stringByAddingPercentEscapesUsingEncoding:NSUTF8StringEncoding] ;
-        [parameters setObject:encodedString forKey:@"q"];
+        [parameters setObject:searchString forKey:@"q"];
     }
     //Sort
     if(orderField!=NULL){

@@ -135,6 +135,9 @@ INSERT INTO localization (language,type,key,value) VALUES ("","itemType","tvBroa
 INSERT INTO localization (language,type,key,value) VALUES ("","itemType","thesis","Thesis");
 INSERT INTO localization (language,type,key,value) VALUES ("","itemType","videoRecording","Video Recording");
 INSERT INTO localization (language,type,key,value) VALUES ("","itemType","webpage","Web Page");
+
+INSERT INTO localization (language,type,key,value) VALUES ("","itemType","attachment","Attachment");
+
 INSERT INTO localization (language,type,key,value) VALUES ("","field","numPages","# of Pages");
 INSERT INTO localization (language,type,key,value) VALUES ("","field","numberOfVolumes","# of Volumes");
 INSERT INTO localization (language,type,key,value) VALUES ("","field","abstractNote","Abstract");

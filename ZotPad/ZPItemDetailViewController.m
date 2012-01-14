@@ -13,7 +13,6 @@
 #import "ZPDataLayer.h"
 #import "ZPLocalization.h"
 #import "ZPFileThumbnailAndQuicklookController.h"
-#import "ZPServerConnection.h"
 #import "ZPLogger.h"
 
 #define ATTACHMENT_VIEW_HEIGHT 680
@@ -24,12 +23,10 @@
 @interface ZPItemDetailViewController();
 - (void) _reconfigureDetailTableView;
 - (void) _reconfigureAttachmentsCarousel;
-- (void) _downloadWithProgressAlert:(ZPZoteroAttachment *)attachment;
-- (void) _downloadAttachment:(ZPZoteroAttachment *)attachment withUIProgressView:(UIProgressView*) progressView;
-
 @end
 
 @implementation ZPItemDetailViewController
+
 
 @synthesize selectedItem = _currentItem;
 @synthesize detailTableView = _detailTableView;
@@ -219,7 +216,7 @@
     }
     //Creators
     if(section==1){
-        if(_currentItem.creators!=NULL){
+        if(_currentItem.creators!=NULL || [_currentItem.itemType isEqualToString:@"attachment"]|| [_currentItem.itemType isEqualToString:@"note"]){
             return [_currentItem.creators count];
         }
         else{
@@ -228,7 +225,7 @@
     }
     //Rest of the fields
     if(section==2){
-        if(_currentItem.fields!=NULL){
+        if(_currentItem.fields!=NULL || [_currentItem.itemType isEqualToString:@"attachment"]|| [_currentItem.itemType isEqualToString:@"note"]){
             //Two fields, itemType and title, are shown separately
             return [_currentItem.fields count]-2;
         }
@@ -334,42 +331,6 @@
 
 
 #pragma mark-
-#pragma mark Item downloading
-
-- (void) _downloadWithProgressAlert:(ZPZoteroAttachment *)attachment {
-    
-    _progressAlert = [[UIAlertView alloc] initWithTitle: [NSString stringWithFormat:@"Downloading (%i KB)",attachment.attachmentLength/1024]
-                                                message: nil
-                                               delegate: self
-                                      cancelButtonTitle: nil
-                                      otherButtonTitles: nil];
-    
-    // Create the progress bar and add it to the alert
-    UIProgressView *progressView = [[UIProgressView alloc] initWithFrame:CGRectMake(30.0f, 80.0f, 225.0f, 90.0f)];
-    [_progressAlert addSubview:progressView];
-    [progressView setProgressViewStyle: UIProgressViewStyleBar];
-    [_progressAlert show];
-    
-    //Create an invocation
-    SEL selector = @selector(_downloadAttachment:withUIProgressView:);
-    
-    NSMethodSignature* signature = [[self class] instanceMethodSignatureForSelector:selector];
-    NSInvocation* invocation  = [NSInvocation invocationWithMethodSignature:signature];
-    [invocation setTarget:self];
-    [invocation setSelector:selector];
-    
-    //Set arguments
-    [invocation setArgument:&attachment atIndex:2];
-    [invocation setArgument:&progressView atIndex:3];
-    
-    [invocation performSelectorInBackground:@selector(invoke) withObject:NULL];
-}
-
-- (void) _downloadAttachment:(ZPZoteroAttachment *)attachment withUIProgressView:(UIProgressView*) progressView {
-    [[ZPServerConnection instance] downloadAttachment:attachment withUIProgressView:progressView];
-    [_progressAlert dismissWithClickedButtonIndex:0 animated:YES];
-    [_previewController performSelectorOnMainThread:@selector(openInQuickLookWithAttachment:) withObject:attachment waitUntilDone:NO];
-}
 
 
 /*
@@ -425,8 +386,7 @@
         
         ZPZoteroAttachment* attachment = [[_currentItem attachments] objectAtIndex:index];
         
-        if(! attachment.fileExists) [self _downloadWithProgressAlert:attachment];
-        else [_previewController openInQuickLookWithAttachment:attachment];
+        [_previewController openInQuickLookWithAttachment:attachment];
     }
 }
 

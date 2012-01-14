@@ -23,7 +23,6 @@
     ZPSimpleItemListViewController* _itemListController;
     ZPFileThumbnailAndQuicklookController* _previewController;
     NSMutableArray* _carouselViews;
-    UIAlertView* _progressAlert;
     UIActivityIndicatorView* _activityIndicator;
 
 }

@@ -16,7 +16,10 @@
 
 #import "ZPLogger.h"
 
-@interface ZPDetailedItemListViewController ()
+@interface ZPDetailedItemListViewController (){
+    ZPFileThumbnailAndQuicklookController* _buttonController;
+}
+
 - (void) _configureUncachedKeys:(NSArray*)itemKeyList;
 - (void)_makeBusy;
 - (void)_makeAvailable;
@@ -37,6 +40,7 @@ static ZPDetailedItemListViewController* _instance = nil;
 
 -(id) init{
     self = [super init];
+                           
     return self;
 }
 
@@ -222,10 +226,7 @@ static ZPDetailedItemListViewController* _instance = nil;
                 [articleThumbnailHolder addSubview:button];
                 button.frame = articleThumbnailHolder.frame;
                 
-                ZPFileThumbnailAndQuicklookController* buttonController = [[ZPFileThumbnailAndQuicklookController alloc]
-                                                                           initWithItem:item viewController:self maxHeight:articleThumbnailHolder.frame.size.height
-                                                                           maxWidth:articleThumbnailHolder.frame.size.width];
-                [buttonController configureButton:button];
+                [_buttonController configureButton:button withAttachment:[item.attachments objectAtIndex:0]];
                 
             }
         }
@@ -246,6 +247,11 @@ static ZPDetailedItemListViewController* _instance = nil;
 	// Do any additional setup after loading the view, typically from a nib.
 
     _instance = self;
+
+    // 64 X 64 is the smallest file type icon size on iPad 2
+    _buttonController = [[ZPFileThumbnailAndQuicklookController alloc]
+                         initWithItem:NULL viewController:self maxHeight:64
+                         maxWidth:64];
 
 
     [self configureView];

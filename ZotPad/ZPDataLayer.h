@@ -59,7 +59,6 @@
 
 //Notifies all observers that a new data are available
 -(void) notifyItemAvailable:(ZPZoteroItem*)item;
--(void) notifyItemAttachmentsAvailable:(ZPZoteroItem*)item;
 
 -(void) notifyLibraryWithCollectionsAvailable:(ZPZoteroLibrary*) library;
 

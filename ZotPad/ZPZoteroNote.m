@@ -10,10 +10,22 @@
 
 @implementation ZPZoteroNote
 
-@synthesize parentItemKey = _parentItemKey;
-
 // An alias for setParentCollectionKey
 - (void) setParentKey:(NSString*)key{
     [self setParentItemKey:key];    
 }
+
+- (void) setParentItemKey:(NSString*)key{
+    _parentItemKey = key; 
+}
+- (NSString*) parentItemKey{
+    if(_parentItemKey == NULL){
+        return _key;
+    }
+    else{
+        return _parentItemKey;
+    }
+}
+
+
 @end

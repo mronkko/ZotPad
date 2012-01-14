@@ -131,6 +131,7 @@ static NSCache* _objectCache = NULL;
     _notes = notes;
 }
 
+/*
 
 -(ZPZoteroAttachment*) firstExistingAttachment{
 
@@ -141,7 +142,7 @@ static NSCache* _objectCache = NULL;
     }
     return NULL;
 }
-
+*/
 -(NSArray*) allExistingAttachments{
     NSMutableArray* returnArray = [NSMutableArray arrayWithCapacity:[_attachments count]];
 

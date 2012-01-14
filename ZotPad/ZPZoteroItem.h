@@ -58,7 +58,7 @@
 -(NSString*)key;
 -(BOOL) needsToBeWrittenToCache;
 -(void) clearNeedsToBeWrittenToCache;
--(ZPZoteroAttachment*) firstExistingAttachment;
+//-(ZPZoteroAttachment*) firstExistingAttachment;
 -(NSArray*) allExistingAttachments;
 
 @end
