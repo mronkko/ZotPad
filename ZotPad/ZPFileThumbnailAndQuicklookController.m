@@ -74,8 +74,8 @@ static NSCache* _fileTypeImageCache;
 -(void) buttonTapped:(id)sender{
     
     //Get the table cell.
-    UITableViewCell* cell = (UITableViewCell* )[[sender superview] superview];
-    
+    UITableViewCell* cell = (UITableViewCell* )[[[sender superview] superview] superview];
+
     //Get the row of this cell
     NSInteger row = [[(ZPSimpleItemListViewController*) _viewController tableView] indexPathForCell:cell].row;
     
@@ -107,9 +107,10 @@ static NSCache* _fileTypeImageCache;
     else {
         
         QLPreviewController *quicklook = [[QLPreviewController alloc] init];
-        [quicklook setDataSource:self];
         _item = [ZPZoteroItem retrieveOrInitializeWithKey:attachment.parentItemKey];
-        [quicklook setCurrentPreviewItemIndex:[[_item allExistingAttachments] indexOfObject:attachment]];
+        [quicklook setDataSource:self];
+        NSInteger index = [[_item allExistingAttachments] indexOfObject:attachment];
+        [quicklook setCurrentPreviewItemIndex:index];
         UIViewController* root = [UIApplication sharedApplication].delegate.window.rootViewController;       
         [root presentModalViewController:quicklook animated:YES];
         
