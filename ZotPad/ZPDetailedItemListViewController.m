@@ -72,7 +72,7 @@ static ZPDetailedItemListViewController* _instance = nil;
             //This is required because a background thread might be modifying the table
              @synchronized(_tableView){
                  _itemKeysNotInCache = [NSMutableArray array];
-                 _itemKeysShown = [NSMutableArray array];
+                 _itemKeysShown = [NSArray array];
                  //TODO: Investigate why a relaodsection call a bit below causes a crash. Then uncomment these both.
                  //[_tableView reloadSections:[NSIndexSet indexSetWithIndex:0] withRowAnimation:UITableViewRowAnimationAutomatic];
                  [_tableView reloadData];
@@ -99,8 +99,8 @@ static ZPDetailedItemListViewController* _instance = nil;
 
 - (void) _configureCachedKeys{
     
-    NSMutableArray* array = [NSMutableArray arrayWithArray: [[ZPDataLayer instance] getItemKeysFromCacheForLibrary:self.libraryID collection:self.collectionKey
-                                                                                                      searchString:[self.searchString stringByTrimmingCharactersInSet:[NSCharacterSet whitespaceAndNewlineCharacterSet]]orderField:self.orderField sortDescending:self.sortDescending]];
+    NSArray* array = [[ZPDataLayer instance] getItemKeysFromCacheForLibrary:self.libraryID collection:self.collectionKey
+                                                                                                      searchString:[self.searchString stringByTrimmingCharactersInSet:[NSCharacterSet whitespaceAndNewlineCharacterSet]]orderField:self.orderField sortDescending:self.sortDescending];
     @synchronized(_tableView){
         _itemKeysShown = array;
         

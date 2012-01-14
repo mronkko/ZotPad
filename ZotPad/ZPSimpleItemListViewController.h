@@ -17,7 +17,8 @@
 @interface ZPSimpleItemListViewController : UIViewController <UITableViewDataSource, ZPItemObserver>{
     NSCache* _cellCache;
     
-    NSMutableArray* _itemKeysShown;
+    //This is an array instead of a mutable array because of thread safety
+    NSArray* _itemKeysShown;
     NSMutableArray* _itemKeysNotInCache;
 
     UITableView* _tableView;
