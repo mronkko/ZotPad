@@ -278,7 +278,7 @@
     //Creators
     else if([indexPath indexAtPosition:0] == 1){
         NSDictionary* creator=[_currentItem.creators objectAtIndex:indexPath.row];
-        cell.textLabel.text = [creator objectForKey:@"creatorType"];
+        cell.textLabel.text = [ZPLocalization getLocalizationStringWithKey:[creator objectForKey:@"creatorType"] type:@"creatorType" locale:NULL];
         
         NSString* lastName = [creator objectForKey:@"lastName"];
         if(lastName==NULL || [lastName isEqualToString:@""]){
