@@ -34,6 +34,8 @@
 
 @interface  ZPDatabase ()
 - (NSDictionary*) _fieldsForItem:(ZPZoteroItem*)item;
+- (NSArray*) _creatorsForItem:(ZPZoteroItem*)item;
+
 @end
 
 @implementation ZPDatabase
@@ -43,57 +45,19 @@ static ZPDatabase* _instance = nil;
 -(id)init
 {
     self = [super init];
-    
+    _instance = self;
     
 	NSString *dbPath = [[NSSearchPathForDirectoriesInDomains(NSDocumentDirectory, NSUserDomainMask, YES) objectAtIndex:0] stringByAppendingPathComponent:@"zotpad.sqlite"];
-    
+   
+    if(! [[NSFileManager defaultManager] fileExistsAtPath:dbPath]) [self resetDatabase];
+    else{
+        _database = [FMDatabase databaseWithPath:dbPath];
+        [_database open];
+    }
 
-    BOOL recreateDB = ! [[NSFileManager defaultManager] fileExistsAtPath:dbPath];
-    
-    
-    NSError* error;
-    
-    _database = [FMDatabase databaseWithPath:dbPath];
-    
-    //Prevent backing up of DB
-    const char* filePath = [dbPath fileSystemRepresentation];
-    const char* attrName = "com.apple.MobileBackup";
-    u_int8_t attrValue = 1;
-    setxattr(filePath, attrName, &attrValue, sizeof(attrValue), 0, 0);
-
-    [_database open];
-    
-    //Changing these two will affect how much info is printed in log
     [_database setTraceExecution:FALSE];
     [_database setLogsErrors:TRUE];
-    
-    //Read the database structure from file and create the database
 
-
-    if(recreateDB){
-        
-        //TODO: Consider running this in a background thread. The SQL file would probably need to split into two parts because some tables are needed early on in the library and collection retrieval process
-        
-        NSLog(@"Recreating database because it was missing");
-        NSStringEncoding encoding;
-        
-        NSString *sqlFile = [NSString stringWithContentsOfFile:[[NSBundle mainBundle]
-                                                                pathForResource:@"database"
-                                                                ofType:@"sql"] usedEncoding:&encoding error:&error];
-        
-        NSArray *sqlStatements = [sqlFile componentsSeparatedByString:@";"];
-        
-        NSEnumerator *e = [sqlStatements objectEnumerator];
-        id sqlString;
-        while (sqlString = [e nextObject]) {
-            [_database executeUpdate:sqlString];
-        }
-        
-        
-        NSLog(@"Done recreating database");
-
-    }
-    
 	return self;
 }
 
@@ -109,6 +73,58 @@ static ZPDatabase* _instance = nil;
         return _instance;
     }
     else return NULL;
+}
+
+-(void) resetDatabase{
+    @synchronized(self){
+        NSLog(@"Reseting database");
+        
+        NSError* error;
+        
+        NSString *dbPath = [[NSSearchPathForDirectoriesInDomains(NSDocumentDirectory, NSUserDomainMask, YES) objectAtIndex:0] stringByAppendingPathComponent:@"zotpad.sqlite"];
+        
+        if([[NSFileManager defaultManager] fileExistsAtPath:dbPath]){
+            [[NSFileManager defaultManager] removeItemAtPath: dbPath error:&error];   
+        }
+        
+        _database = [FMDatabase databaseWithPath:dbPath];
+        
+        [_database open];  
+        //Prevent backing up of DB
+        const char* filePath = [dbPath fileSystemRepresentation];
+        const char* attrName = "com.apple.MobileBackup";
+        u_int8_t attrValue = 1;
+        setxattr(filePath, attrName, &attrValue, sizeof(attrValue), 0, 0);
+        
+        //Changing these two will affect how much info is printed in log
+        [_database setTraceExecution:FALSE];
+        [_database setLogsErrors:TRUE];
+        
+        //Read the database structure from file and create the database
+        
+        //TODO: Consider running this in a background thread. The SQL file would probably need to split into two parts because some tables are needed early on in the library and collection retrieval process
+        
+        NSStringEncoding encoding;
+        
+        NSString *sqlFile = [NSString stringWithContentsOfFile:[[NSBundle mainBundle]
+                                                                pathForResource:@"database"
+                                                                ofType:@"sql"] usedEncoding:&encoding error:&error];
+        
+        NSArray *sqlStatements = [sqlFile componentsSeparatedByString:@";"];
+        
+        NSEnumerator *e = [sqlStatements objectEnumerator];
+        id sqlString;
+        
+        while (sqlString = [e nextObject]) {
+            if(! [[sqlString stringByTrimmingCharactersInSet:
+                   [NSCharacterSet whitespaceAndNewlineCharacterSet]] isEqualToString:@""]) [_database executeUpdate:sqlString];
+        }
+        
+        
+        NSLog(@"Database reset completed");
+
+    }
+
 }
 
 -(void) addOrUpdateLibraries:(NSArray*)libraries{
@@ -131,16 +147,17 @@ static ZPDatabase* _instance = nil;
 }
 
 
--(void) addOrUpdateCollections:(NSArray*)collections forLibrary:(NSNumber*)libraryID{
+-(void) addOrUpdateCollections:(NSArray*)collections forLibrary:(ZPZoteroLibrary*)library{
 
     NSMutableArray* collectionKeys;
     
     @synchronized(self){
-        FMResultSet* resultSet=[_database executeQuery:@"SELECT key FROM collections WHERE libraryID = ?",libraryID];
+        FMResultSet* resultSet=[_database executeQuery:@"SELECT key FROM collections WHERE libraryID = ?",library.libraryID];
         
         collectionKeys =[[NSMutableArray alloc] init];
         
         while([resultSet next]){
+            library.hasChildren = YES;
             [collectionKeys addObject:[resultSet stringForColumnIndex:0]];
         }
         [resultSet close];
@@ -158,10 +175,10 @@ static ZPDatabase* _instance = nil;
         @synchronized(self){
             if(count == [collectionKeys count]){
                 
-                [_database executeUpdate:@"INSERT INTO collections (title, key, libraryID, parentCollectionKey,lastCompletedCacheTimestamp) VALUES (?,?,?,?,?)",collection.title,collection.collectionKey,libraryID,collection.parentCollectionKey,collection.lastCompletedCacheTimestamp];
+                [_database executeUpdate:@"INSERT INTO collections (title, key, libraryID, parentCollectionKey,lastCompletedCacheTimestamp) VALUES (?,?,?,?,?)",collection.title,collection.collectionKey,library.libraryID,collection.parentCollectionKey,collection.lastCompletedCacheTimestamp];
             }
             else{
-                [_database executeUpdate:@"UPDATE collections SET title=?, libraryID=?, parentCollectionKey=?,lastCompletedCacheTimestamp=? WHERE key=?",collection.title,libraryID,collection.parentCollectionKey ,collection.lastCompletedCacheTimestamp,collection.collectionKey];
+                [_database executeUpdate:@"UPDATE collections SET title=?, libraryID=?, parentCollectionKey=?,lastCompletedCacheTimestamp=? WHERE key=?",collection.title,library.libraryID,collection.parentCollectionKey ,collection.lastCompletedCacheTimestamp,collection.collectionKey];
             }
         }
         
@@ -195,8 +212,11 @@ static ZPDatabase* _instance = nil;
 }
 
 
-// These remove items from the cache
+// These remove items from the collection
 - (void) removeItemsNotInArray:(NSArray*)itemKeys fromCollection:(NSString*)collectionKey inLibrary:(NSNumber*)libraryID{
+
+    if([itemKeys count] == 0) return;
+
     @synchronized(self){
         //This might generate a too long query
         [_database executeUpdate:[NSString stringWithFormat:@"DELETE FROM collectionItems WHERE collectionKey = ? AND itemKey NOT IN ('%@')",
@@ -204,14 +224,28 @@ static ZPDatabase* _instance = nil;
     }
 
 }
+
 /*
- Attachments are purged elsewhere
+ 
+Deletes items, notes, and attachments
+ 
  */
+
 - (void) deleteItemsNotInArray:(NSArray*)itemKeys fromLibrary:(NSNumber*)libraryID{
+    
+    if([itemKeys count] == 0) return;
+
     @synchronized(self){
-        //This might generate a too long query
+        //This might generate a too long query, so needs to be tested with very large libraries
         [_database executeUpdate:[NSString stringWithFormat:@"DELETE FROM items WHERE libraryID = ? AND key NOT IN ('%@')",
                                   [itemKeys componentsJoinedByString:@"', '"]],libraryID];
+
+        [_database executeUpdate:[NSString stringWithFormat:@"DELETE FROM attachments WHERE key NOT IN ('%@') AND parentItemKey in (SELECT key FROM items WHERE libraryID = ?)",
+                                  [itemKeys componentsJoinedByString:@"', '"]],libraryID];
+
+        [_database executeUpdate:[NSString stringWithFormat:@"DELETE FROM notes WHERE key NOT IN ('%@') AND parentItemKey in (SELECT key FROM items WHERE libraryID = ?)",
+                                  [itemKeys componentsJoinedByString:@"', '"]],libraryID];
+
     }
 }
 
@@ -322,44 +356,119 @@ static ZPDatabase* _instance = nil;
 }
 
 
--(void) addItemToDatabase:(ZPZoteroItem*)item {
+-(NSArray*) addItemsToDatabase:(NSArray*)items {
     
-    @synchronized(self){
-        //TODO: Implement modifying already existing items if they are older (lastTimestamp) nthan the new item
-        FMResultSet* resultSet = [_database executeQuery: @"SELECT lastTimestamp FROM items WHERE key =? LIMIT 1",item.key];
+    
+    if([items count] == 0) return items;
 
-        BOOL found = [resultSet next];
-        NSString* timestamp = [resultSet stringForColumnIndex:0];
-        
-        [resultSet close];
-        
-        NSNumber* year;
-        if(item.year!=0){
-            year=[NSNumber numberWithInt:item.year];
-        }
-        else{
-            year=NULL;
-        }
+    ZPZoteroItem* item;
 
-        
-        if(! found ){
-            
-                       
-            
-            [_database executeUpdate:@"INSERT INTO items (itemType,libraryID,year,creator,title,publishedIn,key,fullCitation,lastTimestamp) VALUES (?,?,?,?,?,?,?,?,?)",item.itemType,item.libraryID,year,item.creatorSummary,item.title,item.publishedIn,item.key,item.fullCitation,item.lastTimestamp];
-            
-        }
-        //TODO: consider how the time stamp could be used to determine if fields need to be updated
-        else if(! [item.lastTimestamp isEqualToString: timestamp]){
-            [_database executeUpdate:@"UPDATE items SET itemType = ?, libraryID = ?, year = ?,creator =? ,title = ?,publishedIn = ?,fullCitation =?,lastTimestamp = ? WHERE key = ?",item.itemType,item.libraryID,year,item.creatorSummary,item.title,item.publishedIn,item.fullCitation,item.lastTimestamp,item.key];
-        }
-        
+    NSMutableArray* itemKeys = [NSMutableArray array];
+    for(item in items){
+        [itemKeys addObject:item.key];
     }
+    
+    NSMutableDictionary* timestamps = [NSMutableDictionary dictionary];
+
+    //Retrieve timestamps
+    @synchronized(self){
+        FMResultSet* resultSet = [_database executeQuery:[NSString stringWithFormat:@"SELECT key, lastTimestamp FROM items WHERE key IN ('%@')",[itemKeys componentsJoinedByString:@"', '"]]];
+    
+        while([resultSet next]){
+            [timestamps setObject:[resultSet stringForColumnIndex:1] forKey:[resultSet stringForColumnIndex:0]];
+        }
+        [resultSet close];
+    }
+
+    NSMutableArray* returnArray=[NSMutableArray array]; 
+
+    NSMutableArray* itemsRemaining = [NSMutableArray arrayWithArray:items];
+    
+    while([itemsRemaining count]>0){
+        
+        NSMutableArray* itemBatch = [NSMutableArray array];
+        
+        //The maximum rows in union select is 500. (http://www.sqlite.org/limits.html)
+        
+        NSInteger counter =0;
+        ZPZoteroItem* item = [itemsRemaining lastObject];
+        while(counter  < 500 && item != NULL){
+            [itemBatch addObject:item];
+            [itemsRemaining removeLastObject];
+            counter++;
+            item = [itemsRemaining lastObject];
+        }
+        
+        
+        NSString* insertSQL;
+        NSMutableArray* insertArguments = [NSMutableArray array];
+        
+        for (item in itemBatch){
+            
+            //Check the timestamp
+            NSString* timestamp = [timestamps objectForKey:item.key];
+            
+            
+            NSObject* year;
+            if(item.year!=0){
+                year=[NSNumber numberWithInt:item.year];
+            }
+            else{
+                year = [NSNull null];
+            }
+            
+            if(timestamp == NULL){
+                /*
+                 
+                 IMPORTANT: the order of the fields in this SQL query must match exactly those in the database.
+                 
+                 */
+                if(insertSQL == NULL){
+                    insertSQL = @"INSERT INTO items (key, itemType, libraryID, year, creator, title, publishedIn,  fullCitation, lastTimestamp) SELECT ? AS key, ? AS itemType, ? AS libraryID, ? AS year, ? AS creator, ? AS title, ? AS publishedIn,  ? AS fullCitation, ? AS lastTimestamp";
+                }
+                else{
+                    insertSQL = [insertSQL stringByAppendingString:@" UNION SELECT ?,?,?,?,?,?,?,?,?"];
+                }
+                
+                NSString* publishedIn = item.publishedIn;
+                if(publishedIn == NULL) publishedIn =@"";
+                
+                NSString* creatorSummary = item.creatorSummary;
+                if(creatorSummary == NULL) creatorSummary =@"";
+                
+                
+                [insertArguments addObjectsFromArray:[NSArray arrayWithObjects:item.key,item.itemType,item.libraryID,year,creatorSummary,item.title,publishedIn,item.fullCitation,item.lastTimestamp,nil]];
+                
+                [returnArray addObject:item];
+            }
+            
+            else if(! [item.lastTimestamp isEqualToString: timestamp]){
+                @synchronized(self){
+                    [_database executeUpdate:@"UPDATE items SET itemType = ?, libraryID = ?, year = ?,creator =? ,title = ?,publishedIn = ?,fullCitation =?,lastTimestamp = ? WHERE key = ?",item.itemType,item.libraryID,year,item.creatorSummary,item.title,item.publishedIn,item.fullCitation,item.lastTimestamp,item.key];
+                }
+                [returnArray addObject:item];
+            }
+            
+        }
+        
+        if(insertSQL != NULL){
+            @synchronized(self){
+                [_database executeUpdate:insertSQL withArgumentsInArray:insertArguments]; 
+            }
+        }
+    }
+    return returnArray;
+        
 }
 
--(void) addNoteToDatabase:(ZPZoteroNote*)note{
-    //For now ignore standalone notes
-    if(note.parentItemKey !=NULL){
+-(void) addNotesToDatabase:(NSArray*)notes{
+    
+    if([notes count] == 0) return;
+
+    /*
+     
+    Notes are currently not supported, so no need to run this query at all. 
+     
         @synchronized(self){
             //TODO: Implement modifying already existing items if they are older (lastTimestamp) nthan the new note
             FMResultSet* resultSet = [_database executeQuery: @"SELECT lastTimestamp FROM notes WHERE key =? LIMIT 1",note.key];
@@ -372,37 +481,110 @@ static ZPDatabase* _instance = nil;
                 [_database executeUpdate:@"INSERT INTO notes (key,parentItemKey,lastTimestamp) VALUES (?,?,?)",note.key,note.parentItemKey,note.lastTimestamp];
             }
         }
-    }
+     */
 }
 
--(void) addAttachmentToDatabase:(ZPZoteroAttachment*)attachment{
+-(void) addAttachmentsToDatabase:(NSArray*)attachments{
 
+    if([attachments count] == 0) return;
+
+    ZPZoteroAttachment* attachment;
+    
+    NSMutableArray* itemKeys = [NSMutableArray array];
+    for(attachment in attachments){
+        [itemKeys addObject:attachment.key];
+    }
+    
+    NSMutableDictionary* timestamps = [NSMutableDictionary dictionary];
+    
+    //Retrieve timestamps
     @synchronized(self){
-        //TODO: Implement modifying already existing items if they are older (lastTimestamp) nthan the new item
-        FMResultSet* resultSet = [_database executeQuery: @"SELECT lastTimestamp FROM attachments WHERE key =? LIMIT 1",attachment.key];
+        FMResultSet* resultSet = [_database executeQuery:[NSString stringWithFormat:@"SELECT key, lastTimestamp FROM attachments WHERE key IN ('%@')",[itemKeys componentsJoinedByString:@"', '"]]];
         
-        BOOL found = [resultSet next];
+        while([resultSet next]){
+            [timestamps setObject:[resultSet stringForColumnIndex:1] forKey:[resultSet stringForColumnIndex:0]];
+        }
         
         [resultSet close];
+    }
+    
+    
+    NSString* insertSQL;
+    NSMutableArray* insertArguments = [NSMutableArray array];
+    
+    for(attachment in attachments){
         
-        if(! found ){
+        //Check the timestamp
+        NSString* timestamp = [timestamps objectForKey:attachment.key];
+        
+        if(timestamp == NULL){
             
+            if(insertSQL == NULL){
+                insertSQL = @"INSERT INTO attachments (key, parentItemKey, lastTimestamp, attachmentURL, attachmentType, attachmentTitle, attachmentLength, lastViewed) SELECT ? AS key, ? AS parentItemKey, ? AS lastTimestamp, ? AS attachmentURL, ? AS attachmentType, ? AS attachmentTitle, ? AS attachmentLength, NULL AS lastViewed";
+            }
+            else{
+                insertSQL = [insertSQL stringByAppendingString:@" UNION SELECT ?,?,?,?,?,?,?,NULL"];
+            }
             
-            [_database executeUpdate:@"INSERT INTO attachments (key,parentItemKey,lastTimestamp,attachmentURL,attachmentType,attachmentTitle,attachmentLength) VALUES (?,?,?,?,?,?,?)",
-             attachment.key,attachment.parentItemKey,attachment.lastTimestamp,attachment.attachmentURL,attachment.attachmentType,attachment.attachmentTitle,[NSNumber numberWithInt: attachment.attachmentLength]];
-            
+            [insertArguments addObjectsFromArray:[NSArray arrayWithObjects:attachment.key,attachment.parentItemKey,attachment.lastTimestamp,attachment.attachmentURL,attachment.attachmentType,attachment.attachmentTitle,[NSNumber numberWithInt: attachment.attachmentLength],nil]];
+        }
+        else if(! [attachment.lastTimestamp isEqualToString: timestamp]){
+            @synchronized(self){
+                [_database executeUpdate:@"UPDATE attachments SET parentItemKey = ?,lastTimestamp = ?,attachmentURL = ?,attachmentType = ?,attachmentTitle = ?,attachmentLength = ? WHERE key = ?",attachment.parentItemKey,attachment.lastTimestamp,attachment.attachmentURL,attachment.attachmentType,attachment.attachmentTitle,[NSNumber numberWithInt: attachment.attachmentLength],attachment.key];
+            }
+        }
+    }
+    
+    if(insertSQL != NULL){
+        @synchronized(self){
+            [_database executeUpdate:insertSQL withArgumentsInArray:insertArguments]; 
         }
     }
 }
 
 
 // Records a new collection membership
--(void) addItem:(ZPZoteroItem*)item toCollection:(NSString*)collectionKey{
-    //TODO: Make this check if an item exists in a collection before running this
-    @synchronized(self){
-        [_database executeUpdate:@"INSERT INTO collectionItems (collectionKey, itemKey) VALUES (?,?)",collectionKey,item.key];
+-(void) addItems:(NSArray*)items toCollection:(NSString*)collectionKey{
 
+    if([items count] == 0) return;
+
+    ZPZoteroItem* item;
+    NSMutableArray* itemKeys = [NSMutableArray array];
+    for(item in items){
+        [itemKeys addObject:item.key];
     }
+    
+    @synchronized(self){
+        FMResultSet* resultSet = [_database executeQuery:[NSString stringWithFormat:@"SELECT itemKey FROM collectionItems WHERE itemKey NOT IN ('%@') AND  collectionKey = ?",[itemKeys componentsJoinedByString:@"', '"]],collectionKey];
+        itemKeys = [NSMutableArray array];
+        while([resultSet next]){
+            [itemKeys addObject:[resultSet stringForColumnIndex:0]];
+        }
+        [resultSet close];
+    }
+    
+    NSString* insertSQL;
+    NSMutableArray* insertArguments = [NSMutableArray array];
+    NSString* itemKey;
+    
+    for(itemKey in itemKeys){
+        if(insertSQL==NULL){
+            insertSQL = @"INSERT INTO collectionItems SELECT ? AS collectionKey, ? AS itemKey";
+        }
+        else{
+            insertSQL = [insertSQL stringByAppendingString:@" UNION SELECT ?, ?"];
+        }
+    
+        [insertArguments addObject:collectionKey];
+        [insertArguments addObject:itemKey];
+    }
+    
+   if(insertSQL != NULL){
+        @synchronized(self){
+            [_database executeUpdate:insertSQL withArgumentsInArray:insertArguments]; 
+        }
+   }
+
 }
 
 
@@ -430,27 +612,83 @@ static ZPDatabase* _instance = nil;
     }
 }
 
--(void) writeItemCreatorsToDatabase:(ZPZoteroItem*)item{
+
+/*
+ 
+ Writes or updates the creators for this field in the database
+ 
+ See this for union select
+ http://stackoverflow.com/questions/1609637/is-it-possible-to-insert-multiple-rows-at-a-time-in-an-sqlite-database
+ 
+ 
+ */
+
+-(void) writeItemsCreatorsToDatabase:(NSArray*)items{
     
-    //Creators
-    @synchronized(self){
+    if([items count] == 0) return;
+
+    ZPZoteroItem* item;
+    NSString* insertSQL;
+    NSMutableArray* insertArguments = [NSMutableArray array];
+
+    for(item in items){
         
-        //Drop all creators for this 
-        //TODO: This could be optimized so that it would work the same way as fields: only do changes that are required instead of dropping and recreating everything
-        [_database executeUpdate:@"DELETE FROM creators WHERE itemKey =?",item.key];
+        NSArray* oldCreators = [self _creatorsForItem:item];
         
-        
-        NSEnumerator* e = [item.creators objectEnumerator];
+       
+        NSEnumerator* e = [oldCreators objectEnumerator];
         NSInteger order=1;
-        NSDictionary* creator;
-        
-        while(creator= [e nextObject]){
-            [_database executeUpdate:@"INSERT INTO creators (itemKey,\"order\",firstName,lastName,shortName,creatorType) VALUES (?,?,?,?,?,?)",
-                                      item.key,[NSNumber numberWithInt:order],[creator objectForKey:@"firstName"],[creator objectForKey:@"lastName"],
-                                      [creator objectForKey:@"shortName"],[creator objectForKey:@"creatorType"]];
+        NSDictionary* newCreator;
+        NSDictionary* oldCreator;
+
+        for (newCreator in item.creators){
+            oldCreator = [e nextObject];
+            if(oldCreator == NULL){
+                //Insert
+                if(insertSQL == NULL){
+                    insertSQL = @"INSERT INTO creators (itemKey, \"order\", firstName, lastName, shortName, creatorType)  SELECT ? AS itemKey, ? AS \"order\", ? AS firstName, ? AS lastName, ? AS shortName, ? AS creatorType";
+                }
+                else{
+                    insertSQL = [insertSQL stringByAppendingString:@" UNION SELECT ?,?,?,?,?,?"];
+                }
+
+                NSObject* firstName = [newCreator objectForKey:@"firstName"];
+                if(firstName == NULL) firstName = [NSNull null];
+                NSObject* lastName = [newCreator objectForKey:@"lastName"];
+                if(lastName == NULL) lastName = [NSNull null];
+                NSObject* shortName = [newCreator objectForKey:@"shortName"];
+                if(shortName == NULL) shortName = [NSNull null];
+                
+                [insertArguments addObjectsFromArray:[NSArray arrayWithObjects:
+                                                      item.key,[NSNumber numberWithInt:order],firstName,lastName,shortName,[newCreator objectForKey:@"creatorType"], nil]];
+            }
+            else if(![oldCreator isEqualToDictionary:newCreator]){
+                //Update
+                @synchronized(self){
+                    [_database executeUpdate:@"UPDATE creators SET firstName = ? , lastName = ? ,shortName = ?,creatorType = ?) WHERE itemKey = ? \"order\" = ?",
+                     [newCreator objectForKey:@"firstName"],[newCreator objectForKey:@"lastName"],
+                     [newCreator objectForKey:@"shortName"],[newCreator objectForKey:@"creatorType"],item.key,[NSNumber numberWithInt:order]];
+                }
+            }
             order++;
         }
+        //If there are more creators in the DB than there are in the item, delete these
+        
+        //TODO: Consider optimizing this by running just one delete query for the entire item set.
+        
+        if([e nextObject]){
+            @synchronized(self){
+                [_database executeUpdate:@"DELETE FROM creators WHERE itemKey =? AND \"order\" >= ?",item.key,order];
+            }
+        }
+
     }
+    if(insertSQL != NULL){
+        @synchronized(self){
+            [_database executeUpdate:insertSQL withArgumentsInArray:insertArguments]; 
+        }
+    }
+    
 }
 
 /*
@@ -464,67 +702,90 @@ static ZPDatabase* _instance = nil;
  */
 
 
--(void) writeItemFieldsToDatabase:(ZPZoteroItem*)item{
+-(void) writeItemsFieldsToDatabase:(NSArray*)items{
+
+    if([items count] == 0) return;
+
+    //This can easily result in too large queries, so we will split them up into batches
+
+    NSMutableArray* itemsRemaining = [NSMutableArray arrayWithArray:items];
     
-    
-    //Fields      
-    NSMutableDictionary* oldFields = [NSMutableDictionary dictionaryWithDictionary:[self _fieldsForItem:item]];
-    NSEnumerator* e = [item.fields keyEnumerator]; 
-    
-    NSString* key;
-    NSString* insertSQL=NULL;
-    NSMutableArray* insertArguments = [NSMutableArray array];
-    
-    while(key=[e nextObject]){
-        NSString* oldValue = [oldFields objectForKey:key];
-        NSString* newValue = [item.fields objectForKey:key];
+    while([itemsRemaining count]>0){
+
+        NSMutableArray* itemBatch = [NSMutableArray array];
+
+        //The maximum rows in union select is 500. (http://www.sqlite.org/limits.html)
         
-        if(! [newValue isEqualToString:@""]){
-            if(oldValue == NULL ){
-                if(insertSQL == NULL){
-                    insertSQL = @"INSERT INTO fields SELECT ? AS fieldName, ? AS fieldValue, ? AS itemKey ";
-                }
-                else{
-                    insertSQL = [insertSQL stringByAppendingString:@" UNION SELECT ?, ?, ? "];
-                }
-                [insertArguments addObject:key];
-                [insertArguments addObject:newValue];
-                [insertArguments addObject:item.key];
+        NSInteger counter =0;
+        ZPZoteroItem* item = [itemsRemaining lastObject];
+        while(item != NULL && counter + [item.fields count] < 500){
+            [itemBatch addObject:item];
+            [itemsRemaining removeLastObject];
+            counter = counter + [item.fields count];
+            item = [itemsRemaining lastObject];
+            
+        }
+        
+        NSString* insertSQL=NULL;
+        NSMutableArray* insertArguments = [NSMutableArray array];
+        
+        for (item in itemBatch){
+            //Fields      
+            NSMutableDictionary* oldFields = [NSMutableDictionary dictionaryWithDictionary:[self _fieldsForItem:item]];
+            NSEnumerator* e = [item.fields keyEnumerator]; 
+            
+            NSString* key;
+            
+            while(key=[e nextObject]){
+                NSString* oldValue = [oldFields objectForKey:key];
+                NSString* newValue = [item.fields objectForKey:key];
                 
-            }
-            else if (! [oldValue isEqualToString:newValue]){
-                @synchronized(self){
-                    [_database executeUpdate:@"UPDATE fields SET fieldValue = ? WHERE fieldName=? AND itemKey = ? ",newValue,key,item.key];
+                if(! [newValue isEqualToString:@""]){
+                    if(oldValue == NULL ){
+                        if(insertSQL == NULL){
+                            insertSQL = @"INSERT INTO fields (fieldName, fieldValue, itemKey) SELECT ? AS fieldName, ? AS fieldValue, ? AS itemKey";
+                        }
+                        else{
+                            insertSQL = [insertSQL stringByAppendingString:@" UNION SELECT ?, ?, ? "];
+                        }
+                        [insertArguments addObject:key];
+                        [insertArguments addObject:newValue];
+                        [insertArguments addObject:item.key];
+                        
+                    }
+                    else if (! [oldValue isEqualToString:newValue]){
+                        @synchronized(self){
+                            [_database executeUpdate:@"UPDATE fields SET fieldValue = ? WHERE fieldName=? AND itemKey = ? ",newValue,key,item.key];
+                        }
+                    }
+                    //Remove the field from old fields because it has been written to DB. We will later delete all fields that have not been written to DB.
+                    [oldFields removeObjectForKey:key];
                 }
             }
-            //Remove the field from old fields because it has been written to DB. We will later delete all fields that have not been written to DB.
-            [oldFields removeObjectForKey:key];
+            
+            e = [oldFields keyEnumerator]; 
+            if (key=[e nextObject]) {
+                NSMutableArray* deleteArguments = [NSMutableArray arrayWithObject:key];
+                NSString* deleteSql = @"DELETE FROM fields WHERE fieldName IN (?";
+                [deleteArguments addObject:key];
+                while(key=[e nextObject]){
+                    [deleteArguments addObject:key];
+                    deleteSql = [deleteSql stringByAppendingString:@", ?"];
+                }
+                deleteSql = [deleteSql stringByAppendingString:@") AND  itemKey = ?"];
+                [deleteArguments addObject:item.key];
+                
+                @synchronized(self){
+                    [_database executeUpdate:deleteSql withArgumentsInArray:deleteArguments];
+                }
+            }    
+        }
+        if(insertSQL != NULL){
+            @synchronized(self){
+                [_database executeUpdate:insertSQL withArgumentsInArray:insertArguments]; 
+            }
         }
     }
-
-
-    if(insertSQL == NULL){
-        @synchronized(self){
-           [_database executeUpdate:insertSQL withArgumentsInArray:insertArguments]; 
-        }
-    }
-
-    e = [oldFields keyEnumerator]; 
-    if (key=[e nextObject]) {
-        NSMutableArray* deleteArguments = [NSMutableArray arrayWithObject:key];
-        NSString* deleteSql = @"DELETE FROM fields WHERE fieldName IN (?";
-        [deleteArguments addObject:key];
-        while(key=[e nextObject]){
-            [deleteArguments addObject:key];
-            deleteSql = [deleteSql stringByAppendingString:@", ?"];
-        }
-        deleteSql = [deleteSql stringByAppendingString:@") AND  itemKey = ?"];
-        [deleteArguments addObject:item.key];
-
-        @synchronized(self){
-            [_database executeUpdate:deleteSql withArgumentsInArray:deleteArguments];
-        }
-    }    
 }
 
 - (NSDictionary*) _fieldsForItem:(ZPZoteroItem*)item{
@@ -541,11 +802,9 @@ static ZPDatabase* _instance = nil;
     return fields;
 }
 
-
-- (void) addCreatorsToItem: (ZPZoteroItem*) item {
-    
+- (NSArray*) _creatorsForItem:(ZPZoteroItem*)item{
     @synchronized(self){
-        FMResultSet* resultSet = [_database executeQuery: @"SELECT firstName, lastName, shortName,creatorType, fieldMode FROM creators WHERE itemKey = ? ORDER BY \"order\"",item.key];
+        FMResultSet* resultSet = [_database executeQuery: @"SELECT firstName, lastName, shortName,creatorType FROM creators WHERE itemKey = ? ORDER BY \"order\"",item.key];
         
         NSMutableArray* creators = [[NSMutableArray alloc] init];
         
@@ -557,15 +816,18 @@ static ZPDatabase* _instance = nil;
             if([resultSet stringForColumnIndex:2]!=NULL) [creator setObject:[resultSet stringForColumnIndex:2] forKey:@"shortName"];
             [creator setObject:[resultSet stringForColumnIndex:3] forKey:@"creatorType"];
             
-            //TODO: Would this be needed at all?
-            //[creator setObject:[NSNumber numberWithInt:[resultSet intForColumnIndex:4]] forKey:@"fieldMode"];
-            
             [creators addObject:creator];
         }
         
         [resultSet close];
-        item.creators = creators;
+        return creators;
     }
+
+}
+
+
+- (void) addCreatorsToItem: (ZPZoteroItem*) item {
+    item.creators = [self _creatorsForItem:item];
 }
 
 
@@ -706,7 +968,7 @@ static ZPDatabase* _instance = nil;
         sql=[sql stringByAppendingFormat:@", collectionItems"];
 
     if(searchString != NULL)
-        sql=[sql stringByAppendingFormat:@", fields"];
+        sql=[sql stringByAppendingFormat:@", fields, creators"];
     
     //Conditions
 
@@ -718,7 +980,7 @@ static ZPDatabase* _instance = nil;
     if(searchString != NULL){
         //TODO: Make a more feature rich search query
         
-        sql=[sql stringByAppendingFormat:@" AND fields.itemKey = items.key AND (fields.fieldValue LIKE '%%%@%%')",searchString];
+        sql=[sql stringByAppendingFormat:@" AND ((fields.itemKey = items.key AND fields.fieldValue LIKE '%%%@%%') OR (creators.itemKey = items.key AND (creators.firstName LIKE '%%%@%%') OR (creators.lastName LIKE '%%%@%%') OR (creators.shortName LIKE '%%%@%%')))",searchString,searchString];
     }
     
     if(orderField!=NULL){
@@ -738,8 +1000,9 @@ static ZPDatabase* _instance = nil;
         
         resultSet = [_database executeQuery: sql];
         
-        
         while([resultSet next]) [keys addObject:[resultSet stringForColumnIndex:0]];
+        
+        [resultSet close];
     }
 
     return keys;

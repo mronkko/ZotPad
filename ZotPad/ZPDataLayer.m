@@ -116,26 +116,38 @@ static ZPDataLayer* _instance = nil;
 
 
 
-//Notifies all observers that a new item is available
--(void) notifyItemAvailable:(ZPZoteroItem*)item{
-    
-    NSEnumerator* e = [_itemObservers objectEnumerator];
-    NSObject* id;
-    
-    while( id= [e nextObject]) {
-        if([(NSObject <ZPItemObserver>*) id respondsToSelector:@selector(notifyItemAvailable:)]){
-            [(NSObject <ZPItemObserver>*) id notifyItemAvailable:item];
+-(void) notifyItemsAvailable:(NSArray*)items{
+    ZPZoteroItem* item;
+    NSMutableArray* itemsToBeNotifiedAbout = [NSMutableArray array];
+
+    //Check subitems 
+    for(item in items){
+        //If this is a subitem, notify about the parent if it is not already included
+        if([item respondsToSelector:@selector(parentItemKey)]){
+            NSString* parentKey = (NSString*)[item performSelector:@selector(parentItemKey)];
+            if(![parentKey isEqualToString:item.key]){
+                ZPZoteroItem* parentItem = [ZPZoteroItem retrieveOrInitializeWithKey:parentKey];
+                
+                //For now notify about Attachments only
+                if([item isKindOfClass:[ZPZoteroAttachment class]] && ! [itemsToBeNotifiedAbout containsObject:parentItem]){
+                    [itemsToBeNotifiedAbout addObject:parentItem];
+                }
+            }
         }
+        
+        if(![itemsToBeNotifiedAbout containsObject:item]){
+            [itemsToBeNotifiedAbout addObject:item];
+        }
+
     }
-    //If this is a subitem, notify about the parent
-    if([item respondsToSelector:@selector(parentItemKey)]){
-        NSString* parentKey = (NSString*)[item performSelector:@selector(parentItemKey)];
-        if(![parentKey isEqualToString:item.key]){
-            ZPZoteroItem* parentItem = [ZPZoteroItem retrieveOrInitializeWithKey:parentKey];
-            if([item isKindOfClass:[ZPZoteroAttachment class]]){
-                //Refresh the attachments of parent and notify that it was updated
-                [[ZPDatabase instance] addAttachmentsToItem:parentItem];
-                [self notifyItemAvailable:parentItem];
+    
+    for(item in itemsToBeNotifiedAbout){
+        NSEnumerator* e = [_itemObservers objectEnumerator];
+        NSObject* id;
+        
+        while( id= [e nextObject]) {
+            if([(NSObject <ZPItemObserver>*) id respondsToSelector:@selector(notifyItemAvailable:)]){
+                [(NSObject <ZPItemObserver>*) id notifyItemAvailable:item];
             }
         }
     }

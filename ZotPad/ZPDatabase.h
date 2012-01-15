@@ -10,6 +10,7 @@
 #import "ZPZoteroItem.h"
 #import "ZPZoteroNote.h"
 #import "ZPZoteroAttachment.h"
+#import "ZPZoteroLibrary.h"
 
 #import "../FMDB/src/FMDatabase.h"
 #import "../FMDB/src/FMResultSet.h"
@@ -23,8 +24,14 @@
 + (ZPDatabase*) instance;
 
 
--(void) addOrUpdateLibraries:(NSArray*)libraries;
--(void) addOrUpdateCollections:(NSArray*)collections forLibrary:(NSNumber*)libraryID;
+-(void) resetDatabase;
+
+/*
+ 
+ Methods for reading from DB
+ 
+ */
+
 
 
 // Methods for retrieving data from the data layer
@@ -49,24 +56,36 @@
 //Return a list of all attachment paths priority for retrieval
 - (NSArray*) getAttachmentThatNeedToBeDownloadedInLibrary:(NSNumber*)libraryID collection:(NSString*)collectionKey;
 
-- (void) updateViewedTimestamp:(ZPZoteroAttachment*)attachment;
-
 - (NSString*) getLocalizationStringWithKey:(NSString*) key type:(NSString*) type locale:(NSString*) locale;
 
--(BOOL) doesItemKey:(NSString*)itemKey belongToCollection:(NSString*) collectionKey;
+- (BOOL) doesItemKey:(NSString*)itemKey belongToCollection:(NSString*) collectionKey;
+
+/*
+ 
+ Methods for writing to DB
+
+ */
+
+- (void) addOrUpdateLibraries:(NSArray*)libraries;
+- (void) addOrUpdateCollections:(NSArray*)collections forLibrary:(ZPZoteroLibrary*)library;
+- (void) updateViewedTimestamp:(ZPZoteroAttachment*)attachment;
+
 
 // Methods for writing data to database
--(void) addItemToDatabase:(ZPZoteroItem*)item;
--(void) addNoteToDatabase:(ZPZoteroNote*)note;
--(void) addAttachmentToDatabase:(ZPZoteroAttachment*)attachment;
+// These take an array of ZPZotero* objects instead of a single objects because batch editing or inserting results in a significant performance boost
 
-// Records a new collection membership
--(void) addItem:(ZPZoteroItem*)item toCollection:(NSString*)collectionKey;
+// This method returns an array containing the items that were actually modified in the DB. This can be used to determine if fields and attachments
+// need to be modified
 
-//Extract data from item and write to database
+-(NSArray*) addItemsToDatabase:(NSArray*)items;
 
--(void) writeItemCreatorsToDatabase:(ZPZoteroItem*)item;
--(void) writeItemFieldsToDatabase:(ZPZoteroItem*)item;
+-(void) addNotesToDatabase:(NSArray*)notes;
+-(void) addAttachmentsToDatabase:(NSArray*)attachments;
+-(void) addItems:(NSArray*)items toCollection:(NSString*)collectionKey;
+-(void) writeItemsCreatorsToDatabase:(NSArray*)items;
+-(void) writeItemsFieldsToDatabase:(NSArray*)items;
+
+
 
 // These remove items from the cache
 - (void) removeItemsNotInArray:(NSArray*)itemKeys fromCollection:(NSString*)collectionKey inLibrary:(NSNumber*)libraryID;

@@ -24,7 +24,7 @@ void ZPLog(NSObject* source,int line,NSString* format, ...){
         timeWhenAppStarted = [NSDate date]; 
         debugClasses = [NSMutableArray array ];
         
-//        [debugClasses addObject:@"ZPServerConnection"];
+        [debugClasses addObject:@"ZPServerConnection"];
 //        [debugClasses addObject:@"ZPSimpleItemListViewController"];
 //        [debugClasses addObject:@"ZPDetailedItemListViewController"];
 //        [debugClasses addObject:@"ZPServerResponseXMLParser"];

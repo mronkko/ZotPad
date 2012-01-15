@@ -8,7 +8,7 @@
 
 #import "ZPPreferences.h"
 #import "ZPLogger.h"
-
+#import "ZPDatabase.h"
 
 @implementation ZPPreferences
 
@@ -37,6 +37,12 @@ static ZPPreferences* _instance = nil;
 
 -(void) reload {
    
+    // If any of the reset options are set process these first
+    
+    
+    NSUserDefaults* defaults = [NSUserDefaults standardUserDefaults];
+    
+    
     //Read the defaults preferences and set these if no preferences are set.
     
     NSString *settingsBundle = [[NSBundle mainBundle] pathForResource:@"Settings" ofType:@"bundle"];
@@ -56,14 +62,44 @@ static ZPPreferences* _instance = nil;
         }
     }
     
-    [[NSUserDefaults standardUserDefaults] registerDefaults:defaultsToRegister];
+    [defaults registerDefaults:defaultsToRegister];
 
-    _metadataCacheLevel = [[NSUserDefaults standardUserDefaults] integerForKey:@"preemptivecachemetadata"];
-    _attachmentsCacheLevel = [[NSUserDefaults standardUserDefaults] integerForKey:@"preemptivecacheattachmentfiles"];
-    _mode = [[NSUserDefaults standardUserDefaults] integerForKey:@"mode"];
-    _maxCacheSize = [[NSUserDefaults standardUserDefaults] floatForKey:@"cachesizemax"]*1073741824;
+    _metadataCacheLevel = [defaults integerForKey:@"preemptivecachemetadata"];
+    _attachmentsCacheLevel = [defaults integerForKey:@"preemptivecacheattachmentfiles"];
+    _mode = [defaults integerForKey:@"mode"];
+    _maxCacheSize = [defaults floatForKey:@"cachesizemax"]*1073741824;
     
-    NSLog(@"NSUserDefaults dump: %@",[[NSUserDefaults standardUserDefaults] dictionaryRepresentation]);
+    NSLog(@"NSUserDefaults dump: %@",[defaults dictionaryRepresentation]);
+    
+    if([defaults boolForKey:@"resetusername"]){
+        NSLog(@"Reseting username");
+        [defaults removeObjectForKey:@"username"];
+        [defaults removeObjectForKey:@"userID"];
+        [defaults removeObjectForKey:@"OAuthKey"];
+        [defaults removeObjectForKey:@"resetusername"];
+    }
+    
+    if([defaults boolForKey:@"resetitemdata"]){
+        NSLog(@"Reseting itemdata");
+        [defaults removeObjectForKey:@"resetitemdata"];
+        [[ZPDatabase instance] resetDatabase];
+    }
+    
+    if([defaults boolForKey:@"resetfiles"]){
+        //TODO: Run in background thread
+        NSLog(@"Reseting files");
+        [defaults removeObjectForKey:@"resetfiles"];
+        
+        NSString* _documentsDirectory = [NSSearchPathForDirectoriesInDomains(NSDocumentDirectory, NSUserDomainMask, YES)  objectAtIndex:0];
+        NSArray *directoryContent = [[NSFileManager defaultManager] contentsOfDirectoryAtPath:_documentsDirectory error:NULL];
+        
+        for (NSString* _documentFilePath in directoryContent) {
+            if(! [@"zotpad.sqlite" isEqualToString: _documentFilePath]){
+                [[NSFileManager defaultManager] removeItemAtPath:[_documentsDirectory stringByAppendingPathComponent:_documentFilePath] error:NULL];
+            }
+        }
+    }
+
 }
 
 

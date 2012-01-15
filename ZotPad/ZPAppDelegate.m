@@ -8,6 +8,7 @@
 
 #import "ZPAppDelegate.h"
 #import "ZPCacheController.h"
+#import "ZPPreferences.h"
 #import "ZPLogger.h"
 
 
@@ -19,43 +20,8 @@
 
 - (BOOL)application:(UIApplication *)application didFinishLaunchingWithOptions:(NSDictionary *)launchOptions
 {
+    [[ZPPreferences instance] reload];
     
-    // If any of the reset options are set process these first
-    
-    //TODO: Do not access defaults directly, but do so through ZPPreference
-    
-    NSUserDefaults* defaults = [NSUserDefaults standardUserDefaults];
-
-    if([defaults boolForKey:@"resetusername"]){
-        NSLog(@"Reseting username");
-        [defaults removeObjectForKey:@"username"];
-        [defaults removeObjectForKey:@"userID"];
-        [defaults removeObjectForKey:@"OAuthKey"];
-        [defaults removeObjectForKey:@"resetusername"];
-    }
-
-    if([defaults boolForKey:@"resetitemdata"]){
-        NSLog(@"Reseting itemdata");
-        [defaults removeObjectForKey:@"resetitemdata"];
-        NSString *dbPath = [[NSSearchPathForDirectoriesInDomains(NSDocumentDirectory, NSUserDomainMask, YES) objectAtIndex:0] stringByAppendingPathComponent:@"zotpad.sqlite"];
-        [[NSFileManager defaultManager] removeItemAtPath: dbPath error:NULL];
-    }
-
-    if([defaults boolForKey:@"resetfiles"]){
-        //TODO: Run in background thread
-        NSLog(@"Reseting files");
-        [defaults removeObjectForKey:@"resetfiles"];
-
-        NSString* _documentsDirectory = [NSSearchPathForDirectoriesInDomains(NSDocumentDirectory, NSUserDomainMask, YES)  objectAtIndex:0];
-        NSArray *directoryContent = [[NSFileManager defaultManager] contentsOfDirectoryAtPath:_documentsDirectory error:NULL];
-        
-        for (NSString* _documentFilePath in directoryContent) {
-            if(! [@"zotpad.sqlite" isEqualToString: _documentFilePath]){
-                [[NSFileManager defaultManager] removeItemAtPath:[_documentsDirectory stringByAppendingPathComponent:_documentFilePath] error:NULL];
-            }
-        }
-    }
-
     //Set up a background operation for retrieving data
     [[ZPCacheController instance] activate];
     
@@ -92,6 +58,9 @@
     /*
      Called as part of the transition from the background to the inactive state; here you can undo many of the changes made on entering the background.
      */
+    
+    [[ZPPreferences instance] reload];
+
 }
 
 - (void)applicationDidBecomeActive:(UIApplication *)application

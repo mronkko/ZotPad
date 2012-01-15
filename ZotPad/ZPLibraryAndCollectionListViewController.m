@@ -86,12 +86,12 @@ static ZPLibraryAndCollectionListViewController* _instance = nil;
 -(void) _refreshLibrariesAndCollections {
     [_activityIndicator startAnimating];
     [[ZPCacheController instance] updateLibrariesAndCollectionsFromServer];
-    [_activityIndicator stopAnimating];
 }
 //TODO: Instead of realoding everything, this method should just add or update the library that it receives
 
 -(void) notifyLibraryWithCollectionsAvailable:(ZPZoteroLibrary*) library{
-  
+
+
     if([NSThread isMainThread]){
         
         NSIndexPath* selected = [[self tableView] indexPathForSelectedRow];
@@ -108,10 +108,15 @@ static ZPLibraryAndCollectionListViewController* _instance = nil;
         
         [[self tableView] reloadData];
         if(selected!=NULL) [[self tableView] selectRowAtIndexPath:selected animated:FALSE scrollPosition:UITableViewScrollPositionNone];
+
+        //TODO: Figure out a way to keep the activity view spinning until the last library is loaded.
+        [_activityIndicator stopAnimating];
+
     }
     else{
         [self performSelectorOnMainThread:@selector( notifyLibraryWithCollectionsAvailable:) withObject:library waitUntilDone:NO];
     }
+    
 }
 
 

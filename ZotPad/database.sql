@@ -12,6 +12,8 @@ TODO: Create triggers
 
 */
 
+
+
 /*
 
 Group is the same as library. My library is not stored, because it will
@@ -36,14 +38,13 @@ CREATE TABLE IF NOT EXISTS collections (
 );
 
 CREATE TABLE IF NOT EXISTS items (
+    key TEXT NOT NULL,
     itemType TEXT NOT NULL,
-    dateModified TIMESTAMP NOT NULL DEFAULT CURRENT_TIMESTAMP,
     libraryID INT,
     year INT,
     creator TEXT,
     title TEXT,
     publishedIn TEXT,
-    key TEXT NOT NULL,
     fullCitation TEXT NOT NULL,
     lastTimestamp TEXT DEFAULT NULL,
     UNIQUE (libraryID, key)
@@ -76,14 +77,15 @@ CREATE TABLE IF NOT EXISTS collectionItems (
     FOREIGN KEY (itemKey) REFERENCES items(itemKey)
 );
 
+/*    fieldMode INT  -  This is used by Zotero, but it is probably not needed by ZotPad. Leaving this comment here if storign field mode becomes relevant */
+
 CREATE TABLE  IF NOT EXISTS creators (
     itemKey TEXT NOT NULL,
     "order" INT NOT NULL,
     firstName TEXT,
     lastName TEXT,
     shortName TEXT,
-    creatorType TEXT NOT NULL,
-    fieldMode INT
+    creatorType TEXT NOT NULL
 );
 
 CREATE TABLE  IF NOT EXISTS  fields (
