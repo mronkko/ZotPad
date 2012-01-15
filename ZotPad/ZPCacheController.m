@@ -170,6 +170,7 @@ static ZPCacheController* _instance = nil;
                 //Create operation and queue it for background retrieval
                 NSOperation* retrieveOperation = [[NSInvocationOperation alloc] initWithInvocation:invocation];
                 [_serverRequestQueue addOperation:retrieveOperation];
+                NSLog(@"Added item retrieval operation. Operations in queue is %i. Number of items in queue for library %i is %i",[_serverRequestQueue operationCount],libraryID,[keyArray count]);
                 
             }
             
@@ -183,7 +184,8 @@ static ZPCacheController* _instance = nil;
                 [_containersToCache removeObjectAtIndex:0];
                 
                 [_serverRequestQueue addOperation:retrieveOperation];
-                
+                NSLog(@"Added container retrieval operation. Operations in queue is %i. Number of containers in queue is %i",[_serverRequestQueue operationCount],[_containersToCache count]);
+
             } 
             else break;
             
@@ -203,56 +205,55 @@ static ZPCacheController* _instance = nil;
         [self _cacheItemIfNeeded:item];
     }
 
-    [self _checkQueues];
+    //Perform checking the queue in another thread so that the current operation can exit
+    NSLog(@"Rechecking queues");
+    [self performSelectorInBackground:@selector(_checkQueues) withObject:NULL];
 }
 
 -(void) _cacheItemIfNeeded:(ZPZoteroItem*) item{
     
-
-    //Do this with synchronization to avoid using too much CPU by attempting to run this in parallel
-    @synchronized(self){
         
-        if(! [item needsToBeWrittenToCache]) return;
-        
-        [item clearNeedsToBeWrittenToCache];
-        
-        //If this is an attachement item, store the attachment information
-        
-        if([item isKindOfClass:[ZPZoteroAttachment class]]){       
-            ZPZoteroAttachment* attachment = (ZPZoteroAttachment*) item;
-            //For now we only deal with attachment files, not attachment links.
-            if(attachment.attachmentURL != NULL){
-                [[ZPDatabase instance] addAttachmentToDatabase:attachment];
-                [self _checkIfAttachmentExistsAndQueueForDownload:attachment];
-            }
-            //Standalone attachments
-            if(attachment.parentItemKey==attachment.key){
-                [[ZPDatabase instance] addItemToDatabase:attachment];
-            }
-            
+    if(! [item needsToBeWrittenToCache]) return;
+    
+    [item clearNeedsToBeWrittenToCache];
+    
+    //If this is an attachement item, store the attachment information
+    
+    if([item isKindOfClass:[ZPZoteroAttachment class]]){       
+        ZPZoteroAttachment* attachment = (ZPZoteroAttachment*) item;
+        //For now we only deal with attachment files, not attachment links.
+        if(attachment.attachmentURL != NULL){
+            [[ZPDatabase instance] addAttachmentToDatabase:attachment];
+            [self _checkIfAttachmentExistsAndQueueForDownload:attachment];
         }
-        //If this is a note item, store the note information
-        else if([item isKindOfClass:[ZPZoteroNote class]]){
-            ZPZoteroNote* note = (ZPZoteroNote*) item;
-            [[ZPDatabase instance] addNoteToDatabase:note];
-            
-            //Standalone notes
-            if(note.parentItemKey==note.key){
-                [[ZPDatabase instance] addItemToDatabase:note];
-            }
-            
-        }
-        //Normal item
-        else{
-            if(item.creators ==NULL) [NSException raise:@"Creators cannot be null" format:@"Attempted to write an item (%@) with null creators to database. This is most likely a bug in API response parser."];
-            if(item.fields ==NULL || [item.fields count]==0) [NSException raise:@"Fields cannot be null or empty" format:@"Attempted to write an item (%@) with null or empty fields to database. This is most likely a bug in API response parser."];
-            [[ZPDatabase instance] addItemToDatabase:item];
-            [[ZPDatabase instance] writeItemFieldsToDatabase:item];
-            [[ZPDatabase instance] writeItemCreatorsToDatabase:item];
+        //Standalone attachments
+        if(attachment.parentItemKey==attachment.key){
+            [[ZPDatabase instance] addItemToDatabase:attachment];
         }
         
-        [[ZPDataLayer instance] notifyItemAvailable:item];
     }
+    //If this is a note item, store the note information
+    else if([item isKindOfClass:[ZPZoteroNote class]]){
+        ZPZoteroNote* note = (ZPZoteroNote*) item;
+        [[ZPDatabase instance] addNoteToDatabase:note];
+        
+        //Standalone notes
+        if(note.parentItemKey==note.key){
+            [[ZPDatabase instance] addItemToDatabase:note];
+        }
+        
+    }
+    //Normal item
+    else{
+        if(item.creators ==NULL) [NSException raise:@"Creators cannot be null" format:@"Attempted to write an item (%@) with null creators to database. This is most likely a bug in API response parser."];
+        if(item.fields ==NULL || [item.fields count]==0) [NSException raise:@"Fields cannot be null or empty" format:@"Attempted to write an item (%@) with null or empty fields to database. This is most likely a bug in API response parser."];
+        [[ZPDatabase instance] addItemToDatabase:item];
+        [[ZPDatabase instance] writeItemFieldsToDatabase:item];
+        [[ZPDatabase instance] writeItemCreatorsToDatabase:item];
+    }
+    
+    [[ZPDataLayer instance] notifyItemAvailable:item];
+    
 }
 
 /*
@@ -526,6 +527,8 @@ static ZPCacheController* _instance = nil;
     NSEnumerator* e = [libraries objectEnumerator];
     
     ZPZoteroLibrary* library;
+    
+    //TODO: Execute in parallel. 
     
     while ( library = (ZPZoteroLibrary*) [e nextObject]) {
         

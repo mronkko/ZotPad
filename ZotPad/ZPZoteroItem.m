@@ -117,7 +117,20 @@ static NSCache* _objectCache = NULL;
 }
 
 - (void) setFields:(NSDictionary*)fields{
-    _fields = fields;
+
+    //Remove empty fields. There is no need to store these in the DB or memory because they can be determined from item template
+    
+    NSEnumerator* e = [fields keyEnumerator];
+    NSMutableDictionary* newFields = [NSMutableDictionary dictionary];
+    NSString* key;
+    while(key = [e nextObject]){
+        NSString* value = [fields objectForKey:key];
+        if(![value isEqual:@""]){
+            [newFields setObject:value forKey:key];
+        }
+    }
+    
+    _fields = newFields;
 }
 
 - (NSArray*) notes{

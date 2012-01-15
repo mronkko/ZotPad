@@ -42,6 +42,7 @@
     }
 
     if([defaults boolForKey:@"resetfiles"]){
+        //TODO: Run in background thread
         NSLog(@"Reseting files");
         [defaults removeObjectForKey:@"resetfiles"];
 

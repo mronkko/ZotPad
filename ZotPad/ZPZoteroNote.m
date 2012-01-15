@@ -27,5 +27,12 @@
     }
 }
 
+- (NSArray*) creators{
+    return [NSArray array];
+}
+- (NSDictionary*) fields{
+    return [NSDictionary dictionary];
+}
+
 
 @end

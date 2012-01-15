@@ -9,8 +9,18 @@
 
 #include <sys/xattr.h>
 
-//TODO: Implement webdav client http://code.google.com/p/wtclient/
+//Some of these are needed to determine if network connection is available.
+//TODO: determine which and clean up
+#import <sys/socket.h>
+#import <netinet/in.h>
+#import <netinet6/in6.h>
+#import <arpa/inet.h>
+#import <ifaddrs.h>
+#import <netdb.h>
 
+#import <SystemConfiguration/SystemConfiguration.h>
+
+//TODO: Implement webdav client http://code.google.com/p/wtclient/
 
 #import "ZPAppDelegate.h"
 #import "ZPServerConnection.h"
@@ -68,7 +78,7 @@ const NSInteger ZPServerConnectionRequestTopLevelKeys = 9;
 
 /*
 
- Singleton accessor. If ZotPad is offline, return null to prevent accessing the server.
+ Singleton accessor. If ZotPad is offline or there is no internet connection, return null to prevent accessing the server.
  
  */
 
@@ -77,9 +87,28 @@ const NSInteger ZPServerConnectionRequestTopLevelKeys = 9;
         if(_instance == NULL){
             _instance = [[ZPServerConnection alloc] init];
         }
-        return _instance;
+        if([_instance hasInternetConnection]) return _instance;
+           
     }
-    else return NULL;
+    
+    return NULL;
+}
+
+//Adapted from the Reachability example project
+
+-(BOOL) hasInternetConnection{
+    
+    struct sockaddr_in zeroAddress;
+    bzero(&zeroAddress, sizeof(zeroAddress));
+    zeroAddress.sin_len = sizeof(zeroAddress);
+    zeroAddress.sin_family = AF_INET;
+    SCNetworkReachabilityRef reachability = SCNetworkReachabilityCreateWithAddress(kCFAllocatorDefault, (const struct sockaddr*) &zeroAddress);
+    SCNetworkReachabilityFlags flags;
+    BOOL success = SCNetworkReachabilityGetFlags(reachability, &flags);
+    BOOL online = success && (flags & kSCNetworkFlagsReachable) && !(flags & kSCNetworkFlagsConnectionRequired);
+    CFRelease(reachability);
+
+    return online;
 }
 
 /*

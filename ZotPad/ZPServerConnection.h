@@ -31,6 +31,8 @@
 // Check if the connection is already authenticated
 - (BOOL) authenticated;
 
+- (BOOL) hasInternetConnection;
+
 // Methods to get data from the server
 -(NSArray*) retrieveLibrariesFromServer;
 -(NSArray*) retrieveCollectionsForLibraryFromServer:(NSNumber*)libraryID;

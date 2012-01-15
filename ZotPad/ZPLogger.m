@@ -24,14 +24,14 @@ void ZPLog(NSObject* source,int line,NSString* format, ...){
         timeWhenAppStarted = [NSDate date]; 
         debugClasses = [NSMutableArray array ];
         
-        [debugClasses addObject:@"ZPServerConnection"];
+//        [debugClasses addObject:@"ZPServerConnection"];
 //        [debugClasses addObject:@"ZPSimpleItemListViewController"];
 //        [debugClasses addObject:@"ZPDetailedItemListViewController"];
 //        [debugClasses addObject:@"ZPServerResponseXMLParser"];
 //        [debugClasses addObject:@"ZPPreferences"];
-        [debugClasses addObject:@"ZPCacheController"];
+//        [debugClasses addObject:@"ZPCacheController"];
 //        [debugClasses addObject:@"ZPAppDelegate"];
-//        [debugClasses addObject:@"ZPDatabase"];
+        [debugClasses addObject:@"ZPDatabase"];
 //        [debugClasses addObject:@"ZPAuthenticationDialog"];
 //        [debugClasses addObject:@"ZPFileThumbnailAndQuicklookController"];
 //        [debugClasses addObject:@"ZPItemDetailViewController"];

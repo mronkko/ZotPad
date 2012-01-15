@@ -43,6 +43,12 @@
 
 }
 
+- (NSArray*) creators{
+    return [NSArray array];
+}
+- (NSDictionary*) fields{
+    return [NSDictionary dictionary];
+}
 
 -(BOOL) fileExists{
     return ([[NSFileManager defaultManager] fileExistsAtPath:[self fileSystemPath]]);

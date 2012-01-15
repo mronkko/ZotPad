@@ -55,7 +55,6 @@
 		A76D3C7414AD97BB000C3ED9 /* CFNetwork.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = A76D3C7314AD97BA000C3ED9 /* CFNetwork.framework */; };
 		A76D3C7614AD97CC000C3ED9 /* SystemConfiguration.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = A76D3C7514AD97CB000C3ED9 /* SystemConfiguration.framework */; };
 		A76D3C7814AD97D7000C3ED9 /* MobileCoreServices.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = A76D3C7714AD97D6000C3ED9 /* MobileCoreServices.framework */; };
-		A76D3C7A14AD97F1000C3ED9 /* libz.dylib in Frameworks */ = {isa = PBXBuildFile; fileRef = A76D3C7914AD97F0000C3ED9 /* libz.dylib */; };
 		A76D3C7E14AD9D12000C3ED9 /* ASIHTTPRequest.m in Sources */ = {isa = PBXBuildFile; fileRef = A76D3C7D14AD9D12000C3ED9 /* ASIHTTPRequest.m */; settings = {COMPILER_FLAGS = "-fno-objc-arc"; }; };
 		A76D3C8114AD9F2E000C3ED9 /* Reachability.m in Sources */ = {isa = PBXBuildFile; fileRef = A76D3C8014AD9F2E000C3ED9 /* Reachability.m */; settings = {COMPILER_FLAGS = "-fno-objc-arc"; }; };
 		A76D3C8814AD9FA7000C3ED9 /* ASIAuthenticationDialog.m in Sources */ = {isa = PBXBuildFile; fileRef = A76D3C8314AD9FA6000C3ED9 /* ASIAuthenticationDialog.m */; settings = {COMPILER_FLAGS = "-fno-objc-arc"; }; };
@@ -104,6 +103,7 @@
 		A7D3C08014AEDE7B00DB975D /* QuickLook.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = A7D3C07F14AEDE7B00DB975D /* QuickLook.framework */; };
 		A7D3C08314AEE71000DB975D /* ZPLocalization.m in Sources */ = {isa = PBXBuildFile; fileRef = A7D3C08214AEE70F00DB975D /* ZPLocalization.m */; };
 		A7F72BC114B984920059617D /* ZPLogger.m in Sources */ = {isa = PBXBuildFile; fileRef = A7F72BC014B984920059617D /* ZPLogger.m */; };
+		A7F8638014C21D8800021662 /* libz.dylib in Frameworks */ = {isa = PBXBuildFile; fileRef = A7F8637F14C21D8800021662 /* libz.dylib */; };
 /* End PBXBuildFile section */
 
 /* Begin PBXContainerItemProxy section */
@@ -339,7 +339,6 @@
 		A76D3C7314AD97BA000C3ED9 /* CFNetwork.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; name = CFNetwork.framework; path = System/Library/Frameworks/CFNetwork.framework; sourceTree = SDKROOT; };
 		A76D3C7514AD97CB000C3ED9 /* SystemConfiguration.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; name = SystemConfiguration.framework; path = System/Library/Frameworks/SystemConfiguration.framework; sourceTree = SDKROOT; };
 		A76D3C7714AD97D6000C3ED9 /* MobileCoreServices.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; name = MobileCoreServices.framework; path = System/Library/Frameworks/MobileCoreServices.framework; sourceTree = SDKROOT; };
-		A76D3C7914AD97F0000C3ED9 /* libz.dylib */ = {isa = PBXFileReference; lastKnownFileType = "compiled.mach-o.dylib"; name = libz.dylib; path = usr/lib/libz.dylib; sourceTree = SDKROOT; };
 		A76D3C7C14AD9D12000C3ED9 /* ASIHTTPRequest.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; name = ASIHTTPRequest.h; path = "asi-http-request/Classes/ASIHTTPRequest.h"; sourceTree = "<group>"; };
 		A76D3C7D14AD9D12000C3ED9 /* ASIHTTPRequest.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; name = ASIHTTPRequest.m; path = "asi-http-request/Classes/ASIHTTPRequest.m"; sourceTree = "<group>"; };
 		A76D3C7F14AD9F2E000C3ED9 /* Reachability.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; name = Reachability.h; path = "asi-http-request/External/Reachability/Reachability.h"; sourceTree = "<group>"; };
@@ -431,6 +430,7 @@
 		A7D4A1801494B1B700935847 /* ZPItemObserver.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = ZPItemObserver.h; sourceTree = "<group>"; };
 		A7F72BBF14B984920059617D /* ZPLogger.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = ZPLogger.h; sourceTree = "<group>"; };
 		A7F72BC014B984920059617D /* ZPLogger.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = ZPLogger.m; sourceTree = "<group>"; };
+		A7F8637F14C21D8800021662 /* libz.dylib */ = {isa = PBXFileReference; lastKnownFileType = "compiled.mach-o.dylib"; name = libz.dylib; path = usr/lib/libz.dylib; sourceTree = SDKROOT; };
 /* End PBXFileReference section */
 
 /* Begin PBXFrameworksBuildPhase section */
@@ -438,8 +438,8 @@
 			isa = PBXFrameworksBuildPhase;
 			buildActionMask = 2147483647;
 			files = (
+				A7F8638014C21D8800021662 /* libz.dylib in Frameworks */,
 				A7D3C08014AEDE7B00DB975D /* QuickLook.framework in Frameworks */,
-				A76D3C7A14AD97F1000C3ED9 /* libz.dylib in Frameworks */,
 				A7200DD914718DC0004347C9 /* CoreGraphics.framework in Frameworks */,
 				A76D3C7814AD97D7000C3ED9 /* MobileCoreServices.framework in Frameworks */,
 				A76D3C7614AD97CC000C3ED9 /* SystemConfiguration.framework in Frameworks */,
@@ -588,11 +588,6 @@
 		A7200DC514718DBF004347C9 = {
 			isa = PBXGroup;
 			children = (
-				A7D3C07F14AEDE7B00DB975D /* QuickLook.framework */,
-				A76D3C7914AD97F0000C3ED9 /* libz.dylib */,
-				A76D3C7714AD97D6000C3ED9 /* MobileCoreServices.framework */,
-				A76D3C7514AD97CB000C3ED9 /* SystemConfiguration.framework */,
-				A76D3C7314AD97BA000C3ED9 /* CFNetwork.framework */,
 				A7200DDA14718DC0004347C9 /* ZotPad */,
 				A7200DD314718DC0004347C9 /* Frameworks */,
 				A7200DD114718DC0004347C9 /* Products */,
@@ -610,6 +605,11 @@
 		A7200DD314718DC0004347C9 /* Frameworks */ = {
 			isa = PBXGroup;
 			children = (
+				A7F8637F14C21D8800021662 /* libz.dylib */,
+				A7D3C07F14AEDE7B00DB975D /* QuickLook.framework */,
+				A76D3C7714AD97D6000C3ED9 /* MobileCoreServices.framework */,
+				A76D3C7514AD97CB000C3ED9 /* SystemConfiguration.framework */,
+				A76D3C7314AD97BA000C3ED9 /* CFNetwork.framework */,
 				A76D3C7B14AD9CEF000C3ED9 /* ASIHTTPRequest */,
 				A716C05D1495132200BD6025 /* json-framework */,
 				A7CC252A1493E14D00FDEAF4 /* iCarousel */,

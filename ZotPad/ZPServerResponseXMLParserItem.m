@@ -52,7 +52,9 @@
     if(_currentElement == NULL){
         [super _setField:key toValue:value];
     }
-    else if([key isEqualToString: @"json"] && [_currentElement isKindOfClass:[ZPZoteroItem class]]){
+    else if([key isEqualToString: @"json"] && [_currentElement isKindOfClass:[ZPZoteroItem class]] && 
+            ! ([_currentElement isKindOfClass:[ZPZoteroAttachment class]] || [_currentElement isKindOfClass:[ZPZoteroNote class]]) ){
+
         //PARSE JSON CONTENT
         NSDictionary* data = [value JSONValue];
         
@@ -61,6 +63,8 @@
         //TODO: Tags are include in the JSON, think how they should be processed. (This is for a future version)
         
         NSMutableDictionary* fields = [NSMutableDictionary dictionaryWithDictionary:data];
+        
+        
         [fields removeObjectForKey:@"creators"];
         [fields removeObjectForKey:@"tags"];
         [(ZPZoteroItem*) _currentElement setFields:fields];
