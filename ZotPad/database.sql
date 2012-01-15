@@ -7,12 +7,12 @@ All data entities that have identifiers use key strings that are received
 from the Zotero server. The only exception is libraries, that receive
 integer ids from the server. 
 
-TODO: Add indices and keys
-TODO: Create triggers 
-
+TODO: Needs more optimization (e.g. http://web.utk.edu/~jplyon/sqlite/SQLite_optimization_FAQ.html)
+ 
 */
 
-
+PRAGMA synchronous=OFF;
+PRAGMA count_changes=OFF;
 
 /*
 
@@ -34,11 +34,14 @@ CREATE TABLE IF NOT EXISTS collections (
     parentCollectionKey TEXT DEFAULT NULL,
     lastCompletedCacheTimestamp TEXT DEFAULT NULL,
     libraryID INT,
-    key TEXT NOT NULL
+    key TEXT PRIMARY KEY
 );
 
+CREATE INDEX collections_parentCollectionKey ON collections (parentCollectionKey);
+
+
 CREATE TABLE IF NOT EXISTS items (
-    key TEXT NOT NULL,
+    key TEXT PRIMARY KEY,
     itemType TEXT NOT NULL,
     libraryID INT,
     year INT,
@@ -46,28 +49,36 @@ CREATE TABLE IF NOT EXISTS items (
     title TEXT,
     publishedIn TEXT,
     fullCitation TEXT NOT NULL,
-    lastTimestamp TEXT DEFAULT NULL,
-    UNIQUE (libraryID, key)
+    lastTimestamp TEXT DEFAULT NULL
 );
+
+CREATE INDEX items_libraryID ON items (libraryID);
+
+
 
 CREATE TABLE IF NOT EXISTS notes (
     parentItemKey TEXT NOT NULL,
-    key TEXT NOT NULL,
-    lastTimestamp TEXT NOT NULL,
-    PRIMARY KEY (key)
+    key TEXT PRIMARY KEY,
+    lastTimestamp TEXT NOT NULL
 );
+
+CREATE INDEX notes_parentItemKey ON notes (parentItemKey);
+
 
 CREATE TABLE IF NOT EXISTS attachments (
     parentItemKey TEXT NOT NULL,
-    key TEXT NOT NULL,
+    key TEXT PRIMARY KEY,
     lastTimestamp TEXT NOT NULL,
     attachmentURL TEXT NOT NULL,
     attachmentType TEXT NOT NULL,
     attachmentTitle TEXT NOT NULL,
     attachmentLength TEXT NOT NULL,
-    lastViewed TIMESTAMP DEFAULT NULL,
-    PRIMARY KEY (key)
+    lastViewed TIMESTAMP DEFAULT NULL
 );
+
+CREATE INDEX attachments_parentItemKey ON attachments (parentItemKey);
+
+
 
 CREATE TABLE IF NOT EXISTS collectionItems (
     collectionKey TEXT,
@@ -85,189 +96,190 @@ CREATE TABLE  IF NOT EXISTS creators (
     firstName TEXT,
     lastName TEXT,
     shortName TEXT,
-    creatorType TEXT NOT NULL
+    creatorType TEXT NOT NULL,
+    PRIMARY KEY (itemKey, "order")
 );
 
 CREATE TABLE  IF NOT EXISTS  fields (
     itemKey TEXT NOT NULL,
     fieldName TEXT NOT NULL,
-    fieldValue TeXT NOT NULL
+    fieldValue TeXT NOT NULL,
+    PRIMARY KEY (itemKey, fieldName)
 );
 
-CREATE TABLE  IF NOT EXISTS localization (
+CREATE TABLE IF NOT EXISTS localization (
     language TEXT NOT NULL,
     type TEXT NOT NULL,
     key TEXT NOT NULL,
     value TEXT NOT NULL,
     PRIMARY KEY (language,type,key)
 );
-  
-INSERT INTO localization (language,type,key,value) VALUES ("","itemType","artwork","Artwork");
-INSERT INTO localization (language,type,key,value) VALUES ("","itemType","audioRecording","Audio Recording");
-INSERT INTO localization (language,type,key,value) VALUES ("","itemType","bill","Bill");
-INSERT INTO localization (language,type,key,value) VALUES ("","itemType","blogPost","Blog Post");
-INSERT INTO localization (language,type,key,value) VALUES ("","itemType","book","Book");
-INSERT INTO localization (language,type,key,value) VALUES ("","itemType","bookSection","Book Section");
-INSERT INTO localization (language,type,key,value) VALUES ("","itemType","case","Case");
-INSERT INTO localization (language,type,key,value) VALUES ("","itemType","computerProgram","Computer Program");
-INSERT INTO localization (language,type,key,value) VALUES ("","itemType","conferencePaper","Conference Paper");
-INSERT INTO localization (language,type,key,value) VALUES ("","itemType","dictionaryEntry","Dictionary Entry");
-INSERT INTO localization (language,type,key,value) VALUES ("","itemType","document","Document");
-INSERT INTO localization (language,type,key,value) VALUES ("","itemType","email","E-mail");
-INSERT INTO localization (language,type,key,value) VALUES ("","itemType","encyclopediaArticle","Encyclopedia Article");
-INSERT INTO localization (language,type,key,value) VALUES ("","itemType","film","Film");
-INSERT INTO localization (language,type,key,value) VALUES ("","itemType","forumPost","Forum Post");
-INSERT INTO localization (language,type,key,value) VALUES ("","itemType","hearing","Hearing");
-INSERT INTO localization (language,type,key,value) VALUES ("","itemType","instantMessage","Instant Message");
-INSERT INTO localization (language,type,key,value) VALUES ("","itemType","interview","Interview");
-INSERT INTO localization (language,type,key,value) VALUES ("","itemType","journalArticle","Journal Article");
-INSERT INTO localization (language,type,key,value) VALUES ("","itemType","letter","Letter");
-INSERT INTO localization (language,type,key,value) VALUES ("","itemType","magazineArticle","Magazine Article");
-INSERT INTO localization (language,type,key,value) VALUES ("","itemType","manuscript","Manuscript");
-INSERT INTO localization (language,type,key,value) VALUES ("","itemType","map","Map");
-INSERT INTO localization (language,type,key,value) VALUES ("","itemType","newspaperArticle","Newspaper Article");
-INSERT INTO localization (language,type,key,value) VALUES ("","itemType","note","Note");
-INSERT INTO localization (language,type,key,value) VALUES ("","itemType","patent","Patent");
-INSERT INTO localization (language,type,key,value) VALUES ("","itemType","podcast","Podcast");
-INSERT INTO localization (language,type,key,value) VALUES ("","itemType","presentation","Presentation");
-INSERT INTO localization (language,type,key,value) VALUES ("","itemType","radioBroadcast","Radio Broadcast");
-INSERT INTO localization (language,type,key,value) VALUES ("","itemType","report","Report");
-INSERT INTO localization (language,type,key,value) VALUES ("","itemType","statute","Statute");
-INSERT INTO localization (language,type,key,value) VALUES ("","itemType","tvBroadcast","TV Broadcast");
-INSERT INTO localization (language,type,key,value) VALUES ("","itemType","thesis","Thesis");
-INSERT INTO localization (language,type,key,value) VALUES ("","itemType","videoRecording","Video Recording");
-INSERT INTO localization (language,type,key,value) VALUES ("","itemType","webpage","Web Page");
 
-INSERT INTO localization (language,type,key,value) VALUES ("","itemType","attachment","Attachment");
+INSERT INTO localization (language,type,key,value) SELECT "" AS languare, "itemType" AS type, "artwork" AS key, "Artwork" AS value
+UNION SELECT "","itemType","audioRecording","Audio Recording"
+UNION SELECT "","itemType","bill","Bill"
+UNION SELECT "","itemType","blogPost","Blog Post"
+UNION SELECT "","itemType","book","Book"
+UNION SELECT "","itemType","bookSection","Book Section"
+UNION SELECT "","itemType","case","Case"
+UNION SELECT "","itemType","computerProgram","Computer Program"
+UNION SELECT "","itemType","conferencePaper","Conference Paper"
+UNION SELECT "","itemType","dictionaryEntry","Dictionary Entry"
+UNION SELECT "","itemType","document","Document"
+UNION SELECT "","itemType","email","E-mail"
+UNION SELECT "","itemType","encyclopediaArticle","Encyclopedia Article"
+UNION SELECT "","itemType","film","Film"
+UNION SELECT "","itemType","forumPost","Forum Post"
+UNION SELECT "","itemType","hearing","Hearing"
+UNION SELECT "","itemType","instantMessage","Instant Message"
+UNION SELECT "","itemType","interview","Interview"
+UNION SELECT "","itemType","journalArticle","Journal Article"
+UNION SELECT "","itemType","letter","Letter"
+UNION SELECT "","itemType","magazineArticle","Magazine Article"
+UNION SELECT "","itemType","manuscript","Manuscript"
+UNION SELECT "","itemType","map","Map"
+UNION SELECT "","itemType","newspaperArticle","Newspaper Article"
+UNION SELECT "","itemType","note","Note"
+UNION SELECT "","itemType","patent","Patent"
+UNION SELECT "","itemType","podcast","Podcast"
+UNION SELECT "","itemType","presentation","Presentation"
+UNION SELECT "","itemType","radioBroadcast","Radio Broadcast"
+UNION SELECT "","itemType","report","Report"
+UNION SELECT "","itemType","statute","Statute"
+UNION SELECT "","itemType","tvBroadcast","TV Broadcast"
+UNION SELECT "","itemType","thesis","Thesis"
+UNION SELECT "","itemType","videoRecording","Video Recording"
+UNION SELECT "","itemType","webpage","Web Page"
+UNION SELECT "","itemType","attachment","Attachment"
+UNION SELECT "","field","numPages","# of Pages"
+UNION SELECT "","field","numberOfVolumes","# of Volumes"
+UNION SELECT "","field","abstractNote","Abstract"
+UNION SELECT "","field","accessDate","Accessed"
+UNION SELECT "","field","applicationNumber","Application Number"
+UNION SELECT "","field","archive","Archive"
+UNION SELECT "","field","artworkSize","Artwork Size"
+UNION SELECT "","field","assignee","Assignee"
+UNION SELECT "","field","billNumber","Bill Number"
+UNION SELECT "","field","blogTitle","Blog Title"
+UNION SELECT "","field","bookTitle","Book Title"
+UNION SELECT "","field","callNumber","Call Number"
+UNION SELECT "","field","caseName","Case Name"
+UNION SELECT "","field","code","Code"
+UNION SELECT "","field","codeNumber","Code Number"
+UNION SELECT "","field","codePages","Code Pages"
+UNION SELECT "","field","codeVolume","Code Volume"
+UNION SELECT "","field","committee","Committee"
+UNION SELECT "","field","company","Company"
+UNION SELECT "","field","conferenceName","Conference Name"
+UNION SELECT "","field","country","Country"
+UNION SELECT "","field","court","Court"
+UNION SELECT "","field","DOI","DOI"
+UNION SELECT "","field","date","Date"
+UNION SELECT "","field","dateDecided","Date Decided"
+UNION SELECT "","field","dateEnacted","Date Enacted"
+UNION SELECT "","field","dictionaryTitle","Dictionary Title"
+UNION SELECT "","field","distributor","Distributor"
+UNION SELECT "","field","docketNumber","Docket Number"
+UNION SELECT "","field","documentNumber","Document Number"
+UNION SELECT "","field","edition","Edition"
+UNION SELECT "","field","encyclopediaTitle","Encyclopedia Title"
+UNION SELECT "","field","episodeNumber","Episode Number"
+UNION SELECT "","field","extra","Extra"
+UNION SELECT "","field","audioFileType","File Type"
+UNION SELECT "","field","filingDate","Filing Date"
+UNION SELECT "","field","firstPage","First Page"
+UNION SELECT "","field","audioRecordingFormat","Format"
+UNION SELECT "","field","videoRecordingFormat","Format"
+UNION SELECT "","field","forumTitle","Forum\/Listserv Title"
+UNION SELECT "","field","genre","Genre"
+UNION SELECT "","field","history","History"
+UNION SELECT "","field","ISBN","ISBN"
+UNION SELECT "","field","ISSN","ISSN"
+UNION SELECT "","field","institution","Institution"
+UNION SELECT "","field","issue","Issue"
+UNION SELECT "","field","issueDate","Issue Date"
+UNION SELECT "","field","issuingAuthority","Issuing Authority"
+UNION SELECT "","field","journalAbbreviation","Journal Abbr"
+UNION SELECT "","field","label","Label"
+UNION SELECT "","field","language","Language"
+UNION SELECT "","field","programmingLanguage","Language"
+UNION SELECT "","field","legalStatus","Legal Status"
+UNION SELECT "","field","legislativeBody","Legislative Body"
+UNION SELECT "","field","libraryCatalog","Library Catalog"
+UNION SELECT "","field","archiveLocation","Loc. in Archive"
+UNION SELECT "","field","interviewMedium","Medium"
+UNION SELECT "","field","artworkMedium","Medium"
+UNION SELECT "","field","meetingName","Meeting Name"
+UNION SELECT "","field","nameOfAct","Name of Act"
+UNION SELECT "","field","network","Network"
+UNION SELECT "","field","pages","Pages"
+UNION SELECT "","field","patentNumber","Patent Number"
+UNION SELECT "","field","place","Place"
+UNION SELECT "","field","postType","Post Type"
+UNION SELECT "","field","priorityNumbers","Priority Numbers"
+UNION SELECT "","field","proceedingsTitle","Proceedings Title"
+UNION SELECT "","field","programTitle","Program Title"
+UNION SELECT "","field","publicLawNumber","Public Law Number"
+UNION SELECT "","field","publicationTitle","Publication"
+UNION SELECT "","field","publisher","Publisher"
+UNION SELECT "","field","references","References"
+UNION SELECT "","field","reportNumber","Report Number"
+UNION SELECT "","field","reportType","Report Type"
+UNION SELECT "","field","reporter","Reporter"
+UNION SELECT "","field","reporterVolume","Reporter Volume"
+UNION SELECT "","field","rights","Rights"
+UNION SELECT "","field","runningTime","Running Time"
+UNION SELECT "","field","scale","Scale"
+UNION SELECT "","field","section","Section"
+UNION SELECT "","field","series","Series"
+UNION SELECT "","field","seriesNumber","Series Number"
+UNION SELECT "","field","seriesText","Series Text"
+UNION SELECT "","field","seriesTitle","Series Title"
+UNION SELECT "","field","session","Session"
+UNION SELECT "","field","shortTitle","Short Title"
+UNION SELECT "","field","studio","Studio"
+UNION SELECT "","field","subject","Subject"
+UNION SELECT "","field","system","System"
+UNION SELECT "","field","title","Title"
+UNION SELECT "","field","thesisType","Type"
+UNION SELECT "","field","mapType","Type"
+UNION SELECT "","field","manuscriptType","Type"
+UNION SELECT "","field","letterType","Type"
+UNION SELECT "","field","presentationType","Type"
+UNION SELECT "","field","url","URL"
+UNION SELECT "","field","university","University"
+UNION SELECT "","field","version","Version"
+UNION SELECT "","field","volume","Volume"
+UNION SELECT "","field","websiteTitle","Website Title"
+UNION SELECT "","field","websiteType","Website Type"
+UNION SELECT "","creatorType","artist","Artist"
+UNION SELECT "","creatorType","attorneyAgent","Attorney\/Agent"
+UNION SELECT "","creatorType","author","Author"
+UNION SELECT "","creatorType","bookAuthor","Book Author"
+UNION SELECT "","creatorType","cartographer","Cartographer"
+UNION SELECT "","creatorType","castMember","Cast Member"
+UNION SELECT "","creatorType","commenter","Commenter"
+UNION SELECT "","creatorType","composer","Composer"
+UNION SELECT "","creatorType","contributor","Contributor"
+UNION SELECT "","creatorType","cosponsor","Cosponsor"
+UNION SELECT "","creatorType","counsel","Counsel"
+UNION SELECT "","creatorType","director","Director"
+UNION SELECT "","creatorType","editor","Editor"
+UNION SELECT "","creatorType","guest","Guest"
+UNION SELECT "","creatorType","interviewee","Interview With"
+UNION SELECT "","creatorType","interviewer","Interviewer"
+UNION SELECT "","creatorType","inventor","Inventor"
+UNION SELECT "","creatorType","performer","Performer"
+UNION SELECT "","creatorType","podcaster","Podcaster"
+UNION SELECT "","creatorType","presenter","Presenter"
+UNION SELECT "","creatorType","producer","Producer"
+UNION SELECT "","creatorType","programmer","Programmer"
+UNION SELECT "","creatorType","recipient","Recipient"
+UNION SELECT "","creatorType","reviewedAuthor","Reviewed Author"
+UNION SELECT "","creatorType","scriptwriter","Scriptwriter"
+UNION SELECT "","creatorType","seriesEditor","Series Editor"
+UNION SELECT "","creatorType","sponsor","Sponsor"
+UNION SELECT "","creatorType","translator","Translator"
+UNION SELECT "","creatorType","wordsBy","Words By";
 
-INSERT INTO localization (language,type,key,value) VALUES ("","field","numPages","# of Pages");
-INSERT INTO localization (language,type,key,value) VALUES ("","field","numberOfVolumes","# of Volumes");
-INSERT INTO localization (language,type,key,value) VALUES ("","field","abstractNote","Abstract");
-INSERT INTO localization (language,type,key,value) VALUES ("","field","accessDate","Accessed");
-INSERT INTO localization (language,type,key,value) VALUES ("","field","applicationNumber","Application Number");
-INSERT INTO localization (language,type,key,value) VALUES ("","field","archive","Archive");
-INSERT INTO localization (language,type,key,value) VALUES ("","field","artworkSize","Artwork Size");
-INSERT INTO localization (language,type,key,value) VALUES ("","field","assignee","Assignee");
-INSERT INTO localization (language,type,key,value) VALUES ("","field","billNumber","Bill Number");
-INSERT INTO localization (language,type,key,value) VALUES ("","field","blogTitle","Blog Title");
-INSERT INTO localization (language,type,key,value) VALUES ("","field","bookTitle","Book Title");
-INSERT INTO localization (language,type,key,value) VALUES ("","field","callNumber","Call Number");
-INSERT INTO localization (language,type,key,value) VALUES ("","field","caseName","Case Name");
-INSERT INTO localization (language,type,key,value) VALUES ("","field","code","Code");
-INSERT INTO localization (language,type,key,value) VALUES ("","field","codeNumber","Code Number");
-INSERT INTO localization (language,type,key,value) VALUES ("","field","codePages","Code Pages");
-INSERT INTO localization (language,type,key,value) VALUES ("","field","codeVolume","Code Volume");
-INSERT INTO localization (language,type,key,value) VALUES ("","field","committee","Committee");
-INSERT INTO localization (language,type,key,value) VALUES ("","field","company","Company");
-INSERT INTO localization (language,type,key,value) VALUES ("","field","conferenceName","Conference Name");
-INSERT INTO localization (language,type,key,value) VALUES ("","field","country","Country");
-INSERT INTO localization (language,type,key,value) VALUES ("","field","court","Court");
-INSERT INTO localization (language,type,key,value) VALUES ("","field","DOI","DOI");
-INSERT INTO localization (language,type,key,value) VALUES ("","field","date","Date");
-INSERT INTO localization (language,type,key,value) VALUES ("","field","dateDecided","Date Decided");
-INSERT INTO localization (language,type,key,value) VALUES ("","field","dateEnacted","Date Enacted");
-INSERT INTO localization (language,type,key,value) VALUES ("","field","dictionaryTitle","Dictionary Title");
-INSERT INTO localization (language,type,key,value) VALUES ("","field","distributor","Distributor");
-INSERT INTO localization (language,type,key,value) VALUES ("","field","docketNumber","Docket Number");
-INSERT INTO localization (language,type,key,value) VALUES ("","field","documentNumber","Document Number");
-INSERT INTO localization (language,type,key,value) VALUES ("","field","edition","Edition");
-INSERT INTO localization (language,type,key,value) VALUES ("","field","encyclopediaTitle","Encyclopedia Title");
-INSERT INTO localization (language,type,key,value) VALUES ("","field","episodeNumber","Episode Number");
-INSERT INTO localization (language,type,key,value) VALUES ("","field","extra","Extra");
-INSERT INTO localization (language,type,key,value) VALUES ("","field","audioFileType","File Type");
-INSERT INTO localization (language,type,key,value) VALUES ("","field","filingDate","Filing Date");
-INSERT INTO localization (language,type,key,value) VALUES ("","field","firstPage","First Page");
-INSERT INTO localization (language,type,key,value) VALUES ("","field","audioRecordingFormat","Format");
-INSERT INTO localization (language,type,key,value) VALUES ("","field","videoRecordingFormat","Format");
-INSERT INTO localization (language,type,key,value) VALUES ("","field","forumTitle","Forum\/Listserv Title");
-INSERT INTO localization (language,type,key,value) VALUES ("","field","genre","Genre");
-INSERT INTO localization (language,type,key,value) VALUES ("","field","history","History");
-INSERT INTO localization (language,type,key,value) VALUES ("","field","ISBN","ISBN");
-INSERT INTO localization (language,type,key,value) VALUES ("","field","ISSN","ISSN");
-INSERT INTO localization (language,type,key,value) VALUES ("","field","institution","Institution");
-INSERT INTO localization (language,type,key,value) VALUES ("","field","issue","Issue");
-INSERT INTO localization (language,type,key,value) VALUES ("","field","issueDate","Issue Date");
-INSERT INTO localization (language,type,key,value) VALUES ("","field","issuingAuthority","Issuing Authority");
-INSERT INTO localization (language,type,key,value) VALUES ("","field","journalAbbreviation","Journal Abbr");
-INSERT INTO localization (language,type,key,value) VALUES ("","field","label","Label");
-INSERT INTO localization (language,type,key,value) VALUES ("","field","language","Language");
-INSERT INTO localization (language,type,key,value) VALUES ("","field","programmingLanguage","Language");
-INSERT INTO localization (language,type,key,value) VALUES ("","field","legalStatus","Legal Status");
-INSERT INTO localization (language,type,key,value) VALUES ("","field","legislativeBody","Legislative Body");
-INSERT INTO localization (language,type,key,value) VALUES ("","field","libraryCatalog","Library Catalog");
-INSERT INTO localization (language,type,key,value) VALUES ("","field","archiveLocation","Loc. in Archive");
-INSERT INTO localization (language,type,key,value) VALUES ("","field","interviewMedium","Medium");
-INSERT INTO localization (language,type,key,value) VALUES ("","field","artworkMedium","Medium");
-INSERT INTO localization (language,type,key,value) VALUES ("","field","meetingName","Meeting Name");
-INSERT INTO localization (language,type,key,value) VALUES ("","field","nameOfAct","Name of Act");
-INSERT INTO localization (language,type,key,value) VALUES ("","field","network","Network");
-INSERT INTO localization (language,type,key,value) VALUES ("","field","pages","Pages");
-INSERT INTO localization (language,type,key,value) VALUES ("","field","patentNumber","Patent Number");
-INSERT INTO localization (language,type,key,value) VALUES ("","field","place","Place");
-INSERT INTO localization (language,type,key,value) VALUES ("","field","postType","Post Type");
-INSERT INTO localization (language,type,key,value) VALUES ("","field","priorityNumbers","Priority Numbers");
-INSERT INTO localization (language,type,key,value) VALUES ("","field","proceedingsTitle","Proceedings Title");
-INSERT INTO localization (language,type,key,value) VALUES ("","field","programTitle","Program Title");
-INSERT INTO localization (language,type,key,value) VALUES ("","field","publicLawNumber","Public Law Number");
-INSERT INTO localization (language,type,key,value) VALUES ("","field","publicationTitle","Publication");
-INSERT INTO localization (language,type,key,value) VALUES ("","field","publisher","Publisher");
-INSERT INTO localization (language,type,key,value) VALUES ("","field","references","References");
-INSERT INTO localization (language,type,key,value) VALUES ("","field","reportNumber","Report Number");
-INSERT INTO localization (language,type,key,value) VALUES ("","field","reportType","Report Type");
-INSERT INTO localization (language,type,key,value) VALUES ("","field","reporter","Reporter");
-INSERT INTO localization (language,type,key,value) VALUES ("","field","reporterVolume","Reporter Volume");
-INSERT INTO localization (language,type,key,value) VALUES ("","field","rights","Rights");
-INSERT INTO localization (language,type,key,value) VALUES ("","field","runningTime","Running Time");
-INSERT INTO localization (language,type,key,value) VALUES ("","field","scale","Scale");
-INSERT INTO localization (language,type,key,value) VALUES ("","field","section","Section");
-INSERT INTO localization (language,type,key,value) VALUES ("","field","series","Series");
-INSERT INTO localization (language,type,key,value) VALUES ("","field","seriesNumber","Series Number");
-INSERT INTO localization (language,type,key,value) VALUES ("","field","seriesText","Series Text");
-INSERT INTO localization (language,type,key,value) VALUES ("","field","seriesTitle","Series Title");
-INSERT INTO localization (language,type,key,value) VALUES ("","field","session","Session");
-INSERT INTO localization (language,type,key,value) VALUES ("","field","shortTitle","Short Title");
-INSERT INTO localization (language,type,key,value) VALUES ("","field","studio","Studio");
-INSERT INTO localization (language,type,key,value) VALUES ("","field","subject","Subject");
-INSERT INTO localization (language,type,key,value) VALUES ("","field","system","System");
-INSERT INTO localization (language,type,key,value) VALUES ("","field","title","Title");
-INSERT INTO localization (language,type,key,value) VALUES ("","field","thesisType","Type");
-INSERT INTO localization (language,type,key,value) VALUES ("","field","mapType","Type");
-INSERT INTO localization (language,type,key,value) VALUES ("","field","manuscriptType","Type");
-INSERT INTO localization (language,type,key,value) VALUES ("","field","letterType","Type");
-INSERT INTO localization (language,type,key,value) VALUES ("","field","presentationType","Type");
-INSERT INTO localization (language,type,key,value) VALUES ("","field","url","URL");
-INSERT INTO localization (language,type,key,value) VALUES ("","field","university","University");
-INSERT INTO localization (language,type,key,value) VALUES ("","field","version","Version");
-INSERT INTO localization (language,type,key,value) VALUES ("","field","volume","Volume");
-INSERT INTO localization (language,type,key,value) VALUES ("","field","websiteTitle","Website Title");
-INSERT INTO localization (language,type,key,value) VALUES ("","field","websiteType","Website Type");
-INSERT INTO localization (language,type,key,value) VALUES ("","creatorType","artist","Artist");
-INSERT INTO localization (language,type,key,value) VALUES ("","creatorType","attorneyAgent","Attorney\/Agent");
-INSERT INTO localization (language,type,key,value) VALUES ("","creatorType","author","Author");
-INSERT INTO localization (language,type,key,value) VALUES ("","creatorType","bookAuthor","Book Author");
-INSERT INTO localization (language,type,key,value) VALUES ("","creatorType","cartographer","Cartographer");
-INSERT INTO localization (language,type,key,value) VALUES ("","creatorType","castMember","Cast Member");
-INSERT INTO localization (language,type,key,value) VALUES ("","creatorType","commenter","Commenter");
-INSERT INTO localization (language,type,key,value) VALUES ("","creatorType","composer","Composer");
-INSERT INTO localization (language,type,key,value) VALUES ("","creatorType","contributor","Contributor");
-INSERT INTO localization (language,type,key,value) VALUES ("","creatorType","cosponsor","Cosponsor");
-INSERT INTO localization (language,type,key,value) VALUES ("","creatorType","counsel","Counsel");
-INSERT INTO localization (language,type,key,value) VALUES ("","creatorType","director","Director");
-INSERT INTO localization (language,type,key,value) VALUES ("","creatorType","editor","Editor");
-INSERT INTO localization (language,type,key,value) VALUES ("","creatorType","guest","Guest");
-INSERT INTO localization (language,type,key,value) VALUES ("","creatorType","interviewee","Interview With");
-INSERT INTO localization (language,type,key,value) VALUES ("","creatorType","interviewer","Interviewer");
-INSERT INTO localization (language,type,key,value) VALUES ("","creatorType","inventor","Inventor");
-INSERT INTO localization (language,type,key,value) VALUES ("","creatorType","performer","Performer");
-INSERT INTO localization (language,type,key,value) VALUES ("","creatorType","podcaster","Podcaster");
-INSERT INTO localization (language,type,key,value) VALUES ("","creatorType","presenter","Presenter");
-INSERT INTO localization (language,type,key,value) VALUES ("","creatorType","producer","Producer");
-INSERT INTO localization (language,type,key,value) VALUES ("","creatorType","programmer","Programmer");
-INSERT INTO localization (language,type,key,value) VALUES ("","creatorType","recipient","Recipient");
-INSERT INTO localization (language,type,key,value) VALUES ("","creatorType","reviewedAuthor","Reviewed Author");
-INSERT INTO localization (language,type,key,value) VALUES ("","creatorType","scriptwriter","Scriptwriter");
-INSERT INTO localization (language,type,key,value) VALUES ("","creatorType","seriesEditor","Series Editor");
-INSERT INTO localization (language,type,key,value) VALUES ("","creatorType","sponsor","Sponsor");
-INSERT INTO localization (language,type,key,value) VALUES ("","creatorType","translator","Translator");
-INSERT INTO localization (language,type,key,value) VALUES ("","creatorType","wordsBy","Words By");
 

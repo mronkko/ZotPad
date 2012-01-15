@@ -9,6 +9,7 @@
 #import "ZPPreferences.h"
 #import "ZPLogger.h"
 #import "ZPDatabase.h"
+#import "ZPCacheController.h"
 
 @implementation ZPPreferences
 
@@ -37,10 +38,8 @@ static ZPPreferences* _instance = nil;
 
 -(void) reload {
    
-    // If any of the reset options are set process these first
-    
-    
     NSUserDefaults* defaults = [NSUserDefaults standardUserDefaults];
+
     
     
     //Read the defaults preferences and set these if no preferences are set.
@@ -71,6 +70,13 @@ static ZPPreferences* _instance = nil;
     
     NSLog(@"NSUserDefaults dump: %@",[defaults dictionaryRepresentation]);
     
+
+}
+
+-(void) checkAndProcessApplicationResetPreferences{
+    
+    NSUserDefaults* defaults = [NSUserDefaults standardUserDefaults];
+
     if([defaults boolForKey:@"resetusername"]){
         NSLog(@"Reseting username");
         [defaults removeObjectForKey:@"username"];
@@ -89,20 +95,10 @@ static ZPPreferences* _instance = nil;
         //TODO: Run in background thread
         NSLog(@"Reseting files");
         [defaults removeObjectForKey:@"resetfiles"];
-        
-        NSString* _documentsDirectory = [NSSearchPathForDirectoriesInDomains(NSDocumentDirectory, NSUserDomainMask, YES)  objectAtIndex:0];
-        NSArray *directoryContent = [[NSFileManager defaultManager] contentsOfDirectoryAtPath:_documentsDirectory error:NULL];
-        
-        for (NSString* _documentFilePath in directoryContent) {
-            if(! [@"zotpad.sqlite" isEqualToString: _documentFilePath]){
-                [[NSFileManager defaultManager] removeItemAtPath:[_documentsDirectory stringByAppendingPathComponent:_documentFilePath] error:NULL];
-            }
-        }
+        [[ZPCacheController instance] purgeAllAttachmentFilesFromCache];
     }
 
 }
-
-
 -(NSInteger) maxCacheSize{
     return _maxCacheSize;
 }

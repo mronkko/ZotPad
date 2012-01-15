@@ -18,8 +18,6 @@
 #import "ZPLogger.h"
 
 
-#define USE_THUMBNAILS_FOR_PDFS 0
-
 
 @interface ZPFileThumbnailAndQuicklookController(){
     ZPZoteroAttachment* _currentAttachment;
@@ -44,16 +42,11 @@
 
 @implementation ZPFileThumbnailAndQuicklookController
 
-static NSOperationQueue* _buttonRenderQueue;
 static NSOperationQueue* _imageRenderQueue;
 static NSCache* _fileTypeImageCache;
 
 -(id) initWithItem:(ZPZoteroItem*)item viewController:(UIViewController*) viewController maxHeight:(NSInteger)maxHeight maxWidth:(NSInteger)maxWidth{
     
-    if(_buttonRenderQueue == NULL){
-        _buttonRenderQueue = [[NSOperationQueue alloc] init];
-        [_buttonRenderQueue setMaxConcurrentOperationCount:3];
-    }
     if(_imageRenderQueue == NULL){
         _imageRenderQueue = [[NSOperationQueue alloc] init];
         [_imageRenderQueue setMaxConcurrentOperationCount:3];
@@ -186,12 +179,6 @@ static NSCache* _fileTypeImageCache;
     
     [button addTarget:self action:@selector(buttonTapped:) 
      forControlEvents:UIControlEventTouchUpInside];
-    
-    if(USE_THUMBNAILS_FOR_PDFS && [attachment fileExists] && [attachment.attachmentType isEqualToString:@"application/pdf"]){
-        NSOperation* operation = [[NSInvocationOperation alloc] initWithTarget:self selector:@selector(_configureButton:) object:button];
-        [_buttonRenderQueue addOperation:operation];
-    }
-     
 
 }
 
@@ -290,8 +277,6 @@ static NSCache* _fileTypeImageCache;
 
 -(void) configurePreview:(UIView*)view withAttachment:(ZPZoteroAttachment*)attachment{
     
-    //We can cancel everything in the image render queue because images are not show
-    [_buttonRenderQueue cancelAllOperations];
 
     for(UIView* subview in view.subviews){
         [subview removeFromSuperview];
@@ -322,7 +307,7 @@ static NSCache* _fileTypeImageCache;
         
         //Create operation and queue it for background retrieval
         NSOperation* operation = [[NSInvocationOperation alloc] initWithInvocation:invocation];
-        [_buttonRenderQueue addOperation:operation];
+        [_imageRenderQueue addOperation:operation];
     }
 }
 

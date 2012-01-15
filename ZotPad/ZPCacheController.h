@@ -39,6 +39,7 @@
 //-(void) setCurrentLibrary:(NSNumber*) libraryID;
 //-(void) setCurrentItem:(NSString*) itemKey;
 -(void) updateLibrariesAndCollectionsFromServer;
+- (void) purgeAllAttachmentFilesFromCache;
 
 -(void) refreshActiveItem:(ZPZoteroItem*) item;
 -(NSArray*) uncachedItemKeysForLibrary:(NSNumber*)libraryID collection:(NSString*)collectionKey searchString:(NSString*)searchString orderField:(NSString*)orderField sortDescending:(BOOL)sortDescending;

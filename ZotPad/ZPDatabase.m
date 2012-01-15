@@ -590,7 +590,7 @@ Deletes items, notes, and attachments
 
 
 
-- (void) addBasicToItem:(ZPZoteroItem *)item{
+- (void) addBasicsToItem:(ZPZoteroItem *)item{
     
     @synchronized(self){
         FMResultSet* resultSet = [_database executeQuery: @"SELECT itemType,libraryID,year,creator,title,publishedIn,key,fullCitation,lastTimestamp FROM items WHERE key=? LIMIT 1",item.key];
@@ -975,7 +975,7 @@ Deletes items, notes, and attachments
     sql=[sql stringByAppendingFormat:@" WHERE libraryID = %@",libraryID];
 
     if(collectionKey!=NULL)
-        sql=[sql stringByAppendingFormat:@" AND collectionItems.collectionKey = %@ and collectionItems.itemKey = items.key",collectionKey];
+        sql=[sql stringByAppendingFormat:@" AND collectionItems.collectionKey = '%@' and collectionItems.itemKey = items.key",collectionKey];
 
     if(searchString != NULL){
         //TODO: Make a more feature rich search query
@@ -993,7 +993,6 @@ Deletes items, notes, and attachments
         sql=[sql stringByAppendingFormat:@" ORDER BY items.lastTimestamp DESC"];
     }
     
-    NSLog(@"Retrieving item list from local cache with SQL: %@",sql);
     
     @synchronized(self){
         FMResultSet* resultSet;

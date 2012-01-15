@@ -20,6 +20,7 @@
 
 - (BOOL)application:(UIApplication *)application didFinishLaunchingWithOptions:(NSDictionary *)launchOptions
 {
+    [[ZPPreferences instance] checkAndProcessApplicationResetPreferences];
     [[ZPPreferences instance] reload];
     
     //Set up a background operation for retrieving data

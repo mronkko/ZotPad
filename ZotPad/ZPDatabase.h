@@ -47,7 +47,7 @@
 - (void) addFieldsToItem: (ZPZoteroItem*) item;
 - (void) addNotesToItem: (ZPZoteroItem*) item;
 - (void) addAttachmentsToItem: (ZPZoteroItem*) item;
-- (void) addBasicToItem:(ZPZoteroItem *)item;
+- (void) addBasicsToItem:(ZPZoteroItem *)item;
 
 
 //Return a list of all attachment paths ordered by priority for removel

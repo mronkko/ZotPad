@@ -23,6 +23,7 @@
 @synthesize numChildren = _numChildren;
 @synthesize numTags = _numTags;
 
+//TODO: HIGH PRIORITY - IMPLEMENT DELETING ITEMS FROM CACHE WHEN MEMORY ALERT IS RECEIVED
 
 //Timestamp uses a custom setter because it is used to determine if the item needs to be written in cache
 
@@ -76,7 +77,7 @@ static NSCache* _objectCache = NULL;
         obj->_needsToBeWrittenToCache = FALSE;
         
         //Retrieve data for this item from DB
-        [[ZPDatabase instance] addBasicToItem:obj] ;
+        [[ZPDatabase instance] addBasicsToItem:obj] ;
 
         
         [_objectCache setObject:obj  forKey:key];

@@ -392,7 +392,7 @@ static ZPCacheController* _instance = nil;
 
     if(! [libraryID isEqual:_activeLibraryID] && ! [[ZPPreferences instance] cacheAttachmentsAllLibraries] ){
         [_filesToDownload removeAllObjects];
-        NSLog(@"Clearing download queue because library changed and preferences do not indicate that all libraries should be downloaded");
+        NSLog(@"Clearing download queue because library changed to %i (this is %i) and preferences do not indicate that all libraries should be downloaded",_activeLibraryID,libraryID);
     }
     
     //Store the libraryID and collectionKEy
@@ -401,7 +401,7 @@ static ZPCacheController* _instance = nil;
     //Both keys might be null, so we need to compare equality directly as well
     if(! (collectionKey == _activeCollectionKey || [collectionKey isEqual:_activeCollectionKey]) && ! [[ZPPreferences instance] cacheAttachmentsActiveLibrary]){
         [_filesToDownload removeAllObjects];
-        NSLog(@"Clearing download queue because collection changed and preferences do not indicate that all collections should be downloaded");
+        NSLog(@"Clearing download queue because collection changed to %@ (this is %@) and preferences do not indicate that all collections should be downloaded",[ZPZoteroCollection ZPZoteroCollectionWithKey: _activeCollectionKey].title ,[ZPZoteroCollection ZPZoteroCollectionWithKey: collectionKey].title);
     }
     _activeCollectionKey = collectionKey;
     
@@ -598,6 +598,18 @@ static ZPCacheController* _instance = nil;
     [self _checkQueues];
 }
 
+- (void) purgeAllAttachmentFilesFromCache{
+    
+    NSString* _documentsDirectory = [NSSearchPathForDirectoriesInDomains(NSDocumentDirectory, NSUserDomainMask, YES)  objectAtIndex:0];
+    NSArray *directoryContent = [[NSFileManager defaultManager] contentsOfDirectoryAtPath:_documentsDirectory error:NULL];
+    
+    for (NSString* _documentFilePath in directoryContent) {
+        if(! [@"zotpad.sqlite" isEqualToString: _documentFilePath]){
+            [[NSFileManager defaultManager] removeItemAtPath:[_documentsDirectory stringByAppendingPathComponent:_documentFilePath] error:NULL];
+        }
+    }
+    [self _scanAndSetSizeOfDocumentsFolder];
+}
 
 - (void) _scanAndSetSizeOfDocumentsFolder{
     _sizeOfDocumentsFolder = [self _documentsFolderSize];

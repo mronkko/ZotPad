@@ -31,5 +31,6 @@
 -(NSInteger) maxCacheSize;
 
 -(void) reload;
+-(void) checkAndProcessApplicationResetPreferences;
 
 @end

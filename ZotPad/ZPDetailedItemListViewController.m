@@ -59,13 +59,16 @@ static ZPDetailedItemListViewController* _instance = nil;
 {
     
     if([NSThread isMainThread]){
+        
         // Update the user interface for the detail item.
         
         if (self.masterPopoverController != nil) {
             [self.masterPopoverController dismissPopoverAnimated:YES];
         }
         
-                
+
+        [self _makeAvailable];
+
         // Retrieve the item IDs if a library is selected. 
         
         if(_libraryID!=0){
@@ -112,6 +115,8 @@ static ZPDetailedItemListViewController* _instance = nil;
         //[_tableView reloadSections:[NSIndexSet indexSetWithIndex:0] withRowAnimation:UITableViewRowAnimationAutomatic];
         [_tableView reloadData];
     }
+    
+    //TODO: HIGH PRIORITY - MAKE THESE RUN IN AN NSOPERATION QUEUE THAT ONLY SUPPORTS A LIMITED NUMBER OF PARALLEL RETRIEVALS AND CANCELS
     
     // Queue an operation to retrieve all item keys that belong to this collection but are not found in cache. 
     [self performSelectorInBackground:@selector(_configureUncachedKeys:) withObject:_itemKeysShown];
@@ -163,6 +168,7 @@ static ZPDetailedItemListViewController* _instance = nil;
     
     UITableViewCell* cell = [_cellCache objectForKey:keyObj];
     
+    //TODO: Do not allocate any UI elements in this method, but specify them in the story board
     
     if(cell==nil){
         
