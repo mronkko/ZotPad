@@ -12,7 +12,6 @@ TODO: Needs more optimization (e.g. http://web.utk.edu/~jplyon/sqlite/SQLite_opt
 */
 
 PRAGMA synchronous=OFF;
-PRAGMA count_changes=OFF;
 
 /*
 
@@ -69,10 +68,10 @@ CREATE TABLE IF NOT EXISTS attachments (
     parentItemKey TEXT NOT NULL,
     key TEXT PRIMARY KEY,
     lastTimestamp TEXT NOT NULL,
-    attachmentURL TEXT NOT NULL,
-    attachmentType TEXT NOT NULL,
-    attachmentTitle TEXT NOT NULL,
-    attachmentLength TEXT NOT NULL,
+    attachmentURL TEXT,
+    attachmentType TEXT,
+    attachmentTitle TEXT,
+    attachmentLength TEXT,
     lastViewed TIMESTAMP DEFAULT NULL
 );
 

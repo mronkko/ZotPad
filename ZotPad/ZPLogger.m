@@ -30,8 +30,9 @@ void ZPLog(NSObject* source,int line,NSString* format, ...){
 //        [debugClasses addObject:@"ZPServerResponseXMLParser"];
 //        [debugClasses addObject:@"ZPPreferences"];
         [debugClasses addObject:@"ZPCacheController"];
+        [debugClasses addObject:@"ZPDataLayer"];
 //        [debugClasses addObject:@"ZPAppDelegate"];
-//        [debugClasses addObject:@"ZPDatabase"];
+        [debugClasses addObject:@"ZPDatabase"];
 //        [debugClasses addObject:@"ZPAuthenticationDialog"];
 //        [debugClasses addObject:@"ZPFileThumbnailAndQuicklookController"];
 //        [debugClasses addObject:@"ZPItemDetailViewController"];

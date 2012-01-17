@@ -22,6 +22,7 @@
 + (ZPDetailedItemListViewController*) instance;
 
 - (void)configureView;
+- (void) configureUncachedKeys:(NSArray*)uncachedItems;
 
 @property (nonatomic, retain) IBOutlet UISearchBar* searchBar;
 

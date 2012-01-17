@@ -96,21 +96,22 @@ static NSCache* _fileTypeImageCache;
 
 -(void) openInQuickLookWithAttachment:(ZPZoteroAttachment*) attachment{
 
+    //Mark these items as recently viewed
+    _item = [ZPZoteroItem retrieveOrInitializeWithKey:attachment.parentItemKey];
+    for(ZPZoteroAttachment* attachment in [_item allExistingAttachments]){
+        [[ZPDatabase instance] updateViewedTimestamp:attachment];
+    }
+
     if(! attachment.fileExists) [self _downloadWithProgressAlert:attachment];
     else {
         
         QLPreviewController *quicklook = [[QLPreviewController alloc] init];
-        _item = [ZPZoteroItem retrieveOrInitializeWithKey:attachment.parentItemKey];
         [quicklook setDataSource:self];
         NSInteger index = [[_item allExistingAttachments] indexOfObject:attachment];
         [quicklook setCurrentPreviewItemIndex:index];
         UIViewController* root = [UIApplication sharedApplication].delegate.window.rootViewController;       
         [root presentModalViewController:quicklook animated:YES];
         
-        //Mark these items as recently viewed
-        for(ZPZoteroAttachment* attachment in [_item allExistingAttachments]){
-            [[ZPDatabase instance] updateViewedTimestamp:attachment];
-        }
     }
 }
 

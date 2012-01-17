@@ -41,6 +41,7 @@
 - (NSArray*) getItemKeysForLibrary:(NSNumber*)libraryID collectionKey:(NSString*)collectionKey
                       searchString:(NSString*)searchString orderField:(NSString*)orderField sortDescending:(BOOL)sortDescending;
 
+- (NSString*) getFirstItemKeyWithTimestamp:(NSString*)timestamp from:(NSNumber*)libraryID;
 
 
 - (void) addCreatorsToItem: (ZPZoteroItem*) item;
@@ -48,7 +49,6 @@
 - (void) addNotesToItem: (ZPZoteroItem*) item;
 - (void) addAttachmentsToItem: (ZPZoteroItem*) item;
 - (void) addBasicsToItem:(ZPZoteroItem *)item;
-
 
 //Return a list of all attachment paths ordered by priority for removel
 - (NSArray*) getCachedAttachmentPaths;
@@ -59,6 +59,12 @@
 - (NSString*) getLocalizationStringWithKey:(NSString*) key type:(NSString*) type locale:(NSString*) locale;
 
 - (BOOL) doesItemKey:(NSString*)itemKey belongToCollection:(NSString*) collectionKey;
+
+
+// Retrieves all item keys and note and attachment keys from the library
+
+- (NSArray*) getAllItemKeysForLibrary:(NSNumber*)libraryID;
+
 
 /*
  
@@ -81,15 +87,18 @@
 
 -(void) addNotesToDatabase:(NSArray*)notes;
 -(void) addAttachmentsToDatabase:(NSArray*)attachments;
+
 -(void) addItems:(NSArray*)items toCollection:(NSString*)collectionKey;
+-(void) addItemKeys:(NSArray*)keys toCollection:(NSString*)collectionKey;
+
 -(void) writeItemsCreatorsToDatabase:(NSArray*)items;
 -(void) writeItemsFieldsToDatabase:(NSArray*)items;
 
 
 
 // These remove items from the cache
-- (void) removeItemsNotInArray:(NSArray*)itemKeys fromCollection:(NSString*)collectionKey inLibrary:(NSNumber*)libraryID;
-- (void) deleteItemsNotInArray:(NSArray*)itemKeys fromLibrary:(NSNumber*)libraryID;
+- (void) removeItemKeysNotInArray:(NSArray*)itemKeys fromCollection:(NSString*)collectionKey;
+- (void) deleteItemKeysNotInArray:(NSArray*)itemKeys fromLibrary:(NSNumber*)libraryID;
 
 - (void) setUpdatedTimestampForCollection:(NSString*)collectionKey toValue:(NSString*)updatedTimestamp;
 - (void) setUpdatedTimestampForLibrary:(NSNumber*)libraryID toValue:(NSString*)updatedTimestamp;

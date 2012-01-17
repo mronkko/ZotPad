@@ -39,13 +39,11 @@
 
 -(NSArray*) retrieveItemsFromLibrary:(NSNumber*)libraryID itemKeys:(NSArray*)keys;
 
--(NSArray*) retrieveItemsFromLibrary:(NSNumber*)libraryID limit:(NSInteger)limit offset:(NSInteger)offest;
-
 -(NSArray*) retrieveKeysInContainer:(NSNumber*)libraryID collectionKey:(NSString*)key;
 -(NSArray*) retrieveKeysInContainer:(NSNumber*)libraryID collectionKey:(NSString*)collectionKey searchString:(NSString*)searchString orderField:(NSString*)orderField sortDescending:(BOOL)sortDescending;
     
 -(NSString*) retrieveTimestampForContainer:(NSNumber*)libraryID collectionKey:(NSString*)key;
--(NSArray*) retrieveNoteAndAttachmentKeysFromLibrary:(NSNumber*)libraryID;
+-(NSArray*) retrieveAllItemKeysFromLibrary:(NSNumber*)libraryID;
 
 //This retrieves single item details and notes and attachments associated with that item
 -(ZPZoteroItem*) retrieveSingleItemDetailsFromServer:(ZPZoteroItem*)item;

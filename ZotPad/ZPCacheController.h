@@ -9,14 +9,17 @@
 #import <Foundation/Foundation.h>
 #import "ZPLibraryObserver.h"
 #import "ZPAttachmentObserver.h"
-
+#import "ZPZoteroCollection.h"
 
 @interface ZPCacheController : NSObject <ZPLibraryObserver, ZPAttachmentObserver>{
     
     //These two arrays contain a list of IDs/Keys that will be cached
     
     NSMutableDictionary* _itemKeysToRetrieve;
-    NSMutableArray* _containersToCache;
+    NSMutableDictionary* _libraryTimestamps;
+    
+    NSMutableArray* _collectionsToCache;
+    NSMutableArray* _librariesToCache;
     NSMutableArray* _filesToDownload;
     
     // An operation que to fetch items in the background
@@ -43,5 +46,11 @@
 
 -(void) refreshActiveItem:(ZPZoteroItem*) item;
 -(NSArray*) uncachedItemKeysForLibrary:(NSNumber*)libraryID collection:(NSString*)collectionKey searchString:(NSString*)searchString orderField:(NSString*)orderField sortDescending:(BOOL)sortDescending;
+-(void) setActiveLibrary:(NSNumber*)libraryID collection:(NSString*)collectionKey;
+
+-(void) addToLibrariesQueue:(ZPZoteroLibrary*)object priority:(BOOL)priority;
+-(void) addToCollectionsQueue:(ZPZoteroCollection*)object priority:(BOOL)priority;
+-(void) addToItemQueue:(NSArray*)items libraryID:(NSNumber*)libraryID priority:(BOOL)priority;
+
 
 @end

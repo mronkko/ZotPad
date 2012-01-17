@@ -131,18 +131,25 @@ static ZPDatabase* _instance = nil;
     
     @synchronized(self){
         //Delete everything but leave my library
+        FMResultSet* resultSet = [_database executeQuery:@"SELECT groupID,lastCompletedCacheTimestamp FROM groups"];
+        
+        NSMutableDictionary* timestamps = [NSMutableDictionary dictionary];
+        while([resultSet next]){
+            if([resultSet stringForColumnIndex:1] != NULL) [timestamps setObject:[resultSet stringForColumnIndex:1] forKey:[NSNumber numberWithInt:[resultSet intForColumnIndex:0]]];
+        }
+              
         [_database executeUpdate:@"DELETE FROM groups WHERE groupID != 1"];
-    
+
     
         NSEnumerator* e = [libraries objectEnumerator];
     
         ZPZoteroLibrary* library;
     
         while ( library = (ZPZoteroLibrary*) [e nextObject]) {
-        
+            
             NSNumber* libraryID = library.libraryID;
-            [_database executeUpdate:@"INSERT INTO groups (groupID, title) VALUES (?, ?)",libraryID,library.title];
-        }  
+            [_database executeUpdate:@"INSERT INTO groups (groupID, title,lastCompletedCacheTimestamp) VALUES (?, ?, ?)",libraryID,library.title,[timestamps objectForKey:libraryID]];
+        }
     }
 }
 
@@ -213,7 +220,7 @@ static ZPDatabase* _instance = nil;
 
 
 // These remove items from the collection
-- (void) removeItemsNotInArray:(NSArray*)itemKeys fromCollection:(NSString*)collectionKey inLibrary:(NSNumber*)libraryID{
+- (void) removeItemKeysNotInArray:(NSArray*)itemKeys fromCollection:(NSString*)collectionKey{
 
     if([itemKeys count] == 0) return;
 
@@ -231,20 +238,68 @@ Deletes items, notes, and attachments
  
  */
 
-- (void) deleteItemsNotInArray:(NSArray*)itemKeys fromLibrary:(NSNumber*)libraryID{
+- (void) deleteItemKeysNotInArray:(NSArray*)itemKeys fromLibrary:(NSNumber*)libraryID{
     
+    BOOL debugThisFunction = FALSE;
     if([itemKeys count] == 0) return;
-
+    
     @synchronized(self){
         //This might generate a too long query, so needs to be tested with very large libraries
+        if(debugThisFunction){
+            FMResultSet* rs = [_database executeQuery:@"SELECT COUNT(key) FROM items WHERE libraryID=?",libraryID];
+            [rs next];
+            NSLog(@"Items prior to delete %i",[rs intForColumnIndex:0]);
+            [rs close];
+            
+        }
         [_database executeUpdate:[NSString stringWithFormat:@"DELETE FROM items WHERE libraryID = ? AND key NOT IN ('%@')",
                                   [itemKeys componentsJoinedByString:@"', '"]],libraryID];
+        if(debugThisFunction){
+            FMResultSet* rs = [_database executeQuery:@"SELECT COUNT(key) FROM items WHERE libraryID=?",libraryID];
+            [rs next];
+            NSLog(@"Items after delete %i",[rs intForColumnIndex:0]);
+            [rs close];
+            
+        }
 
-        [_database executeUpdate:[NSString stringWithFormat:@"DELETE FROM attachments WHERE key NOT IN ('%@') AND parentItemKey in (SELECT key FROM items WHERE libraryID = ?)",
+        if(debugThisFunction){
+            FMResultSet* rs = [_database executeQuery:@"SELECT COUNT(key) FROM attachments WHERE parentItemKey IN (SELECT key FROM items WHERE libraryID = ?)",libraryID];
+            [rs next];
+            NSLog(@"Attachments prior to delete %i",[rs intForColumnIndex:0]);
+            [rs close];
+            
+        }
+
+        [_database executeUpdate:[NSString stringWithFormat:@"DELETE FROM attachments WHERE key NOT IN ('%@') AND parentItemKey IN (SELECT key FROM items WHERE libraryID = ?)",
                                   [itemKeys componentsJoinedByString:@"', '"]],libraryID];
+
+        if(debugThisFunction){
+            FMResultSet* rs = [_database executeQuery:@"SELECT COUNT(key) FROM attachments WHERE parentItemKey IN (SELECT key FROM items WHERE libraryID = ?)",libraryID];
+            [rs next];
+            NSLog(@"Attachments after delete %i",[rs intForColumnIndex:0]);
+            [rs close];
+            
+        }
+
+        
+        if(debugThisFunction){
+            FMResultSet* rs = [_database executeQuery:@"SELECT COUNT(key) FROM notes WHERE parentItemKey IN (SELECT key FROM items WHERE libraryID = ?)",libraryID];
+            [rs next];
+            NSLog(@"Notes prior to delete %i",[rs intForColumnIndex:0]);
+            [rs close];
+            
+        }
 
         [_database executeUpdate:[NSString stringWithFormat:@"DELETE FROM notes WHERE key NOT IN ('%@') AND parentItemKey in (SELECT key FROM items WHERE libraryID = ?)",
                                   [itemKeys componentsJoinedByString:@"', '"]],libraryID];
+
+        if(debugThisFunction){
+            FMResultSet* rs = [_database executeQuery:@"SELECT COUNT(key) FROM notes WHERE parentItemKey IN (SELECT key FROM items WHERE libraryID = ?)",libraryID];
+            [rs next];
+            NSLog(@"Notes after delete %i",[rs intForColumnIndex:0]);
+            [rs close];
+            
+        }
 
     }
 }
@@ -465,23 +520,60 @@ Deletes items, notes, and attachments
     
     if([notes count] == 0) return;
 
-    /*
-     
-    Notes are currently not supported, so no need to run this query at all. 
-     
-        @synchronized(self){
-            //TODO: Implement modifying already existing items if they are older (lastTimestamp) nthan the new note
-            FMResultSet* resultSet = [_database executeQuery: @"SELECT lastTimestamp FROM notes WHERE key =? LIMIT 1",note.key];
+    
+    ZPZoteroNote* note;
+    
+    NSMutableArray* itemKeys = [NSMutableArray array];
+
+    for(note in notes){
+        [itemKeys addObject:note.key];
+    }
+    
+    NSMutableDictionary* timestamps = [NSMutableDictionary dictionary];
+    
+    //Retrieve timestamps
+    @synchronized(self){
+        FMResultSet* resultSet = [_database executeQuery:[NSString stringWithFormat:@"SELECT key, lastTimestamp FROM notes WHERE key IN ('%@')",[itemKeys componentsJoinedByString:@"', '"]]];
+        
+        while([resultSet next]){
+            [timestamps setObject:[resultSet stringForColumnIndex:1] forKey:[resultSet stringForColumnIndex:0]];
+        }
+        
+        [resultSet close];
+    }
+    
+    
+    NSString* insertSQL;
+    NSMutableArray* insertArguments = [NSMutableArray array];
+    
+    for(note in notes){
+        
+        //Check the timestamp
+        NSString* timestamp = [timestamps objectForKey:note.key];
+        
+        if(timestamp == NULL){
             
-            BOOL found = [resultSet next];
+            if(insertSQL == NULL){
+                insertSQL = @"INSERT INTO notes (key, parentItemKey, lastTimestamp) SELECT ? AS key, ? AS parentItemKey, ? AS lastTimestamp";
+            }
+            else{
+                insertSQL = [insertSQL stringByAppendingString:@" UNION SELECT ?,?,?"];
+            }
             
-            [resultSet close];
-            
-            if(! found ){
-                [_database executeUpdate:@"INSERT INTO notes (key,parentItemKey,lastTimestamp) VALUES (?,?,?)",note.key,note.parentItemKey,note.lastTimestamp];
+            [insertArguments addObjectsFromArray:[NSArray arrayWithObjects:note.key,note.parentItemKey,note.lastTimestamp,nil]];
+        }
+        else if(! [note.lastTimestamp isEqualToString: timestamp]){
+            @synchronized(self){
+                [_database executeUpdate:@"UPDATE notes SET parentItemKey = ?,lastTimestamp = ? WHERE key = ?",note.parentItemKey,note.lastTimestamp,note.key];
             }
         }
-     */
+    }
+    
+    if(insertSQL != NULL){
+        @synchronized(self){
+            [_database executeUpdate:insertSQL withArgumentsInArray:insertArguments]; 
+        }
+    }
 }
 
 -(void) addAttachmentsToDatabase:(NSArray*)attachments{
@@ -519,13 +611,22 @@ Deletes items, notes, and attachments
         
         if(timestamp == NULL){
             
+            // We have at least two different types of attachments. Real files and links. The links are currently not stored (URL is null) but their keys are needed for synchronization.
             if(insertSQL == NULL){
-                insertSQL = @"INSERT INTO attachments (key, parentItemKey, lastTimestamp, attachmentURL, attachmentType, attachmentTitle, attachmentLength, lastViewed) SELECT ? AS key, ? AS parentItemKey, ? AS lastTimestamp, ? AS attachmentURL, ? AS attachmentType, ? AS attachmentTitle, ? AS attachmentLength, NULL AS lastViewed";
+                if(attachment.attachmentURL!=NULL){
+                    insertSQL = @"INSERT INTO attachments (key, parentItemKey, lastTimestamp, attachmentURL, attachmentType, attachmentTitle, attachmentLength, lastViewed) SELECT ? AS key, ? AS parentItemKey, ? AS lastTimestamp, ? AS attachmentURL, ? AS attachmentType, ? AS attachmentTitle, ? AS attachmentLength, NULL AS lastViewed";
+                }
+                else{
+                    insertSQL = @"INSERT INTO attachments (key, parentItemKey, lastTimestamp, attachmentURL, attachmentType, attachmentTitle, attachmentLength, lastViewed) SELECT ? AS key, ? AS parentItemKey, ? AS lastTimestamp, NULL AS attachmentURL, NULL AS attachmentType, NULL AS attachmentTitle, NULL AS attachmentLength, NULL AS lastViewed";
+                }
             }
-            else{
+            else if(attachment.attachmentURL!=NULL){
                 insertSQL = [insertSQL stringByAppendingString:@" UNION SELECT ?,?,?,?,?,?,?,NULL"];
             }
-            
+            else{
+                insertSQL = [insertSQL stringByAppendingString:@" UNION SELECT ?,?,?,NULL,NULL,NULL,NULL,NULL"];
+
+            }
             [insertArguments addObjectsFromArray:[NSArray arrayWithObjects:attachment.key,attachment.parentItemKey,attachment.lastTimestamp,attachment.attachmentURL,attachment.attachmentType,attachment.attachmentTitle,[NSNumber numberWithInt: attachment.attachmentLength],nil]];
         }
         else if(! [attachment.lastTimestamp isEqualToString: timestamp]){
@@ -544,15 +645,24 @@ Deletes items, notes, and attachments
 
 
 // Records a new collection membership
+
 -(void) addItems:(NSArray*)items toCollection:(NSString*)collectionKey{
-
     if([items count] == 0) return;
-
+    
     ZPZoteroItem* item;
     NSMutableArray* itemKeys = [NSMutableArray array];
     for(item in items){
         [itemKeys addObject:item.key];
     }
+    [self addItems:itemKeys toCollection:collectionKey];
+}
+
+
+-(void) addItemKeys:(NSArray*)keys toCollection:(NSString*)collectionKey{
+
+    if([keys count]==0) return;
+    
+    NSMutableArray* itemKeys= [NSMutableArray arrayWithArray:keys];
     
     @synchronized(self){
         FMResultSet* resultSet = [_database executeQuery:[NSString stringWithFormat:@"SELECT itemKey FROM collectionItems WHERE itemKey NOT IN ('%@') AND  collectionKey = ?",[itemKeys componentsJoinedByString:@"', '"]],collectionKey];
@@ -839,7 +949,7 @@ Deletes items, notes, and attachments
 - (void) addAttachmentsToItem: (ZPZoteroItem*) item  {
     
     @synchronized(self){
-        FMResultSet* resultSet = [_database executeQuery: @"SELECT key,lastTimestamp,attachmentURL,attachmentType,attachmentTitle,attachmentLength FROM attachments WHERE parentItemKey = ? ",item.key];
+        FMResultSet* resultSet = [_database executeQuery: @"SELECT key,lastTimestamp,attachmentURL,attachmentType,attachmentTitle,attachmentLength FROM attachments WHERE parentItemKey = ? AND attachmentURL IS NOT NULL",item.key];
         
         NSMutableArray* attachments = [[NSMutableArray alloc] init];
         while([resultSet next]) {
@@ -868,7 +978,7 @@ Deletes items, notes, and attachments
         
         NSMutableArray* returnArray = [NSMutableArray array];
         
-        FMResultSet* resultSet = [_database executeQuery: @"SELECT key,lastTimestamp,attachmentURL,attachmentType,attachmentTitle,attachmentLength,parentItemKey FROM attachments ORDER BY CASE WHEN lastViewed IS NULL THEN 0 ELSE 1 end, lastViewed ASC, lastTimestamp ASC"];
+        FMResultSet* resultSet = [_database executeQuery: @"SELECT key,lastTimestamp,attachmentURL,attachmentType,attachmentTitle,attachmentLength,parentItemKey FROM attachments WHERE attachmentURL IS NOT NULL ORDER BY CASE WHEN lastViewed IS NULL THEN 0 ELSE 1 end, lastViewed ASC, lastTimestamp ASC"];
         
         while([resultSet next]){
             ZPZoteroAttachment* attachment = [ZPZoteroAttachment retrieveOrInitializeWithKey:[resultSet stringForColumnIndex:0]];
@@ -900,10 +1010,10 @@ Deletes items, notes, and attachments
         FMResultSet* resultSet;
         
         if(collectionKey==NULL){
-            resultSet= [_database executeQuery: @"SELECT attachments.key,attachments.lastTimestamp,attachmentURL,attachmentType,attachmentTitle,attachmentLength,parentItemKey FROM attachments, items WHERE parentItemKey = items.key AND items.libraryID = ? ORDER BY attachments.lastTimestamp DESC",libraryID];
+            resultSet= [_database executeQuery: @"SELECT attachments.key,attachments.lastTimestamp,attachmentURL,attachmentType,attachmentTitle,attachmentLength,parentItemKey FROM attachments, items WHERE parentItemKey = items.key AND items.libraryID = ? AND attachmentURL IS NOT NULL ORDER BY attachments.lastTimestamp DESC",libraryID];
         }
         else{
-            resultSet= [_database executeQuery: @"SELECT attachments.key,attachments.lastTimestamp,attachmentURL,attachmentType,attachmentTitle,attachmentLength,parentItemKey FROM attachments, collectionItems WHERE parentItemKey = itemsKey AND collectionKey = ? ORDER BY attachments.lastTimestamp DESC",collectionKey];
+            resultSet= [_database executeQuery: @"SELECT attachments.key,attachments.lastTimestamp,attachmentURL,attachmentType,attachmentTitle,attachmentLength,parentItemKey FROM attachments, collectionItems WHERE parentItemKey = itemsKey AND collectionKey = ? AND attachmentURL IS NOT NULL ORDER BY attachments.lastTimestamp DESC",collectionKey];
         }
         
         while([resultSet next]){
@@ -936,7 +1046,7 @@ Deletes items, notes, and attachments
 - (void) addNotesToItem: (ZPZoteroItem*) item  {
     
     @synchronized(self){
-        FMResultSet* resultSet = [_database executeQuery: @"SELECT key,lastTimestamp FROM attachments WHERE parentItemKey = ? ",item.key];
+        FMResultSet* resultSet = [_database executeQuery: @"SELECT key,lastTimestamp FROM notes WHERE parentItemKey = ? ",item.key];
         
         NSMutableArray* notes = [[NSMutableArray alloc] init];
         while([resultSet next]) {
@@ -955,13 +1065,52 @@ Deletes items, notes, and attachments
     }
 }
 
+/*
+ Retrieves all item keys and note and attachment keys from the library
+ */
+
+- (NSArray*) getAllItemKeysForLibrary:(NSNumber*)libraryID{
+    
+    NSMutableArray* keys = [[NSMutableArray alloc] init];
+    
+    
+    NSString* sql = @"SELECT DISTINCT key, lastTimestamp FROM items UNION SELECT key, lastTimestamp FROM attachments UNION SELECT key, lastTimestamp FROM notes ORDER BY lastTimestamp DESC";
+    
+    @synchronized(self){
+        FMResultSet* resultSet;
+        
+        resultSet = [_database executeQuery: sql];
+        
+        while([resultSet next]) [keys addObject:[resultSet stringForColumnIndex:0]];
+        
+        [resultSet close];
+    }
+    
+    return keys;
+}
+
+- (NSString*) getFirstItemKeyWithTimestamp:(NSString*)timestamp from:(NSNumber*)libraryID{
+    @synchronized(self){
+        FMResultSet* resultSet;
+        NSString* sql = @"SELECT key FROM items WHERE lastTimestamp < ? and libraryID = ? LIMIT 1";
+        
+        resultSet = [_database executeQuery: sql, timestamp, libraryID];
+        
+        [resultSet next];
+        NSString* ret= [resultSet stringForColumnIndex:0];
+        [resultSet close];
+        return ret;
+    }
+    
+}
+
 - (NSArray*) getItemKeysForLibrary:(NSNumber*)libraryID collectionKey:(NSString*)collectionKey
                       searchString:(NSString*)searchString orderField:(NSString*)orderField sortDescending:(BOOL)sortDescending{
 
     NSMutableArray* keys = [[NSMutableArray alloc] init];
 
-    //Build the SQL query as a string first. This currently searches only in the full citation.
-
+    //Build the SQL query as a string first. 
+    
     NSString* sql = @"SELECT DISTINCT items.key FROM items";
     
     if(collectionKey!=NULL)

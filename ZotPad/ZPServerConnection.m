@@ -412,30 +412,6 @@ const NSInteger ZPServerConnectionRequestTopLevelKeys = 9;
 }
 
 
-
--(NSArray*) retrieveItemsFromLibrary:(NSNumber*)libraryID limit:(NSInteger)limit offset:(NSInteger)offset{
-    
-    
-    NSMutableDictionary* parameters = [NSMutableDictionary dictionaryWithObject:libraryID  forKey:@"libraryID"];
-
-    [parameters setObject:@"bib,json" forKey:@"content"];
-    [parameters setObject:@"apa" forKey:@"style"];
-    [parameters setObject:@"dateModified" forKey:@"order"];
-    [parameters setObject:@"desc" forKey:@"sort"];
-
-    if(offset!=0){
-        [parameters setObject:[NSString  stringWithFormat:@"%i",offset] forKey:@"start"];
-    }
-    if(limit!=0){
-        [parameters setObject:[NSString  stringWithFormat:@"%i",limit] forKey:@"limit"];
-    }
-    
-    ZPServerResponseXMLParser* parserDelegate =  [self makeServerRequest:ZPServerConnectionRequestItemsAndChildren withParameters:parameters];
-    
-    return parserDelegate.parsedElements;
-    
-}
-
 -(NSArray*) retrieveItemsFromLibrary:(NSNumber*)libraryID itemKeys:(NSArray*)keys {
     
     
@@ -445,19 +421,17 @@ const NSInteger ZPServerConnectionRequestTopLevelKeys = 9;
     [parameters setObject:@"apa" forKey:@"style"];
     [parameters setObject:[keys componentsJoinedByString:@","] forKey:@"itemKey"];
         
-    ZPServerResponseXMLParser* parserDelegate =  [self makeServerRequest:ZPServerConnectionRequestItems withParameters:parameters];
+    ZPServerResponseXMLParser* parserDelegate =  [self makeServerRequest:ZPServerConnectionRequestItemsAndChildren withParameters:parameters];
     
     return parserDelegate.parsedElements;
     
     
 }
--(NSArray*) retrieveNoteAndAttachmentKeysFromLibrary:(NSNumber*)libraryID{
+-(NSArray*) retrieveAllItemKeysFromLibrary:(NSNumber*)libraryID{
     
     NSMutableDictionary* parameters = [NSMutableDictionary dictionaryWithObject:libraryID  forKey:@"libraryID"];
-    
-    [parameters setObject:@"attachment || note" forKey:@"itemType"];
-    
-    
+    [parameters setObject:@"dateModified" forKey:@"order"];
+    [parameters setObject:@"desc" forKey:@"sort"];
     ZPServerResponseXMLParser* parserDelegate =  [self makeServerRequest:ZPServerConnectionRequestKeys withParameters:parameters];
     
     return parserDelegate.parsedElements;

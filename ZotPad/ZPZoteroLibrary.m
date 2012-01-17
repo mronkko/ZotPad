@@ -7,6 +7,7 @@
 //
 
 #import "ZPZoteroLibrary.h"
+#import "ZPDatabase.h"
 
 @implementation ZPZoteroLibrary
 
@@ -26,6 +27,7 @@ static NSCache* _objectCache = NULL;
         obj->_libraryID=libraryID;
         [_objectCache setObject:obj  forKey:libraryID];
     }
+    
     return obj;
 }
 

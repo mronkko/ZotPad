@@ -30,6 +30,5 @@
 - (void) setParentKey:(NSString*)key;
 - (NSString*) fileSystemPath;
 - (BOOL) fileExists;
-+(id) retrieveOrInitializeWithKey:(NSString*) key;
 
 @end

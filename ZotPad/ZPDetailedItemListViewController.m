@@ -10,7 +10,6 @@
 #import "ZPDetailedItemListViewController.h"
 #import "ZPLibraryAndCollectionListViewController.h"
 #import "ZPDataLayer.h"
-#import "ZPCacheController.h"
 #import "../DSActivityView/Sources/DSActivityView.h"
 #import "ZPFileThumbnailAndQuicklookController.h"
 
@@ -114,13 +113,17 @@ static ZPDetailedItemListViewController* _instance = nil;
         //TODO: Uncommenting thic causes the thread to crash. Investigate why. After this uncomment also the reload sections earlier.
         //[_tableView reloadSections:[NSIndexSet indexSetWithIndex:0] withRowAnimation:UITableViewRowAnimationAutomatic];
         [_tableView reloadData];
+        
+        //We do not need to observe for new item events if we do not have a list of unknown keys available
+        [[ZPDataLayer instance] removeItemObserver:self];
+
     }
     
     //TODO: HIGH PRIORITY - MAKE THESE RUN IN AN NSOPERATION QUEUE THAT ONLY SUPPORTS A LIMITED NUMBER OF PARALLEL RETRIEVALS AND CANCELS
     
     // Queue an operation to retrieve all item keys that belong to this collection but are not found in cache. 
-    [self performSelectorInBackground:@selector(_configureUncachedKeys:) withObject:_itemKeysShown];
-    
+    [[ZPDataLayer instance] uncachedItemKeysForView:self];
+
     if([_itemKeysShown count] == 0){
         [self performSelectorOnMainThread:@selector(_makeBusy) withObject:NULL waitUntilDone:YES];
     }
@@ -138,24 +141,20 @@ static ZPDetailedItemListViewController* _instance = nil;
     _activityView = NULL;
 }
 
-- (void) _configureUncachedKeys:(NSArray*)itemKeyList{
-    
-    NSArray* uncachedItems = [[ZPCacheController instance] uncachedItemKeysForLibrary:self.libraryID collection:self.collectionKey                                                                          searchString:[self.searchString stringByTrimmingCharactersInSet:[NSCharacterSet whitespaceAndNewlineCharacterSet]]orderField:self.orderField sortDescending:self.sortDescending];
-    
+- (void) configureUncachedKeys:(NSArray*)uncachedItems{
+        
     //Only update the uncached keys if we are still showing the same item key list
-    if(itemKeyList==_itemKeysShown){
-        [_itemKeysNotInCache addObjectsFromArray:uncachedItems];
-        if([_itemKeysShown count] ==0){
-            [self _performTableUpdates];
-            [self performSelectorOnMainThread:@selector(_makeAvailable) withObject:NULL waitUntilDone:YES];
-        }
-        else{
-            [self _performTableUpdates];
-
-        }
-        [[ZPDataLayer instance] registerItemObserver:self];
-
+    [_itemKeysNotInCache addObjectsFromArray:uncachedItems];
+    if([_itemKeysShown count] ==0){
+        [self _performTableUpdates];
+        [self performSelectorOnMainThread:@selector(_makeAvailable) withObject:NULL waitUntilDone:YES];
     }
+    else{
+        [self _performTableUpdates];
+        
+    }
+    [[ZPDataLayer instance] registerItemObserver:self];
+
     
 }
 
@@ -350,7 +349,7 @@ static ZPDetailedItemListViewController* _instance = nil;
 - (void)searchBarSearchButtonClicked:(UISearchBar *)sourceSearchBar{
     
     if(![[sourceSearchBar text] isEqualToString:_searchString]){
-        _searchString = [sourceSearchBar text];
+        _searchString = [[sourceSearchBar text] stringByTrimmingCharactersInSet:[NSCharacterSet whitespaceAndNewlineCharacterSet]];
         [self configureView];
     }
     [sourceSearchBar resignFirstResponder ];

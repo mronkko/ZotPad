@@ -37,8 +37,11 @@
 - (NSString*) fileSystemPath{
     
     NSRange lastPeriod = [_attachmentTitle rangeOfString:@"." options:NSBackwardsSearch];
-    NSString *path = [_attachmentTitle stringByReplacingCharactersInRange:lastPeriod
-                                                                    withString:[NSString stringWithFormat:@".%@.",_key]];
+    
+    NSString* path;
+    if(lastPeriod.location == NSNotFound) path = [_attachmentTitle stringByAppendingFormat:@"_",_key];
+    else path = [_attachmentTitle stringByReplacingCharactersInRange:lastPeriod
+                                                                    withString:[NSString stringWithFormat:@"_%@.",_key]];
     return  [[NSSearchPathForDirectoriesInDomains(NSDocumentDirectory, NSUserDomainMask, YES) objectAtIndex:0] stringByAppendingPathComponent:path];
 
 }
