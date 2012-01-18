@@ -7,6 +7,7 @@
 //
 
 #import "ZPZoteroCollection.h"
+#import "ZPDatabase.h";
 
 @implementation ZPZoteroCollection
 
@@ -27,10 +28,16 @@ static NSCache* _objectCache = NULL;
     if(obj==NULL){
         obj= [[ZPZoteroCollection alloc] init];
         obj->_key = key;
+        [[ZPDatabase instance] addFieldsToCollection:obj];
         [_objectCache setObject:obj  forKey:key];
     }
     return obj;
 }
+
++(void) dropCache{
+    [_objectCache removeAllObjects];
+}
+
 
 -(NSString*) collectionKey{
     return _key;

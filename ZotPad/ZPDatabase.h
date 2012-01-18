@@ -11,6 +11,7 @@
 #import "ZPZoteroNote.h"
 #import "ZPZoteroAttachment.h"
 #import "ZPZoteroLibrary.h"
+#import "ZPZoteroCollection.h"
 
 #import "../FMDB/src/FMDatabase.h"
 #import "../FMDB/src/FMResultSet.h"
@@ -42,6 +43,10 @@
                       searchString:(NSString*)searchString orderField:(NSString*)orderField sortDescending:(BOOL)sortDescending;
 
 - (NSString*) getFirstItemKeyWithTimestamp:(NSString*)timestamp from:(NSNumber*)libraryID;
+
+
+- (void) addFieldsToLibrary:(ZPZoteroLibrary*) library;
+- (void) addFieldsToCollection:(ZPZoteroCollection*) collection;
 
 
 - (void) addCreatorsToItem: (ZPZoteroItem*) item;

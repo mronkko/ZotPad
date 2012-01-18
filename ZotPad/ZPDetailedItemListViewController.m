@@ -119,7 +119,6 @@ static ZPDetailedItemListViewController* _instance = nil;
 
     }
     
-    //TODO: HIGH PRIORITY - MAKE THESE RUN IN AN NSOPERATION QUEUE THAT ONLY SUPPORTS A LIMITED NUMBER OF PARALLEL RETRIEVALS AND CANCELS
     
     // Queue an operation to retrieve all item keys that belong to this collection but are not found in cache. 
     [[ZPDataLayer instance] uncachedItemKeysForView:self];
@@ -167,7 +166,6 @@ static ZPDetailedItemListViewController* _instance = nil;
     
     UITableViewCell* cell = [_cellCache objectForKey:keyObj];
     
-    //TODO: Do not allocate any UI elements in this method, but specify them in the story board
     
     if(cell==nil){
         
@@ -182,57 +180,36 @@ static ZPDetailedItemListViewController* _instance = nil;
 
             //Publication as a formatted label
 
-            NSString* publishedIn = item.publishedIn;
             
-            if(publishedIn == NULL){
-                publishedIn=@"";   
-            }
-            
-            //Does this cell already have a TTStyledTextLabel
-            NSEnumerator* e = [[cell subviews] objectEnumerator];
+            TTStyledTextLabel* publishedInLabel = (TTStyledTextLabel*) [cell viewWithTag:3];
 
-            TTStyledTextLabel* publishedInLabel;
-
-            NSObject* subView;
-            while(subView = [e nextObject]){
-                if([subView isKindOfClass:[TTStyledTextLabel class]]){
-                    publishedInLabel = (TTStyledTextLabel*) subView;
-                    break;
-                }
+            if( item.publishedIn == NULL){
+                [publishedInLabel setHidden:TRUE];
             }
-            //Get the authors label so that we can align publication details label with it
-            UILabel *authorsLabel = (UILabel *)[cell viewWithTag:2];
-            
-            if(publishedInLabel == NULL){
-                CGRect frame = CGRectMake(CGRectGetMinX(authorsLabel.frame),CGRectGetMaxY(authorsLabel.frame),CGRectGetWidth(cell.frame)-CGRectGetMinX(authorsLabel.frame),CGRectGetHeight(cell.frame)-CGRectGetMaxY(authorsLabel.frame)-2);
-                publishedInLabel = [[TTStyledTextLabel alloc] 
-                                            initWithFrame:frame];
+            else{
+                [publishedInLabel setHidden:FALSE];
+                
+                //TODO: Could these two be configured in storyboard?
+                
                 [publishedInLabel setFont:[UIFont systemFontOfSize:12]];
                 [publishedInLabel setClipsToBounds:TRUE];
-                [cell addSubview:publishedInLabel];
-            }
-            TTStyledText* text = [TTStyledText textFromXHTML:[publishedIn stringByReplacingOccurrencesOfString:@" & " 
+                TTStyledText* text = [TTStyledText textFromXHTML:[item.publishedIn stringByReplacingOccurrencesOfString:@" & " 
                                                                                                     withString:@" &amp; "] lineBreaks:YES URLs:NO];
-            [publishedInLabel setText:text];
-            
-
-            UIView* articleThumbnailHolder = (UIView *) [cell viewWithTag:4];
-
-            //Remove all subviews
-            for (UIView *view in  articleThumbnailHolder.subviews) {
-                [view removeFromSuperview];
+                [publishedInLabel setText:text];
             }
-            
+
+            UIButton* articleThumbnail = (UIButton *) [cell viewWithTag:4];
+
              //Check if the item has attachments and render a thumbnail from the first attachment PDF
              
             if([item.attachments count] > 0){
 
-                UIButton* button = [[UIButton alloc] init];
-                [articleThumbnailHolder addSubview:button];
-                button.frame = articleThumbnailHolder.frame;
+                [articleThumbnail setHidden:FALSE];
+                [_buttonController configureButton:articleThumbnail withAttachment:[item.attachments objectAtIndex:0]];
                 
-                [_buttonController configureButton:button withAttachment:[item.attachments objectAtIndex:0]];
-                
+            }
+            else{
+                [articleThumbnail setHidden:TRUE];
             }
         }
         [_cellCache setObject:cell forKey:keyObj];

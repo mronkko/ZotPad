@@ -14,6 +14,10 @@
 
 static NSCache* localizationCache = NULL;
 
++ (void) dropCache{
+    [localizationCache removeAllObjects];
+}
+
 + (NSString*) getLocalizationStringWithKey:(NSString*) key type:(NSString*) type locale:(NSString*) locale{
     
     if(localizationCache == NULL) localizationCache = [[NSCache alloc] init ];

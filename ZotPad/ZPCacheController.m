@@ -112,7 +112,7 @@ static ZPCacheController* _instance = nil;
     
     //Initialize OperationQueues for retrieving data from server and writing it to cache
     _serverRequestQueue = [[NSOperationQueue alloc] init];
-    [_serverRequestQueue setMaxConcurrentOperationCount:10];
+    [_serverRequestQueue setMaxConcurrentOperationCount:4];
 
     _fileDownloadQueue  = [[NSOperationQueue alloc] init];
     [_fileDownloadQueue  setMaxConcurrentOperationCount:2];

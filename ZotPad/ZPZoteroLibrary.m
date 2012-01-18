@@ -25,10 +25,15 @@ static NSCache* _objectCache = NULL;
     if(obj==NULL){
         obj= [[ZPZoteroLibrary alloc] init];
         obj->_libraryID=libraryID;
+        [[ZPDatabase instance] addFieldsToLibrary:obj];
         [_objectCache setObject:obj  forKey:libraryID];
     }
     
     return obj;
+}
+
++(void) dropCache{
+    [_objectCache removeAllObjects];
 }
 
 - (NSNumber*) libraryID{

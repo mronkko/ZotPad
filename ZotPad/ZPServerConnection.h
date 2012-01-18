@@ -21,8 +21,6 @@
         
     NSInteger _activeRequestCount;
     
-    NSMutableDictionary* _attachmentFileDataObjectsByConnection;
-    NSMutableDictionary* _attachmentObjectsByConnection;
 }
 
 // This class is used as a singleton

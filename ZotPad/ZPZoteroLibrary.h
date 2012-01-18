@@ -13,6 +13,6 @@
 }
 
 +(ZPZoteroLibrary*) ZPZoteroLibraryWithID:(NSNumber*) libraryID;
-
++(void) dropCache;
 
 @end

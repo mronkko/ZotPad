@@ -17,6 +17,7 @@
 -(NSString*) collectionKey;
 
 +(ZPZoteroCollection*) ZPZoteroCollectionWithKey:(NSString*) key;
++(void) dropCache;
 
 
 @end

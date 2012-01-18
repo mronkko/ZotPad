@@ -23,8 +23,6 @@
 @synthesize numChildren = _numChildren;
 @synthesize numTags = _numTags;
 
-//TODO: HIGH PRIORITY - IMPLEMENT DELETING ITEMS FROM CACHE WHEN MEMORY ALERT IS RECEIVED
-
 //Timestamp uses a custom setter because it is used to determine if the item needs to be written in cache
 
 -(NSString*) lastTimestamp{
@@ -57,6 +55,13 @@ static NSCache* _objectCache = NULL;
         
 }
 
+-(id) init{
+    self = [super init];
+    _isStandaloneAttachment = FALSE;
+    _isStandaloneNote = FALSE;
+    return self;
+}
+
 +(id) retrieveOrInitializeWithKey:(NSString*) key{
     
     if(key == NULL)
@@ -85,6 +90,10 @@ static NSCache* _objectCache = NULL;
     return obj;
 }
 
++(void) dropCache{
+    [_objectCache removeAllObjects];
+}
+
 -(NSString*)key{
     return _key;
 }
@@ -101,13 +110,27 @@ static NSCache* _objectCache = NULL;
 }
 
 - (NSArray*) attachments{
+    
+    if(_isStandaloneAttachment) return [NSArray arrayWithObject:self];
+    
     if(_attachments == NULL){
         [[ZPDatabase instance] addAttachmentsToItem:self];
     }
     return _attachments;
 }
 - (void) setAttachments:(NSArray *)attachments{
-    _attachments = attachments;
+    
+    // If there is only one attachment that has the same key as this, mark this
+    // as a standalone attachment instead of storing an array with reference
+    // to self. Storing an array would create a circular retain reference
+    // and prevent deallocating memory of this object
+    
+    if([attachments count]==1 && [[(ZPZoteroItem*) [attachments objectAtIndex:0] key] isEqualToString: _key]){
+        _isStandaloneAttachment = TRUE;
+    }
+    else{
+        _attachments = attachments;
+    }
 }
 
 - (NSDictionary*) fields{
@@ -135,6 +158,8 @@ static NSCache* _objectCache = NULL;
 }
 
 - (NSArray*) notes{
+    if(_isStandaloneNote) return [NSArray arrayWithObject:self];
+    
     if(_notes == NULL){
         //TODO: Implement notes
         //[[ZPDatabase instance] addNotesItem:self];
@@ -142,6 +167,19 @@ static NSCache* _objectCache = NULL;
     return _notes;
 }
 - (void) setNotes:(NSArray*)notes{
+
+    // If there is only one note that has the same key as this, mark this
+    // as a standalone note instead of storing an array with reference
+    // to self. Storing an array would create a circular retain reference
+    // and prevent deallocating memory of this object
+    
+    if([notes count]==1 && [[(ZPZoteroItem*) [notes objectAtIndex:0] key] isEqualToString: _key]){
+        _isStandaloneNote = TRUE;
+    }
+    else{
+        _notes = notes;
+    }
+
     _notes = notes;
 }
 

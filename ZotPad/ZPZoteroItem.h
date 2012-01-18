@@ -33,7 +33,8 @@
     NSString* _lastTimestamp;
 
     BOOL _needsToBeWrittenToCache;
-
+    BOOL _isStandaloneAttachment;
+    BOOL _isStandaloneNote;
 }
 
 @property (retain) NSString* title;
@@ -60,5 +61,8 @@
 -(void) clearNeedsToBeWrittenToCache;
 //-(ZPZoteroAttachment*) firstExistingAttachment;
 -(NSArray*) allExistingAttachments;
+
++(void) dropCache;
+
 
 @end

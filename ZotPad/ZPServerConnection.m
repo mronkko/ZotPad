@@ -70,8 +70,6 @@ const NSInteger ZPServerConnectionRequestTopLevelKeys = 9;
     self = [super init];
         
     _activeRequestCount = 0;
-    _attachmentFileDataObjectsByConnection = [NSMutableDictionary dictionary];
-    _attachmentObjectsByConnection = [NSMutableDictionary dictionary];
 
     return self;
 }

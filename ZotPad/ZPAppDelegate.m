@@ -10,7 +10,7 @@
 #import "ZPCacheController.h"
 #import "ZPPreferences.h"
 #import "ZPLogger.h"
-
+#import "ZPLocalization.h"
 
 @implementation ZPAppDelegate
 
@@ -37,7 +37,14 @@
     
     return YES;
 }
-							
+
+- (void)applicationDidReceiveMemoryWarning:(UIApplication *)application{
+    [ZPZoteroItem dropCache];
+    [ZPZoteroCollection dropCache];
+    [ZPZoteroLibrary dropCache];
+    [ZPLocalization dropCache];
+}
+
 - (void)applicationWillResignActive:(UIApplication *)application
 {
     /*

@@ -11,5 +11,6 @@
 @interface ZPLocalization : NSObject
 
 + (NSString*) getLocalizationStringWithKey:(NSString*) key type:(NSString*) type locale:(NSString*) locale;
++ (void) dropCache;
 
 @end

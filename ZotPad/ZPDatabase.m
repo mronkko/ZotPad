@@ -67,10 +67,12 @@ static ZPDatabase* _instance = nil;
 
 +(ZPDatabase*) instance {
     if([[ZPPreferences instance] useCache]){
-        if(_instance == NULL){
-            _instance = [[ZPDatabase alloc] init];
+        @synchronized(self){
+            if(_instance == NULL){
+                _instance = [[ZPDatabase alloc] init];
+            }
+            return _instance;
         }
-        return _instance;
     }
     else return NULL;
 }
@@ -137,7 +139,8 @@ static ZPDatabase* _instance = nil;
         while([resultSet next]){
             if([resultSet stringForColumnIndex:1] != NULL) [timestamps setObject:[resultSet stringForColumnIndex:1] forKey:[NSNumber numberWithInt:[resultSet intForColumnIndex:0]]];
         }
-              
+        [resultSet close];
+        
         [_database executeUpdate:@"DELETE FROM groups WHERE groupID != 1"];
 
     
@@ -317,98 +320,133 @@ Deletes items, notes, and attachments
 
 
 // Methods for retrieving data from the data layer
+
+//TODO: Optimize so that the results from the query can be used when initializing library objects
+
 - (NSArray*) libraries{
     NSMutableArray *returnArray = [[NSMutableArray alloc] init];
+    NSMutableArray* keyArray = [[NSMutableArray alloc] init];
     
     //Group libraries
     @synchronized(self){
         
-        FMResultSet* resultSet = [_database executeQuery:@"SELECT groupID, title,  groupID IN (SELECT DISTINCT libraryID from collections) AS hasChildren, lastCompletedCacheTimestamp FROM groups"];
-		
+        FMResultSet* resultSet = [_database executeQuery:@"SELECT groupID FROM groups"];
+
         
         while([resultSet next]) {
-            
-            NSInteger libraryID = [resultSet intForColumnIndex:0];
-            NSString* name = [resultSet stringForColumnIndex:1];
-            BOOL hasChildren = [resultSet boolForColumnIndex:2];
-            
-            ZPZoteroLibrary* thisLibrary = [ZPZoteroLibrary ZPZoteroLibraryWithID:[NSNumber numberWithInt:libraryID]];
-            [thisLibrary setTitle: name];
-            [thisLibrary setHasChildren:hasChildren];
-            [thisLibrary setLastCompletedCacheTimestamp:[resultSet stringForColumnIndex:3]];
-            [returnArray addObject:thisLibrary];
+            [keyArray addObject:[NSNumber numberWithInt:[resultSet intForColumnIndex:0]]];
+        }
+        [resultSet close];
+    }
+    for(NSNumber* key in keyArray){
+        [returnArray addObject:[ZPZoteroLibrary ZPZoteroLibraryWithID:key]];
+    }
+
+	return returnArray;
+}
+
+- (void) addFieldsToLibrary:(ZPZoteroLibrary*) library{
+    //Group libraries
+    @synchronized(self){
+        
+        FMResultSet* resultSet = [_database executeQuery:@"SELECT title,  groupID IN (SELECT DISTINCT libraryID from collections) AS hasChildren, lastCompletedCacheTimestamp FROM groups WHERE groupID = ?",library.libraryID];
+		
+        
+        if([resultSet next]){
+        
+            NSString* name = [resultSet stringForColumnIndex:0];
+            BOOL hasChildren = [resultSet boolForColumnIndex:1];
+        
+            [library setTitle: name];
+            [library setHasChildren:hasChildren];
+            [library setLastCompletedCacheTimestamp:[resultSet stringForColumnIndex:2]];
         }
         [resultSet close];
         
     }
-	return returnArray;
 }
+
 
 - (NSArray*) collectionsForLibrary : (NSNumber*)libraryID withParentCollection:(NSString*)collectionKey {
 	
     
     
-    NSMutableArray* returnArray;
+    NSMutableArray* returnArray = [[NSMutableArray alloc] init];
+    NSMutableArray* keyArray = [[NSMutableArray alloc] init];
     
 	@synchronized(self){
         
         FMResultSet* resultSet;
         if(collectionKey == NULL)
-            resultSet= [_database executeQuery:@"SELECT key, title, key IN (SELECT DISTINCT parentCollectionKey FROM collections WHERE libraryID=?) AS hasChildren, lastCompletedCacheTimestamp FROM collections WHERE libraryID=? AND parentCollectionKey IS NULL",libraryID,libraryID];
+            resultSet= [_database executeQuery:@"SELECT key FROM collections WHERE libraryID=? AND parentCollectionKey IS NULL",libraryID,libraryID];
         
         else
-            resultSet= [_database executeQuery:@"SELECT key, title, key IN (SELECT DISTINCT parentCollectionKey FROM collections WHERE libraryID=?) AS hasChildren, lastCompletedCacheTimestamp FROM collections WHERE libraryID=? AND parentCollectionKey = ?",libraryID,libraryID,collectionKey];
+            resultSet= [_database executeQuery:@"SELECT key FROM collections WHERE libraryID=? AND parentCollectionKey = ?",libraryID,libraryID,collectionKey];
         
         
         
         returnArray = [[NSMutableArray alloc] init];
         
         while([resultSet next]) {
-            
-            
-            ZPZoteroCollection* thisCollection = [ZPZoteroCollection ZPZoteroCollectionWithKey:[resultSet stringForColumnIndex:0]];
-            [thisCollection setLibraryID : libraryID];
-            [thisCollection setTitle : [resultSet stringForColumnIndex:1]];
-            [thisCollection setHasChildren:(BOOL) [resultSet intForColumnIndex:2]];
-            [thisCollection setLastCompletedCacheTimestamp:[resultSet stringForColumnIndex:3]];
-            
-            [returnArray addObject:thisCollection];
-            
+            [keyArray addObject:[resultSet stringForColumnIndex:0]];
+                
         }
         [resultSet close];
         
-        
 	}
-    
+
+    for(NSString* key in keyArray){
+        [returnArray addObject:[ZPZoteroCollection ZPZoteroCollectionWithKey:key]];
+    }
 	return returnArray;
 }
 
 
 - (NSArray*) allCollectionsForLibrary:(NSNumber*)libraryID{	
 
-    NSMutableArray* returnArray;
+    NSMutableArray* returnArray = [[NSMutableArray alloc] init];;
+    NSMutableArray* keyArray = [[NSMutableArray alloc] init];
     
     //TODO: Refactor: Make a method that takes a row from resulset and then creates an object from it.
     // resultDict method in FMResultSet is probably useful for this
     
 	@synchronized(self){
-        FMResultSet* resultSet = [_database executeQuery:@"SELECT key, lastCompletedCacheTimestamp FROM collections WHERE libraryID=?",libraryID];
-        
-        
-        
-        returnArray = [[NSMutableArray alloc] init];
-        
+        FMResultSet* resultSet = [_database executeQuery:@"SELECT key FROM collections WHERE libraryID=?",libraryID];
+
         while([resultSet next]) {
-            ZPZoteroCollection* thisCollection = [ZPZoteroCollection ZPZoteroCollectionWithKey:[resultSet stringForColumnIndex:0]];
-            [thisCollection setLastCompletedCacheTimestamp:[resultSet stringForColumnIndex:1]];
-            [returnArray addObject:thisCollection];
-            
+            [keyArray addObject:[resultSet stringForColumnIndex:0]];
         }
         [resultSet close];
-	}
+    }
+
+    for(NSString* key in keyArray){
+        [returnArray addObject:[ZPZoteroCollection ZPZoteroCollectionWithKey:key]];
+    }
     
 	return returnArray;
 }
+
+- (void) addFieldsToCollection:(ZPZoteroCollection*) collection{
+    
+    
+	@synchronized(self){
+        FMResultSet* resultSet = [_database executeQuery:@"SELECT libraryID, title, key IN (SELECT DISTINCT parentCollectionKey FROM collections) AS hasChildren, lastCompletedCacheTimestamp, parentCollectionKey FROM collections WHERE key=?",collection.collectionKey];
+        
+        
+        if([resultSet next]){
+        
+            [collection setLibraryID : [NSNumber numberWithInt:[resultSet intForColumnIndex:0]]];
+            [collection setTitle : [resultSet stringForColumnIndex:1]];
+            [collection setHasChildren:(BOOL) [resultSet intForColumnIndex:2]];
+            [collection setLastCompletedCacheTimestamp:[resultSet stringForColumnIndex:3]];
+            [collection setParentCollectionKey:[resultSet stringForColumnIndex:3]];
+        }
+        
+        [resultSet close];
+    
+    }
+}
+
 
 
 -(NSArray*) addItemsToDatabase:(NSArray*)items {
@@ -1092,7 +1130,7 @@ Deletes items, notes, and attachments
 - (NSString*) getFirstItemKeyWithTimestamp:(NSString*)timestamp from:(NSNumber*)libraryID{
     @synchronized(self){
         FMResultSet* resultSet;
-        NSString* sql = @"SELECT key FROM items WHERE lastTimestamp < ? and libraryID = ? LIMIT 1";
+        NSString* sql = @"SELECT key FROM items WHERE lastTimestamp <= ? and libraryID = ? LIMIT 1 ORDER BY lastTimestamp DESC";
         
         resultSet = [_database executeQuery: sql, timestamp, libraryID];
         
