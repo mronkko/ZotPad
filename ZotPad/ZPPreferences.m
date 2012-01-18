@@ -95,7 +95,7 @@ static ZPPreferences* _instance = nil;
         //TODO: Run in background thread
         NSLog(@"Reseting files");
         [defaults removeObjectForKey:@"resetfiles"];
-        [[ZPCacheController instance] purgeAllAttachmentFilesFromCache];
+        [[ZPCacheController instance] performSelectorInBackground:@selector(purgeAllAttachmentFilesFromCache) withObject:NULL];
     }
 
 }

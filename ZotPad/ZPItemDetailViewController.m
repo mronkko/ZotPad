@@ -15,6 +15,8 @@
 #import "ZPFileThumbnailAndQuicklookController.h"
 #import "ZPLogger.h"
 
+#import "ZPPreferences.h"
+
 #define ATTACHMENT_VIEW_HEIGHT 680
 
 #define ATTACHMENT_IMAGE_HEIGHT 600
@@ -119,16 +121,17 @@
 -(void) configureWithItemKey:(NSString*)key{
     
     _currentItem = [ZPZoteroItem retrieveOrInitializeWithKey: key];
-    [_activityIndicator startAnimating];
-    [[ZPDataLayer instance] updateItemDetailsFromServer:_currentItem];
 
-    // Get the selected row from the item list
-    NSUInteger indexArr[] = {0,[_itemListController.itemKeysShown indexOfObject:key]};
-    NSIndexPath* indexPath = [NSIndexPath indexPathWithIndexes:indexArr length:2];
+    //TODO: This object should probably be recycled.
     
-    //Set the selected row to match the current row
-    [[_itemListController tableView] selectRowAtIndexPath:indexPath animated:FALSE scrollPosition:UITableViewScrollPositionMiddle];
+    _previewController = [[ZPFileThumbnailAndQuicklookController alloc] initWithItem:_currentItem viewController:self maxHeight:ATTACHMENT_IMAGE_HEIGHT maxWidth:ATTACHMENT_IMAGE_WIDTH];
 
+    
+    if([[ZPPreferences instance] online]){
+        [_activityIndicator startAnimating];
+        [[ZPDataLayer instance] updateItemDetailsFromServer:_currentItem];
+    }
+        
         
     [self _reconfigureDetailTableView];
     [self _reconfigureAttachmentsCarousel];
@@ -145,9 +148,10 @@
         self.navigationItem.title=_currentItem.title;
     }
     
-    _previewController = [[ZPFileThumbnailAndQuicklookController alloc] initWithItem:_currentItem viewController:self maxHeight:ATTACHMENT_IMAGE_HEIGHT maxWidth:ATTACHMENT_IMAGE_WIDTH];
 
 }
+
+//TODO: Recycle these views
 
 -(void) _reconfigureAttachmentsCarousel{
     

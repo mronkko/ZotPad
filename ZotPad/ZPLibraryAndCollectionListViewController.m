@@ -15,6 +15,8 @@
 #import "ZPZoteroLibrary.h"
 #import "ZPCacheController.h"
 #import "ZPLogger.h"
+#import "ZPPreferences.h"
+
 
 @interface ZPLibraryAndCollectionListViewController();
 -(void) _refreshLibrariesAndCollections;
@@ -56,7 +58,6 @@ static ZPLibraryAndCollectionListViewController* _instance = nil;
     _instance= self;
     
     _activityIndicator = [[UIActivityIndicatorView alloc] initWithFrame:CGRectMake(0,0,20, 20)];
-    [_activityIndicator startAnimating];
     [_activityIndicator hidesWhenStopped];
     UIBarButtonItem* barButton = [[UIBarButtonItem alloc] initWithCustomView:_activityIndicator];
     self.navigationItem.rightBarButtonItem = barButton;
@@ -84,8 +85,10 @@ static ZPLibraryAndCollectionListViewController* _instance = nil;
 }
 
 -(void) _refreshLibrariesAndCollections {
-    [_activityIndicator startAnimating];
-    [[ZPCacheController instance] updateLibrariesAndCollectionsFromServer];
+    if([[ZPPreferences instance] online]){
+        [_activityIndicator startAnimating];
+        [[ZPCacheController instance] updateLibrariesAndCollectionsFromServer];
+    }
 }
 //TODO: Instead of realoding everything, this method should just add or update the library that it receives
 

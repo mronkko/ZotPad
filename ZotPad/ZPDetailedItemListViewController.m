@@ -13,13 +13,14 @@
 #import "../DSActivityView/Sources/DSActivityView.h"
 #import "ZPFileThumbnailAndQuicklookController.h"
 
+#import "ZPPreferences.h"
+
 #import "ZPLogger.h"
 
 @interface ZPDetailedItemListViewController (){
     ZPFileThumbnailAndQuicklookController* _buttonController;
 }
 
-- (void) _configureUncachedKeys:(NSArray*)itemKeyList;
 - (void)_makeBusy;
 - (void)_makeAvailable;
 - (void) _configureCachedKeys;
@@ -74,7 +75,6 @@ static ZPDetailedItemListViewController* _instance = nil;
             
             [_activityIndicator startAnimating];
             
-            
             //This is required because a background thread might be modifying the table
              @synchronized(_tableView){
                  _itemKeysNotInCache = [NSMutableArray array];
@@ -82,6 +82,7 @@ static ZPDetailedItemListViewController* _instance = nil;
                  //TODO: Investigate why a relaodsection call a bit below causes a crash. Then uncomment these both.
                  //[_tableView reloadSections:[NSIndexSet indexSetWithIndex:0] withRowAnimation:UITableViewRowAnimationAutomatic];
                  [_tableView reloadData];
+                 
              }
 
 
@@ -119,14 +120,17 @@ static ZPDetailedItemListViewController* _instance = nil;
 
     }
     
-    
-    // Queue an operation to retrieve all item keys that belong to this collection but are not found in cache. 
-    [[ZPDataLayer instance] uncachedItemKeysForView:self];
+    if([[ZPPreferences instance] online]){
+        // Queue an operation to retrieve all item keys that belong to this collection but are not found in cache. 
+        [[ZPDataLayer instance] uncachedItemKeysForView:self];
 
-    if([_itemKeysShown count] == 0){
-        [self performSelectorOnMainThread:@selector(_makeBusy) withObject:NULL waitUntilDone:YES];
+        if([_itemKeysShown count] == 0){
+            [self performSelectorOnMainThread:@selector(_makeBusy) withObject:NULL waitUntilDone:YES];
+        }
     }
-    
+    else{
+        [_activityIndicator stopAnimating];
+    }
 }
 
 /*
@@ -203,6 +207,9 @@ static ZPDetailedItemListViewController* _instance = nil;
              //Check if the item has attachments and render a thumbnail from the first attachment PDF
              
             if([item.attachments count] > 0){
+                [articleThumbnail removeTarget:nil 
+                                        action:NULL 
+                              forControlEvents:UIControlEventAllEvents];
 
                 [articleThumbnail setHidden:FALSE];
                 [_buttonController configureButton:articleThumbnail withAttachment:[item.attachments objectAtIndex:0]];

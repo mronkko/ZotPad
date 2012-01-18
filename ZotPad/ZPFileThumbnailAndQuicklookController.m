@@ -15,8 +15,9 @@
 #import "ZPItemDetailViewController.h"
 #import "ZPServerConnection.h"
 
-#import "ZPLogger.h"
+#import "ZPPreferences.h"
 
+#import "ZPLogger.h"
 
 
 @interface ZPFileThumbnailAndQuicklookController(){
@@ -66,16 +67,20 @@ static NSCache* _fileTypeImageCache;
 
 -(void) buttonTapped:(id)sender{
     
+    
     //Get the table cell.
     UITableViewCell* cell = (UITableViewCell* )[[[sender superview] superview] superview];
-
+    
     //Get the row of this cell
     NSInteger row = [[(ZPSimpleItemListViewController*) _viewController tableView] indexPathForCell:cell].row;
     
     ZPZoteroItem* item = [ZPZoteroItem retrieveOrInitializeWithKey:[[(ZPSimpleItemListViewController*) _viewController itemKeysShown] objectAtIndex:row]];
     
     _currentAttachment = [item.attachments objectAtIndex:0];
-    [self openInQuickLookWithAttachment:_currentAttachment];
+    if(_currentAttachment.fileExists || [[ZPPreferences instance] online]){
+        [self openInQuickLookWithAttachment:_currentAttachment];
+        
+    }
 }
 
 #pragma mark QuickLook delegate methods
@@ -96,13 +101,18 @@ static NSCache* _fileTypeImageCache;
 
 -(void) openInQuickLookWithAttachment:(ZPZoteroAttachment*) attachment{
 
-    //Mark these items as recently viewed
+    // Mark these items as recently viewed. This will be done also in the case
+    // that the file cannot be downloaded because the fact that user tapped an
+    //item is still relevant information for the cache controller
+    
     _item = [ZPZoteroItem retrieveOrInitializeWithKey:attachment.parentItemKey];
     for(ZPZoteroAttachment* attachment in [_item allExistingAttachments]){
         [[ZPDatabase instance] updateViewedTimestamp:attachment];
     }
 
-    if(! attachment.fileExists) [self _downloadWithProgressAlert:attachment];
+    if(! attachment.fileExists){
+        if([[ZPPreferences instance] online]) [self _downloadWithProgressAlert:attachment];
+    }
     else {
         
         QLPreviewController *quicklook = [[QLPreviewController alloc] init];
@@ -167,22 +177,32 @@ static NSCache* _fileTypeImageCache;
     return image;
 }
 
-//TODO: Consider recycling the uibutton and uiimageview objects
 
 -(void) configureButton:(UIButton*) button withAttachment:(ZPZoteroAttachment*)attachment{
 
-    //We can cancel everything in the image render queue because images are not show
-    [_imageRenderQueue cancelAllOperations];
     
     UIImage* image = [self _getFiletypeImage:attachment];
     [button setImage:image forState:UIControlStateNormal];
     [button setNeedsDisplay];
     
-    [button addTarget:self action:@selector(buttonTapped:) 
-     forControlEvents:UIControlEventTouchUpInside];
-
+    if(attachment.fileExists || [[ZPPreferences instance] online]){
+        [button setAlpha:1];
+        [button addTarget:self action:@selector(buttonTapped:) 
+            forControlEvents:UIControlEventTouchUpInside];
+    }
+    else{
+        [button setAlpha:.25];
+    }
 }
 
+
+/*
+
+ Renders a small thumbnail of an article page 
+ 
+ Not currently used. Do not remove. 
+ 
+ */
 -(void) _configureButton:(UIButton*) button{
 
     ZPZoteroAttachment* attachment = [_item.attachments objectAtIndex:0];
@@ -248,7 +268,8 @@ static NSCache* _fileTypeImageCache;
         extraInfo = [@"Preview not supported for " stringByAppendingString:attachment.attachmentType];
     }
     else if(![attachment fileExists] ){
-        extraInfo = [NSString stringWithFormat:@"Tap to download KB %i",attachment.attachmentLength/1024];
+        if([[ZPPreferences instance] online]) extraInfo = [NSString stringWithFormat:@"Tap to download KB %i.",attachment.attachmentLength/1024];
+        else  extraInfo = @"File has not been downloaded";
     }
 
     //Add information over the thumbnail
@@ -256,7 +277,7 @@ static NSCache* _fileTypeImageCache;
 
     UILabel* label = [[UILabel alloc] init];
     
-    if(extraInfo!=NULL) label.text = [NSString stringWithFormat:@"%@ (%@)", attachment.attachmentTitle, extraInfo];
+    if(extraInfo!=NULL) label.text = [NSString stringWithFormat:@"%@ \n\n(%@)", attachment.attachmentTitle, extraInfo];
     else label.text = [NSString stringWithFormat:@"%@", attachment.attachmentTitle];
     
     label.textColor = [UIColor whiteColor];
