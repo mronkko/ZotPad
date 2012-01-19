@@ -85,7 +85,7 @@ static ZPPreferences* _instance = nil;
         [defaults removeObjectForKey:@"resetusername"];
     }
     
-    if([defaults boolForKey:@"resetitemdata"]){
+    if([defaults boolForKey:@"resetitemdata"] || TRUE){
         NSLog(@"Reseting itemdata");
         [defaults removeObjectForKey:@"resetitemdata"];
         [[ZPDatabase instance] resetDatabase];

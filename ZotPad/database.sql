@@ -46,7 +46,7 @@ CREATE TABLE IF NOT EXISTS items (
     year INT,
     creator TEXT,
     title TEXT,
-    publishedIn TEXT,
+    publicationTitle TEXT,
     fullCitation TEXT NOT NULL,
     lastTimestamp TEXT DEFAULT NULL
 );

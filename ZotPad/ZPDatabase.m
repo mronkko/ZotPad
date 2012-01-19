@@ -517,27 +517,27 @@ Deletes items, notes, and attachments
                  
                  */
                 if(insertSQL == NULL){
-                    insertSQL = @"INSERT INTO items (key, itemType, libraryID, year, creator, title, publishedIn,  fullCitation, lastTimestamp) SELECT ? AS key, ? AS itemType, ? AS libraryID, ? AS year, ? AS creator, ? AS title, ? AS publishedIn,  ? AS fullCitation, ? AS lastTimestamp";
+                    insertSQL = @"INSERT INTO items (key, itemType, libraryID, year, creator, title, publicationTitle,  fullCitation, lastTimestamp) SELECT ? AS key, ? AS itemType, ? AS libraryID, ? AS year, ? AS creator, ? AS title, ? AS publicationTitle,  ? AS fullCitation, ? AS lastTimestamp";
                 }
                 else{
                     insertSQL = [insertSQL stringByAppendingString:@" UNION SELECT ?,?,?,?,?,?,?,?,?"];
                 }
                 
-                NSString* publishedIn = item.publishedIn;
-                if(publishedIn == NULL) publishedIn =@"";
+                NSString* publicationTitle = item.publicationTitle;
+                if(publicationTitle == NULL) publicationTitle =@"";
                 
                 NSString* creatorSummary = item.creatorSummary;
                 if(creatorSummary == NULL) creatorSummary =@"";
                 
                 
-                [insertArguments addObjectsFromArray:[NSArray arrayWithObjects:item.key,item.itemType,item.libraryID,year,creatorSummary,item.title,publishedIn,item.fullCitation,item.lastTimestamp,nil]];
+                [insertArguments addObjectsFromArray:[NSArray arrayWithObjects:item.key,item.itemType,item.libraryID,year,creatorSummary,item.title,publicationTitle,item.fullCitation,item.lastTimestamp,nil]];
                 
                 [returnArray addObject:item];
             }
             
             else if(! [item.lastTimestamp isEqualToString: timestamp]){
                 @synchronized(self){
-                    [_database executeUpdate:@"UPDATE items SET itemType = ?, libraryID = ?, year = ?,creator =? ,title = ?,publishedIn = ?,fullCitation =?,lastTimestamp = ? WHERE key = ?",item.itemType,item.libraryID,year,item.creatorSummary,item.title,item.publishedIn,item.fullCitation,item.lastTimestamp,item.key];
+                    [_database executeUpdate:@"UPDATE items SET itemType = ?, libraryID = ?, year = ?,creator =? ,title = ?,publicationTitle = ?,fullCitation =?,lastTimestamp = ? WHERE key = ?",item.itemType,item.libraryID,year,item.creatorSummary,item.title,item.publicationTitle,item.fullCitation,item.lastTimestamp,item.key];
                 }
                 [returnArray addObject:item];
             }
@@ -741,7 +741,7 @@ Deletes items, notes, and attachments
 - (void) addBasicsToItem:(ZPZoteroItem *)item{
     
     @synchronized(self){
-        FMResultSet* resultSet = [_database executeQuery: @"SELECT itemType,libraryID,year,creator,title,publishedIn,key,fullCitation,lastTimestamp FROM items WHERE key=? LIMIT 1",item.key];
+        FMResultSet* resultSet = [_database executeQuery: @"SELECT itemType,libraryID,year,creator,title,publicationTitle,key,fullCitation,lastTimestamp FROM items WHERE key=? LIMIT 1",item.key];
         
         if ([resultSet next]) {
             
@@ -750,8 +750,8 @@ Deletes items, notes, and attachments
             [item setYear:[resultSet intForColumnIndex:2]];
             [item setCreatorSummary:[resultSet stringForColumnIndex:3]];
             [item setTitle:[resultSet stringForColumnIndex:4]];
-            NSString* publishedIn = [resultSet stringForColumnIndex:5];
-            [item setPublishedIn:publishedIn];
+            NSString* publicationTitle = [resultSet stringForColumnIndex:5];
+            [item setPublicationTitle:publicationTitle];
             [item setFullCitation:[resultSet stringForColumnIndex:7]];
             [item setLastTimestamp:[resultSet stringForColumnIndex:8]];
 
@@ -943,7 +943,7 @@ Deletes items, notes, and attachments
         FMResultSet* resultSet = [_database executeQuery:@"SELECT fieldName, fieldValue FROM fields WHERE itemKey = ? ",item.key];
         
         while([resultSet next]){
-            [fields setObject:[resultSet stringForColumnIndex:0] forKey:[resultSet stringForColumnIndex:1]];
+            [fields setObject:[resultSet stringForColumnIndex:1] forKey:[resultSet stringForColumnIndex:0]];
         }
         [resultSet close];
     }
@@ -1130,7 +1130,10 @@ Deletes items, notes, and attachments
 - (NSString*) getFirstItemKeyWithTimestamp:(NSString*)timestamp from:(NSNumber*)libraryID{
     @synchronized(self){
         FMResultSet* resultSet;
-        NSString* sql = @"SELECT key FROM items WHERE lastTimestamp <= ? and libraryID = ? LIMIT 1 ORDER BY lastTimestamp DESC";
+        
+        //TODO: What if this key was deleted from the server? 
+        
+        NSString* sql = @"SELECT key FROM items WHERE lastTimestamp <= ? and libraryID = ? ORDER BY lastTimestamp DESC LIMIT 1";
         
         resultSet = [_database executeQuery: sql, timestamp, libraryID];
         
@@ -1146,28 +1149,50 @@ Deletes items, notes, and attachments
                       searchString:(NSString*)searchString orderField:(NSString*)orderField sortDescending:(BOOL)sortDescending{
 
     NSMutableArray* keys = [[NSMutableArray alloc] init];
+    NSMutableArray* parameters = [[NSMutableArray alloc] init];
 
     //Build the SQL query as a string first. 
     
-    NSString* sql = @"SELECT DISTINCT items.key FROM items";
+    NSString* sql = @"SELECT items.key FROM items";
     
     if(collectionKey!=NULL)
-        sql=[sql stringByAppendingFormat:@", collectionItems"];
+        sql=[sql stringByAppendingString:@", collectionItems"];
 
-    if(searchString != NULL)
-        sql=[sql stringByAppendingFormat:@", fields, creators"];
-    
     //Conditions
 
-    sql=[sql stringByAppendingFormat:@" WHERE libraryID = %@",libraryID];
-
-    if(collectionKey!=NULL)
-        sql=[sql stringByAppendingFormat:@" AND collectionItems.collectionKey = '%@' and collectionItems.itemKey = items.key",collectionKey];
+    sql=[sql stringByAppendingString:@" WHERE libraryID = ?"];
+    [parameters addObject:libraryID];
+    
+    if(collectionKey!=NULL){
+        sql=[sql stringByAppendingString:@" AND collectionItems.collectionKey = ? and collectionItems.itemKey = items.key"];
+        [parameters addObject:collectionKey];
+    }
 
     if(searchString != NULL){
         //TODO: Make a more feature rich search query
         
-        sql=[sql stringByAppendingFormat:@" AND ((fields.itemKey = items.key AND fields.fieldValue LIKE '%%%@%%') OR (creators.itemKey = items.key AND (creators.firstName LIKE '%%%@%%') OR (creators.lastName LIKE '%%%@%%') OR (creators.shortName LIKE '%%%@%%')))",searchString,searchString];
+        //This query is designed to minimize the amount of table scans. 
+        NSMutableArray* newParameters = [NSMutableArray arrayWithArray:parameters ];
+
+        NSString* newSql=[sql stringByAppendingString:@" AND items.title LIKE '%' || ? || '%' OR items.key IN (SELECT itemKey FROM fields WHERE fieldValue LIKE '%' || ? || '%' AND itemKey IN ("];
+        [newParameters addObject:searchString];
+        [newParameters addObject:searchString];
+        
+        newSql = [newSql stringByAppendingString:sql];
+        [newParameters addObjectsFromArray:parameters];
+        
+        newSql = [newSql stringByAppendingString:@" ) UNION SELECT itemKey FROM creators WHERE (firstName LIKE '%' || ? || '%' OR lastName LIKE '%' || ? || '%' OR shortName LIKE '%' || ? || '%') AND itemKey IN ("];
+        [newParameters addObject:searchString];
+        [newParameters addObject:searchString];
+        [newParameters addObject:searchString];
+
+        newSql = [newSql stringByAppendingString:sql];
+        [newParameters addObjectsFromArray:parameters];
+        
+        newSql =[newSql stringByAppendingString:@"))"];
+        
+        sql=newSql;
+        parameters=newParameters;
     }
     
     if(orderField!=NULL){
@@ -1184,9 +1209,11 @@ Deletes items, notes, and attachments
     @synchronized(self){
         FMResultSet* resultSet;
         
-        resultSet = [_database executeQuery: sql];
+        resultSet = [_database executeQuery: sql withArgumentsInArray:parameters];
         
-        while([resultSet next]) [keys addObject:[resultSet stringForColumnIndex:0]];
+        while([resultSet next]){
+            [keys addObject:[resultSet stringForColumnIndex:0]];   
+        }
         
         [resultSet close];
     }

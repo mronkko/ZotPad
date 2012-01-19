@@ -72,16 +72,26 @@
 
     @synchronized(self){
 
-        if([_itemKeysNotInCache containsObject:item.key]){
-            [_itemKeysNotInCache removeObject:item.key];
-            
+        BOOL found = FALSE;
+        BOOL update = FALSE;
+        @synchronized(_itemKeysNotInCache){
+            if([_itemKeysNotInCache containsObject:item.key]){
+                [_itemKeysNotInCache removeObject:item.key];
+                found=TRUE;
+            }
             NSLog(@"Item keys not in cache deacreased to %i after removing key %@",[_itemKeysNotInCache count],item.key);
             
             //Update the view if we have received sufficient number of new items
-            if([_itemKeysNotInCache count] % SIZE_OF_DATABASE_UPDATE_BATCH ==0 ||
+            update = ([_itemKeysNotInCache count] % SIZE_OF_DATABASE_UPDATE_BATCH ==0 ||
                [_itemKeysShown count] == 0 ||
-               [_itemKeysShown lastObject]!=[NSNull null]){
-               
+                      [_itemKeysShown lastObject]!=[NSNull null]);
+        
+        }
+        
+        
+        if(found){
+            
+            if(update){
                 _animations = UITableViewRowAnimationAutomatic;
                 [self _performTableUpdates];
             }

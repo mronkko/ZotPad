@@ -365,7 +365,7 @@
 		A79ED822148B2683003EE77C /* ZPItemDetailViewController.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = ZPItemDetailViewController.m; sourceTree = "<group>"; };
 		A79ED82A148B7404003EE77C /* ZPSimpleItemListViewController.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = ZPSimpleItemListViewController.h; sourceTree = "<group>"; };
 		A79ED82B148B7405003EE77C /* ZPSimpleItemListViewController.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = ZPSimpleItemListViewController.m; sourceTree = "<group>"; };
-		A7A3F94F147BAB6C00CA7266 /* database.sql */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = text; path = database.sql; sourceTree = "<group>"; };
+		A7A3F94F147BAB6C00CA7266 /* database.sql */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = text; lineEnding = 0; path = database.sql; sourceTree = "<group>"; };
 		A7A3F951147BBCCA00CA7266 /* ZPServerResponseXMLParser.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = ZPServerResponseXMLParser.h; sourceTree = "<group>"; };
 		A7A3F952147BBCCA00CA7266 /* ZPServerResponseXMLParser.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = ZPServerResponseXMLParser.m; sourceTree = "<group>"; };
 		A7A54B0514878E4F00EBAD80 /* FMDatabase.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; name = FMDatabase.h; path = FMDB/src/FMDatabase.h; sourceTree = "<group>"; };

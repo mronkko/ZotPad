@@ -233,12 +233,14 @@ static ZPDataLayer* _instance = nil;
     }
     
     for(item in itemsToBeNotifiedAbout){
-        NSEnumerator* e = [_itemObservers objectEnumerator];
-        NSObject* id;
-        
-        while( id= [e nextObject]) {
-            if([(NSObject <ZPItemObserver>*) id respondsToSelector:@selector(notifyItemAvailable:)]){
-                [(NSObject <ZPItemObserver>*) id notifyItemAvailable:item];
+        @synchronized(_itemObservers){
+            NSEnumerator* e = [_itemObservers objectEnumerator];
+            NSObject* id;
+            
+            while( id= [e nextObject]) {
+                if([(NSObject <ZPItemObserver>*) id respondsToSelector:@selector(notifyItemAvailable:)]){
+                    [(NSObject <ZPItemObserver>*) id notifyItemAvailable:item];
+                }
             }
         }
     }
@@ -246,52 +248,68 @@ static ZPDataLayer* _instance = nil;
 
 
 -(void) notifyLibraryWithCollectionsAvailable:(ZPZoteroLibrary*) library{
-    NSEnumerator* e = [_libraryObservers objectEnumerator];
-    NSObject* id;
     
-    while( id= [e nextObject]) {
-        [(NSObject <ZPLibraryObserver>*) id notifyLibraryWithCollectionsAvailable:library];
-    }
-    
+    @synchronized(_libraryObservers){
+
+        NSEnumerator* e = [_libraryObservers objectEnumerator];
+        NSObject* id;
+        
+        while( id= [e nextObject]) {
+            [(NSObject <ZPLibraryObserver>*) id notifyLibraryWithCollectionsAvailable:library];
+        }
+    }    
 }
 
 
 -(void) notifyAttachmentDownloadCompleted:(ZPZoteroAttachment*) attachment{
-    NSEnumerator* e = [_attachmentObservers objectEnumerator];
-    NSObject* id;
-    
-    while( id= [e nextObject]) {
-        [(NSObject <ZPAttachmentObserver>*) id notifyAttachmentDownloadCompleted:attachment];
+    @synchronized(_attachmentObservers){
+        NSEnumerator* e = [_attachmentObservers objectEnumerator];
+        NSObject* id;
+        
+        while( id= [e nextObject]) {
+            [(NSObject <ZPAttachmentObserver>*) id notifyAttachmentDownloadCompleted:attachment];
+        }
     }
-    
 }
 
 
 //Adds and removes observers
 -(void) registerItemObserver:(NSObject<ZPItemObserver>*)observer{
-    [_itemObservers addObject:observer];
+    @synchronized(_itemObservers){
+        [_itemObservers addObject:observer];
+    }
     
 }
 -(void) removeItemObserver:(NSObject<ZPItemObserver>*)observer{
-    [_itemObservers removeObject:observer];
+    @synchronized(_itemObservers){
+        [_itemObservers removeObject:observer];
+    }
 }
 
 -(void) registerLibraryObserver:(NSObject<ZPLibraryObserver>*)observer{
-    [_libraryObservers addObject:observer];
+    @synchronized(_libraryObservers){
+        [_libraryObservers addObject:observer];
+    }
     
 }
 -(void) removeLibraryObserver:(NSObject<ZPLibraryObserver>*)observer{
-    [_libraryObservers removeObject:observer];
+    @synchronized(_libraryObservers){
+        [_libraryObservers removeObject:observer];
+    }
 }
 
 
 
 -(void) registerAttachmentObserver:(NSObject<ZPAttachmentObserver>*)observer{
-    [_attachmentObservers addObject:observer];
+    @synchronized(_attachmentObservers){
+        [_attachmentObservers addObject:observer];
+    }
 }
 
 -(void) removeAttachmentObserver:(NSObject<ZPAttachmentObserver>*)observer{
-    [_attachmentObservers removeObject:observer];
+    @synchronized(_attachmentObservers){
+        [_attachmentObservers removeObject:observer];
+    }
 }
 
 

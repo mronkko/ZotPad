@@ -90,7 +90,7 @@
         if(item.creatorSummary==NULL){
             //Anything after the first closing parenthesis is publication details
             NSRange range = [value rangeOfString:@")"];
-            if(range.location != NSNotFound) [item setPublishedIn:[value substringFromIndex:(range.location+1)]];
+            if(range.location != NSNotFound) [item setPublicationTitle:[value substringFromIndex:(range.location+1)]];
         }
         else{
             
@@ -112,13 +112,13 @@
                 range = [value rangeOfString:@"." options:0 range:NSMakeRange(index, ([value length]-index))];
                 index = (range.location+2);
                 if(index<[value length]){
-                    NSString* publishedIn = [value substringFromIndex:index];
-                    [item setPublishedIn:publishedIn];
+                    NSString* publicationTitle = [value substringFromIndex:index];
+                    [item setPublicationTitle:publicationTitle];
                 }
             }
         }    
         //Trim spaces, periods, and commas from the beginning of the publication detail
-        [item setPublishedIn:[item.publishedIn stringByTrimmingCharactersInSet:[NSCharacterSet characterSetWithCharactersInString:@"., "]]];
+        [item setPublicationTitle:[item.publicationTitle stringByTrimmingCharactersInSet:[NSCharacterSet characterSetWithCharactersInString:@"., "]]];
     }
     else if([key isEqualToString: @"zapi:numTags"] && [_currentElement isKindOfClass:[ZPZoteroItem class]]){
         [(ZPZoteroItem*) _currentElement setNumTags:[value intValue]];

@@ -102,10 +102,12 @@ static ZPLibraryAndCollectionListViewController* _instance = nil;
 
         //If the current library is not defined, show a list of libraries
         if(self->_currentLibraryID == 0){
+            [ZPZoteroLibrary dropCache]; //TODO: Figure a more elegant solution
             self->_content = [[ZPDataLayer instance] libraries];
         }
         //If a library is chosen, show collections level collections for that library
         else{
+            [ZPZoteroCollection dropCache]; //TODO: Figure a more elegant solution
             self->_content = [[ZPDataLayer instance] collectionsForLibrary:self->_currentLibraryID withParentCollection:self->_currentCollectionKey];        
         }
         

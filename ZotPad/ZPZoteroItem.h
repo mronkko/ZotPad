@@ -16,7 +16,7 @@
 @interface ZPZoteroItem : NSObject{
     NSString* _title;
     NSString* _key;
-    NSString* _publishedIn;
+    NSString* _publicationTitle;
     NSString* _creatorSummary;
     NSInteger _year;
     NSNumber* _libraryID;
@@ -40,7 +40,7 @@
 @property (retain) NSString* title;
 @property (retain) NSString* fullCitation;
 @property (retain) NSString* creatorSummary;
-@property (retain) NSString* publishedIn;
+@property (retain) NSString* publicationTitle;
 @property (assign) NSInteger year;
 @property (retain) NSNumber* libraryID;
 @property (assign) BOOL hasChildren;

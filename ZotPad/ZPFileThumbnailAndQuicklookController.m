@@ -69,7 +69,7 @@ static NSCache* _fileTypeImageCache;
     
     
     //Get the table cell.
-    UITableViewCell* cell = (UITableViewCell* )[[[sender superview] superview] superview];
+    UITableViewCell* cell = (UITableViewCell* )[[sender superview] superview];
     
     //Get the row of this cell
     NSInteger row = [[(ZPSimpleItemListViewController*) _viewController tableView] indexPathForCell:cell].row;

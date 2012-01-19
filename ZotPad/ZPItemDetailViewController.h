@@ -24,6 +24,7 @@
     ZPFileThumbnailAndQuicklookController* _previewController;
     NSMutableArray* _carouselViews;
     UIActivityIndicatorView* _activityIndicator;
+    NSInteger _detailTitleWidth;
 
 }
 

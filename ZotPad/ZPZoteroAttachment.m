@@ -53,6 +53,14 @@
     return [NSDictionary dictionary];
 }
 
+- (NSArray*) attachments{
+    
+    return [NSArray arrayWithObject:self];
+}
+
+- (void) setAttachments:(NSArray *)attachments{
+}
+
 
 -(BOOL) fileExists{
     return ([[NSFileManager defaultManager] fileExistsAtPath:[self fileSystemPath]]);

@@ -189,36 +189,36 @@ static ZPDetailViewController* _instance = nil;
 
             //Publication as a formatted label
 
-            NSString* publishedIn = item.publishedIn;
+            NSString* publicationTitle = item.publicationTitle;
             
-            if(publishedIn == NULL){
-                publishedIn=@"";   
+            if(publicationTitle == NULL){
+                publicationTitle=@"";   
             }
             
             //Does this cell already have a TTStyledTextLabel
             NSEnumerator* e = [[cell subviews] objectEnumerator];
 
-            TTStyledTextLabel* publishedInLabel;
+            TTStyledTextLabel* publicationTitleLabel;
 
             NSObject* subView;
             while(subView = [e nextObject]){
                 if([subView isKindOfClass:[TTStyledTextLabel class]]){
-                    publishedInLabel = (TTStyledTextLabel*) subView;
+                    publicationTitleLabel = (TTStyledTextLabel*) subView;
                     break;
                 }
             }
                   
-            if(publishedInLabel == NULL){
+            if(publicationTitleLabel == NULL){
                 CGRect frame = CGRectMake(CGRectGetMinX(authorsLabel.frame),CGRectGetMaxY(authorsLabel.frame),CGRectGetWidth(cell.frame)-CGRectGetMinX(authorsLabel.frame),CGRectGetHeight(cell.frame)-CGRectGetMaxY(authorsLabel.frame)-2);
-                publishedInLabel = [[TTStyledTextLabel alloc] 
+                publicationTitleLabel = [[TTStyledTextLabel alloc] 
                                             initWithFrame:frame];
-                [publishedInLabel setFont:[UIFont systemFontOfSize:12]];
-                [publishedInLabel setClipsToBounds:TRUE];
-                [cell addSubview:publishedInLabel];
+                [publicationTitleLabel setFont:[UIFont systemFontOfSize:12]];
+                [publicationTitleLabel setClipsToBounds:TRUE];
+                [cell addSubview:publicationTitleLabel];
             }
-            TTStyledText* text = [TTStyledText textFromXHTML:[publishedIn stringByReplacingOccurrencesOfString:@" & " 
+            TTStyledText* text = [TTStyledText textFromXHTML:[publicationTitle stringByReplacingOccurrencesOfString:@" & " 
                                                                                                     withString:@" &amp; "] lineBreaks:YES URLs:NO];
-            [publishedInLabel setText:text];
+            [publicationTitleLabel setText:text];
             
             /*
              

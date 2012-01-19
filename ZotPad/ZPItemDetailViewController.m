@@ -25,6 +25,9 @@
 @interface ZPItemDetailViewController();
 - (void) _reconfigureDetailTableView;
 - (void) _reconfigureAttachmentsCarousel;
+- (NSString*) _textAtIndexPath:(NSIndexPath*)indexPath isTitle:(BOOL)isTitle;
+- (BOOL) _useAbstractCell:(NSIndexPath*)indexPath;
+
 @end
 
 @implementation ZPItemDetailViewController
@@ -55,14 +58,14 @@
     _itemListController = [self.storyboard instantiateViewControllerWithIdentifier:@"NavigationItemListView"];
     _itemListController.navigationItem.hidesBackButton = YES;
     
-    
+
     //Configure attachment section. Attachment section will be always shown even if there are no attachments
     
     UIView* attachmentView = [self.view viewWithTag:2];
     [attachmentView setFrame:CGRectMake(0,0, 
                                         self.view.frame.size.width,
                                         ATTACHMENT_VIEW_HEIGHT)];
-    
+
     //Configure activity indicator.
     _activityIndicator = [[UIActivityIndicatorView alloc] initWithFrame:CGRectMake(0,0,20, 20)];
     [_activityIndicator hidesWhenStopped];
@@ -155,34 +158,53 @@
 
 -(void) _reconfigureAttachmentsCarousel{
     
-    [_carouselViews removeAllObjects];
-    
-    ZPZoteroAttachment* attachment;
-    for (attachment in _currentItem.attachments) {
-        UIView* view = [[UIView alloc] initWithFrame:CGRectMake(0, 0, ATTACHMENT_IMAGE_WIDTH, ATTACHMENT_IMAGE_HEIGHT)];
-        [_carouselViews addObject:view];
-        [_previewController configurePreview:view withAttachment:attachment];
+    if([_currentItem.attachments count]==0) [_carousel setHidden:TRUE];
+    else{
+        [_carouselViews removeAllObjects];
+        
+        ZPZoteroAttachment* attachment;
+        for (attachment in _currentItem.attachments) {
+            UIView* view = [[UIView alloc] initWithFrame:CGRectMake(0, 0, ATTACHMENT_IMAGE_WIDTH, ATTACHMENT_IMAGE_HEIGHT)];
+            [_carouselViews addObject:view];
+            [_previewController configurePreview:view withAttachment:attachment];
+        }
+        
+        [_carousel setScrollEnabled:[_currentItem.attachments count]>1];
+        [_carousel reloadData];
     }
-    
-    [_carousel reloadData];
     
 }
 - (void)_reconfigureDetailTableView{
     
     //Configure the size of the detail view table.
     
-    [_detailTableView reloadData];
     
+    [_detailTableView reloadData];
+
+    UILabel* label= [self tableView:_detailTableView cellForRowAtIndexPath:[NSIndexPath indexPathForRow:0 inSection:0]].textLabel;
+
+    _detailTitleWidth = 0;
+
+    for(NSString* key in _currentItem.fields){
+        NSInteger fittedWidth = [key sizeWithFont:label.font].width;
+        if(fittedWidth > _detailTitleWidth){
+            _detailTitleWidth = fittedWidth;
+        }
+    }
+
     [_detailTableView layoutIfNeeded];
     
     [_detailTableView setFrame:CGRectMake(0, 
-                                          ATTACHMENT_VIEW_HEIGHT, 
+                                          ([_currentItem.attachments count]>0)*ATTACHMENT_VIEW_HEIGHT, 
                                           self.view.frame.size.width, 
                                           [_detailTableView contentSize].height)];
 
     
     //Configure  the size of the UIScrollView
-    [(UIScrollView*) self.view setContentSize:CGSizeMake(self.view.frame.size.width, ATTACHMENT_VIEW_HEIGHT + [_detailTableView contentSize].height)];
+//    CGRect lastRowRect= [_detailTableView rectForRowAtIndexPath:[NSIndexPath indexPathForRow:([self tableView:_detailTableView numberOfRowsInSection:2]-1) inSection:2]];
+//    CGFloat contentHeight = lastRowRect.origin.y + lastRowRect.size.height;
+    CGFloat contentHeight = _detailTableView.contentSize.height;
+    [(UIScrollView*) self.view setContentSize:CGSizeMake(self.view.frame.size.width, ([_currentItem.attachments count]>0)*ATTACHMENT_VIEW_HEIGHT + contentHeight)];
     
     
     
@@ -244,53 +266,75 @@
 
 
 
+- (CGFloat)tableView:(UITableView *)tableView heightForRowAtIndexPath:(NSIndexPath *)indexPath
+{
 
+    //Abstract is treated a bit differently
+    if(tableView==_detailTableView && [self _useAbstractCell:indexPath]){
+        
+        NSString *text = [self _textAtIndexPath:indexPath isTitle:false];
+        CGSize textSize = [text sizeWithFont:[UIFont systemFontOfSize:14]
+                           constrainedToSize:CGSizeMake(_detailTableView.frame.size.width-100, 1000.0f)];
+        
+        return textSize.height + 100;
+       
+    }
+    return tableView.rowHeight;
+}
 
- 
-- (UITableViewCell *)tableView:(UITableView *)tableView cellForRowAtIndexPath:(NSIndexPath *)indexPath {
+- (BOOL) _useAbstractCell:(NSIndexPath*)indexPath{
+    if([indexPath indexAtPosition:0] != 2) return FALSE;
     
-    NSString *CellIdentifier;
+    NSEnumerator* e = [_currentItem.fields keyEnumerator]; 
     
-    //The first section
-    CellIdentifier = @"ItemDetailCell";        
-
-    // Dequeue or create a cell of the appropriate type.
-    UITableViewCell *cell = [tableView dequeueReusableCellWithIdentifier:CellIdentifier];
-    if (cell == nil)
-	{
-        cell = [[UITableViewCell alloc] initWithStyle:UITableViewCellStyleDefault reuseIdentifier:CellIdentifier];
+    NSInteger index = -1;
+    NSString* key;
+    while(key = [e nextObject]){
+        if(! [key isEqualToString:@"itemType"] && ! [key isEqualToString:@"title"]){
+            index++;
+        }
+        
+        if(index==indexPath.row){
+            break;
+        }
     }
     
-    // Configure the cell
+    return [key isEqualToString:@"abstractNote"];
+    
+}
+
+- (NSString*) _textAtIndexPath:(NSIndexPath*)indexPath isTitle:(BOOL)isTitle{
 
     
     //Title and itemtype
+
     if([indexPath indexAtPosition:0] == 0){
         if(indexPath.row == 0){
-            cell.textLabel.text = @"Title";
-            cell.detailTextLabel.text = _currentItem.title;
+            if(isTitle) return @"Title";
+            else return _currentItem.title;
         }
         if(indexPath.row == 1){
-            cell.textLabel.text = @"Item type";
-            cell.detailTextLabel.text = [ZPLocalization getLocalizationStringWithKey:_currentItem.itemType  type:@"itemType" locale:NULL];
+            if(isTitle) return @"Item type";
+            else return [ZPLocalization getLocalizationStringWithKey:_currentItem.itemType  type:@"itemType" locale:NULL];
         }
-
+        
     }
     //Creators
     else if([indexPath indexAtPosition:0] == 1){
         NSDictionary* creator=[_currentItem.creators objectAtIndex:indexPath.row];
-        cell.textLabel.text = [ZPLocalization getLocalizationStringWithKey:[creator objectForKey:@"creatorType"] type:@"creatorType" locale:NULL];
-        
-        NSString* lastName = [creator objectForKey:@"lastName"];
-        if(lastName==NULL || [lastName isEqualToString:@""]){
-            cell.detailTextLabel.text = [creator objectForKey:@"shortName"];
-        }
+        if(isTitle) return [ZPLocalization getLocalizationStringWithKey:[creator objectForKey:@"creatorType"] type:@"creatorType" locale:NULL];
         else{
-            cell.detailTextLabel.text = [NSString stringWithFormat:@"%@ %@",[creator objectForKey:@"firstName"],lastName];
+            NSString* lastName = [creator objectForKey:@"lastName"];
+            if(lastName==NULL || [lastName isEqualToString:@""]){
+                return [creator objectForKey:@"shortName"];
+            }
+            else{
+                return [NSString stringWithFormat:@"%@ %@",[creator objectForKey:@"firstName"],lastName];
+            }
+
         }
     }
-    
-    //Reset of the fields
+    //Rest of the fields
     else{
         NSEnumerator* e = [_currentItem.fields keyEnumerator]; 
         
@@ -306,10 +350,47 @@
             }
         }
         
-        cell.textLabel.text = [ZPLocalization getLocalizationStringWithKey:key  type:@"field" locale:NULL];
-        cell.detailTextLabel.text = [_currentItem.fields objectForKey:key];
+        if(isTitle) return [ZPLocalization getLocalizationStringWithKey:key  type:@"field" locale:NULL];
+        else return [_currentItem.fields objectForKey:key];
     }
+}
+
+
+ 
+- (UITableViewCell *)tableView:(UITableView *)tableView cellForRowAtIndexPath:(NSIndexPath *)indexPath {
     
+    UITableViewCell *cell;
+    
+    if([self _useAbstractCell:indexPath]){
+        NSString* CellIdentifier = @"ItemAbstractCell";        
+        
+        // Dequeue or create a cell of the appropriate type.
+        cell = [tableView dequeueReusableCellWithIdentifier:CellIdentifier];
+        if (cell == nil)
+        {
+            cell = [[UITableViewCell alloc] initWithStyle:UITableViewCellStyleDefault reuseIdentifier:CellIdentifier];
+        }
+        
+        // Configure the cell
+        UITextView* textView = (UITextView*) [cell viewWithTag:2];
+        textView.text = [self _textAtIndexPath:indexPath isTitle:FALSE];
+        textView.frame= CGRectMake(textView.frame.origin.x, textView.frame.origin.y, textView.frame.size.width, [self tableView:tableView heightForRowAtIndexPath:indexPath]-50);
+        
+    }
+    else {
+        NSString* CellIdentifier = @"ItemDetailCell";        
+        
+        // Dequeue or create a cell of the appropriate type.
+        cell = [tableView dequeueReusableCellWithIdentifier:CellIdentifier];
+        if (cell == nil)
+        {
+            cell = [[UITableViewCell alloc] initWithStyle:UITableViewCellStyleDefault reuseIdentifier:CellIdentifier];
+        }
+        
+        // Configure the cell
+        cell.textLabel.text = [self _textAtIndexPath:indexPath isTitle:TRUE];
+        cell.detailTextLabel.text = [self _textAtIndexPath:indexPath isTitle:FALSE];
+    }
 	return ( cell );
 }
 
@@ -332,10 +413,6 @@
         
     }
 }
-
-
-#pragma mark-
-
 
 /*
     
@@ -362,6 +439,7 @@
 
     }
 }
+
 
 -(void) notifyAttachmentDownloadCompleted:(ZPZoteroAttachment*) attachment{
     ZPZoteroAttachment* thisAttachment;

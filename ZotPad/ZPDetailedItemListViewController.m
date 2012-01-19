@@ -105,9 +105,13 @@ static ZPDetailedItemListViewController* _instance = nil;
 }
 
 - (void) _configureCachedKeys{
+
+    //Store references to these two strings to prevent deallocation.
+    NSString* search = self.searchString;
+    NSString* order = self.orderField;
     
     NSArray* array = [[ZPDataLayer instance] getItemKeysFromCacheForLibrary:self.libraryID collection:self.collectionKey
-                                                                                                      searchString:[self.searchString stringByTrimmingCharactersInSet:[NSCharacterSet whitespaceAndNewlineCharacterSet]]orderField:self.orderField sortDescending:self.sortDescending];
+                                                                                                      searchString:search orderField:order sortDescending:self.sortDescending];
     @synchronized(_tableView){
         _itemKeysShown = array;
         
@@ -185,21 +189,21 @@ static ZPDetailedItemListViewController* _instance = nil;
             //Publication as a formatted label
 
             
-            TTStyledTextLabel* publishedInLabel = (TTStyledTextLabel*) [cell viewWithTag:3];
+            TTStyledTextLabel* publicationTitleLabel = (TTStyledTextLabel*) [cell viewWithTag:3];
 
-            if( item.publishedIn == NULL){
-                [publishedInLabel setHidden:TRUE];
+            if( item.publicationTitle == NULL){
+                [publicationTitleLabel setHidden:TRUE];
             }
             else{
-                [publishedInLabel setHidden:FALSE];
+                [publicationTitleLabel setHidden:FALSE];
                 
                 //TODO: Could these two be configured in storyboard?
                 
-                [publishedInLabel setFont:[UIFont systemFontOfSize:12]];
-                [publishedInLabel setClipsToBounds:TRUE];
-                TTStyledText* text = [TTStyledText textFromXHTML:[item.publishedIn stringByReplacingOccurrencesOfString:@" & " 
+                [publicationTitleLabel setFont:[UIFont systemFontOfSize:12]];
+                [publicationTitleLabel setClipsToBounds:TRUE];
+                TTStyledText* text = [TTStyledText textFromXHTML:[item.publicationTitle stringByReplacingOccurrencesOfString:@" & " 
                                                                                                     withString:@" &amp; "] lineBreaks:YES URLs:NO];
-                [publishedInLabel setText:text];
+                [publicationTitleLabel setText:text];
             }
 
             UIButton* articleThumbnail = (UIButton *) [cell viewWithTag:4];
@@ -322,7 +326,7 @@ static ZPDetailedItemListViewController* _instance = nil;
 }
 
 -(IBAction)doSortPublication:(id)sender{
-    [self doOrderField:@"publishedIn"];
+    [self doOrderField:@"publicationTitle"];
 }
 
 -(void) clearSearch{
