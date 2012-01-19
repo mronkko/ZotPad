@@ -120,7 +120,7 @@
         
 
         //If there is a new set of items loaded, return without performing any updates. 
-        if(thisItemKeys != _itemKeysShown) return;
+        if(thisItemKeys != _itemKeysShown || _invalidated) return;
         
         @synchronized(_itemKeysNotInCache){
             [_itemKeysNotInCache removeObjectsInArray:newKeys];
@@ -134,7 +134,7 @@
         for(NSString* newKey in newKeys){
             
             //If there is a new set of items loaded, return without performing any updates. 
-            if(thisItemKeys != _itemKeysShown) return;
+            if(thisItemKeys != _itemKeysShown || _invalidated ) return;
             
             if([newItemKeysShown count] == index){
 //                NSLog(@"Adding item %@ at %i",newKey,index);
@@ -184,7 +184,7 @@
         
         @synchronized(_tableView){
 
-            if(thisItemKeys != _itemKeysShown) return;
+            if(thisItemKeys != _itemKeysShown || _invalidated) return;
             
             _itemKeysShown = newItemKeysShown;
             if([insertIndices count]>0) [self performSelectorOnMainThread:@selector(_performRowInsertions:) withObject:insertIndices waitUntilDone:TRUE];

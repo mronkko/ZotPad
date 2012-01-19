@@ -87,11 +87,15 @@ static NSCache* _fileTypeImageCache;
 
 - (NSInteger) numberOfPreviewItemsInPreviewController: (QLPreviewController *) controller 
 {
+    NSLog(@"Number of previews for item %@ is %i",_item.title, [[_item allExistingAttachments] count] );
     return [[_item allExistingAttachments] count];
 }
 
 
 - (id <QLPreviewItem>) previewController: (QLPreviewController *) controller previewItemAtIndex: (NSInteger) index{
+
+    NSLog(@"Opening preview %i for item %@",index,_item.title );
+
     NSArray* allExisting = [_item allExistingAttachments];
     ZPZoteroAttachment* currentAttachment = [allExisting objectAtIndex:index];
     NSString* path = [currentAttachment fileSystemPath];

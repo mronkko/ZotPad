@@ -76,8 +76,8 @@ static ZPDetailedItemListViewController* _instance = nil;
             [_activityIndicator startAnimating];
             
             //Clear item keys shown so that UI knows to stop drawing the old items
-            _itemKeysShown = NULL;
-
+            _invalidated = TRUE;
+            
             //This is required because a background thread might be modifying the table
             NSLog(@"Entering table lock");
             @synchronized(_tableView){
@@ -89,6 +89,8 @@ static ZPDetailedItemListViewController* _instance = nil;
                  //TODO: Investigate why a relaodsection call a bit below causes a crash. Then uncomment these both.
                  //[_tableView reloadSections:[NSIndexSet indexSetWithIndex:0] withRowAnimation:UITableViewRowAnimationAutomatic];
                  [_tableView reloadData];
+                _invalidated = FALSE;
+
                  
              }
 

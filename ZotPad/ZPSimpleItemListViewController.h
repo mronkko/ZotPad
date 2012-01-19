@@ -29,6 +29,7 @@
     BOOL _sortDescending;
     UIActivityIndicatorView* _activityIndicator;
     NSInteger _animations;
+    BOOL _invalidated;
 }
 
 - (void)configureWithItemListController:(ZPSimpleItemListViewController*)controller;
