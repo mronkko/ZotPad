@@ -354,6 +354,18 @@ static DSActivityView *dsActivityView = nil;
     [UIApplication sharedApplication].networkActivityIndicatorVisible = showNetworkActivityIndicator;
 }
 
+/*
+ These two methods are needed for the view to capture all touches. Otherwise the
+ touches just go through to the underlying view.
+ */
+- (BOOL)canBecomeFirstResponder {
+    return YES;
+}
+
+- (void)viewDidAppear {
+    [self becomeFirstResponder];
+}
+
 @end
 
 

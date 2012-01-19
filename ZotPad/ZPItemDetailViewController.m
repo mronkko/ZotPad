@@ -23,8 +23,8 @@
 #define ATTACHMENT_IMAGE_WIDTH 423
 
 @interface ZPItemDetailViewController();
-- (void) _reconfigureDetailTableView;
-- (void) _reconfigureAttachmentsCarousel;
+- (void) _reconfigureDetailTableView:(BOOL)animated;
+- (void) _reconfigureCarousel;
 - (NSString*) _textAtIndexPath:(NSIndexPath*)indexPath isTitle:(BOOL)isTitle;
 - (BOOL) _useAbstractCell:(NSIndexPath*)indexPath;
 
@@ -52,7 +52,6 @@
   
     //configure carousel
     _carousel.type = iCarouselTypeCoverFlow2;
-    _carouselViews = [[NSMutableArray alloc] init];
     
     //Show the item view in the navigator
     _itemListController = [self.storyboard instantiateViewControllerWithIdentifier:@"NavigationItemListView"];
@@ -135,10 +134,13 @@
         [[ZPDataLayer instance] updateItemDetailsFromServer:_currentItem];
     }
         
-        
-    [self _reconfigureDetailTableView];
-    [self _reconfigureAttachmentsCarousel];
+
     
+    [self _reconfigureDetailTableView:FALSE];
+    [self _reconfigureCarousel];
+
+
+
     if(_currentItem.creatorSummary!=NULL && ! [_currentItem.creatorSummary isEqualToString:@""]){
         if(_currentItem.year!=0){
             self.navigationItem.title=[NSString stringWithFormat:@"%@ (%i) %@",_currentItem.creatorSummary,_currentItem.year,_currentItem.title];
@@ -153,28 +155,27 @@
     
 
 }
-
-//TODO: Recycle these views
-
--(void) _reconfigureAttachmentsCarousel{
-    
+- (void) _reconfigureCarousel{
     if([_currentItem.attachments count]==0) [_carousel setHidden:TRUE];
     else{
-        [_carouselViews removeAllObjects];
-        
-        ZPZoteroAttachment* attachment;
-        for (attachment in _currentItem.attachments) {
-            UIView* view = [[UIView alloc] initWithFrame:CGRectMake(0, 0, ATTACHMENT_IMAGE_WIDTH, ATTACHMENT_IMAGE_HEIGHT)];
-            [_carouselViews addObject:view];
-            [_previewController configurePreview:view withAttachment:attachment];
-        }
-        
+        [_carousel setHidden:FALSE];
         [_carousel setScrollEnabled:[_currentItem.attachments count]>1];
+        
+        NSMutableArray* tempArray = [[NSMutableArray alloc] init];
+        
+        for(ZPZoteroAttachment* attachment in _currentItem.attachments){
+            UIView* view = [[UIView alloc] initWithFrame:CGRectMake(0, 0, ATTACHMENT_IMAGE_WIDTH, ATTACHMENT_IMAGE_HEIGHT)];
+            [_previewController configurePreview:view withAttachment:attachment];
+            [tempArray addObject:view];
+        }
+        _carouselViews =  tempArray;
         [_carousel reloadData];
     }
     
 }
-- (void)_reconfigureDetailTableView{
+
+
+- (void)_reconfigureDetailTableView:(BOOL)animated{
     
     //Configure the size of the detail view table.
     
@@ -194,19 +195,29 @@
 
     [_detailTableView layoutIfNeeded];
     
-    [_detailTableView setFrame:CGRectMake(0, 
-                                          ([_currentItem.attachments count]>0)*ATTACHMENT_VIEW_HEIGHT, 
-                                          self.view.frame.size.width, 
-                                          [_detailTableView contentSize].height)];
-
-    
-    //Configure  the size of the UIScrollView
-//    CGRect lastRowRect= [_detailTableView rectForRowAtIndexPath:[NSIndexPath indexPathForRow:([self tableView:_detailTableView numberOfRowsInSection:2]-1) inSection:2]];
-//    CGFloat contentHeight = lastRowRect.origin.y + lastRowRect.size.height;
     CGFloat contentHeight = _detailTableView.contentSize.height;
-    [(UIScrollView*) self.view setContentSize:CGSizeMake(self.view.frame.size.width, ([_currentItem.attachments count]>0)*ATTACHMENT_VIEW_HEIGHT + contentHeight)];
     
-    
+    if(animated){
+        [UIView animateWithDuration:0.5 animations:^{
+            [_detailTableView setFrame:CGRectMake(0, 
+                                                  ([_currentItem.attachments count]>0)*ATTACHMENT_VIEW_HEIGHT, 
+                                                  self.view.frame.size.width, 
+                                                  [_detailTableView contentSize].height)];
+            
+            
+            [(UIScrollView*) self.view setContentSize:CGSizeMake(self.view.frame.size.width, ([_currentItem.attachments count]>0)*ATTACHMENT_VIEW_HEIGHT + contentHeight)];
+        }];
+    }
+    else{
+        [_detailTableView setFrame:CGRectMake(0, 
+                                              ([_currentItem.attachments count]>0)*ATTACHMENT_VIEW_HEIGHT, 
+                                              self.view.frame.size.width, 
+                                              [_detailTableView contentSize].height)];
+        
+        
+        [(UIScrollView*) self.view setContentSize:CGSizeMake(self.view.frame.size.width, ([_currentItem.attachments count]>0)*ATTACHMENT_VIEW_HEIGHT + contentHeight)];
+
+    }
     
 }
 - (void)viewWillDisappear:(BOOL)animated
@@ -433,8 +444,10 @@
     if([item.key isEqualToString:_currentItem.key]){
         _currentItem = item;
         [_activityIndicator startAnimating];
-        [self performSelectorOnMainThread:@selector( _reconfigureAttachmentsCarousel) withObject:nil waitUntilDone:YES];
-        [self performSelectorOnMainThread:@selector( _reconfigureDetailTableView) withObject:nil waitUntilDone:YES];
+
+        [self _reconfigureCarousel];
+        [self performSelectorOnMainThread:@selector(_reconfigureDetailTableView:) withObject:[NSNumber numberWithBool:TRUE] waitUntilDone:YES];
+
         [_activityIndicator stopAnimating];
 
     }
@@ -448,8 +461,8 @@
         if([attachment isEqual:thisAttachment]){
             //It is possible that we have new items from this view
             [_activityIndicator startAnimating];
-            if([_carouselViews count] <= index) [self performSelectorOnMainThread:@selector( _reconfigureAttachmentsCarousel) withObject:nil waitUntilDone:YES];
-            [_previewController configurePreview:[_carouselViews objectAtIndex:index] withAttachment:attachment];
+            //TODO: Smarter reloading. Do inserts and reloads on a view level instead
+            [_carousel reloadData];
             [_activityIndicator stopAnimating];
         }
         index++;
@@ -493,7 +506,6 @@
 
 - (UIView *)carousel:(iCarousel *)carousel viewForItemAtIndex:(NSUInteger)index
 {
-    
     return [_carouselViews objectAtIndex:index];
 }
 

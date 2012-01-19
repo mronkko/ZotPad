@@ -22,11 +22,12 @@
 @interface ZPDataLayer : NSObject {
     
     
-    NSMutableSet* _itemObservers;
-    NSMutableSet* _libraryObservers;
-    NSMutableSet* _attachmentObservers;
+    //These sets are immutable due to concurrency issues
+    NSSet* _itemObservers;
+    NSSet* _libraryObservers;
+    NSSet* _attachmentObservers;
     
-    //Queut for ad hoc retrievals
+    //Queue for ad hoc retrievals
     NSOperationQueue* _serverRequestQueue;
     
 }

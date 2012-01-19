@@ -338,30 +338,35 @@ static NSCache* _fileTypeImageCache;
     //Render images
     
     UIImage* image;
-    if([view superview] != nil && attachment.fileExists && [attachment.attachmentType isEqualToString:@"application/pdf"]) image  = [self _renderThumbnailFromPDFFile:attachment.fileSystemPath];
-
-    if([view superview] != nil){
+    if( attachment.fileExists && [attachment.attachmentType isEqualToString:@"application/pdf"]){
+        //TODO: Figure out a way to stop rendering if the user has switched to another item
+            
+        image  = [self _renderThumbnailFromPDFFile:attachment.fileSystemPath];
         
-        UIView* subview;
-        NSArray* subviews=[NSArray arrayWithArray:view.subviews];
-        for(subview in subviews){
-            [subview removeFromSuperview];
+        if(image!=NULL){
+            
+            UIView* subview;
+            NSArray* subviews=[NSArray arrayWithArray:view.subviews];
+            for(subview in subviews){
+                [subview removeFromSuperview];
+            }
+            
+            UIImageView* imageView = [[UIImageView alloc] initWithImage:image];
+            
+            view.layer.frame = [self _getDimensionsWithImage:image];
+            imageView.layer.frame = [self _getDimensionsWithImage:image];
+            [view setNeedsLayout];
+            
+            [view addSubview:imageView];
+            //Add the subviews back, but not the imageview
+            for(subview in subviews){
+                if(! [subview isKindOfClass:[UIImageView class]]) [view addSubview:subview];
+            }
+            
+            [view setNeedsDisplay];
+            [[(ZPItemDetailViewController*) _viewController carousel] reloadItemAtIndex:[_item.attachments indexOfObject:attachment] animated:YES];
+
         }
-
-        UIImageView* imageView = [[UIImageView alloc] initWithImage:image];
-
-        view.layer.frame = [self _getDimensionsWithImage:image];
-        imageView.layer.frame = [self _getDimensionsWithImage:image];
-        [view setNeedsLayout];
-        
-        [view addSubview:imageView];
-        //Add the subviews back, but not the imageview
-        for(subview in subviews){
-            if(! [subview isKindOfClass:[UIImageView class]]) [view addSubview:subview];
-        }
-        [view setNeedsDisplay];
-        [[(ZPItemDetailViewController*) _viewController carousel] reloadItemAtIndex:[_item.attachments indexOfObject:attachment] animated:YES];
-
     }
 }
 

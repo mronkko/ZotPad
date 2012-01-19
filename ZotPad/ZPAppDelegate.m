@@ -39,10 +39,13 @@
 }
 
 - (void)applicationDidReceiveMemoryWarning:(UIApplication *)application{
+    NSLog(@"Start freeing memory");
     [ZPZoteroItem dropCache];
     [ZPZoteroCollection dropCache];
     [ZPZoteroLibrary dropCache];
     [ZPLocalization dropCache];
+    NSLog(@"Done freeing memory");
+
 }
 
 - (void)applicationWillResignActive:(UIApplication *)application
@@ -85,7 +88,8 @@
      Save data if appropriate.
      See also applicationDidEnterBackground:.
      */
-    
+    NSLog(@"Terminating");
+
     
 }
 

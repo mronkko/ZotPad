@@ -111,8 +111,6 @@ static NSCache* _objectCache = NULL;
 
 - (NSArray*) attachments{
     
-    if(_isStandaloneAttachment) return [NSArray arrayWithObject:self];
-    
     if(_attachments == NULL){
         [[ZPDatabase instance] addAttachmentsToItem:self];
     }
@@ -172,9 +170,9 @@ static NSCache* _objectCache = NULL;
 }
 */
 -(NSArray*) allExistingAttachments{
-    NSMutableArray* returnArray = [NSMutableArray arrayWithCapacity:[_attachments count]];
+    NSMutableArray* returnArray = [NSMutableArray array];
 
-    for(ZPZoteroAttachment* attachment in _attachments){
+    for(ZPZoteroAttachment* attachment in [self attachments]){
         if([attachment fileExists]){
             [returnArray addObject:attachment];
         }

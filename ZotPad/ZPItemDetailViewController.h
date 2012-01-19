@@ -22,10 +22,9 @@
     iCarousel* _carousel;
     ZPSimpleItemListViewController* _itemListController;
     ZPFileThumbnailAndQuicklookController* _previewController;
-    NSMutableArray* _carouselViews;
     UIActivityIndicatorView* _activityIndicator;
     NSInteger _detailTitleWidth;
-
+    NSArray* _carouselViews;
 }
 
 @property (nonatomic, retain) IBOutlet iCarousel* carousel;

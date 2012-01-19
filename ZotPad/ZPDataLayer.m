@@ -233,7 +233,6 @@ static ZPDataLayer* _instance = nil;
     }
     
     for(item in itemsToBeNotifiedAbout){
-        @synchronized(_itemObservers){
             NSEnumerator* e = [_itemObservers objectEnumerator];
             NSObject* id;
             
@@ -242,14 +241,12 @@ static ZPDataLayer* _instance = nil;
                     [(NSObject <ZPItemObserver>*) id notifyItemAvailable:item];
                 }
             }
-        }
     }
 }
 
 
 -(void) notifyLibraryWithCollectionsAvailable:(ZPZoteroLibrary*) library{
     
-    @synchronized(_libraryObservers){
 
         NSEnumerator* e = [_libraryObservers objectEnumerator];
         NSObject* id;
@@ -257,59 +254,48 @@ static ZPDataLayer* _instance = nil;
         while( id= [e nextObject]) {
             [(NSObject <ZPLibraryObserver>*) id notifyLibraryWithCollectionsAvailable:library];
         }
-    }    
 }
 
 
 -(void) notifyAttachmentDownloadCompleted:(ZPZoteroAttachment*) attachment{
-    @synchronized(_attachmentObservers){
         NSEnumerator* e = [_attachmentObservers objectEnumerator];
         NSObject* id;
         
         while( id= [e nextObject]) {
             [(NSObject <ZPAttachmentObserver>*) id notifyAttachmentDownloadCompleted:attachment];
         }
-    }
 }
 
 
-//Adds and removes observers
+//Adds and removes observers. Because of concurrency issues we are not using mutable sets here.
 -(void) registerItemObserver:(NSObject<ZPItemObserver>*)observer{
-    @synchronized(_itemObservers){
-        [_itemObservers addObject:observer];
-    }
+    _itemObservers = [_itemObservers setByAddingObject:observer];
     
 }
 -(void) removeItemObserver:(NSObject<ZPItemObserver>*)observer{
-    @synchronized(_itemObservers){
-        [_itemObservers removeObject:observer];
-    }
+    NSMutableSet* tempSet =[NSMutableSet setWithSet:_itemObservers];
+    [tempSet removeObject:observer];
+    _itemObservers = tempSet;
 }
 
 -(void) registerLibraryObserver:(NSObject<ZPLibraryObserver>*)observer{
-    @synchronized(_libraryObservers){
-        [_libraryObservers addObject:observer];
-    }
-    
+    _libraryObservers = [_libraryObservers setByAddingObject:observer];
 }
 -(void) removeLibraryObserver:(NSObject<ZPLibraryObserver>*)observer{
-    @synchronized(_libraryObservers){
-        [_libraryObservers removeObject:observer];
-    }
+    NSMutableSet* tempSet =[NSMutableSet setWithSet:_libraryObservers];
+    [tempSet removeObject:observer];
+    _libraryObservers = tempSet;
 }
-
 
 
 -(void) registerAttachmentObserver:(NSObject<ZPAttachmentObserver>*)observer{
-    @synchronized(_attachmentObservers){
-        [_attachmentObservers addObject:observer];
-    }
+    _attachmentObservers = [_attachmentObservers setByAddingObject:observer];
 }
 
 -(void) removeAttachmentObserver:(NSObject<ZPAttachmentObserver>*)observer{
-    @synchronized(_attachmentObservers){
-        [_attachmentObservers removeObject:observer];
-    }
+    NSMutableSet* tempSet =[NSMutableSet setWithSet:_attachmentObservers];
+    [tempSet removeObject:observer];
+    _attachmentObservers = tempSet;
 }
 
 

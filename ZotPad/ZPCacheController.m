@@ -166,7 +166,7 @@ static ZPCacheController* _instance = nil;
 }
 
 -(void) _checkDownloadQueue{
-    @synchronized(_fileDownloadQueue){
+    @synchronized(_filesToDownload){
         //Only cache up to 95% full
         while([_fileDownloadQueue operationCount] < [_fileDownloadQueue maxConcurrentOperationCount] && [_filesToDownload count] >0 && _sizeOfDocumentsFolder < 0.95*[[ZPPreferences instance] maxCacheSize]){
             ZPZoteroAttachment* attachment = [_filesToDownload objectAtIndex:0];
@@ -185,82 +185,88 @@ static ZPCacheController* _instance = nil;
     @synchronized(_serverRequestQueue){
         while([_serverRequestQueue operationCount] <= [_serverRequestQueue maxConcurrentOperationCount]){
             
-            if([_librariesToCache count]>0){
-                
-                NSOperation* retrieveOperation = [[NSInvocationOperation alloc] initWithTarget:self selector:@selector(_doContainerRetrieval:) object:[_librariesToCache lastObject]];
-                
-                //Remove the items that we are retrieving
-                [_librariesToCache removeLastObject];
-                
-                [_serverRequestQueue addOperation:retrieveOperation];
-                NSLog(@"Started Library retrieval operation. Operations in queue is %i. Number of libraries in queue is %i",[_serverRequestQueue operationCount],[_librariesToCache count]);
-                
-            } 
-
-            //Choose the queue the active library or choose a first non-empty queue
-            NSMutableArray* keyArray = [_itemKeysToRetrieve objectForKey:_activeLibraryID];
-            NSEnumerator* e = [_itemKeysToRetrieve keyEnumerator];
-            NSNumber* libraryID = _activeLibraryID;
-            
-            while((keyArray == NULL || [keyArray count]==0) && (libraryID = [e nextObject])) keyArray = [_itemKeysToRetrieve objectForKey:keyArray];
-            
-            //If we found a non-empty que, queue item retrival
-            if(keyArray != NULL && [keyArray count]>0){
-                NSArray* keysToRetrieve;
-                @synchronized(keyArray){
-                    NSRange range = NSMakeRange(0, MIN(NUMBER_OF_ITEMS_TO_RETRIEVE,[keyArray count]));
-                    keysToRetrieve = [keyArray subarrayWithRange:range];
+            @synchronized(_librariesToCache){
+                if([_librariesToCache count]>0){
+                    
+                    NSOperation* retrieveOperation = [[NSInvocationOperation alloc] initWithTarget:self selector:@selector(_doContainerRetrieval:) object:[_librariesToCache lastObject]];
                     
                     //Remove the items that we are retrieving
-                    [keyArray removeObjectsInRange:range];
+                    [_librariesToCache removeLastObject];
                     
-                    //If the array became empty, mark this library as completely cached
-                    if([keyArray count]==0){
-                        NSString* timestamp = [_libraryTimestamps objectForKey:libraryID];
-                        if(timestamp!=NULL){
-                            //Update both the DB and the in-memory cache.
-                            [[ZPDatabase instance] setUpdatedTimestampForLibrary:libraryID toValue:timestamp];
-                            [[ZPZoteroLibrary ZPZoteroLibraryWithID:libraryID] setLastCompletedCacheTimestamp:timestamp];
-                            NSLog(@"Library %@ is now fully cached", libraryID);
-                            [_libraryTimestamps removeObjectForKey:libraryID];
+                    [_serverRequestQueue addOperation:retrieveOperation];
+                    NSLog(@"Started Library retrieval operation. Operations in queue is %i. Number of libraries in queue is %i",[_serverRequestQueue operationCount],[_librariesToCache count]);
+                    
+                } 
+            }
+            //Choose the queue the active library or choose a first non-empty queue
+            
+            @synchronized(_itemKeysToRetrieve){
+                NSMutableArray* keyArray = [_itemKeysToRetrieve objectForKey:_activeLibraryID];
+                NSEnumerator* e = [_itemKeysToRetrieve keyEnumerator];
+                NSNumber* libraryID = _activeLibraryID;
+                
+                while((keyArray == NULL || [keyArray count]==0) && (libraryID = [e nextObject])) keyArray = [_itemKeysToRetrieve objectForKey:keyArray];
+                
+                //If we found a non-empty que, queue item retrival
+                if(keyArray != NULL && [keyArray count]>0){
+                    NSArray* keysToRetrieve;
+                    @synchronized(keyArray){
+                        NSRange range = NSMakeRange(0, MIN(NUMBER_OF_ITEMS_TO_RETRIEVE,[keyArray count]));
+                        keysToRetrieve = [keyArray subarrayWithRange:range];
+                        
+                        //Remove the items that we are retrieving
+                        [keyArray removeObjectsInRange:range];
+                        
+                        //If the array became empty, mark this library as completely cached
+                        if([keyArray count]==0){
+                            NSString* timestamp = [_libraryTimestamps objectForKey:libraryID];
+                            if(timestamp!=NULL){
+                                //Update both the DB and the in-memory cache.
+                                [[ZPDatabase instance] setUpdatedTimestampForLibrary:libraryID toValue:timestamp];
+                                [[ZPZoteroLibrary ZPZoteroLibraryWithID:libraryID] setLastCompletedCacheTimestamp:timestamp];
+                                NSLog(@"Library %@ is now fully cached", libraryID);
+                                [_libraryTimestamps removeObjectForKey:libraryID];
+                            }
                         }
+                        
                     }
-                   
+                    
+                    //Create an invocation
+                    SEL selector = @selector(_doItemRetrieval:fromLibrary:);
+                    NSMethodSignature* signature = [[self class] instanceMethodSignatureForSelector:selector];
+                    NSInvocation* invocation  = [NSInvocation invocationWithMethodSignature:signature];
+                    [invocation setTarget:self];
+                    [invocation setSelector:selector];
+                    
+                    //Set arguments
+                    [invocation setArgument:&keysToRetrieve atIndex:2];
+                    [invocation setArgument:&libraryID atIndex:3];
+                    
+                    //Create operation and queue it for background retrieval
+                    NSOperation* retrieveOperation = [[NSInvocationOperation alloc] initWithInvocation:invocation];
+                    [_serverRequestQueue addOperation:retrieveOperation];
+                    NSLog(@"Started item retrieval operation. Operations in queue is %i. Number of items in queue for library %@ is %i",[_serverRequestQueue operationCount],libraryID,[keyArray count]);
+                    
                 }
                 
-                //Create an invocation
-                SEL selector = @selector(_doItemRetrieval:fromLibrary:);
-                NSMethodSignature* signature = [[self class] instanceMethodSignatureForSelector:selector];
-                NSInvocation* invocation  = [NSInvocation invocationWithMethodSignature:signature];
-                [invocation setTarget:self];
-                [invocation setSelector:selector];
-                
-                //Set arguments
-                [invocation setArgument:&keysToRetrieve atIndex:2];
-                [invocation setArgument:&libraryID atIndex:3];
-                
-                //Create operation and queue it for background retrieval
-                NSOperation* retrieveOperation = [[NSInvocationOperation alloc] initWithInvocation:invocation];
-                [_serverRequestQueue addOperation:retrieveOperation];
-                NSLog(@"Started item retrieval operation. Operations in queue is %i. Number of items in queue for library %@ is %i",[_serverRequestQueue operationCount],libraryID,[keyArray count]);
-                
             }
-            
-            
-            //If there are no items, start retrieving collection memberships
-            else if([_collectionsToCache count]>0){
-                
-                NSOperation* retrieveOperation = [[NSInvocationOperation alloc] initWithTarget:self selector:@selector(_doContainerRetrieval:) object:[_collectionsToCache lastObject]];
-                
-                //Remove the items that we are retrieving
-                [_collectionsToCache removeLastObject];
-                
-                [_serverRequestQueue addOperation:retrieveOperation];
-                NSLog(@"Started collection retrieval operation. Operations in queue is %i. Number of collections in queue is %i",[_serverRequestQueue operationCount],[_collectionsToCache count]);
 
-            } 
-            else break;
-            
+            // Last, check collection memberships
+            @synchronized(_collectionsToCache){
+                
+                if([_collectionsToCache count]>0){
+                    
+                    NSOperation* retrieveOperation = [[NSInvocationOperation alloc] initWithTarget:self selector:@selector(_doContainerRetrieval:) object:[_collectionsToCache lastObject]];
+                    
+                    //Remove the items that we are retrieving
+                    [_collectionsToCache removeLastObject];
+                    
+                    [_serverRequestQueue addOperation:retrieveOperation];
+                    NSLog(@"Started collection retrieval operation. Operations in queue is %i. Number of collections in queue is %i",[_serverRequestQueue operationCount],[_collectionsToCache count]);
+                    
+                } 
+                else break;
+            }
         }
     }
 }
@@ -337,12 +343,12 @@ static ZPCacheController* _instance = nil;
         }
     }
     
-    NSArray* itemsThatWereWrittenToCache = [[ZPDatabase instance] addItemsToDatabase:[normalItems arrayByAddingObjectsFromArray:standaloneNotesAndAttachments]];
+    NSArray* topLevelItemsThatWereWrittenToCache = [[ZPDatabase instance] addItemsToDatabase:[normalItems arrayByAddingObjectsFromArray:standaloneNotesAndAttachments]];
 
     [[ZPDatabase instance] addAttachmentsToDatabase:attachments];
     [[ZPDatabase instance] addNotesToDatabase:notes];
     
-    NSMutableArray* itemsThatNeedCreatorsAndFields = [NSMutableArray arrayWithArray:itemsThatWereWrittenToCache];
+    NSMutableArray* itemsThatNeedCreatorsAndFields = [NSMutableArray arrayWithArray:topLevelItemsThatWereWrittenToCache];
     [itemsThatNeedCreatorsAndFields removeObjectsInArray:standaloneNotesAndAttachments];
                             
     [[ZPDatabase instance] writeItemsFieldsToDatabase:itemsThatNeedCreatorsAndFields];
@@ -356,7 +362,8 @@ static ZPCacheController* _instance = nil;
         [[ZPDatabase instance] addNotesToItem:item];
     }
     
-    [[ZPDataLayer instance] performSelectorInBackground:@selector(notifyItemsAvailable:) withObject:itemsThatWereWrittenToCache];
+    [[ZPDataLayer instance] performSelectorInBackground:@selector(notifyItemsAvailable:)
+                                              withObject:[[topLevelItemsThatWereWrittenToCache arrayByAddingObjectsFromArray:parentItemsForNotes]arrayByAddingObjectsFromArray:parentItemsForAttachments]];
     
 }
 
@@ -481,13 +488,18 @@ static ZPCacheController* _instance = nil;
     [items addObjectsFromArray:item.notes];
     
     [self _cacheItemsAndAttachToParentsIfNeeded:items];
+
+    //The method call above will only fire a notification if the item was actually updated. Fire it here again so that we will always get a notification and know that the item has been updated.
+    [[ZPDataLayer instance] notifyItemsAvailable:[NSArray arrayWithObject:item]];
        
 }
 
 -(void) setActiveLibrary:(NSNumber*)libraryID collection:(NSString*)collectionKey{
 
     if(! [libraryID isEqual:_activeLibraryID] && ! [[ZPPreferences instance] cacheAttachmentsAllLibraries] ){
-        [_filesToDownload removeAllObjects];
+        @synchronized(_filesToDownload){
+            [_filesToDownload removeAllObjects];
+        }
 //        NSLog(@"Clearing attachment download queue because library changed and preferences do not indicate that all libraries should be downloaded");
     }
     
@@ -496,7 +508,10 @@ static ZPCacheController* _instance = nil;
     
     //Both keys might be null, so we need to compare equality directly as well
     if(! (collectionKey == _activeCollectionKey || [collectionKey isEqual:_activeCollectionKey]) && ! [[ZPPreferences instance] cacheAttachmentsActiveLibrary]){
-        [_filesToDownload removeAllObjects];
+        @synchronized(_filesToDownload){
+
+            [_filesToDownload removeAllObjects];
+        }
 //        NSLog(@"Clearing attachment download queue because collection changed and preferences do not indicate that all collections should be downloaded");
     }
     _activeCollectionKey = collectionKey;
@@ -550,10 +565,12 @@ static ZPCacheController* _instance = nil;
         }
         
         if(doCache){
-            [_filesToDownload removeObject:attachment];
-            [_filesToDownload insertObject:attachment atIndex:0];
-//            NSLog(@"Queuing attachment download to %@, number of files in queue %i",attachment.fileSystemPath,[_filesToDownload count]);
+            @synchronized(_filesToDownload){
 
+                [_filesToDownload removeObject:attachment];
+                [_filesToDownload insertObject:attachment atIndex:0];
+                //            NSLog(@"Queuing attachment download to %@, number of files in queue %i",attachment.fileSystemPath,[_filesToDownload count]);
+            }
             [self _checkQueues];
         }
     }
@@ -562,12 +579,14 @@ static ZPCacheController* _instance = nil;
 -(void) addToLibrariesQueue:(ZPZoteroLibrary*)object priority:(BOOL)priority{
     //Check this library is already baing cached
     if([_libraryTimestamps objectForKey:object.libraryID] == NULL){
-        if(priority){
-            [_librariesToCache removeObject:object];
-            [_librariesToCache addObject:object];
-        }
-        else if(! [_librariesToCache containsObject:object]){
-            [_librariesToCache insertObject:object atIndex:0]; 
+        @synchronized(_librariesToCache){
+            if(priority){
+                [_librariesToCache removeObject:object];
+                [_librariesToCache addObject:object];
+            }
+            else if(! [_librariesToCache containsObject:object]){
+                [_librariesToCache insertObject:object atIndex:0]; 
+            }
         }
     }
 }
@@ -575,24 +594,26 @@ static ZPCacheController* _instance = nil;
 
 -(void) addToCollectionsQueue:(ZPZoteroCollection*)object priority:(BOOL)priority{
 
-    if(priority){
-        [_collectionsToCache removeObject:object];
-        [_collectionsToCache addObject:object];
-    }
-    else if(! [_collectionsToCache containsObject:object]){
-        [_collectionsToCache insertObject:object atIndex:0]; 
+    @synchronized(_collectionsToCache){
+        if(priority){
+            [_collectionsToCache removeObject:object];
+            [_collectionsToCache addObject:object];
+        }
+        else if(! [_collectionsToCache containsObject:object]){
+            [_collectionsToCache insertObject:object atIndex:0]; 
+        }
     }
 }
 
 -(void) addToItemQueue:(NSArray*)itemKeys libraryID:(NSNumber*)libraryID priority:(BOOL)priority{
 
-    NSMutableArray* targetArray = [_itemKeysToRetrieve objectForKey:libraryID];
-    if(targetArray == NULL){
-        targetArray = [NSMutableArray array];
-        [_itemKeysToRetrieve setObject:targetArray forKey:libraryID];               
-    }
-    
-    @synchronized(targetArray){
+    @synchronized(_itemKeysToRetrieve){
+        NSMutableArray* targetArray = [_itemKeysToRetrieve objectForKey:libraryID];
+        if(targetArray == NULL){
+            targetArray = [NSMutableArray array];
+            [_itemKeysToRetrieve setObject:targetArray forKey:libraryID];               
+        }
+        
         if(priority){
             [targetArray removeObjectsInArray:itemKeys];
             [targetArray insertObjects:itemKeys atIndexes:[NSIndexSet indexSetWithIndexesInRange:NSMakeRange(0,[itemKeys count])]];

@@ -26,12 +26,12 @@ void ZPLog(NSObject* source,int line,NSString* format, ...){
         
 //        [debugClasses addObject:@"ZPServerConnection"];
 //        [debugClasses addObject:@"ZPSimpleItemListViewController"];
-//        [debugClasses addObject:@"ZPDetailedItemListViewController"];
+        [debugClasses addObject:@"ZPDetailedItemListViewController"];
 //        [debugClasses addObject:@"ZPServerResponseXMLParser"];
 //        [debugClasses addObject:@"ZPPreferences"];
 //        [debugClasses addObject:@"ZPCacheController"];
-//        [debugClasses addObject:@"ZPDataLayer"];
-//        [debugClasses addObject:@"ZPAppDelegate"];
+        [debugClasses addObject:@"ZPDataLayer"];
+        [debugClasses addObject:@"ZPAppDelegate"];
 //        [debugClasses addObject:@"ZPDatabase"];
 //        [debugClasses addObject:@"ZPAuthenticationDialog"];
 //        [debugClasses addObject:@"ZPFileThumbnailAndQuicklookController"];

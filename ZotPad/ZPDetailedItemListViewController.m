@@ -59,7 +59,7 @@ static ZPDetailedItemListViewController* _instance = nil;
 {
     
     if([NSThread isMainThread]){
-        
+        NSLog(@"Started configuring view");
         // Update the user interface for the detail item.
         
         if (self.masterPopoverController != nil) {
@@ -75,10 +75,17 @@ static ZPDetailedItemListViewController* _instance = nil;
             
             [_activityIndicator startAnimating];
             
+            //Clear item keys shown so that UI knows to stop drawing the old items
+            _itemKeysShown = NULL;
+
             //This is required because a background thread might be modifying the table
-             @synchronized(_tableView){
-                 _itemKeysNotInCache = [NSMutableArray array];
-                 _itemKeysShown = [NSArray array];
+            NSLog(@"Entering table lock");
+            @synchronized(_tableView){
+
+                _itemKeysNotInCache = [NSMutableArray array];
+                _itemKeysShown = [NSArray array];
+
+                NSLog(@"Entered table lock");
                  //TODO: Investigate why a relaodsection call a bit below causes a crash. Then uncomment these both.
                  //[_tableView reloadSections:[NSIndexSet indexSetWithIndex:0] withRowAnimation:UITableViewRowAnimationAutomatic];
                  [_tableView reloadData];
@@ -89,6 +96,9 @@ static ZPDetailedItemListViewController* _instance = nil;
             
             
             [self performSelectorInBackground:@selector(_configureCachedKeys) withObject:nil];
+            
+        NSLog(@"Finished configuring view");
+
         }
     }
     else{
@@ -99,9 +109,17 @@ static ZPDetailedItemListViewController* _instance = nil;
 
 - (void)_makeBusy{
     if(_activityView==NULL){
-        [_tableView setUserInteractionEnabled:FALSE];
-        _activityView = [DSBezelActivityView newActivityViewForView:_tableView];
+        _activityView = [DSBezelActivityView newActivityViewForView:[_tableView superview] withLabel:@"Loading data from\nZotero server..."];
     }
+}
+
+/*
+ Called from data layer to notify that there is data for this view and it can be shown
+ */
+
+- (void)_makeAvailable{
+    [DSBezelActivityView removeViewAnimated:YES];
+    _activityView = NULL;
 }
 
 - (void) _configureCachedKeys{
@@ -137,16 +155,6 @@ static ZPDetailedItemListViewController* _instance = nil;
     }
 }
 
-/*
- Called from data layer to notify that there is data for this view and it can be shown
- */
-
-- (void)_makeAvailable{
-    [DSBezelActivityView removeViewAnimated:YES];
-
-    [_tableView setUserInteractionEnabled:TRUE];
-    _activityView = NULL;
-}
 
 - (void) configureUncachedKeys:(NSArray*)uncachedItems{
         

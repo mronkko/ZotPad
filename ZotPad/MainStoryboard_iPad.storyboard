@@ -173,6 +173,15 @@
                         <rect key="frame" x="0.0" y="64" width="703" height="704"/>
                         <autoresizingMask key="autoresizingMask" widthSizable="YES" heightSizable="YES"/>
                         <subviews>
+                            <view tag="2" contentMode="scaleToFill" id="mJe-AV-5Qd" customClass="iCarousel">
+                                <rect key="frame" x="0.0" y="0.0" width="703" height="263"/>
+                                <autoresizingMask key="autoresizingMask" flexibleMaxX="YES" flexibleMaxY="YES"/>
+                                <color key="backgroundColor" white="1" alpha="1" colorSpace="custom" customColorSpace="calibratedWhite"/>
+                                <connections>
+                                    <outlet property="dataSource" destination="0zt-cp-Ihx" id="sGN-Da-Adl"/>
+                                    <outlet property="delegate" destination="0zt-cp-Ihx" id="p1b-vl-1KU"/>
+                                </connections>
+                            </view>
                             <tableView clipsSubviews="YES" contentMode="scaleToFill" alwaysBounceVertical="YES" scrollEnabled="NO" showsHorizontalScrollIndicator="NO" showsVerticalScrollIndicator="NO" dataMode="prototypes" style="grouped" separatorStyle="singleLineEtched" allowsSelection="NO" rowHeight="44" sectionHeaderHeight="10" sectionFooterHeight="10" id="Qr8-AN-SJ9">
                                 <rect key="frame" x="0.0" y="264" width="723" height="440"/>
                                 <autoresizingMask key="autoresizingMask" heightSizable="YES"/>
@@ -239,15 +248,6 @@
                                     <outlet property="delegate" destination="0zt-cp-Ihx" id="cKN-7a-ZKQ"/>
                                 </connections>
                             </tableView>
-                            <view tag="2" contentMode="scaleToFill" id="mJe-AV-5Qd" customClass="iCarousel">
-                                <rect key="frame" x="0.0" y="0.0" width="703" height="263"/>
-                                <autoresizingMask key="autoresizingMask" flexibleMaxX="YES" flexibleMaxY="YES"/>
-                                <color key="backgroundColor" white="1" alpha="1" colorSpace="custom" customColorSpace="calibratedWhite"/>
-                                <connections>
-                                    <outlet property="dataSource" destination="0zt-cp-Ihx" id="sGN-Da-Adl"/>
-                                    <outlet property="delegate" destination="0zt-cp-Ihx" id="p1b-vl-1KU"/>
-                                </connections>
-                            </view>
                         </subviews>
                         <color key="backgroundColor" white="1" alpha="1" colorSpace="calibratedWhite"/>
                         <simulatedOrientationMetrics key="simulatedOrientationMetrics" orientation="landscapeRight"/>

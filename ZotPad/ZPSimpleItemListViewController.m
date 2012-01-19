@@ -14,7 +14,7 @@
 
 
 #define SIZE_OF_TABLEVIEW_UPDATE_BATCH 5
-#define SIZE_OF_DATABASE_UPDATE_BATCH 25
+#define SIZE_OF_DATABASE_UPDATE_BATCH 50
 
 @interface ZPSimpleItemListViewController();
 -(void) _updateRowForItem:(ZPZoteroItem*)item;
@@ -79,7 +79,7 @@
                 [_itemKeysNotInCache removeObject:item.key];
                 found=TRUE;
             }
-            NSLog(@"Item keys not in cache deacreased to %i after removing key %@",[_itemKeysNotInCache count],item.key);
+//            NSLog(@"Item keys not in cache deacreased to %i after removing key %@",[_itemKeysNotInCache count],item.key);
             
             //Update the view if we have received sufficient number of new items
             update = ([_itemKeysNotInCache count] % SIZE_OF_DATABASE_UPDATE_BATCH ==0 ||
@@ -121,9 +121,10 @@
 
         //If there is a new set of items loaded, return without performing any updates. 
         if(thisItemKeys != _itemKeysShown) return;
-
-        [_itemKeysNotInCache removeObjectsInArray:newKeys];
         
+        @synchronized(_itemKeysNotInCache){
+            [_itemKeysNotInCache removeObjectsInArray:newKeys];
+        }
         NSLog(@"Beging updating the table rows");
         
         NSInteger index=0;
@@ -136,12 +137,12 @@
             if(thisItemKeys != _itemKeysShown) return;
             
             if([newItemKeysShown count] == index){
-                NSLog(@"Adding item %@ at %i",newKey,index);
+//                NSLog(@"Adding item %@ at %i",newKey,index);
                 [newItemKeysShown addObject:newKey];
                 [insertIndices addObject:[NSIndexPath indexPathForRow:index inSection:0]];
             }
             else if([newItemKeysShown objectAtIndex:index] == [NSNull null]){
-                NSLog(@"Replacing NULL with %@ at %i",newKey,index);
+//                NSLog(@"Replacing NULL with %@ at %i",newKey,index);
                 [newItemKeysShown replaceObjectAtIndex:index withObject:newKey];
                 [reloadIndices addObject:[NSIndexPath indexPathForRow:index inSection:0]];
             }
@@ -155,7 +156,7 @@
                 
                 //If the new data cannot be found in the view, insert it
                 if(oldIndex==NSNotFound){
-                    NSLog(@"Inserting %@ at %i",newKey,index);
+//                    NSLog(@"Inserting %@ at %i",newKey,index);
                     [newItemKeysShown insertObject:newKey atIndex:index];
                     [insertIndices addObject:[NSIndexPath indexPathForRow:index inSection:0]];
                 }
@@ -173,12 +174,14 @@
         }
         
         //Add empty rows to the end if there are still unknown rows
-        while([newItemKeysShown count]<([_itemKeysNotInCache count] + [newKeys count])){
-            NSLog(@"Padding with null %i (Unknown keys: %i, Known keys: %i)",[newItemKeysShown count],[_itemKeysNotInCache count],[newKeys count]);
-            [insertIndices addObject:[NSIndexPath indexPathForRow:[newItemKeysShown count] inSection:0]];
-            [newItemKeysShown addObject:[NSNull null]];
+        @synchronized(_itemKeysNotInCache){
+            while([newItemKeysShown count]<([_itemKeysNotInCache count] + [newKeys count])){
+                //            NSLog(@"Padding with null %i (Unknown keys: %i, Known keys: %i)",[newItemKeysShown count],[_itemKeysNotInCache count],[newKeys count]);
+                [insertIndices addObject:[NSIndexPath indexPathForRow:[newItemKeysShown count] inSection:0]];
+                [newItemKeysShown addObject:[NSNull null]];
+            }
         }
-
+        
         @synchronized(_tableView){
 
             if(thisItemKeys != _itemKeysShown) return;
@@ -189,19 +192,20 @@
             
             //If modifications have caused the visible items become too long, remove items from the end
 
-            NSMutableArray* deleteIndices = [NSMutableArray array];   
-            while([newItemKeysShown count]>([_itemKeysNotInCache count] + [newKeys count])){
-                NSLog(@"Removing extra from end %i (Unknown keys: %i, Known keys: %i)",[newItemKeysShown count],[_itemKeysNotInCache count],[newKeys count]);
-                [newItemKeysShown removeLastObject];
-                [deleteIndices addObject:[NSIndexPath indexPathForRow:[newItemKeysShown count] inSection:0]];
+            NSMutableArray* deleteIndices = [NSMutableArray array];
+            @synchronized(_itemKeysNotInCache){
+                while([newItemKeysShown count]>([_itemKeysNotInCache count] + [newKeys count])){
+                 //   NSLog(@"Removing extra from end %i (Unknown keys: %i, Known keys: %i)",[newItemKeysShown count],[_itemKeysNotInCache count],[newKeys count]);
+                    [newItemKeysShown removeLastObject];
+                    [deleteIndices addObject:[NSIndexPath indexPathForRow:[newItemKeysShown count] inSection:0]];
+                }
+                if([deleteIndices count] >0) [self performSelectorOnMainThread:@selector(_performRowDeletions:) withObject:deleteIndices waitUntilDone:YES];
             }
-            if([deleteIndices count] >0) [self performSelectorOnMainThread:@selector(_performRowDeletions:) withObject:deleteIndices waitUntilDone:YES];
+
+            NSLog(@"End updating the table rows");
+            
+            if([_itemKeysNotInCache count] == 0) [_activityIndicator stopAnimating];
         }
-
-        NSLog(@"End updating the table rows");
-        
-        if([_itemKeysNotInCache count] == 0) [_activityIndicator stopAnimating];
-
     }
 }
 
@@ -327,15 +331,15 @@
 - (void)viewDidAppear:(BOOL)animated
 {
     [super viewDidAppear:animated];
-    
-    //If there are more items coming, make this active
-    if([_itemKeysNotInCache count] >0){
-        [_activityIndicator startAnimating];
+    @synchronized(_itemKeysNotInCache){
+        //If there are more items coming, make this active
+        if([_itemKeysNotInCache count] >0){
+            [_activityIndicator startAnimating];
+        }
+        else{
+            [_activityIndicator stopAnimating];
+        }
     }
-    else{
-        [_activityIndicator stopAnimating];
-    }
-
 }
 
 - (void)viewWillDisappear:(BOOL)animated
