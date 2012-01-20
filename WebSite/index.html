@@ -40,6 +40,7 @@ the items.</p>
 </ul>
 
 <h2>Using ZotPad</h2>
+Note: The screenshots are from an older development version.
 <h3>First launch</h3>
 <p>When ZotPad is launched the first time, it will first ask the user to sign in with their Zotero
 user account and create a private key that ZotPad will use when communicating with the Zotero server.
@@ -105,13 +106,14 @@ section of preferences shows the current username. This can be changed by resett
 after which the application will start with a login screen the next time it is started.<p>
 <p>Mode has three different options:
 <ul>
-<li>Online, no cache - ZotPad will not store anything in or read anythign from cache, but only use
 data from the server.</li>
-<li>Online, with cache (default) - ZotPad will use cache to speed up showing items and to concerve
+<li>Online (default) - ZotPad will use cache to speed up showing items and to concerve
 bandwidth, but will always check for up to data data from the server.</li>
 <li>Offline - ZotPad shows only items from the cache and does not use internet connection.</li>
 </ul>
-There are probably very few instances when this setting should be changed.</p>
+When ZotPad detects that iPad is not connected to the internet, it will automatically switch to the
+offline mode. Because of this, there are probably very few instances when this setting needs to be
+changed.</p>
 <p>Current cache size shows an approximation of how much space the cache is currently using. Max 
 cache size sets the maximum size of a cache. This is not a strict limit, but can be exceeded 
 temporarily until next cache cleanup takes place. The content of the cache can be viewed using
@@ -119,11 +121,8 @@ iTunes file upload and download.</p>
 <p>The second section has two preferences for controlling the preemptive cache. The first setting
 controls background downloading of item data. The choices are:
 <ul>
-<li>Off - No preemptive cache of items</li>
-<li>Active collections (default) - ZotPad will cache item data from all collections that a user has
-viewed.</li>
-<li>Active libraries - ZotPad will cache item data from all collections in all libraries that a user
-has viewed.</li>
+<li>Active libraries (default) - ZotPad will cache item data from all collections in all
+libraries that a user has viewed.</li>
 <li>All libraries - ZotPad will cache all data available from the Zotero server.</li>
 </ul>
 </p>
@@ -144,6 +143,19 @@ has viewed.</li>
 <p>The last section contain three options for resetting ZotPad. These will take effect the next time
 the application is launched.</p>
 <p><img src="IMG_0011.PNG"></p>
+<h1>Support</h1>
+<p>Support will be available by email at <a href="mailto:zotpad@gmail.com">zotpad@gmail.com</a>. A
+support forum will be provided later.</p>
+<h1>Credits</h1>
+<p>ZotPad uses the following third party libraries. This section is added for license compliance.<p>
+<li>iCarousel, Copyright (C) 2011 Charcoal Design. All rigths reserved. (<a href="https://raw.github.com/nicklockwood/iCarousel/104d499da7b107b8baa58ab85c6d0f44d504e957/LICENCE.md">License</a>)</li>
+<li>ASIHTTPRequest, Copyright (C) 2007-2011 All-Seeing Interactive. All rigths reserved. (<a href="https://raw.github.com/pokeb/asi-http-request/3cb0230e547b0d13d88843ec7fc6ed77d69cb7c6/LICENSE">License</a>)</li>
+<li>json-framework, Copyright (C) 2007-2011 Stig Brautaset. All rights reserved. (<a href="http://www.apache.org/licenses/LICENSE-2.0">License</a>)</li>
+<li>OAuthConsumer, Copyright (C) 2010-2012 Jonathan R. Crosby. All rights reserved. (<a href="http://www.opensource.org/licenses/mit-license.php">License</a>)</li>
+<li>DSActivityView, Copyright (C) 2009-2011 Dejal Systems, LLC. All rights reserved. (<a href="https://dejal.svn.beanstalkapp.com/open/DSActivityView/Sources/DSActivityView.h">License</a>)</li>
+<li>fmdb, Copyright (C) 2008 Flying Meat Inc. All rights reserved. (<a href="https://raw.github.com/ccgus/fmdb/7ffd84d76b3b3b6858fbad063451a76b3dfc145a/LICENSE.txt">License</a>)</li>
+<li>three20, Copyright (C) 2009-2011 FacebookAll rights reserved. (<a href="http://www.apache.org/licenses/LICENSE-2.0">License</a>)</li>
+</ul>
 </div>
 </body>
 </html>
