@@ -35,6 +35,7 @@
 -(void) _renderThumbnailFromPDFFile:(ZPZoteroAttachment*)attachment;
     
 -(void) _reloadAttachmentInCarousel:(ZPZoteroItem*)attachment;
+-(void) _reloadCarouselItemAtIndex:(NSInteger) index;
 
 -(CGRect)_getDimensionsWithImage:(UIImage*) image; 
 
@@ -66,7 +67,7 @@
     
     //configure carousel
     _carousel.type = iCarouselTypeCoverFlow2;
-    
+
     //Show the item view in the navigator
     _itemListController = [self.storyboard instantiateViewControllerWithIdentifier:@"NavigationItemListView"];
     _itemListController.navigationItem.hidesBackButton = YES;
@@ -110,7 +111,6 @@
     [_itemListController.tableView setDelegate: self];
 
     [self configureWithItemKey: currentItemKey];
-    [_carousel reloadData];
 }
 
 - (void)viewDidAppear:(BOOL)animated
@@ -178,10 +178,9 @@
     if([_currentItem.attachments count]==0) [_carousel setHidden:TRUE];
     else{
         [_carousel setHidden:FALSE];
+        [_carousel performSelectorOnMainThread:@selector(reloadData) withObject:NULL waitUntilDone:NO];
         [_carousel setScrollEnabled:[_currentItem.attachments count]>1];
-        [_carousel reloadData];
     }
-    
 }
 
 
@@ -326,10 +325,6 @@
     
 }
 
--(void) _reloadAttachmentInCarousel:(ZPZoteroItem*)attachment {
-    NSInteger index = [_currentItem.attachments indexOfObject:attachment];
-    if(index !=NSNotFound) [_carousel reloadItemAtIndex:index animated:YES];
-}
 
 -(CGRect)_getDimensionsWithImage:(UIImage*) image{    
     
@@ -589,26 +584,27 @@
     if([item.key isEqualToString:_currentItem.key]){
         _currentItem = item;
         [_activityIndicator startAnimating];
-
         [self _reconfigureCarousel];
-        [self performSelectorOnMainThread:@selector(_reconfigureDetailTableView:) withObject:[NSNumber numberWithBool:TRUE] waitUntilDone:YES];
+        [self performSelectorOnMainThread:@selector(_reconfigureDetailTableView:) withObject:[NSNumber numberWithBool:TRUE] waitUntilDone:NO];
 
         [_activityIndicator stopAnimating];
 
     }
 }
 
-
 -(void) notifyAttachmentDownloadCompleted:(ZPZoteroAttachment*) attachment{
+    [self _reloadAttachmentInCarousel:attachment];
+}
 
-    NSInteger index= [_currentItem.attachments indexOfObject:attachment];
-    if(index != NSNotFound){
-        //It is possible that we have new items from this view
-        [_activityIndicator startAnimating];
-        //TODO: Smarter reloading. Do inserts and reloads on a view level instead
-        [_carousel reloadItemAtIndex:index animated:YES];
-        [_activityIndicator stopAnimating];
+-(void) _reloadAttachmentInCarousel:(ZPZoteroItem*)attachment {
+    NSInteger index = [_currentItem.attachments indexOfObject:attachment];
+    if(index !=NSNotFound){
+        [self performSelectorOnMainThread:@selector(_reloadCarouselItemAtIndex:) withObject:[NSNumber numberWithInt:index] waitUntilDone:YES];
     }
+}
+
+-(void) _reloadCarouselItemAtIndex:(NSInteger) index{
+    [_carousel reloadItemAtIndex:index animated:YES];
 }
 
 
@@ -654,6 +650,12 @@
     UIView* view = [[UIView alloc] initWithFrame:CGRectMake(0, 0, ATTACHMENT_IMAGE_WIDTH, ATTACHMENT_IMAGE_HEIGHT)];
     [self _configurePreview:view withAttachment:attachment];
         
+    return view;
+}
+
+//This is implemented because it is a mandatory protocol method
+- (UIView *)carousel:(iCarousel *)carousel placeholderViewAtIndex:(NSUInteger)index reusingView:(UIView *)view{
+    if(view==NULL) return view = [[UIView alloc] initWithFrame:CGRectMake(0, 0, ATTACHMENT_IMAGE_WIDTH, ATTACHMENT_IMAGE_HEIGHT)];
     return view;
 }
 

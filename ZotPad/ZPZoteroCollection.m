@@ -7,7 +7,7 @@
 //
 
 #import "ZPZoteroCollection.h"
-#import "ZPDatabase.h";
+#import "ZPDatabase.h"
 
 @implementation ZPZoteroCollection
 

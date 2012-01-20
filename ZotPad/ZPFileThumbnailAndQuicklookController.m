@@ -26,9 +26,6 @@
 - (void) _downloadWithProgressAlert:(ZPZoteroAttachment *)attachment;
 - (void) _downloadAttachment:(ZPZoteroAttachment *)attachment withUIProgressView:(UIProgressView*) progressView progressAlert:(UIAlertView*)progressAlert;
 
-
--(void) _configureButton:(UIButton*) button;
-
 @end
 
 
