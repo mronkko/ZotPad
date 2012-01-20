@@ -17,16 +17,26 @@
 
 #import "ZPPreferences.h"
 
-#define ATTACHMENT_VIEW_HEIGHT 680
+#define ATTACHMENT_VIEW_HEIGHT 600
 
-#define ATTACHMENT_IMAGE_HEIGHT 600
+#define ATTACHMENT_IMAGE_HEIGHT 580
 #define ATTACHMENT_IMAGE_WIDTH 423
 
-@interface ZPItemDetailViewController();
+@interface ZPItemDetailViewController(){
+    NSOperationQueue* _imageRenderQueue;
+}
 - (void) _reconfigureDetailTableView:(BOOL)animated;
 - (void) _reconfigureCarousel;
 - (NSString*) _textAtIndexPath:(NSIndexPath*)indexPath isTitle:(BOOL)isTitle;
+
 - (BOOL) _useAbstractCell:(NSIndexPath*)indexPath;
+-(void) _configurePreview:(UIView*) view withAttachment:(ZPZoteroAttachment*)attachment;
+-(void) _configurePreviewLabel:(UIView*)view withAttachment:(ZPZoteroAttachment*)attachment;
+-(void) _renderThumbnailFromPDFFile:(ZPZoteroAttachment*)attachment;
+    
+-(void) _reloadAttachmentInCarousel:(ZPZoteroItem*)attachment;
+
+-(CGRect)_getDimensionsWithImage:(UIImage*) image; 
 
 @end
 
@@ -48,8 +58,12 @@
 
     _detailTableView.scrollEnabled = FALSE;
     
+    _imageRenderQueue = [[NSOperationQueue alloc] init];
+    [_imageRenderQueue setMaxConcurrentOperationCount:3];
 
-  
+    _previewCache = [[NSCache alloc] init];
+    [_previewCache setCountLimit:20];
+    
     //configure carousel
     _carousel.type = iCarouselTypeCoverFlow2;
     
@@ -96,14 +110,13 @@
     [_itemListController.tableView setDelegate: self];
 
     [self configureWithItemKey: currentItemKey];
-
+    [_carousel reloadData];
 }
 
 - (void)viewDidAppear:(BOOL)animated
 {
     [super viewDidAppear:animated];
     
-
 }
 
 
@@ -119,6 +132,12 @@
     return YES;
 }
 
+
+- (void)didReceiveMemoryWarning
+{
+    [super didReceiveMemoryWarning];
+    [_previewCache removeAllObjects];
+}
 
 -(void) configureWithItemKey:(NSString*)key{
     
@@ -160,16 +179,6 @@
     else{
         [_carousel setHidden:FALSE];
         [_carousel setScrollEnabled:[_currentItem.attachments count]>1];
-        
-        NSMutableArray* tempArray = [[NSMutableArray alloc] init];
-        
-        for(ZPZoteroAttachment* attachment in _currentItem.attachments){
-            UIView* view = [[UIView alloc] initWithFrame:CGRectMake(0, 0, ATTACHMENT_IMAGE_WIDTH, ATTACHMENT_IMAGE_HEIGHT)];
-            [_previewController configurePreview:view withAttachment:attachment];
-            [tempArray addObject:view];
-        }
-        _carouselViews =  tempArray;
-        [_carousel reloadData];
     }
     
 }
@@ -231,7 +240,142 @@
 	[super viewWillDisappear:animated];
 }
 
-     
+
+-(void) _configurePreviewLabel:(UIView*)view withAttachment:(ZPZoteroAttachment*)attachment{
+    
+    //Add a label over the view
+    NSString* extraInfo;
+    
+    
+    if([attachment fileExists] && ![attachment.attachmentType isEqualToString:@"application/pdf"]){
+        extraInfo = [@"Preview not supported for " stringByAppendingString:attachment.attachmentType];
+    }
+    else if(![attachment fileExists] ){
+        if([[ZPPreferences instance] online]) extraInfo = [NSString stringWithFormat:@"Tap to download KB %i.",attachment.attachmentLength/1024];
+        else  extraInfo = @"File has not been downloaded";
+    }
+    
+    //Add information over the thumbnail
+    
+    
+    UILabel* label = [[UILabel alloc] init];
+    
+    if(extraInfo!=NULL) label.text = [NSString stringWithFormat:@"%@ \n\n(%@)", attachment.attachmentTitle, extraInfo];
+    else label.text = [NSString stringWithFormat:@"%@", attachment.attachmentTitle];
+    
+    label.textColor = [UIColor whiteColor];
+    label.backgroundColor = [UIColor clearColor];
+    label.textAlignment = UITextAlignmentCenter;
+    label.lineBreakMode = UILineBreakModeWordWrap;
+    label.numberOfLines = 5;
+    label.frame=CGRectMake(50, 200, view.frame.size.width-100, view.frame.size.height-400);
+    
+    UIView* background = [[UIView alloc] init];
+    background.frame=CGRectMake(40, 190, view.frame.size.width-80, view.frame.size.height-380);
+    background.backgroundColor=[UIColor blackColor];
+    background.alpha = 0.5;
+    background.layer.cornerRadius = 8;
+    
+    [view addSubview:background];
+    [view addSubview:label];
+}
+
+-(void) _configurePreview:(UIView*)view withAttachment:(ZPZoteroAttachment*)attachment{
+    
+    
+    for(UIView* subview in view.subviews){
+        [subview removeFromSuperview];
+    }
+    view.layer.borderWidth = 2.0f;
+    view.backgroundColor = [UIColor whiteColor];
+    
+    UIImageView* imageView = NULL;
+    if(attachment.fileExists && [attachment.attachmentType isEqualToString:@"application/pdf"]){
+
+        UIImage* image = [_previewCache objectForKey:attachment.fileSystemPath];
+        
+        if(image == NULL){
+            NSLog(@"Start rendering %@",attachment.fileSystemPath);
+            [_previewCache setObject:[NSNull null] forKey:attachment.fileSystemPath];
+            
+            //Create an invocation
+            NSInvocationOperation* operation  = [[NSInvocationOperation alloc] initWithTarget:self selector:@selector(_renderThumbnailFromPDFFile:) object:attachment]; 
+            //Create operation and queue it for background retrieval
+            [_imageRenderQueue addOperation:operation];
+            NSLog(@"Added file %@ to preview render queue. Operations in queue now %i",attachment.attachmentTitle,[_imageRenderQueue operationCount]);
+        }
+        else if(image != [NSNull null]){
+            NSLog(@"Got an image from cache %@",attachment.fileSystemPath);
+            imageView = [[UIImageView alloc] initWithImage:image];
+            view.layer.frame = [self _getDimensionsWithImage:image];
+            imageView.layer.frame = [self _getDimensionsWithImage:image];
+        }
+        else NSLog(@"Image is being rendered %@",attachment.fileSystemPath);
+    }
+    
+    if(imageView == NULL){
+        imageView = [[UIImageView alloc] initWithImage:[_previewController getFiletypeImage:attachment]];   
+    }
+
+    [view addSubview:imageView];
+    imageView.center = view.center;
+    
+    //Configure label
+    [self _configurePreviewLabel:view withAttachment:attachment];
+    
+}
+
+-(void) _reloadAttachmentInCarousel:(ZPZoteroItem*)attachment {
+    NSInteger index = [_currentItem.attachments indexOfObject:attachment];
+    if(index !=NSNotFound) [_carousel reloadItemAtIndex:index animated:YES];
+}
+
+-(CGRect)_getDimensionsWithImage:(UIImage*) image{    
+    
+    float scalingFactor = ATTACHMENT_IMAGE_HEIGHT/image.size.height;
+    
+    if(ATTACHMENT_IMAGE_HEIGHT/image.size.width<scalingFactor) scalingFactor = ATTACHMENT_IMAGE_WIDTH/image.size.width;
+    
+    return CGRectMake(0,0,image.size.width*scalingFactor,image.size.height*scalingFactor);
+    
+}
+
+
+-(void) _renderThumbnailFromPDFFile:(ZPZoteroAttachment*)attachment{
+    
+    //
+    // Renders a first page of a PDF as an image
+    //
+    // Source: http://stackoverflow.com/questions/5658993/creating-pdf-thumbnail-in-iphone
+    //
+    NSString* filename = attachment.fileSystemPath;
+    
+    NSLog(@"Start rendering pdf %@",filename);
+    
+    NSURL *pdfUrl = [NSURL fileURLWithPath:filename];
+    CGPDFDocumentRef document = CGPDFDocumentCreateWithURL((__bridge_retained CFURLRef)pdfUrl);
+    
+    
+    CGPDFPageRef pageRef = CGPDFDocumentGetPage(document, 1);
+    CGRect pageRect = CGPDFPageGetBoxRect(pageRef, kCGPDFCropBox);
+    
+    UIGraphicsBeginImageContext(pageRect.size);
+    CGContextRef context = UIGraphicsGetCurrentContext();
+    CGContextTranslateCTM(context, CGRectGetMinX(pageRect),CGRectGetMaxY(pageRect));
+    CGContextScaleCTM(context, 1, -1);  
+    CGContextTranslateCTM(context, -(pageRect.origin.x), -(pageRect.origin.y));
+    CGContextDrawPDFPage(context, pageRef);
+    
+    UIImage* image = UIGraphicsGetImageFromCurrentImageContext();
+    UIGraphicsEndImageContext();
+    
+    NSLog(@"Done rendering pdf %@",filename);
+    
+    [_previewCache setObject:image forKey:filename];
+
+    [self performSelectorOnMainThread:@selector(_reloadAttachmentInCarousel:) withObject:attachment waitUntilDone:NO];
+    
+}
 /*
  
  sections
@@ -506,7 +650,13 @@
 
 - (UIView *)carousel:(iCarousel *)carousel viewForItemAtIndex:(NSUInteger)index
 {
-    return [_carouselViews objectAtIndex:index];
+    
+    ZPZoteroAttachment* attachment = [_currentItem.attachments objectAtIndex:index];
+        
+    UIView* view = [[UIView alloc] initWithFrame:CGRectMake(0, 0, ATTACHMENT_IMAGE_WIDTH, ATTACHMENT_IMAGE_HEIGHT)];
+    [self _configurePreview:view withAttachment:attachment];
+        
+    return view;
 }
 
 #pragma mark -

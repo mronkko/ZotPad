@@ -23,19 +23,11 @@
 @interface ZPFileThumbnailAndQuicklookController(){
     ZPZoteroAttachment* _currentAttachment;
 }
-    
-
--(UIImage*) _renderThumbnailFromPDFFile:(NSString*)filename;
--(CGRect)_getDimensionsWithImage:(UIImage*) image; 
--(UIImage*) _getFiletypeImage:(ZPZoteroAttachment*)attachment;
-
 - (void) _downloadWithProgressAlert:(ZPZoteroAttachment *)attachment;
 - (void) _downloadAttachment:(ZPZoteroAttachment *)attachment withUIProgressView:(UIProgressView*) progressView progressAlert:(UIAlertView*)progressAlert;
 
 
 -(void) _configureButton:(UIButton*) button;
--(void) _configurePreview:(UIView*) view withAttachment:(ZPZoteroAttachment*)attachment;
--(void) _configurePreviewLabel:(UIView*)view withAttachment:(ZPZoteroAttachment*)attachment;
 
 @end
 
@@ -43,15 +35,10 @@
 
 @implementation ZPFileThumbnailAndQuicklookController
 
-static NSOperationQueue* _imageRenderQueue;
 static NSCache* _fileTypeImageCache;
 
 -(id) initWithItem:(ZPZoteroItem*)item viewController:(UIViewController*) viewController maxHeight:(NSInteger)maxHeight maxWidth:(NSInteger)maxWidth{
     
-    if(_imageRenderQueue == NULL){
-        _imageRenderQueue = [[NSOperationQueue alloc] init];
-        [_imageRenderQueue setMaxConcurrentOperationCount:3];
-    }
     if(_fileTypeImageCache == NULL){
         _fileTypeImageCache = [[NSCache alloc] init];
     }
@@ -129,17 +116,8 @@ static NSCache* _fileTypeImageCache;
     }
 }
 
--(CGRect)_getDimensionsWithImage:(UIImage*) image{    
-    
-    float scalingFactor = _maxHeight/image.size.height;
-    
-    if(_maxWidth/image.size.width<scalingFactor) scalingFactor = _maxWidth/image.size.width;
-    
-    return CGRectMake(0,0,image.size.width*scalingFactor,image.size.height*scalingFactor);
 
-}
-
--(UIImage*) _getFiletypeImage:(ZPZoteroAttachment*)attachment{
+-(UIImage*) getFiletypeImage:(ZPZoteroAttachment*)attachment{
 
     
     NSString* key = [NSString stringWithFormat:@"%@%ix%i",attachment.attachmentType,_maxHeight,_maxWidth];
@@ -185,7 +163,7 @@ static NSCache* _fileTypeImageCache;
 -(void) configureButton:(UIButton*) button withAttachment:(ZPZoteroAttachment*)attachment{
 
     
-    UIImage* image = [self _getFiletypeImage:attachment];
+    UIImage* image = [self getFiletypeImage:attachment];
     [button setImage:image forState:UIControlStateNormal];
     [button setNeedsDisplay];
     
@@ -199,27 +177,6 @@ static NSCache* _fileTypeImageCache;
     }
 }
 
-
-/*
-
- Renders a small thumbnail of an article page 
- 
- Not currently used. Do not remove. 
- 
- */
--(void) _configureButton:(UIButton*) button{
-
-    ZPZoteroAttachment* attachment = [_item.attachments objectAtIndex:0];
-    UIImage* image;
-    if([button superview] != nil && attachment.fileExists) image  = [self _renderThumbnailFromPDFFile:attachment.fileSystemPath];
-    if([button superview] != nil){
-        [button setImage:image forState:UIControlStateNormal];
-        button.frame=[self _getDimensionsWithImage:image];
-        button.layer.borderWidth = 1.0f;
-        [button setNeedsDisplay];
-    }
-    
-}
 
 #pragma mark Item downloading
 
@@ -259,150 +216,6 @@ static NSCache* _fileTypeImageCache;
     [[ZPServerConnection instance] downloadAttachment:attachment withUIProgressView:progressView];
     [progressAlert dismissWithClickedButtonIndex:0 animated:YES];
     [self performSelectorOnMainThread:@selector(openInQuickLookWithAttachment:) withObject:attachment waitUntilDone:NO];
-}
-
-
--(void) _configurePreviewLabel:(UIView*)view withAttachment:(ZPZoteroAttachment*)attachment{
-
-    //Add a label over the view
-    NSString* extraInfo;
-    
-    
-    if([attachment fileExists] && ![attachment.attachmentType isEqualToString:@"application/pdf"]){
-        extraInfo = [@"Preview not supported for " stringByAppendingString:attachment.attachmentType];
-    }
-    else if(![attachment fileExists] ){
-        if([[ZPPreferences instance] online]) extraInfo = [NSString stringWithFormat:@"Tap to download KB %i.",attachment.attachmentLength/1024];
-        else  extraInfo = @"File has not been downloaded";
-    }
-
-    //Add information over the thumbnail
-
-
-    UILabel* label = [[UILabel alloc] init];
-    
-    if(extraInfo!=NULL) label.text = [NSString stringWithFormat:@"%@ \n\n(%@)", attachment.attachmentTitle, extraInfo];
-    else label.text = [NSString stringWithFormat:@"%@", attachment.attachmentTitle];
-    
-    label.textColor = [UIColor whiteColor];
-    label.backgroundColor = [UIColor clearColor];
-    label.textAlignment = UITextAlignmentCenter;
-    label.lineBreakMode = UILineBreakModeWordWrap;
-    label.numberOfLines = 5;
-    label.frame=CGRectMake(50, 200, view.frame.size.width-100, view.frame.size.height-400);
-    
-    UIView* background = [[UIView alloc] init];
-    background.frame=CGRectMake(40, 190, view.frame.size.width-80, view.frame.size.height-380);
-    background.backgroundColor=[UIColor blackColor];
-    background.alpha = 0.5;
-    background.layer.cornerRadius = 8;
-    
-    [view addSubview:background];
-    [view addSubview:label];
-}
-
--(void) configurePreview:(UIView*)view withAttachment:(ZPZoteroAttachment*)attachment{
-    
-
-    for(UIView* subview in view.subviews){
-        [subview removeFromSuperview];
-    }
-    view.layer.borderWidth = 2.0f;
-    view.backgroundColor = [UIColor whiteColor];
-
-    UIImageView* imageView = [[UIImageView alloc] initWithImage:[self _getFiletypeImage:attachment]];
-    [view addSubview:imageView];
-    imageView.center = view.center;
-    
-    [self _configurePreviewLabel:view withAttachment:attachment];
-    
-    
-    //Render an image 
-    
-    //Create an invocation
-    if(attachment.fileExists && [attachment.attachmentType isEqualToString:@"application/pdf"]){
-        SEL selector = @selector(_configurePreview:withAttachment:);
-        NSMethodSignature* signature = [[self class] instanceMethodSignatureForSelector:selector];
-        NSInvocation* invocation  = [NSInvocation invocationWithMethodSignature:signature];
-        [invocation setTarget:self];
-        [invocation setSelector:selector];
-        
-        //Set arguments
-        [invocation setArgument:&view atIndex:2];
-        [invocation setArgument:&attachment atIndex:3];
-        
-        //Create operation and queue it for background retrieval
-        NSOperation* operation = [[NSInvocationOperation alloc] initWithInvocation:invocation];
-        [_imageRenderQueue addOperation:operation];
-    }
-}
-
--(void) _configurePreview:(UIView*)view withAttachment:(ZPZoteroAttachment*)attachment{
-
-    //Render images
-    
-    UIImage* image;
-    if( attachment.fileExists && [attachment.attachmentType isEqualToString:@"application/pdf"]){
-        //TODO: Figure out a way to stop rendering if the user has switched to another item
-            
-        image  = [self _renderThumbnailFromPDFFile:attachment.fileSystemPath];
-        
-        if(image!=NULL){
-            
-            UIView* subview;
-            NSArray* subviews=[NSArray arrayWithArray:view.subviews];
-            for(subview in subviews){
-                [subview removeFromSuperview];
-            }
-            
-            UIImageView* imageView = [[UIImageView alloc] initWithImage:image];
-            
-            view.layer.frame = [self _getDimensionsWithImage:image];
-            imageView.layer.frame = [self _getDimensionsWithImage:image];
-            [view setNeedsLayout];
-            
-            [view addSubview:imageView];
-            //Add the subviews back, but not the imageview
-            for(subview in subviews){
-                if(! [subview isKindOfClass:[UIImageView class]]) [view addSubview:subview];
-            }
-            
-            [view setNeedsDisplay];
-            [[(ZPItemDetailViewController*) _viewController carousel] reloadItemAtIndex:[_item.attachments indexOfObject:attachment] animated:YES];
-
-        }
-    }
-}
-
-
--(UIImage*) _renderThumbnailFromPDFFile:(NSString*)filename{
-    
-    //
-    // Renders a first page of a PDF as an image
-    //
-    // Source: http://stackoverflow.com/questions/5658993/creating-pdf-thumbnail-in-iphone
-    //
-    
-    NSURL *pdfUrl = [NSURL fileURLWithPath:filename];
-    CGPDFDocumentRef document = CGPDFDocumentCreateWithURL((__bridge_retained CFURLRef)pdfUrl);
-    
-    
-    CGPDFPageRef pageRef = CGPDFDocumentGetPage(document, 1);
-    CGRect pageRect = CGPDFPageGetBoxRect(pageRef, kCGPDFCropBox);
-    
-    NSLog(@"Rendering pdf, width = %f, height = %f",pageRect.size.width,pageRect.size.height);
-    UIGraphicsBeginImageContext(pageRect.size);
-    CGContextRef context = UIGraphicsGetCurrentContext();
-    CGContextTranslateCTM(context, CGRectGetMinX(pageRect),CGRectGetMaxY(pageRect));
-    CGContextScaleCTM(context, 1, -1);  
-    CGContextTranslateCTM(context, -(pageRect.origin.x), -(pageRect.origin.y));
-    CGContextDrawPDFPage(context, pageRef);
-    
-    UIImage* image = UIGraphicsGetImageFromCurrentImageContext();
-    UIGraphicsEndImageContext();
-    
-    return image;
-    
 }
 
 

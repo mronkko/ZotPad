@@ -24,8 +24,7 @@
 -(id) initWithItem:(ZPZoteroItem*)item viewController:(UIViewController*) viewController maxHeight:(NSInteger)maxHeight maxWidth:(NSInteger)maxWidth;
 -(void) buttonTapped:(id)sender;
 -(void) openInQuickLookWithAttachment:(ZPZoteroAttachment*) attachment;
-
 -(void) configureButton:(UIButton*) button withAttachment:(ZPZoteroAttachment*)attachment;
--(void) configurePreview:(UIView*) view withAttachment:(ZPZoteroAttachment*)attachment;
+-(UIImage*) getFiletypeImage:(ZPZoteroAttachment*)attachment;
 
 @end

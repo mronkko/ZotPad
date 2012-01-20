@@ -479,7 +479,9 @@ static ZPCacheController* _instance = nil;
 }
 
 -(void) _updateItemDetailsFromServer:(ZPZoteroItem*)item{
-    
+
+    if(item == NULL) [NSException raise:@"Item cannot be null" format:@"Method _updateItemDetailsFromServer was called with an argument that was null."];
+
     _activeItemKey = item.key;
     
     item = [[ZPServerConnection instance] retrieveSingleItemDetailsFromServer:item];

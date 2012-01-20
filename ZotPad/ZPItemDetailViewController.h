@@ -24,7 +24,8 @@
     ZPFileThumbnailAndQuicklookController* _previewController;
     UIActivityIndicatorView* _activityIndicator;
     NSInteger _detailTitleWidth;
-    NSArray* _carouselViews;
+        
+    NSCache* _previewCache;
 }
 
 @property (nonatomic, retain) IBOutlet iCarousel* carousel;
