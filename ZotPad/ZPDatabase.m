@@ -378,10 +378,10 @@ Deletes items, notes, and attachments
         
         FMResultSet* resultSet;
         if(collectionKey == NULL)
-            resultSet= [_database executeQuery:@"SELECT key FROM collections WHERE libraryID=? AND parentCollectionKey IS NULL",libraryID,libraryID];
+            resultSet= [_database executeQuery:@"SELECT key FROM collections WHERE libraryID=? AND parentCollectionKey IS NULL",libraryID];
         
         else
-            resultSet= [_database executeQuery:@"SELECT key FROM collections WHERE libraryID=? AND parentCollectionKey = ?",libraryID,libraryID,collectionKey];
+            resultSet= [_database executeQuery:@"SELECT key FROM collections WHERE libraryID=? AND parentCollectionKey = ?",libraryID,collectionKey];
         
         
         

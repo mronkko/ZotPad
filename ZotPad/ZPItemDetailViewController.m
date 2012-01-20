@@ -179,6 +179,7 @@
     else{
         [_carousel setHidden:FALSE];
         [_carousel setScrollEnabled:[_currentItem.attachments count]>1];
+        [_carousel reloadData];
     }
     
 }
@@ -599,17 +600,14 @@
 
 
 -(void) notifyAttachmentDownloadCompleted:(ZPZoteroAttachment*) attachment{
-    ZPZoteroAttachment* thisAttachment;
-    NSInteger index=0;
-    for(thisAttachment in _currentItem.attachments){
-        if([attachment isEqual:thisAttachment]){
-            //It is possible that we have new items from this view
-            [_activityIndicator startAnimating];
-            //TODO: Smarter reloading. Do inserts and reloads on a view level instead
-            [_carousel reloadData];
-            [_activityIndicator stopAnimating];
-        }
-        index++;
+
+    NSInteger index= [_currentItem.attachments indexOfObject:attachment];
+    if(index != NSNotFound){
+        //It is possible that we have new items from this view
+        [_activityIndicator startAnimating];
+        //TODO: Smarter reloading. Do inserts and reloads on a view level instead
+        [_carousel reloadItemAtIndex:index animated:YES];
+        [_activityIndicator stopAnimating];
     }
 }
 
