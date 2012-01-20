@@ -34,8 +34,9 @@ void ZPLog(NSObject* source,int line,NSString* format, ...){
         [debugClasses addObject:@"ZPAppDelegate"];
 //        [debugClasses addObject:@"ZPDatabase"];
 //        [debugClasses addObject:@"ZPAuthenticationDialog"];
-        [debugClasses addObject:@"ZPFileThumbnailAndQuicklookController"];
-        [debugClasses addObject:@"ZPItemDetailViewController"];
+//        [debugClasses addObject:@"ZPFileThumbnailAndQuicklookController"];
+//        [debugClasses addObject:@"ZPItemDetailViewController"];
+        [debugClasses addObject:@"ZPUncachedItemsOperation"];
   
         
         
@@ -47,9 +48,9 @@ void ZPLog(NSObject* source,int line,NSString* format, ...){
         
         NSTimeInterval milliseconds = -([timeWhenAppStarted timeIntervalSinceNow] * 1000);
 //        NSString* logPrefix = [NSString stringWithFormat:@"%i - %@:%i ",milliseconds,name,line];
-        NSString* logPrefix = [NSString stringWithFormat:@"\n\n%f - ",milliseconds];
+        NSString* logPrefix = [NSString stringWithFormat:@"\n%f - ",milliseconds];
         logPrefix = [logPrefix stringByAppendingString:name];
-        logPrefix = [logPrefix stringByAppendingFormat:@":%i ",line];
+        logPrefix = [logPrefix stringByAppendingFormat:@":%i",line];
         
         va_list args;
         va_start(args,format);
@@ -58,7 +59,7 @@ void ZPLog(NSObject* source,int line,NSString* format, ...){
         va_end(args);
         
         
-        fprintf(stderr,"%s",[message UTF8String]);
+        fprintf(stderr,"%s\n",[message UTF8String]);
     }
 }
 

@@ -43,7 +43,6 @@
 - (NSArray*) collectionsForLibrary : (NSNumber*)currentLibraryID withParentCollection:(NSString*)currentCollectionKey;
 - (NSArray*) getItemKeysFromCacheForLibrary:(NSNumber*)libraryID collection:(NSString*)collectionKey
                         searchString:(NSString*)searchString orderField:(NSString*)orderField sortDescending:(BOOL)sortDescending;
-- (void) uncachedItemKeysForView:(ZPDetailedItemListViewController*)listViewController;
 
 
 

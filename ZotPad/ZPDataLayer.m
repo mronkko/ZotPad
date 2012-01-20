@@ -28,87 +28,6 @@
 #import "ZPLogger.h"
 
 
-//A small helper class for performing configuration of uncanched items list in itemlistview
-
-@interface ZPUncachedItemsOperation : NSOperation {
-@private
-    NSString*_searchString;
-    NSString*_collectionKey;
-    NSNumber* _libraryID;
-    NSString* _orderField;
-    BOOL _sortDescending;
-    ZPDetailedItemListViewController* _itemListController;
-}
-
--(id) initWithItemListController:(ZPDetailedItemListViewController*)itemListController;
-
-@end
-
-@implementation ZPUncachedItemsOperation;
-
--(id) initWithItemListController:(ZPDetailedItemListViewController*)itemListController{
-    self = [super init];
-    _itemListController=itemListController;
-    _searchString = itemListController.searchString;
-    _collectionKey = itemListController.collectionKey;
-    _libraryID = itemListController.libraryID;
-    _orderField = itemListController.orderField;
-    _sortDescending = itemListController.sortDescending;
-    
-    return self;
-}
-
--(void)main {
-
-    if ( self.isCancelled ) return;
-
-    [[ZPCacheController instance] setActiveLibrary:_libraryID collection:_collectionKey];
-    
-    NSArray* serverKeys =[[ZPServerConnection instance] retrieveKeysInContainer:_libraryID collectionKey:_collectionKey searchString:_searchString orderField:_orderField sortDescending:_sortDescending];
-
-    if ( self.isCancelled ) return;
-    
-    //Remove items that we have in the cache
-       
-    NSArray* cachedKeys = [[ZPDatabase instance] getItemKeysForLibrary:_libraryID collectionKey:_collectionKey searchString:_searchString orderField:_orderField sortDescending:_sortDescending];
-
-    if ( self.isCancelled ) return;
-
-    
-    NSMutableArray* uncachedItems = [NSMutableArray arrayWithArray:serverKeys];
-    [uncachedItems removeObjectsInArray:cachedKeys];
-    
-    //Check if the collection memberships are still valid in the cache
-    if(_searchString == NULL || [_searchString isEqualToString:@""]){
-        if([serverKeys count]!=[cachedKeys count] || [uncachedItems count] > 0){
-            if(_collectionKey == NULL){
-                [[ZPDatabase instance] deleteItemKeysNotInArray:serverKeys fromLibrary:_libraryID];
-            }
-            else{
-                [[ZPDatabase instance] removeItemKeysNotInArray:serverKeys fromCollection:_collectionKey];
-                [[ZPDatabase instance] addItemKeys:uncachedItems toCollection:_collectionKey];
-            }
-            
-        }
-    }
-
-    if ( self.isCancelled ) return;
-
-    //Add this into the queue if there are any uncached items
-    if([uncachedItems count]>0){
-        [[ZPCacheController instance] addToItemQueue:uncachedItems libraryID:_libraryID priority:YES];
-        
-        if(![_searchString isEqualToString:@""]){
-            if(_collectionKey!=NULL && ! [_searchString isEqualToString:@""]) [[ZPCacheController instance] addToCollectionsQueue:[ZPZoteroCollection ZPZoteroCollectionWithKey:_collectionKey]  priority:YES];
-            else [[ZPCacheController instance] addToLibrariesQueue:[ZPZoteroLibrary ZPZoteroLibraryWithID: _libraryID] priority:YES];
-        }
-    }
-    
-    if ( self.isCancelled ) return;
-    
-    [_itemListController configureUncachedKeys:uncachedItems];
-}
-@end
 
 //Private methods 
 
@@ -177,15 +96,11 @@ static ZPDataLayer* _instance = nil;
 }
 
 
-/*
- 
- Creates an array that will hold the item IDs of the current view. Initially contains only 15 first
-    IDs with the rest of the item ids set to 0 and populated later in the bacground.
-
- */
-
 
 - (NSArray*) getItemKeysFromCacheForLibrary:(NSNumber*)libraryID collection:(NSString*)collectionKey searchString:(NSString*)searchString orderField:(NSString*)orderField sortDescending:(BOOL)sortDescending{
+    
+    [[ZPCacheController instance] setActiveLibrary:libraryID collection:collectionKey];
+    
     return [[ZPDatabase instance] getItemKeysForLibrary:libraryID collectionKey:collectionKey searchString:searchString orderField:orderField sortDescending:sortDescending];
 }
 
@@ -198,13 +113,6 @@ static ZPDataLayer* _instance = nil;
 
 
 
-- (void) uncachedItemKeysForView:(ZPDetailedItemListViewController*)listViewController{
-    
-    //This queue is only used for retrieving key lists for uncahced items, so we can just invalidate all previous requests
-    [_serverRequestQueue cancelAllOperations];
-    ZPUncachedItemsOperation* operation = [[ZPUncachedItemsOperation alloc] initWithItemListController:listViewController];
-    [_serverRequestQueue addOperation:operation];
-}
 
 
 -(void) notifyItemsAvailable:(NSArray*)items{

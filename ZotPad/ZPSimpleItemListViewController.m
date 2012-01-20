@@ -13,14 +13,13 @@
 #import "ZPLogger.h"
 
 
-#define SIZE_OF_TABLEVIEW_UPDATE_BATCH 5
+#define SIZE_OF_TABLEVIEW_UPDATE_BATCH 25
 #define SIZE_OF_DATABASE_UPDATE_BATCH 50
 
 @interface ZPSimpleItemListViewController();
+
 -(void) _updateRowForItem:(ZPZoteroItem*)item;
--(void) _performRowReloads:(NSArray*)indexPaths;
--(void) _performRowInsertions:(NSArray*)indexPaths;
--(void) _performRowDeletions:(NSArray*)indexPaths;
+-(void) _performRowInsertions:(NSArray*)insertIndexPaths reloads:(NSArray*)reloadIndexPaths tableLength:(NSNumber*)tableLength;
 
 @end
 
@@ -91,9 +90,9 @@
         
         if(found){
             
-            if(update){
+            if(update){  
                 _animations = UITableViewRowAnimationAutomatic;
-                [self _performTableUpdates];
+                [self _performTableUpdates:TRUE];
             }
         }
         else if([_itemKeysShown containsObject:item.key]){
@@ -105,8 +104,9 @@
     }    
 }
 
--(void) _performTableUpdates{
+-(void) _performTableUpdates:(BOOL)animated{
     
+    NSLog(@"Start table updates");
     //Only one thread at a time
     @synchronized(self){
         //Get a pointer to an array to know if another thread has changed this in the background
@@ -121,28 +121,31 @@
 
         //If there is a new set of items loaded, return without performing any updates. 
         if(thisItemKeys != _itemKeysShown || _invalidated) return;
-        
+
+        NSLog(@"Beging updating the table rows: Known keys befor update %i. Unknown keys %i. New keys %i",[_itemKeysShown count],[_itemKeysNotInCache count],[newKeys count]);
+
         @synchronized(_itemKeysNotInCache){
             [_itemKeysNotInCache removeObjectsInArray:newKeys];
         }
-        NSLog(@"Beging updating the table rows");
-        
+
         NSInteger index=0;
         NSMutableArray* reloadIndices = [NSMutableArray array];
         NSMutableArray* insertIndices = [NSMutableArray array];
         
         for(NSString* newKey in newKeys){
-            
             //If there is a new set of items loaded, return without performing any updates. 
             if(thisItemKeys != _itemKeysShown || _invalidated ) return;
             
+            //First index contains a placeholder cell
+            
             if([newItemKeysShown count] == index){
-//                NSLog(@"Adding item %@ at %i",newKey,index);
+               // NSLog(@"Adding item %@ at %i",newKey,index);
                 [newItemKeysShown addObject:newKey];
-                [insertIndices addObject:[NSIndexPath indexPathForRow:index inSection:0]];
+                if(index==0) [reloadIndices addObject:[NSIndexPath indexPathForRow:index inSection:0]];
+                else [insertIndices addObject:[NSIndexPath indexPathForRow:index inSection:0]];
             }
             else if([newItemKeysShown objectAtIndex:index] == [NSNull null]){
-//                NSLog(@"Replacing NULL with %@ at %i",newKey,index);
+               // NSLog(@"Replacing NULL with %@ at %i",newKey,index);
                 [newItemKeysShown replaceObjectAtIndex:index withObject:newKey];
                 [reloadIndices addObject:[NSIndexPath indexPathForRow:index inSection:0]];
             }
@@ -156,12 +159,14 @@
                 
                 //If the new data cannot be found in the view, insert it
                 if(oldIndex==NSNotFound){
-//                    NSLog(@"Inserting %@ at %i",newKey,index);
+                 //   NSLog(@"Inserting %@ at %i",newKey,index);
                     [newItemKeysShown insertObject:newKey atIndex:index];
                     [insertIndices addObject:[NSIndexPath indexPathForRow:index inSection:0]];
                 }
                 //Else move it
                 else{
+                   // NSLog(@"Moving %@ from %i to %i",newKey,oldIndex,index);
+
                     //Instead of performing a move operation, we are just replacing the old location with null. This because of thread safety.
                     
                     [newItemKeysShown replaceObjectAtIndex:oldIndex withObject:[NSNull null]];
@@ -177,7 +182,11 @@
         @synchronized(_itemKeysNotInCache){
             while([newItemKeysShown count]<([_itemKeysNotInCache count] + [newKeys count])){
                 //            NSLog(@"Padding with null %i (Unknown keys: %i, Known keys: %i)",[newItemKeysShown count],[_itemKeysNotInCache count],[newKeys count]);
-                [insertIndices addObject:[NSIndexPath indexPathForRow:[newItemKeysShown count] inSection:0]];
+                if([newItemKeysShown count]==0)
+                    [reloadIndices addObject:[NSIndexPath indexPathForRow:0 inSection:0]];
+                else{
+                    [insertIndices addObject:[NSIndexPath indexPathForRow:[newItemKeysShown count] inSection:0]];
+                }
                 [newItemKeysShown addObject:[NSNull null]];
             }
         }
@@ -187,38 +196,60 @@
             if(thisItemKeys != _itemKeysShown || _invalidated) return;
             
             _itemKeysShown = newItemKeysShown;
-            if([insertIndices count]>0) [self performSelectorOnMainThread:@selector(_performRowInsertions:) withObject:insertIndices waitUntilDone:TRUE];
-            if([reloadIndices count]>0) [self performSelectorOnMainThread:@selector(_performRowReloads:) withObject:reloadIndices waitUntilDone:TRUE];
-            
-            //If modifications have caused the visible items become too long, remove items from the end
 
-            NSMutableArray* deleteIndices = [NSMutableArray array];
-            @synchronized(_itemKeysNotInCache){
-                while([newItemKeysShown count]>([_itemKeysNotInCache count] + [newKeys count])){
-                 //   NSLog(@"Removing extra from end %i (Unknown keys: %i, Known keys: %i)",[newItemKeysShown count],[_itemKeysNotInCache count],[newKeys count]);
-                    [newItemKeysShown removeLastObject];
-                    [deleteIndices addObject:[NSIndexPath indexPathForRow:[newItemKeysShown count] inSection:0]];
-                }
-                if([deleteIndices count] >0) [self performSelectorOnMainThread:@selector(_performRowDeletions:) withObject:deleteIndices waitUntilDone:YES];
+            NSNumber* tableLength = [NSNumber numberWithInt:[_itemKeysNotInCache count] + [newKeys count]];
+
+            if(animated){
+                SEL selector = @selector(_performRowInsertions:reloads:tableLength:);
+                NSMethodSignature* signature = [[self class] instanceMethodSignatureForSelector:selector];
+                NSInvocation* invocation  = [NSInvocation invocationWithMethodSignature:signature];
+                [invocation setTarget:self];
+                [invocation setSelector:selector];
+                
+                //Set arguments
+                [invocation setArgument:&insertIndices atIndex:2];
+                [invocation setArgument:&reloadIndices atIndex:3];
+                [invocation setArgument:&tableLength atIndex:4];
+                
+                
+                [invocation performSelectorOnMainThread:@selector(invoke) withObject:NULL waitUntilDone:YES];
             }
-
+            else{
+                if([tableLength intValue]>[_itemKeysShown count]){
+                    _itemKeysShown = [_itemKeysShown subarrayWithRange:NSMakeRange(0,[tableLength intValue])];
+                }
+                [_tableView performSelectorOnMainThread:@selector(reloadData) withObject:NULL waitUntilDone:YES];
+            }
             NSLog(@"End updating the table rows");
             
             if([_itemKeysNotInCache count] == 0) [_activityIndicator stopAnimating];
+            
         }
     }
 }
 
--(void) _performRowReloads:(NSArray*)indexPaths{
-    [_tableView reloadRowsAtIndexPaths:indexPaths withRowAnimation:_animations];
-}
--(void) _performRowInsertions:(NSArray*)indexPaths{
-    [_tableView insertRowsAtIndexPaths:indexPaths withRowAnimation:_animations];
-}
--(void) _performRowDeletions:(NSArray*)indexPaths{
-    [_tableView deleteRowsAtIndexPaths:indexPaths withRowAnimation:_animations];
-}
 
+-(void) _performRowInsertions:(NSArray*)insertIndexPaths reloads:(NSArray*)reloadIndexPaths tableLength:(NSNumber*)tableLength{
+    NSLog(@"Modifying the table. Inserts %i Reloads %i",[insertIndexPaths count],[reloadIndexPaths count]);
+    [_tableView beginUpdates];
+    if([insertIndexPaths count]>0) [_tableView insertRowsAtIndexPaths:insertIndexPaths withRowAnimation:_animations];
+    if([reloadIndexPaths count]>0) [_tableView reloadRowsAtIndexPaths:reloadIndexPaths withRowAnimation:_animations];
+
+    if([tableLength intValue]>[_itemKeysShown count]){
+        NSMutableArray* deleteIndexPaths = [NSMutableArray array];
+        
+        for(NSInteger i=[_itemKeysShown count];i>[tableLength intValue];i--){
+            [deleteIndexPaths addObject:[NSIndexPath indexPathForRow:i inSection:0]];
+        }
+        
+        _itemKeysShown = [_itemKeysShown subarrayWithRange:NSMakeRange(0,[tableLength intValue])];
+        NSLog(@"Deletes %i",[deleteIndexPaths count]);
+        
+        [_tableView deleteRowsAtIndexPaths:deleteIndexPaths withRowAnimation:_animations];
+    }
+
+    [_tableView endUpdates];
+}
 -(void) _updateRowForItem:(ZPZoteroItem*)item{
     [_cellCache removeObjectForKey:item.key];
     NSIndexPath* indexPath = [NSIndexPath indexPathForRow:[_itemKeysShown indexOfObject:item.key] inSection:0];
@@ -230,7 +261,9 @@
 #pragma mark UITableViewDataSource Protocol Methods
 
 - (NSInteger)tableView:(UITableView *)aTableView numberOfRowsInSection:(NSInteger)section {
-    return [_itemKeysShown count];
+    NSInteger rows=MAX(1,[_itemKeysShown count]);
+    NSLog(@"Number of rows is now %i",rows);
+    return rows;
 }
 
 - (NSInteger)numberOfSectionsInTableView:(UITableView *)tableView{
@@ -241,9 +274,12 @@
 
 - (UITableViewCell *)tableView:(UITableView *)tableView cellForRowAtIndexPath:(NSIndexPath *)indexPath {
     
+    //If the data has become invalid, return a cell 
+    NSArray* tempArray = _itemKeysShown;
+    if(indexPath.row>=[tempArray count]) return [tableView dequeueReusableCellWithIdentifier:@"BlankCell"];
     
     
-    NSObject* keyObj = [_itemKeysShown objectAtIndex: indexPath.row];
+    NSObject* keyObj = [tempArray objectAtIndex: indexPath.row];
     
     
     NSString* key;

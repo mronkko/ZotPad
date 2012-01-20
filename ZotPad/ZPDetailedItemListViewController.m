@@ -17,16 +17,123 @@
 
 #import "ZPLogger.h"
 
-@interface ZPDetailedItemListViewController (){
-    ZPFileThumbnailAndQuicklookController* _buttonController;
+//TODO: Refactor so that these would not be needed
+#import "ZPServerConnection.h"
+#import "ZPDatabase.h"
+#import "ZPCacheController.h"
+
+
+//A small helper class for performing configuration of uncanched items list in itemlistview
+
+@interface ZPUncachedItemsOperation : NSOperation {
+@private
+    NSString*_searchString;
+    NSString*_collectionKey;
+    NSNumber* _libraryID;
+    NSString* _orderField;
+    BOOL _sortDescending;
+    ZPDetailedItemListViewController* _itemListController;
 }
 
-- (void)_makeBusy;
-- (void)_makeAvailable;
-- (void) _configureCachedKeys;
+-(id) initWithItemListController:(ZPDetailedItemListViewController*)itemListController;
+
+@end
+
+@implementation ZPUncachedItemsOperation;
+
+-(id) initWithItemListController:(ZPDetailedItemListViewController*)itemListController{
+    self = [super init];
+    _itemListController=itemListController;
+    _searchString = itemListController.searchString;
+    _collectionKey = itemListController.collectionKey;
+    _libraryID = itemListController.libraryID;
+    _orderField = itemListController.orderField;
+    _sortDescending = itemListController.sortDescending;
+    
+    return self;
+}
+
+-(void)main {
+    
+    if ( self.isCancelled ) return;
+    NSLog(@"Clearing table");
+    
+    [_itemListController clearTable];
+    NSLog(@"Retrieving cached keys");
+    NSArray* cacheKeys= [[ZPDataLayer instance] getItemKeysFromCacheForLibrary:_libraryID collection:_collectionKey
+                                                               searchString:_searchString orderField:_orderField sortDescending:_sortDescending];
+    NSLog(@"Got cached keys");
+    if ( self.isCancelled ) return;
+    
+    if([cacheKeys count]>0){
+        NSLog(@"Configuring cached keys");
+
+        [_itemListController configureCachedKeys:cacheKeys];
+    }
+    
+    if([[ZPPreferences instance] online]){
+        if ( self.isCancelled ) return;
+        NSLog(@"Retrieving server keys");
+
+        if([cacheKeys count]==0){
+            NSLog(@"Making view busy");
+            [_itemListController performSelectorOnMainThread:@selector(makeBusy) withObject:NULL waitUntilDone:FALSE];        
+        }
+        NSArray* serverKeys =[[ZPServerConnection instance] retrieveKeysInContainer:_libraryID collectionKey:_collectionKey searchString:_searchString orderField:_orderField sortDescending:_sortDescending];
+
+        NSMutableArray* uncachedItems = [NSMutableArray arrayWithArray:serverKeys];
+        [uncachedItems removeObjectsInArray:cacheKeys];
+        
+        //Check if the collection memberships are still valid in the cache
+        if(_searchString == NULL || [_searchString isEqualToString:@""]){
+            if([serverKeys count]!=[cacheKeys count] || [uncachedItems count] > 0){
+                if(_collectionKey == NULL){
+                    [[ZPDatabase instance] deleteItemKeysNotInArray:serverKeys fromLibrary:_libraryID];
+                }
+                else{
+                    [[ZPDatabase instance] removeItemKeysNotInArray:serverKeys fromCollection:_collectionKey];
+                    [[ZPDatabase instance] addItemKeys:uncachedItems toCollection:_collectionKey];
+                }
+                
+            }
+        }
+
+        if ( self.isCancelled ) return;
+        
+        //Add this into the queue if there are any uncached items
+        if([uncachedItems count]>0){
+            [[ZPCacheController instance] addToItemQueue:uncachedItems libraryID:_libraryID priority:YES];
+            
+            if(![_searchString isEqualToString:@""]){
+                if(_collectionKey!=NULL && ! [_searchString isEqualToString:@""]) [[ZPCacheController instance] addToCollectionsQueue:[ZPZoteroCollection ZPZoteroCollectionWithKey:_collectionKey]  priority:YES];
+                else [[ZPCacheController instance] addToLibrariesQueue:[ZPZoteroLibrary ZPZoteroLibraryWithID: _libraryID] priority:YES];
+            }
+        }
+
+        if ( self.isCancelled ) return;
+        NSLog(@"Setting server keys");
+
+        [_itemListController configureUncachedKeys:uncachedItems];
+    }
+    
+    
+    
+    
+    
+    
+}
+@end
+
+
+@interface ZPDetailedItemListViewController (){
+    ZPFileThumbnailAndQuicklookController* _buttonController;
+    NSOperationQueue* _uiEventQueue;
+}
 
 @property (strong, nonatomic) UIPopoverController *masterPopoverController;
+
 @end
+
 
 @implementation ZPDetailedItemListViewController
 
@@ -40,7 +147,6 @@ static ZPDetailedItemListViewController* _instance = nil;
 
 -(id) init{
     self = [super init];
-                           
     return self;
 }
 
@@ -57,17 +163,19 @@ static ZPDetailedItemListViewController* _instance = nil;
 
 - (void)configureView
 {
-    
+    //Clear item keys shown so that UI knows to stop drawing the old items
+    _invalidated = TRUE;
+    [[ZPDataLayer instance] removeItemObserver:self];
+
     if([NSThread isMainThread]){
-        NSLog(@"Started configuring view");
-        // Update the user interface for the detail item.
+
         
         if (self.masterPopoverController != nil) {
             [self.masterPopoverController dismissPopoverAnimated:YES];
         }
         
 
-        [self _makeAvailable];
+        [self makeAvailable];
 
         // Retrieve the item IDs if a library is selected. 
         
@@ -75,31 +183,12 @@ static ZPDetailedItemListViewController* _instance = nil;
             
             [_activityIndicator startAnimating];
             
-            //Clear item keys shown so that UI knows to stop drawing the old items
-            _invalidated = TRUE;
             
-            //This is required because a background thread might be modifying the table
-            NSLog(@"Entering table lock");
-            @synchronized(_tableView){
-
-                _itemKeysNotInCache = [NSMutableArray array];
-                _itemKeysShown = [NSArray array];
-
-                NSLog(@"Entered table lock");
-                 //TODO: Investigate why a relaodsection call a bit below causes a crash. Then uncomment these both.
-                 //[_tableView reloadSections:[NSIndexSet indexSetWithIndex:0] withRowAnimation:UITableViewRowAnimationAutomatic];
-                 [_tableView reloadData];
-                _invalidated = FALSE;
-
-                 
-             }
-
-
-            
-            
-            [self performSelectorInBackground:@selector(_configureCachedKeys) withObject:nil];
-            
-        NSLog(@"Finished configuring view");
+            //This queue is only used for retrieving key lists for uncahced items, so we can just invalidate all previous requests
+            [_uiEventQueue cancelAllOperations];
+            ZPUncachedItemsOperation* operation = [[ZPUncachedItemsOperation alloc] initWithItemListController:self];
+            [_uiEventQueue addOperation:operation];
+            NSLog(@"UI update events in queue %i",[_uiEventQueue operationCount]);
 
         }
     }
@@ -109,7 +198,7 @@ static ZPDetailedItemListViewController* _instance = nil;
 }
 //If we are not already displaying an activity view, do so now
 
-- (void)_makeBusy{
+- (void)makeBusy{
     if(_activityView==NULL){
         _activityView = [DSBezelActivityView newActivityViewForView:[_tableView superview] withLabel:@"Loading data from\nZotero server..."];
     }
@@ -119,41 +208,42 @@ static ZPDetailedItemListViewController* _instance = nil;
  Called from data layer to notify that there is data for this view and it can be shown
  */
 
-- (void)_makeAvailable{
+- (void)makeAvailable{
     [DSBezelActivityView removeViewAnimated:YES];
     _activityView = NULL;
 }
 
-- (void) _configureCachedKeys{
-
-    //Store references to these two strings to prevent deallocation.
-    NSString* search = self.searchString;
-    NSString* order = self.orderField;
+- (void)clearTable{
     
-    NSArray* array = [[ZPDataLayer instance] getItemKeysFromCacheForLibrary:self.libraryID collection:self.collectionKey
-                                                                                                      searchString:search orderField:order sortDescending:self.sortDescending];
+    _invalidated = TRUE;
+    
     @synchronized(_tableView){
-        _itemKeysShown = array;
         
-        //TODO: Uncommenting thic causes the thread to crash. Investigate why. After this uncomment also the reload sections earlier.
-        //[_tableView reloadSections:[NSIndexSet indexSetWithIndex:0] withRowAnimation:UITableViewRowAnimationAutomatic];
-        [_tableView reloadData];
+        BOOL needsReload = [self tableView:_tableView numberOfRowsInSection:0]>1;
+
+        _itemKeysNotInCache = [NSMutableArray array];
+        _itemKeysShown = [NSArray array];
         
         //We do not need to observe for new item events if we do not have a list of unknown keys available
         [[ZPDataLayer instance] removeItemObserver:self];
-
-    }
-    
-    if([[ZPPreferences instance] online]){
-        // Queue an operation to retrieve all item keys that belong to this collection but are not found in cache. 
-        [[ZPDataLayer instance] uncachedItemKeysForView:self];
-
-        if([_itemKeysShown count] == 0){
-            [self performSelectorOnMainThread:@selector(_makeBusy) withObject:NULL waitUntilDone:YES];
+        
+        //TODO: Investigate why a relaodsection call a bit below causes a crash. Then uncomment these both.
+        //[_tableView reloadSections:[NSIndexSet indexSetWithIndex:0] withRowAnimation:UITableViewRowAnimationAutomatic];
+        if(needsReload){
+            [_tableView performSelectorOnMainThread:@selector(reloadData) withObject:NULL waitUntilDone:YES];
+            NSLog(@"Reloaded data (1). Number of rows now %i",[self tableView:_tableView  numberOfRowsInSection:0]);
         }
     }
-    else{
-        [_activityIndicator stopAnimating];
+}
+
+- (void) configureCachedKeys:(NSArray*)array{
+
+    @synchronized(_tableView){
+
+        _itemKeysShown = array;
+        [_tableView performSelectorOnMainThread:@selector(reloadData) withObject:NULL waitUntilDone:YES];
+        NSLog(@"Reloaded data (2). Number of rows now %i",[self tableView:_tableView  numberOfRowsInSection:0]);
+        
     }
 }
 
@@ -161,15 +251,11 @@ static ZPDetailedItemListViewController* _instance = nil;
 - (void) configureUncachedKeys:(NSArray*)uncachedItems{
         
     //Only update the uncached keys if we are still showing the same item key list
-    [_itemKeysNotInCache addObjectsFromArray:uncachedItems];
-    if([_itemKeysShown count] ==0){
-        [self _performTableUpdates];
-        [self performSelectorOnMainThread:@selector(_makeAvailable) withObject:NULL waitUntilDone:YES];
-    }
-    else{
-        [self _performTableUpdates];
-        
-    }
+    _itemKeysNotInCache = [NSMutableArray arrayWithArray:uncachedItems];
+    _invalidated = FALSE;
+    [self _performTableUpdates:FALSE];
+    [self performSelectorOnMainThread:@selector(makeAvailable) withObject:NULL waitUntilDone:NO];
+    NSLog(@"Configured uncached keys");
     [[ZPDataLayer instance] registerItemObserver:self];
 
     
@@ -178,8 +264,15 @@ static ZPDetailedItemListViewController* _instance = nil;
 - (UITableViewCell *)tableView:(UITableView *)tableView cellForRowAtIndexPath:(NSIndexPath *)indexPath {
 
    
-    //This array contains NSStrings and NSNulls. Nulls mean that there is no data available yet
-    NSObject* keyObj = [_itemKeysShown objectAtIndex: indexPath.row];
+    //If the data has become invalid, return a cell 
+    NSArray* tempArray = _itemKeysShown;
+    if(indexPath.row>=[tempArray count]){
+        if(_libraryID==0) return [tableView dequeueReusableCellWithIdentifier:@"ChooseLibraryCell"];
+        else if(_invalidated) return [tableView dequeueReusableCellWithIdentifier:@"BlankCell"];
+        else return [tableView dequeueReusableCellWithIdentifier:@"NoItemsCell"];
+    }
+    
+    NSObject* keyObj = [tempArray objectAtIndex: indexPath.row];
     
     
     UITableViewCell* cell = [_cellCache objectForKey:keyObj];
@@ -250,6 +343,9 @@ static ZPDetailedItemListViewController* _instance = nil;
 	// Do any additional setup after loading the view, typically from a nib.
 
     _instance = self;
+
+    _uiEventQueue = [[NSOperationQueue alloc] init];
+    _uiEventQueue.maxConcurrentOperationCount = 3;
 
     // 64 X 64 is the smallest file type icon size on iPad 2
     _buttonController = [[ZPFileThumbnailAndQuicklookController alloc]

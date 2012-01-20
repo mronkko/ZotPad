@@ -29,13 +29,14 @@
     BOOL _sortDescending;
     UIActivityIndicatorView* _activityIndicator;
     NSInteger _animations;
+    BOOL _hasContent;
     BOOL _invalidated;
 }
 
 - (void)configureWithItemListController:(ZPSimpleItemListViewController*)controller;
 
 // Needed by sub class, so needs to be here
-- (void) _performTableUpdates;
+- (void) _performTableUpdates:(BOOL)animated;
 
 @property (nonatomic, retain) IBOutlet UITableView* tableView;
 @property (nonatomic, retain) NSArray* itemKeysShown;

@@ -22,13 +22,17 @@
 + (ZPDetailedItemListViewController*) instance;
 
 - (void)configureView;
-- (void) configureUncachedKeys:(NSArray*)uncachedItems;
+- (void)clearTable;
+- (void)configureCachedKeys:(NSArray*)array;
+- (void)configureUncachedKeys:(NSArray*)uncachedItems;
+
+- (void)makeBusy;
+- (void)makeAvailable;
 
 @property (nonatomic, retain) IBOutlet UISearchBar* searchBar;
 
 
 -(void) clearSearch;
-
 -(void) doOrderField:(NSString*)value;
 
 -(IBAction)doSortCreator:(id)sender;
