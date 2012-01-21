@@ -19,7 +19,7 @@
 
 
 @interface ZPLibraryAndCollectionListViewController();
--(void) _refreshLibrariesAndCollections;
+//-(void) _refreshLibrariesAndCollections;
 @end
 
 
@@ -63,10 +63,10 @@ static ZPLibraryAndCollectionListViewController* _instance = nil;
     //_activityIndicator = [[UIActivityIndicatorView alloc] initWithFrame:CGRectMake(0,0,20, 20)];
     //[_activityIndicator hidesWhenStopped];
 
-    UIBarButtonItem* barButton = [[UIBarButtonItem alloc] initWithCustomView:_activityIndicator];
-    self.navigationItem.rightBarButtonItem = barButton;
+    //UIBarButtonItem* barButton = [[UIBarButtonItem alloc] initWithCustomView:_activityIndicator];
+    //self.navigationItem.rightBarButtonItem = barButton;
 
-    [self performSelectorInBackground:@selector(_refreshLibrariesAndCollections) withObject:NULL];
+    //[self performSelectorInBackground:@selector(_refreshLibrariesAndCollections) withObject:NULL];
 
     //If the current library is not defined, show a list of libraries
     if(self->_currentLibraryID == 0){
@@ -88,6 +88,7 @@ static ZPLibraryAndCollectionListViewController* _instance = nil;
     return [self->_content count];
 }
 
+/*
 // TODO: Not currently used. Figure out logic for retriecing new data from the server for collections. 
 
 -(void) _refreshLibrariesAndCollections {
@@ -96,7 +97,7 @@ static ZPLibraryAndCollectionListViewController* _instance = nil;
         [[ZPCacheController instance] updateLibrariesAndCollectionsFromServer];
     }
 }
-
+*/
 //TODO: Instead of realoding everything, this method should just add or update the library that it receives
 
 -(void) notifyLibraryWithCollectionsAvailable:(ZPZoteroLibrary*) library{

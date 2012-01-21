@@ -89,10 +89,14 @@
             if([serverKeys count]!=[cacheKeys count] || [uncachedItems count] > 0){
                 if(_collectionKey == NULL){
                     [[ZPDatabase instance] deleteItemKeysNotInArray:serverKeys fromLibrary:_libraryID];
+                    NSLog(@"Deleted old items from library");
+
                 }
                 else{
                     [[ZPDatabase instance] removeItemKeysNotInArray:serverKeys fromCollection:_collectionKey];
                     [[ZPDatabase instance] addItemKeys:uncachedItems toCollection:_collectionKey];
+                    NSLog(@"Refreshed collection memberships in cache");
+
                 }
                 
             }
@@ -253,10 +257,10 @@ static ZPDetailedItemListViewController* _instance = nil;
     //Only update the uncached keys if we are still showing the same item key list
     _itemKeysNotInCache = [NSMutableArray arrayWithArray:uncachedItems];
     _invalidated = FALSE;
+    [[ZPDataLayer instance] registerItemObserver:self];
     [self _performTableUpdates:FALSE];
     [self performSelectorOnMainThread:@selector(makeAvailable) withObject:NULL waitUntilDone:NO];
     NSLog(@"Configured uncached keys");
-    [[ZPDataLayer instance] registerItemObserver:self];
 
     
 }

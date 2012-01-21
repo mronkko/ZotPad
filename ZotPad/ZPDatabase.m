@@ -183,6 +183,7 @@ static ZPDatabase* _instance = nil;
         [collectionKeys removeObject:collection.collectionKey];
                 
         @synchronized(self){
+            //TODO: Make this a mass-insert using union select
             if(count == [collectionKeys count]){
                 NSLog(@"Inserting collection %@ ID: %@ Library: %@ Parent: %@",collection.title,collection.collectionKey,library.libraryID,collection.parentCollectionKey);
                 [_database executeUpdate:@"INSERT INTO collections (title, key, libraryID, parentCollectionKey,lastCompletedCacheTimestamp) VALUES (?,?,?,?,?)",collection.title,collection.collectionKey,library.libraryID,collection.parentCollectionKey,collection.lastCompletedCacheTimestamp];
@@ -206,6 +207,10 @@ static ZPDatabase* _instance = nil;
             [_database executeUpdate:@"DELETE FROM collections WHERE key=?",key];
         }
     }
+
+    //Because parents come before children from the Zotero server, none of the collections in the in-memory cache will be flagged as having children.
+    //TODO: Figure a way to do collection updates in the in-memory cache in a more efficient way
+    [ZPZoteroCollection dropCache];
 }
 
 -(BOOL) doesItemKey:(NSString*)itemKey belongToCollection:(NSString*) collectionKey{
