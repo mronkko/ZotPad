@@ -12,6 +12,7 @@
 #import "ZPDataLayer.h"
 #import "../DSActivityView/Sources/DSActivityView.h"
 #import "ZPFileThumbnailAndQuicklookController.h"
+#import "ZPItemDetailViewController.h"
 
 #import "ZPPreferences.h"
 
@@ -335,6 +336,36 @@ static ZPDetailedItemListViewController* _instance = nil;
     
     return cell;
 }
+
+
+- (void)prepareForSegue:(UIStoryboardSegue *)segue sender:(id)sender{
+    // Make sure your segue name in storyboard is the same as this line
+    if ([[segue identifier] isEqualToString:@"PushItemDetailView"])
+    {
+        ZPItemDetailViewController* target = (ZPItemDetailViewController*)[segue destinationViewController];
+        
+        // Get the selected row from the item list
+        NSIndexPath* indexPath = [_tableView indexPathForSelectedRow];
+        
+        // Get the key for the selected item 
+        NSString* currentItemKey = [_itemKeysShown objectAtIndex: indexPath.row]; 
+        [target setSelectedItem:[ZPZoteroItem retrieveOrInitializeWithKey:currentItemKey]];
+        
+        // Set the navigation controller
+//        [[ZPLibraryAndCollectionListViewController instance] performSegueWithIdentifier:@"PushItemsToNavigator" sender:self];
+        ZPSimpleItemListViewController* simpleItemListViewController = [self.storyboard instantiateViewControllerWithIdentifier:@"NavigationItemListView"];
+        simpleItemListViewController.navigationItem.hidesBackButton = YES;
+
+        [simpleItemListViewController configureWithItemListController:[ZPDetailedItemListViewController instance]];
+        [[[ZPLibraryAndCollectionListViewController instance] navigationController] pushViewController:simpleItemListViewController  animated:YES];
+
+        [simpleItemListViewController.tableView selectRowAtIndexPath:indexPath animated:NO scrollPosition:UITableViewScrollPositionMiddle]; 
+        [simpleItemListViewController.tableView setDelegate: target];
+        
+    }
+    
+}
+
 
 
 #pragma mark - View lifecycle

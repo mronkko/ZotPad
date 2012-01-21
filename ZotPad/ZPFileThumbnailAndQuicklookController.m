@@ -107,8 +107,9 @@ static NSCache* _fileTypeImageCache;
         [quicklook setDataSource:self];
         NSInteger index = [[_item allExistingAttachments] indexOfObject:attachment];
         [quicklook setCurrentPreviewItemIndex:index];
-        UIViewController* root = [UIApplication sharedApplication].delegate.window.rootViewController;       
-        [root presentModalViewController:quicklook animated:YES];
+//        UIViewController* root = [UIApplication sharedApplication].delegate.window.rootViewController;
+//        NSArray* viewControllers = [(UISplitViewController*) root viewControllers];
+        [_viewController presentModalViewController:quicklook animated:YES];
         
     }
 }

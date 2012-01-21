@@ -80,7 +80,7 @@
                                         </view>
                                         <color key="backgroundColor" white="1" alpha="1" colorSpace="calibratedWhite"/>
                                         <connections>
-                                            <segue destination="0zt-cp-Ihx" kind="push" id="qr5-4E-2S5"/>
+                                            <segue destination="0zt-cp-Ihx" kind="push" identifier="PushItemDetailView" splitViewControllerTargetIndex="1" id="qr5-4E-2S5"/>
                                         </connections>
                                     </tableViewCell>
                                     <tableViewCell contentMode="scaleToFill" selectionStyle="none" hidesAccessoryWhenEditing="NO" indentationLevel="1" indentationWidth="0.0" reuseIdentifier="LoadingCell" rowHeight="80" id="eu2-Rk-xhK">
@@ -361,7 +361,7 @@
                     </tableView>
                     <navigationItem key="navigationItem" title="Libraries" id="39"/>
                     <connections>
-                        <segue destination="WCH-zk-FP7" kind="push" identifier="ShowItemsInNavigator" id="gXP-en-Uwt"/>
+                        <segue destination="WCH-zk-FP7" kind="push" identifier="PushItemsToNavigator" id="bc4-Il-rI2"/>
                     </connections>
                 </tableViewController>
             </objects>
@@ -425,6 +425,7 @@
                         </prototypes>
                         <connections>
                             <outlet property="dataSource" destination="WCH-zk-FP7" id="HUB-zG-HnZ"/>
+                            <outlet property="delegate" destination="WCH-zk-FP7" id="sgo-RE-c74"/>
                         </connections>
                     </tableView>
                     <navigationItem key="navigationItem" title="Items" id="fBK-CH-iUS"/>

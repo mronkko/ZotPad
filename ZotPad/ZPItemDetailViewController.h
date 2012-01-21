@@ -16,11 +16,10 @@
 
 
 @interface ZPItemDetailViewController : UIViewController <UITableViewDataSource, UITableViewDelegate, iCarouselDataSource,
-    iCarouselDelegate, ZPItemObserver, ZPAttachmentObserver, UISplitViewControllerDelegate>{
+    iCarouselDelegate, ZPItemObserver, ZPAttachmentObserver, UINavigationControllerDelegate >{
     ZPZoteroItem* _currentItem;
     UITableView* _detailTableView;
     iCarousel* _carousel;
-    ZPSimpleItemListViewController* _itemListController;
     ZPFileThumbnailAndQuicklookController* _previewController;
     UIActivityIndicatorView* _activityIndicator;
     NSInteger _detailTitleWidth;
@@ -28,13 +27,14 @@
     NSCache* _previewCache;
 }
 
++(ZPItemDetailViewController*) instance;
+- (void) configure;
+
 @property (nonatomic, retain) IBOutlet iCarousel* carousel;
 
 @property (nonatomic, retain) ZPZoteroItem* selectedItem;
 
 //This contains sections about the item details
 @property (retain) IBOutlet UITableView* detailTableView;
-
--(void) configureWithItemKey:(NSString*)key;
 
 @end

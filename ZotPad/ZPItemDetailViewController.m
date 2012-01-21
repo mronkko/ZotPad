@@ -50,10 +50,17 @@
 
 #pragma mark - View lifecycle
 
+static ZPItemDetailViewController* _instance;
+
++(ZPItemDetailViewController*) instance{
+    return _instance;
+}
+
 - (void)viewDidLoad
 {
     [super viewDidLoad];
-
+    _instance = self;
+    
     [[ZPDataLayer instance] registerItemObserver:self];
     [[ZPDataLayer instance] registerAttachmentObserver:self];
 
@@ -66,15 +73,9 @@
     [_previewCache setCountLimit:20];
     
     //configure carousel
-    _carousel.type = iCarouselTypeCoverFlow2;
+    _carousel.type = iCarouselTypeCoverFlow2;    
 
-    //Show the item view in the navigator
-    _itemListController = [self.storyboard instantiateViewControllerWithIdentifier:@"NavigationItemListView"];
-    _itemListController.navigationItem.hidesBackButton = YES;
-    
-
-    //Configure attachment section. Attachment section will be always shown even if there are no attachments
-    
+    //Configure attachment section.     
     UIView* attachmentView = [self.view viewWithTag:2];
     [attachmentView setFrame:CGRectMake(0,0, 
                                         self.view.frame.size.width,
@@ -87,30 +88,16 @@
     self.navigationItem.rightBarButtonItem = barButton;
 
 
-
 }
 
 - (void)viewWillAppear:(BOOL)animated
 {
-    
-
+    //We need the dimensions of the view to be set before reconfiguring.
+    [self configure];
+    //Set self as a delegate for the navigation controller so that we know when the view is being dismissed by the navigation controller and know to pop the other navigation controller.
+    [self.navigationController setDelegate:self];
     [super viewWillAppear:animated];
 
-
-    // Get the selected row from the item list
-    NSIndexPath* indexPath = [[[ZPDetailedItemListViewController instance] tableView] indexPathForSelectedRow];
-    
-    // Get the key for the selected item 
-    NSString* currentItemKey = [[[ZPDetailedItemListViewController instance] itemKeysShown] objectAtIndex: indexPath.row]; 
-    
-    // Set the navigation controller
-    [_itemListController configureWithItemListController:[ZPDetailedItemListViewController instance]];
-    
-    [[[ZPLibraryAndCollectionListViewController instance] navigationController] pushViewController:_itemListController  animated:YES];
-    
-    [_itemListController.tableView setDelegate: self];
-
-    [self configureWithItemKey: currentItemKey];
 }
 
 - (void)viewDidAppear:(BOOL)animated
@@ -139,10 +126,8 @@
     [_previewCache removeAllObjects];
 }
 
--(void) configureWithItemKey:(NSString*)key{
+-(void) configure{
     
-    _currentItem = [ZPZoteroItem retrieveOrInitializeWithKey: key];
-
     //TODO: This object should probably be recycled.
     
     _previewController = [[ZPFileThumbnailAndQuicklookController alloc] initWithItem:_currentItem viewController:self maxHeight:ATTACHMENT_IMAGE_HEIGHT maxWidth:ATTACHMENT_IMAGE_WIDTH];
@@ -225,7 +210,7 @@
         
         
         [(UIScrollView*) self.view setContentSize:CGSizeMake(self.view.frame.size.width, ([_currentItem.attachments count]>0)*ATTACHMENT_VIEW_HEIGHT + contentHeight)];
-
+        [_detailTableView setNeedsDisplay];
     }
     
 }
@@ -233,11 +218,20 @@
 {
     //Pop the item navigator away from the navigator.
     
-    [[[ZPLibraryAndCollectionListViewController instance] navigationController] popViewControllerAnimated:YES];
     
     [[ZPDataLayer instance] removeItemObserver:self];
     
 	[super viewWillDisappear:animated];
+}
+
+- (void)navigationController:(UINavigationController *)navigationController willShowViewController:(UIViewController *)viewController animated:(BOOL)animated{
+    if(viewController != self){
+        //Pop the other controller if something else than self is showing
+        [[[ZPLibraryAndCollectionListViewController instance] navigationController] popViewControllerAnimated:YES];
+        
+        //Remove delegate because we no longer need to pop the other controller
+        [navigationController setDelegate:NULL];
+    }
 }
 
 
@@ -545,6 +539,7 @@
 	return ( cell );
 }
 
+
 - (void)tableView:(UITableView *)aTableView didSelectRowAtIndexPath:(NSIndexPath *)indexPath {
     
     // Item details
@@ -553,16 +548,6 @@
         
     }
     
-    // Navigator list view
-    
-    else{
-        
-        // Get the key for the selected item 
-        NSString* currentItemKey = [[_itemListController itemKeysShown] objectAtIndex: indexPath.row]; 
-        
-        if(currentItemKey != [NSNull null]) [self configureWithItemKey: currentItemKey];
-        
-    }
 }
 
 /*

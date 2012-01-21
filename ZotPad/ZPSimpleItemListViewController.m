@@ -9,7 +9,7 @@
 #import "ZPSimpleItemListViewController.h"
 #import "ZPZoteroItem.h"
 #import "ZPDataLayer.h"
-
+#import "ZPItemDetailViewController.h"
 #import "ZPLogger.h"
 
 
@@ -335,6 +335,18 @@
     }
     
     return cell;
+}
+
+- (void)tableView:(UITableView *)aTableView didSelectRowAtIndexPath:(NSIndexPath *)indexPath {
+    
+    // Get the key for the selected item 
+    NSString* currentItemKey = [_itemKeysShown objectAtIndex: indexPath.row]; 
+    
+    if(currentItemKey != [NSNull null]){
+        [[ZPItemDetailViewController instance] setSelectedItem:[ZPZoteroItem retrieveOrInitializeWithKey:currentItemKey]];
+        [[ZPItemDetailViewController instance] configure];
+
+    }
 }
 
 
