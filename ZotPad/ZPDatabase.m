@@ -234,10 +234,12 @@ static ZPDatabase* _instance = nil;
 
     if([itemKeys count] == 0) return;
 
+    NSString* sql=[NSString stringWithFormat:@"DELETE FROM collectionItems WHERE collectionKey = ? AND itemKey NOT IN ('%@')",
+                   [itemKeys componentsJoinedByString:@"', '"]];
+
     @synchronized(self){
         //This might generate a too long query
-        [_database executeUpdate:[NSString stringWithFormat:@"DELETE FROM collectionItems WHERE collectionKey = ? AND itemKey NOT IN ('%@')",
-                                                           [itemKeys componentsJoinedByString:@"', '"]],collectionKey];
+        [_database executeUpdate:sql,collectionKey];
     }
 
 }
@@ -709,22 +711,27 @@ Deletes items, notes, and attachments
 
     if([keys count]==0) return;
     
-    NSMutableArray* itemKeys= [NSMutableArray arrayWithArray:keys];
+    NSMutableArray* existingItemKeys= [NSMutableArray arrayWithArray:keys];
+
+    //Start by checking which items are already members of this collection
     
     @synchronized(self){
-        FMResultSet* resultSet = [_database executeQuery:[NSString stringWithFormat:@"SELECT itemKey FROM collectionItems WHERE itemKey NOT IN ('%@') AND  collectionKey = ?",[itemKeys componentsJoinedByString:@"', '"]],collectionKey];
-        itemKeys = [NSMutableArray array];
+        FMResultSet* resultSet = [_database executeQuery:[NSString stringWithFormat:@"SELECT itemKey FROM collectionItems WHERE itemKey NOT IN ('%@') AND  collectionKey = ?",[keys componentsJoinedByString:@"', '"]],collectionKey];
+        existingItemKeys = [NSMutableArray array];
         while([resultSet next]){
-            [itemKeys addObject:[resultSet stringForColumnIndex:0]];
+            [existingItemKeys addObject:[resultSet stringForColumnIndex:0]];
         }
         [resultSet close];
     }
+    
+    NSMutableArray* newItemKeys = [NSMutableArray arrayWithArray:keys];
+    [newItemKeys removeObjectsInArray:existingItemKeys];
     
     NSString* insertSQL;
     NSMutableArray* insertArguments = [NSMutableArray array];
     NSString* itemKey;
     
-    for(itemKey in itemKeys){
+    for(itemKey in newItemKeys){
         if(insertSQL==NULL){
             insertSQL = @"INSERT INTO collectionItems SELECT ? AS collectionKey, ? AS itemKey";
         }

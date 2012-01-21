@@ -69,6 +69,8 @@
 
 -(void) notifyItemAvailable:(ZPZoteroItem *)item{
 
+    NSLog(@"Received item %@",item.fullCitation);
+
     @synchronized(self){
 
         BOOL found = FALSE;

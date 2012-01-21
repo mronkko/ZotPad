@@ -627,6 +627,7 @@ static ZPCacheController* _instance = nil;
             [targetArray addObjectsFromArray:checkedKeys];
         }
     }
+    [self _checkQueues];
 }
 
 -(void) _checkIfLibraryNeedsCacheRefreshAndQueue:(NSNumber*) libraryID{
