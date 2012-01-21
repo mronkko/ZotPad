@@ -511,7 +511,12 @@ const NSInteger ZPServerConnectionRequestTopLevelKeys = 9;
 
     NSURL* url = [NSURL URLWithString:[NSString stringWithFormat:@"%@?key=%@", attachment.attachmentURL,oauthkey]];
     ASIHTTPRequest *request = [ASIHTTPRequest requestWithURL:url];
-    [request setDownloadDestinationPath:[attachment fileSystemPath]];
+    
+    //Although ASIHttpRequest does downloads using temp files, it seems to create an empty while when download starts. This is problematic, so we will use a temp file of our own.
+    NSString* tempFile = [NSTemporaryDirectory() stringByAppendingPathComponent:[NSString stringWithFormat:@"ZP%@%i",attachment.key,[[NSDate date] timeIntervalSince1970]*1000000]];
+    NSLog(@"Temporary download file is %@",tempFile);
+    
+    [request setDownloadDestinationPath:tempFile];
     
 
     _activeRequestCount++;
@@ -529,6 +534,9 @@ const NSInteger ZPServerConnectionRequestTopLevelKeys = 9;
         request.showAccurateProgress=FALSE;
     }
     [request startSynchronous];
+    
+    //Move the file to the right place
+    [[NSFileManager defaultManager] moveItemAtPath:tempFile toPath:[attachment fileSystemPath] error:NULL];
     
     //Set this file as not cached
     const char* filePath = [[attachment fileSystemPath] fileSystemRepresentation];
