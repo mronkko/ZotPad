@@ -150,6 +150,7 @@ static ZPCacheController* _instance = nil;
 -(void) activate{
     
     [[ZPDataLayer instance] registerLibraryObserver:self];
+    [self performSelectorInBackground:@selector(updateLibrariesAndCollectionsFromServer) withObject:NULL];
 
 }
 

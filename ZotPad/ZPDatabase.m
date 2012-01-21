@@ -184,10 +184,11 @@ static ZPDatabase* _instance = nil;
                 
         @synchronized(self){
             if(count == [collectionKeys count]){
-                
+                NSLog(@"Inserting collection %@ ID: %@ Library: %@ Parent: %@",collection.title,collection.collectionKey,library.libraryID,collection.parentCollectionKey);
                 [_database executeUpdate:@"INSERT INTO collections (title, key, libraryID, parentCollectionKey,lastCompletedCacheTimestamp) VALUES (?,?,?,?,?)",collection.title,collection.collectionKey,library.libraryID,collection.parentCollectionKey,collection.lastCompletedCacheTimestamp];
             }
             else{
+                NSLog(@"Updating collection %@ ID: %@ Library: %@ Parent: %@",collection.title,collection.collectionKey,library.libraryID,collection.parentCollectionKey);
                 [_database executeUpdate:@"UPDATE collections SET title=?, libraryID=?, parentCollectionKey=?,lastCompletedCacheTimestamp=? WHERE key=?",collection.title,library.libraryID,collection.parentCollectionKey ,collection.lastCompletedCacheTimestamp,collection.collectionKey];
             }
         }
@@ -201,6 +202,7 @@ static ZPDatabase* _instance = nil;
     NSString* key;
     while( key =(NSString*)[e3 nextObject]){
         @synchronized(self){
+            NSLog(@"Deleting collection with key %@",key);
             [_database executeUpdate:@"DELETE FROM collections WHERE key=?",key];
         }
     }
@@ -392,6 +394,7 @@ Deletes items, notes, and attachments
                 
         }
         [resultSet close];
+        NSLog(@"Retrieved %i collections for parent collection %@ in library %@",[returnArray count],collectionKey,libraryID);
         
 	}
 
@@ -422,7 +425,8 @@ Deletes items, notes, and attachments
     for(NSString* key in keyArray){
         [returnArray addObject:[ZPZoteroCollection ZPZoteroCollectionWithKey:key]];
     }
-    
+    NSLog(@"Retrieved %i collections for library %@",[returnArray count],libraryID);
+
 	return returnArray;
 }
 
@@ -439,11 +443,11 @@ Deletes items, notes, and attachments
             [collection setTitle : [resultSet stringForColumnIndex:1]];
             [collection setHasChildren:(BOOL) [resultSet intForColumnIndex:2]];
             [collection setLastCompletedCacheTimestamp:[resultSet stringForColumnIndex:3]];
-            [collection setParentCollectionKey:[resultSet stringForColumnIndex:3]];
+            [collection setParentCollectionKey:[resultSet stringForColumnIndex:4]];
         }
         
         [resultSet close];
-    
+        NSLog(@"Retrieved collection fields from DB for %@ Key: %@ Library: %@ Parent: %@",collection.title,collection.collectionKey,collection.libraryID,collection.parentCollectionKey);
     }
 }
 

@@ -57,8 +57,12 @@ static ZPLibraryAndCollectionListViewController* _instance = nil;
     
     _instance= self;
     
-    _activityIndicator = [[UIActivityIndicatorView alloc] initWithFrame:CGRectMake(0,0,20, 20)];
-    [_activityIndicator hidesWhenStopped];
+    //TODO: Fix this activity indicator. There should be a reliable way to know when the
+    //view is receiving new data and when it has received all data. This is complicated
+    //by the fact that each item in the navigation stack is a separate view.
+    //_activityIndicator = [[UIActivityIndicatorView alloc] initWithFrame:CGRectMake(0,0,20, 20)];
+    //[_activityIndicator hidesWhenStopped];
+
     UIBarButtonItem* barButton = [[UIBarButtonItem alloc] initWithCustomView:_activityIndicator];
     self.navigationItem.rightBarButtonItem = barButton;
 
@@ -84,12 +88,15 @@ static ZPLibraryAndCollectionListViewController* _instance = nil;
     return [self->_content count];
 }
 
+// TODO: Not currently used. Figure out logic for retriecing new data from the server for collections. 
+
 -(void) _refreshLibrariesAndCollections {
     if([[ZPPreferences instance] online]){
         [_activityIndicator startAnimating];
         [[ZPCacheController instance] updateLibrariesAndCollectionsFromServer];
     }
 }
+
 //TODO: Instead of realoding everything, this method should just add or update the library that it receives
 
 -(void) notifyLibraryWithCollectionsAvailable:(ZPZoteroLibrary*) library{
@@ -115,7 +122,7 @@ static ZPLibraryAndCollectionListViewController* _instance = nil;
         if(selected!=NULL) [[self tableView] selectRowAtIndexPath:selected animated:FALSE scrollPosition:UITableViewScrollPositionNone];
 
         //TODO: Figure out a way to keep the activity view spinning until the last library is loaded.
-        [_activityIndicator stopAnimating];
+        //[_activityIndicator stopAnimating];
 
     }
     else{

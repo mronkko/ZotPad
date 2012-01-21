@@ -642,12 +642,12 @@
     return ret;
 }
 
-- (UIView *)carousel:(iCarousel *)carousel viewForItemAtIndex:(NSUInteger)index
+- (UIView *)carousel:(iCarousel *)carousel viewForItemAtIndex:(NSUInteger)index reusingView:(UIView*)view
 {
     
     ZPZoteroAttachment* attachment = [_currentItem.attachments objectAtIndex:index];
-        
-    UIView* view = [[UIView alloc] initWithFrame:CGRectMake(0, 0, ATTACHMENT_IMAGE_WIDTH, ATTACHMENT_IMAGE_HEIGHT)];
+    //TOOD: Recycle views    
+    view = [[UIView alloc] initWithFrame:CGRectMake(0, 0, ATTACHMENT_IMAGE_WIDTH, ATTACHMENT_IMAGE_HEIGHT)];
     [self _configurePreview:view withAttachment:attachment];
         
     return view;
