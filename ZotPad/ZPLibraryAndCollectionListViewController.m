@@ -54,9 +54,7 @@ static ZPLibraryAndCollectionListViewController* _instance = nil;
 - (void)viewDidLoad
 {
     [super viewDidLoad];
-    
-    _instance= self;
-    
+        
     //TODO: Fix this activity indicator. There should be a reliable way to know when the
     //view is receiving new data and when it has received all data. This is complicated
     //by the fact that each item in the navigation stack is a separate view.
@@ -214,6 +212,7 @@ static ZPLibraryAndCollectionListViewController* _instance = nil;
 - (void)viewDidAppear:(BOOL)animated
 {
     [[ZPDataLayer instance] registerLibraryObserver:self];
+    _instance= self;
     [super viewDidAppear:animated];
 }
 

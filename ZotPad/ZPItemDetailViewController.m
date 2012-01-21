@@ -251,7 +251,7 @@
         extraInfo = [@"Preview not supported for " stringByAppendingString:attachment.attachmentType];
     }
     else if(![attachment fileExists] ){
-        if([[ZPPreferences instance] online]) extraInfo = [NSString stringWithFormat:@"Tap to download KB %i.",attachment.attachmentLength/1024];
+        if([[ZPPreferences instance] online]) extraInfo = [NSString stringWithFormat:@"Tap to download %i KB.",attachment.attachmentLength/1024];
         else  extraInfo = @"File has not been downloaded";
     }
     
