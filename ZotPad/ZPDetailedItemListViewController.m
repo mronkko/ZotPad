@@ -462,7 +462,7 @@ static ZPDetailedItemListViewController* _instance = nil;
 }
 
 -(IBAction)doSortDate:(id)sender{
-    [self doOrderField:@"year"];
+    [self doOrderField:@"date"];
 }
 
 -(IBAction)doSortTitle:(id)sender{
