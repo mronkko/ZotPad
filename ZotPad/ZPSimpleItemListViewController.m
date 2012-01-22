@@ -346,12 +346,14 @@
 - (void)tableView:(UITableView *)aTableView didSelectRowAtIndexPath:(NSIndexPath *)indexPath {
     
     // Get the key for the selected item 
-    NSString* currentItemKey = [_itemKeysShown objectAtIndex: indexPath.row]; 
-    
-    if(currentItemKey != [NSNull null]){
-        [[ZPItemDetailViewController instance] setSelectedItem:[ZPZoteroItem retrieveOrInitializeWithKey:currentItemKey]];
-        [[ZPItemDetailViewController instance] configure];
-
+    if(indexPath.row < [_itemKeysShown count]){
+        NSString* currentItemKey = [_itemKeysShown objectAtIndex: indexPath.row]; 
+        
+        if(currentItemKey != [NSNull null]){
+            [[ZPItemDetailViewController instance] setSelectedItem:[ZPZoteroItem retrieveOrInitializeWithKey:currentItemKey]];
+            [[ZPItemDetailViewController instance] configure];
+            
+        }
     }
 }
 
