@@ -38,6 +38,8 @@ static ZPPreferences* _instance = nil;
 
 -(void) reload {
    
+    NSLog(@"Realoding preferences");
+    
     NSUserDefaults* defaults = [NSUserDefaults standardUserDefaults];
 
     

@@ -535,25 +535,34 @@ const NSInteger ZPServerConnectionRequestTopLevelKeys = 9;
     }
     [request startSynchronous];
     
-    //Move the file to the right place
-    [[NSFileManager defaultManager] moveItemAtPath:tempFile toPath:[attachment fileSystemPath] error:NULL];
+    //If we got a file, move it to the right plae
     
-    //Set this file as not cached
-    const char* filePath = [[attachment fileSystemPath] fileSystemRepresentation];
-    const char* attrName = "com.apple.MobileBackup";
-    u_int8_t attrValue = 1;
-    setxattr(filePath, attrName, &attrValue, sizeof(attrValue), 0, 0);
+    NSDictionary *_documentFileAttributes = [[NSFileManager defaultManager] fileAttributesAtPath:tempFile traverseLink:YES];
 
-    
+    if([_documentFileAttributes fileSize]>0){
+        
+        //Move the file to the right place
+        
+        [[NSFileManager defaultManager] moveItemAtPath:tempFile toPath:[attachment fileSystemPath] error:NULL];
+        
+        //Set this file as not cached
+        const char* filePath = [[attachment fileSystemPath] fileSystemRepresentation];
+        const char* attrName = "com.apple.MobileBackup";
+        u_int8_t attrValue = 1;
+        setxattr(filePath, attrName, &attrValue, sizeof(attrValue), 0, 0);
+        
+        
+        
+        NSLog(@"File download completed (%@) : %@ Active queries: %i",attachment.attachmentTitle,attachment.attachmentURL,_activeRequestCount);
+        
+        //We need to do this in a different thread so that the current thread does not count towards the operations count
+        [[ZPDataLayer instance] performSelectorInBackground:@selector(notifyAttachmentDownloadCompleted:) withObject:attachment];
+    }
+
     _activeRequestCount--;
-    
-    NSLog(@"File download completed (%@) : %@ Active queries: %i",attachment.attachmentTitle,attachment.attachmentURL,_activeRequestCount);
     
     //First request starts the network indicator
     if(_activeRequestCount==0) [[UIApplication sharedApplication] setNetworkActivityIndicatorVisible:NO];
-    
-    //We need to do this in a different thread so that the current thread does not count towards the operations count
-    [[ZPDataLayer instance] performSelectorInBackground:@selector(notifyAttachmentDownloadCompleted:) withObject:attachment];
 
 }
 

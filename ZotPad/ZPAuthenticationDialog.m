@@ -68,6 +68,7 @@ static ZPAuthenticationDialog* _instance = nil;
 }
 - (BOOL)webView:(UIWebView *)webView shouldStartLoadWithRequest:(NSURLRequest *)request navigationType:(UIWebViewNavigationType)navigationType{
 
+    NSLog(@"Requesting new page %@ method: %@",request.mainDocumentURL,request.HTTPMethod);
     //These are valid URL prefixes in the authentication workflow and should be loaded
     NSArray* validURLs = [NSArray arrayWithObjects:@"https://www.zotero.org/oauth/authorize?oauth_token=",
                           @"https://www.zotero.org/settings/keys/new?oauth=1&oauth_token=",
@@ -91,6 +92,8 @@ static ZPAuthenticationDialog* _instance = nil;
             
         return FALSE;
     }
+    //All POST requests are loaded
+    else if([request.HTTPMethod isEqualToString:@"POST"]) return TRUE;
     //Loop through the white list and load the url if it should be loaded
     else{
         NSString* validURL;

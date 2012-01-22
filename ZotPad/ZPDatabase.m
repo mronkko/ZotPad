@@ -513,12 +513,12 @@ Deletes items, notes, and attachments
             NSString* timestamp = [timestamps objectForKey:item.key];
             
             
-            NSObject* year;
-            if(item.year!=0){
-                year=[NSNumber numberWithInt:item.year];
+            NSObject* date;
+            if(item.date!=0){
+                date=[NSNumber numberWithInt:item.date];
             }
             else{
-                year = [NSNull null];
+                date = [NSNull null];
             }
             
             if(timestamp == NULL){
@@ -528,7 +528,7 @@ Deletes items, notes, and attachments
                  
                  */
                 if(insertSQL == NULL){
-                    insertSQL = @"INSERT INTO items (key, itemType, libraryID, year, creator, title, publicationTitle,  fullCitation, lastTimestamp) SELECT ? AS key, ? AS itemType, ? AS libraryID, ? AS year, ? AS creator, ? AS title, ? AS publicationTitle,  ? AS fullCitation, ? AS lastTimestamp";
+                    insertSQL = @"INSERT INTO items (key, itemType, libraryID, date, creator, title, publicationTitle,  fullCitation, lastTimestamp) SELECT ? AS key, ? AS itemType, ? AS libraryID, ? AS date, ? AS creator, ? AS title, ? AS publicationTitle,  ? AS fullCitation, ? AS lastTimestamp";
                 }
                 else{
                     insertSQL = [insertSQL stringByAppendingString:@" UNION SELECT ?,?,?,?,?,?,?,?,?"];
@@ -541,14 +541,14 @@ Deletes items, notes, and attachments
                 if(creatorSummary == NULL) creatorSummary =@"";
                 
                 
-                [insertArguments addObjectsFromArray:[NSArray arrayWithObjects:item.key,item.itemType,item.libraryID,year,creatorSummary,item.title,publicationTitle,item.fullCitation,item.lastTimestamp,nil]];
+                [insertArguments addObjectsFromArray:[NSArray arrayWithObjects:item.key,item.itemType,item.libraryID,date,creatorSummary,item.title,publicationTitle,item.fullCitation,item.lastTimestamp,nil]];
                 
                 [returnArray addObject:item];
             }
             
             else if(! [item.lastTimestamp isEqualToString: timestamp]){
                 @synchronized(self){
-                    [_database executeUpdate:@"UPDATE items SET itemType = ?, libraryID = ?, year = ?,creator =? ,title = ?,publicationTitle = ?,fullCitation =?,lastTimestamp = ? WHERE key = ?",item.itemType,item.libraryID,year,item.creatorSummary,item.title,item.publicationTitle,item.fullCitation,item.lastTimestamp,item.key];
+                    [_database executeUpdate:@"UPDATE items SET itemType = ?, libraryID = ?, date = ?,creator =? ,title = ?,publicationTitle = ?,fullCitation =?,lastTimestamp = ? WHERE key = ?",item.itemType,item.libraryID,date,item.creatorSummary,item.title,item.publicationTitle,item.fullCitation,item.lastTimestamp,item.key];
                 }
                 [returnArray addObject:item];
             }
@@ -745,7 +745,9 @@ Deletes items, notes, and attachments
     
    if(insertSQL != NULL){
         @synchronized(self){
-            [_database executeUpdate:insertSQL withArgumentsInArray:insertArguments]; 
+            if(![_database executeUpdate:insertSQL withArgumentsInArray:insertArguments]){
+                NSLog(@"Database error");
+            }
         }
    }
 
@@ -757,13 +759,13 @@ Deletes items, notes, and attachments
 - (void) addBasicsToItem:(ZPZoteroItem *)item{
     
     @synchronized(self){
-        FMResultSet* resultSet = [_database executeQuery: @"SELECT itemType,libraryID,year,creator,title,publicationTitle,key,fullCitation,lastTimestamp FROM items WHERE key=? LIMIT 1",item.key];
+        FMResultSet* resultSet = [_database executeQuery: @"SELECT itemType,libraryID,date,creator,title,publicationTitle,key,fullCitation,lastTimestamp FROM items WHERE key=? LIMIT 1",item.key];
         
         if ([resultSet next]) {
             
             [item setItemType:[resultSet stringForColumnIndex:0]];
             [item setLibraryID:[NSNumber numberWithInt:[resultSet intForColumnIndex:1]]];
-            [item setYear:[resultSet intForColumnIndex:2]];
+            [item setDate:[resultSet intForColumnIndex:2]];
             [item setCreatorSummary:[resultSet stringForColumnIndex:3]];
             [item setTitle:[resultSet stringForColumnIndex:4]];
             NSString* publicationTitle = [resultSet stringForColumnIndex:5];

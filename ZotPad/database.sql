@@ -43,7 +43,7 @@ CREATE TABLE IF NOT EXISTS items (
     key TEXT PRIMARY KEY,
     itemType TEXT NOT NULL,
     libraryID INT,
-    year INT,
+    date INT,
     creator TEXT,
     title TEXT,
     publicationTitle TEXT,

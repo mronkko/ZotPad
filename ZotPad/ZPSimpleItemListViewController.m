@@ -200,7 +200,7 @@
             _itemKeysShown = newItemKeysShown;
 
             NSNumber* tableLength = [NSNumber numberWithInt:[_itemKeysNotInCache count] + [newKeys count]];
-
+            NSLog(@"Items found from DB %i, items that are still uncached %i",[newKeys count],[_itemKeysNotInCache count]);
             if(animated){
                 SEL selector = @selector(_performRowInsertions:reloads:tableLength:);
                 NSMethodSignature* signature = [[self class] instanceMethodSignatureForSelector:selector];
@@ -224,7 +224,9 @@
             }
             NSLog(@"End updating the table rows");
             
-            if([_itemKeysNotInCache count] == 0) [_activityIndicator stopAnimating];
+            if([_itemKeysNotInCache count] == 0){
+                [_activityIndicator stopAnimating];   
+            }
             
         }
     }
@@ -232,25 +234,29 @@
 
 
 -(void) _performRowInsertions:(NSArray*)insertIndexPaths reloads:(NSArray*)reloadIndexPaths tableLength:(NSNumber*)tableLength{
-    NSLog(@"Modifying the table. Inserts %i Reloads %i",[insertIndexPaths count],[reloadIndexPaths count]);
-    [_tableView beginUpdates];
+    NSLog(@"Modifying the table. Inserts %i Reloads %i, Max length %@, Item key array length %i",[insertIndexPaths count],[reloadIndexPaths count],tableLength,[_itemKeysShown count]);
+//    [_tableView beginUpdates];
+    NSLog(@"Insert index paths %@",insertIndexPaths);
     if([insertIndexPaths count]>0) [_tableView insertRowsAtIndexPaths:insertIndexPaths withRowAnimation:_animations];
+    NSLog(@"Reload index paths %@",reloadIndexPaths);
     if([reloadIndexPaths count]>0) [_tableView reloadRowsAtIndexPaths:reloadIndexPaths withRowAnimation:_animations];
 
-    if([tableLength intValue]>[_itemKeysShown count]){
+    if([tableLength intValue]<[_itemKeysShown count]){
         NSMutableArray* deleteIndexPaths = [NSMutableArray array];
         
-        for(NSInteger i=[_itemKeysShown count];i>[tableLength intValue];i--){
+        NSInteger max = [_itemKeysShown count];
+        for(NSInteger i=[tableLength intValue];i<max;i++){
             [deleteIndexPaths addObject:[NSIndexPath indexPathForRow:i inSection:0]];
         }
         
         _itemKeysShown = [_itemKeysShown subarrayWithRange:NSMakeRange(0,[tableLength intValue])];
+        NSLog(@"Delete index paths %@",deleteIndexPaths);
         NSLog(@"Deletes %i",[deleteIndexPaths count]);
         
         [_tableView deleteRowsAtIndexPaths:deleteIndexPaths withRowAnimation:_animations];
     }
 
-    [_tableView endUpdates];
+//    [_tableView endUpdates];
 }
 -(void) _updateRowForItem:(ZPZoteroItem*)item{
     [_cellCache removeObjectForKey:item.key];
@@ -315,15 +321,15 @@
             //Show different things depending on what data we have
         
             if(item.creatorSummary!=NULL){
-                if(item.year != 0){
-                    authorsLabel.text = [NSString stringWithFormat:@"%@ (%i)",item.creatorSummary,item.year];
+                if(item.date != 0){
+                    authorsLabel.text = [NSString stringWithFormat:@"%@ (%i)",item.creatorSummary,item.date];
                 }
                 else{
                     authorsLabel.text = [NSString stringWithFormat:@"%@ (No date)",item.creatorSummary];
                 }
             }    
-            else if(item.year != 0){
-                authorsLabel.text = [NSString stringWithFormat:@"No author (%i)",item.year];
+            else if(item.date != 0){
+                authorsLabel.text = [NSString stringWithFormat:@"No author (%i)",item.date];
             }
             else{
                 authorsLabel.text = @"No author (No date)";

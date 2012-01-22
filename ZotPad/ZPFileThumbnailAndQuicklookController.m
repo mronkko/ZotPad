@@ -61,10 +61,8 @@ static NSCache* _fileTypeImageCache;
     ZPZoteroItem* item = [ZPZoteroItem retrieveOrInitializeWithKey:[[(ZPSimpleItemListViewController*) _viewController itemKeysShown] objectAtIndex:row]];
     
     _currentAttachment = [item.attachments objectAtIndex:0];
-    if(_currentAttachment.fileExists || [[ZPPreferences instance] online]){
-        [self openInQuickLookWithAttachment:_currentAttachment];
-        
-    }
+
+    [self openInQuickLookWithAttachment:_currentAttachment];
 }
 
 #pragma mark QuickLook delegate methods
@@ -99,7 +97,7 @@ static NSCache* _fileTypeImageCache;
     }
 
     if(! attachment.fileExists){
-        if([[ZPPreferences instance] online]) [self _downloadWithProgressAlert:attachment];
+        if([[ZPPreferences instance] online] && [[ZPServerConnection instance] hasInternetConnection]) [self _downloadWithProgressAlert:attachment];
     }
     else {
         

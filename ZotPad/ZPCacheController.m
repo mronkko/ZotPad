@@ -399,63 +399,66 @@ static ZPCacheController* _instance = nil;
             
             [[ZPDatabase instance] deleteItemKeysNotInArray:serverKeys fromLibrary:libraryID]; 
             
-            //Get all keys in the library
-            NSArray* cacheKeys = [[ZPDatabase instance] getAllItemKeysForLibrary:libraryID];
+            //If there is data in the library, start cacheing it
             
-            NSString* markerKey = [[ZPDatabase instance] getFirstItemKeyWithTimestamp:[(ZPZoteroLibrary*)container lastCompletedCacheTimestamp] from:libraryID];
-            
-            //Iterate the arrays backward until we find a difference
-            
-            NSInteger index = [serverKeys indexOfObject:markerKey];
-            
-            //Sanity check
-            if(index == NSNotFound){
-                index = [serverKeys count]-1;
-            }
-            
-            NSArray* itemKeysThatNeedToBeRetrieved = [serverKeys subarrayWithRange:NSMakeRange(0, index)];
-
-            /*
-            Old check. Do not remove. 
-            
-            NSInteger index;
-             
-            for(index=0; index < [serverKeys count]; index++){
+            if([serverKeys count]>0){
+                //Get all keys in the library
+                NSArray* cacheKeys = [[ZPDatabase instance] getAllItemKeysForLibrary:libraryID];
                 
-                if(index >=[cacheKeys count]) break;
+                NSString* markerKey = [[ZPDatabase instance] getFirstItemKeyWithTimestamp:[(ZPZoteroLibrary*)container lastCompletedCacheTimestamp] from:libraryID];
                 
-                NSString* serverKey = [serverKeys objectAtIndex:[serverKeys count]-index-1];
-                NSString* cacheKey = [cacheKeys objectAtIndex:[cacheKeys count]-index-1];
+                //Iterate the arrays backward until we find a difference
                 
-                if(![serverKey isEqualToString:cacheKey]) break;
-            }
-
-            NSLog(@"Adding items to queue up to last %i",index);
-            
-            // Queue all the items that were different
-            NSArray* itemKeysThatNeedToBeRetrieved = [serverKeys subarrayWithRange:NSMakeRange(0, [serverKeys count]-index-1)];
-            
-            */
-            
-            
-            // First add all items that do not exist in the cache
-            NSMutableArray* nonExistingKeys = [NSMutableArray arrayWithArray:itemKeysThatNeedToBeRetrieved];
-            [nonExistingKeys removeObjectsInArray:cacheKeys];
-            if([nonExistingKeys count]>0){
-                [self addToItemQueue:nonExistingKeys libraryID:libraryID priority:FALSE];
-                NSLog(@"Added %i non-existing keys that need data",[nonExistingKeys count]);
-            }
-            
-            // Then add the rest of the items
-            NSMutableArray* existingKeys = [NSMutableArray arrayWithArray:itemKeysThatNeedToBeRetrieved];
-            [existingKeys removeObjectsInArray:nonExistingKeys];
-            if([existingKeys count]>0){
-                [self addToItemQueue:existingKeys libraryID:libraryID priority:FALSE];   
-                NSLog(@"Added %i existing keys that might need new data",[existingKeys count]);
-            }
-            
-        }            
-        
+                NSInteger index = [serverKeys indexOfObject:markerKey];
+                
+                //Sanity check
+                if(index == NSNotFound){
+                    index = [serverKeys count]-1;
+                }
+                
+                NSArray* itemKeysThatNeedToBeRetrieved = [serverKeys subarrayWithRange:NSMakeRange(0, index)];
+                
+                /*
+                 Old check. Do not remove. 
+                 
+                 NSInteger index;
+                 
+                 for(index=0; index < [serverKeys count]; index++){
+                 
+                 if(index >=[cacheKeys count]) break;
+                 
+                 NSString* serverKey = [serverKeys objectAtIndex:[serverKeys count]-index-1];
+                 NSString* cacheKey = [cacheKeys objectAtIndex:[cacheKeys count]-index-1];
+                 
+                 if(![serverKey isEqualToString:cacheKey]) break;
+                 }
+                 
+                 NSLog(@"Adding items to queue up to last %i",index);
+                 
+                 // Queue all the items that were different
+                 NSArray* itemKeysThatNeedToBeRetrieved = [serverKeys subarrayWithRange:NSMakeRange(0, [serverKeys count]-index-1)];
+                 
+                 */
+                
+                
+                // First add all items that do not exist in the cache
+                NSMutableArray* nonExistingKeys = [NSMutableArray arrayWithArray:itemKeysThatNeedToBeRetrieved];
+                [nonExistingKeys removeObjectsInArray:cacheKeys];
+                if([nonExistingKeys count]>0){
+                    [self addToItemQueue:nonExistingKeys libraryID:libraryID priority:FALSE];
+                    NSLog(@"Added %i non-existing keys that need data",[nonExistingKeys count]);
+                }
+                
+                // Then add the rest of the items
+                NSMutableArray* existingKeys = [NSMutableArray arrayWithArray:itemKeysThatNeedToBeRetrieved];
+                [existingKeys removeObjectsInArray:nonExistingKeys];
+                if([existingKeys count]>0){
+                    [self addToItemQueue:existingKeys libraryID:libraryID priority:FALSE];   
+                    NSLog(@"Added %i existing keys that might need new data",[existingKeys count]);
+                }
+                
+            }            
+        }        
     }
     else{
         NSArray* itemKeys = [[ZPServerConnection instance] retrieveKeysInContainer:libraryID collectionKey:collectionKey];

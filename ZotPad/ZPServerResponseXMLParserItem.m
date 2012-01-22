@@ -127,7 +127,7 @@
         [(ZPZoteroItem*) _currentElement setNumChildren:[value intValue]];
     }
     else if([key isEqualToString: @"zapi:year"] && [_currentElement isKindOfClass:[ZPZoteroItem class]]){
-        [(ZPZoteroItem*) _currentElement setYear:[value intValue]];
+        [(ZPZoteroItem*) _currentElement setDate:[value intValue]];
     }
     else if([key isEqualToString:@"updated"]){
         [super _setField:@"LastTimestamp" toValue:value];
