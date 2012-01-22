@@ -548,6 +548,20 @@ static ZPItemDetailViewController* _instance;
         
     }
     
+    // Navigator
+    else{
+        // Get the key for the selected item 
+        NSArray* itemArray =[(ZPSimpleItemListViewController*) aTableView.dataSource itemKeysShown];
+        if(indexPath.row<[itemArray count]){                    
+            NSString* currentItemKey = [itemArray objectAtIndex: indexPath.row]; 
+            
+            if(currentItemKey != [NSNull null]){
+                _currentItem = [ZPZoteroItem retrieveOrInitializeWithKey:currentItemKey];
+                [self configure];
+            }
+            
+        }
+    }
 }
 
 /*
