@@ -51,6 +51,8 @@ static ZPAuthenticationDialog* _instance = nil;
 - (void)setKeyAndLoadZoteroSite:(NSString*) key{
     NSLog(@"Starting loading Zotero website");
     
+    //TODO: Implement default parameters hat would access the group libraries as well http://www.zotero.org/support/dev/server_api/oauth
+    
     NSString *urlAddress = [NSString stringWithFormat:@"https://www.zotero.org/oauth/authorize?oauth_token=%@",key];
     
     //Create a URL object.
