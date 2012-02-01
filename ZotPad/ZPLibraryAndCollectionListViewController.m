@@ -26,7 +26,7 @@
 @implementation ZPLibraryAndCollectionListViewController
 
 @synthesize detailViewController = _detailViewController;
-@synthesize currentLibraryID = _currentLibraryID;
+@synthesize currentlibraryID = _currentlibraryID;
 @synthesize currentCollectionKey = _currentCollectionKey;
 
 static ZPLibraryAndCollectionListViewController* _instance = nil;
@@ -67,12 +67,12 @@ static ZPLibraryAndCollectionListViewController* _instance = nil;
     //[self performSelectorInBackground:@selector(_refreshLibrariesAndCollections) withObject:NULL];
 
     //If the current library is not defined, show a list of libraries
-    if(self->_currentLibraryID == 0){
+    if(self->_currentlibraryID == 0){
         self->_content = [[ZPDataLayer instance] libraries];
     }
     //If a library is chosen, show collections level collections for that library
     else{
-        self->_content = [[ZPDataLayer instance] collectionsForLibrary:self->_currentLibraryID withParentCollection:self->_currentCollectionKey];        
+        self->_content = [[ZPDataLayer instance] collectionsForLibrary:self->_currentlibraryID withParentCollection:self->_currentCollectionKey];        
     }
     
 	// Do any additional setup after loading the view, typically from a nib.
@@ -107,14 +107,14 @@ static ZPLibraryAndCollectionListViewController* _instance = nil;
         //If we are showing the libraries view, reload the data
 
         //If the current library is not defined, show a list of libraries
-        if(self->_currentLibraryID == 0){
+        if(self->_currentlibraryID == 0){
             [ZPZoteroLibrary dropCache]; //TODO: Figure a more elegant solution
             self->_content = [[ZPDataLayer instance] libraries];
         }
         //If a library is chosen, show collections level collections for that library
         else{
             [ZPZoteroCollection dropCache]; //TODO: Figure a more elegant solution
-            self->_content = [[ZPDataLayer instance] collectionsForLibrary:self->_currentLibraryID withParentCollection:self->_currentCollectionKey];        
+            self->_content = [[ZPDataLayer instance] collectionsForLibrary:self->_currentlibraryID withParentCollection:self->_currentCollectionKey];        
         }
         
         [[self tableView] reloadData];
@@ -148,7 +148,7 @@ static ZPLibraryAndCollectionListViewController* _instance = nil;
     }
     
     // Configure the cell.
-	ZPZoteroItemContainer* node = [self->_content objectAtIndex: indexPath.row];
+	ZPZoteroDataObject* node = [self->_content objectAtIndex: indexPath.row];
 	if ( [node hasChildren])
 	{
 		cell.accessoryType = UITableViewCellAccessoryDetailDisclosureButton;
@@ -170,7 +170,7 @@ static ZPLibraryAndCollectionListViewController* _instance = nil;
      When a row is selected, set the detail view controller's library and collection and refresh
      */
     
-   ZPZoteroItemContainer* node = [self->_content objectAtIndex: indexPath.row];
+   ZPZoteroDataObject* node = [self->_content objectAtIndex: indexPath.row];
     self.detailViewController.libraryID = [node libraryID];
     self.detailViewController.collectionKey = [node collectionKey];
 
@@ -189,8 +189,8 @@ static ZPLibraryAndCollectionListViewController* _instance = nil;
     
     ZPLibraryAndCollectionListViewController* subController = [[ZPLibraryAndCollectionListViewController alloc] initWithStyle: UITableViewStylePlain];
 	subController.detailViewController = self.detailViewController;
-    ZPZoteroItemContainer* selectedNode  = [self->_content objectAtIndex: indexPath.row];
-	subController.currentLibraryID=[selectedNode libraryID];
+    ZPZoteroDataObject* selectedNode  = [self->_content objectAtIndex: indexPath.row];
+	subController.currentlibraryID=[selectedNode libraryID];
 	subController.currentCollectionKey=[selectedNode collectionKey];
 	
 	[self.navigationController pushViewController: subController animated: YES];

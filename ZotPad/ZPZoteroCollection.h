@@ -7,16 +7,13 @@
 //
 
 #import <Foundation/Foundation.h>
-#import "ZPZoteroItemContainer.h"
+#import "ZPZoteroDataObject.h"
 
-@interface ZPZoteroCollection : ZPZoteroItemContainer{
+@interface ZPZoteroCollection : ZPZoteroDataObject{
     NSString* _parentCollectionKey;
 }
 @property (retain, nonatomic) NSString* parentCollectionKey;
 
--(NSString*) collectionKey;
-
-+(ZPZoteroCollection*) ZPZoteroCollectionWithKey:(NSString*) key;
 +(void) dropCache;
 
 

@@ -15,6 +15,11 @@
     NSInteger _maxCacheSize;
 }
 
+@property NSString* OAuthKey;
+@property NSString* userID;
+@property NSString* username;
+@property NSString* currentCacheSize;
+
 +(ZPPreferences*) instance;
 -(BOOL) cacheMetadataAllLibraries;
 -(BOOL) cacheMetadataActiveLibrary;
@@ -29,6 +34,8 @@
 -(BOOL) online;
 
 -(NSInteger) maxCacheSize;
+
+-(void) resetUserCredentials;
 
 -(void) reload;
 -(void) checkAndProcessApplicationResetPreferences;

@@ -11,6 +11,7 @@
 #import "ZPCacheController.h"
 #import "ZPServerConnection.h"
 #import "ZPLibraryAndCollectionListViewController.h"
+#import "ZPPreferences.h"
 
 #import "ZPLogger.h"
 
@@ -143,18 +144,18 @@ static ZPAuthenticationProcess* _instance = nil;
         NSLog(@"Got access token");
         
         //Save the key to preferences
-        [[NSUserDefaults standardUserDefaults] setValue:[_latestToken key] forKey:@"OAuthKey"];
+        [[ZPPreferences instance] setOAuthKey:[_latestToken key]];
         _oauthkey = [_latestToken key];
         
         //Save userID and username
         NSArray* parts = [responseBody componentsSeparatedByString:@"&"];
         
         NSString* userID = [[[parts objectAtIndex:2]componentsSeparatedByString:@"="] objectAtIndex:1];
-        [[NSUserDefaults standardUserDefaults] setValue:userID forKey:@"userID"];
+        [[ZPPreferences instance] setUserID:userID];
         _userID = userID;
         
         NSString* username = [[[parts objectAtIndex:3]componentsSeparatedByString:@"="] objectAtIndex:1];
-        [[NSUserDefaults standardUserDefaults] setValue:username forKey:@"username"];
+        [[ZPPreferences instance] setUsername:username];
         _username = username;
         
         //Tell the application to start updating libraries and collections from server

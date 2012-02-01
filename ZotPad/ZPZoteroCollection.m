@@ -15,7 +15,7 @@
 
 static NSCache* _objectCache = NULL;
 
-+(ZPZoteroCollection*) ZPZoteroCollectionWithKey:(NSString*) key{
++(ZPZoteroCollection*) dataObjectWithKey:(NSString*) key{
     
     if(key == NULL)
         [NSException raise:@"Key is null" format:@"ZPZoteroCollection cannot be instantiated with NULL key"];
@@ -38,20 +38,9 @@ static NSCache* _objectCache = NULL;
     [_objectCache removeAllObjects];
 }
 
-
--(NSString*) collectionKey{
-    return _key;
-}
 // An alias for setParentCollectionKey
 - (void) setParentKey:(NSString*)key{
     [self setParentCollectionKey:key];    
 }
                                    
-- (BOOL)isEqual:(id)anObject{
-    if([anObject isKindOfClass:[self class]]){
-        return [[(ZPZoteroCollection*) anObject collectionKey] isEqualToString: _key];
-    }
-    else return FALSE;
-}
-
 @end

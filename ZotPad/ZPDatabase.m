@@ -62,20 +62,25 @@ static ZPDatabase* _instance = nil;
 }
 
 /*
- Singleton accessor. If ZotPad is set to not use cache, prevent accessing this boject by returning NULL
+ 
+ Singleton accessor. 
+ 
  */
 
 +(ZPDatabase*) instance {
-    if([[ZPPreferences instance] useCache]){
-        @synchronized(self){
-            if(_instance == NULL){
-                _instance = [[ZPDatabase alloc] init];
-            }
-            return _instance;
+    @synchronized(self){
+        if(_instance == NULL){
+            _instance = [[ZPDatabase alloc] init];
         }
+        return _instance;
     }
-    else return NULL;
 }
+
+/*
+ 
+ Deletes and re-creates the database
+
+ */
 
 -(void) resetDatabase{
     @synchronized(self){
@@ -104,8 +109,6 @@ static ZPDatabase* _instance = nil;
         
         //Read the database structure from file and create the database
         
-        //TODO: Consider running this in a background thread. The SQL file would probably need to split into two parts because some tables are needed early on in the library and collection retrieval process
-        
         NSStringEncoding encoding;
         
         NSString *sqlFile = [NSString stringWithContentsOfFile:[[NSBundle mainBundle]
@@ -129,6 +132,14 @@ static ZPDatabase* _instance = nil;
 
 }
 
+#pragma mark Library methods
+
+/*
+ 
+ Writes an array of ZPZoteroLibrary objects into the database
+ 
+ */
+
 -(void) addOrUpdateLibraries:(NSArray*)libraries{
     
     @synchronized(self){
@@ -149,13 +160,74 @@ static ZPDatabase* _instance = nil;
         ZPZoteroLibrary* library;
     
         while ( library = (ZPZoteroLibrary*) [e nextObject]) {
-            
-            NSNumber* libraryID = library.libraryID;
-            [_database executeUpdate:@"INSERT INTO groups (groupID, title,lastCompletedCacheTimestamp) VALUES (?, ?, ?)",libraryID,library.title,[timestamps objectForKey:libraryID]];
+            [_database executeUpdate:@"INSERT INTO groups (groupID, title,lastCompletedCacheTimestamp) VALUES (?, ?, ?)",library.libraryID,library.title,[timestamps objectForKey:library.libraryID]];
         }
     }
 }
 
+- (void) setUpdatedTimestampForLibrary:(NSNumber*)libraryID toValue:(NSString*)updatedTimestamp{
+    @synchronized(self){
+        [_database executeUpdate:@"UPDATE groups SET lastCompletedCacheTimestamp = ? WHERE groupID = ?",updatedTimestamp,libraryID];
+    }
+}
+
+/*
+ 
+ Returns an array of ZPLibrary objects
+ 
+ */
+
+- (NSArray*) groupLibraries{
+    NSMutableArray *returnArray = [[NSMutableArray alloc] init];
+    NSMutableArray* keyArray = [[NSMutableArray alloc] init];
+    
+    //Group libraries
+    @synchronized(self){
+        
+        FMResultSet* resultSet = [_database executeQuery:@"SELECT groupID FROM groups"];
+        
+        
+        while([resultSet next]) {
+            [keyArray addObject:[NSNumber numberWithInt:[resultSet intForColumnIndex:0]]];
+        }
+        [resultSet close];
+    }
+    for(NSNumber* key in keyArray){
+        [returnArray addObject:[ZPZoteroLibrary dataObjectWithKey:key]];
+    }
+    
+	return returnArray;
+}
+/*
+ 
+ Reads data for for a group library and updates the library object
+ 
+ */
+- (void) addFieldsToGroupLibrary:(ZPZoteroLibrary*) library{
+    @synchronized(self){
+        
+        FMResultSet* resultSet = [_database executeQuery:@"SELECT *, groupID IN (SELECT DISTINCT libraryID from collections) AS hasChildren FROM groups WHERE groupID = ?",library.libraryID];
+		
+        
+        if([resultSet next]){
+            [library configureWithDictionary:[resultSet resultDict]];
+        }
+        [resultSet close];
+        
+    }
+}
+
+
+
+#pragma mark - 
+
+#pragma mark Collection methods
+
+/*
+ 
+ Writes an array of ZPZoteroCollections belonging to a ZPZoteroLibrary to database
+ 
+ */
 
 -(void) addOrUpdateCollections:(NSArray*)collections forLibrary:(ZPZoteroLibrary*)library{
 
@@ -213,40 +285,36 @@ static ZPDatabase* _instance = nil;
     [ZPZoteroCollection dropCache];
 }
 
--(BOOL) doesItemKey:(NSString*)itemKey belongToCollection:(NSString*) collectionKey{
-    @synchronized(self){
-        
-        FMResultSet* resultSet = [_database executeQuery:@"SELECT itemKey FROM collectionItems WHERE itemKey = ? AND collectionKey = ?",itemKey,collectionKey];
-		
-        BOOL ret = [resultSet next];
-            
-        [resultSet close];
-        
-        return ret;
-        
-    }
-
-}
-
-
 // These remove items from the collection
 - (void) removeItemKeysNotInArray:(NSArray*)itemKeys fromCollection:(NSString*)collectionKey{
-
+    
     if([itemKeys count] == 0) return;
-
+    
     NSString* sql=[NSString stringWithFormat:@"DELETE FROM collectionItems WHERE collectionKey = ? AND itemKey NOT IN ('%@')",
                    [itemKeys componentsJoinedByString:@"', '"]];
-
+    
     @synchronized(self){
         //This might generate a too long query
         [_database executeUpdate:sql,collectionKey];
     }
-
+    
 }
+
+- (void) setUpdatedTimestampForCollection:(NSString*)collectionKey toValue:(NSString*)updatedTimestamp{
+    @synchronized(self){
+        [_database executeUpdate:@"UPDATE collections SET lastCompletedCacheTimestamp = ? WHERE key = ?",updatedTimestamp,collectionKey];
+    }
+}
+
+
+#pragma mark - 
+
+#pragma mark Item methods
+
 
 /*
  
-Deletes items, notes, and attachments
+Deletes items, notes, and attachments based in array of keys from a library
  
  */
 
@@ -316,65 +384,11 @@ Deletes items, notes, and attachments
     }
 }
 
-- (void) setUpdatedTimestampForCollection:(NSString*)collectionKey toValue:(NSString*)updatedTimestamp{
-    @synchronized(self){
-        [_database executeUpdate:@"UPDATE collections SET lastCompletedCacheTimestamp = ? WHERE key = ?",updatedTimestamp,collectionKey];
-    }
-}
-- (void) setUpdatedTimestampForLibrary:(NSNumber*)libraryID toValue:(NSString*)updatedTimestamp{
-    @synchronized(self){
-        [_database executeUpdate:@"UPDATE groups SET lastCompletedCacheTimestamp = ? WHERE groupID = ?",updatedTimestamp,libraryID];
-    }
-}
-
-
-// Methods for retrieving data from the data layer
-
-//TODO: Optimize so that the results from the query can be used when initializing library objects
-
-- (NSArray*) libraries{
-    NSMutableArray *returnArray = [[NSMutableArray alloc] init];
-    NSMutableArray* keyArray = [[NSMutableArray alloc] init];
-    
-    //Group libraries
-    @synchronized(self){
-        
-        FMResultSet* resultSet = [_database executeQuery:@"SELECT groupID FROM groups"];
-
-        
-        while([resultSet next]) {
-            [keyArray addObject:[NSNumber numberWithInt:[resultSet intForColumnIndex:0]]];
-        }
-        [resultSet close];
-    }
-    for(NSNumber* key in keyArray){
-        [returnArray addObject:[ZPZoteroLibrary ZPZoteroLibraryWithID:key]];
-    }
-
-	return returnArray;
-}
-
-- (void) addFieldsToLibrary:(ZPZoteroLibrary*) library{
-    //Group libraries
-    @synchronized(self){
-        
-        FMResultSet* resultSet = [_database executeQuery:@"SELECT title,  groupID IN (SELECT DISTINCT libraryID from collections) AS hasChildren, lastCompletedCacheTimestamp FROM groups WHERE groupID = ?",library.libraryID];
-		
-        
-        if([resultSet next]){
-        
-            NSString* name = [resultSet stringForColumnIndex:0];
-            BOOL hasChildren = [resultSet boolForColumnIndex:1];
-        
-            [library setTitle: name];
-            [library setHasChildren:hasChildren];
-            [library setLastCompletedCacheTimestamp:[resultSet stringForColumnIndex:2]];
-        }
-        [resultSet close];
-        
-    }
-}
-
+/*
+ 
+ Returns an array of ZPZoteroCollections
+ 
+ */
 
 - (NSArray*) collectionsForLibrary : (NSNumber*)libraryID withParentCollection:(NSString*)collectionKey {
 	
@@ -412,13 +426,10 @@ Deletes items, notes, and attachments
 }
 
 
-- (NSArray*) allCollectionsForLibrary:(NSNumber*)libraryID{	
+- (NSArray*) libraryID:(NSNumber*)libraryID{	
 
     NSMutableArray* returnArray = [[NSMutableArray alloc] init];;
     NSMutableArray* keyArray = [[NSMutableArray alloc] init];
-    
-    //TODO: Refactor: Make a method that takes a row from resulset and then creates an object from it.
-    // resultDict method in FMResultSet is probably useful for this
     
 	@synchronized(self){
         FMResultSet* resultSet = [_database executeQuery:@"SELECT key FROM collections WHERE libraryID=?",libraryID];
@@ -432,6 +443,7 @@ Deletes items, notes, and attachments
     for(NSString* key in keyArray){
         [returnArray addObject:[ZPZoteroCollection ZPZoteroCollectionWithKey:key]];
     }
+
     NSLog(@"Retrieved %i collections for library %@",[returnArray count],libraryID);
 
 	return returnArray;
@@ -446,7 +458,7 @@ Deletes items, notes, and attachments
         
         if([resultSet next]){
         
-            [collection setLibraryID : [NSNumber numberWithInt:[resultSet intForColumnIndex:0]]];
+            [collection setlibraryID : [NSNumber numberWithInt:[resultSet intForColumnIndex:0]]];
             [collection setTitle : [resultSet stringForColumnIndex:1]];
             [collection setHasChildren:(BOOL) [resultSet intForColumnIndex:2]];
             [collection setLastCompletedCacheTimestamp:[resultSet stringForColumnIndex:3]];
@@ -764,7 +776,7 @@ Deletes items, notes, and attachments
         if ([resultSet next]) {
             
             [item setItemType:[resultSet stringForColumnIndex:0]];
-            [item setLibraryID:[NSNumber numberWithInt:[resultSet intForColumnIndex:1]]];
+            [item setlibraryID:[NSNumber numberWithInt:[resultSet intForColumnIndex:1]]];
             [item setDate:[resultSet intForColumnIndex:2]];
             [item setCreatorSummary:[resultSet stringForColumnIndex:3]];
             [item setTitle:[resultSet stringForColumnIndex:4]];

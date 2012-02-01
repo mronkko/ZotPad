@@ -36,16 +36,16 @@
 
 
 // Methods for retrieving data from the data layer
-- (NSArray*) libraries;
-- (NSArray*) collectionsForLibrary : (NSNumber*)currentLibraryID withParentCollection:(NSString*)currentCollectionKey;
-- (NSArray*) allCollectionsForLibrary: (NSNumber*)libraryID;
+- (NSArray*) groupLibraries;
+- (NSArray*) collectionsForLibrary : (NSNumber*)currentlibraryID withParentCollection:(NSString*)currentCollectionKey;
+- (NSArray*) libraryID: (NSNumber*)libraryID;
 - (NSArray*) getItemKeysForLibrary:(NSNumber*)libraryID collectionKey:(NSString*)collectionKey
                       searchString:(NSString*)searchString orderField:(NSString*)orderField sortDescending:(BOOL)sortDescending;
 
 - (NSString*) getFirstItemKeyWithTimestamp:(NSString*)timestamp from:(NSNumber*)libraryID;
 
 
-- (void) addFieldsToLibrary:(ZPZoteroLibrary*) library;
+- (void) addFieldsToGroupLibrary:(ZPZoteroLibrary*) library;
 - (void) addFieldsToCollection:(ZPZoteroCollection*) collection;
 
 

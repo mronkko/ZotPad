@@ -6,6 +6,9 @@
 //  Copyright (c) 2011 __MyCompanyName__. All rights reserved.
 //
 
+
+// TODO: Consider software dimming http://stackoverflow.com/questions/8234981/make-the-iphone-screen-dim
+
 #import "ZPAppDelegate.h"
 #import "ZPCacheController.h"
 #import "ZPPreferences.h"

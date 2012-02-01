@@ -115,7 +115,7 @@ const NSInteger ZPServerConnectionRequestTopLevelKeys = 9;
 
 - (BOOL) authenticated{
     
-    return([[NSUserDefaults standardUserDefaults] objectForKey:@""] != nil);
+    return([[ZPPreferences instance] OAuthKey] != nil);
     
 }
 
@@ -137,7 +137,7 @@ const NSInteger ZPServerConnectionRequestTopLevelKeys = 9;
     //no longer valid.
     if([(NSHTTPURLResponse*)response statusCode]==403){
         NSLog(@"The authorization key is no longer valid.");
-        [[NSUserDefaults standardUserDefaults] removeObjectForKey:@"OAuthKey"];
+        [[ZPPreferences instance] resetUserCredentials];
     }
     
     _activeRequestCount--;
@@ -155,13 +155,13 @@ const NSInteger ZPServerConnectionRequestTopLevelKeys = 9;
     NSData* responseData = NULL;
     NSString* urlString;
    
-    NSString* oauthkey =  [[NSUserDefaults standardUserDefaults] objectForKey:@"OAuthKey"];
+    NSString* oauthkey =  [[ZPPreferences instance] OAuthKey];
     if(oauthkey!=NULL){
 
         NSInteger libraryID = [(NSNumber*)[parameters objectForKey:@"libraryID"] integerValue];
         
         if(libraryID==1 || libraryID == 0){
-            urlString = [NSString stringWithFormat:@"https://api.zotero.org/users/%@/",[[NSUserDefaults standardUserDefaults] objectForKey:@"userID"]];
+            urlString = [NSString stringWithFormat:@"https://api.zotero.org/users/%@/",[[ZPPreferences instance] userID]];
         }
         else{
             urlString = [NSString stringWithFormat:@"https://api.zotero.org/groups/%i/",libraryID];        
@@ -507,7 +507,7 @@ const NSInteger ZPServerConnectionRequestTopLevelKeys = 9;
 
 -(void) downloadAttachment:(ZPZoteroAttachment*)attachment withUIProgressView:(UIProgressView*) progressView{
         
-    NSString* oauthkey =  [[NSUserDefaults standardUserDefaults] objectForKey:@"OAuthKey"];
+    NSString* oauthkey =  [[ZPPreferences instance] OAuthKey];
 
     NSURL* url = [NSURL URLWithString:[NSString stringWithFormat:@"%@?key=%@", attachment.attachmentURL,oauthkey]];
     ASIHTTPRequest *request = [ASIHTTPRequest requestWithURL:url];

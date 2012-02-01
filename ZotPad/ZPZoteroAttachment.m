@@ -6,6 +6,9 @@
 //  Copyright (c) 2011 __MyCompanyName__. All rights reserved.
 //
 
+
+// TODO: Implement linked files or at least some kind of info that they are not supported
+
 #import "ZPZoteroAttachment.h"
 
 @implementation ZPZoteroAttachment

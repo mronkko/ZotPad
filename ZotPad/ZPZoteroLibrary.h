@@ -7,12 +7,11 @@
 //
 
 #import <Foundation/Foundation.h>
-#import "ZPZoteroItemContainer.h"
+#import "ZPZoteroDataObject.h"
 
-@interface ZPZoteroLibrary : ZPZoteroItemContainer {
+@interface ZPZoteroLibrary : ZPZoteroDataObject {
 }
 
-+(ZPZoteroLibrary*) ZPZoteroLibraryWithID:(NSNumber*) libraryID;
 +(void) dropCache;
 
 @end

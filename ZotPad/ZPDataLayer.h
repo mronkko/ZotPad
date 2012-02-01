@@ -40,7 +40,7 @@
 
 // Methods for retrieving data from the data layer
 - (NSArray*) libraries;
-- (NSArray*) collectionsForLibrary : (NSNumber*)currentLibraryID withParentCollection:(NSString*)currentCollectionKey;
+- (NSArray*) collectionsForLibrary : (NSNumber*)currentlibraryID withParentCollection:(NSString*)currentCollectionKey;
 - (NSArray*) getItemKeysFromCacheForLibrary:(NSNumber*)libraryID collection:(NSString*)collectionKey
                         searchString:(NSString*)searchString orderField:(NSString*)orderField sortDescending:(BOOL)sortDescending;
 

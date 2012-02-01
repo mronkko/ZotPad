@@ -16,14 +16,14 @@
 @interface ZPLibraryAndCollectionListViewController : UITableViewController <ZPLibraryObserver>{
     ZPDataLayer* _database;
     NSArray* _content;
-    NSNumber* _currentLibraryID;
+    NSNumber* _currentlibraryID;
     NSString* _currentCollectionKey;
     UIActivityIndicatorView* _activityIndicator;
     
 }
 
 @property (strong, nonatomic) ZPDetailedItemListViewController *detailViewController;
-@property (retain, nonatomic) NSNumber* currentLibraryID;
+@property (retain, nonatomic) NSNumber* currentlibraryID;
 @property (retain, nonatomic) NSString* currentCollectionKey;
 
 // TODO: refactor the code so that this does not need a singleton

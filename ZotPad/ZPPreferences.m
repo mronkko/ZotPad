@@ -81,9 +81,7 @@ static ZPPreferences* _instance = nil;
 
     if([defaults boolForKey:@"resetusername"]){
         NSLog(@"Reseting username");
-        [defaults removeObjectForKey:@"username"];
-        [defaults removeObjectForKey:@"userID"];
-        [defaults removeObjectForKey:@"OAuthKey"];
+        [self resetUserCredentials];
         [defaults removeObjectForKey:@"resetusername"];
     }
     
@@ -100,6 +98,14 @@ static ZPPreferences* _instance = nil;
     }
 
 }
+-(void) resetUserCredentials{
+    NSUserDefaults* defaults = [NSUserDefaults standardUserDefaults];
+    [defaults removeObjectForKey:@"username"];
+    [defaults removeObjectForKey:@"userID"];
+    [defaults removeObjectForKey:@"OAuthKey"];
+
+}
+
 -(NSInteger) maxCacheSize{
     return _maxCacheSize;
 }
@@ -138,5 +144,40 @@ static ZPPreferences* _instance = nil;
     
 }
 
+-(NSString*) username{
+    NSUserDefaults* defaults = [NSUserDefaults standardUserDefaults];
+    return [defaults objectForKey:@"username"];
+}
+-(void) setUsername: (NSString*) value {
+    NSUserDefaults* defaults = [NSUserDefaults standardUserDefaults];
+    [defaults setValue:value forKey:@"username"];
+}
+
+-(NSString*) userID{
+    NSUserDefaults* defaults = [NSUserDefaults standardUserDefaults];
+    return [defaults objectForKey:@"userID"];
+}
+-(void) setUserID: (NSString*) value {
+    NSUserDefaults* defaults = [NSUserDefaults standardUserDefaults];
+    [defaults setValue:value forKey:@"userID"];
+}
+
+-(NSString*) OAuthKey{
+    NSUserDefaults* defaults = [NSUserDefaults standardUserDefaults];
+    return [defaults objectForKey:@"OAuthKey"];
+}
+-(void) setOAuthKey:(NSString *)OAuthKey: (NSString*) value {
+    NSUserDefaults* defaults = [NSUserDefaults standardUserDefaults];
+    [defaults setValue:value forKey:@"OAuthKey"];
+}
+
+-(NSString*) currentCacheSize{
+    NSUserDefaults* defaults = [NSUserDefaults standardUserDefaults];
+    return [defaults objectForKey:@"cachesizecurrent"];
+}
+-(void) setCurrentCacheSize:(NSString *)currentCacheSize:(NSString *)OAuthKey: (NSString*) value {
+    NSUserDefaults* defaults = [NSUserDefaults standardUserDefaults];
+    [defaults setValue:value forKey:@"cachesizecurrent"];
+}
 
 @end

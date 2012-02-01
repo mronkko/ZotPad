@@ -448,7 +448,7 @@
                                 <rect key="frame" x="0.0" y="0.0" width="768" height="44"/>
                                 <autoresizingMask key="autoresizingMask" widthSizable="YES" flexibleMaxY="YES"/>
                                 <items>
-                                    <navigationItem title="Login to Zotero" id="ELS-Rt-bzu"/>
+                                    <navigationItem title="Log in to Zotero" id="ELS-Rt-bzu"/>
                                 </items>
                             </navigationBar>
                             <webView contentMode="scaleToFill" id="g43-sE-XbP">
@@ -501,50 +501,6 @@
             <point key="canvasLocation" x="-390" y="686"/>
         </scene>
     </scenes>
-    <classes>
-        <class className="TTStyledTextLabel" superclassName="UIView">
-            <source key="sourceIdentifier" type="project" relativePath="./Classes/TTStyledTextLabel.h"/>
-        </class>
-        <class className="ZPAuthenticationDialog" superclassName="UIViewController">
-            <source key="sourceIdentifier" type="project" relativePath="./Classes/ZPAuthenticationDialog.h"/>
-            <relationships>
-                <relationship kind="outlet" name="webView" candidateClass="UIWebView"/>
-            </relationships>
-        </class>
-        <class className="ZPDetailedItemListViewController" superclassName="ZPSimpleItemListViewController">
-            <source key="sourceIdentifier" type="project" relativePath="./Classes/ZPDetailedItemListViewController.h"/>
-            <relationships>
-                <relationship kind="action" name="doSortCreator:"/>
-                <relationship kind="action" name="doSortDate:"/>
-                <relationship kind="action" name="doSortPublication:"/>
-                <relationship kind="action" name="doSortTitle:"/>
-                <relationship kind="outlet" name="searchBar" candidateClass="UISearchBar"/>
-            </relationships>
-        </class>
-        <class className="ZPItemDetailViewController" superclassName="UIViewController">
-            <source key="sourceIdentifier" type="project" relativePath="./Classes/ZPItemDetailViewController.h"/>
-            <relationships>
-                <relationship kind="outlet" name="carousel" candidateClass="iCarousel"/>
-                <relationship kind="outlet" name="detailTableView" candidateClass="UITableView"/>
-            </relationships>
-        </class>
-        <class className="ZPLibraryAndCollectionListViewController" superclassName="UITableViewController">
-            <source key="sourceIdentifier" type="project" relativePath="./Classes/ZPLibraryAndCollectionListViewController.h"/>
-        </class>
-        <class className="ZPSimpleItemListViewController" superclassName="UIViewController">
-            <source key="sourceIdentifier" type="project" relativePath="./Classes/ZPSimpleItemListViewController.h"/>
-            <relationships>
-                <relationship kind="outlet" name="tableView" candidateClass="UITableView"/>
-            </relationships>
-        </class>
-        <class className="iCarousel" superclassName="UIView">
-            <source key="sourceIdentifier" type="project" relativePath="./Classes/iCarousel.h"/>
-            <relationships>
-                <relationship kind="outlet" name="dataSource"/>
-                <relationship kind="outlet" name="delegate"/>
-            </relationships>
-        </class>
-    </classes>
     <simulatedMetricsContainer key="defaultSimulatedMetrics">
         <simulatedStatusBarMetrics key="statusBar" statusBarStyle="blackTranslucent"/>
         <simulatedOrientationMetrics key="orientation"/>

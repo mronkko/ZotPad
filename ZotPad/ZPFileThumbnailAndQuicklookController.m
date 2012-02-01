@@ -58,7 +58,7 @@ static NSCache* _fileTypeImageCache;
     //Get the row of this cell
     NSInteger row = [[(ZPSimpleItemListViewController*) _viewController tableView] indexPathForCell:cell].row;
     
-    ZPZoteroItem* item = [ZPZoteroItem retrieveOrInitializeWithKey:[[(ZPSimpleItemListViewController*) _viewController itemKeysShown] objectAtIndex:row]];
+    ZPZoteroItem* item = [ZPZoteroItem dataObjectWithKey:[[(ZPSimpleItemListViewController*) _viewController itemKeysShown] objectAtIndex:row]];
     
     _currentAttachment = [item.attachments objectAtIndex:0];
 
@@ -69,8 +69,8 @@ static NSCache* _fileTypeImageCache;
 
 - (NSInteger) numberOfPreviewItemsInPreviewController: (QLPreviewController *) controller 
 {
-    NSLog(@"Number of previews for item %@ is %i",_item.title, [[_item allExistingAttachments] count] );
-    return [[_item allExistingAttachments] count];
+    NSLog(@"Number of previews for item %@ is %i",_item.title, [[_item libraryIDchments] count] );
+    return [[_item libraryIDchments] count];
 }
 
 
@@ -78,7 +78,7 @@ static NSCache* _fileTypeImageCache;
 
     NSLog(@"Opening preview %i for item %@",index,_item.title );
 
-    NSArray* allExisting = [_item allExistingAttachments];
+    NSArray* allExisting = [_item libraryIDchments];
     ZPZoteroAttachment* currentAttachment = [allExisting objectAtIndex:index];
     NSString* path = [currentAttachment fileSystemPath];
     return [NSURL fileURLWithPath:path];
@@ -91,8 +91,8 @@ static NSCache* _fileTypeImageCache;
     // that the file cannot be downloaded because the fact that user tapped an
     //item is still relevant information for the cache controller
     
-    _item = [ZPZoteroItem retrieveOrInitializeWithKey:attachment.parentItemKey];
-    for(ZPZoteroAttachment* attachment in [_item allExistingAttachments]){
+    _item = [ZPZoteroItem dataObjectWithKey:attachment.parentItemKey];
+    for(ZPZoteroAttachment* attachment in [_item libraryIDchments]){
         [[ZPDatabase instance] updateViewedTimestamp:attachment];
     }
 
@@ -103,7 +103,7 @@ static NSCache* _fileTypeImageCache;
         
         QLPreviewController *quicklook = [[QLPreviewController alloc] init];
         [quicklook setDataSource:self];
-        NSInteger index = [[_item allExistingAttachments] indexOfObject:attachment];
+        NSInteger index = [[_item libraryIDchments] indexOfObject:attachment];
         [quicklook setCurrentPreviewItemIndex:index];
 //        UIViewController* root = [UIApplication sharedApplication].delegate.window.rootViewController;
 //        NSArray* viewControllers = [(UISplitViewController*) root viewControllers];

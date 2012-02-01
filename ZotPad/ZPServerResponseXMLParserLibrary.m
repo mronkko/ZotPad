@@ -12,7 +12,7 @@
 @implementation ZPServerResponseXMLParserLibrary
 
 - (void) _initNewElementWithID:(NSString*)id{
-    _currentElement = [ZPZoteroLibrary ZPZoteroLibraryWithID:[NSNumber numberWithInteger:[id intValue]]];
+    _currentElement = [ZPZoteroLibrary dataObjectWithKey:[NSNumber numberWithInteger:[id intValue]]];
     [super _processTemporaryFieldStorage];
 }
 

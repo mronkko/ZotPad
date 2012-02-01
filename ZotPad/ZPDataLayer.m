@@ -79,7 +79,7 @@ static ZPDataLayer* _instance = nil;
 
 - (NSArray*) libraries {
 	
-    return [[ZPDatabase instance] libraries];
+    return [[ZPDatabase instance] groupLibraries];
 }
 
 
@@ -89,9 +89,9 @@ static ZPDataLayer* _instance = nil;
  
  */
 
-- (NSArray*) collectionsForLibrary : (NSNumber*)currentLibraryID withParentCollection:(NSString*)currentcollectionKey {
+- (NSArray*) collectionsForLibrary : (NSNumber*)currentlibraryID withParentCollection:(NSString*)currentcollectionKey {
 	
-    return [[ZPDatabase instance] collectionsForLibrary:currentLibraryID withParentCollection:currentcollectionKey];
+    return [[ZPDatabase instance] collectionsForLibrary:currentlibraryID withParentCollection:currentcollectionKey];
 
 }
 
@@ -125,7 +125,7 @@ static ZPDataLayer* _instance = nil;
         if([item respondsToSelector:@selector(parentItemKey)]){
             NSString* parentKey = (NSString*)[item performSelector:@selector(parentItemKey)];
             if(![parentKey isEqualToString:item.key]){
-                ZPZoteroItem* parentItem = [ZPZoteroItem retrieveOrInitializeWithKey:parentKey];
+                ZPZoteroItem* parentItem = [ZPZoteroItem dataObjectWithKey:parentKey];
                 
                 //For now notify about Attachments only
                 if([item isKindOfClass:[ZPZoteroAttachment class]] && ! [itemsToBeNotifiedAbout containsObject:parentItem]){
