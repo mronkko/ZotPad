@@ -47,7 +47,7 @@
 //  cache. If we have the flag for redoing the cache update set, the process
 //  for refreshing the cache is repeated.
 //
-//  (This description is not updated for the current cahce logic)
+//  (This description is not updated for the current cache logic)
 
 
 #import "ZPCacheController.h"
@@ -206,7 +206,9 @@ static ZPCacheController* _instance = nil;
                 NSEnumerator* e = [_itemKeysToRetrieve keyEnumerator];
                 NSNumber* libraryID = _activeLibraryID;
                 
-                while((keyArray == NULL || [keyArray count]==0) && (libraryID = [e nextObject])) keyArray = [_itemKeysToRetrieve objectForKey:keyArray];
+                while((keyArray == NULL || [keyArray count]==0) && (libraryID = [e nextObject])){
+                    keyArray = [_itemKeysToRetrieve objectForKey:libraryID];   
+                }
                 
                 //If we found a non-empty que, queue item retrival
                 if(keyArray != NULL && [keyArray count]>0){
