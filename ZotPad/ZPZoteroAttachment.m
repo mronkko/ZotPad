@@ -54,8 +54,8 @@
 }
 
 - (NSArray*) attachments{
-    
-    return [NSArray arrayWithObject:self];
+    if(_attachmentType == nil) return [NSArray array];
+    else return [NSArray arrayWithObject:self];
 }
 
 - (void) setAttachments:(NSArray *)attachments{
