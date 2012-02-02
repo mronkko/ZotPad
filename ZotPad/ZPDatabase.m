@@ -726,31 +726,51 @@ Deletes items, notes, and attachments
     
     NSMutableArray* newItemKeys = [NSMutableArray arrayWithArray:keys];
     [newItemKeys removeObjectsInArray:existingItemKeys];
+
+    //This can easily result in too large queries, so we will split them up into batches
     
-    NSString* insertSQL;
-    NSMutableArray* insertArguments = [NSMutableArray array];
-    NSString* itemKey;
+    NSMutableArray* itemsRemaining = newItemKeys;
     
-    for(itemKey in newItemKeys){
-        if(insertSQL==NULL){
-            insertSQL = @"INSERT INTO collectionItems SELECT ? AS collectionKey, ? AS itemKey";
+    while([itemsRemaining count]>0){
+        
+        NSMutableArray* itemBatch = [NSMutableArray array];
+        
+        //The maximum rows in union select is 500. (http://www.sqlite.org/limits.html)
+        
+        NSInteger counter =0;
+        NSString* item = [itemsRemaining lastObject];
+
+        while(item != NULL && counter < 500){
+            [itemBatch addObject:item];
+            [itemsRemaining removeLastObject];
+            counter = counter + 1;
+            item = [itemsRemaining lastObject];
         }
-        else{
-            insertSQL = [insertSQL stringByAppendingString:@" UNION SELECT ?, ?"];
+        
+        NSString* insertSQL;
+        NSMutableArray* insertArguments = [NSMutableArray array];
+        NSString* itemKey;
+        
+        for(itemKey in itemBatch){
+            if(insertSQL==NULL){
+                insertSQL = @"INSERT INTO collectionItems SELECT ? AS collectionKey, ? AS itemKey";
+            }
+            else{
+                insertSQL = [insertSQL stringByAppendingString:@" UNION SELECT ?, ?"];
+            }
+            
+            [insertArguments addObject:collectionKey];
+            [insertArguments addObject:itemKey];
         }
-    
-        [insertArguments addObject:collectionKey];
-        [insertArguments addObject:itemKey];
-    }
-    
-   if(insertSQL != NULL){
-        @synchronized(self){
-            if(![_database executeUpdate:insertSQL withArgumentsInArray:insertArguments]){
-                NSLog(@"Database error");
+        
+        if(insertSQL != NULL){
+            @synchronized(self){
+                if(![_database executeUpdate:insertSQL withArgumentsInArray:insertArguments]){
+                    NSLog(@"Database error");
+                }
             }
         }
-   }
-
+    }
 }
 
 

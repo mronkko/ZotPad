@@ -20,6 +20,14 @@
 
 - (BOOL)application:(UIApplication *)application didFinishLaunchingWithOptions:(NSDictionary *)launchOptions
 {
+    
+    //Manual override for userID and Key. Useful for running the code in debugger with other people's credentials.
+    /*
+    NSUserDefaults* defaults = [NSUserDefaults standardUserDefaults];
+    [defaults setObject:@"" forKey:@"userID"];
+    [defaults setObject:@"" forKey:@"OAuthKey"];
+    */
+    
     [[ZPPreferences instance] checkAndProcessApplicationResetPreferences];
     [[ZPPreferences instance] reload];
     
