@@ -38,28 +38,31 @@
 // Methods for retrieving data from the data layer
 - (NSArray*) groupLibraries;
 - (NSArray*) collectionsForLibrary : (NSNumber*)currentlibraryID withParentCollection:(NSString*)currentCollectionKey;
-- (NSArray*) libraryID: (NSNumber*)libraryID;
+
+
+// Methods for retrieving item keys
 - (NSArray*) getItemKeysForLibrary:(NSNumber*)libraryID collectionKey:(NSString*)collectionKey
                       searchString:(NSString*)searchString orderField:(NSString*)orderField sortDescending:(BOOL)sortDescending;
 
 - (NSString*) getFirstItemKeyWithTimestamp:(NSString*)timestamp from:(NSNumber*)libraryID;
 
 
-- (void) addFieldsToGroupLibrary:(ZPZoteroLibrary*) library;
-- (void) addFieldsToCollection:(ZPZoteroCollection*) collection;
+// Methods for filling data into existing objects
+- (void) addAttributesToGroupLibrary:(ZPZoteroLibrary*) library;
+- (void) addAttributsToCollection:(ZPZoteroCollection*) collection;
+- (void) addAttributesToItem:(ZPZoteroItem *)item;
 
 
 - (void) addCreatorsToItem: (ZPZoteroItem*) item;
 - (void) addFieldsToItem: (ZPZoteroItem*) item;
 - (void) addNotesToItem: (ZPZoteroItem*) item;
 - (void) addAttachmentsToItem: (ZPZoteroItem*) item;
-- (void) addBasicsToItem:(ZPZoteroItem *)item;
 
 //Return a list of all attachment paths ordered by priority for removel
-- (NSArray*) getCachedAttachmentPaths;
+- (NSArray*) getCachedAttachmentsOrderedByRemovalPriority;
 
 //Return a list of all attachment paths priority for retrieval
-- (NSArray*) getAttachmentThatNeedToBeDownloadedInLibrary:(NSNumber*)libraryID collection:(NSString*)collectionKey;
+- (NSArray*) getAttachmentsInLibrary:(NSNumber*)libraryID collection:(NSString*)collectionKey;
 
 - (NSString*) getLocalizationStringWithKey:(NSString*) key type:(NSString*) type locale:(NSString*) locale;
 
@@ -77,34 +80,31 @@
 
  */
 
-- (void) addOrUpdateLibraries:(NSArray*)libraries;
-- (void) addOrUpdateCollections:(NSArray*)collections forLibrary:(ZPZoteroLibrary*)library;
-- (void) updateViewedTimestamp:(ZPZoteroAttachment*)attachment;
-
-
 // Methods for writing data to database
 // These take an array of ZPZotero* objects instead of a single objects because batch editing or inserting results in a significant performance boost
+
+- (void) writeLibraries:(NSArray*)libraries;
+- (void) writeCollections:(NSArray*)collections toLibrary:(ZPZoteroLibrary*)library;
 
 // This method returns an array containing the items that were actually modified in the DB. This can be used to determine if fields and attachments
 // need to be modified
 
--(NSArray*) addItemsToDatabase:(NSArray*)items;
-
--(void) addNotesToDatabase:(NSArray*)notes;
--(void) addAttachmentsToDatabase:(NSArray*)attachments;
+-(NSArray*) writeItems:(NSArray*)items;
+-(NSArray*) writeNotes:(NSArray*)notes;
+-(NSArray*) writeAttachments:(NSArray*)attachments;
 
 -(void) addItems:(NSArray*)items toCollection:(NSString*)collectionKey;
 -(void) addItemKeys:(NSArray*)keys toCollection:(NSString*)collectionKey;
 
--(void) writeItemsCreatorsToDatabase:(NSArray*)items;
--(void) writeItemsFieldsToDatabase:(NSArray*)items;
-
+-(void) writeItemsCreators:(NSArray*)items;
+-(void) writeItemsFields:(NSArray*)items;
 
 
 // These remove items from the cache
 - (void) removeItemKeysNotInArray:(NSArray*)itemKeys fromCollection:(NSString*)collectionKey;
 - (void) deleteItemKeysNotInArray:(NSArray*)itemKeys fromLibrary:(NSNumber*)libraryID;
 
+- (void) updateViewedTimestamp:(ZPZoteroAttachment*)attachment;
 - (void) setUpdatedTimestampForCollection:(NSString*)collectionKey toValue:(NSString*)updatedTimestamp;
 - (void) setUpdatedTimestampForLibrary:(NSNumber*)libraryID toValue:(NSString*)updatedTimestamp;
 

@@ -344,16 +344,16 @@ static ZPCacheController* _instance = nil;
         }
     }
     
-    NSArray* topLevelItemsThatWereWrittenToCache = [[ZPDatabase instance] addItemsToDatabase:[normalItems arrayByAddingObjectsFromArray:standaloneNotesAndAttachments]];
+    NSArray* topLevelItemsThatWereWrittenToCache = [[ZPDatabase instance] writeItems:[normalItems arrayByAddingObjectsFromArray:standaloneNotesAndAttachments]];
 
-    [[ZPDatabase instance] addAttachmentsToDatabase:attachments];
-    [[ZPDatabase instance] addNotesToDatabase:notes];
+    [[ZPDatabase instance] writeAttachments:attachments];
+    [[ZPDatabase instance] writeNotes:notes];
     
     NSMutableArray* itemsThatNeedCreatorsAndFields = [NSMutableArray arrayWithArray:topLevelItemsThatWereWrittenToCache];
     [itemsThatNeedCreatorsAndFields removeObjectsInArray:standaloneNotesAndAttachments];
                             
-    [[ZPDatabase instance] writeItemsFieldsToDatabase:itemsThatNeedCreatorsAndFields];
-    [[ZPDatabase instance] writeItemsCreatorsToDatabase:itemsThatNeedCreatorsAndFields];
+    [[ZPDatabase instance] writeItemsFields:itemsThatNeedCreatorsAndFields];
+    [[ZPDatabase instance] writeItemsCreators:itemsThatNeedCreatorsAndFields];
 
     //Refresh the attachments for those items that got new attachments
     for(item in parentItemsForAttachments){
@@ -716,7 +716,7 @@ static ZPCacheController* _instance = nil;
             [self performSelectorInBackground:@selector(_updateCollectionsForLibraryFromServer:) withObject:library];
             
         }
-        [[ZPDatabase instance] addOrUpdateLibraries:libraries];
+        [[ZPDatabase instance] writeLibraries:libraries];
     }    
 }
 
@@ -725,7 +725,7 @@ static ZPCacheController* _instance = nil;
     
     NSArray* collections = [[ZPServerConnection instance] retrieveCollectionsForLibraryFromServer:library.libraryID];
     if(collections!=NULL){
-        [[ZPDatabase instance] addOrUpdateCollections:collections forLibrary:library];
+        [[ZPDatabase instance] writeCollections:collections toLibrary:library];
         [[ZPDataLayer instance] notifyLibraryWithCollectionsAvailable:library];
     }
 
@@ -823,7 +823,7 @@ static ZPCacheController* _instance = nil;
 
 - (void) _cleanUpCache{
     
-    NSArray* paths = [[ZPDatabase instance] getCachedAttachmentPaths];
+    NSArray* paths = [[ZPDatabase instance] getCachedAttachmentsOrderedByRemovalPriority];
 
     //Delete orphaned files
     

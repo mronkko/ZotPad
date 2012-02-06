@@ -24,8 +24,13 @@
  
  */
 
-+(id) dataObjectWithKey:(NSString*) key{
++(id) dataObjectWithKey:(NSObject*) key{
     [NSException raise:@"Not implemented" format:@"Subclasses of ZPZoteroDataObject need to implement dataObjectWithKey method"];
+    return nil;
+}
+
++(id) dataObjectWithDictionary:(NSDictionary*) fields{
+    [NSException raise:@"Not implemented" format:@"Subclasses of ZPZoteroDataObject need to implement dataObjectWithDictionary method"];
     return nil;
 }
 

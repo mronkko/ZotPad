@@ -37,7 +37,36 @@ static NSCache* _objectCache = NULL;
     return self;
 }
 
-+(id) dataObjectWithKey:(NSString*) key{
++(id) dataObjectWithDictionary:(NSDictionary *)fields{
+    
+    NSString* key = [fields objectForKey:@"itemKey"];
+    
+    if(key == NULL)
+        [NSException raise:@"Key is null" format:@"ZPZoteroItem cannot be instantiated with NULL key"];
+    if([key isEqualToString:@""])
+        [NSException raise:@"Key is empty" format:@"ZPZoteroItem cannot be instantiated with empty key"];
+    
+    
+    if(_objectCache == NULL) _objectCache = [[NSCache alloc] init];
+    
+    ZPZoteroItem* obj= [_objectCache objectForKey:key];
+    
+    //It is possible that subclasses of this class have already been instantiated with this key, so we need to reinstantiate the object
+    
+    if(obj==NULL || ! [obj isKindOfClass:[self class]]){
+        obj= [[self alloc] init];
+        obj->_key=key;
+        obj->_needsToBeWrittenToCache = FALSE;
+        
+        [obj configureWithDictionary:fields];
+        [_objectCache setObject:obj  forKey:key];
+    }
+    else [obj configureWithDictionary:fields];
+
+    return obj;
+}
+
++(id) dataObjectWithKey:(NSObject*) key{
     
     if(key == NULL)
         [NSException raise:@"Key is null" format:@"ZPZoteroItem cannot be instantiated with NULL key"];
@@ -57,7 +86,7 @@ static NSCache* _objectCache = NULL;
         obj->_needsToBeWrittenToCache = FALSE;
         
         //Retrieve data for this item from DB
-        [[ZPDatabase instance] addBasicsToItem:obj] ;
+        [[ZPDatabase instance] addAttributesToItem:obj] ;
 
         
         [_objectCache setObject:obj  forKey:key];

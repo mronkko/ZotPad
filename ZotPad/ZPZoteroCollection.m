@@ -15,7 +15,31 @@
 
 static NSCache* _objectCache = NULL;
 
-+(ZPZoteroCollection*) dataObjectWithKey:(NSString*) key{
++(id) dataObjectWithDictionary:(NSDictionary*) fields{
+    
+    NSString* key = [fields objectForKey:@"collectionKey"];
+    
+    if(key == NULL)
+        [NSException raise:@"Key is null" format:@"ZPZoteroCollection cannot be instantiated with NULL key"];
+    
+    
+    if(_objectCache == NULL) _objectCache = [[NSCache alloc] init];
+    
+    ZPZoteroCollection* obj= [_objectCache objectForKey:key];
+    
+    if(obj==NULL){
+        obj= [[ZPZoteroCollection alloc] init];
+        obj->_key = key;
+        [obj configureWithDictionary:fields];
+        [_objectCache setObject:obj  forKey:key];
+    }
+    else [obj configureWithDictionary:fields];
+
+    return obj;
+
+}
+
++(ZPZoteroCollection*) dataObjectWithKey:(NSObject*) key{
     
     if(key == NULL)
         [NSException raise:@"Key is null" format:@"ZPZoteroCollection cannot be instantiated with NULL key"];
@@ -28,7 +52,7 @@ static NSCache* _objectCache = NULL;
     if(obj==NULL){
         obj= [[ZPZoteroCollection alloc] init];
         obj->_key = key;
-        [[ZPDatabase instance] addFieldsToCollection:obj];
+        [[ZPDatabase instance] addAttributsToCollection:obj];
         [_objectCache setObject:obj  forKey:key];
     }
     return obj;

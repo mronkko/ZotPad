@@ -16,31 +16,29 @@ PRAGMA synchronous=OFF;
 /*
 
 Group is the same as library. My library is not stored, because it will
-always exists. My library has id 1.
+always exists.
 
 */
 
 CREATE TABLE IF NOT EXISTS groups ( 
     groupID INTEGER PRIMARY KEY,
     title TEXT NOT NULL,
-    lastCompletedCacheTimestamp TEXT DEFAULT NULL
+    timestamp TEXT DEFAULT NULL
 );
-
-INSERT INTO groups (groupid, title) VALUES (1,"My Library");
 
 CREATE TABLE IF NOT EXISTS collections (
     title TEXT NOT NULL,
     parentCollectionKey TEXT DEFAULT NULL,
-    lastCompletedCacheTimestamp TEXT DEFAULT NULL,
+    timestamp TEXT DEFAULT NULL,
     libraryID INT,
-    key TEXT PRIMARY KEY
+    collectionKey TEXT PRIMARY KEY
 );
 
 CREATE INDEX collections_parentCollectionKey ON collections (parentCollectionKey);
 
 
 CREATE TABLE IF NOT EXISTS items (
-    key TEXT PRIMARY KEY,
+    itemKey TEXT PRIMARY KEY,
     itemType TEXT NOT NULL,
     libraryID INT,
     date INT,
@@ -48,17 +46,22 @@ CREATE TABLE IF NOT EXISTS items (
     title TEXT,
     publicationTitle TEXT,
     fullCitation TEXT NOT NULL,
-    lastTimestamp TEXT DEFAULT NULL
+    timestamp TEXT DEFAULT NULL
 );
 
 CREATE INDEX items_libraryID ON items (libraryID);
 
+/*
+ 
+ Notes and attachments are subclasses of item, so they have itemKey as primary key.
+
+*/
 
 
 CREATE TABLE IF NOT EXISTS notes (
     parentItemKey TEXT NOT NULL,
-    key TEXT PRIMARY KEY,
-    lastTimestamp TEXT NOT NULL
+    itemKey TEXT PRIMARY KEY,
+    timestamp TEXT NOT NULL
 );
 
 CREATE INDEX notes_parentItemKey ON notes (parentItemKey);
@@ -66,8 +69,8 @@ CREATE INDEX notes_parentItemKey ON notes (parentItemKey);
 
 CREATE TABLE IF NOT EXISTS attachments (
     parentItemKey TEXT NOT NULL,
-    key TEXT PRIMARY KEY,
-    lastTimestamp TEXT NOT NULL,
+    itemKey TEXT PRIMARY KEY,
+    timestamp TEXT NOT NULL,
     attachmentURL TEXT,
     attachmentType TEXT,
     attachmentTitle TEXT,

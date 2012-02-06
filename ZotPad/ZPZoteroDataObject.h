@@ -30,6 +30,8 @@
 @property (retain) NSString* serverTimestamp;
 
 +(id) dataObjectWithKey:(NSObject*) key;
++(id) dataObjectWithDictionary:(NSDictionary*) fields;
+
 -(void) configureWithDictionary:(NSDictionary*) dictionary;
 -(BOOL) needsToBeWrittenToCache;
 
