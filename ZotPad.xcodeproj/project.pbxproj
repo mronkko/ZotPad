@@ -64,6 +64,8 @@
 		A776EE7E14908AED0087B8FA /* 57x57.png in Resources */ = {isa = PBXBuildFile; fileRef = A776EE7D14908AED0087B8FA /* 57x57.png */; };
 		A776EE8014908AF30087B8FA /* 114x114.png in Resources */ = {isa = PBXBuildFile; fileRef = A776EE7F14908AF30087B8FA /* 114x114.png */; };
 		A77B98DF14DE5CDB00132E9B /* ZPItemListViewController.m in Sources */ = {isa = PBXBuildFile; fileRef = A77B98DE14DE5CDB00132E9B /* ZPItemListViewController.m */; };
+		A77B991B14E0701800132E9B /* gear20x20.png in Resources */ = {isa = PBXBuildFile; fileRef = A77B991914E0701800132E9B /* gear20x20.png */; };
+		A77B991C14E0701800132E9B /* gear40x40.png in Resources */ = {isa = PBXBuildFile; fileRef = A77B991A14E0701800132E9B /* gear40x40.png */; };
 		A786F7781476A56200B35B92 /* MainStoryboard_iPhone.storyboard in Resources */ = {isa = PBXBuildFile; fileRef = A786F7771476A56200B35B92 /* MainStoryboard_iPhone.storyboard */; };
 		A78B7F13149091B8008303BA /* Default-Landscape~ipad.png in Resources */ = {isa = PBXBuildFile; fileRef = A78B7F12149091B8008303BA /* Default-Landscape~ipad.png */; };
 		A78B7F1514909285008303BA /* Default-Portrait~ipad.png in Resources */ = {isa = PBXBuildFile; fileRef = A78B7F1414909285008303BA /* Default-Portrait~ipad.png */; };
@@ -353,6 +355,8 @@
 		A776EE7F14908AF30087B8FA /* 114x114.png */ = {isa = PBXFileReference; lastKnownFileType = image.png; name = 114x114.png; path = ../Icons/114x114.png; sourceTree = "<group>"; };
 		A77B98DD14DE5CDB00132E9B /* ZPItemListViewController.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = ZPItemListViewController.h; sourceTree = "<group>"; };
 		A77B98DE14DE5CDB00132E9B /* ZPItemListViewController.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = ZPItemListViewController.m; sourceTree = "<group>"; };
+		A77B991914E0701800132E9B /* gear20x20.png */ = {isa = PBXFileReference; lastKnownFileType = image.png; name = gear20x20.png; path = Icons/gear20x20.png; sourceTree = SOURCE_ROOT; };
+		A77B991A14E0701800132E9B /* gear40x40.png */ = {isa = PBXFileReference; lastKnownFileType = image.png; name = gear40x40.png; path = Icons/gear40x40.png; sourceTree = SOURCE_ROOT; };
 		A786F7771476A56200B35B92 /* MainStoryboard_iPhone.storyboard */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = file.storyboard; path = MainStoryboard_iPhone.storyboard; sourceTree = "<group>"; };
 		A78B7F12149091B8008303BA /* Default-Landscape~ipad.png */ = {isa = PBXFileReference; lastKnownFileType = image.png; name = "Default-Landscape~ipad.png"; path = "../LaunchImages/Default-Landscape~ipad.png"; sourceTree = "<group>"; };
 		A78B7F1414909285008303BA /* Default-Portrait~ipad.png */ = {isa = PBXFileReference; lastKnownFileType = image.png; name = "Default-Portrait~ipad.png"; path = "../LaunchImages/Default-Portrait~ipad.png"; sourceTree = "<group>"; };
@@ -646,6 +650,8 @@
 		A7200DDB14718DC0004347C9 /* Supporting Files */ = {
 			isa = PBXGroup;
 			children = (
+				A77B991914E0701800132E9B /* gear20x20.png */,
+				A77B991A14E0701800132E9B /* gear40x40.png */,
 				A7F72BBF14B984920059617D /* ZPLogger.h */,
 				A7F72BC014B984920059617D /* ZPLogger.m */,
 				A78B7F0F149090D2008303BA /* Launch images */,
@@ -1055,6 +1061,8 @@
 				A776EE8014908AF30087B8FA /* 114x114.png in Resources */,
 				A78B7F13149091B8008303BA /* Default-Landscape~ipad.png in Resources */,
 				A78B7F1514909285008303BA /* Default-Portrait~ipad.png in Resources */,
+				A77B991B14E0701800132E9B /* gear20x20.png in Resources */,
+				A77B991C14E0701800132E9B /* gear40x40.png in Resources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
