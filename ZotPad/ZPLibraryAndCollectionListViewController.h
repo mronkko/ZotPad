@@ -7,11 +7,11 @@
 //
 
 #import <UIKit/UIKit.h>
-#import "ZPDetailedItemListViewController.h"
+#import "ZPItemListViewController.h"
 #import "ZPDataLayer.h"
 #import "ZPLibraryObserver.h"
 
-@class ZPDetailedItemListViewController;
+@class ZPItemListViewController;
 
 @interface ZPLibraryAndCollectionListViewController : UITableViewController <ZPLibraryObserver>{
     ZPDataLayer* _database;
@@ -22,7 +22,7 @@
     
 }
 
-@property (strong, nonatomic) ZPDetailedItemListViewController *detailViewController;
+@property (strong, nonatomic) ZPItemListViewController *detailViewController;
 @property (retain, nonatomic) NSNumber* currentlibraryID;
 @property (retain, nonatomic) NSString* currentCollectionKey;
 

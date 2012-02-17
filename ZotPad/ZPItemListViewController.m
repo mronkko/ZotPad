@@ -7,7 +7,6 @@
 //
 
 #import "ZPItemListViewController.h"
-#import "ZPMasterViewController.h"
 #import "ZPDataLayer.h"
 #import <QuartzCore/QuartzCore.h>
 #import "../DSActivityView/Sources/DSActivityView.h"

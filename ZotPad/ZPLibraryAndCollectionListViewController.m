@@ -7,7 +7,7 @@
 //
 
 #import "ZPLibraryAndCollectionListViewController.h"
-#import "ZPDetailedItemListViewController.h"
+#import "ZPItemListViewController.h"
 #import "ZPDataLayer.h"
 #import "ZPServerConnection.h"
 #import "ZPAuthenticationDialog.h"
@@ -76,7 +76,7 @@ static ZPLibraryAndCollectionListViewController* _instance = nil;
     }
     
 	// Do any additional setup after loading the view, typically from a nib.
-    self.detailViewController = (ZPDetailedItemListViewController *)[[self.splitViewController.viewControllers lastObject] topViewController];
+    self.detailViewController = (ZPItemListViewController *)[[self.splitViewController.viewControllers lastObject] topViewController];
  
 }
 
@@ -172,7 +172,7 @@ static ZPLibraryAndCollectionListViewController* _instance = nil;
     
    ZPZoteroDataObject* node = [self->_content objectAtIndex: indexPath.row];
     self.detailViewController.libraryID = [node libraryID];
-    self.detailViewController.collectionKey = [node collectionKey];
+    self.detailViewController.collectionKey = [node key];
 
     //Clear search when changing collection. This is how Zotero behaves
     [self.detailViewController clearSearch];
@@ -191,7 +191,7 @@ static ZPLibraryAndCollectionListViewController* _instance = nil;
 	subController.detailViewController = self.detailViewController;
     ZPZoteroDataObject* selectedNode  = [self->_content objectAtIndex: indexPath.row];
 	subController.currentlibraryID=[selectedNode libraryID];
-	subController.currentCollectionKey=[selectedNode collectionKey];
+	subController.currentCollectionKey=[selectedNode key];
 	
 	[self.navigationController pushViewController: subController animated: YES];
 	
@@ -201,15 +201,16 @@ static ZPLibraryAndCollectionListViewController* _instance = nil;
     if ([[segue identifier] isEqualToString:@"PushItemsToNavigator"])
     {
         
-        ZPSimpleItemListViewController* simpleItemListViewController = (ZPSimpleItemListViewController*)[segue destinationViewController];
+        UITableViewController* simpleItemListViewController = (UITableViewController*)[segue destinationViewController];
 
         simpleItemListViewController.navigationItem.hidesBackButton = YES;
 
-        ZPDetailedItemListViewController* itemList = (ZPDetailedItemListViewController*) sender;
-        [simpleItemListViewController configureWithItemListController:itemList];
+        ZPItemListViewController* itemList = (ZPItemListViewController*) sender;
 
         // Get the selected row from the item list
         NSIndexPath* indexPath = [[itemList tableView] indexPathForSelectedRow];
+        simpleItemListViewController.tableView.dataSource = sender;
+        simpleItemListViewController.tableView.delegate = 
         //TODO: set the selected row
         //[simpleItemListViewController.tableView selectRowAtIndexPath:indexPath animated:NO scrollPosition:UITableViewScrollPositionMiddle]; 
         

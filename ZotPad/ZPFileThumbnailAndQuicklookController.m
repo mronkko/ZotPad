@@ -56,9 +56,9 @@ static NSCache* _fileTypeImageCache;
     UITableViewCell* cell = (UITableViewCell* )[[sender superview] superview];
     
     //Get the row of this cell
-    NSInteger row = [[(ZPSimpleItemListViewController*) _viewController tableView] indexPathForCell:cell].row;
+    NSInteger row = [[(ZPItemListViewController*) _viewController tableView] indexPathForCell:cell].row;
     
-    ZPZoteroItem* item = [ZPZoteroItem dataObjectWithKey:[[(ZPSimpleItemListViewController*) _viewController itemKeysShown] objectAtIndex:row]];
+    ZPZoteroItem* item = [ZPZoteroItem dataObjectWithKey:[[(ZPItemListViewController*) _viewController itemKeysShown] objectAtIndex:row]];
     
     _currentAttachment = [item.attachments objectAtIndex:0];
 

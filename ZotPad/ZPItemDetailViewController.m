@@ -8,8 +8,8 @@
 
 #import "ZPItemDetailViewController.h"
 #import "ZPLibraryAndCollectionListViewController.h"
-#import "ZPSimpleItemListViewController.h"
-#import "ZPDetailedItemListViewController.h"
+#import "ZPItemListViewController.h"
+#import "ZPItemListViewController.h"
 #import "ZPDataLayer.h"
 #import "ZPLocalization.h"
 #import "ZPFileThumbnailAndQuicklookController.h"
@@ -551,7 +551,7 @@ static ZPItemDetailViewController* _instance;
     // Navigator
     else{
         // Get the key for the selected item 
-        NSArray* itemArray =[(ZPSimpleItemListViewController*) aTableView.dataSource itemKeysShown];
+        NSArray* itemArray =[(ZPItemListViewController*) aTableView.dataSource itemKeysShown];
         if(indexPath.row<[itemArray count]){                    
             NSString* currentItemKey = [itemArray objectAtIndex: indexPath.row]; 
             

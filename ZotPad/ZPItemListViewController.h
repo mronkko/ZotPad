@@ -35,8 +35,8 @@
 
 @property (retain) NSArray* itemKeysShown;
 
-@property NSInteger collectionID;
-@property NSInteger libraryID;
+@property NSString* collectionKey;
+@property NSNumber* libraryID;
 
 @property (copy) NSString* searchString;
 

@@ -11,7 +11,7 @@
 #import "ZPZoteroItem.h"
 #import "ZPAttachmentObserver.h"
 #import "iCarousel.h"
-#import "ZPSimpleItemListViewController.h"
+#import "ZPItemListViewController.h"
 #import "ZPFileThumbnailAndQuicklookController.h"
 
 
