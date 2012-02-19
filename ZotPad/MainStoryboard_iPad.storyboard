@@ -211,14 +211,6 @@
                                     <barButtonItem style="plain" systemItem="flexibleSpace" id="M49-jf-aF2"/>
                                 </items>
                             </toolbar>
-                            <activityIndicatorView opaque="NO" contentMode="scaleToFill" style="gray" id="F9a-sh-YVw">
-                                <rect key="frame" x="667" y="-35" width="20" height="20"/>
-                                <autoresizingMask key="autoresizingMask" flexibleMaxX="YES" flexibleMaxY="YES"/>
-                            </activityIndicatorView>
-                            <activityIndicatorView opaque="NO" contentMode="scaleToFill" style="gray" id="hop-ZH-T5s">
-                                <rect key="frame" x="663" y="-33" width="20" height="20"/>
-                                <autoresizingMask key="autoresizingMask" flexibleMaxX="YES" flexibleMaxY="YES"/>
-                            </activityIndicatorView>
                         </subviews>
                         <color key="backgroundColor" white="1" alpha="1" colorSpace="custom" customColorSpace="calibratedWhite"/>
                         <simulatedOrientationMetrics key="simulatedOrientationMetrics" orientation="landscapeRight"/>
@@ -535,7 +527,7 @@
                 <relationship kind="outlet" name="detailTableView" candidateClass="UITableView"/>
             </relationships>
         </class>
-        <class className="ZPItemListViewController" superclassName="UITableViewController">
+        <class className="ZPItemListViewController" superclassName="UIViewController">
             <source key="sourceIdentifier" type="project" relativePath="./Classes/ZPItemListViewController.h"/>
             <relationships>
                 <relationship kind="action" name="sortButtonPressed:"/>

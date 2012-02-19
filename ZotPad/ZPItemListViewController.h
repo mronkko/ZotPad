@@ -13,7 +13,7 @@
 #import "ZPItemDetailViewController.h"
 
 
-@interface ZPItemListViewController : UITableViewController <UISplitViewControllerDelegate, UISearchBarDelegate>{
+@interface ZPItemListViewController : UIViewController <UISplitViewControllerDelegate, UISearchBarDelegate, UITableViewDelegate, UITableViewDataSource>{
     NSString* _searchString;
     NSString* _collectionKey;
     NSNumber* _libraryID;
@@ -21,6 +21,8 @@
     BOOL _sortDescending;
     DSBezelActivityView* _activityView;
     NSCache* _cellCache;
+    ZPItemDetailViewController* _itemDetailViewController;
+    UITableView* _tableView;
 }
 
 - (void)configureView;
@@ -30,8 +32,8 @@
 - (void)makeBusy;
 
 @property (nonatomic, retain) IBOutlet UISearchBar* searchBar;
-@property (strong, nonatomic) ZPItemDetailViewController* detailViewController;
-@property (assign, nonatomic) BOOL masterIsVisible;
+@property (nonatomic, retain) IBOutlet UITableView* tableView;
+@property (nonatomic, retain) ZPItemDetailViewController* itemDetailViewController;
 
 @property (nonatomic, retain) NSArray* itemKeysShown;
 @property (nonatomic, retain) NSString* collectionKey;

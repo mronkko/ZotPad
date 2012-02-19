@@ -25,11 +25,11 @@
 
 @synthesize masterPopoverController = _masterPopoverController;
 
-@synthesize tableView;
-@synthesize searchBar;
+@synthesize tableView = _tableView;
+@synthesize searchBar = _searchBar;
 
 @synthesize itemKeysShown = _itemKeysShown;
-
+@synthesize itemDetailViewController =  _itemDetailViewController;
 
 
 #pragma mark - Managing the detail item
@@ -274,11 +274,6 @@
     
     [super viewDidLoad];
     
-    // Store this instance as static variable so that we can access it through the class later
-    if(_instance == NULL){
-        _instance = self;
-    }
-
 	// Do any additional setup after loading the view, typically from a nib.
     [self configureView];
 }
@@ -367,7 +362,7 @@
 
 -(void) clearSearch{
     _searchString = NULL;
-    [searchBar setText:@""];
+    [_searchBar setText:@""];
 }
 
 - (void)searchBarSearchButtonClicked:(UISearchBar *)sourceSearchBar{

@@ -14,7 +14,7 @@
 //For showing file thumbnails
 #import <QuickLook/QuickLook.h>
 
-@interface ZPFileThumbnailAndQuicklookController : NSObject <QLPreviewControllerDataSource>{
+@interface ZPQuicklookController : NSObject <QLPreviewControllerDataSource>{
     ZPZoteroItem* _item;
     UIViewController* _viewController;
     NSInteger _maxWidth;

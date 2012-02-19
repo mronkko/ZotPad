@@ -6,7 +6,7 @@
 //  Copyright (c) 2012 __MyCompanyName__. All rights reserved.
 //
 
-#import "ZPFileThumbnailAndQuicklookController.h"
+#import "ZPQuicklookController.h"
 #import "ZPZoteroItem.h"
 #import "ZPZoteroAttachment.h"
 #import "ZPDatabase.h"
@@ -20,7 +20,7 @@
 #import "ZPLogger.h"
 
 
-@interface ZPFileThumbnailAndQuicklookController(){
+@interface ZPQuicklookController(){
     ZPZoteroAttachment* _currentAttachment;
 }
 - (void) _downloadWithProgressAlert:(ZPZoteroAttachment *)attachment;
@@ -30,7 +30,7 @@
 
 
 
-@implementation ZPFileThumbnailAndQuicklookController
+@implementation ZPQuicklookController
 
 static NSCache* _fileTypeImageCache;
 
@@ -51,7 +51,7 @@ static NSCache* _fileTypeImageCache;
 
 -(void) buttonTapped:(id)sender{
     
-    
+/*    
     //Get the table cell.
     UITableViewCell* cell = (UITableViewCell* )[[sender superview] superview];
     
@@ -63,6 +63,8 @@ static NSCache* _fileTypeImageCache;
     _currentAttachment = [item.attachments objectAtIndex:0];
 
     [self openInQuickLookWithAttachment:_currentAttachment];
+*/
+    
 }
 
 #pragma mark QuickLook delegate methods

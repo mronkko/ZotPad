@@ -11,8 +11,7 @@
 #import "ZPZoteroItem.h"
 #import "ZPAttachmentObserver.h"
 #import "iCarousel.h"
-#import "ZPItemListViewController.h"
-#import "ZPFileThumbnailAndQuicklookController.h"
+#import "ZPQuicklookController.h"
 #import "ZPItemObserver.h"
 
 @interface ZPItemDetailViewController : UIViewController <UITableViewDataSource, UITableViewDelegate, iCarouselDataSource,
@@ -20,7 +19,7 @@
     ZPZoteroItem* _currentItem;
     UITableView* _detailTableView;
     iCarousel* _carousel;
-    ZPFileThumbnailAndQuicklookController* _previewController;
+    ZPQuicklookController* _previewController;
     UIActivityIndicatorView* _activityIndicator;
     NSInteger _detailTitleWidth;
         
@@ -31,7 +30,6 @@
 
 @property (nonatomic, retain) IBOutlet iCarousel* carousel;
 @property (nonatomic, retain) ZPZoteroItem* selectedItem;
-@property (assign, nonatomic) BOOL masterIsVisible;
 
 //This contains sections about the item details
 @property (retain) IBOutlet UITableView* detailTableView;

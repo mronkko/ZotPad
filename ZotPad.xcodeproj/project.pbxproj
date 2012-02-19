@@ -70,7 +70,7 @@
 		A78B7F13149091B8008303BA /* Default-Landscape~ipad.png in Resources */ = {isa = PBXBuildFile; fileRef = A78B7F12149091B8008303BA /* Default-Landscape~ipad.png */; };
 		A78B7F1514909285008303BA /* Default-Portrait~ipad.png in Resources */ = {isa = PBXBuildFile; fileRef = A78B7F1414909285008303BA /* Default-Portrait~ipad.png */; };
 		A79299C3149E0CFE000F8B42 /* ZPZoteroDataObject.m in Sources */ = {isa = PBXBuildFile; fileRef = A79299C2149E0CFE000F8B42 /* ZPZoteroDataObject.m */; };
-		A793153E14B185E800E1ABF0 /* ZPFileThumbnailAndQuicklookController.m in Sources */ = {isa = PBXBuildFile; fileRef = A793153D14B185E800E1ABF0 /* ZPFileThumbnailAndQuicklookController.m */; };
+		A793153E14B185E800E1ABF0 /* ZPQuicklookController.m in Sources */ = {isa = PBXBuildFile; fileRef = A793153D14B185E800E1ABF0 /* ZPQuicklookController.m */; };
 		A79ED823148B2683003EE77C /* ZPItemDetailViewController.m in Sources */ = {isa = PBXBuildFile; fileRef = A79ED822148B2683003EE77C /* ZPItemDetailViewController.m */; };
 		A7A3F950147BAB6C00CA7266 /* database.sql in Resources */ = {isa = PBXBuildFile; fileRef = A7A3F94F147BAB6C00CA7266 /* database.sql */; };
 		A7A3F953147BBCCB00CA7266 /* ZPServerResponseXMLParser.m in Sources */ = {isa = PBXBuildFile; fileRef = A7A3F952147BBCCA00CA7266 /* ZPServerResponseXMLParser.m */; };
@@ -362,8 +362,8 @@
 		A78B7F1414909285008303BA /* Default-Portrait~ipad.png */ = {isa = PBXFileReference; lastKnownFileType = image.png; name = "Default-Portrait~ipad.png"; path = "../LaunchImages/Default-Portrait~ipad.png"; sourceTree = "<group>"; };
 		A79299C1149E0CFE000F8B42 /* ZPZoteroDataObject.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = ZPZoteroDataObject.h; sourceTree = "<group>"; };
 		A79299C2149E0CFE000F8B42 /* ZPZoteroDataObject.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = ZPZoteroDataObject.m; sourceTree = "<group>"; };
-		A793153C14B185E800E1ABF0 /* ZPFileThumbnailAndQuicklookController.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = ZPFileThumbnailAndQuicklookController.h; sourceTree = "<group>"; };
-		A793153D14B185E800E1ABF0 /* ZPFileThumbnailAndQuicklookController.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = ZPFileThumbnailAndQuicklookController.m; sourceTree = "<group>"; };
+		A793153C14B185E800E1ABF0 /* ZPQuicklookController.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = ZPQuicklookController.h; sourceTree = "<group>"; };
+		A793153D14B185E800E1ABF0 /* ZPQuicklookController.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = ZPQuicklookController.m; sourceTree = "<group>"; };
 		A79ED821148B2683003EE77C /* ZPItemDetailViewController.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = ZPItemDetailViewController.h; sourceTree = "<group>"; };
 		A79ED822148B2683003EE77C /* ZPItemDetailViewController.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = ZPItemDetailViewController.m; sourceTree = "<group>"; };
 		A7A3F94F147BAB6C00CA7266 /* database.sql */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = text; lineEnding = 0; path = database.sql; sourceTree = "<group>"; };
@@ -678,8 +678,8 @@
 				A77B98DE14DE5CDB00132E9B /* ZPItemListViewController.m */,
 				A79ED821148B2683003EE77C /* ZPItemDetailViewController.h */,
 				A79ED822148B2683003EE77C /* ZPItemDetailViewController.m */,
-				A793153C14B185E800E1ABF0 /* ZPFileThumbnailAndQuicklookController.h */,
-				A793153D14B185E800E1ABF0 /* ZPFileThumbnailAndQuicklookController.m */,
+				A793153C14B185E800E1ABF0 /* ZPQuicklookController.h */,
+				A793153D14B185E800E1ABF0 /* ZPQuicklookController.m */,
 				A74348D5147AB37A00DA6FC3 /* ZPAuthenticationDialog.h */,
 				A74348D6147AB37A00DA6FC3 /* ZPAuthenticationDialog.m */,
 				A7D3C08114AEE70F00DB975D /* ZPLocalization.h */,
@@ -1136,7 +1136,7 @@
 				A76D3C8A14AD9FA7000C3ED9 /* ASIDataDecompressor.m in Sources */,
 				A76D3C8D14AD9FB5000C3ED9 /* ASIInputStream.m in Sources */,
 				A7D3C08314AEE71000DB975D /* ZPLocalization.m in Sources */,
-				A793153E14B185E800E1ABF0 /* ZPFileThumbnailAndQuicklookController.m in Sources */,
+				A793153E14B185E800E1ABF0 /* ZPQuicklookController.m in Sources */,
 				A7F72BC114B984920059617D /* ZPLogger.m in Sources */,
 				A77B98DF14DE5CDB00132E9B /* ZPItemListViewController.m in Sources */,
 			);

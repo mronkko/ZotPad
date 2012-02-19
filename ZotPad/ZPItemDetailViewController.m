@@ -12,7 +12,7 @@
 #import "ZPItemListViewController.h"
 #import "ZPDataLayer.h"
 #import "ZPLocalization.h"
-#import "ZPFileThumbnailAndQuicklookController.h"
+#import "ZPQuicklookController.h"
 #import "ZPLogger.h"
 
 #import "ZPPreferences.h"
@@ -125,7 +125,7 @@
     
     //TODO: This object should probably be recycled.
     
-    _previewController = [[ZPFileThumbnailAndQuicklookController alloc] initWithItem:_currentItem viewController:self maxHeight:ATTACHMENT_IMAGE_HEIGHT maxWidth:ATTACHMENT_IMAGE_WIDTH];
+    _previewController = [[ZPQuicklookController alloc] initWithItem:_currentItem viewController:self maxHeight:ATTACHMENT_IMAGE_HEIGHT maxWidth:ATTACHMENT_IMAGE_WIDTH];
 
     
     if([[ZPPreferences instance] online]){
@@ -222,7 +222,7 @@
 - (void)navigationController:(UINavigationController *)navigationController willShowViewController:(UIViewController *)viewController animated:(BOOL)animated{
     if(viewController != self){
         //Pop the other controller if something else than self is showing
-        [[[ZPLibraryAndCollectionListViewController instance] navigationController] popViewControllerAnimated:YES];
+        //[[[ZPLibraryAndCollectionListViewController instance] navigationController] popViewControllerAnimated:YES];
         
         //Remove delegate because we no longer need to pop the other controller
         [navigationController setDelegate:NULL];
