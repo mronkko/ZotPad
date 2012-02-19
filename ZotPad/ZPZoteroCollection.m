@@ -12,7 +12,6 @@
 @implementation ZPZoteroCollection
 
 @synthesize parentCollectionKey=_parentCollectionKey;
-@synthesize collectionKey=_collectionKey;
 
 static NSCache* _objectCache = NULL;
 
@@ -66,6 +65,10 @@ static NSCache* _objectCache = NULL;
 // An alias for setParentCollectionKey
 - (void) setParentKey:(NSString*)key{
     [self setParentCollectionKey:key];    
+}
+
+-(NSString *) collectionKey{
+    return [self key];
 }
                                    
 @end

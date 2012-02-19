@@ -189,7 +189,7 @@ static ZPDatabase* _instance = nil;
         
         for (object in objectBatch){
             if(insertSQL == NULL){
-                insertSQL = [NSMutableString stringWithFormat:@"INSERT INTO %@ (%@) SELECT (? AS %@)",
+                insertSQL = [NSMutableString stringWithFormat:@"INSERT INTO %@ (%@) SELECT ? AS %@",
                              table,
                              [dbFieldNames componentsJoinedByString:@", "],
                              [dbFieldNames componentsJoinedByString:@", ? AS "]];
@@ -202,6 +202,7 @@ static ZPDatabase* _instance = nil;
             
         @synchronized(self){
             [_database executeUpdate:insertSQL withArgumentsInArray:insertArguments]; 
+
         }
     }
     
@@ -245,6 +246,8 @@ static ZPDatabase* _instance = nil;
  */
 
 - (NSArray*) writeObjects:(NSArray*) objects intoTable:(NSString*) table checkTimestamp:(BOOL) checkTimestamp{
+    
+    if([objects count] == 0 ) return objects;
 
     NSArray* primaryKeyFieldNames = [self dbPrimaryKeyNamesForTable:table];
 
@@ -259,13 +262,26 @@ static ZPDatabase* _instance = nil;
         for(NSObject* object in objects){
             [keys addObject:[[self dbFieldValuesForObject:object fieldsNames:primaryKeyFieldNames] objectAtIndex:0]];
         }
-             
+         
+        BOOL keysAreString = [[keys objectAtIndex:0] isKindOfClass:[NSString class]];
+        
         if(checkTimestamp){
-            NSString* selectSQL= [NSString stringWithFormat:@"SELECT %@, timestamp FROM %@ WHERE %@ IN (%@)",
+            //Check if the keys are string
+            NSString* selectSQL;
+            if(keysAreString){
+                selectSQL= [NSString stringWithFormat:@"SELECT %@, timestamp FROM %@ WHERE %@ IN ('%@')",
                                   [primaryKeyFieldNames objectAtIndex:0],
                                   table,
                                   [primaryKeyFieldNames objectAtIndex:0],
-                                  [keys componentsJoinedByString:@", "]];
+                                  [keys componentsJoinedByString:@"', '"]];
+            }
+            else{
+                selectSQL= [NSString stringWithFormat:@"SELECT %@, timestamp FROM %@ WHERE %@ IN (%@)",
+                            [primaryKeyFieldNames objectAtIndex:0],
+                            table,
+                            [primaryKeyFieldNames objectAtIndex:0],
+                            [keys componentsJoinedByString:@", "]];
+            }
             
             
             NSMutableDictionary* timestamps = [NSMutableDictionary dictionary];
@@ -306,21 +322,32 @@ static ZPDatabase* _instance = nil;
         }
         //No checking of timestamp
         else{
-            NSString* selectSQL= [NSString stringWithFormat:@"SELECT %@ FROM %@ WHERE %@ IN (%@)",
-                                  [primaryKeyFieldNames objectAtIndex:0],
-                                  table,
-                                  [primaryKeyFieldNames objectAtIndex:0],
-                                  [keys componentsJoinedByString:@", "]];
+            NSString* selectSQL;
+            if(keysAreString){
+                selectSQL= [NSString stringWithFormat:@"SELECT %@ FROM %@ WHERE %@ IN ('%@')",
+                            [primaryKeyFieldNames objectAtIndex:0],
+                            table,
+                            [primaryKeyFieldNames objectAtIndex:0],
+                            [keys componentsJoinedByString:@"', '"]];
+            }
+            else{
+                selectSQL= [NSString stringWithFormat:@"SELECT %@ FROM %@ WHERE %@ IN (%@)",
+                            [primaryKeyFieldNames objectAtIndex:0],
+                            table,
+                            [primaryKeyFieldNames objectAtIndex:0],
+                            [keys componentsJoinedByString:@", "]];
+            }
             
             
             NSMutableSet* keys = [NSMutableSet set];
             
-            //Retrieve timestamps
+            //Retrieve keys
             @synchronized(self){
                 FMResultSet* resultSet = [_database executeQuery:selectSQL];
                 
                 while([resultSet next]){
-                    [keys addObject:[resultSet stringForColumnIndex:0]];
+                    if(keysAreString) [keys addObject:[resultSet stringForColumnIndex:0]];
+                    else [keys addObject:[NSNumber numberWithInt:[resultSet intForColumnIndex:0]]];
                 }
                 [resultSet close];
             }
@@ -373,7 +400,7 @@ static ZPDatabase* _instance = nil;
     if(returnArray == NULL){
         NSMutableArray* mutableReturnArray = [NSMutableArray array];
         @synchronized(self){
-            FMResultSet* resultSet = [_database executeQuery:@"pragma table_info(?)",table];
+            FMResultSet* resultSet = [_database executeQuery:[NSString stringWithFormat:@"pragma table_info(%@)",table]];
             
             while([resultSet next]){
                 [mutableReturnArray addObject:[resultSet stringForColumn:@"name"]];
@@ -392,7 +419,7 @@ static ZPDatabase* _instance = nil;
     if(returnArray == NULL){
         NSMutableArray* mutableReturnArray = [NSMutableArray array];
         @synchronized(self){
-            FMResultSet* resultSet = [_database executeQuery:@"pragma table_info(?)",table];
+            FMResultSet* resultSet = [_database executeQuery:[NSString stringWithFormat:@"pragma table_info(%@)",table]];
             
             while([resultSet next]){
                 if([resultSet intForColumn:@"pk"]) [mutableReturnArray addObject:[resultSet stringForColumn:@"name"]];
@@ -409,14 +436,15 @@ static ZPDatabase* _instance = nil;
 
 - (NSArray*) dbFieldValuesForObject:(NSObject*) object fieldsNames:(NSArray*)fieldNames{
     NSMutableArray* returnArray = [NSMutableArray array];
-    if([object isKindOfClass:[NSDictionary class]]){
-        for(NSString* fieldName in fieldNames){
+
+    for(NSString* fieldName in fieldNames){
+        if([object isKindOfClass:[NSDictionary class]]){
             [returnArray addObject:[(NSDictionary*) object objectForKey:fieldName]];
         }
-    }
-    else{
-        for(NSString* fieldName in fieldNames){
-            [returnArray addObject:[object performSelector:NSSelectorFromString(fieldName)]];
+        else{
+            NSObject* value = [object performSelector:NSSelectorFromString(fieldName)];
+            if(value!=NULL) [returnArray addObject:value];
+            else [returnArray addObject:[NSNull null]];
         }
     }
     return returnArray;
@@ -433,7 +461,7 @@ static ZPDatabase* _instance = nil;
  */
 
 -(void) writeLibraries:(NSArray*)libraries{
-    [self writeObjects:libraries intoTable:@"libraries" checkTimestamp:FALSE];
+    [self writeObjects:libraries intoTable:@"groups" checkTimestamp:FALSE];
     
 }
 
@@ -553,10 +581,10 @@ static ZPDatabase* _instance = nil;
         
         FMResultSet* resultSet;
         if(collectionKey == NULL)
-            resultSet= [_database executeQuery:@"SELECT *, key IN (SELECT DISTINCT parentCollectionKey FROM collections) AS hasChildren FROM collections WHERE libraryID=? AND parentCollectionKey IS NULL",libraryID];
+            resultSet= [_database executeQuery:@"SELECT *, collectionKey IN (SELECT DISTINCT parentCollectionKey FROM collections) AS hasChildren FROM collections WHERE libraryID=? AND parentCollectionKey IS NULL",libraryID];
         
         else
-            resultSet= [_database executeQuery:@"SELECT *, key IN (SELECT DISTINCT parentCollectionKey FROM collections) AS hasChildren FROM collections WHERE libraryID=? AND parentCollectionKey = ?",libraryID,collectionKey];
+            resultSet= [_database executeQuery:@"SELECT *, collectionKey IN (SELECT DISTINCT parentCollectionKey FROM collections) AS hasChildren FROM collections WHERE libraryID=? AND parentCollectionKey = ?",libraryID,collectionKey];
         
         while([resultSet next]) {
             [returnArray addObject:[ZPZoteroCollection dataObjectWithDictionary:[resultSet resultDict]]];
@@ -575,7 +603,7 @@ static ZPDatabase* _instance = nil;
 	@synchronized(self){
         
         FMResultSet* resultSet;
-        resultSet= [_database executeQuery:@"SELECT *, key IN (SELECT DISTINCT parentCollectionKey FROM collections) AS hasChildren FROM collections WHERE libraryID=?",libraryID];
+        resultSet= [_database executeQuery:@"SELECT *, collectionKey IN (SELECT DISTINCT parentCollectionKey FROM collections) AS hasChildren FROM collections WHERE libraryID=?",libraryID];
            
         while([resultSet next]) {
             [returnArray addObject:[ZPZoteroCollection dataObjectWithDictionary:[resultSet resultDict]]];
@@ -593,7 +621,7 @@ static ZPDatabase* _instance = nil;
     
     
 	@synchronized(self){
-        FMResultSet* resultSet = [_database executeQuery:@"SELECT *, key IN (SELECT DISTINCT parentCollectionKey FROM collections) AS hasChildren FROM collections WHERE key=? LIMIT 1",collection.key];
+        FMResultSet* resultSet = [_database executeQuery:@"SELECT *, collectionKey IN (SELECT DISTINCT parentCollectionKey FROM collections) AS hasChildren FROM collections WHERE collectionKey=? LIMIT 1",collection.key];
         
         
         if([resultSet next]){

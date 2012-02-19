@@ -58,6 +58,9 @@ static NSCache* _objectCache = NULL;
     [_objectCache removeAllObjects];
 }
 
+-(NSNumber*) groupID{
+    return [self libraryID];
+}
 
 
 @end

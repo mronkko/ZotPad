@@ -7,8 +7,6 @@ All data entities that have identifiers use key strings that are received
 from the Zotero server. The only exception is libraries, that receive
 integer ids from the server. 
 
-TODO: Needs more optimization (e.g. http://web.utk.edu/~jplyon/sqlite/SQLite_optimization_FAQ.html)
- 
 */
 
 PRAGMA synchronous=OFF;
@@ -23,13 +21,13 @@ always exists.
 CREATE TABLE IF NOT EXISTS groups ( 
     groupID INTEGER PRIMARY KEY,
     title TEXT NOT NULL,
-    timestamp TEXT DEFAULT NULL
+    cacheTimestamp TEXT DEFAULT NULL
 );
 
 CREATE TABLE IF NOT EXISTS collections (
     title TEXT NOT NULL,
     parentCollectionKey TEXT DEFAULT NULL,
-    timestamp TEXT DEFAULT NULL,
+    cacheTimestamp TEXT DEFAULT NULL,
     libraryID INT,
     collectionKey TEXT PRIMARY KEY
 );
@@ -46,7 +44,7 @@ CREATE TABLE IF NOT EXISTS items (
     title TEXT,
     publicationTitle TEXT,
     fullCitation TEXT NOT NULL,
-    timestamp TEXT DEFAULT NULL
+    cacheTimestamp TEXT DEFAULT NULL
 );
 
 CREATE INDEX items_libraryID ON items (libraryID);
@@ -61,7 +59,7 @@ CREATE INDEX items_libraryID ON items (libraryID);
 CREATE TABLE IF NOT EXISTS notes (
     parentItemKey TEXT NOT NULL,
     itemKey TEXT PRIMARY KEY,
-    timestamp TEXT NOT NULL
+    cacheTimestamp TEXT NOT NULL
 );
 
 CREATE INDEX notes_parentItemKey ON notes (parentItemKey);
@@ -70,7 +68,7 @@ CREATE INDEX notes_parentItemKey ON notes (parentItemKey);
 CREATE TABLE IF NOT EXISTS attachments (
     parentItemKey TEXT NOT NULL,
     itemKey TEXT PRIMARY KEY,
-    timestamp TEXT NOT NULL,
+    cacheTimestamp TEXT NOT NULL,
     attachmentURL TEXT,
     attachmentType TEXT,
     attachmentTitle TEXT,

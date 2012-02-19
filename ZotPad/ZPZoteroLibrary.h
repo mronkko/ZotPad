@@ -13,5 +13,6 @@
 }
 
 +(void) dropCache;
+-(NSNumber*) groupID;
 
 @end
