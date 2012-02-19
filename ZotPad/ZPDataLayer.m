@@ -125,7 +125,7 @@ static ZPDataLayer* _instance = nil;
         if([item respondsToSelector:@selector(parentItemKey)]){
             NSString* parentKey = (NSString*)[item performSelector:@selector(parentItemKey)];
             if(![parentKey isEqualToString:item.key]){
-                ZPZoteroItem* parentItem = [ZPZoteroItem dataObjectWithKey:parentKey];
+                ZPZoteroItem* parentItem = (ZPZoteroItem*) [ZPZoteroItem dataObjectWithKey:parentKey];
                 
                 //For now notify about Attachments only
                 if([item isKindOfClass:[ZPZoteroAttachment class]] && ! [itemsToBeNotifiedAbout containsObject:parentItem]){

@@ -64,6 +64,15 @@
 - (void) setAttachments:(NSArray *)attachments{
 }
 
+//If an attachment is updated, delete the old attachment file
+- (void) setServerTimestamp:(NSString*)timestamp{
+    [super setServerTimestamp:timestamp];
+    if(![_serverTimestamp isEqual:_cacheTimestamp] && [self fileExists]){
+        NSError* error;
+        [[NSFileManager defaultManager] removeItemAtPath: [self fileSystemPath] error:&error];   
+    }
+    
+}
 
 -(BOOL) fileExists{
     return ([[NSFileManager defaultManager] fileExistsAtPath:[self fileSystemPath]]);

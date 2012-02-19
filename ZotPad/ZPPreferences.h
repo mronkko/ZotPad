@@ -15,10 +15,10 @@
     NSInteger _maxCacheSize;
 }
 
-@property NSString* OAuthKey;
-@property NSString* userID;
-@property NSString* username;
-@property NSString* currentCacheSize;
+@property (retain) NSString* OAuthKey;
+@property (retain) NSString* userID;
+@property (retain) NSString* username;
+@property (retain) NSString* currentCacheSize;
 
 +(ZPPreferences*) instance;
 -(BOOL) cacheMetadataAllLibraries;

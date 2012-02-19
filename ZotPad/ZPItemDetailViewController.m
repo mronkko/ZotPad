@@ -50,16 +50,11 @@
 
 #pragma mark - View lifecycle
 
-static ZPItemDetailViewController* _instance;
 
-+(ZPItemDetailViewController*) instance{
-    return _instance;
-}
 
 - (void)viewDidLoad
 {
     [super viewDidLoad];
-    _instance = self;
     
     [[ZPDataLayer instance] registerItemObserver:self];
     [[ZPDataLayer instance] registerAttachmentObserver:self];
@@ -298,7 +293,7 @@ static ZPItemDetailViewController* _instance;
             [_imageRenderQueue addOperation:operation];
             NSLog(@"Added file %@ to preview render queue. Operations in queue now %i",attachment.attachmentTitle,[_imageRenderQueue operationCount]);
         }
-        else if(image != [NSNull null]){
+        else if((NSObject*)image != [NSNull null]){
             NSLog(@"Got an image from cache %@",attachment.fileSystemPath);
             imageView = [[UIImageView alloc] initWithImage:image];
             view.layer.frame = [self _getDimensionsWithImage:image];
@@ -555,8 +550,8 @@ static ZPItemDetailViewController* _instance;
         if(indexPath.row<[itemArray count]){                    
             NSString* currentItemKey = [itemArray objectAtIndex: indexPath.row]; 
             
-            if(currentItemKey != [NSNull null]){
-                _currentItem = [ZPZoteroItem retrieveOrInitializeWithKey:currentItemKey];
+            if((NSObject*)currentItemKey != [NSNull null]){
+                _currentItem = (ZPZoteroItem*) [ZPZoteroItem dataObjectWithKey:currentItemKey];
                 [self configure];
             }
             

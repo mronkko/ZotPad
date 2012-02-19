@@ -16,7 +16,7 @@
 @synthesize hasChildren=_hasChildren;
 @synthesize cacheTimestamp = _cacheTimestamp;
 @synthesize serverTimestamp = _serverTimestamp;
-@synthesize numItems = _numItems;
+@synthesize numChildren = _numChildren;
 
 /*
  
@@ -24,12 +24,12 @@
  
  */
 
-+(id) dataObjectWithKey:(NSObject*) key{
++(ZPZoteroDataObject*) dataObjectWithKey:(NSObject*) key{
     [NSException raise:@"Not implemented" format:@"Subclasses of ZPZoteroDataObject need to implement dataObjectWithKey method"];
     return nil;
 }
 
-+(id) dataObjectWithDictionary:(NSDictionary*) fields{
++(ZPZoteroDataObject*) dataObjectWithDictionary:(NSDictionary*) fields{
     [NSException raise:@"Not implemented" format:@"Subclasses of ZPZoteroDataObject need to implement dataObjectWithDictionary method"];
     return nil;
 }
@@ -57,7 +57,7 @@
 
 - (BOOL)isEqual:(id)anObject{
     if([anObject isKindOfClass:[self class]]){
-        if(_key == nil) return [_libraryID isEqualToString:[(ZPZoteroDataObject*) anObject libraryID]];
+        if(_key == nil) return [_libraryID isEqual:[(ZPZoteroDataObject*) anObject libraryID]];
         else return [_key isEqualToString:[(ZPZoteroDataObject*) anObject key]];
     }
     else return FALSE;

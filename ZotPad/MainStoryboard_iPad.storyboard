@@ -387,7 +387,7 @@
         <scene sceneID="Zza-eC-TaA">
             <objects>
                 <placeholder placeholderIdentifier="IBFirstResponder" id="uuF-id-wBA" userLabel="First Responder" sceneMemberID="firstResponder"/>
-                <viewController storyboardIdentifier="NavigationItemListView" id="WCH-zk-FP7" customClass="ZPSimpleItemListViewController" sceneMemberID="viewController">
+                <viewController storyboardIdentifier="NavigationItemListView" id="WCH-zk-FP7" customClass="UITableViewController" sceneMemberID="viewController">
                     <tableView key="view" clipsSubviews="YES" contentMode="scaleToFill" alwaysBounceVertical="YES" dataMode="prototypes" style="plain" rowHeight="44" sectionHeaderHeight="22" sectionFooterHeight="22" id="7zD-LX-EJk">
                         <rect key="frame" x="0.0" y="64" width="320" height="704"/>
                         <autoresizingMask key="autoresizingMask" widthSizable="YES" heightSizable="YES"/>

@@ -17,7 +17,7 @@
 
 @implementation ZPItemListViewController
 
-@synthesize collectionID = _collectionKey;
+@synthesize collectionKey = _collectionKey;
 @synthesize libraryID =  _libraryID;
 @synthesize searchString = _searchString;
 @synthesize sortField = _sortField;
@@ -31,7 +31,6 @@
 @synthesize itemKeysShown = _itemKeysShown;
 
 
-static ZPItemListViewController* _instance = nil;
 
 #pragma mark - Managing the detail item
 
@@ -42,9 +41,6 @@ static ZPItemListViewController* _instance = nil;
     return self;
 }
 
-+ (ZPItemListViewController*) instance{
-    return _instance;
-}
 
 - (void)didReceiveMemoryWarning
 {
@@ -74,7 +70,7 @@ static ZPItemListViewController* _instance = nil;
     // Retrieve the item IDs if a library is selected. 
     
     if(_libraryID!=0){
-        _itemKeysShown = [[ZPDataLayer instance] getItemKeysForView: self];
+        _itemKeysShown = [[ZPDataLayer instance] getItemKeysFromCacheForLibrary:_libraryID collection:_collectionKey searchString:_searchString orderField:_sortField sortDescending:_sortDescending];
         if(_itemKeysShown == NULL){
             [self makeBusy];
         }
@@ -137,7 +133,7 @@ static ZPItemListViewController* _instance = nil;
     [self.tableView reloadRowsAtIndexPaths:indexPaths withRowAnimation:UITableViewRowAnimationFade];
 
 }
-- (UITableViewCell *)tableView:(UITableView *)tableView cellForRowAtIndexPath:(NSIndexPath *)indexPath {
+- (UITableViewCell *)tableView:(UITableView *)aTableView cellForRowAtIndexPath:(NSIndexPath *)indexPath {
 
    
     
@@ -159,14 +155,14 @@ static ZPItemListViewController* _instance = nil;
         
         //TODO: Set author and year to empty if not defined. 
         ZPZoteroItem* item=NULL;
-        if(![key isEqualToString:@""]) item = [[ZPDataLayer instance] getItemByKey:key];
+        if(![key isEqualToString:@""]) item = (ZPZoteroItem*) [ZPZoteroItem dataObjectWithKey:key];
         
         if(item==NULL){
-            cell = [tableView dequeueReusableCellWithIdentifier:@"LoadingCell"];        
+            cell = [aTableView dequeueReusableCellWithIdentifier:@"LoadingCell"];        
         }
         else{
 
-            cell = [tableView dequeueReusableCellWithIdentifier:@"ZoteroItemCell"];
+            cell = [aTableView dequeueReusableCellWithIdentifier:@"ZoteroItemCell"];
             
             UILabel *titleLabel = (UILabel *)[cell viewWithTag:1];
             titleLabel.text = item.title;
@@ -175,20 +171,20 @@ static ZPItemListViewController* _instance = nil;
             
             //Show different things depending on what data we have
             if(item.creatorSummary!=NULL){
-                if(item.year != 0){
-                    authorsLabel.text = [NSString stringWithFormat:@"%@ (%i)",item.creatorSummary,item.year];
+                if(item.date!= 0){
+                    authorsLabel.text = [NSString stringWithFormat:@"%@ (%i)",item.creatorSummary,item.date];
                 }
                 else{
                     authorsLabel.text = [NSString stringWithFormat:@"%@ (No date)",item.creatorSummary];
                 }
             }    
-            else if(item.year != 0){
-                authorsLabel.text = [NSString stringWithFormat:@"No author (%i)",item.year];
+            else if(item.date!= 0){
+                authorsLabel.text = [NSString stringWithFormat:@"No author (%i)",item.date];
             }
 
             //Publication as a formatted label
 
-            NSString* publishedIn = item.publishedIn;
+            NSString* publishedIn = item.publicationTitle;
             
             if(publishedIn == NULL){
                 publishedIn=@"";   

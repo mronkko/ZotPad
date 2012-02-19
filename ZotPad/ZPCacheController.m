@@ -57,7 +57,6 @@
 #import "ZPServerResponseXMLParser.h"
 #import "ZPServerConnection.h"
 #import "ZPZoteroCollection.h"
-#import "ZPZoteroItemContainer.h"
 #import "ZPZoteroAttachment.h"
 #import "ZPZoteroNote.h"
 #import "ZPLogger.h"
@@ -77,7 +76,7 @@
 -(void) _doItemRetrieval:(NSArray*) itemKeys fromLibrary:(NSNumber*)libraryID;
 
 -(void) _cacheItemsAndAttachToParentsIfNeeded:(NSArray*) items;
--(void) _attachChildItemsToParents:(NSArray*) items;
+//-(void) _attachChildItemsToParents:(NSArray*) items;
 
 //Gets one item details and writes these to the database
 -(void) _updateItemDetailsFromServer:(ZPZoteroItem*) item;
@@ -224,7 +223,7 @@ static ZPCacheController* _instance = nil;
                             if(timestamp!=NULL){
                                 //Update both the DB and the in-memory cache.
                                 [[ZPDatabase instance] setUpdatedTimestampForLibrary:libraryID toValue:timestamp];
-                                [[ZPZoteroLibrary ZPZoteroLibraryWithID:libraryID] setLastCompletedCacheTimestamp:timestamp];
+                                [[ZPZoteroLibrary dataObjectWithKey:libraryID] setCacheTimestamp:timestamp];
                                 NSLog(@"Library %@ is now fully cached", libraryID);
                                 [_libraryTimestamps removeObjectForKey:libraryID];
                             }
@@ -315,7 +314,7 @@ static ZPCacheController* _instance = nil;
                     [standaloneNotesAndAttachments addObject:attachment];
                 }
                 else{
-                    ZPZoteroItem* parent = [ZPZoteroItem dataObjectWithKey:attachment.parentItemKey];
+                    ZPZoteroItem* parent = (ZPZoteroItem*) [ZPZoteroItem dataObjectWithKey:attachment.parentItemKey];
                     if(![parentItemsForAttachments containsObject:parent]) [parentItemsForAttachments addObject:parent];
                 }
                 
@@ -330,7 +329,7 @@ static ZPCacheController* _instance = nil;
                     [standaloneNotesAndAttachments addObject:note];
                 }
                 else{
-                    ZPZoteroItem* parent = [ZPZoteroItem dataObjectWithKey:note.parentItemKey];
+                    ZPZoteroItem* parent = (ZPZoteroItem*) [ZPZoteroItem dataObjectWithKey:note.parentItemKey];
                     if(![parentItemsForNotes containsObject:parent]) [parentItemsForNotes addObject:parent];
                 }
 
@@ -340,7 +339,6 @@ static ZPCacheController* _instance = nil;
             else{
                 [normalItems addObject:item];
             }
-            [item clearNeedsToBeWrittenToCache];
         }
     }
     
@@ -539,7 +537,7 @@ static ZPCacheController* _instance = nil;
 -(void) _checkIfAttachmenstExistAndQueueForDownload:(NSArray*)parentKeys{
 
     for(NSString* key in parentKeys){
-        ZPZoteroItem* item = [ZPZoteroItem dataObjectWithKey:key];
+        ZPZoteroItem* item = (ZPZoteroItem*) [ZPZoteroItem dataObjectWithKey:key];
         for(ZPZoteroAttachment* attachment in item.attachments){
             [self _checkIfAttachmentExistsAndQueueForDownload:attachment];
         }    
@@ -558,11 +556,13 @@ static ZPCacheController* _instance = nil;
             doCache = (attachment.libraryID == _activelibraryID);
             
         }
+        //Check if the parent belongs to active the collection
         else if([[ZPPreferences instance] cacheAttachmentsActiveCollection]){
-            if([[ZPZoteroItem dataObjectWithKey:attachment.parentItemKey].libraryID isEqualToNumber:_activelibraryID] && _activeCollectionKey == NULL){
+            ZPZoteroItem* parent = (ZPZoteroItem*)[ZPZoteroItem dataObjectWithKey:attachment.parentItemKey];
+            if([parent.libraryID isEqualToNumber:_activelibraryID] && _activeCollectionKey == NULL){
                 doCache=true;
             }
-            else if([[ZPDatabase instance] doesItemKey:attachment.parentItemKey belongToCollection:_activeCollectionKey]){
+            else if([parent.collections containsObject:[ZPZoteroCollection dataObjectWithKey:_activeCollectionKey] ]){
                 doCache = true;
             }
         }
@@ -640,7 +640,7 @@ static ZPCacheController* _instance = nil;
     
     if(timestamp != NULL){
         
-        ZPZoteroLibrary* container = [ZPZoteroLibrary dataObjectWithKey:libraryID];
+        ZPZoteroLibrary* container = (ZPZoteroLibrary*) [ZPZoteroLibrary dataObjectWithKey:libraryID];
         
         if(![timestamp isEqualToString:container.cacheTimestamp]){
             
@@ -650,7 +650,7 @@ static ZPCacheController* _instance = nil;
             if([[ZPPreferences instance] cacheMetadataActiveLibrary]){
                 
                 //Retrieve all collections for this library and add them to cache
-                for(ZPZoteroCollection* collection in [[ZPDatabase instance] allCollectionsForLibrary:container.libraryID]){
+                for(ZPZoteroCollection* collection in [[ZPDatabase instance] collectionsForLibrary:container.libraryID]){
                     
                     timestamp = [[ZPServerConnection instance] retrieveTimestampForContainer:libraryID collectionKey:collection.collectionKey];
                     
@@ -672,7 +672,7 @@ static ZPCacheController* _instance = nil;
 
 -(void) _checkIfCollectionNeedsCacheRefreshAndQueue:(NSString*)collectionKey{
  
-    ZPZoteroCollection* container = [ZPZoteroCollection ZPZoteroCollectionWithKey:collectionKey];
+    ZPZoteroCollection* container = (ZPZoteroCollection*) [ZPZoteroCollection dataObjectWithKey:collectionKey];
     NSNumber* libraryID = container.libraryID;
     
     if(libraryID == NULL) [NSException raise:@"libraryID for collection object was null" format:@"This should not happen"];

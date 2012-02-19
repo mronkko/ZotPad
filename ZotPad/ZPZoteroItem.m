@@ -19,8 +19,6 @@
 @synthesize itemType = _itemType;
 @synthesize numTags = _numTags;
 
-
-
 static NSCache* _objectCache = NULL;
 
 +(BOOL) existsInCache:(NSString*) key{
@@ -56,7 +54,6 @@ static NSCache* _objectCache = NULL;
     if(obj==NULL || ! [obj isKindOfClass:[self class]]){
         obj= [[self alloc] init];
         obj->_key=key;
-        obj->_needsToBeWrittenToCache = FALSE;
         
         [obj configureWithDictionary:fields];
         [_objectCache setObject:obj  forKey:key];
@@ -70,7 +67,7 @@ static NSCache* _objectCache = NULL;
     
     if(key == NULL)
         [NSException raise:@"Key is null" format:@"ZPZoteroItem cannot be instantiated with NULL key"];
-    if([key isEqualToString:@""])
+    if([key isEqual:@""])
         [NSException raise:@"Key is empty" format:@"ZPZoteroItem cannot be instantiated with empty key"];
 
     
@@ -82,8 +79,7 @@ static NSCache* _objectCache = NULL;
     
     if(obj==NULL || ! [obj isKindOfClass:[self class]]){
         obj= [[self alloc] init];
-        obj->_key=key;
-        obj->_needsToBeWrittenToCache = FALSE;
+        obj->_key=(NSString*)key;
         
         //Retrieve data for this item from DB
         [[ZPDatabase instance] addAttributesToItem:obj] ;
@@ -156,6 +152,14 @@ static NSCache* _objectCache = NULL;
 - (void) setNotes:(NSArray*)notes{
 
     _notes = notes;
+}
+
+
+-(NSArray*) collections{
+    if(_collections == NULL){
+        _collections = [[ZPDatabase instance] collectionsForItem:self];
+    }
+    return _collections;
 }
 
 @end

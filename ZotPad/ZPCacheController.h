@@ -45,7 +45,6 @@
 - (void) purgeAllAttachmentFilesFromCache;
 
 -(void) refreshActiveItem:(ZPZoteroItem*) item;
--(NSArray*) uncachedItemKeysForLibrary:(NSNumber*)libraryID collection:(NSString*)collectionKey searchString:(NSString*)searchString orderField:(NSString*)orderField sortDescending:(BOOL)sortDescending;
 -(void) setActiveLibrary:(NSNumber*)libraryID collection:(NSString*)collectionKey;
 
 -(void) addToLibrariesQueue:(ZPZoteroLibrary*)object priority:(BOOL)priority;

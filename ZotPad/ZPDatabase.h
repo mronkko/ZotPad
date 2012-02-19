@@ -38,6 +38,7 @@
 // Methods for retrieving data from the data layer
 - (NSArray*) groupLibraries;
 - (NSArray*) collectionsForLibrary : (NSNumber*)currentlibraryID withParentCollection:(NSString*)currentCollectionKey;
+- (NSArray*) collectionsForLibrary : (NSNumber*)currentlibraryID;
 
 
 // Methods for retrieving item keys
@@ -49,7 +50,7 @@
 
 // Methods for filling data into existing objects
 - (void) addAttributesToGroupLibrary:(ZPZoteroLibrary*) library;
-- (void) addAttributsToCollection:(ZPZoteroCollection*) collection;
+- (void) addAttributesToCollection:(ZPZoteroCollection*) collection;
 - (void) addAttributesToItem:(ZPZoteroItem *)item;
 
 
@@ -66,14 +67,13 @@
 
 - (NSString*) getLocalizationStringWithKey:(NSString*) key type:(NSString*) type locale:(NSString*) locale;
 
-- (BOOL) doesItemKey:(NSString*)itemKey belongToCollection:(NSString*) collectionKey;
-
-
 // Retrieves all item keys and note and attachment keys from the library
 
 - (NSArray*) getAllItemKeysForLibrary:(NSNumber*)libraryID;
 
 
+- (NSArray*) collectionsForItem:(ZPZoteroItem*)item;
+    
 /*
  
  Methods for writing to DB
@@ -93,7 +93,7 @@
 -(NSArray*) writeNotes:(NSArray*)notes;
 -(NSArray*) writeAttachments:(NSArray*)attachments;
 
--(void) addItems:(NSArray*)items toCollection:(NSString*)collectionKey;
+-(void) writeItems:(NSArray*)items toCollection:(NSString*)collectionKey;
 -(void) addItemKeys:(NSArray*)keys toCollection:(NSString*)collectionKey;
 
 -(void) writeItemsCreators:(NSArray*)items;

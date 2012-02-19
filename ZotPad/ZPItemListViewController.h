@@ -10,20 +10,18 @@
 #import "../DSActivityView/Sources/DSActivityView.h"
 #import "Three20/Three20.h"
 #import "ZPItemListViewController.h"
+#import "ZPItemDetailViewController.h"
 
-//TODO: Make this a UITableViewController instead of UIViewController
 
 @interface ZPItemListViewController : UITableViewController <UISplitViewControllerDelegate, UISearchBarDelegate>{
     NSString* _searchString;
-    NSInteger _collectionID;
-    NSInteger _libraryID;
+    NSString* _collectionKey;
+    NSNumber* _libraryID;
     NSString* _sortField;
     BOOL _sortDescending;
     DSBezelActivityView* _activityView;
+    NSCache* _cellCache;
 }
-
-// This class is used as a singleton
-+ (ZPItemListViewController*) instance;
 
 - (void)configureView;
 - (void)notifyDataAvailable;
@@ -32,15 +30,14 @@
 - (void)makeBusy;
 
 @property (nonatomic, retain) IBOutlet UISearchBar* searchBar;
+@property (strong, nonatomic) ZPItemDetailViewController* detailViewController;
+@property (assign, nonatomic) BOOL masterIsVisible;
 
-@property (retain) NSArray* itemKeysShown;
-
-@property NSString* collectionKey;
-@property NSNumber* libraryID;
-
-@property (copy) NSString* searchString;
-
-@property (copy) NSString* sortField;
+@property (nonatomic, retain) NSArray* itemKeysShown;
+@property (nonatomic, retain) NSString* collectionKey;
+@property (nonatomic, retain) NSNumber* libraryID;
+@property (nonatomic, retain) NSString* searchString;
+@property (nonatomic, retain) NSString* sortField;
 @property BOOL sortDescending;
 
 -(void) clearSearch;

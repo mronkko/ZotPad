@@ -24,9 +24,10 @@
     NSArray* _notes;
     NSDictionary* _fields;
 
-    BOOL _needsToBeWrittenToCache;
     BOOL _isStandaloneAttachment;
     BOOL _isStandaloneNote;
+    
+    NSArray* _collections;
 }
 
 @property (retain) NSString* fullCitation;
@@ -35,13 +36,12 @@
 @property (assign) NSInteger date;
 @property (retain) NSString* itemType;
 @property (assign) NSInteger numTags;
-
 @property (retain) NSArray* notes;
 @property (retain) NSArray* attachments;
 @property (retain) NSArray* creators;
 @property (retain) NSDictionary* fields;
 
 +(void) dropCache;
-
+-(NSArray*) collections;
 
 @end

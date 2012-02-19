@@ -15,22 +15,22 @@
     BOOL _hasChildren;
     NSString* _cacheTimestamp;
     NSString* _serverTimestamp;
-    NSInteger _numItems;
+    NSInteger _numChildren;
 }
 @property (retain) NSString* title;
-@property (retain, readonly) NSNumber* libraryID;
+@property (retain) NSNumber* libraryID;
 @property (retain, readonly) NSString* key;
 
 // Important: This field stores the number of all items including items that are attachments to parent items. 
 
-@property (assign) NSInteger numItems;
+@property (assign) NSInteger numChildren;
 @property (assign, readonly) BOOL hasChildren;
 
 @property (retain) NSString* cacheTimestamp;
 @property (retain) NSString* serverTimestamp;
 
-+(id) dataObjectWithKey:(NSObject*) key;
-+(id) dataObjectWithDictionary:(NSDictionary*) fields;
++(ZPZoteroDataObject*) dataObjectWithKey:(NSObject*) key;
++(ZPZoteroDataObject*) dataObjectWithDictionary:(NSDictionary*) fields;
 
 -(void) configureWithDictionary:(NSDictionary*) dictionary;
 -(BOOL) needsToBeWrittenToCache;

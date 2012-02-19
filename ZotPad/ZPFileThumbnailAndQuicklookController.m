@@ -69,8 +69,8 @@ static NSCache* _fileTypeImageCache;
 
 - (NSInteger) numberOfPreviewItemsInPreviewController: (QLPreviewController *) controller 
 {
-    NSLog(@"Number of previews for item %@ is %i",_item.title, [[_item libraryIDchments] count] );
-    return [[_item libraryIDchments] count];
+    NSLog(@"Number of previews for item %@ is %i",_item.title, [[_item attachments] count] );
+    return [[_item attachments] count];
 }
 
 
@@ -78,7 +78,7 @@ static NSCache* _fileTypeImageCache;
 
     NSLog(@"Opening preview %i for item %@",index,_item.title );
 
-    NSArray* allExisting = [_item libraryIDchments];
+    NSArray* allExisting = [_item attachments];
     ZPZoteroAttachment* currentAttachment = [allExisting objectAtIndex:index];
     NSString* path = [currentAttachment fileSystemPath];
     return [NSURL fileURLWithPath:path];
@@ -92,7 +92,7 @@ static NSCache* _fileTypeImageCache;
     //item is still relevant information for the cache controller
     
     _item = [ZPZoteroItem dataObjectWithKey:attachment.parentItemKey];
-    for(ZPZoteroAttachment* attachment in [_item libraryIDchments]){
+    for(ZPZoteroAttachment* attachment in [_item attachments]){
         [[ZPDatabase instance] updateViewedTimestamp:attachment];
     }
 
@@ -103,7 +103,7 @@ static NSCache* _fileTypeImageCache;
         
         QLPreviewController *quicklook = [[QLPreviewController alloc] init];
         [quicklook setDataSource:self];
-        NSInteger index = [[_item libraryIDchments] indexOfObject:attachment];
+        NSInteger index = [[_item attachments] indexOfObject:attachment];
         [quicklook setCurrentPreviewItemIndex:index];
 //        UIViewController* root = [UIApplication sharedApplication].delegate.window.rootViewController;
 //        NSArray* viewControllers = [(UISplitViewController*) root viewControllers];

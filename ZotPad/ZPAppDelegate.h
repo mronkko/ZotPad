@@ -10,7 +10,7 @@
 
 @interface ZPAppDelegate : UIResponder <UIApplicationDelegate>
 
-
 @property (strong, nonatomic) UIWindow *window;
-    
+@property (retain, nonatomic) IBOutlet UISplitViewController *splitViewController;
+
 @end

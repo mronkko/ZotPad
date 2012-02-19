@@ -26,8 +26,5 @@
 @property (retain, nonatomic) NSNumber* currentlibraryID;
 @property (retain, nonatomic) NSString* currentCollectionKey;
 
-// TODO: refactor the code so that this does not need a singleton
-
-+ (ZPLibraryAndCollectionListViewController*) instance;
 
 @end

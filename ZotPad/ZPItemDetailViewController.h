@@ -13,7 +13,7 @@
 #import "iCarousel.h"
 #import "ZPItemListViewController.h"
 #import "ZPFileThumbnailAndQuicklookController.h"
-
+#import "ZPItemObserver.h"
 
 @interface ZPItemDetailViewController : UIViewController <UITableViewDataSource, UITableViewDelegate, iCarouselDataSource,
     iCarouselDelegate, ZPItemObserver, ZPAttachmentObserver, UINavigationControllerDelegate >{
@@ -27,12 +27,11 @@
     NSCache* _previewCache;
 }
 
-+(ZPItemDetailViewController*) instance;
 - (void) configure;
 
 @property (nonatomic, retain) IBOutlet iCarousel* carousel;
-
 @property (nonatomic, retain) ZPZoteroItem* selectedItem;
+@property (assign, nonatomic) BOOL masterIsVisible;
 
 //This contains sections about the item details
 @property (retain) IBOutlet UITableView* detailTableView;

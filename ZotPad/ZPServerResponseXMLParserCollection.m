@@ -13,8 +13,8 @@
 
 
 - (void) _initNewElementWithID:(NSString*)id{
-    _currentElement = [ZPZoteroCollection ZPZoteroCollectionWithKey:id];
-    [(ZPZoteroCollection*)_currentElement setlibraryID:_libraryID];
+    _currentElement = [ZPZoteroCollection dataObjectWithKey:id];
+    [(ZPZoteroCollection*)_currentElement setLibraryID:_libraryID];
     [super _processTemporaryFieldStorage];
 }
 
@@ -33,7 +33,7 @@
         [(ZPZoteroCollection*) _currentElement setServerTimestamp:value];
     }
     else if([field isEqualToString:@"zapi:numItems"]){
-        [(ZPZoteroCollection*) _currentElement setNumItems:[value intValue]];
+        [(ZPZoteroCollection*) _currentElement setNumChildren:[value intValue]];
     }
     else{
         [super _setField:field toValue:value];

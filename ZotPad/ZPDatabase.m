@@ -433,7 +433,7 @@ static ZPDatabase* _instance = nil;
  */
 
 -(void) writeLibraries:(NSArray*)libraries{
-    [self writeObjects:libraries intoTable:libraries checkTimestamp:FALSE];
+    [self writeObjects:libraries intoTable:@"libraries" checkTimestamp:FALSE];
     
 }
 
@@ -569,8 +569,27 @@ static ZPDatabase* _instance = nil;
 	return returnArray;
 }
 
+- (NSArray*) collectionsForLibrary : (NSNumber*)libraryID{
+    NSMutableArray* returnArray = [[NSMutableArray alloc] init];
+    
+	@synchronized(self){
+        
+        FMResultSet* resultSet;
+        resultSet= [_database executeQuery:@"SELECT *, key IN (SELECT DISTINCT parentCollectionKey FROM collections) AS hasChildren FROM collections WHERE libraryID=?",libraryID];
+           
+        while([resultSet next]) {
+            [returnArray addObject:[ZPZoteroCollection dataObjectWithDictionary:[resultSet resultDict]]];
+            
+        }
+        [resultSet close];
+        
+	}
+	return returnArray;
+    
+}
 
-- (void) addAttributsToCollection:(ZPZoteroCollection*) collection{
+
+- (void) addAttributesToCollection:(ZPZoteroCollection*) collection{
     
     
 	@synchronized(self){
@@ -640,14 +659,14 @@ Deletes items, notes, and attachments based in array of keys from a library
 
 // Records a new collection membership
 
--(void) addItems:(NSArray*)items toCollection:(NSString*)collectionKey{
+-(void) writeItems:(NSArray*)items toCollection:(NSString*)collectionKey{
 
     ZPZoteroItem* item;
     NSMutableArray* itemKeys = [NSMutableArray array];
     for(item in items){
         [itemKeys addObject:item.key];
     }
-    [self addItems:itemKeys toCollection:collectionKey];
+    [self writeItems:itemKeys toCollection:collectionKey];
 }
 
 
@@ -768,6 +787,22 @@ Deletes items, notes, and attachments based in array of keys from a library
 
 }
 
+- (NSArray*) collectionsForItem:(ZPZoteroItem*)item{
+    
+    NSMutableArray* collections = [[NSMutableArray alloc] init];
+    
+    @synchronized(self){
+        FMResultSet* resultSet = [_database executeQuery: @"SELECT * FROM collectionItems, collections WHERE itemKey = ? AND collectionItems.collectionKey = collections.collectionKey ORDER BY title",item.key];
+        
+        while([resultSet next]) {
+            [collections addObject:[ZPZoteroCollection dataObjectWithDictionary:[resultSet resultDict]]];
+        }
+        
+        [resultSet close];
+    }
+    return collections;
+    
+}
 
 - (void) addCreatorsToItem: (ZPZoteroItem*) item {
     item.creators = [self creatorsForItem:item];
@@ -805,7 +840,7 @@ Deletes items, notes, and attachments based in array of keys from a library
         FMResultSet* resultSet = [_database executeQuery: @"SELECT * FROM attachments WHERE attachmentURL IS NOT NULL ORDER BY CASE WHEN lastViewed IS NULL THEN 0 ELSE 1 end, lastViewed ASC, lastTimestamp ASC"];
         
         while([resultSet next]){
-            ZPZoteroAttachment* attachment = [ZPZoteroAttachment dataObjectWithDictionary:[resultSet resultDict]];
+            ZPZoteroAttachment* attachment = (ZPZoteroAttachment*) [ZPZoteroAttachment dataObjectWithDictionary:[resultSet resultDict]];
             
             //If this attachment does have a file, add it to the list that we return;
             if(attachment.fileExists){
@@ -835,7 +870,7 @@ Deletes items, notes, and attachments based in array of keys from a library
         }
         
         while([resultSet next]){
-            ZPZoteroAttachment* attachment = [ZPZoteroAttachment dataObjectWithDictionary:[resultSet resultDict]];
+            ZPZoteroAttachment* attachment = (ZPZoteroAttachment*) [ZPZoteroAttachment dataObjectWithDictionary:[resultSet resultDict]];
 
             [returnArray addObject:attachment];
         }

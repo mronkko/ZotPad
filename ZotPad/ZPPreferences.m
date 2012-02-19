@@ -166,7 +166,7 @@ static ZPPreferences* _instance = nil;
     NSUserDefaults* defaults = [NSUserDefaults standardUserDefaults];
     return [defaults objectForKey:@"OAuthKey"];
 }
--(void) setOAuthKey:(NSString *)OAuthKey: (NSString*) value {
+-(void) setOAuthKey:(NSString*) value {
     NSUserDefaults* defaults = [NSUserDefaults standardUserDefaults];
     [defaults setValue:value forKey:@"OAuthKey"];
 }
@@ -175,7 +175,7 @@ static ZPPreferences* _instance = nil;
     NSUserDefaults* defaults = [NSUserDefaults standardUserDefaults];
     return [defaults objectForKey:@"cachesizecurrent"];
 }
--(void) setCurrentCacheSize:(NSString *)currentCacheSize:(NSString *)OAuthKey: (NSString*) value {
+-(void) setCurrentCacheSize:(NSString*) value {
     NSUserDefaults* defaults = [NSUserDefaults standardUserDefaults];
     [defaults setValue:value forKey:@"cachesizecurrent"];
 }

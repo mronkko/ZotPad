@@ -154,7 +154,7 @@
         //IF the item does not exist in the in-memory cache, attempt to load it from the disk cache 
         _currentElement = [ZPZoteroItem dataObjectWithKey:id];
     }
-    [(ZPZoteroItem*)_currentElement setlibraryID:_libraryID];
+    [(ZPZoteroItem*)_currentElement setLibraryID:_libraryID];
     [super _processTemporaryFieldStorage];
 }
 

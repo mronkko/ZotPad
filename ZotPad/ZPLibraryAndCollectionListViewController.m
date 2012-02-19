@@ -29,11 +29,6 @@
 @synthesize currentlibraryID = _currentlibraryID;
 @synthesize currentCollectionKey = _currentCollectionKey;
 
-static ZPLibraryAndCollectionListViewController* _instance = nil;
-
-+ (ZPLibraryAndCollectionListViewController*) instance{
-    return _instance;
-}
 
 - (void)awakeFromNib
 {
@@ -196,27 +191,6 @@ static ZPLibraryAndCollectionListViewController* _instance = nil;
 	[self.navigationController pushViewController: subController animated: YES];
 	
 }
-- (void)prepareForSegue:(UIStoryboardSegue *)segue sender:(id)sender{
-    // Make sure your segue name in storyboard is the same as this line
-    if ([[segue identifier] isEqualToString:@"PushItemsToNavigator"])
-    {
-        
-        UITableViewController* simpleItemListViewController = (UITableViewController*)[segue destinationViewController];
-
-        simpleItemListViewController.navigationItem.hidesBackButton = YES;
-
-        ZPItemListViewController* itemList = (ZPItemListViewController*) sender;
-
-        // Get the selected row from the item list
-        NSIndexPath* indexPath = [[itemList tableView] indexPathForSelectedRow];
-        simpleItemListViewController.tableView.dataSource = sender;
-        simpleItemListViewController.tableView.delegate = 
-        //TODO: set the selected row
-        //[simpleItemListViewController.tableView selectRowAtIndexPath:indexPath animated:NO scrollPosition:UITableViewScrollPositionMiddle]; 
-        
-    }
-    
-}
 
 - (void)viewDidUnload
 {
@@ -234,7 +208,6 @@ static ZPLibraryAndCollectionListViewController* _instance = nil;
 - (void)viewDidAppear:(BOOL)animated
 {
     [[ZPDataLayer instance] registerLibraryObserver:self];
-    _instance= self;
     [super viewDidAppear:animated];
 }
 

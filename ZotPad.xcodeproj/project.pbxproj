@@ -670,20 +670,20 @@
 		A72853FE147E33F400D3FE97 /* UI and delegate files */ = {
 			isa = PBXGroup;
 			children = (
-				A77B98DD14DE5CDB00132E9B /* ZPItemListViewController.h */,
-				A77B98DE14DE5CDB00132E9B /* ZPItemListViewController.m */,
-				A7D3C08114AEE70F00DB975D /* ZPLocalization.h */,
-				A7D3C08214AEE70F00DB975D /* ZPLocalization.m */,
 				A7200DE314718DC0004347C9 /* ZPAppDelegate.h */,
 				A7200DE414718DC0004347C9 /* ZPAppDelegate.m */,
 				A7200DE914718DC1004347C9 /* ZPLibraryAndCollectionListViewController.h */,
 				A7200DEA14718DC1004347C9 /* ZPLibraryAndCollectionListViewController.m */,
-				A793153C14B185E800E1ABF0 /* ZPFileThumbnailAndQuicklookController.h */,
-				A793153D14B185E800E1ABF0 /* ZPFileThumbnailAndQuicklookController.m */,
+				A77B98DD14DE5CDB00132E9B /* ZPItemListViewController.h */,
+				A77B98DE14DE5CDB00132E9B /* ZPItemListViewController.m */,
 				A79ED821148B2683003EE77C /* ZPItemDetailViewController.h */,
 				A79ED822148B2683003EE77C /* ZPItemDetailViewController.m */,
+				A793153C14B185E800E1ABF0 /* ZPFileThumbnailAndQuicklookController.h */,
+				A793153D14B185E800E1ABF0 /* ZPFileThumbnailAndQuicklookController.m */,
 				A74348D5147AB37A00DA6FC3 /* ZPAuthenticationDialog.h */,
 				A74348D6147AB37A00DA6FC3 /* ZPAuthenticationDialog.m */,
+				A7D3C08114AEE70F00DB975D /* ZPLocalization.h */,
+				A7D3C08214AEE70F00DB975D /* ZPLocalization.m */,
 				A786F7771476A56200B35B92 /* MainStoryboard_iPhone.storyboard */,
 				A72C3CA61487C9DA00F6744E /* MainStoryboard_iPad.storyboard */,
 			);
