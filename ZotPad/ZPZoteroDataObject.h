@@ -12,7 +12,6 @@
     NSString* _title;
     NSString* _key;
     NSNumber* _libraryID;
-    BOOL _hasChildren;
     NSString* _cacheTimestamp;
     NSString* _serverTimestamp;
     NSInteger _numChildren;
@@ -23,7 +22,7 @@
 
 // Important: This field stores the number of all items including items that are attachments to parent items. 
 
-@property (assign) NSInteger numChildren;
+@property (retain) NSNumber* numChildren;
 @property (assign, readonly) BOOL hasChildren;
 
 @property (retain) NSString* cacheTimestamp;

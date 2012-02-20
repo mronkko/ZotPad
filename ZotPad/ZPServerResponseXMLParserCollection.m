@@ -33,7 +33,7 @@
         [(ZPZoteroCollection*) _currentElement setServerTimestamp:value];
     }
     else if([field isEqualToString:@"zapi:numItems"]){
-        [(ZPZoteroCollection*) _currentElement setNumChildren:[value intValue]];
+        [(ZPZoteroCollection*) _currentElement setNumChildren:[NSNumber numberWithInt:[value intValue]]];
     }
     else{
         [super _setField:field toValue:value];

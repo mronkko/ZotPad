@@ -483,7 +483,7 @@ static ZPDatabase* _instance = nil;
     //Group libraries
     @synchronized(self){
         
-        FMResultSet* resultSet = [_database executeQuery:@"SELECT *, groupID IN (SELECT DISTINCT libraryID from collections) AS hasChildren FROM groups"];
+        FMResultSet* resultSet = [_database executeQuery:@"SELECT *, (SELECT count(*) FROM collections WHERE libraryID=groupID AND parentCollectionKey IS NULL) AS numChildren FROM groups ORDER BY LOWER(title)"];
         
         while([resultSet next]) {
             [returnArray addObject:[ZPZoteroLibrary dataObjectWithDictionary:[resultSet resultDict]]];
@@ -500,7 +500,7 @@ static ZPDatabase* _instance = nil;
 - (void) addAttributesToGroupLibrary:(ZPZoteroLibrary*) library{
     @synchronized(self){
         
-        FMResultSet* resultSet = [_database executeQuery:@"SELECT *, groupID IN (SELECT DISTINCT libraryID from collections) AS hasChildren FROM groups WHERE groupID = ?  LIMIT 1",library.libraryID];
+        FMResultSet* resultSet = [_database executeQuery:@"SELECT *, (SELECT count(*) FROM collections WHERE libraryID=groupID AND parentCollectionKey IS NULL) AS numChildren FROM groups WHERE groupID = ?  LIMIT 1",library.libraryID];
         
         if([resultSet next]){
             [library configureWithDictionary:[resultSet resultDict]];
@@ -538,7 +538,7 @@ static ZPDatabase* _instance = nil;
     // Delete collections that no longer exist
 
     @synchronized(self){
-        [_database executeUpdate:[NSString stringWithFormat:@"DELETE FROM collections WHERE key NOT IN () and libraryID = ?",[keys componentsJoinedByString:@", "]],library.libraryID];
+        [_database executeUpdate:[NSString stringWithFormat:@"DELETE FROM collections WHERE collectionKey NOT IN ('%@') and libraryID = ?",[keys componentsJoinedByString:@"', '"]],library.libraryID];
     }
 
     //Because parents come before children from the Zotero server, none of the collections in the in-memory cache will be flagged as having children.
@@ -581,10 +581,10 @@ static ZPDatabase* _instance = nil;
         
         FMResultSet* resultSet;
         if(collectionKey == NULL)
-            resultSet= [_database executeQuery:@"SELECT *, collectionKey IN (SELECT DISTINCT parentCollectionKey FROM collections) AS hasChildren FROM collections WHERE libraryID=? AND parentCollectionKey IS NULL",libraryID];
+            resultSet= [_database executeQuery:@"SELECT *, (SELECT count(*) FROM collections WHERE parentCollectionKey = collectionKey) AS numChildren FROM collections WHERE libraryID=? AND parentCollectionKey IS NULL ORDER BY LOWER(title)",libraryID];
         
         else
-            resultSet= [_database executeQuery:@"SELECT *, collectionKey IN (SELECT DISTINCT parentCollectionKey FROM collections) AS hasChildren FROM collections WHERE libraryID=? AND parentCollectionKey = ?",libraryID,collectionKey];
+            resultSet= [_database executeQuery:@"SELECT *, (SELECT count(*) FROM collections WHERE parentCollectionKey = collectionKey) AS numChildren FROM collections WHERE libraryID=? AND parentCollectionKey = ? ORDER BY LOWER(title)",libraryID,collectionKey];
         
         while([resultSet next]) {
             [returnArray addObject:[ZPZoteroCollection dataObjectWithDictionary:[resultSet resultDict]]];
@@ -820,7 +820,7 @@ Deletes items, notes, and attachments based in array of keys from a library
     NSMutableArray* collections = [[NSMutableArray alloc] init];
     
     @synchronized(self){
-        FMResultSet* resultSet = [_database executeQuery: @"SELECT * FROM collectionItems, collections WHERE itemKey = ? AND collectionItems.collectionKey = collections.collectionKey ORDER BY title",item.key];
+        FMResultSet* resultSet = [_database executeQuery: @"SELECT * FROM collectionItems, collections WHERE itemKey = ? AND collectionItems.collectionKey = collections.collectionKey ORDER BY LOWER(title)",item.key];
         
         while([resultSet next]) {
             [collections addObject:[ZPZoteroCollection dataObjectWithDictionary:[resultSet resultDict]]];

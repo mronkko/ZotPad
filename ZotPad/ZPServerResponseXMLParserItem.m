@@ -124,7 +124,7 @@
         [(ZPZoteroItem*) _currentElement setNumTags:[value intValue]];
     }
     else if([key isEqualToString: @"zapi:numChildren"] && [_currentElement isKindOfClass:[ZPZoteroItem class]]){
-        [(ZPZoteroItem*) _currentElement setNumChildren:[value intValue]];
+        [(ZPZoteroItem*) _currentElement setNumChildren:[NSNumber numberWithInt:[value intValue]]];
     }
     else if([key isEqualToString: @"zapi:year"] && [_currentElement isKindOfClass:[ZPZoteroItem class]]){
         [(ZPZoteroItem*) _currentElement setDate:[value intValue]];

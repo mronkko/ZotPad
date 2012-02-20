@@ -13,10 +13,8 @@
 @synthesize key = _key;
 @synthesize title =  _title;
 @synthesize libraryID =_libraryID;
-@synthesize hasChildren=_hasChildren;
 @synthesize cacheTimestamp = _cacheTimestamp;
 @synthesize serverTimestamp = _serverTimestamp;
-@synthesize numChildren = _numChildren;
 
 /*
  
@@ -50,7 +48,8 @@
         //Make a setter and use it if it exists
         setterString = [[@"set" stringByAppendingString:setterString]stringByAppendingString: @":"];
         if([self respondsToSelector:NSSelectorFromString(setterString)]){
-            [self performSelector:NSSelectorFromString(setterString) withObject:[dictionary objectForKey:key]];
+            NSObject* value=[dictionary objectForKey:key];
+            [self performSelector:NSSelectorFromString(setterString) withObject:value];
         }
     }
 }
@@ -65,6 +64,16 @@
 
 -(BOOL) needsToBeWrittenToCache{
     return ! [_serverTimestamp isEqualToString:_cacheTimestamp];
+}
+-(BOOL) hasChildren{
+    return _numChildren>0;
+}
+
+-(NSNumber*) numChildren{
+    return [NSNumber numberWithInt: _numChildren];
+}
+-(void) setNumChildren:(NSNumber*) numChildren {
+    _numChildren = [numChildren intValue];
 }
 
 @end
