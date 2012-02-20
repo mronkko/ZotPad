@@ -581,10 +581,10 @@ static ZPDatabase* _instance = nil;
         
         FMResultSet* resultSet;
         if(collectionKey == NULL)
-            resultSet= [_database executeQuery:@"SELECT *, (SELECT count(*) FROM collections WHERE parentCollectionKey = collectionKey) AS numChildren FROM collections WHERE libraryID=? AND parentCollectionKey IS NULL ORDER BY LOWER(title)",libraryID];
+            resultSet= [_database executeQuery:@"SELECT *, (SELECT count(*) FROM collections WHERE parentCollectionKey = parent.collectionKey) AS numChildren FROM collections parent WHERE libraryID=? AND parentCollectionKey IS NULL ORDER BY LOWER(title)",libraryID];
         
         else
-            resultSet= [_database executeQuery:@"SELECT *, (SELECT count(*) FROM collections WHERE parentCollectionKey = collectionKey) AS numChildren FROM collections WHERE libraryID=? AND parentCollectionKey = ? ORDER BY LOWER(title)",libraryID,collectionKey];
+            resultSet= [_database executeQuery:@"SELECT *, (SELECT count(*) FROM collections WHERE parentCollectionKey = parent.collectionKey) AS numChildren FROM collections parent WHERE libraryID=? AND parentCollectionKey = ? ORDER BY LOWER(title)",libraryID,collectionKey];
         
         while([resultSet next]) {
             [returnArray addObject:[ZPZoteroCollection dataObjectWithDictionary:[resultSet resultDict]]];
@@ -603,7 +603,7 @@ static ZPDatabase* _instance = nil;
 	@synchronized(self){
         
         FMResultSet* resultSet;
-        resultSet= [_database executeQuery:@"SELECT *, collectionKey IN (SELECT DISTINCT parentCollectionKey FROM collections) AS hasChildren FROM collections WHERE libraryID=?",libraryID];
+        resultSet= [_database executeQuery:@"SELECT *, (SELECT count(*) FROM collections WHERE parentCollectionKey = parent.collectionKey) AS numChildren FROM collections parent WHERE libraryID=?",libraryID];
            
         while([resultSet next]) {
             [returnArray addObject:[ZPZoteroCollection dataObjectWithDictionary:[resultSet resultDict]]];
