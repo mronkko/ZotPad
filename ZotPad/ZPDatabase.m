@@ -1031,6 +1031,7 @@ Deletes items, notes, and attachments based in array of keys from a library
         parameters=newParameters;
     }
     
+    /*
     if(orderField!=NULL){
         if(sortDescending)
             sql=[sql stringByAppendingFormat:@" ORDER BY items.%@ DESC",orderField];
@@ -1040,7 +1041,7 @@ Deletes items, notes, and attachments based in array of keys from a library
     else{
         sql=[sql stringByAppendingFormat:@" ORDER BY items.lastTimestamp DESC"];
     }
-    
+    */
     
     @synchronized(self){
         FMResultSet* resultSet;
