@@ -13,12 +13,13 @@
 @implementation ZPLocalization
 
 static NSCache* localizationCache = NULL;
+static NSString* locale = NULL;
 
 + (void) dropCache{
     [localizationCache removeAllObjects];
 }
 
-+ (NSString*) getLocalizationStringWithKey:(NSString*) key type:(NSString*) type locale:(NSString*) locale{
++ (NSString*) getLocalizationStringWithKey:(NSString*) key type:(NSString*) type{
     
     if(localizationCache == NULL) localizationCache = [[NSCache alloc] init ];
     

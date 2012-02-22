@@ -10,6 +10,78 @@
 #import "ZPDataLayer.h"
 #import <QuartzCore/QuartzCore.h>
 #import "../DSActivityView/Sources/DSActivityView.h"
+#import "ZPLocalization.h"
+
+//A helped class for setting sort buttons
+
+@interface ZPItemListViewController_sortHelper: UITableViewController{
+    UIPopoverController* _popover;
+    UIButton* _targetButton;
+    NSArray* _fieldTitles;
+    NSArray* _fieldValues;
+}
+
+@property (retain) UIPopoverController* popover;
+@property (retain) UIButton* targetButton;
+
+@end
+
+@implementation ZPItemListViewController_sortHelper
+
+@synthesize popover = _popover;
+@synthesize targetButton = _targetButton;
+
+-(id) init{
+    self=[super init];
+    
+    NSMutableArray* fieldTitles = [NSMutableArray array];
+    NSArray* fieldValues = [[ZPDataLayer instance] fieldsThatCanBeUsedForSorting];
+    
+    for(NSString* value in fieldValues){
+        [fieldTitles addObject:[ZPLocalization getLocalizationStringWithKey:value type:@"field"]];
+    }
+    
+    _fieldTitles = [fieldTitles sortedArrayUsingSelector:@selector(localizedCaseInsensitiveCompare:)];
+
+    NSMutableArray* sortedFieldValues = [NSMutableArray array];
+    
+    for(NSString* title in _fieldTitles){
+        [sortedFieldValues addObject:[fieldValues objectAtIndex:[fieldTitles indexOfObjectIdenticalTo:title]]];
+    }
+    
+    _fieldValues = sortedFieldValues;
+    
+    return self;
+}
+
+- (UITableViewCell *)tableView:(UITableView *)tableView cellForRowAtIndexPath:(NSIndexPath *)indexPath{
+    UITableViewCell* cell = [[UITableViewCell alloc] init];
+    cell.textLabel.text = [_fieldTitles objectAtIndex:indexPath.row];
+    return cell;
+}
+
+- (NSInteger)tableView:(UITableView *)tableView numberOfRowsInSection:(NSInteger)section{
+    return [_fieldValues count];
+}
+
+- (void)tableView:(UITableView *)tableView didSelectRowAtIndexPath:(NSIndexPath *)indexPath{
+    
+    NSString* sortField = [_fieldValues objectAtIndex:indexPath.row];
+    //Because this preference is not used anywhere else, it is accessed directly.
+    NSUserDefaults* defaults = [NSUserDefaults standardUserDefaults];
+    [defaults setObject:sortField forKey:[NSString stringWithFormat: @"itemListView_sortButton%i",_targetButton.tag]];
+
+    UILabel* label = (UILabel*)[_targetButton.subviews objectAtIndex:1];
+    
+    [label setText:[ZPLocalization getLocalizationStringWithKey:sortField type:@"field"]];
+    
+    [_popover dismissPopoverAnimated:YES];
+}
+
+@end
+
+
+
 
 @interface ZPItemListViewController ()
 @property (strong, nonatomic) UIPopoverController *masterPopoverController;
@@ -27,6 +99,7 @@
 
 @synthesize tableView = _tableView;
 @synthesize searchBar = _searchBar;
+@synthesize toolBar = _toolBar;
 
 @synthesize itemKeysShown = _itemKeysShown;
 @synthesize itemDetailViewController =  _itemDetailViewController;
@@ -271,10 +344,79 @@
 - (void)viewDidLoad
 {
 
+    //TODO: Read this 
+    // http://stackoverflow.com/questions/2655630/how-can-you-add-a-uigesturerecognizer-to-a-uibarbuttonitem-as-in-the-common-undo
+    // https://developer.apple.com/library/ios/#documentation/WindowsViews/Conceptual/ViewControllerCatalog/Chapters/Popovers.html#//apple_ref/doc/uid/TP40011313-CH5-SW1
     
     [super viewDidLoad];
     
 	// Do any additional setup after loading the view, typically from a nib.
+    
+    //Configure the sort buttons based on preferences
+    
+    NSUserDefaults* defaults = [NSUserDefaults standardUserDefaults];
+
+    UIBarButtonItem* spacer = [[UIBarButtonItem alloc] initWithBarButtonSystemItem:UIBarButtonSystemItemFlexibleSpace target:nil action:nil];  
+    NSMutableArray* toobarItems=[NSMutableArray arrayWithObject:spacer];
+
+    NSInteger buttonCount;
+
+    if ([[UIDevice currentDevice] userInterfaceIdiom] == UIUserInterfaceIdiomPad) buttonCount = 6;
+    else buttonCount = 4;
+    
+    for(NSInteger i = 1; i<=buttonCount; ++i){
+        //Because this preference is not used anywhere else, it is accessed directly.
+        NSString* sortField =  [defaults objectForKey:[NSString stringWithFormat: @"itemListView_sortButton%i",i]];
+        NSString* title;
+        if(sortField != NULL){
+            title = [ZPLocalization getLocalizationStringWithKey:sortField type:@"field"];
+        }
+        else if(i<5){
+            if(i==1) sortField =  @"title";
+            else if(i==2) sortField =  @"creator";
+            else if(i==3) sortField =  @"date";
+            else if(i==4) sortField =  @"dateModified";
+            
+            [defaults setObject:sortField forKey:[NSString stringWithFormat: @"itemListView_sortButton%i",i]];
+            title = [ZPLocalization getLocalizationStringWithKey:sortField type:@"field"];
+
+        }
+        else{
+            title = @"Tap and hold to set";
+        }
+        
+        UIButton* button  = [UIButton buttonWithType:UIButtonTypeCustom];
+        button.frame = CGRectMake(0,0, 101, 30);
+        [button setImage:[UIImage imageNamed:@"barbutton_image_up_state.png"] forState:UIControlStateNormal];
+        [button setImage:[UIImage imageNamed:@"barbutton_image_down_state.png"] forState:UIControlStateHighlighted];
+        
+        UILabel* label = [[UILabel alloc] initWithFrame:CGRectMake(0,0, 90, 30)];
+        
+        label.textAlignment = UITextAlignmentCenter;
+        label.adjustsFontSizeToFitWidth = YES;
+        label.text = title;
+        label.backgroundColor = [UIColor clearColor];
+        label.textColor = [UIColor whiteColor];
+        label.center = button.center;
+        label.font =  [UIFont fontWithName:@"Helvetica-Bold" size:12.0f];
+        
+        [button addSubview:label];
+        
+        [button addTarget:self action:@selector(sortButtonPressed:) forControlEvents:UIControlEventTouchUpInside];
+        button.tag = i;
+        
+        UILongPressGestureRecognizer* longPressRecognizer = [[UILongPressGestureRecognizer alloc] initWithTarget:self action:@selector(sortButtonLongPressed:)];
+        [button addGestureRecognizer:longPressRecognizer]; 
+
+        UIBarButtonItem* barButton = [[UIBarButtonItem alloc] initWithCustomView:button];
+        barButton.tag=i;
+
+        [toobarItems addObject:barButton];
+        [toobarItems addObject:spacer];
+
+
+    }
+    [_toolBar setItems:toobarItems];
     [self configureView];
 }
 
@@ -329,36 +471,56 @@
 
 #pragma mark - Actions
 
--(void) doSortField:(NSString*)value{
-    if([value isEqualToString: _sortField ]){
-        _sortDescending = !_sortDescending;
-    }
-    else{
-        _sortField = value;
-        _sortDescending = FALSE;
-    }
+-(IBAction) sortButtonPressed:(id)sender{
+
+    _tagForActiveSortButton = [(UIView*)sender tag];
     
-    [self configureView];
+    //Because this preference is not used anywhere else, it is accessed directly.
+    NSUserDefaults* defaults = [NSUserDefaults standardUserDefaults];
+    NSString* sortField =  [defaults objectForKey:[NSString stringWithFormat: @"itemListView_sortButton%i",[sender tag]]];
+    if(sortField == NULL){
+        [self sortButtonLongPressed:sender];
+    }
+        
+    else{
+        if([sortField isEqualToString: _sortField ]){
+        _sortDescending = !_sortDescending;
+        }
+        else{
+            _sortField = sortField;
+            _sortDescending = FALSE;
+        }
+        
+        [self configureView];
+    }
+
 }
 
-// How to get sort buttons recognizing long press
-// http://stackoverflow.com/questions/4464649/is-it-possible-to-differentiate-between-a-long-press-and-a-tap-on-a-button
 
--(IBAction)doSortCreator:(id)sender{
-    [self doSortField:@"creator"];
+-(void) sortButtonLongPressed:(UILongPressGestureRecognizer*)sender{
+    
+    if(sender.state == UIGestureRecognizerStateBegan ){
+        _tagForActiveSortButton = [sender view].tag;
+        
+        UIBarButtonItem* button;
+        for(button in _toolBar.items){
+            if(button.tag == _tagForActiveSortButton) break;
+        }
+        
+        ZPItemListViewController_sortHelper* tableViewController = [[ZPItemListViewController_sortHelper alloc] init];
+        UITableView* tableView = [[UITableView alloc] init];
+        
+        tableViewController.tableView = tableView;
+        tableView.delegate =tableViewController;
+        tableView.dataSource = tableViewController;
+        
+        tableViewController.popover = [[UIPopoverController alloc] initWithContentViewController:tableViewController];
+        tableViewController.targetButton = (UIButton*) button.customView;
+        
+        [tableViewController.popover presentPopoverFromBarButtonItem:button permittedArrowDirections: UIPopoverArrowDirectionAny animated:YES];
+    }
 }
 
--(IBAction)doSortDate:(id)sender{
-    [self doSortField:@"date"];
-}
-
--(IBAction)doSortTitle:(id)sender{
-    [self doSortField:@"title"];
-}
-
--(IBAction)doSortPublication:(id)sender{
-    [self doSortField:@"publicationTitle"];
-}
 
 -(void) clearSearch{
     _searchString = NULL;

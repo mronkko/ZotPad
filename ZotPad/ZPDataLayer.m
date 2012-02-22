@@ -111,8 +111,11 @@ static ZPDataLayer* _instance = nil;
     [[ZPCacheController instance] refreshActiveItem:item];
 }
 
+//These are hard coded for now. 
+- (NSArray*) fieldsThatCanBeUsedForSorting{
 
-
+    return [NSArray arrayWithObjects:@"dateAdded", @"dateModified", @"title", @"creator", @"type", @"date", @"publisher", @"publicationTitle", @"journalAbbreviation", @"language", @"accessDate", @"libraryCatalog", @"callNumber", @"rights", @"addedBy", @"numItems", nil];
+}
 
 
 -(void) notifyItemsAvailable:(NSArray*)items{

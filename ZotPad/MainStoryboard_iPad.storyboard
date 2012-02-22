@@ -8,10 +8,14 @@
         <scene sceneID="14">
             <objects>
                 <placeholder placeholderIdentifier="IBFirstResponder" id="13" sceneMemberID="firstResponder"/>
-                <navigationController title="Libraries" id="3" sceneMemberID="viewController">
+                <navigationController title="Libraries" toolbarHidden="NO" id="3" sceneMemberID="viewController">
                     <navigationBar key="navigationBar" clipsSubviews="YES" multipleTouchEnabled="YES" contentMode="scaleToFill" id="6">
                         <autoresizingMask key="autoresizingMask"/>
                     </navigationBar>
+                    <toolbar key="toolbar" opaque="NO" clipsSubviews="YES" multipleTouchEnabled="YES" contentMode="center" id="i32-LC-LoM">
+                        <rect key="frame" x="0.0" y="724" width="320" height="44"/>
+                        <autoresizingMask key="autoresizingMask"/>
+                    </toolbar>
                     <connections>
                         <segue destination="19" kind="relationship" relationship="rootViewController" id="25"/>
                     </connections>
@@ -171,45 +175,7 @@
                             <toolbar opaque="NO" clearsContextBeforeDrawing="NO" contentMode="scaleToFill" id="OEM-9Y-d5F">
                                 <rect key="frame" x="0.0" y="660" width="703" height="44"/>
                                 <autoresizingMask key="autoresizingMask" widthSizable="YES" flexibleMinY="YES"/>
-                                <items>
-                                    <barButtonItem style="plain" systemItem="flexibleSpace" id="OMk-a8-UjJ"/>
-                                    <barButtonItem title="Tap to set sort" id="jT6-gW-USA">
-                                        <connections>
-                                            <action selector="sortButtonPressed:" destination="4" id="sqJ-Ra-Kgi"/>
-                                        </connections>
-                                    </barButtonItem>
-                                    <barButtonItem style="plain" systemItem="flexibleSpace" id="tND-Fm-Z3F"/>
-                                    <barButtonItem title="Tap to set sort" id="Lew-aD-Cbs">
-                                        <connections>
-                                            <action selector="sortButtonPressed:" destination="4" id="dBy-ve-fVe"/>
-                                        </connections>
-                                    </barButtonItem>
-                                    <barButtonItem style="plain" systemItem="flexibleSpace" id="9u6-lA-e4v"/>
-                                    <barButtonItem title="Tap to set sort" id="bhi-Y7-ndK">
-                                        <connections>
-                                            <action selector="sortButtonPressed:" destination="4" id="jQF-EO-16G"/>
-                                        </connections>
-                                    </barButtonItem>
-                                    <barButtonItem style="plain" systemItem="flexibleSpace" id="ozg-M8-PMq"/>
-                                    <barButtonItem title="Tap to set sort" id="dIg-Fc-Pdw">
-                                        <connections>
-                                            <action selector="sortButtonPressed:" destination="4" id="QHu-GW-sa5"/>
-                                        </connections>
-                                    </barButtonItem>
-                                    <barButtonItem style="plain" systemItem="flexibleSpace" id="0VQ-x4-Zln"/>
-                                    <barButtonItem title="Tap to set sort" id="FGQ-rZ-5Eo">
-                                        <connections>
-                                            <action selector="sortButtonPressed:" destination="4" id="pfw-6V-gcW"/>
-                                        </connections>
-                                    </barButtonItem>
-                                    <barButtonItem style="plain" systemItem="flexibleSpace" id="VB9-qP-Rsq"/>
-                                    <barButtonItem title="Tap to set sort" id="4FN-EY-dfc">
-                                        <connections>
-                                            <action selector="sortButtonPressed:" destination="4" id="Gwi-T7-Diy"/>
-                                        </connections>
-                                    </barButtonItem>
-                                    <barButtonItem style="plain" systemItem="flexibleSpace" id="M49-jf-aF2"/>
-                                </items>
+                                <items/>
                             </toolbar>
                         </subviews>
                         <color key="backgroundColor" white="1" alpha="1" colorSpace="custom" customColorSpace="calibratedWhite"/>
@@ -220,6 +186,7 @@
                     <connections>
                         <outlet property="searchBar" destination="5Lp-vc-vaz" id="j30-li-jVf"/>
                         <outlet property="tableView" destination="J8S-Ym-8C6" id="m5W-Om-e7X"/>
+                        <outlet property="toolBar" destination="OEM-9Y-d5F" id="7t5-Bu-4Tk"/>
                         <outlet property="view" destination="26" id="VwB-Lj-80j"/>
                     </connections>
                 </viewController>
@@ -346,7 +313,7 @@
                 <placeholder placeholderIdentifier="IBFirstResponder" id="23" sceneMemberID="firstResponder"/>
                 <tableViewController storyboardIdentifier="" title="Libraries" clearsSelectionOnViewWillAppear="NO" id="19" customClass="ZPLibraryAndCollectionListViewController" sceneMemberID="viewController">
                     <tableView key="view" clipsSubviews="YES" contentMode="scaleToFill" alwaysBounceVertical="YES" dataMode="prototypes" style="plain" rowHeight="44" sectionHeaderHeight="22" sectionFooterHeight="22" id="20">
-                        <rect key="frame" x="0.0" y="64" width="320" height="704"/>
+                        <rect key="frame" x="0.0" y="64" width="320" height="660"/>
                         <autoresizingMask key="autoresizingMask" widthSizable="YES" heightSizable="YES"/>
                         <color key="backgroundColor" white="1" alpha="1" colorSpace="calibratedWhite"/>
                         <simulatedOrientationMetrics key="simulatedOrientationMetrics" orientation="landscapeRight"/>
@@ -381,7 +348,7 @@
                 <placeholder placeholderIdentifier="IBFirstResponder" id="uuF-id-wBA" userLabel="First Responder" sceneMemberID="firstResponder"/>
                 <viewController storyboardIdentifier="NavigationItemListView" id="WCH-zk-FP7" customClass="UITableViewController" sceneMemberID="viewController">
                     <tableView key="view" clipsSubviews="YES" contentMode="scaleToFill" alwaysBounceVertical="YES" dataMode="prototypes" style="plain" rowHeight="44" sectionHeaderHeight="22" sectionFooterHeight="22" id="7zD-LX-EJk">
-                        <rect key="frame" x="0.0" y="64" width="320" height="704"/>
+                        <rect key="frame" x="0.0" y="64" width="320" height="660"/>
                         <autoresizingMask key="autoresizingMask" widthSizable="YES" heightSizable="YES"/>
                         <color key="backgroundColor" white="1" alpha="1" colorSpace="calibratedWhite"/>
                         <simulatedOrientationMetrics key="simulatedOrientationMetrics" orientation="landscapeRight"/>
@@ -532,6 +499,8 @@
             <relationships>
                 <relationship kind="action" name="sortButtonPressed:"/>
                 <relationship kind="outlet" name="searchBar" candidateClass="UISearchBar"/>
+                <relationship kind="outlet" name="tableView" candidateClass="UITableView"/>
+                <relationship kind="outlet" name="toolBar" candidateClass="UIToolbar"/>
             </relationships>
         </class>
         <class className="ZPLibraryAndCollectionListViewController" superclassName="UITableViewController">

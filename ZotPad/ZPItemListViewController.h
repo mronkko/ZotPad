@@ -23,6 +23,9 @@
     NSCache* _cellCache;
     ZPItemDetailViewController* _itemDetailViewController;
     UITableView* _tableView;
+    UIToolbar* _toolBar;
+    NSInteger _tagForActiveSortButton;
+    
 }
 
 - (void)configureView;
@@ -32,6 +35,7 @@
 - (void)makeBusy;
 
 @property (nonatomic, retain) IBOutlet UISearchBar* searchBar;
+@property (nonatomic, retain) IBOutlet UIToolbar* toolBar;
 @property (nonatomic, retain) IBOutlet UITableView* tableView;
 @property (nonatomic, retain) ZPItemDetailViewController* itemDetailViewController;
 

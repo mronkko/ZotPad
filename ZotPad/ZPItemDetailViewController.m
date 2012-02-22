@@ -455,14 +455,14 @@
         }
         if(indexPath.row == 1){
             if(isTitle) return @"Item type";
-            else return [ZPLocalization getLocalizationStringWithKey:_currentItem.itemType  type:@"itemType" locale:NULL];
+            else return [ZPLocalization getLocalizationStringWithKey:_currentItem.itemType  type:@"itemType" ];
         }
         
     }
     //Creators
     else if([indexPath indexAtPosition:0] == 1){
         NSDictionary* creator=[_currentItem.creators objectAtIndex:indexPath.row];
-        if(isTitle) return [ZPLocalization getLocalizationStringWithKey:[creator objectForKey:@"creatorType"] type:@"creatorType" locale:NULL];
+        if(isTitle) return [ZPLocalization getLocalizationStringWithKey:[creator objectForKey:@"creatorType"] type:@"creatorType" ];
         else{
             NSString* lastName = [creator objectForKey:@"lastName"];
             if(lastName==NULL || [lastName isEqualToString:@""]){
@@ -490,7 +490,7 @@
             }
         }
         
-        if(isTitle) return [ZPLocalization getLocalizationStringWithKey:key  type:@"field" locale:NULL];
+        if(isTitle) return [ZPLocalization getLocalizationStringWithKey:key  type:@"field" ];
         else return [_currentItem.fields objectForKey:key];
     }
 }

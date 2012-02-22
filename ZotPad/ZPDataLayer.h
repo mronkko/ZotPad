@@ -44,6 +44,7 @@
 - (NSArray*) getItemKeysFromCacheForLibrary:(NSNumber*)libraryID collection:(NSString*)collectionKey
                         searchString:(NSString*)searchString orderField:(NSString*)orderField sortDescending:(BOOL)sortDescending;
 
+- (NSArray*) fieldsThatCanBeUsedForSorting;
 
 
 //Adds and removes observers

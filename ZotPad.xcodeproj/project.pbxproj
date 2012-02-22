@@ -103,6 +103,8 @@
 		A7CC252F1493E14E00FDEAF4 /* iCarousel.m in Sources */ = {isa = PBXBuildFile; fileRef = A7CC252C1493E14D00FDEAF4 /* iCarousel.m */; settings = {COMPILER_FLAGS = " -fno-objc-arc"; }; };
 		A7D3C08014AEDE7B00DB975D /* QuickLook.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = A7D3C07F14AEDE7B00DB975D /* QuickLook.framework */; };
 		A7D3C08314AEE71000DB975D /* ZPLocalization.m in Sources */ = {isa = PBXBuildFile; fileRef = A7D3C08214AEE70F00DB975D /* ZPLocalization.m */; };
+		A7D6DA5214F4CA3500420FF1 /* barbutton_image_up_state.png in Resources */ = {isa = PBXBuildFile; fileRef = A7D6DA5014F4CA3500420FF1 /* barbutton_image_up_state.png */; };
+		A7D6DA5314F4CA3500420FF1 /* barbutton_image_down_state.png in Resources */ = {isa = PBXBuildFile; fileRef = A7D6DA5114F4CA3500420FF1 /* barbutton_image_down_state.png */; };
 		A7F72BC114B984920059617D /* ZPLogger.m in Sources */ = {isa = PBXBuildFile; fileRef = A7F72BC014B984920059617D /* ZPLogger.m */; };
 		A7F8638014C21D8800021662 /* libz.dylib in Frameworks */ = {isa = PBXBuildFile; fileRef = A7F8637F14C21D8800021662 /* libz.dylib */; };
 /* End PBXBuildFile section */
@@ -429,6 +431,8 @@
 		A7D3C08114AEE70F00DB975D /* ZPLocalization.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = ZPLocalization.h; sourceTree = "<group>"; };
 		A7D3C08214AEE70F00DB975D /* ZPLocalization.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = ZPLocalization.m; sourceTree = "<group>"; };
 		A7D4A1801494B1B700935847 /* ZPItemObserver.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = ZPItemObserver.h; sourceTree = "<group>"; };
+		A7D6DA5014F4CA3500420FF1 /* barbutton_image_up_state.png */ = {isa = PBXFileReference; lastKnownFileType = image.png; path = barbutton_image_up_state.png; sourceTree = "<group>"; };
+		A7D6DA5114F4CA3500420FF1 /* barbutton_image_down_state.png */ = {isa = PBXFileReference; lastKnownFileType = image.png; path = barbutton_image_down_state.png; sourceTree = "<group>"; };
 		A7F72BBF14B984920059617D /* ZPLogger.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = ZPLogger.h; sourceTree = "<group>"; };
 		A7F72BC014B984920059617D /* ZPLogger.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = ZPLogger.m; sourceTree = "<group>"; };
 		A7F8637F14C21D8800021662 /* libz.dylib */ = {isa = PBXFileReference; lastKnownFileType = "compiled.mach-o.dylib"; name = libz.dylib; path = usr/lib/libz.dylib; sourceTree = SDKROOT; };
@@ -650,8 +654,7 @@
 		A7200DDB14718DC0004347C9 /* Supporting Files */ = {
 			isa = PBXGroup;
 			children = (
-				A77B991914E0701800132E9B /* gear20x20.png */,
-				A77B991A14E0701800132E9B /* gear40x40.png */,
+				A7D6DA4F14F4CA0B00420FF1 /* In-App icons */,
 				A7F72BBF14B984920059617D /* ZPLogger.h */,
 				A7F72BC014B984920059617D /* ZPLogger.m */,
 				A78B7F0F149090D2008303BA /* Launch images */,
@@ -861,6 +864,17 @@
 			path = iCarousel/iCarousel;
 			sourceTree = SOURCE_ROOT;
 		};
+		A7D6DA4F14F4CA0B00420FF1 /* In-App icons */ = {
+			isa = PBXGroup;
+			children = (
+				A7D6DA5014F4CA3500420FF1 /* barbutton_image_up_state.png */,
+				A7D6DA5114F4CA3500420FF1 /* barbutton_image_down_state.png */,
+				A77B991914E0701800132E9B /* gear20x20.png */,
+				A77B991A14E0701800132E9B /* gear40x40.png */,
+			);
+			name = "In-App icons";
+			sourceTree = "<group>";
+		};
 /* End PBXGroup section */
 
 /* Begin PBXNativeTarget section */
@@ -1063,6 +1077,8 @@
 				A78B7F1514909285008303BA /* Default-Portrait~ipad.png in Resources */,
 				A77B991B14E0701800132E9B /* gear20x20.png in Resources */,
 				A77B991C14E0701800132E9B /* gear40x40.png in Resources */,
+				A7D6DA5214F4CA3500420FF1 /* barbutton_image_up_state.png in Resources */,
+				A7D6DA5314F4CA3500420FF1 /* barbutton_image_down_state.png in Resources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
