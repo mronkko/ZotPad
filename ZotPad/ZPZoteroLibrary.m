@@ -47,7 +47,15 @@ static NSCache* _objectCache = NULL;
     if(obj==NULL){
         obj= [[ZPZoteroLibrary alloc] init];
         obj->_libraryID=(NSNumber*)libraryID;
-        [[ZPDatabase instance] addAttributesToGroupLibrary:obj];
+
+        if([obj.libraryID intValue]==1){
+            obj.title = @"My Library";
+            [obj setNumChildren:[NSNumber numberWithInt:[[[ZPDatabase instance] collectionsForLibrary:obj.libraryID withParentCollection:NULL] count]]];
+        }
+        else{
+            [[ZPDatabase instance] addAttributesToGroupLibrary:obj];
+        }
+            
         [_objectCache setObject:obj  forKey:libraryID];
     }
     

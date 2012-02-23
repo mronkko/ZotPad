@@ -16,11 +16,8 @@
 #import "ZPCacheController.h"
 #import "ZPLogger.h"
 #import "ZPPreferences.h"
+#import "ZPCacheStatusToolbarController.h"
 
-
-@interface ZPLibraryAndCollectionListViewController();
-//-(void) _refreshLibrariesAndCollections;
-@end
 
 
 @implementation ZPLibraryAndCollectionListViewController
@@ -49,7 +46,8 @@
 - (void)viewDidLoad
 {
     [super viewDidLoad];
-        
+    /*
+
     //TODO: Fix this activity indicator. There should be a reliable way to know when the
     //view is receiving new data and when it has received all data. This is complicated
     //by the fact that each item in the navigation stack is a separate view.
@@ -69,60 +67,55 @@
     else{
         self->_content = [[ZPDataLayer instance] collectionsForLibrary:self->_currentlibraryID withParentCollection:self->_currentCollectionKey];        
     }
+
+    //Show Cache controller status
+    ZPCacheStatusToolbarController* statusController = [[ZPCacheStatusToolbarController alloc] init];
+    NSArray* toolBarItems = [NSArray arrayWithObjects: [[UIBarButtonItem alloc] initWithCustomView:statusController.view], nil];
+    [self setToolbarItems:toolBarItems];
+
     
 	// Do any additional setup after loading the view, typically from a nib.
     self.detailViewController = (ZPItemListViewController *)[[self.splitViewController.viewControllers lastObject] topViewController];
+    */
  
 }
 
+- (void)viewDidUnload
+{
+    [super viewDidUnload];
+    // Release any retained subviews of the main view.
+    // e.g. self.myOutlet = nil;
+}
+
+
+- (void)viewWillAppear:(BOOL)animated
+{
+    [super viewWillAppear:animated];
+}
+
+- (void)viewDidAppear:(BOOL)animated
+{
+    [[ZPDataLayer instance] registerLibraryObserver:self];
+    [super viewDidAppear:animated];
+}
+
+- (void)viewWillDisappear:(BOOL)animated
+{
+    [[ZPDataLayer instance] removeLibraryObserver:self];
+	[super viewWillDisappear:animated];
+}
+
+- (void)viewDidDisappear:(BOOL)animated
+{
+	[super viewDidDisappear:animated];
+}
+
+#pragma mark - 
+#pragma mark Table view data source and delegate methods
 
 - (NSInteger)tableView:(UITableView *)aTableView numberOfRowsInSection:(NSInteger)section {
     // Return the number of rows in the section.
     return [self->_content count];
-}
-
-/*
-// TODO: Not currently used. Figure out logic for retriecing new data from the server for collections. 
-
--(void) _refreshLibrariesAndCollections {
-    if([[ZPPreferences instance] online]){
-        [_activityIndicator startAnimating];
-        [[ZPCacheController instance] updateLibrariesAndCollectionsFromServer];
-    }
-}
-*/
-//TODO: Instead of realoding everything, this method should just add or update the library that it receives
-
--(void) notifyLibraryWithCollectionsAvailable:(ZPZoteroLibrary*) library{
-
-
-    if([NSThread isMainThread]){
-        
-        NSIndexPath* selected = [[self tableView] indexPathForSelectedRow];
-        //If we are showing the libraries view, reload the data
-
-        //If the current library is not defined, show a list of libraries
-        if(self->_currentlibraryID == 0){
-            [ZPZoteroLibrary dropCache]; //TODO: Figure a more elegant solution
-            self->_content = [[ZPDataLayer instance] libraries];
-        }
-        //If a library is chosen, show collections level collections for that library
-        else{
-            [ZPZoteroCollection dropCache]; //TODO: Figure a more elegant solution
-            self->_content = [[ZPDataLayer instance] collectionsForLibrary:self->_currentlibraryID withParentCollection:self->_currentCollectionKey];        
-        }
-        
-        [[self tableView] reloadData];
-        if(selected!=NULL) [[self tableView] selectRowAtIndexPath:selected animated:FALSE scrollPosition:UITableViewScrollPositionNone];
-
-        //TODO: Figure out a way to keep the activity view spinning until the last library is loaded.
-        //[_activityIndicator stopAnimating];
-
-    }
-    else{
-        [self performSelectorOnMainThread:@selector( notifyLibraryWithCollectionsAvailable:) withObject:library waitUntilDone:NO];
-    }
-    
 }
 
 
@@ -165,13 +158,12 @@
      When a row is selected, set the detail view controller's library and collection and refresh
      */
     
-   ZPZoteroDataObject* node = [self->_content objectAtIndex: indexPath.row];
+    ZPZoteroDataObject* node = [self->_content objectAtIndex: indexPath.row];
     self.detailViewController.libraryID = [node libraryID];
     self.detailViewController.collectionKey = [node key];
 
     //Clear search when changing collection. This is how Zotero behaves
     [self.detailViewController clearSearch];
-     
     [self.detailViewController configureView];
     
 }
@@ -192,41 +184,53 @@
 	
 }
 
-- (void)viewDidUnload
-{
-    [super viewDidUnload];
-    // Release any retained subviews of the main view.
-    // e.g. self.myOutlet = nil;
-}
-       
-
-- (void)viewWillAppear:(BOOL)animated
-{
-    [super viewWillAppear:animated];
-}
-
-- (void)viewDidAppear:(BOOL)animated
-{
-    [[ZPDataLayer instance] registerLibraryObserver:self];
-    [super viewDidAppear:animated];
-}
-
-- (void)viewWillDisappear:(BOOL)animated
-{
-    [[ZPDataLayer instance] removeLibraryObserver:self];
-	[super viewWillDisappear:animated];
-}
-
-- (void)viewDidDisappear:(BOOL)animated
-{
-	[super viewDidDisappear:animated];
-}
 
 - (BOOL)shouldAutorotateToInterfaceOrientation:(UIInterfaceOrientation)interfaceOrientation
 {
     
     // Return YES for supported orientations
     return YES;
+}
+
+
+
+#pragma mark - 
+#pragma mark Notified methods
+
+-(void) notifyLibraryWithCollectionsAvailable:(ZPZoteroLibrary*) library{
+    
+    
+    if([NSThread isMainThread]){
+        
+        NSIndexPath* selected = [[self tableView] indexPathForSelectedRow];
+        //If we are showing the libraries view, reload the data
+        
+        //If the current library is not defined, show a list of libraries
+        if(self->_currentlibraryID == 0){
+            [ZPZoteroLibrary dropCache]; //TODO: Figure a more elegant solution
+            self->_content = [[ZPDataLayer instance] libraries];
+        }
+        //If a library is chosen, show collections level collections for that library
+        else{
+            [ZPZoteroCollection dropCache]; //TODO: Figure a more elegant solution
+            self->_content = [[ZPDataLayer instance] collectionsForLibrary:self->_currentlibraryID withParentCollection:self->_currentCollectionKey];        
+        }
+        
+        //TODO: Instead of realoding everything, this method should just add or update the library that it receives
+        
+        UITableView* tableView = [self tableView];
+        [tableView reloadData];
+        
+        if(selected!=NULL) [[self tableView] selectRowAtIndexPath:selected animated:FALSE scrollPosition:UITableViewScrollPositionNone];
+        
+        //TODO: Figure out a way to keep the activity view spinning until the last library is loaded.
+        //[_activityIndicator stopAnimating];
+        
+    }
+    else{
+        [self performSelectorOnMainThread:@selector( notifyLibraryWithCollectionsAvailable:) withObject:library waitUntilDone:NO];
+    }
+    
 }
 
 

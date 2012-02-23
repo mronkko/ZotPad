@@ -14,12 +14,10 @@
 @class ZPItemListViewController;
 
 @interface ZPLibraryAndCollectionListViewController : UITableViewController <ZPLibraryObserver>{
-    ZPDataLayer* _database;
     NSArray* _content;
     NSNumber* _currentlibraryID;
     NSString* _currentCollectionKey;
     UIActivityIndicatorView* _activityIndicator;
-    
 }
 
 @property (strong, nonatomic) ZPItemListViewController *detailViewController;

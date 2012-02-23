@@ -13,26 +13,32 @@
 #import "ZPItemDetailViewController.h"
 
 
-@interface ZPItemListViewController : UIViewController <UISplitViewControllerDelegate, UISearchBarDelegate, UITableViewDelegate, UITableViewDataSource>{
+@interface ZPItemListViewController : UIViewController <UISplitViewControllerDelegate, UISearchBarDelegate, UITableViewDelegate, UITableViewDataSource, ZPItemObserver>{
+
+    NSCache* _cellCache;
+    
+    //This is an array instead of a mutable array because of thread safety
+    NSArray* _itemKeysShown;
+    NSMutableArray* _itemKeysNotInCache;
+    
+    
     NSString* _searchString;
     NSString* _collectionKey;
     NSNumber* _libraryID;
-    NSString* _sortField;
+    NSString* _orderField;
     BOOL _sortDescending;
+    
     DSBezelActivityView* _activityView;
-    NSCache* _cellCache;
     ZPItemDetailViewController* _itemDetailViewController;
     UITableView* _tableView;
     UIToolbar* _toolBar;
     NSInteger _tagForActiveSortButton;
+    UIActivityIndicatorView* _activityIndicator;
+    NSInteger _animations;
+    BOOL _hasContent;
+    BOOL _invalidated;
     
 }
-
-- (void)configureView;
-- (void)notifyDataAvailable;
-- (void)notifyItemAvailable:(NSString*) key;
-- (void)_refreshCellAtIndexPaths:(NSArray*)indexPath;
-- (void)makeBusy;
 
 @property (nonatomic, retain) IBOutlet UISearchBar* searchBar;
 @property (nonatomic, retain) IBOutlet UIToolbar* toolBar;
@@ -43,12 +49,21 @@
 @property (nonatomic, retain) NSString* collectionKey;
 @property (nonatomic, retain) NSNumber* libraryID;
 @property (nonatomic, retain) NSString* searchString;
-@property (nonatomic, retain) NSString* sortField;
-@property BOOL sortDescending;
+@property (nonatomic, retain) NSString* orderField;
+@property (assign) BOOL sortDescending;
+
+- (void)configureView;
+- (void)notifyDataAvailable;
+- (void)clearTable;
+- (void)configureCachedKeys:(NSArray*)array;
+- (void)configureUncachedKeys:(NSArray*)uncachedItems;
+
+- (void)makeBusy;
+- (void)makeAvailable;
 
 -(void) clearSearch;
 
 -(IBAction) sortButtonPressed:(id)sender;
 -(void) sortButtonLongPressed:(id)sender;
-
+-(IBAction) attachmentThumbnailPressed:(id)sender;
 @end

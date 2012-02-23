@@ -562,7 +562,7 @@ static ZPCacheController* _instance = nil;
             if([parent.libraryID isEqualToNumber:_activelibraryID] && _activeCollectionKey == NULL){
                 doCache=true;
             }
-            else if([parent.collections containsObject:[ZPZoteroCollection dataObjectWithKey:_activeCollectionKey] ]){
+            else if(_activeCollectionKey!= NULL && [parent.collections containsObject:[ZPZoteroCollection dataObjectWithKey:_activeCollectionKey] ]){
                 doCache = true;
             }
         }
@@ -812,7 +812,7 @@ static ZPCacheController* _instance = nil;
 - (void) _updateCacheSizeAfterAddingAttachment:(ZPZoteroAttachment*)attachment{
     if(_sizeOfDocumentsFolder!=0){
         
-        _sizeOfDocumentsFolder = _sizeOfDocumentsFolder + attachment.attachmentLength;
+        _sizeOfDocumentsFolder = _sizeOfDocumentsFolder + [attachment.attachmentLength intValue];
 
 //        NSLog(@"Cache size after adding %@ to cache is %i",attachment.fileSystemPath,_sizeOfDocumentsFolder);
 

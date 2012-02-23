@@ -124,6 +124,7 @@ const NSInteger ZPServerConnectionRequestTopLevelKeys = 9;
     
     NSLog(@"Request started: %@ Active queries: %i",urlString,_activeRequestCount);
     
+    //TODO: Fix the network activity indicator. It does not always get activated because it activates and deactivates in the same method call.
     
     //First request starts the network indicator
     if(_activeRequestCount==1) [[UIApplication sharedApplication] setNetworkActivityIndicatorVisible:YES];

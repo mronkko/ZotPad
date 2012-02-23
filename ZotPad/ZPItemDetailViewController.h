@@ -19,7 +19,6 @@
     ZPZoteroItem* _currentItem;
     UITableView* _detailTableView;
     iCarousel* _carousel;
-    ZPQuicklookController* _previewController;
     UIActivityIndicatorView* _activityIndicator;
     NSInteger _detailTitleWidth;
         

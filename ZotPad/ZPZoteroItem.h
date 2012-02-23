@@ -14,9 +14,9 @@
 @interface ZPZoteroItem : ZPZoteroDataObject{
     NSString* _publicationTitle;
     NSString* _creatorSummary;
-    NSInteger _date;
+    NSNumber* _date;
     NSString* _itemType;
-    NSInteger _numTags;
+    NSNumber* _numTags;
     NSString* _fullCitation;
     
     NSArray* _creators;
@@ -33,13 +33,14 @@
 @property (retain) NSString* fullCitation;
 @property (retain) NSString* creatorSummary;
 @property (retain) NSString* publicationTitle;
-@property (assign) NSInteger date;
+@property (retain) NSNumber* date;
 @property (retain) NSString* itemType;
-@property (assign) NSInteger numTags;
+@property (retain) NSNumber* numTags;
 @property (retain) NSArray* notes;
 @property (retain) NSArray* attachments;
 @property (retain) NSArray* creators;
 @property (retain) NSDictionary* fields;
+@property (retain, readonly) NSString* itemKey;
 
 +(void) dropCache;
 -(NSArray*) collections;

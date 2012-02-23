@@ -16,14 +16,14 @@
     NSString* _attachmentURL;
     NSString* _attachmentType;
     NSString* _attachmentTitle;
-    NSInteger _attachmentLength;
+    NSNumber* _attachmentLength;
 }
 
 @property (retain) NSString* parentItemKey;
 @property (retain) NSString* attachmentURL;
 @property (retain) NSString* attachmentType;
 @property (retain) NSString* attachmentTitle;
-@property (assign) NSInteger attachmentLength;
+@property (retain) NSNumber* attachmentLength;
 
 
 // An alias for setParentItemKey

@@ -162,4 +162,8 @@ static NSCache* _objectCache = NULL;
     return _collections;
 }
 
+-(NSString *) itemKey{
+    return [self key];
+}
+
 @end

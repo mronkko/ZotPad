@@ -25,155 +25,70 @@
 }
 - (void) _downloadWithProgressAlert:(ZPZoteroAttachment *)attachment;
 - (void) _downloadAttachment:(ZPZoteroAttachment *)attachment withUIProgressView:(UIProgressView*) progressView progressAlert:(UIAlertView*)progressAlert;
-
+- (void) _displayQuicklook;
 @end
 
 
 
 @implementation ZPQuicklookController
 
-static NSCache* _fileTypeImageCache;
+static ZPQuicklookController* _instance;
 
--(id) initWithItem:(ZPZoteroItem*)item viewController:(UIViewController*) viewController maxHeight:(NSInteger)maxHeight maxWidth:(NSInteger)maxWidth{
-    
-    if(_fileTypeImageCache == NULL){
-        _fileTypeImageCache = [[NSCache alloc] init];
++(ZPQuicklookController*) instance{
+    if(_instance == NULL){
+        _instance = [[ZPQuicklookController alloc] init];
     }
-    
+    return _instance;
+}
+
+-(id) init{
     self = [super init];
-    _item= item;
-    _viewController=viewController;
-    _maxWidth=maxWidth;
-    _maxHeight=maxHeight;
-    
+    _fileURLs = [[NSMutableArray alloc] init];
     return self;
 }
 
--(void) buttonTapped:(id)sender{
+-(void) openItemInQuickLook:(ZPZoteroItem*)item attachmentIndex:(NSInteger)index sourceView:(UIViewController*)view{
     
-/*    
-    //Get the table cell.
-    UITableViewCell* cell = (UITableViewCell* )[[sender superview] superview];
+    ZPZoteroAttachment* attachment = [item.attachments objectAtIndex:index];
+    _source = view;
+    // Mark this file as recently viewed. This will be done also in the case
+    // that the file cannot be downloaded because the fact that user tapped an
+    // item is still relevant information for the cache controller
+ 
     
-    //Get the row of this cell
-    NSInteger row = [[(ZPItemListViewController*) _viewController tableView] indexPathForCell:cell].row;
+    [[ZPDatabase instance] updateViewedTimestamp:attachment];
     
-    ZPZoteroItem* item = [ZPZoteroItem dataObjectWithKey:[[(ZPItemListViewController*) _viewController itemKeysShown] objectAtIndex:row]];
-    
-    _currentAttachment = [item.attachments objectAtIndex:0];
+    if(! attachment.fileExists){
+        if([[ZPPreferences instance] online] && [[ZPServerConnection instance] hasInternetConnection]) [self _downloadWithProgressAlert:attachment];
+    }
+    else {
+        [_fileURLs addObject:attachment.fileSystemPath];
+        [self _displayQuicklook];
+    }
+}
 
-    [self openInQuickLookWithAttachment:_currentAttachment];
-*/
+
+- (void) _displayQuicklook{
+    QLPreviewController *quicklook = [[QLPreviewController alloc] init];
+    [quicklook setDataSource:self];
+    [quicklook setCurrentPreviewItemIndex:[_fileURLs count]-1];
+    [_source presentModalViewController:quicklook animated:YES];
     
 }
+
 
 #pragma mark QuickLook delegate methods
 
 - (NSInteger) numberOfPreviewItemsInPreviewController: (QLPreviewController *) controller 
 {
-    NSLog(@"Number of previews for item %@ is %i",_item.title, [[_item attachments] count] );
-    return [[_item attachments] count];
+    return [_fileURLs count];
 }
 
 
 - (id <QLPreviewItem>) previewController: (QLPreviewController *) controller previewItemAtIndex: (NSInteger) index{
-
-    NSLog(@"Opening preview %i for item %@",index,_item.title );
-
-    NSArray* allExisting = [_item attachments];
-    ZPZoteroAttachment* currentAttachment = [allExisting objectAtIndex:index];
-    NSString* path = [currentAttachment fileSystemPath];
-    return [NSURL fileURLWithPath:path];
+    return [NSURL fileURLWithPath:[_fileURLs objectAtIndex:index]];
 }
 
-
--(void) openInQuickLookWithAttachment:(ZPZoteroAttachment*) attachment{
-
-    // Mark these items as recently viewed. This will be done also in the case
-    // that the file cannot be downloaded because the fact that user tapped an
-    //item is still relevant information for the cache controller
-    
-    _item = [ZPZoteroItem dataObjectWithKey:attachment.parentItemKey];
-    for(ZPZoteroAttachment* attachment in [_item attachments]){
-        [[ZPDatabase instance] updateViewedTimestamp:attachment];
-    }
-
-    if(! attachment.fileExists){
-        if([[ZPPreferences instance] online] && [[ZPServerConnection instance] hasInternetConnection]) [self _downloadWithProgressAlert:attachment];
-    }
-    else {
-        
-        QLPreviewController *quicklook = [[QLPreviewController alloc] init];
-        [quicklook setDataSource:self];
-        NSInteger index = [[_item attachments] indexOfObject:attachment];
-        [quicklook setCurrentPreviewItemIndex:index];
-//        UIViewController* root = [UIApplication sharedApplication].delegate.window.rootViewController;
-//        NSArray* viewControllers = [(UISplitViewController*) root viewControllers];
-        [_viewController presentModalViewController:quicklook animated:YES];
-        
-    }
-}
-
-
--(UIImage*) getFiletypeImage:(ZPZoteroAttachment*)attachment{
-
-    
-    NSString* key = [NSString stringWithFormat:@"%@%ix%i",attachment.attachmentType,_maxHeight,_maxWidth];
-    
-    UIImage* image = [_fileTypeImageCache objectForKey:key];
-    
-    if(image==NULL){
-        NSLog(@"Getting file type image for %@ (%ix%i)",attachment.attachmentType,_maxHeight,_maxWidth);
-        
-        // Source: http://stackoverflow.com/questions/5876895/using-built-in-icons-for-mime-type-or-uti-type-in-ios
-        
-        //Need to initialize this way or the doc controller doesn't work
-        NSURL*fooUrl = [NSURL URLWithString:@"file://foot.dat"];
-        UIDocumentInteractionController* docController = [UIDocumentInteractionController interactionControllerWithURL:fooUrl];
-        
-        //Need to convert from mime type to a UTI to be able to get icons for the document
-        CFStringRef mime = (__bridge CFStringRef) attachment.attachmentType;
-        NSString *uti = (__bridge NSString*) UTTypeCreatePreferredIdentifierForTag(kUTTagClassMIMEType,mime, NULL);
-        
-        //Tell the doc controller what UTI type we want
-        docController.UTI = uti;
-        
-        //Get the largest image that can fit
-        
-        for(UIImage* icon in docController.icons) {
-            
-            if(icon.size.width<_maxWidth && icon.size.height<_maxHeight) image=icon;
-            else{
-                if(image==NULL) image=icon;
-                break;   
-            }
-        }
-
-        NSLog(@"Using image with size ( %f x %f )",image.size.width,image.size.height);
-
-        [_fileTypeImageCache setObject:image forKey:key];
-    }
-
-    return image;
-}
-
-
--(void) configureButton:(UIButton*) button withAttachment:(ZPZoteroAttachment*)attachment{
-
-    
-    UIImage* image = [self getFiletypeImage:attachment];
-    [button setImage:image forState:UIControlStateNormal];
-    [button setNeedsDisplay];
-    
-    if(attachment.fileExists || [[ZPPreferences instance] online]){
-        [button setAlpha:1];
-        [button addTarget:self action:@selector(buttonTapped:) 
-            forControlEvents:UIControlEventTouchUpInside];
-    }
-    else{
-        [button setAlpha:.25];
-    }
-}
 
 
 #pragma mark Item downloading
@@ -182,7 +97,7 @@ static NSCache* _fileTypeImageCache;
     
     UIAlertView* progressAlert;
 
-    progressAlert = [[UIAlertView alloc] initWithTitle: [NSString stringWithFormat:@"Downloading (%i KB)",attachment.attachmentLength/1024]
+    progressAlert = [[UIAlertView alloc] initWithTitle: [NSString stringWithFormat:@"Downloading (%i KB)",[attachment.attachmentLength intValue]/1024]
                                                 message: nil
                                                delegate: self
                                       cancelButtonTitle: nil
@@ -213,7 +128,8 @@ static NSCache* _fileTypeImageCache;
 - (void) _downloadAttachment:(ZPZoteroAttachment *)attachment withUIProgressView:(UIProgressView*) progressView progressAlert:(UIAlertView*)progressAlert{
     [[ZPServerConnection instance] downloadAttachment:attachment withUIProgressView:progressView];
     [progressAlert dismissWithClickedButtonIndex:0 animated:YES];
-    [self performSelectorOnMainThread:@selector(openInQuickLookWithAttachment:) withObject:attachment waitUntilDone:NO];
+    [_fileURLs addObject:attachment.fileSystemPath];
+    [self performSelectorOnMainThread:@selector(_displayQuickLook) withObject:NULL waitUntilDone:NO];
 }
 
 

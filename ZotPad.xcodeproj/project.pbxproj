@@ -103,6 +103,8 @@
 		A7CC252F1493E14E00FDEAF4 /* iCarousel.m in Sources */ = {isa = PBXBuildFile; fileRef = A7CC252C1493E14D00FDEAF4 /* iCarousel.m */; settings = {COMPILER_FLAGS = " -fno-objc-arc"; }; };
 		A7D3C08014AEDE7B00DB975D /* QuickLook.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = A7D3C07F14AEDE7B00DB975D /* QuickLook.framework */; };
 		A7D3C08314AEE71000DB975D /* ZPLocalization.m in Sources */ = {isa = PBXBuildFile; fileRef = A7D3C08214AEE70F00DB975D /* ZPLocalization.m */; };
+		A7D5E2DC14F5690700593A39 /* ZPCacheStatusToolbarController.m in Sources */ = {isa = PBXBuildFile; fileRef = A7D5E2DB14F5690700593A39 /* ZPCacheStatusToolbarController.m */; };
+		A7D5E2DF14F624F600593A39 /* ZPAttachmentThumbnailFactory.m in Sources */ = {isa = PBXBuildFile; fileRef = A7D5E2DE14F624F500593A39 /* ZPAttachmentThumbnailFactory.m */; };
 		A7D6DA5214F4CA3500420FF1 /* barbutton_image_up_state.png in Resources */ = {isa = PBXBuildFile; fileRef = A7D6DA5014F4CA3500420FF1 /* barbutton_image_up_state.png */; };
 		A7D6DA5314F4CA3500420FF1 /* barbutton_image_down_state.png in Resources */ = {isa = PBXBuildFile; fileRef = A7D6DA5114F4CA3500420FF1 /* barbutton_image_down_state.png */; };
 		A7F72BC114B984920059617D /* ZPLogger.m in Sources */ = {isa = PBXBuildFile; fileRef = A7F72BC014B984920059617D /* ZPLogger.m */; };
@@ -431,6 +433,10 @@
 		A7D3C08114AEE70F00DB975D /* ZPLocalization.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = ZPLocalization.h; sourceTree = "<group>"; };
 		A7D3C08214AEE70F00DB975D /* ZPLocalization.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = ZPLocalization.m; sourceTree = "<group>"; };
 		A7D4A1801494B1B700935847 /* ZPItemObserver.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = ZPItemObserver.h; sourceTree = "<group>"; };
+		A7D5E2DA14F5690700593A39 /* ZPCacheStatusToolbarController.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = ZPCacheStatusToolbarController.h; sourceTree = "<group>"; };
+		A7D5E2DB14F5690700593A39 /* ZPCacheStatusToolbarController.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = ZPCacheStatusToolbarController.m; sourceTree = "<group>"; };
+		A7D5E2DD14F624F500593A39 /* ZPAttachmentThumbnailFactory.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = ZPAttachmentThumbnailFactory.h; sourceTree = "<group>"; };
+		A7D5E2DE14F624F500593A39 /* ZPAttachmentThumbnailFactory.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = ZPAttachmentThumbnailFactory.m; sourceTree = "<group>"; };
 		A7D6DA5014F4CA3500420FF1 /* barbutton_image_up_state.png */ = {isa = PBXFileReference; lastKnownFileType = image.png; path = barbutton_image_up_state.png; sourceTree = "<group>"; };
 		A7D6DA5114F4CA3500420FF1 /* barbutton_image_down_state.png */ = {isa = PBXFileReference; lastKnownFileType = image.png; path = barbutton_image_down_state.png; sourceTree = "<group>"; };
 		A7F72BBF14B984920059617D /* ZPLogger.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = ZPLogger.h; sourceTree = "<group>"; };
@@ -675,6 +681,8 @@
 			children = (
 				A7200DE314718DC0004347C9 /* ZPAppDelegate.h */,
 				A7200DE414718DC0004347C9 /* ZPAppDelegate.m */,
+				A7D5E2DA14F5690700593A39 /* ZPCacheStatusToolbarController.h */,
+				A7D5E2DB14F5690700593A39 /* ZPCacheStatusToolbarController.m */,
 				A7200DE914718DC1004347C9 /* ZPLibraryAndCollectionListViewController.h */,
 				A7200DEA14718DC1004347C9 /* ZPLibraryAndCollectionListViewController.m */,
 				A77B98DD14DE5CDB00132E9B /* ZPItemListViewController.h */,
@@ -683,6 +691,8 @@
 				A79ED822148B2683003EE77C /* ZPItemDetailViewController.m */,
 				A793153C14B185E800E1ABF0 /* ZPQuicklookController.h */,
 				A793153D14B185E800E1ABF0 /* ZPQuicklookController.m */,
+				A7D5E2DD14F624F500593A39 /* ZPAttachmentThumbnailFactory.h */,
+				A7D5E2DE14F624F500593A39 /* ZPAttachmentThumbnailFactory.m */,
 				A74348D5147AB37A00DA6FC3 /* ZPAuthenticationDialog.h */,
 				A74348D6147AB37A00DA6FC3 /* ZPAuthenticationDialog.m */,
 				A7D3C08114AEE70F00DB975D /* ZPLocalization.h */,
@@ -1155,6 +1165,8 @@
 				A793153E14B185E800E1ABF0 /* ZPQuicklookController.m in Sources */,
 				A7F72BC114B984920059617D /* ZPLogger.m in Sources */,
 				A77B98DF14DE5CDB00132E9B /* ZPItemListViewController.m in Sources */,
+				A7D5E2DC14F5690700593A39 /* ZPCacheStatusToolbarController.m in Sources */,
+				A7D5E2DF14F624F600593A39 /* ZPAttachmentThumbnailFactory.m in Sources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};

@@ -78,8 +78,8 @@ static ZPDataLayer* _instance = nil;
  */
 
 - (NSArray*) libraries {
-	
-    return [[ZPDatabase instance] groupLibraries];
+    NSArray* ret=[NSArray arrayWithObject:[ZPZoteroLibrary dataObjectWithKey:[NSNumber numberWithInt:1]]];
+    return [ret arrayByAddingObjectsFromArray:[[ZPDatabase instance] groupLibraries]];
 }
 
 
@@ -114,7 +114,8 @@ static ZPDataLayer* _instance = nil;
 //These are hard coded for now. 
 - (NSArray*) fieldsThatCanBeUsedForSorting{
 
-    return [NSArray arrayWithObjects:@"dateAdded", @"dateModified", @"title", @"creator", @"type", @"date", @"publisher", @"publicationTitle", @"journalAbbreviation", @"language", @"accessDate", @"libraryCatalog", @"callNumber", @"rights", @"addedBy", @"numItems", nil];
+    return [NSArray arrayWithObjects: @"dateModified", @"title", @"creator", @"type", @"date", @"publisher", @"publicationTitle", @"journalAbbreviation", @"language", @"accessDate", @"libraryCatalog", @"callNumber", @"rights", nil];
+    //These are available through the API, but not used: @"dateAdded" @"addedBy" @"numItems"
 }
 
 

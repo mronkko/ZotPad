@@ -15,16 +15,11 @@
 #import <QuickLook/QuickLook.h>
 
 @interface ZPQuicklookController : NSObject <QLPreviewControllerDataSource>{
-    ZPZoteroItem* _item;
-    UIViewController* _viewController;
-    NSInteger _maxWidth;
-    NSInteger _maxHeight;
+    NSMutableArray* _fileURLs;
+    UIViewController* _source;
 }
 
--(id) initWithItem:(ZPZoteroItem*)item viewController:(UIViewController*) viewController maxHeight:(NSInteger)maxHeight maxWidth:(NSInteger)maxWidth;
--(void) buttonTapped:(id)sender;
--(void) openInQuickLookWithAttachment:(ZPZoteroAttachment*) attachment;
--(void) configureButton:(UIButton*) button withAttachment:(ZPZoteroAttachment*)attachment;
--(UIImage*) getFiletypeImage:(ZPZoteroAttachment*)attachment;
++(ZPQuicklookController*) instance;
+-(void) openItemInQuickLook:(ZPZoteroItem*)item attachmentIndex:(NSInteger)index sourceView:(UIViewController*)view;
 
 @end

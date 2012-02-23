@@ -14,6 +14,7 @@
 #import "ZPLocalization.h"
 #import "ZPQuicklookController.h"
 #import "ZPLogger.h"
+#import "ZPAttachmentThumbnailFactory.h"
 
 #import "ZPPreferences.h"
 
@@ -122,11 +123,6 @@
 }
 
 -(void) configure{
-    
-    //TODO: This object should probably be recycled.
-    
-    _previewController = [[ZPQuicklookController alloc] initWithItem:_currentItem viewController:self maxHeight:ATTACHMENT_IMAGE_HEIGHT maxWidth:ATTACHMENT_IMAGE_WIDTH];
-
     
     if([[ZPPreferences instance] online]){
         [_activityIndicator startAnimating];
@@ -240,7 +236,7 @@
         extraInfo = [@"Preview not supported for " stringByAppendingString:attachment.attachmentType];
     }
     else if(![attachment fileExists] ){
-        if([[ZPPreferences instance] online]) extraInfo = [NSString stringWithFormat:@"Tap to download %i KB.",attachment.attachmentLength/1024];
+        if([[ZPPreferences instance] online]) extraInfo = [NSString stringWithFormat:@"Tap to download %i KB.",[attachment.attachmentLength intValue]/1024];
         else  extraInfo = @"File has not been downloaded";
     }
     
@@ -303,7 +299,7 @@
     }
     
     if(imageView == NULL){
-        imageView = [[UIImageView alloc] initWithImage:[_previewController getFiletypeImage:attachment]];   
+        imageView = [[UIImageView alloc] initWithImage:[[ZPAttachmentThumbnailFactory instance] getFiletypeImage:attachment height:ATTACHMENT_IMAGE_HEIGHT width:ATTACHMENT_IMAGE_WIDTH]];
     }
 
     [view addSubview:imageView];
@@ -609,11 +605,7 @@
 
 - (void)carousel:(iCarousel *)carousel didSelectItemAtIndex:(NSInteger)index{
     if([carousel currentItemIndex] == index){
-        
-        
-        ZPZoteroAttachment* attachment = [[_currentItem attachments] objectAtIndex:index];
-        
-        [_previewController openInQuickLookWithAttachment:attachment];
+        [[ZPQuicklookController instance] openItemInQuickLook:_currentItem attachmentIndex:index sourceView:self];
     }
 }
 

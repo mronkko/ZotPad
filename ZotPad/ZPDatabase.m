@@ -58,13 +58,17 @@ static ZPDatabase* _instance = nil;
 {
     self = [super init];
     
+    _instance = self;
+
     dbFieldsByTables = [NSMutableDictionary dictionary];
     dbPrimaryKeysByTables = [NSMutableDictionary dictionary];
 
-    _instance = self;
-    
+    //uncomment this to always reset the DB 
+    [self resetDatabase];
+
 	NSString *dbPath = [[NSSearchPathForDirectoriesInDomains(NSDocumentDirectory, NSUserDomainMask, YES) objectAtIndex:0] stringByAppendingPathComponent:@"zotpad.sqlite"];
    
+    
     if(! [[NSFileManager defaultManager] fileExistsAtPath:dbPath]) [self resetDatabase];
     else{
         _database = [FMDatabase databaseWithPath:dbPath];
@@ -251,7 +255,9 @@ static ZPDatabase* _instance = nil;
 
     NSArray* primaryKeyFieldNames = [self dbPrimaryKeyNamesForTable:table];
 
-    if([primaryKeyFieldNames count] > 1 || checkTimestamp) [NSException raise:@"Unsupported" format:@"Checkign timestamp is not supported for writing opbjects with multicolumn primary keys"];
+    if([primaryKeyFieldNames count] > 1 && checkTimestamp){
+        [NSException raise:@"Unsupported" format:@"Checkign timestamp is not supported for writing opbjects with multicolumn primary keys"];
+    }
 
     NSMutableArray* insertObjects = [NSMutableArray array];
     NSMutableArray* updateObjects = [NSMutableArray array];
@@ -269,14 +275,14 @@ static ZPDatabase* _instance = nil;
             //Check if the keys are string
             NSString* selectSQL;
             if(keysAreString){
-                selectSQL= [NSString stringWithFormat:@"SELECT %@, timestamp FROM %@ WHERE %@ IN ('%@')",
+                selectSQL= [NSString stringWithFormat:@"SELECT %@, cacheTimestamp FROM %@ WHERE %@ IN ('%@')",
                                   [primaryKeyFieldNames objectAtIndex:0],
                                   table,
                                   [primaryKeyFieldNames objectAtIndex:0],
                                   [keys componentsJoinedByString:@"', '"]];
             }
             else{
-                selectSQL= [NSString stringWithFormat:@"SELECT %@, timestamp FROM %@ WHERE %@ IN (%@)",
+                selectSQL= [NSString stringWithFormat:@"SELECT %@, cacheTimestamp FROM %@ WHERE %@ IN (%@)",
                             [primaryKeyFieldNames objectAtIndex:0],
                             table,
                             [primaryKeyFieldNames objectAtIndex:0],
@@ -311,7 +317,7 @@ static ZPDatabase* _instance = nil;
 
                 }
                 //Update if timestamps differ
-                else if(! [[[self dbFieldValuesForObject:object fieldsNames:[NSArray arrayWithObject: @"timestamp"]] objectAtIndex:0] isEqualToString: timestamp]){
+                else if(! [[[self dbFieldValuesForObject:object fieldsNames:[NSArray arrayWithObject: @"cacheTimestamp"]] objectAtIndex:0] isEqualToString: timestamp]){
                     [updateObjects addObject:object];
                     [returnArray addObject:object];
                 }
@@ -442,7 +448,8 @@ static ZPDatabase* _instance = nil;
             [returnArray addObject:[(NSDictionary*) object objectForKey:fieldName]];
         }
         else{
-            NSObject* value = [object performSelector:NSSelectorFromString(fieldName)];
+            SEL selector = NSSelectorFromString(fieldName);
+            NSObject* value = [object performSelector:selector];
             if(value!=NULL) [returnArray addObject:value];
             else [returnArray addObject:[NSNull null]];
         }
@@ -467,7 +474,7 @@ static ZPDatabase* _instance = nil;
 
 - (void) setUpdatedTimestampForLibrary:(NSNumber*)libraryID toValue:(NSString*)updatedTimestamp{
     @synchronized(self){
-        [_database executeUpdate:@"UPDATE groups SET lastCompletedCacheTimestamp = ? WHERE groupID = ?",updatedTimestamp,libraryID];
+        [_database executeUpdate:@"UPDATE groups SET cacheTimestamp = ? WHERE groupID = ?",updatedTimestamp,libraryID];
     }
 }
 
@@ -563,7 +570,7 @@ static ZPDatabase* _instance = nil;
 
 - (void) setUpdatedTimestampForCollection:(NSString*)collectionKey toValue:(NSString*)updatedTimestamp{
     @synchronized(self){
-        [_database executeUpdate:@"UPDATE collections SET lastCompletedCacheTimestamp = ? WHERE key = ?",updatedTimestamp,collectionKey];
+        [_database executeUpdate:@"UPDATE collections SET cacheTimestamp = ? WHERE collectionKey = ?",updatedTimestamp,collectionKey];
     }
 }
 
@@ -650,13 +657,13 @@ Deletes items, notes, and attachments based in array of keys from a library
     
     @synchronized(self){
 
-        [_database executeUpdate:[NSString stringWithFormat:@"DELETE FROM items WHERE libraryID = ? AND key NOT IN ('%@')",
+        [_database executeUpdate:[NSString stringWithFormat:@"DELETE FROM items WHERE libraryID = ? AND itemKey NOT IN ('%@')",
                                   [itemKeys componentsJoinedByString:@"', '"]],libraryID];
         
-        [_database executeUpdate:[NSString stringWithFormat:@"DELETE FROM attachments WHERE key NOT IN ('%@') AND parentItemKey IN (SELECT key FROM items WHERE libraryID = ?)",
+        [_database executeUpdate:[NSString stringWithFormat:@"DELETE FROM attachments WHERE itemKey NOT IN ('%@') AND parentItemKey IN (SELECT itemKey FROM items WHERE libraryID = ?)",
                                   [itemKeys componentsJoinedByString:@"', '"]],libraryID];
 
-        [_database executeUpdate:[NSString stringWithFormat:@"DELETE FROM notes WHERE key NOT IN ('%@') AND parentItemKey in (SELECT key FROM items WHERE libraryID = ?)",
+        [_database executeUpdate:[NSString stringWithFormat:@"DELETE FROM notes WHERE itemKey NOT IN ('%@') AND parentItemKey in (SELECT itemKey FROM items WHERE libraryID = ?)",
                                   [itemKeys componentsJoinedByString:@"', '"]],libraryID];
 
 
@@ -715,7 +722,7 @@ Deletes items, notes, and attachments based in array of keys from a library
 - (void) addAttributesToItem:(ZPZoteroItem *)item{
     
     @synchronized(self){
-        FMResultSet* resultSet = [_database executeQuery: @"SELECT * FROM items WHERE key=? LIMIT 1",item.key];
+        FMResultSet* resultSet = [_database executeQuery: @"SELECT * FROM items WHERE itemKey=? LIMIT 1",item.key];
         
         if ([resultSet next]) {
             [item configureWithDictionary:[resultSet resultDict]];
@@ -751,9 +758,10 @@ Deletes items, notes, and attachments based in array of keys from a library
     }
     
     [self writeObjects:creators intoTable:@"creators" checkTimestamp:FALSE];
-    
-    [_database executeUpdate:deleteSQL];
-    
+ 
+    @synchronized(self){
+        [_database executeUpdate:deleteSQL];
+    }
 }
 
 
@@ -779,8 +787,10 @@ Deletes items, notes, and attachments based in array of keys from a library
     }
     
     [self writeObjects:fields intoTable:@"fields" checkTimestamp:FALSE];
-    
-    [_database executeUpdate:deleteSQL];
+
+    @synchronized(self){
+        [_database executeUpdate:deleteSQL];
+    }
 
 }
 
@@ -865,7 +875,7 @@ Deletes items, notes, and attachments based in array of keys from a library
         
         NSMutableArray* returnArray = [NSMutableArray array];
         
-        FMResultSet* resultSet = [_database executeQuery: @"SELECT * FROM attachments WHERE attachmentURL IS NOT NULL ORDER BY CASE WHEN lastViewed IS NULL THEN 0 ELSE 1 end, lastViewed ASC, lastTimestamp ASC"];
+        FMResultSet* resultSet = [_database executeQuery: @"SELECT * FROM attachments WHERE attachmentURL IS NOT NULL ORDER BY CASE WHEN lastViewed IS NULL THEN 0 ELSE 1 end, lastViewed ASC, cacheTimestamp ASC"];
         
         while([resultSet next]){
             ZPZoteroAttachment* attachment = (ZPZoteroAttachment*) [ZPZoteroAttachment dataObjectWithDictionary:[resultSet resultDict]];
@@ -891,10 +901,10 @@ Deletes items, notes, and attachments based in array of keys from a library
         FMResultSet* resultSet;
         
         if(collectionKey==NULL){
-            resultSet= [_database executeQuery: @"SELECT * FROM attachments, items WHERE parentItemKey = items.key AND items.libraryID = ? AND attachmentURL IS NOT NULL ORDER BY attachments.lastTimestamp DESC",libraryID];
+            resultSet= [_database executeQuery: @"SELECT * FROM attachments, items WHERE parentItemKey = items.itemKey AND items.libraryID = ? AND attachmentURL IS NOT NULL ORDER BY attachments.cacheTimestamp DESC",libraryID];
         }
         else{
-            resultSet= [_database executeQuery: @"SELECT * FROM attachments, collectionItems WHERE parentItemKey = itemsKey AND collectionKey = ? AND attachmentURL IS NOT NULL ORDER BY attachments.lastTimestamp DESC",collectionKey];
+            resultSet= [_database executeQuery: @"SELECT * FROM attachments, collectionItems WHERE parentItemKey = itemsKey AND collectionKey = ? AND attachmentURL IS NOT NULL ORDER BY attachments.cacheTimestamp DESC",collectionKey];
         }
         
         while([resultSet next]){
@@ -913,7 +923,7 @@ Deletes items, notes, and attachments based in array of keys from a library
 
 - (void) updateViewedTimestamp:(ZPZoteroAttachment*)attachment{
     @synchronized(self){
-        [_database executeUpdate:@"UPDATE attachments SET lastViewed = datetime('now') where key = ? ",attachment.key];
+        [_database executeUpdate:@"UPDATE attachments SET lastViewed = datetime('now') WHERE itemKey = ? ",attachment.key];
     }
 }
 
@@ -944,7 +954,7 @@ Deletes items, notes, and attachments based in array of keys from a library
     NSMutableArray* keys = [[NSMutableArray alloc] init];
     
     
-    NSString* sql = @"SELECT DISTINCT key, lastTimestamp FROM items UNION SELECT key, lastTimestamp FROM attachments UNION SELECT key, lastTimestamp FROM notes ORDER BY lastTimestamp DESC";
+    NSString* sql = @"SELECT DISTINCT itemKey, cacheTimestamp FROM items UNION SELECT itemKey, cacheTimestamp FROM attachments UNION SELECT itemKey, cacheTimestamp FROM notes ORDER BY cacheTimestamp DESC";
     
     @synchronized(self){
         FMResultSet* resultSet;
@@ -963,7 +973,7 @@ Deletes items, notes, and attachments based in array of keys from a library
     @synchronized(self){
         FMResultSet* resultSet;
         
-        NSString* sql = @"SELECT key FROM items WHERE lastTimestamp <= ? and libraryID = ? ORDER BY lastTimestamp DESC LIMIT 1";
+        NSString* sql = @"SELECT itemKey FROM items WHERE cacheTimestamp <= ? and libraryID = ? ORDER BY cacheTimestamp DESC LIMIT 1";
         
         resultSet = [_database executeQuery: sql, timestamp, libraryID];
         
@@ -987,20 +997,36 @@ Deletes items, notes, and attachments based in array of keys from a library
     NSMutableArray* keys = [[NSMutableArray alloc] init];
     NSMutableArray* parameters = [[NSMutableArray alloc] init];
 
+    
     //Build the SQL query as a string first. 
     
-    NSString* sql = @"SELECT items.key FROM items";
+    NSString* sql = @"SELECT items.itemKey FROM items";
     
     if(collectionKey!=NULL)
         sql=[sql stringByAppendingString:@", collectionItems"];
 
+    //These are available through the API, but are not fields
+    NSArray* specialSortColumns = [NSArray arrayWithObjects: @"dateAdded", @"dateModified", @"creator", @"addedBy", @"numItems",nil ];
+
+    //Sort
+    if(orderField!=NULL){
+        //There is an inconssitency between fields and API
+        if([@"type" isEqualToString:orderField]) orderField = @"fieldType";
+        
+        
+        if([specialSortColumns indexOfObject:orderField]==NSNotFound){
+            sql=[sql stringByAppendingString:@" LEFT JOIN (SELECT itemkey, fieldValue FROM fields WHERE fieldName = ?) fields ON items.itemKey = fields.itemKey"];
+            [parameters addObject:orderField];
+        }
+
+    }
     //Conditions
 
     sql=[sql stringByAppendingString:@" WHERE libraryID = ?"];
     [parameters addObject:libraryID];
     
     if(collectionKey!=NULL){
-        sql=[sql stringByAppendingString:@" AND collectionItems.collectionKey = ? and collectionItems.itemKey = items.key"];
+        sql=[sql stringByAppendingString:@" AND collectionItems.collectionKey = ? and collectionItems.itemKey = items.itemKey"];
         [parameters addObject:collectionKey];
     }
 
@@ -1010,7 +1036,7 @@ Deletes items, notes, and attachments based in array of keys from a library
         //This query is designed to minimize the amount of table scans. 
         NSMutableArray* newParameters = [NSMutableArray arrayWithArray:parameters ];
 
-        NSString* newSql=[sql stringByAppendingString:@" AND items.title LIKE '%' || ? || '%' OR items.key IN (SELECT itemKey FROM fields WHERE fieldValue LIKE '%' || ? || '%' AND itemKey IN ("];
+        NSString* newSql=[sql stringByAppendingString:@" AND items.title LIKE '%' || ? || '%' OR items.itemKey IN (SELECT itemKey FROM fields WHERE fieldValue LIKE '%' || ? || '%' AND itemKey IN ("];
         [newParameters addObject:searchString];
         [newParameters addObject:searchString];
         
@@ -1031,17 +1057,32 @@ Deletes items, notes, and attachments based in array of keys from a library
         parameters=newParameters;
     }
     
-    /*
+    
     if(orderField!=NULL){
+        
+        
+        if([specialSortColumns indexOfObject:orderField]==NSNotFound){
+            sql=[sql stringByAppendingString:@" ORDER BY fieldValue"];
+        }
+        else if([orderField isEqualToString:@"creator"]){
+            sql=[sql stringByAppendingString:@" ORDER BY creator"];
+        }
+        else if([orderField isEqualToString:@"dateModified"]){
+            sql=[sql stringByAppendingString:@" ORDER BY cacheTimestamp"];
+        }
+        else{
+            [NSException raise:@"Not implemented" format:@"Sorting by @% has not been implemented",orderField];
+        }
+
         if(sortDescending)
-            sql=[sql stringByAppendingFormat:@" ORDER BY items.%@ DESC",orderField];
+            sql=[sql stringByAppendingString:@" DESC"];
         else
-            sql=[sql stringByAppendingFormat:@" ORDER BY items.%@ ASC",orderField];
+            sql=[sql stringByAppendingFormat:@" ASC"];
     }
     else{
-        sql=[sql stringByAppendingFormat:@" ORDER BY items.lastTimestamp DESC"];
+        sql=[sql stringByAppendingFormat:@" ORDER BY items.cacheTimestamp DESC"];
     }
-    */
+    
     
     @synchronized(self){
         FMResultSet* resultSet;

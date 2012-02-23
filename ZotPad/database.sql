@@ -40,7 +40,7 @@ CREATE TABLE IF NOT EXISTS items (
     itemType TEXT NOT NULL,
     libraryID INT,
     date INT,
-    creator TEXT,
+    creatorSummary TEXT,
     title TEXT,
     publicationTitle TEXT,
     fullCitation TEXT NOT NULL,

@@ -8,14 +8,10 @@
         <scene sceneID="14">
             <objects>
                 <placeholder placeholderIdentifier="IBFirstResponder" id="13" sceneMemberID="firstResponder"/>
-                <navigationController title="Libraries" toolbarHidden="NO" id="3" sceneMemberID="viewController">
+                <navigationController title="Libraries" id="3" sceneMemberID="viewController">
                     <navigationBar key="navigationBar" clipsSubviews="YES" multipleTouchEnabled="YES" contentMode="scaleToFill" id="6">
                         <autoresizingMask key="autoresizingMask"/>
                     </navigationBar>
-                    <toolbar key="toolbar" opaque="NO" clipsSubviews="YES" multipleTouchEnabled="YES" contentMode="center" id="i32-LC-LoM">
-                        <rect key="frame" x="0.0" y="724" width="320" height="44"/>
-                        <autoresizingMask key="autoresizingMask"/>
-                    </toolbar>
                     <connections>
                         <segue destination="19" kind="relationship" relationship="rootViewController" id="25"/>
                     </connections>
@@ -175,8 +171,37 @@
                             <toolbar opaque="NO" clearsContextBeforeDrawing="NO" contentMode="scaleToFill" id="OEM-9Y-d5F">
                                 <rect key="frame" x="0.0" y="660" width="703" height="44"/>
                                 <autoresizingMask key="autoresizingMask" widthSizable="YES" flexibleMinY="YES"/>
-                                <items/>
+                                <items>
+                                    <barButtonItem title="Author" width="66" id="1Dk-lf-vga">
+                                        <connections>
+                                            <action selector="doSortCreator:" destination="4" id="C3Z-aG-IoP"/>
+                                        </connections>
+                                    </barButtonItem>
+                                    <barButtonItem title="Year" id="nWL-aZ-3id">
+                                        <connections>
+                                            <action selector="doSortDate:" destination="4" id="uFs-CE-oJ4"/>
+                                        </connections>
+                                    </barButtonItem>
+                                    <barButtonItem title="Title" id="F5T-vd-Ge8">
+                                        <connections>
+                                            <action selector="doSortTitle:" destination="4" id="0TE-mM-WJ9"/>
+                                        </connections>
+                                    </barButtonItem>
+                                    <barButtonItem title="Publication" id="NSc-4V-elU">
+                                        <connections>
+                                            <action selector="doSortPublication:" destination="4" id="r3f-LP-RFZ"/>
+                                        </connections>
+                                    </barButtonItem>
+                                </items>
                             </toolbar>
+                            <activityIndicatorView opaque="NO" contentMode="scaleToFill" style="gray" id="F9a-sh-YVw">
+                                <rect key="frame" x="667" y="-35" width="20" height="20"/>
+                                <autoresizingMask key="autoresizingMask" flexibleMaxX="YES" flexibleMaxY="YES"/>
+                            </activityIndicatorView>
+                            <activityIndicatorView opaque="NO" contentMode="scaleToFill" style="gray" id="hop-ZH-T5s">
+                                <rect key="frame" x="663" y="-33" width="20" height="20"/>
+                                <autoresizingMask key="autoresizingMask" flexibleMaxX="YES" flexibleMaxY="YES"/>
+                            </activityIndicatorView>
                         </subviews>
                         <color key="backgroundColor" white="1" alpha="1" colorSpace="custom" customColorSpace="calibratedWhite"/>
                         <simulatedOrientationMetrics key="simulatedOrientationMetrics" orientation="landscapeRight"/>
@@ -186,7 +211,6 @@
                     <connections>
                         <outlet property="searchBar" destination="5Lp-vc-vaz" id="j30-li-jVf"/>
                         <outlet property="tableView" destination="J8S-Ym-8C6" id="m5W-Om-e7X"/>
-                        <outlet property="toolBar" destination="OEM-9Y-d5F" id="7t5-Bu-4Tk"/>
                         <outlet property="view" destination="26" id="VwB-Lj-80j"/>
                     </connections>
                 </viewController>
@@ -313,7 +337,7 @@
                 <placeholder placeholderIdentifier="IBFirstResponder" id="23" sceneMemberID="firstResponder"/>
                 <tableViewController storyboardIdentifier="" title="Libraries" clearsSelectionOnViewWillAppear="NO" id="19" customClass="ZPLibraryAndCollectionListViewController" sceneMemberID="viewController">
                     <tableView key="view" clipsSubviews="YES" contentMode="scaleToFill" alwaysBounceVertical="YES" dataMode="prototypes" style="plain" rowHeight="44" sectionHeaderHeight="22" sectionFooterHeight="22" id="20">
-                        <rect key="frame" x="0.0" y="64" width="320" height="660"/>
+                        <rect key="frame" x="0.0" y="64" width="320" height="704"/>
                         <autoresizingMask key="autoresizingMask" widthSizable="YES" heightSizable="YES"/>
                         <color key="backgroundColor" white="1" alpha="1" colorSpace="calibratedWhite"/>
                         <simulatedOrientationMetrics key="simulatedOrientationMetrics" orientation="landscapeRight"/>
@@ -348,7 +372,7 @@
                 <placeholder placeholderIdentifier="IBFirstResponder" id="uuF-id-wBA" userLabel="First Responder" sceneMemberID="firstResponder"/>
                 <viewController storyboardIdentifier="NavigationItemListView" id="WCH-zk-FP7" customClass="UITableViewController" sceneMemberID="viewController">
                     <tableView key="view" clipsSubviews="YES" contentMode="scaleToFill" alwaysBounceVertical="YES" dataMode="prototypes" style="plain" rowHeight="44" sectionHeaderHeight="22" sectionFooterHeight="22" id="7zD-LX-EJk">
-                        <rect key="frame" x="0.0" y="64" width="320" height="660"/>
+                        <rect key="frame" x="0.0" y="64" width="320" height="704"/>
                         <autoresizingMask key="autoresizingMask" widthSizable="YES" heightSizable="YES"/>
                         <color key="backgroundColor" white="1" alpha="1" colorSpace="calibratedWhite"/>
                         <simulatedOrientationMetrics key="simulatedOrientationMetrics" orientation="landscapeRight"/>
@@ -424,7 +448,7 @@
                                 <rect key="frame" x="0.0" y="0.0" width="768" height="44"/>
                                 <autoresizingMask key="autoresizingMask" widthSizable="YES" flexibleMaxY="YES"/>
                                 <items>
-                                    <navigationItem title="Log in to Zotero" id="ELS-Rt-bzu"/>
+                                    <navigationItem title="Login to Zotero" id="ELS-Rt-bzu"/>
                                 </items>
                             </navigationBar>
                             <webView contentMode="scaleToFill" id="g43-sE-XbP">
@@ -477,43 +501,6 @@
             <point key="canvasLocation" x="-390" y="686"/>
         </scene>
     </scenes>
-    <classes>
-        <class className="TTStyledTextLabel" superclassName="UIView">
-            <source key="sourceIdentifier" type="project" relativePath="./Classes/TTStyledTextLabel.h"/>
-        </class>
-        <class className="ZPAuthenticationDialog" superclassName="UIViewController">
-            <source key="sourceIdentifier" type="project" relativePath="./Classes/ZPAuthenticationDialog.h"/>
-            <relationships>
-                <relationship kind="outlet" name="webView" candidateClass="UIWebView"/>
-            </relationships>
-        </class>
-        <class className="ZPItemDetailViewController" superclassName="UIViewController">
-            <source key="sourceIdentifier" type="project" relativePath="./Classes/ZPItemDetailViewController.h"/>
-            <relationships>
-                <relationship kind="outlet" name="carousel" candidateClass="iCarousel"/>
-                <relationship kind="outlet" name="detailTableView" candidateClass="UITableView"/>
-            </relationships>
-        </class>
-        <class className="ZPItemListViewController" superclassName="UIViewController">
-            <source key="sourceIdentifier" type="project" relativePath="./Classes/ZPItemListViewController.h"/>
-            <relationships>
-                <relationship kind="action" name="sortButtonPressed:"/>
-                <relationship kind="outlet" name="searchBar" candidateClass="UISearchBar"/>
-                <relationship kind="outlet" name="tableView" candidateClass="UITableView"/>
-                <relationship kind="outlet" name="toolBar" candidateClass="UIToolbar"/>
-            </relationships>
-        </class>
-        <class className="ZPLibraryAndCollectionListViewController" superclassName="UITableViewController">
-            <source key="sourceIdentifier" type="project" relativePath="./Classes/ZPLibraryAndCollectionListViewController.h"/>
-        </class>
-        <class className="iCarousel" superclassName="UIView">
-            <source key="sourceIdentifier" type="project" relativePath="./Classes/iCarousel.h"/>
-            <relationships>
-                <relationship kind="outlet" name="dataSource"/>
-                <relationship kind="outlet" name="delegate"/>
-            </relationships>
-        </class>
-    </classes>
     <simulatedMetricsContainer key="defaultSimulatedMetrics">
         <simulatedStatusBarMetrics key="statusBar" statusBarStyle="blackTranslucent"/>
         <simulatedOrientationMetrics key="orientation"/>

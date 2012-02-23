@@ -26,7 +26,7 @@
 {
     [[ZPPreferences instance] checkAndProcessApplicationResetPreferences];
     [[ZPPreferences instance] reload];
-    
+        
     //Set up a background operation for retrieving data
     [[ZPCacheController instance] activate];
     
@@ -35,6 +35,7 @@
         UISplitViewController *splitViewController = (UISplitViewController *)self.window.rootViewController;
         UINavigationController *navigationController = [splitViewController.viewControllers lastObject];
         splitViewController.delegate = (id)navigationController.topViewController;
+        
     }
     
     NSLog(@"Started");

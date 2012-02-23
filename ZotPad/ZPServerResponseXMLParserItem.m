@@ -120,20 +120,8 @@
         //Trim spaces, periods, and commas from the beginning of the publication detail
         [item setPublicationTitle:[item.publicationTitle stringByTrimmingCharactersInSet:[NSCharacterSet characterSetWithCharactersInString:@"., "]]];
     }
-    else if([key isEqualToString: @"zapi:numTags"] && [_currentElement isKindOfClass:[ZPZoteroItem class]]){
-        [(ZPZoteroItem*) _currentElement setNumTags:[value intValue]];
-    }
-    else if([key isEqualToString: @"zapi:numChildren"] && [_currentElement isKindOfClass:[ZPZoteroItem class]]){
-        [(ZPZoteroItem*) _currentElement setNumChildren:[NSNumber numberWithInt:[value intValue]]];
-    }
-    else if([key isEqualToString: @"zapi:year"] && [_currentElement isKindOfClass:[ZPZoteroItem class]]){
-        [(ZPZoteroItem*) _currentElement setDate:[value intValue]];
-    }
     else if([key isEqualToString:@"updated"]){
         [super _setField:@"LastTimestamp" toValue:value];
-    }
-    else if([key isEqualToString:@"AttachmentLength"]&& [_currentElement isKindOfClass:[ZPZoteroAttachment class]]){
-        [(ZPZoteroAttachment*) _currentElement setAttachmentLength:[value intValue]];
     }
     else{
         [super _setField:key toValue:value];
