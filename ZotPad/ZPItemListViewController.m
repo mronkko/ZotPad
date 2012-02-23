@@ -279,9 +279,10 @@
             NSLog(@"UI update events in queue %i",[_uiEventQueue operationCount]);
             
         }
-    }
-    else{
-        [self performSelectorOnMainThread:@selector(configureView) withObject:NULL waitUntilDone:FALSE];
+        else{
+            [self performSelectorOnMainThread:@selector(configureView) withObject:NULL waitUntilDone:FALSE];
+        }
+
     }
 }
 
@@ -735,7 +736,9 @@
         [simpleItemListViewController.tableView setDelegate: self];
         [simpleItemListViewController.tableView setDataSource: self];
         
-        [[[[(ZPAppDelegate*)[[UIApplication sharedApplication] delegate] splitViewController] viewControllers] lastObject] pushViewController:simpleItemListViewController animated:YES];
+        ZPAppDelegate* appDelegate = (ZPAppDelegate*)[[UIApplication sharedApplication] delegate];
+                                      
+        [[[(UISplitViewController*)appDelegate.window.rootViewController viewControllers] lastObject] pushViewController:simpleItemListViewController animated:YES];
 
         
     }
@@ -750,7 +753,9 @@
 
     [super viewDidLoad];
     
-	// Do any additional setup after loading the view, typically from a nib.
+	
+    
+    // Do any additional setup after loading the view, typically from a nib.
     
     //Configure objects
     
@@ -768,7 +773,7 @@
     UIBarButtonItem* barButton = [[UIBarButtonItem alloc] initWithCustomView:_activityIndicator];
     self.navigationItem.rightBarButtonItem = barButton;
     
-    
+
     //Configure the sort buttons based on preferences
     
     NSUserDefaults* defaults = [NSUserDefaults standardUserDefaults];

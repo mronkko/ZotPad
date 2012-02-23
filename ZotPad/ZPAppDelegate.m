@@ -6,9 +6,6 @@
 //  Copyright (c) 2011 __MyCompanyName__. All rights reserved.
 //
 
-
-// TODO: Consider software dimming http://stackoverflow.com/questions/8234981/make-the-iphone-screen-dim
-
 #import "ZPAppDelegate.h"
 #import "ZPCacheController.h"
 #import "ZPPreferences.h"
@@ -19,14 +16,21 @@
 
 
 @synthesize window = _window;
-@synthesize splitViewController =_splitViewController;
 
 
 - (BOOL)application:(UIApplication *)application didFinishLaunchingWithOptions:(NSDictionary *)launchOptions
 {
+    
+    //Manual override for userID and Key. Useful for running the code in debugger with other people's credentials.
+    /*
+    NSUserDefaults* defaults = [NSUserDefaults standardUserDefaults];
+    [defaults setObject:@"" forKey:@"userID"];
+    [defaults setObject:@"" forKey:@"OAuthKey"];
+    */
+    
     [[ZPPreferences instance] checkAndProcessApplicationResetPreferences];
     [[ZPPreferences instance] reload];
-        
+    
     //Set up a background operation for retrieving data
     [[ZPCacheController instance] activate];
     
@@ -35,7 +39,6 @@
         UISplitViewController *splitViewController = (UISplitViewController *)self.window.rootViewController;
         UINavigationController *navigationController = [splitViewController.viewControllers lastObject];
         splitViewController.delegate = (id)navigationController.topViewController;
-        
     }
     
     NSLog(@"Started");

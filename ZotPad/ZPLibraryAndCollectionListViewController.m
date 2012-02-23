@@ -46,7 +46,7 @@
 - (void)viewDidLoad
 {
     [super viewDidLoad];
-    /*
+    
 
     //TODO: Fix this activity indicator. There should be a reliable way to know when the
     //view is receiving new data and when it has received all data. This is complicated
@@ -75,8 +75,7 @@
 
     
 	// Do any additional setup after loading the view, typically from a nib.
-    self.detailViewController = (ZPItemListViewController *)[[self.splitViewController.viewControllers lastObject] topViewController];
-    */
+    
  
 }
 
@@ -96,6 +95,7 @@
 - (void)viewDidAppear:(BOOL)animated
 {
     [[ZPDataLayer instance] registerLibraryObserver:self];
+    self.detailViewController = (ZPItemListViewController *)[[self.splitViewController.viewControllers lastObject] topViewController];
     [super viewDidAppear:animated];
 }
 
