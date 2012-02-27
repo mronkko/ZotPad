@@ -58,7 +58,17 @@
         //PARSE JSON CONTENT
         NSDictionary* data = [value JSONValue];
         
-        [(ZPZoteroItem*) _currentElement setCreators:[data objectForKey:@"creators"]];
+        //The creators do not have a field for authorOrder in the Zotero API, so this needs to be added
+        NSArray* authors = [data objectForKey:@"creators"];
+        NSMutableArray* fixedAuthors= [NSMutableArray arrayWithCapacity:[authors count]];
+        NSInteger counter=0;
+        for(NSDictionary* author in authors){
+            NSMutableDictionary* fixedAuthor = [NSMutableDictionary dictionaryWithDictionary:author];
+            [fixedAuthor setValue:[NSNumber numberWithInt:counter] forKey:@"authorOrder"];
+            [fixedAuthors addObject:fixedAuthor];
+            counter++;
+        }
+        [(ZPZoteroItem*) _currentElement setCreators:fixedAuthors];
         
         //TODO: Tags are include in the JSON, think how they should be processed. (This is for a future version)
         
@@ -121,7 +131,7 @@
         [item setPublicationTitle:[item.publicationTitle stringByTrimmingCharactersInSet:[NSCharacterSet characterSetWithCharactersInString:@"., "]]];
     }
     else if([key isEqualToString:@"updated"]){
-        [super _setField:@"LastTimestamp" toValue:value];
+        [super _setField:@"serverTimestamp" toValue:value];
     }
     else{
         [super _setField:key toValue:value];

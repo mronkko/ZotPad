@@ -166,4 +166,10 @@ static NSCache* _objectCache = NULL;
     return [self key];
 }
 
+-(NSString *) cacheTimestamp{
+    NSString* ts = [super cacheTimestamp];
+    if(ts == NULL) return [super serverTimestamp];
+    else return ts;
+}
+
 @end

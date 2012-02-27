@@ -15,8 +15,6 @@
 
 @interface ZPItemListViewController : UIViewController <UISplitViewControllerDelegate, UISearchBarDelegate, UITableViewDelegate, UITableViewDataSource, ZPItemObserver>{
 
-    NSCache* _cellCache;
-    
     //This is an array instead of a mutable array because of thread safety
     NSArray* _itemKeysShown;
     NSMutableArray* _itemKeysNotInCache;

@@ -68,7 +68,8 @@ static ZPPreferences* _instance = nil;
     _metadataCacheLevel = [defaults integerForKey:@"preemptivecachemetadata"];
     _attachmentsCacheLevel = [defaults integerForKey:@"preemptivecacheattachmentfiles"];
     _mode = [defaults integerForKey:@"mode"];
-    _maxCacheSize = [defaults floatForKey:@"cachesizemax"]*1073741824;
+    float rawmax = [defaults floatForKey:@"cachesizemax"];
+    _maxCacheSize = rawmax*1048576;
     
     NSLog(@"NSUserDefaults dump: %@",[defaults dictionaryRepresentation]);
     

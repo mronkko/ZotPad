@@ -100,7 +100,6 @@
 
 @implementation ZPCacheController
 
-
 static ZPCacheController* _instance = nil;
 
 
@@ -128,8 +127,7 @@ static ZPCacheController* _instance = nil;
     //Register as observer so that we can follow the size of the cache
     [[ZPDataLayer instance] registerAttachmentObserver:self];
     
-    _sizeOfDocumentsFolder = 0;
-    [self performSelectorInBackground:@selector(_scanAndSetSizeOfDocumentsFolder) withObject:NULL];
+    _sizeOfDocumentsFolder = 0;    [self performSelectorInBackground:@selector(_scanAndSetSizeOfDocumentsFolder) withObject:NULL];
 	
     
     return self;
@@ -144,6 +142,16 @@ static ZPCacheController* _instance = nil;
         _instance = [[ZPCacheController alloc] init];
     }
     return _instance;
+}
+
+
+-(void) setStatusView:(ZPCacheStatusToolbarController*) statusView{
+    _statusView = statusView;
+    
+    NSInteger maxCacheSize = [[ZPPreferences instance] maxCacheSize];
+    NSInteger cacheSizePercent = _sizeOfDocumentsFolder*100/ maxCacheSize;
+    [_statusView setCacheUsed:cacheSizePercent];
+
 }
 
 -(void) activate{
@@ -167,9 +175,13 @@ static ZPCacheController* _instance = nil;
 
 -(void) _checkDownloadQueue{
     @synchronized(_filesToDownload){
+
+        [_statusView setFileDownloads:[_filesToDownload count]];
+
         //Only cache up to 95% full
         while([_fileDownloadQueue operationCount] < [_fileDownloadQueue maxConcurrentOperationCount] && [_filesToDownload count] >0 && _sizeOfDocumentsFolder < 0.95*[[ZPPreferences instance] maxCacheSize]){
             ZPZoteroAttachment* attachment = [_filesToDownload objectAtIndex:0];
+            
             [_filesToDownload removeObjectAtIndex:0];
 //            NSLog(@"Queueing download %@ Files in queue %i", attachment.attachmentTitle ,[_filesToDownload count]);
             NSOperation* downloadOperation = [[NSInvocationOperation alloc] initWithTarget:[ZPServerConnection instance] selector:@selector(downloadAttachment:) object:attachment];
@@ -201,10 +213,18 @@ static ZPCacheController* _instance = nil;
             //Choose the queue the active library or choose a first non-empty queue
             
             @synchronized(_itemKeysToRetrieve){
+                
+                NSInteger itemsToDownload=0;
+                for(NSObject* key in _itemKeysToRetrieve){
+                    itemsToDownload += [(NSArray*)[_itemKeysToRetrieve objectForKey:key] count];
+                }
+                [_statusView setItemDownloads:itemsToDownload];
+
+                //Choose a library to retrieve
                 NSMutableArray* keyArray = [_itemKeysToRetrieve objectForKey:_activelibraryID];
                 NSEnumerator* e = [_itemKeysToRetrieve keyEnumerator];
                 NSNumber* libraryID = _activelibraryID;
-                
+            
                 while((keyArray == NULL || [keyArray count]==0) && (libraryID = [e nextObject])) keyArray = [_itemKeysToRetrieve objectForKey:keyArray];
                 
                 //If we found a non-empty que, queue item retrival
@@ -776,16 +796,21 @@ static ZPCacheController* _instance = nil;
     
     
     //Smaller than one gigabyte
-    if(_sizeOfDocumentsFolder < 1073741824){
-        NSInteger temp = _sizeOfDocumentsFolder/1048576;
+    if(_sizeOfDocumentsFolder < 1048576){
+        NSInteger temp = _sizeOfDocumentsFolder/1024;
         [[ZPPreferences instance] setCurrentCacheSize:[NSString stringWithFormat:@"%i MB",temp]];
         
     }
     else{
-        float temp = ((float)_sizeOfDocumentsFolder)/1073741824;
+        float temp = ((float)_sizeOfDocumentsFolder)/1048576;
         [[ZPPreferences instance] setCurrentCacheSize:[NSString stringWithFormat:@"%.1f GB",temp]];
     }
-    
+    //Also update the view if it has been defined
+    if(_statusView !=NULL){
+        NSInteger maxCacheSize = [[ZPPreferences instance] maxCacheSize];
+        NSInteger cacheSizePercent = _sizeOfDocumentsFolder*100/ maxCacheSize;
+        [_statusView setCacheUsed:cacheSizePercent];
+    }
 }
 
 /*
@@ -803,7 +828,7 @@ static ZPCacheController* _instance = nil;
     
     for (NSString* _documentFilePath in directoryContent) {
         NSDictionary *_documentFileAttributes = [[NSFileManager defaultManager] fileAttributesAtPath:[_documentsDirectory stringByAppendingPathComponent:_documentFilePath] traverseLink:YES];
-        _documentsFolderSize += [_documentFileAttributes fileSize];
+        _documentsFolderSize += [_documentFileAttributes fileSize]/1024;
     }
     
     return _documentsFolderSize;
@@ -812,7 +837,7 @@ static ZPCacheController* _instance = nil;
 - (void) _updateCacheSizeAfterAddingAttachment:(ZPZoteroAttachment*)attachment{
     if(_sizeOfDocumentsFolder!=0){
         
-        _sizeOfDocumentsFolder = _sizeOfDocumentsFolder + [attachment.attachmentLength intValue];
+        _sizeOfDocumentsFolder = _sizeOfDocumentsFolder + [attachment.attachmentLength intValue]/1024;
 
 //        NSLog(@"Cache size after adding %@ to cache is %i",attachment.fileSystemPath,_sizeOfDocumentsFolder);
 
@@ -836,7 +861,7 @@ static ZPCacheController* _instance = nil;
 
         if(![paths containsObject:path] && ! [path hasSuffix:@"zotpad.sqlite"] && ! [path hasSuffix:@"zotpad.sqlite-journal"]){
             NSDictionary *_documentFileAttributes = [[NSFileManager defaultManager] fileAttributesAtPath:path traverseLink:YES];
-            _sizeOfDocumentsFolder -= [_documentFileAttributes fileSize];
+            _sizeOfDocumentsFolder -= [_documentFileAttributes fileSize]/1024;
             NSLog(@"Deleting orphaned file %@ cache size now %i",path,_sizeOfDocumentsFolder);
             [[NSFileManager defaultManager] removeItemAtPath:path error: NULL];
         }
@@ -846,7 +871,7 @@ static ZPCacheController* _instance = nil;
     NSString* path;
     for(path in paths){
         NSDictionary *_documentFileAttributes = [[NSFileManager defaultManager] fileAttributesAtPath:path traverseLink:YES];
-        _sizeOfDocumentsFolder -= [_documentFileAttributes fileSize];
+        _sizeOfDocumentsFolder -= [_documentFileAttributes fileSize]/1024;
         [[NSFileManager defaultManager] removeItemAtPath:path error: NULL];
         NSLog(@"Deleting old file to reclaim space %@ cache size now %i",path,_sizeOfDocumentsFolder);
         if (_sizeOfDocumentsFolder<=[[ZPPreferences instance] maxCacheSize]) break;

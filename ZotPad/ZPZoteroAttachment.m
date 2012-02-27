@@ -18,7 +18,7 @@
 @synthesize attachmentType = _attachmentType;
 @synthesize attachmentTitle = _attachmentTitle;
 @synthesize attachmentLength = _attachmentLength;
-
+@synthesize lastViewed;
 
 // An alias for setParentCollectionKey
 - (void) setParentKey:(NSString*)key{
@@ -38,6 +38,8 @@
 }
 
 - (NSString*) fileSystemPath{
+    
+    if(_attachmentTitle == NULL) return NULL;
     
     NSRange lastPeriod = [_attachmentTitle rangeOfString:@"." options:NSBackwardsSearch];
     
@@ -75,7 +77,11 @@
 }
 
 -(BOOL) fileExists{
-    return ([[NSFileManager defaultManager] fileExistsAtPath:[self fileSystemPath]]);
+    NSString* fsPath = [self fileSystemPath];
+    if(fsPath == NULL)
+        return false;
+    else
+        return ([[NSFileManager defaultManager] fileExistsAtPath:fsPath]);
 }
 @end
 

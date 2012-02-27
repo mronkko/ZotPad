@@ -113,8 +113,8 @@
             [[ZPCacheController instance] addToItemQueue:uncachedItems libraryID:_libraryID priority:YES];
             
             if(![_searchString isEqualToString:@""]){
-                if(_collectionKey!=NULL && ! [_searchString isEqualToString:@""]) [[ZPCacheController instance] addToCollectionsQueue:[ZPZoteroCollection dataObjectWithKey:_collectionKey]  priority:YES];
-                else [[ZPCacheController instance] addToLibrariesQueue:[ZPZoteroLibrary dataObjectWithKey: _libraryID] priority:YES];
+                if(_collectionKey!=NULL && ! [_searchString isEqualToString:@""]) [[ZPCacheController instance] addToCollectionsQueue:(ZPZoteroCollection*)[ZPZoteroCollection dataObjectWithKey:_collectionKey]  priority:YES];
+                else [[ZPCacheController instance] addToLibrariesQueue:(ZPZoteroLibrary*)[ZPZoteroLibrary dataObjectWithKey: _libraryID] priority:YES];
             }
         }
         
@@ -242,8 +242,6 @@
 {
     [super didReceiveMemoryWarning];
     // Release any cached data, images, etc that aren't in use.
-    
-    [_cellCache removeAllObjects];
 }
 
 #pragma mark - Methods for configuring the view
@@ -522,7 +520,6 @@
     //    [_tableView endUpdates];
 }
 -(void) _updateRowForItem:(ZPZoteroItem*)item{
-    [_cellCache removeObjectForKey:item.key];
     NSIndexPath* indexPath = [NSIndexPath indexPathForRow:[_itemKeysShown indexOfObject:item.key] inSection:0];
     //Do not reload cell if it is selected
     if(! [[_tableView indexPathForSelectedRow] isEqual:indexPath]) [_tableView reloadRowsAtIndexPaths:[NSArray arrayWithObject:indexPath] withRowAnimation:_animations];
@@ -593,24 +590,36 @@
 
 - (NSInteger)tableView:(UITableView *)aTableView numberOfRowsInSection:(NSInteger)section {
     // Return the number of rows in the section. Initially there is no library selected, so we will just return an empty view
-    if(_itemKeysShown==nil){
-        return 1;
+    NSInteger count=1;
+    if(_itemKeysShown!=nil){
+        count= MAX(1,[_itemKeysShown count]);
     }
-    else{
-        return MAX(1,[_itemKeysShown count]);
-    }
+    NSLog(@"Item table has now %i rows",count);
+    return count;
 }
 
 
 - (UITableViewCell *)tableView:(UITableView *)aTableView cellForRowAtIndexPath:(NSIndexPath *)indexPath {
+    
+    NSLog(@"Getting cell for row %i",indexPath.row);
 
    
     //If the data has become invalid, return a cell 
 
     if(indexPath.row>=[_itemKeysShown count]){
-        if(_libraryID==0) return [aTableView dequeueReusableCellWithIdentifier:@"ChooseLibraryCell"];
-        else if(_invalidated) return [aTableView dequeueReusableCellWithIdentifier:@"BlankCell"];
-        else return [aTableView dequeueReusableCellWithIdentifier:@"NoItemsCell"];
+        NSString* identifier;
+        if(_libraryID==0){
+            identifier = @"ChooseLibraryCell";   
+        }
+        else if(_invalidated){
+            identifier = @"BlankCell";
+        }
+        else{
+            identifier=@"NoItemsCell";
+        }
+        NSLog(@"Cell identifier is %@",identifier);
+        
+        return [aTableView dequeueReusableCellWithIdentifier:identifier];
     }
     NSObject* keyObj = [_itemKeysShown objectAtIndex: indexPath.row];
 
@@ -624,20 +633,21 @@
         key= (NSString*) keyObj;
     }    
     
-	UITableViewCell* cell = [self->_cellCache objectForKey:key];
+	UITableViewCell* cell;
     
-    if(cell==nil){
         
         //TODO: Set author and year to empty if not defined. 
         ZPZoteroItem* item=NULL;
         if(![key isEqualToString:@""]) item = (ZPZoteroItem*) [ZPZoteroItem dataObjectWithKey:key];
         
         if(item==NULL){
-            cell = [aTableView dequeueReusableCellWithIdentifier:@"LoadingCell"];        
+            cell = [aTableView dequeueReusableCellWithIdentifier:@"LoadingCell"]; 
+            NSLog(@"Cell identifier is LoadingCell");
         }
         else{
 
             cell = [aTableView dequeueReusableCellWithIdentifier:@"ZoteroItemCell"];
+            NSLog(@"Cell identifier is ZoteroItemCell");
             
             UILabel *titleLabel = (UILabel *)[cell viewWithTag:1];
             titleLabel.text = item.title;
@@ -709,8 +719,6 @@
                 [articleThumbnail setHidden:TRUE];
             }
             
-        }
-        [_cellCache setObject:cell forKey:key];
     }
     return cell;
 }
@@ -759,7 +767,7 @@
     
     //Configure objects
     
-    _cellCache = [[NSCache alloc] init];
+
     _animations = UITableViewRowAnimationNone;
     _uiEventQueue =[[NSOperationQueue alloc] init];
     [_uiEventQueue setMaxConcurrentOperationCount:3];

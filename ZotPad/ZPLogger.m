@@ -25,7 +25,7 @@ void ZPLog(NSObject* source,int line,NSString* format, ...){
         debugClasses = [NSMutableArray array ];
         
 //        [debugClasses addObject:@"ZPServerConnection"];
-//        [debugClasses addObject:@"ZPItemListViewController"];
+        [debugClasses addObject:@"ZPItemListViewController"];
 //        [debugClasses addObject:@"ZPServerResponseXMLParser"];
 //        [debugClasses addObject:@"ZPPreferences"];
 //        [debugClasses addObject:@"ZPCacheController"];

@@ -10,6 +10,7 @@
 #import "ZPLibraryObserver.h"
 #import "ZPAttachmentObserver.h"
 #import "ZPZoteroCollection.h"
+#import "ZPCacheStatusToolbarController.h"
 
 @interface ZPCacheController : NSObject <ZPLibraryObserver, ZPAttachmentObserver>{
     
@@ -28,9 +29,11 @@
 
     
     unsigned long long int _sizeOfDocumentsFolder;
+    
+    ZPCacheStatusToolbarController* _statusView;
 
 }
-
+-(void) setStatusView:(ZPCacheStatusToolbarController*) statusView;
 
 +(ZPCacheController*) instance;
 

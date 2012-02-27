@@ -92,12 +92,12 @@ CREATE TABLE IF NOT EXISTS collectionItems (
 
 CREATE TABLE  IF NOT EXISTS creators (
     itemKey TEXT NOT NULL,
-    "order" INT NOT NULL,
+    authorOrder INT NOT NULL,
     firstName TEXT,
     lastName TEXT,
     shortName TEXT,
     creatorType TEXT NOT NULL,
-    PRIMARY KEY (itemKey, "order")
+    PRIMARY KEY (itemKey, authorOrder)
 );
 
 CREATE TABLE  IF NOT EXISTS  fields (

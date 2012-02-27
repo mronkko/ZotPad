@@ -63,11 +63,10 @@ static ZPDatabase* _instance = nil;
     dbFieldsByTables = [NSMutableDictionary dictionary];
     dbPrimaryKeysByTables = [NSMutableDictionary dictionary];
 
-    //uncomment this to always reset the DB 
-    [self resetDatabase];
-
 	NSString *dbPath = [[NSSearchPathForDirectoriesInDomains(NSDocumentDirectory, NSUserDomainMask, YES) objectAtIndex:0] stringByAppendingPathComponent:@"zotpad.sqlite"];
    
+    // Uncomment to always reset database
+    [self resetDatabase];
     
     if(! [[NSFileManager defaultManager] fileExistsAtPath:dbPath]) [self resetDatabase];
     else{
@@ -142,7 +141,9 @@ static ZPDatabase* _instance = nil;
         
         while (sqlString = [e nextObject]) {
             if(! [[sqlString stringByTrimmingCharactersInSet:
-                   [NSCharacterSet whitespaceAndNewlineCharacterSet]] isEqualToString:@""]) [_database executeUpdate:sqlString];
+                   [NSCharacterSet whitespaceAndNewlineCharacterSet]] isEqualToString:@""]){
+                if(![_database executeUpdate:sqlString]) [NSException raise:@"Database error" format:@"Error executing query %@",sqlString];
+            }
         }
         
         
@@ -205,7 +206,7 @@ static ZPDatabase* _instance = nil;
             
             
         @synchronized(self){
-            [_database executeUpdate:insertSQL withArgumentsInArray:insertArguments]; 
+            if(![_database executeUpdate:insertSQL withArgumentsInArray:insertArguments]) [NSException raise:@"Database error" format:@"Error executing query %@ with arguments %@",insertSQL,insertArguments];
 
         }
     }
@@ -237,7 +238,10 @@ static ZPDatabase* _instance = nil;
         
         for (NSObject* object in objects){
             @synchronized(self){
-                [_database executeUpdate:updateSQL withArgumentsInArray:[self dbFieldValuesForObject:object fieldsNames:allFields]]; 
+                NSArray* args = [self dbFieldValuesForObject:object fieldsNames:allFields];
+                if(![_database executeUpdate:updateSQL withArgumentsInArray:args])
+                    [NSException raise:@"Database error" format:@"Error executing query %@ with arguments %@",updateSQL,args];
+ 
             }
         }
     }
@@ -445,7 +449,9 @@ static ZPDatabase* _instance = nil;
 
     for(NSString* fieldName in fieldNames){
         if([object isKindOfClass:[NSDictionary class]]){
-            [returnArray addObject:[(NSDictionary*) object objectForKey:fieldName]];
+            NSObject* value = [(NSDictionary*) object objectForKey:fieldName];
+            if(value!=NULL) [returnArray addObject:value];
+            else [returnArray addObject:[NSNull null]];
         }
         else{
             SEL selector = NSSelectorFromString(fieldName);
@@ -750,17 +756,17 @@ Deletes items, notes, and attachments based in array of keys from a library
             [creators addObject:creator];
         }
         if(deleteSQL == NULL){
-            deleteSQL = [NSMutableString stringWithFormat:@"DELETE FROM creators WHERE (itemKey = '%@' AND order >= %i)",item.key,[creators count]];
+            deleteSQL = [NSMutableString stringWithFormat:@"DELETE FROM creators WHERE (itemKey = '%@' AND authorOrder >= %i)",item.key,[item.creators count]];
         }
         else{
-            [deleteSQL appendFormat:@" OR (itemKey = '%@' AND order >= %i)",item.key,[creators count]];
+            [deleteSQL appendFormat:@" OR (itemKey = '%@' AND authorOrder >= %i)",item.key,[item.creators count]];
         }
     }
     
     [self writeObjects:creators intoTable:@"creators" checkTimestamp:FALSE];
  
     @synchronized(self){
-        [_database executeUpdate:deleteSQL];
+        if(![_database executeUpdate:deleteSQL]) [NSException raise:@"Database error" format:@"Error executing query %@",deleteSQL];
     }
 }
 

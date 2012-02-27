@@ -7,6 +7,7 @@
 //
 
 #import "ZPCacheStatusToolbarController.h"
+#import "ZPCacheController.h"
 
 @implementation ZPCacheStatusToolbarController
 
@@ -17,11 +18,11 @@
     
     self=[super init];
 
-    NSInteger titleWidth=80;
+    NSInteger titleWidth=95;
     NSInteger valueWidth=40;
     NSInteger height=11;
     
-    NSArray* titles = [NSArray arrayWithObjects:@"File downloads:",@"File uploads:",@"Item downloads:", nil];
+    NSArray* titles = [NSArray arrayWithObjects:@"File downloads:",@"File uploads:",@"Item downloads:",@"Cache space used:", nil];
     
     _view = [[UIView alloc] initWithFrame:CGRectMake(0,0, titleWidth*2+valueWidth*2, height*2)];
     
@@ -52,11 +53,15 @@
         else if(row==1 && col==2){
             _itemDownloads = label;
         }
+        else if(row==2 && col==2){
+            _cacheUsed = label;
+        }
+
         row=row%2+1;
         if(row==1) col=col+1;
 
     }
-    
+    [[ZPCacheController instance] setStatusView:self];
     
     return self;
 
@@ -71,6 +76,9 @@
 }
 -(void) setItemDownloads:(NSInteger) value{
     [_itemDownloads performSelectorOnMainThread:@selector(setText:) withObject:[NSString stringWithFormat:@"%i",value] waitUntilDone:NO];
+}
+-(void) setCacheUsed:(NSInteger) value{
+    [_cacheUsed performSelectorOnMainThread:@selector(setText:) withObject:[NSString stringWithFormat:@"%i%%",value] waitUntilDone:NO];
 }
 
 @end

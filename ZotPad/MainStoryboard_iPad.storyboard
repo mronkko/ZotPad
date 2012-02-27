@@ -13,7 +13,7 @@
                         <autoresizingMask key="autoresizingMask"/>
                     </navigationBar>
                     <toolbar key="toolbar" opaque="NO" clipsSubviews="YES" multipleTouchEnabled="YES" contentMode="center" id="sye-hT-4WU">
-                        <rect key="frame" x="0.0" y="960" width="768" height="44"/>
+                        <rect key="frame" x="0.0" y="724" width="320" height="44"/>
                         <autoresizingMask key="autoresizingMask"/>
                     </toolbar>
                     <connections>
@@ -175,37 +175,8 @@
                             <toolbar opaque="NO" clearsContextBeforeDrawing="NO" contentMode="scaleToFill" id="OEM-9Y-d5F">
                                 <rect key="frame" x="0.0" y="660" width="703" height="44"/>
                                 <autoresizingMask key="autoresizingMask" widthSizable="YES" flexibleMinY="YES"/>
-                                <items>
-                                    <barButtonItem title="Author" width="66" id="1Dk-lf-vga">
-                                        <connections>
-                                            <action selector="doSortCreator:" destination="4" id="C3Z-aG-IoP"/>
-                                        </connections>
-                                    </barButtonItem>
-                                    <barButtonItem title="Year" id="nWL-aZ-3id">
-                                        <connections>
-                                            <action selector="doSortDate:" destination="4" id="uFs-CE-oJ4"/>
-                                        </connections>
-                                    </barButtonItem>
-                                    <barButtonItem title="Title" id="F5T-vd-Ge8">
-                                        <connections>
-                                            <action selector="doSortTitle:" destination="4" id="0TE-mM-WJ9"/>
-                                        </connections>
-                                    </barButtonItem>
-                                    <barButtonItem title="Publication" id="NSc-4V-elU">
-                                        <connections>
-                                            <action selector="doSortPublication:" destination="4" id="r3f-LP-RFZ"/>
-                                        </connections>
-                                    </barButtonItem>
-                                </items>
+                                <items/>
                             </toolbar>
-                            <activityIndicatorView opaque="NO" contentMode="scaleToFill" style="gray" id="F9a-sh-YVw">
-                                <rect key="frame" x="667" y="-35" width="20" height="20"/>
-                                <autoresizingMask key="autoresizingMask" flexibleMaxX="YES" flexibleMaxY="YES"/>
-                            </activityIndicatorView>
-                            <activityIndicatorView opaque="NO" contentMode="scaleToFill" style="gray" id="hop-ZH-T5s">
-                                <rect key="frame" x="663" y="-33" width="20" height="20"/>
-                                <autoresizingMask key="autoresizingMask" flexibleMaxX="YES" flexibleMaxY="YES"/>
-                            </activityIndicatorView>
                         </subviews>
                         <color key="backgroundColor" white="1" alpha="1" colorSpace="custom" customColorSpace="calibratedWhite"/>
                         <simulatedOrientationMetrics key="simulatedOrientationMetrics" orientation="landscapeRight"/>

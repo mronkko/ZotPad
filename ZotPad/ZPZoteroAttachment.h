@@ -24,7 +24,7 @@
 @property (retain) NSString* attachmentType;
 @property (retain) NSString* attachmentTitle;
 @property (retain) NSNumber* attachmentLength;
-
+@property (retain) NSString* lastViewed;
 
 // An alias for setParentItemKey
 - (void) setParentKey:(NSString*)key;
