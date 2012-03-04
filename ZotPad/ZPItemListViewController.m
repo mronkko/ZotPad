@@ -175,6 +175,13 @@
     
     _fieldValues = sortedFieldValues;
     
+    
+    self.tableView = [[UITableView alloc] init];
+    self.tableView.delegate =self;
+    self.tableView.dataSource =self;
+    
+    _popover = [[UIPopoverController alloc] initWithContentViewController:self];
+
     return self;
 }
 
@@ -209,6 +216,7 @@
 
 @interface ZPItemListViewController (){
     NSOperationQueue* _uiEventQueue;
+    ZPItemListViewController_sortHelper* _sortHelper;
 }
 
 @property (strong, nonatomic) UIPopoverController *masterPopoverController;
@@ -217,6 +225,7 @@
 -(void) _performRowInsertions:(NSArray*)insertIndexPaths reloads:(NSArray*)reloadIndexPaths tableLength:(NSNumber*)tableLength;
 -(void) _performTableUpdates:(BOOL)animated;
 -(void) _refreshCellAtIndexPaths:(NSArray*)indexPath;
+-(void) _configureSortButton:(UIButton*)button;
 
 @end
 
@@ -916,13 +925,16 @@
 
 -(IBAction) sortButtonPressed:(id)sender{
 
+    
+    if(_sortHelper!=NULL && [_sortHelper.popover isPopoverVisible]) [_sortHelper.popover dismissPopoverAnimated:YES];
+
     _tagForActiveSortButton = [(UIView*)sender tag];
     
     //Because this preference is not used anywhere else, it is accessed directly.
     NSUserDefaults* defaults = [NSUserDefaults standardUserDefaults];
     NSString* orderField =  [defaults objectForKey:[NSString stringWithFormat: @"itemListView_sortButton%i",[sender tag]]];
     if(orderField == NULL){
-        [self sortButtonLongPressed:sender];
+        [self _configureSortButton:sender];
     }
         
     else{
@@ -943,25 +955,28 @@
 -(void) sortButtonLongPressed:(UILongPressGestureRecognizer*)sender{
     
     if(sender.state == UIGestureRecognizerStateBegan ){
-        _tagForActiveSortButton = [sender view].tag;
-        
-        UIBarButtonItem* button;
-        for(button in _toolBar.items){
-            if(button.tag == _tagForActiveSortButton) break;
-        }
-        
-        ZPItemListViewController_sortHelper* tableViewController = [[ZPItemListViewController_sortHelper alloc] init];
-        UITableView* tableView = [[UITableView alloc] init];
-        
-        tableViewController.tableView = tableView;
-        tableView.delegate =tableViewController;
-        tableView.dataSource = tableViewController;
-        
-        tableViewController.popover = [[UIPopoverController alloc] initWithContentViewController:tableViewController];
-        tableViewController.targetButton = (UIButton*) button.customView;
-        
-        [tableViewController.popover presentPopoverFromBarButtonItem:button permittedArrowDirections: UIPopoverArrowDirectionAny animated:YES];
+        [self _configureSortButton:(UIButton*)[sender view]];
     }
+}
+
+
+-(void) _configureSortButton:(UIButton*)sender{
+    
+    _tagForActiveSortButton = sender.tag;
+    
+    UIBarButtonItem* button;
+    for(button in _toolBar.items){
+        if(button.tag == _tagForActiveSortButton) break;
+    }
+    
+    if(_sortHelper == NULL){
+        _sortHelper = [[ZPItemListViewController_sortHelper alloc] init];        
+    }
+    
+    if([_sortHelper.popover isPopoverVisible]) [_sortHelper.popover dismissPopoverAnimated:YES];
+        
+    _sortHelper.targetButton = (UIButton*) button.customView;
+    [_sortHelper.popover presentPopoverFromBarButtonItem:button permittedArrowDirections: UIPopoverArrowDirectionAny animated:YES];
 }
 
 -(IBAction) attachmentThumbnailPressed:(id)sender{
