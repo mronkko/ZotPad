@@ -650,20 +650,20 @@
             
             //Show different things depending on what data we have
             if(item.creatorSummary!=NULL){
-                if(item.date!= 0){
-                    authorsLabel.text = [NSString stringWithFormat:@"%@ (%i)",item.creatorSummary,item.date];
+                if(item.year!= 0){
+                    authorsLabel.text = [NSString stringWithFormat:@"%@ (%i)",item.creatorSummary,item.year];
                 }
                 else{
                     authorsLabel.text = [NSString stringWithFormat:@"%@ (No date)",item.creatorSummary];
                 }
             }    
-            else if(item.date!= 0){
-                authorsLabel.text = [NSString stringWithFormat:@"No author (%i)",item.date];
+            else if(item.year!= 0){
+                authorsLabel.text = [NSString stringWithFormat:@"No author (%i)",item.year];
             }
 
             //Publication as a formatted label
 
-            NSString* publishedIn = item.publicationTitle;
+            NSString* publishedIn = item.publicationDetails;
             
             if(publishedIn == NULL){
                 publishedIn=@"";   

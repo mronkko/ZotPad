@@ -12,10 +12,6 @@
 
 
 @interface ZPZoteroItem : ZPZoteroDataObject{
-    NSString* _publicationTitle;
-    NSString* _creatorSummary;
-    NSNumber* _date;
-    NSString* _itemType;
     NSNumber* _numTags;
     NSString* _fullCitation;
     
@@ -31,10 +27,10 @@
 }
 
 @property (retain) NSString* fullCitation;
-@property (retain) NSString* creatorSummary;
-@property (retain) NSString* publicationTitle;
-@property (retain) NSNumber* date;
-@property (retain) NSString* itemType;
+@property (readonly) NSString* creatorSummary;
+@property (readonly) NSString* publicationDetails;
+@property (readonly) NSInteger* year;
+@property (readonly) NSString* itemType;
 @property (retain) NSNumber* numTags;
 @property (retain) NSArray* notes;
 @property (retain) NSArray* attachments;

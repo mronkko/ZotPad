@@ -80,56 +80,6 @@
         [(ZPZoteroItem*) _currentElement setFields:fields];
         
     }
-    else if(key==@"fullCitation" && [_currentElement isKindOfClass:[ZPZoteroItem class]]){
-        
-        /*
-         
-         The full citation is in APA style. This is used to parse the names of the authors and the summary of where the item was published
-         
-         Example:
-         Christensen, C. (1997). <i>The innovator&#x2019;s dilemma&#x202F;: when new technologies cause great firms to fail</i>. Boston&#xA0; Mass.: Harvard Business School Press.
-         
-         */
-        
-        ZPZoteroItem* item  = (ZPZoteroItem*) _currentElement;
-        
-        [item setFullCitation:value];
-        
-        
-        //If there are no authors.
-        if(item.creatorSummary==NULL){
-            //Anything after the first closing parenthesis is publication details
-            NSRange range = [value rangeOfString:@")"];
-            if(range.location != NSNotFound) [item setPublicationTitle:[value substringFromIndex:(range.location+1)]];
-        }
-        else{
-            
-            //Anything before the first parenthesis is author unless it is in italic
-            
-            NSString* authors = (NSString*)[[value componentsSeparatedByString:@" ("] objectAtIndex:0];
-            
-            if([authors rangeOfString:@"<i>"].location != NSNotFound){
-                [item setCreatorSummary:authors];
-            }
-            
-            NSRange range = [value rangeOfString:item.title];
-            
-            //Sometimes the title can contain characters that are not formatted properly by the CSL parser on Zotero server. In this case we will just 
-            //give up parsing it
-            if(range.location!=NSNotFound){
-                //Anything after the first period after the title is publication details
-                NSInteger index = range.location+range.length;
-                range = [value rangeOfString:@"." options:0 range:NSMakeRange(index, ([value length]-index))];
-                index = (range.location+2);
-                if(index<[value length]){
-                    NSString* publicationTitle = [value substringFromIndex:index];
-                    [item setPublicationTitle:publicationTitle];
-                }
-            }
-        }    
-        //Trim spaces, periods, and commas from the beginning of the publication detail
-        [item setPublicationTitle:[item.publicationTitle stringByTrimmingCharactersInSet:[NSCharacterSet characterSetWithCharactersInString:@"., "]]];
-    }
     else if([key isEqualToString:@"updated"]){
         [super _setField:@"serverTimestamp" toValue:value];
     }
