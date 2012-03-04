@@ -51,7 +51,6 @@
 @property (assign) BOOL sortDescending;
 
 - (void)configureView;
-- (void)notifyDataAvailable;
 - (void)clearTable;
 - (void)configureCachedKeys:(NSArray*)array;
 - (void)configureUncachedKeys:(NSArray*)uncachedItems;

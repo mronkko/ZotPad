@@ -13,6 +13,7 @@
 #import "ZPPreferences.h"
 #import "ZPAttachmentThumbnailFactory.h"
 #import "ZPAppDelegate.h"
+#import "ZPLogger.h"
 
 //TODO: Refactor so that these would not be needed
 #import "ZPServerConnection.h"
@@ -365,6 +366,7 @@
         if([NSThread isMainThread]){
             [DSBezelActivityView removeViewAnimated:YES];
             _activityView = NULL;
+            [self.tableView setUserInteractionEnabled:TRUE];
         }
         else{
             [self performSelectorOnMainThread:@selector(makeAvailable) withObject:nil waitUntilDone:NO];
@@ -534,23 +536,6 @@
     if(! [[_tableView indexPathForSelectedRow] isEqual:indexPath]) [_tableView reloadRowsAtIndexPaths:[NSArray arrayWithObject:indexPath] withRowAnimation:_animations];
 }
 
-/*
- Called from data layer to notify that there is data for this view and it can be shown
- */
-
-- (void)notifyDataAvailable{
-    
-    if([NSThread isMainThread]){
-        [self.tableView reloadData];
-        [DSBezelActivityView removeViewAnimated:YES];
-        [self.tableView setUserInteractionEnabled:TRUE];
-        _activityView = NULL;
-    }
-    else{
-        [self performSelectorOnMainThread:@selector(notifyDataAvailable) withObject:nil waitUntilDone:NO];
-    }
-    
-}
 
 -(void) notifyItemAvailable:(ZPZoteroItem *)item{
     

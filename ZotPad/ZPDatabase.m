@@ -8,10 +8,6 @@
 //  Copyright (c) 2011 __MyCompanyName__. All rights reserved.
 //
 
-//
-// Try to do only one query per function. This makes profiling the application with Instruments much easier.
-//
-// TODO: Use appledoc http://gentlebytes.com/appledoc-docs-comments/
 
 #include <sys/xattr.h>
 
@@ -175,6 +171,11 @@ static ZPDatabase* _instance = nil;
     
     NSMutableArray* objectsRemaining = [NSMutableArray arrayWithArray:objects];
     
+    NSString* insertSQLBase = [NSMutableString stringWithFormat:@"INSERT INTO %@ (%@) SELECT ? AS %@",
+                               table,
+                               [dbFieldNames componentsJoinedByString:@", "],
+                               [dbFieldNames componentsJoinedByString:@", ? AS "]];
+    
     while([objectsRemaining count]>0){
         
         NSMutableArray* objectBatch = [NSMutableArray array];
@@ -194,10 +195,7 @@ static ZPDatabase* _instance = nil;
         
         for (object in objectBatch){
             if(insertSQL == NULL){
-                insertSQL = [NSMutableString stringWithFormat:@"INSERT INTO %@ (%@) SELECT ? AS %@",
-                             table,
-                             [dbFieldNames componentsJoinedByString:@", "],
-                             [dbFieldNames componentsJoinedByString:@", ? AS "]];
+                insertSQL = [NSMutableString stringWithString: insertSQLBase];
             }
             else [insertSQL appendString:unionSelectSQL];
             
@@ -206,7 +204,18 @@ static ZPDatabase* _instance = nil;
             
             
         @synchronized(self){
-            if(![_database executeUpdate:insertSQL withArgumentsInArray:insertArguments]) [NSException raise:@"Database error" format:@"Error executing query %@ with arguments %@",insertSQL,insertArguments];
+            if(![_database executeUpdate:insertSQL withArgumentsInArray:insertArguments]){
+
+                //Diagnose the error by running the queries one at a time
+
+                for (object in objectBatch){
+                    NSArray* arguments = [self dbFieldValuesForObject:object fieldsNames:dbFieldNames];
+                    if(![_database executeUpdate:insertSQLBase withArgumentsInArray:arguments]) [NSException raise:@"Database error" format:@"Error executing query %@ with arguments %@",insertSQLBase,arguments];
+
+                }
+                //Finally raise an exception for the whole query if it failed
+                [NSException raise:@"Database error" format:@"Error executing query %@ with arguments %@",insertSQL,insertArguments];
+            }
 
         }
     }
@@ -263,145 +272,152 @@ static ZPDatabase* _instance = nil;
         [NSException raise:@"Unsupported" format:@"Checkign timestamp is not supported for writing opbjects with multicolumn primary keys"];
     }
 
-    NSMutableArray* insertObjects = [NSMutableArray array];
-    NSMutableArray* updateObjects = [NSMutableArray array];
-
-    //Retrieve keys and timestamps from the DB
-    if([primaryKeyFieldNames count]==1){
-        NSMutableArray* keys = [NSMutableArray array];
-        for(NSObject* object in objects){
-            [keys addObject:[[self dbFieldValuesForObject:object fieldsNames:primaryKeyFieldNames] objectAtIndex:0]];
-        }
-         
-        BOOL keysAreString = [[keys objectAtIndex:0] isKindOfClass:[NSString class]];
+    //Because it is possible that the same item is received multiple times, it is important to use synchronized for almost the entire function to avoid inserting the same object twice
+//    @synchronized(self){
         
-        if(checkTimestamp){
-            //Check if the keys are string
-            NSString* selectSQL;
-            if(keysAreString){
-                selectSQL= [NSString stringWithFormat:@"SELECT %@, cacheTimestamp FROM %@ WHERE %@ IN ('%@')",
-                                  [primaryKeyFieldNames objectAtIndex:0],
-                                  table,
-                                  [primaryKeyFieldNames objectAtIndex:0],
-                                  [keys componentsJoinedByString:@"', '"]];
-            }
-            else{
-                selectSQL= [NSString stringWithFormat:@"SELECT %@, cacheTimestamp FROM %@ WHERE %@ IN (%@)",
-                            [primaryKeyFieldNames objectAtIndex:0],
-                            table,
-                            [primaryKeyFieldNames objectAtIndex:0],
-                            [keys componentsJoinedByString:@", "]];
+        NSMutableArray* insertObjects = [NSMutableArray array];
+        NSMutableArray* updateObjects = [NSMutableArray array];
+        
+        //Retrieve keys and timestamps from the DB
+        if([primaryKeyFieldNames count]==1){
+            NSMutableArray* keys = [NSMutableArray array];
+            for(NSObject* object in objects){
+                [keys addObject:[[self dbFieldValuesForObject:object fieldsNames:primaryKeyFieldNames] objectAtIndex:0]];
             }
             
+            BOOL keysAreString = [[keys objectAtIndex:0] isKindOfClass:[NSString class]];
             
-            NSMutableDictionary* timestamps = [NSMutableDictionary dictionary];
-            
-            //Retrieve timestamps
-            @synchronized(self){
-                FMResultSet* resultSet = [_database executeQuery:selectSQL];
-                
-                while([resultSet next]){
-                    [timestamps setObject:[resultSet stringForColumnIndex:1] forKey:[resultSet stringForColumnIndex:0]];
-                }
-                [resultSet close];
-            }
-            
-            NSMutableArray* returnArray=[NSMutableArray array]; 
-            
-                
-            for (NSObject* object in objects){
-                
-                //Check the timestamp
-                NSString* timestamp = [timestamps objectForKey:[primaryKeyFieldNames objectAtIndex:0]];
-                
-                //Insert if timestamp is not found
-                if(timestamp == NULL){
-                    [insertObjects addObject:object];
-                    [returnArray addObject:object];
-
-                }
-                //Update if timestamps differ
-                else if(! [[[self dbFieldValuesForObject:object fieldsNames:[NSArray arrayWithObject: @"cacheTimestamp"]] objectAtIndex:0] isEqualToString: timestamp]){
-                    [updateObjects addObject:object];
-                    [returnArray addObject:object];
-                }
-            }
-            [self updateObjects:updateObjects intoTable:table];
-            [self insertObjects:insertObjects intoTable:table];
-            return returnArray;
-        }
-        //No checking of timestamp
-        else{
-            NSString* selectSQL;
-            if(keysAreString){
-                selectSQL= [NSString stringWithFormat:@"SELECT %@ FROM %@ WHERE %@ IN ('%@')",
-                            [primaryKeyFieldNames objectAtIndex:0],
-                            table,
-                            [primaryKeyFieldNames objectAtIndex:0],
-                            [keys componentsJoinedByString:@"', '"]];
-            }
-            else{
-                selectSQL= [NSString stringWithFormat:@"SELECT %@ FROM %@ WHERE %@ IN (%@)",
-                            [primaryKeyFieldNames objectAtIndex:0],
-                            table,
-                            [primaryKeyFieldNames objectAtIndex:0],
-                            [keys componentsJoinedByString:@", "]];
-            }
-            
-            
-            NSMutableSet* keys = [NSMutableSet set];
-            
-            //Retrieve keys
-            @synchronized(self){
-                FMResultSet* resultSet = [_database executeQuery:selectSQL];
-                
-                while([resultSet next]){
-                    if(keysAreString) [keys addObject:[resultSet stringForColumnIndex:0]];
-                    else [keys addObject:[NSNumber numberWithInt:[resultSet intForColumnIndex:0]]];
-                }
-                [resultSet close];
-            }
-            
-            for (NSObject* object in objects){
-                
-                //Insert if key is not found
-                if( ! [keys containsObject:[[self dbFieldValuesForObject:object fieldsNames:primaryKeyFieldNames] objectAtIndex:0]]){
-                    [insertObjects addObject:object];
+            if(checkTimestamp){
+                //Check if the keys are string
+                NSString* selectSQL;
+                if(keysAreString){
+                    selectSQL= [NSString stringWithFormat:@"SELECT %@, cacheTimestamp FROM %@ WHERE %@ IN ('%@')",
+                                [primaryKeyFieldNames objectAtIndex:0],
+                                table,
+                                [primaryKeyFieldNames objectAtIndex:0],
+                                [keys componentsJoinedByString:@"', '"]];
                 }
                 else{
-                    [updateObjects addObject:object];
+                    selectSQL= [NSString stringWithFormat:@"SELECT %@, cacheTimestamp FROM %@ WHERE %@ IN (%@)",
+                                [primaryKeyFieldNames objectAtIndex:0],
+                                table,
+                                [primaryKeyFieldNames objectAtIndex:0],
+                                [keys componentsJoinedByString:@", "]];
+                }
+                
+                
+                NSMutableDictionary* timestamps = [NSMutableDictionary dictionary];
+                
+                //Retrieve timestamps
+                @synchronized(self){
+                    FMResultSet* resultSet = [_database executeQuery:selectSQL];
+                    
+                    while([resultSet next]){
+                        [timestamps setObject:[resultSet stringForColumnIndex:1] forKey:[resultSet stringForColumnIndex:0]];
+                    }
+                    [resultSet close];
+                }
+                
+                NSMutableArray* returnArray=[NSMutableArray array]; 
+                
+                
+                NSArray* keyArrayFieldName = [NSArray
+                                               arrayWithObject:[primaryKeyFieldNames objectAtIndex:0]];
+                
+                for (NSObject* object in objects){
+                    
+                    //Check the timestamp
+                    NSString* timestamp = [timestamps objectForKey:[[self dbFieldValuesForObject:object fieldsNames:keyArrayFieldName] objectAtIndex:0]];
+                    
+                    //Insert if timestamp is not found
+                    if(timestamp == NULL){
+                        [insertObjects addObject:object];
+                        [returnArray addObject:object];
+                        
+                    }
+                    //Update if timestamps differ
+                    else if(! [[[self dbFieldValuesForObject:object fieldsNames:[NSArray arrayWithObject: @"cacheTimestamp"]] objectAtIndex:0] isEqualToString: timestamp]){
+                        [updateObjects addObject:object];
+                        [returnArray addObject:object];
+                    }
+                }
+                [self updateObjects:updateObjects intoTable:table];
+                [self insertObjects:insertObjects intoTable:table];
+                return returnArray;
+            }
+            //No checking of timestamp
+            else{
+                NSString* selectSQL;
+                if(keysAreString){
+                    selectSQL= [NSString stringWithFormat:@"SELECT %@ FROM %@ WHERE %@ IN ('%@')",
+                                [primaryKeyFieldNames objectAtIndex:0],
+                                table,
+                                [primaryKeyFieldNames objectAtIndex:0],
+                                [keys componentsJoinedByString:@"', '"]];
+                }
+                else{
+                    selectSQL= [NSString stringWithFormat:@"SELECT %@ FROM %@ WHERE %@ IN (%@)",
+                                [primaryKeyFieldNames objectAtIndex:0],
+                                table,
+                                [primaryKeyFieldNames objectAtIndex:0],
+                                [keys componentsJoinedByString:@", "]];
+                }
+                
+                
+                NSMutableSet* keys = [NSMutableSet set];
+                
+                //Retrieve keys
+                @synchronized(self){
+                    FMResultSet* resultSet = [_database executeQuery:selectSQL];
+                    
+                    while([resultSet next]){
+                        if(keysAreString) [keys addObject:[resultSet stringForColumnIndex:0]];
+                        else [keys addObject:[NSNumber numberWithInt:[resultSet intForColumnIndex:0]]];
+                    }
+                    [resultSet close];
+                }
+                
+                for (NSObject* object in objects){
+                    
+                    //Insert if key is not found
+                    if( ! [keys containsObject:[[self dbFieldValuesForObject:object fieldsNames:primaryKeyFieldNames] objectAtIndex:0]]){
+                        [insertObjects addObject:object];
+                    }
+                    else{
+                        [updateObjects addObject:object];
+                    }
+                }
+                [self updateObjects:updateObjects intoTable:table];
+                [self insertObjects:insertObjects intoTable:table];
+                
+                return objects;
+                
+            }
+        }
+        //Multiple colums in primary key
+        else{
+            NSString* selectSQL= [NSString stringWithFormat:@"SELECT %@ FROM %@ WHERE %@ = ?",
+                                  [primaryKeyFieldNames objectAtIndex:0],
+                                  table,
+                                  [primaryKeyFieldNames componentsJoinedByString:@" = ? AND "]];
+            
+            
+            //Check if things exist with these primary keys
+            
+            for(NSObject* object in objects){
+                @synchronized(self){
+                    FMResultSet* resultSet = [_database executeQuery:selectSQL withArgumentsInArray:[self dbFieldValuesForObject:object fieldsNames:primaryKeyFieldNames]];
+                    
+                    if([resultSet next]) [updateObjects addObject:object];
+                    else [insertObjects addObject:object];
+                    [resultSet close];
                 }
             }
             [self updateObjects:updateObjects intoTable:table];
             [self insertObjects:insertObjects intoTable:table];
-
             return objects;
-
         }
-    }
-    //Multiple colums in primary key
-    else{
-        NSString* selectSQL= [NSString stringWithFormat:@"SELECT %@ FROM %@ WHERE %@ = ?",
-                              [primaryKeyFieldNames objectAtIndex:0],
-                              table,
-                              [primaryKeyFieldNames componentsJoinedByString:@" = ? AND "]];
-        
-        
-        //Check if things exist with these primary keys
-        
-        for(NSObject* object in objects){
-            @synchronized(self){
-                FMResultSet* resultSet = [_database executeQuery:selectSQL withArgumentsInArray:[self dbFieldValuesForObject:object fieldsNames:primaryKeyFieldNames]];
-                
-                if([resultSet next]) [updateObjects addObject:object];
-                else [insertObjects addObject:object];
-                [resultSet close];
-            }
-        }
-        [self updateObjects:updateObjects intoTable:table];
-        [self insertObjects:insertObjects intoTable:table];
-        return objects;
-    }
+//    }
 }
 
 
@@ -727,14 +743,16 @@ Deletes items, notes, and attachments based in array of keys from a library
 
 - (void) addAttributesToItem:(ZPZoteroItem *)item{
     
+    NSDictionary* results = NULL;
     @synchronized(self){
         FMResultSet* resultSet = [_database executeQuery: @"SELECT * FROM items WHERE itemKey=? LIMIT 1",item.key];
         
         if ([resultSet next]) {
-            [item configureWithDictionary:[resultSet resultDict]];
+            results = [resultSet resultDict];
         }
         [resultSet close];
     }
+    if(results!=NULL) [item configureWithDictionary:results];
 }
 
 
@@ -773,6 +791,8 @@ Deletes items, notes, and attachments based in array of keys from a library
 
 -(void) writeItemsFields:(NSArray*)items{
 
+    if([items count]==0) return;
+    
     NSMutableArray* fields= [NSMutableArray array];
     NSMutableString* deleteSQL;
     
