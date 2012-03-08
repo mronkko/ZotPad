@@ -630,38 +630,45 @@
 	UITableViewCell* cell;
     
         
-        //TODO: Set author and year to empty if not defined. 
-        ZPZoteroItem* item=NULL;
-        if(![key isEqualToString:@""]) item = (ZPZoteroItem*) [ZPZoteroItem dataObjectWithKey:key];
+    //TODO: Set author and year to empty if not defined. 
+    ZPZoteroItem* item=NULL;
+    if(![key isEqualToString:@""]) item = (ZPZoteroItem*) [ZPZoteroItem dataObjectWithKey:key];
+    
+    if(item==NULL){
+        cell = [aTableView dequeueReusableCellWithIdentifier:@"LoadingCell"]; 
+        NSLog(@"Cell identifier is LoadingCell");
+    }
+    else{
         
-        if(item==NULL){
-            cell = [aTableView dequeueReusableCellWithIdentifier:@"LoadingCell"]; 
-            NSLog(@"Cell identifier is LoadingCell");
-        }
-        else{
-
-            cell = [aTableView dequeueReusableCellWithIdentifier:@"ZoteroItemCell"];
-            NSLog(@"Cell identifier is ZoteroItemCell");
-            
-            UILabel *titleLabel = (UILabel *)[cell viewWithTag:1];
-            titleLabel.text = item.title;
-            
-            UILabel *authorsLabel = (UILabel *)[cell viewWithTag:2];
-            
-            //Show different things depending on what data we have
-            if(item.creatorSummary!=NULL){
-                if(item.year!= 0){
-                    authorsLabel.text = [NSString stringWithFormat:@"%@ (%i)",item.creatorSummary,item.year];
-                }
-                else{
-                    authorsLabel.text = [NSString stringWithFormat:@"%@ (No date)",item.creatorSummary];
-                }
-            }    
-            else if(item.year!= 0){
-                authorsLabel.text = [NSString stringWithFormat:@"No author (%i)",item.year];
+        cell = [aTableView dequeueReusableCellWithIdentifier:@"ZoteroItemCell"];
+        NSLog(@"Cell identifier is ZoteroItemCell");
+        NSLog(@"Item with key %@ has full citation %@",item.key,item.fullCitation);
+        
+        UILabel *titleLabel = (UILabel *)[cell viewWithTag:1];
+        titleLabel.text = item.title;
+        
+        UILabel *authorsLabel = (UILabel *)[cell viewWithTag:2];
+        
+        //Show different things depending on what data we have
+        if(item.creatorSummary!=NULL){
+            if(item.year!= 0){
+                authorsLabel.text = [NSString stringWithFormat:@"%@ (%i)",item.creatorSummary,item.year];
             }
+            else{
+                authorsLabel.text = [NSString stringWithFormat:@"%@",item.creatorSummary];
+            }
+        }    
+        else if(item.year!= 0){
+            authorsLabel.text = [NSString stringWithFormat:@"No author (%i)",item.year];
+        }
+        
+        //Publication as a formatted label
+        
+        TTStyledTextLabel* publishedInLabel = (TTStyledTextLabel *)[cell viewWithTag:3];
 
-            //Publication as a formatted label
+        
+        
+        if(publishedInLabel != NULL){
 
             NSString* publishedIn = item.publicationDetails;
             
@@ -669,41 +676,24 @@
                 publishedIn=@"";   
             }
             
-            //Does this cell already have a TTStyledTextLabel
-            NSEnumerator* e = [[cell subviews] objectEnumerator];
-
-            TTStyledTextLabel* publishedInLabel;
-
-            NSObject* subView;
-            while(subView = [e nextObject]){
-                if([subView isKindOfClass:[TTStyledTextLabel class]]){
-                    publishedInLabel = (TTStyledTextLabel*) subView;
-                    break;
-                }
-            }
-                  
-            if(publishedInLabel == NULL){
-                CGRect frame = CGRectMake(CGRectGetMinX(authorsLabel.frame),CGRectGetMaxY(authorsLabel.frame),CGRectGetWidth(cell.frame)-CGRectGetMinX(authorsLabel.frame),CGRectGetHeight(cell.frame)-CGRectGetMaxY(authorsLabel.frame)-2);
-                publishedInLabel = [[TTStyledTextLabel alloc] 
-                                            initWithFrame:frame];
-                [publishedInLabel setFont:[UIFont systemFontOfSize:12]];
-                [publishedInLabel setClipsToBounds:TRUE];
-                [cell addSubview:publishedInLabel];
-            }
-            TTStyledText* text = [TTStyledText textFromXHTML:[publishedIn stringByReplacingOccurrencesOfString:@" & " 
-                                                                                                    withString:@" &amp; "] lineBreaks:YES URLs:NO];
+            TTStyledText* text = [TTStyledText textFromXHTML:[publishedIn stringByReplacingOccurrencesOfString:@"&" 
+                                                                                                    withString:@"&amp;"] lineBreaks:YES URLs:NO];
+            //Font size of TTStyledTextLabel cannot be set in interface builder, so must be done here
+            [publishedInLabel setFont:[UIFont systemFontOfSize:[UIFont smallSystemFontSize]]];
             [publishedInLabel setText:text];
-            
-            //Attachment icon
-            
-            UIButton* articleThumbnail = (UIButton *) [cell viewWithTag:4];
-            
-            //Check if the item has attachments and render a thumbnail from the first attachment PDF
-            
-            if(articleThumbnail!= NULL && [item.attachments count] > 0){
+        }
+        
+        //Attachment icon
+        
+        UIButton* articleThumbnail = (UIButton *) [cell viewWithTag:4];
+        
+        //Check if the item has attachments and render a thumbnail from the first attachment PDF
+        
+        if(articleThumbnail!= NULL){
+            if([item.attachments count] > 0){
                 [articleThumbnail setHidden:FALSE];
                 
-                 ZPZoteroAttachment* attachment = [item.attachments objectAtIndex:0];
+                ZPZoteroAttachment* attachment = [item.attachments objectAtIndex:0];
                 
                 UIImage* image = [[ZPAttachmentThumbnailFactory instance] getFiletypeImage:attachment height:articleThumbnail.frame.size.height width:articleThumbnail.frame.size.width];
                 [articleThumbnail setImage:image forState:UIControlStateNormal];
@@ -712,9 +702,14 @@
             else{
                 [articleThumbnail setHidden:TRUE];
             }
-            
+        }
     }
     return cell;
+}
+
+//TODO: Implement this
+- (void)tableView:(UITableView *)tableView didSelectRowAtIndexPath:(NSIndexPath *)indexPath{
+    
 }
 
 - (void)prepareForSegue:(UIStoryboardSegue *)segue sender:(id)sender{
@@ -734,13 +729,18 @@
         UITableViewController * simpleItemListViewController = [self.storyboard instantiateViewControllerWithIdentifier:@"NavigationItemListView"];
         simpleItemListViewController.navigationItem.hidesBackButton = YES;
         
-        [simpleItemListViewController.tableView selectRowAtIndexPath:indexPath animated:NO scrollPosition:UITableViewScrollPositionMiddle]; 
         [simpleItemListViewController.tableView setDelegate: self];
         [simpleItemListViewController.tableView setDataSource: self];
-        
+        [simpleItemListViewController.tableView selectRowAtIndexPath:indexPath animated:NO scrollPosition:UITableViewScrollPositionMiddle]; 
+
         ZPAppDelegate* appDelegate = (ZPAppDelegate*)[[UIApplication sharedApplication] delegate];
-                                      
-        [[[(UISplitViewController*)appDelegate.window.rootViewController viewControllers] lastObject] pushViewController:simpleItemListViewController animated:YES];
+        
+        UINavigationController* navigationController = [[(UISplitViewController*)appDelegate.window.rootViewController viewControllers] objectAtIndex:0];
+
+        //Set the cache status display
+        [simpleItemListViewController setToolbarItems:[[navigationController topViewController] toolbarItems]];
+        
+        [navigationController pushViewController:simpleItemListViewController animated:YES];
 
         
     }

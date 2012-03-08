@@ -62,7 +62,7 @@ static ZPDatabase* _instance = nil;
 	NSString *dbPath = [[NSSearchPathForDirectoriesInDomains(NSDocumentDirectory, NSUserDomainMask, YES) objectAtIndex:0] stringByAppendingPathComponent:@"zotpad.sqlite"];
    
     // Uncomment to always reset database
-    [self resetDatabase];
+    // [self resetDatabase];
     
     if(! [[NSFileManager defaultManager] fileExistsAtPath:dbPath]) [self resetDatabase];
     else{
@@ -728,7 +728,7 @@ Deletes items, notes, and attachments based in array of keys from a library
 
 
 -(void) addItemKeys:(NSArray*)keys toCollection:(NSString*)collectionKey{
-
+    
     NSMutableArray* relationships= [NSMutableArray arrayWithCapacity:[keys count]];
 
     for(NSString* key in keys){
@@ -764,6 +764,8 @@ Deletes items, notes, and attachments based in array of keys from a library
  */
 
 -(void) writeItemsCreators:(NSArray*)items{
+    
+    if([items count]==0) return;
     
     NSMutableArray* creators= [NSMutableArray array];
     NSMutableString* deleteSQL;
@@ -1032,7 +1034,7 @@ Deletes items, notes, and attachments based in array of keys from a library
         sql=[sql stringByAppendingString:@", collectionItems"];
 
     //These are available through the API, but are not fields
-    NSArray* specialSortColumns = [NSArray arrayWithObjects: @"dateAdded", @"dateModified", @"creator", @"addedBy", @"numItems",nil ];
+    NSArray* specialSortColumns = [NSArray arrayWithObjects: @"dateAdded", @"dateModified", @"creator", @"title", @"addedBy", @"numItems",nil ];
 
     //Sort
     if(orderField!=NULL){
@@ -1044,7 +1046,6 @@ Deletes items, notes, and attachments based in array of keys from a library
             sql=[sql stringByAppendingString:@" LEFT JOIN (SELECT itemkey, fieldValue FROM fields WHERE fieldName = ?) fields ON items.itemKey = fields.itemKey"];
             [parameters addObject:orderField];
         }
-
     }
     //Conditions
 
@@ -1091,11 +1092,15 @@ Deletes items, notes, and attachments based in array of keys from a library
             sql=[sql stringByAppendingString:@" ORDER BY fieldValue"];
         }
         else if([orderField isEqualToString:@"creator"]){
-            sql=[sql stringByAppendingString:@" ORDER BY creator"];
+            sql=[sql stringByAppendingString:@" ORDER BY fullCitation"];
         }
         else if([orderField isEqualToString:@"dateModified"]){
             sql=[sql stringByAppendingString:@" ORDER BY cacheTimestamp"];
         }
+        else if([orderField isEqualToString:@"title"]){
+            sql=[sql stringByAppendingString:@" ORDER BY title"];
+        }
+
         else{
             [NSException raise:@"Not implemented" format:@"Sorting by @% has not been implemented",orderField];
         }

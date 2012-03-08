@@ -48,13 +48,18 @@ static NSCache* _objectCache = NULL;
     //It is possible that subclasses of this class have already been instantiated with this key, so we need to reinstantiate the object
     
     if(obj==NULL || ! [obj isKindOfClass:[self class]]){
-        obj= [[self alloc] init];
-        obj->_key=key;
-        
-        [obj configureWithDictionary:fields];
-        [_objectCache setObject:obj  forKey:key];
+        ZPZoteroItem* newObj= [[self alloc] init];
+        newObj->_key=key;
+        newObj->_title=obj.title;
+        [newObj configureWithDictionary:fields];
+        [_objectCache setObject:newObj  forKey:key];
+        obj=newObj;
     }
     else [obj configureWithDictionary:fields];
+
+    //If the item does not have library id, it needs to be reconfigured. This can happen if we are initializing an item as an attachment.
+    
+    if(obj.libraryID == NULL) [[ZPDatabase instance] addAttributesToItem:obj] ;
 
     return obj;
 }
@@ -74,6 +79,7 @@ static NSCache* _objectCache = NULL;
     //It is possible that subclasses of this class have already been instantiated with this key, so we need to reinstantiate the object
     
     if(obj==NULL || ! [obj isKindOfClass:[self class]]){
+
         obj= [[self alloc] init];
         obj->_key=(NSString*)key;
         
@@ -92,36 +98,58 @@ static NSCache* _objectCache = NULL;
 
 -(NSString*) publicationDetails{
     
+    if([self.fields count] == 0 || [self.itemType isEqualToString:@"note"] || [self.itemType isEqualToString:@"attachment"]){
+        return @"";
+    }
+    
     //If there are no authors.
     if([[self creators] count]==0){
         //Anything after the first closing parenthesis is publication details
         NSRange range = [_fullCitation rangeOfString:@")"];
-        return [_fullCitation substringFromIndex:(range.location+1)];
-    }
-    else{
-        
-        NSRange range = [_fullCitation rangeOfString:self.title];
-        
-        //Sometimes the title can contain characters that are not formatted properly by the CSL parser on Zotero server. In this case we will just 
-        //give up parsing it
-
-        if(range.location!=NSNotFound){
-            //Anything after the first period after the title is publication details
-            NSInteger index = range.location+range.length;
-            range = [_fullCitation rangeOfString:@"." options:0 range:NSMakeRange(index, ([_fullCitation length]-index))];
-            index = (range.location+2);
-            if(index<[_fullCitation length]){
-                NSString* publicationTitle = [_fullCitation substringFromIndex:index];
-                return [publicationTitle stringByTrimmingCharactersInSet:[NSCharacterSet characterSetWithCharactersInString:@"., "]];
-            }
+        if(range.location != NSNotFound){
+            return [[_fullCitation substringFromIndex:(range.location+1)] stringByTrimmingCharactersInSet:[NSCharacterSet characterSetWithCharactersInString:@"., "]];   
         }
-    }    
+    }
+
+    //If that did not give us publication details, return everything after the title
+    
+    NSString* title = self.title;
+    NSRange range = [_fullCitation rangeOfString:title];
+    
+    //Sometimes the title can contain characters that are not formatted properly by the CSL parser on Zotero server. In this case we will use less strict matching
+    
+    if(range.location==NSNotFound){
+        
+        NSRegularExpression* regex = [NSRegularExpression regularExpressionWithPattern:@"[^a-z0-9]"
+                                                                               options:NSRegularExpressionCaseInsensitive
+                                                                                 error:NULL];
+        NSString* tempFull = [regex stringByReplacingMatchesInString:_fullCitation options:NULL range:NSMakeRange(0, [_fullCitation length]) withTemplate:@" "];
+        NSString* tempTitle = [regex stringByReplacingMatchesInString:title options:NULL range:NSMakeRange(0, [title length]) withTemplate:@" "];
+        range = [tempFull rangeOfString:tempTitle];
+    }
+    
+    //If less strinct matching did not work, give up parsing
+    
+    if(range.location!=NSNotFound){
+        //Anything after the first space after the title is publication details
+        NSInteger index = range.location+range.length;
+        range = [_fullCitation rangeOfString:@" " options:0 range:NSMakeRange(index, ([_fullCitation length]-index))];
+        index = (range.location+1);
+        if(index<[_fullCitation length]){
+            NSString* publicationTitle = [_fullCitation substringFromIndex:index];
+            return [publicationTitle stringByTrimmingCharactersInSet:[NSCharacterSet characterSetWithCharactersInString:@"., "]];
+        }
+    }
 
     return @"";
 }
 
 -(NSString*) creatorSummary{
     
+    if([self.fields count] == 0 || [self.itemType isEqualToString:@"note"] || [self.itemType isEqualToString:@"attachment"]){
+        return @"";
+    }
+
     //Anything before the first parenthesis in an APA citation is author unless it is in italic
     
     NSString* authors = (NSString*)[[_fullCitation componentsSeparatedByString:@" ("] objectAtIndex:0];
@@ -133,10 +161,19 @@ static NSCache* _objectCache = NULL;
         
 }
 
--(NSInteger*) year{
+-(NSInteger) year{
     NSString* value = [[self fields] objectForKey:@"date"];
-    return [value intValue]; 
+    
+    NSRange r;
+    NSString *regEx = @"[0-9]{4}";
+    r = [value rangeOfString:regEx options:NSRegularExpressionSearch];
+    
+    if (r.location != NSNotFound) {
+        return [[value substringWithRange:r] integerValue];
+    } else {
+    }   return 0; 
 }
+
 
 -(NSString*) itemType{
     return [[self fields] objectForKey:@"itemType"];
@@ -149,6 +186,7 @@ static NSCache* _objectCache = NULL;
     }
     return _creators;
 }
+
 - (void) setCreators:(NSArray*)creators{
     _creators = creators;
 }

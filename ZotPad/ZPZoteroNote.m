@@ -34,5 +34,9 @@
     return [NSDictionary dictionary];
 }
 
+-(NSString*) itemType{
+    return @"note";
+}
+
 
 @end

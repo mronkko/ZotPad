@@ -58,6 +58,10 @@
     return [NSDictionary dictionary];
 }
 
+-(NSString*) itemType{
+    return @"attachment";
+}
+
 - (NSArray*) attachments{
     
     return [NSArray arrayWithObject:self];

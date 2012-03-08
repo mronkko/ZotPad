@@ -38,6 +38,7 @@ CREATE INDEX collections_parentCollectionKey ON collections (parentCollectionKey
 CREATE TABLE IF NOT EXISTS items (
     itemKey TEXT PRIMARY KEY,
     libraryID INT,
+    title TEXT,
     fullCitation TEXT NOT NULL,
     cacheTimestamp TEXT DEFAULT NULL
 );

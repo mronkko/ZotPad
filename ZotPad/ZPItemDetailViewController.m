@@ -15,6 +15,7 @@
 #import "ZPQuicklookController.h"
 #import "ZPLogger.h"
 #import "ZPAttachmentThumbnailFactory.h"
+#import "ZPAppDelegate.h"
 
 #import "ZPPreferences.h"
 
@@ -216,10 +217,13 @@
 }
 
 - (void)navigationController:(UINavigationController *)navigationController willShowViewController:(UIViewController *)viewController animated:(BOOL)animated{
+
     if(viewController != self){
         //Pop the other controller if something else than self is showing
-        //[[[ZPLibraryAndCollectionListViewController instance] navigationController] popViewControllerAnimated:YES];
+        ZPAppDelegate* appDelegate = (ZPAppDelegate*)[[UIApplication sharedApplication] delegate];
         
+        [[[(UISplitViewController*)appDelegate.window.rootViewController viewControllers] objectAtIndex:0] popViewControllerAnimated:YES];
+
         //Remove delegate because we no longer need to pop the other controller
         [navigationController setDelegate:NULL];
     }
