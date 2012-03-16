@@ -533,7 +533,7 @@
 -(void) _updateRowForItem:(ZPZoteroItem*)item{
     NSIndexPath* indexPath = [NSIndexPath indexPathForRow:[_itemKeysShown indexOfObject:item.key] inSection:0];
     //Do not reload cell if it is selected
-    if(! [[_tableView indexPathForSelectedRow] isEqual:indexPath]) [_tableView reloadRowsAtIndexPaths:[NSArray arrayWithObject:indexPath] withRowAnimation:_animations];
+    //if(! [[_tableView indexPathForSelectedRow] isEqual:indexPath]) [_tableView reloadRowsAtIndexPaths:[NSArray arrayWithObject:indexPath] withRowAnimation:_animations];
 }
 
 
@@ -729,8 +729,11 @@
         UITableViewController * simpleItemListViewController = [self.storyboard instantiateViewControllerWithIdentifier:@"NavigationItemListView"];
         simpleItemListViewController.navigationItem.hidesBackButton = YES;
         
-        [simpleItemListViewController.tableView setDelegate: self];
-        [simpleItemListViewController.tableView setDataSource: self];
+        @synchronized(self){
+            [simpleItemListViewController.tableView setDelegate: self];
+            [simpleItemListViewController.tableView setDataSource: self];
+            _tableView = simpleItemListViewController.tableView;
+        }
         [simpleItemListViewController.tableView selectRowAtIndexPath:indexPath animated:NO scrollPosition:UITableViewScrollPositionMiddle]; 
 
         ZPAppDelegate* appDelegate = (ZPAppDelegate*)[[UIApplication sharedApplication] delegate];
