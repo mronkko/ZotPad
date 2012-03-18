@@ -112,10 +112,8 @@
                 NSString* length=[attributeDict objectForKey:@"length"];
                 
                 if(type!=NULL && length!=NULL){
-                    [self _setField:@"AttachmentURL" toValue:[attributeDict objectForKey:@"href"]];
-                    [self _setField:@"AttachmentType" toValue:type];
-                    [self _setField:@"AttachmentTitle" toValue:[attributeDict objectForKey:@"title"]];
-                    [self _setField:@"AttachmentLength" toValue:length];
+                    [self _setField:@"existsOnZoteroServer" toValue:[NSNumber numberWithInt:1]];
+                    [self _setField:@"attachmentSize" toValue:[NSNumber numberWithInt:[length intValue]]];
                 }
             }
         }

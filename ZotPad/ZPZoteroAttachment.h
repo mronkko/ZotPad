@@ -11,19 +11,13 @@
 
 @interface ZPZoteroAttachment : ZPZoteroItem{
     NSString* _parentItemKey;
-    
-    
-    NSString* _attachmentURL;
-    NSString* _attachmentType;
-    NSString* _attachmentTitle;
-    NSNumber* _attachmentLength;
 }
 
 @property (retain) NSString* parentItemKey;
-@property (retain) NSString* attachmentURL;
-@property (retain) NSString* attachmentType;
-@property (retain) NSString* attachmentTitle;
-@property (retain) NSNumber* attachmentLength;
+@property (retain) NSString* mimeType;
+@property (retain) NSNumber* linkMode;
+@property (retain) NSNumber* existsOnZoteroServer;
+@property (retain) NSNumber* attachmentSize;
 @property (retain) NSString* lastViewed;
 
 // An alias for setParentItemKey

@@ -20,7 +20,7 @@
 @interface ZPServerConnection : NSObject{
         
     NSInteger _activeRequestCount;
-    
+    NSArray* _fileChannels;
 }
 
 // This class is used as a singleton
@@ -48,6 +48,8 @@
 
 -(void) downloadAttachment:(ZPZoteroAttachment*)attachment;
 -(void) downloadAttachment:(ZPZoteroAttachment*)attachment withUIProgressView:(UIProgressView*) progressView;
+
+-(void) downloadAttachmentFromZoteroServer:(ZPZoteroAttachment*)attachment toTempFile:(NSString*)filePath withUIProgressView:(UIProgressView*) progressView;
 
 
 @end

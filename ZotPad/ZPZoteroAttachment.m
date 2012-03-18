@@ -14,11 +14,11 @@
 @implementation ZPZoteroAttachment
 
 
-@synthesize attachmentURL = _attachmentURL;
-@synthesize attachmentType = _attachmentType;
-@synthesize attachmentTitle = _attachmentTitle;
-@synthesize attachmentLength = _attachmentLength;
+@synthesize mimeType;
 @synthesize lastViewed;
+@synthesize linkMode;
+@synthesize attachmentSize;
+@synthesize existsOnZoteroServer;
 
 // An alias for setParentCollectionKey
 - (void) setParentKey:(NSString*)key{
@@ -39,13 +39,11 @@
 
 - (NSString*) fileSystemPath{
     
-    if(_attachmentTitle == NULL) return NULL;
-    
-    NSRange lastPeriod = [_attachmentTitle rangeOfString:@"." options:NSBackwardsSearch];
+    NSRange lastPeriod = [[super title] rangeOfString:@"." options:NSBackwardsSearch];
     
     NSString* path;
-    if(lastPeriod.location == NSNotFound) path = [_attachmentTitle stringByAppendingFormat:@"_",_key];
-    else path = [_attachmentTitle stringByReplacingCharactersInRange:lastPeriod
+    if(lastPeriod.location == NSNotFound) path = [[super title] stringByAppendingFormat:@"_",_key];
+    else path = [[super title] stringByReplacingCharactersInRange:lastPeriod
                                                                     withString:[NSString stringWithFormat:@"_%@.",_key]];
     return  [[NSSearchPathForDirectoriesInDomains(NSDocumentDirectory, NSUserDomainMask, YES) objectAtIndex:0] stringByAppendingPathComponent:path];
 

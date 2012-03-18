@@ -20,8 +20,6 @@
 
 #import <SystemConfiguration/SystemConfiguration.h>
 
-//TODO: Implement webdav client http://code.google.com/p/wtclient/
-
 #import "ZPAppDelegate.h"
 #import "ZPServerConnection.h"
 #import "ZPAuthenticationDialog.h"
@@ -41,6 +39,13 @@
 
 #import "ZPLogger.h"
 #import "ZPPreferences.h"
+
+#import "ZPFileChannel.h"
+#import "ZPFileChannel_DropBox.h"
+#import "ZPFileChannel_WebDAV.h"
+#import "ZPFileChannel_ZoteroStorage.h"
+#import "ZPFileChannel_LocalNetworkShare.h"
+
 //Private methods
 
 @interface ZPServerConnection();
@@ -70,7 +75,10 @@ const NSInteger ZPServerConnectionRequestTopLevelKeys = 9;
     self = [super init];
         
     _activeRequestCount = 0;
-
+    _fileChannels = [NSArray arrayWithObjects:[[ZPFileChannel_ZoteroStorage alloc] init], 
+                     [[ZPFileChannel_WebDAV alloc] init], 
+                     [[ZPFileChannel_DropBox alloc] init], 
+                     [[ZPFileChannel_LocalNetworkShare alloc] init], nil];
     return self;
 }
 
@@ -321,9 +329,7 @@ const NSInteger ZPServerConnectionRequestTopLevelKeys = 9;
         for(NSObject* child in [parserDelegate parsedElements] ){
             if([child isKindOfClass:[ZPZoteroAttachment class]]){
                 if(attachments == NULL) attachments = [NSMutableArray array];
-                
-                //For now only add attachments that have download URLs on the Zotero server.
-                if([(ZPZoteroAttachment*) child attachmentURL] != NULL) [attachments addObject:child];
+               [attachments addObject:child];
             }
             else if([child isKindOfClass:[ZPZoteroNote class]]){
                 if(notes == NULL) notes = [NSMutableArray array];
@@ -501,6 +507,7 @@ const NSInteger ZPServerConnectionRequestTopLevelKeys = 9;
  Methods for dowloading files
  
  */
+
 -(void) downloadAttachment:(ZPZoteroAttachment*)attachment{
     [self downloadAttachment:attachment withUIProgressView:NULL];
 }
@@ -508,25 +515,73 @@ const NSInteger ZPServerConnectionRequestTopLevelKeys = 9;
 
 -(void) downloadAttachment:(ZPZoteroAttachment*)attachment withUIProgressView:(UIProgressView*) progressView{
         
-    NSString* oauthkey =  [[ZPPreferences instance] OAuthKey];
-
-    NSURL* url = [NSURL URLWithString:[NSString stringWithFormat:@"%@?key=%@", attachment.attachmentURL,oauthkey]];
-    ASIHTTPRequest *request = [ASIHTTPRequest requestWithURL:url];
-    
-    //Although ASIHttpRequest does downloads using temp files, it seems to create an empty while when download starts. This is problematic, so we will use a temp file of our own.
     NSString* tempFile = [NSTemporaryDirectory() stringByAppendingPathComponent:[NSString stringWithFormat:@"ZP%@%i",attachment.key,[[NSDate date] timeIntervalSince1970]*1000000]];
     NSLog(@"Temporary download file is %@",tempFile);
-    
-    [request setDownloadDestinationPath:tempFile];
     
 
     _activeRequestCount++;
     
-    NSLog(@"File download started (%@) : %@ Active queries: %i",attachment.attachmentTitle, attachment.attachmentURL,_activeRequestCount);
-    
     //First request starts the network indicator
     if(_activeRequestCount==1) [[UIApplication sharedApplication] setNetworkActivityIndicatorVisible:YES];
 
+    //Loop over file channels and attempt to download the file
+    
+    BOOL gotFile = FALSE;
+    
+    for(ZPFileChannel* fileChannel in _fileChannels){
+        gotFile = [fileChannel download:attachment intoTempFile:tempFile withUIProgressView:progressView];
+        if(gotFile) break;
+    }
+    
+    if(gotFile){
+        //If we got a file, move it to the right plae
+        
+        NSDictionary *_documentFileAttributes = [[NSFileManager defaultManager] fileAttributesAtPath:tempFile traverseLink:YES];
+        
+        if([_documentFileAttributes fileSize]>0){
+            
+            //Move the file to the right place
+            
+            [[NSFileManager defaultManager] moveItemAtPath:tempFile toPath:[attachment fileSystemPath] error:NULL];
+            
+            //Set this file as not cached
+            const char* filePath = [[attachment fileSystemPath] fileSystemRepresentation];
+            const char* attrName = "com.apple.MobileBackup";
+            u_int8_t attrValue = 1;
+            setxattr(filePath, attrName, &attrValue, sizeof(attrValue), 0, 0);
+            
+            
+            
+            //We need to do this in a different thread so that the current thread does not count towards the operations count
+            [[ZPDataLayer instance] performSelectorInBackground:@selector(notifyAttachmentDownloadCompleted:) withObject:attachment];
+        }
+    }
+    
+    _activeRequestCount--;
+    
+    //First request starts the network indicator
+    if(_activeRequestCount==0) [[UIApplication sharedApplication] setNetworkActivityIndicatorVisible:NO];
+
+}
+
+-(void) downloadAttachmentFromZoteroServer:(ZPZoteroAttachment*)attachment toTempFile:(NSString*)filePath withUIProgressView:(UIProgressView*) progressView{
+ 
+    NSString* oauthkey =  [[ZPPreferences instance] OAuthKey];
+    
+    NSString* urlString;
+    
+    NSInteger libraryID= [attachment.libraryID intValue];
+    
+    if(libraryID==1 || libraryID == 0){
+        urlString = [NSString stringWithFormat:@"https://api.zotero.org/users/%@",[[ZPPreferences instance] userID]];
+    }
+    else{
+        urlString = [NSString stringWithFormat:@"https://api.zotero.org/groups/%i",libraryID];        
+    }
+    
+    NSURL* url = [NSURL URLWithString:[NSString stringWithFormat:@"%@/items/@%/file?key=%@",urlString, attachment.key, oauthkey]];
+    ASIHTTPRequest *request = [ASIHTTPRequest requestWithURL:url];
+    
     if(progressView!=NULL){
         [request setDownloadProgressDelegate:progressView];
     }
@@ -534,37 +589,13 @@ const NSInteger ZPServerConnectionRequestTopLevelKeys = 9;
         //No need to track progress for background downloads
         request.showAccurateProgress=FALSE;
     }
+
+    [request setDownloadDestinationPath:filePath];
+    
+
     [request startSynchronous];
-    
-    //If we got a file, move it to the right plae
-    
-    NSDictionary *_documentFileAttributes = [[NSFileManager defaultManager] fileAttributesAtPath:tempFile traverseLink:YES];
 
-    if([_documentFileAttributes fileSize]>0){
-        
-        //Move the file to the right place
-        
-        [[NSFileManager defaultManager] moveItemAtPath:tempFile toPath:[attachment fileSystemPath] error:NULL];
-        
-        //Set this file as not cached
-        const char* filePath = [[attachment fileSystemPath] fileSystemRepresentation];
-        const char* attrName = "com.apple.MobileBackup";
-        u_int8_t attrValue = 1;
-        setxattr(filePath, attrName, &attrValue, sizeof(attrValue), 0, 0);
-        
-        
-        
-        NSLog(@"File download completed (%@) : %@ Active queries: %i",attachment.attachmentTitle,attachment.attachmentURL,_activeRequestCount);
-        
-        //We need to do this in a different thread so that the current thread does not count towards the operations count
-        [[ZPDataLayer instance] performSelectorInBackground:@selector(notifyAttachmentDownloadCompleted:) withObject:attachment];
-    }
-
-    _activeRequestCount--;
     
-    //First request starts the network indicator
-    if(_activeRequestCount==0) [[UIApplication sharedApplication] setNetworkActivityIndicatorVisible:NO];
-
 }
 
 

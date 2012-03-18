@@ -65,10 +65,10 @@ CREATE TABLE IF NOT EXISTS attachments (
     parentItemKey TEXT NOT NULL,
     itemKey TEXT PRIMARY KEY,
     cacheTimestamp TEXT NOT NULL,
-    attachmentURL TEXT,
-    attachmentType TEXT,
-    attachmentTitle TEXT,
-    attachmentLength TEXT,
+    linkMode NOT NULL,
+    mimeType TEXT NOT NULL,
+    existsOnZoteroServer INT DEFAULT 0,
+    attachmentSize INT DEFAULT NULL,
     lastViewed TIMESTAMP DEFAULT NULL
 );
 

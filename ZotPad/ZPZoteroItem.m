@@ -220,6 +220,18 @@ static NSCache* _objectCache = NULL;
         NSString* value = [fields objectForKey:key];
         if(![value isEqual:@""]){
             [newFields setObject:value forKey:key];
+            
+            //If there is a setter for this field, set it.
+            
+            NSString* setterString = [key stringByReplacingCharactersInRange:NSMakeRange(0,1)  
+                                                                 withString:[[setterString substringToIndex:1] capitalizedString]];
+            
+            //Make a setter and use it if it exists
+            setterString = [[@"set" stringByAppendingString:setterString]stringByAppendingString: @":"];
+            if([self respondsToSelector:NSSelectorFromString(setterString)]){
+                [self performSelector:NSSelectorFromString(setterString) withObject:value];
+            }
+
         }
     }
     
