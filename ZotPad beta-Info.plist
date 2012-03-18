@@ -14,13 +14,13 @@
 		<dict>
 			<key>CFBundleIconFiles</key>
 			<array>
-				<string>AppIcon144x144.png</string>
-				<string>AppIcon72x72.png</string>
+				<string>AppIcon144x144-beta.png</string>
+				<string>AppIcon72x72-beta.png</string>
 			</array>
 		</dict>
 	</dict>
 	<key>CFBundleIdentifier</key>
-	<string>com.mronkko.zotpad</string>
+	<string>com.mronkko.zotpad-beta</string>
 	<key>CFBundleInfoDictionaryVersion</key>
 	<string>6.0</string>
 	<key>CFBundleName</key>

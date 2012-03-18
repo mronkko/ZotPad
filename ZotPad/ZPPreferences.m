@@ -58,8 +58,9 @@ static ZPPreferences* _instance = nil;
     NSMutableDictionary *defaultsToRegister = [[NSMutableDictionary alloc] initWithCapacity:[preferences count]];
     for(NSDictionary *prefSpecification in preferences) {
         NSString *key = [prefSpecification objectForKey:@"Key"];
-        if(key) {
-            [defaultsToRegister setObject:[prefSpecification objectForKey:@"DefaultValue"] forKey:key];
+        NSObject* defaultValue = [prefSpecification objectForKey:@"DefaultValue"];
+        if(key && defaultValue) {
+            [defaultsToRegister setObject:defaultValue forKey:key];
         }
     }
     

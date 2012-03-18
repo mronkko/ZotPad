@@ -60,9 +60,6 @@
 		A76D3C8914AD9FA7000C3ED9 /* ASIDataCompressor.m in Sources */ = {isa = PBXBuildFile; fileRef = A76D3C8514AD9FA7000C3ED9 /* ASIDataCompressor.m */; settings = {COMPILER_FLAGS = "-fno-objc-arc"; }; };
 		A76D3C8A14AD9FA7000C3ED9 /* ASIDataDecompressor.m in Sources */ = {isa = PBXBuildFile; fileRef = A76D3C8714AD9FA7000C3ED9 /* ASIDataDecompressor.m */; settings = {COMPILER_FLAGS = "-fno-objc-arc"; }; };
 		A76D3C8D14AD9FB5000C3ED9 /* ASIInputStream.m in Sources */ = {isa = PBXBuildFile; fileRef = A76D3C8C14AD9FB5000C3ED9 /* ASIInputStream.m */; settings = {COMPILER_FLAGS = "-fno-objc-arc"; }; };
-		A776EE7C14908AE20087B8FA /* 72x72.png in Resources */ = {isa = PBXBuildFile; fileRef = A776EE7B14908AE20087B8FA /* 72x72.png */; };
-		A776EE7E14908AED0087B8FA /* 57x57.png in Resources */ = {isa = PBXBuildFile; fileRef = A776EE7D14908AED0087B8FA /* 57x57.png */; };
-		A776EE8014908AF30087B8FA /* 114x114.png in Resources */ = {isa = PBXBuildFile; fileRef = A776EE7F14908AF30087B8FA /* 114x114.png */; };
 		A77B98DF14DE5CDB00132E9B /* ZPItemListViewController.m in Sources */ = {isa = PBXBuildFile; fileRef = A77B98DE14DE5CDB00132E9B /* ZPItemListViewController.m */; };
 		A77B991B14E0701800132E9B /* gear20x20.png in Resources */ = {isa = PBXBuildFile; fileRef = A77B991914E0701800132E9B /* gear20x20.png */; };
 		A77B991C14E0701800132E9B /* gear40x40.png in Resources */ = {isa = PBXBuildFile; fileRef = A77B991A14E0701800132E9B /* gear40x40.png */; };
@@ -101,6 +98,109 @@
 		A7A7CA0F147AA33A004D8756 /* libxml2.dylib in Frameworks */ = {isa = PBXBuildFile; fileRef = A7A7CA0E147AA339004D8756 /* libxml2.dylib */; };
 		A7B5180B14880CE700806EED /* ZPAuthenticationProcess.m in Sources */ = {isa = PBXBuildFile; fileRef = A7B5180A14880CE700806EED /* ZPAuthenticationProcess.m */; };
 		A7CC252F1493E14E00FDEAF4 /* iCarousel.m in Sources */ = {isa = PBXBuildFile; fileRef = A7CC252C1493E14D00FDEAF4 /* iCarousel.m */; settings = {COMPILER_FLAGS = " -fno-objc-arc"; }; };
+		A7CD070B15161555007A8E1D /* main.m in Sources */ = {isa = PBXBuildFile; fileRef = A7200DE014718DC0004347C9 /* main.m */; };
+		A7CD070C15161555007A8E1D /* ZPAppDelegate.m in Sources */ = {isa = PBXBuildFile; fileRef = A7200DE414718DC0004347C9 /* ZPAppDelegate.m */; };
+		A7CD070D15161555007A8E1D /* ZPLibraryAndCollectionListViewController.m in Sources */ = {isa = PBXBuildFile; fileRef = A7200DEA14718DC1004347C9 /* ZPLibraryAndCollectionListViewController.m */; };
+		A7CD070E15161555007A8E1D /* ZPDataLayer.m in Sources */ = {isa = PBXBuildFile; fileRef = A7200DF514718F44004347C9 /* ZPDataLayer.m */; };
+		A7CD070F15161555007A8E1D /* ZPServerConnection.m in Sources */ = {isa = PBXBuildFile; fileRef = A7A7C9B0147A8144004D8756 /* ZPServerConnection.m */; };
+		A7CD071015161555007A8E1D /* NSMutableURLRequest+Parameters.m in Sources */ = {isa = PBXBuildFile; fileRef = A7A7C9D0147AA2EE004D8756 /* NSMutableURLRequest+Parameters.m */; settings = {COMPILER_FLAGS = "-fno-objc-arc"; }; };
+		A7CD071115161555007A8E1D /* NSString+URLEncoding.m in Sources */ = {isa = PBXBuildFile; fileRef = A7A7C9D2147AA2EE004D8756 /* NSString+URLEncoding.m */; settings = {COMPILER_FLAGS = "-fno-objc-arc"; }; };
+		A7CD071215161555007A8E1D /* NSURL+Base.m in Sources */ = {isa = PBXBuildFile; fileRef = A7A7C9D4147AA2EE004D8756 /* NSURL+Base.m */; settings = {COMPILER_FLAGS = "-fno-objc-arc"; }; };
+		A7CD071315161555007A8E1D /* Base64Transcoder.c in Sources */ = {isa = PBXBuildFile; fileRef = A7A7C9D6147AA2EE004D8756 /* Base64Transcoder.c */; settings = {COMPILER_FLAGS = "-fno-objc-arc"; }; };
+		A7CD071415161555007A8E1D /* hmac.c in Sources */ = {isa = PBXBuildFile; fileRef = A7A7C9D8147AA2EE004D8756 /* hmac.c */; settings = {COMPILER_FLAGS = "-fno-objc-arc"; }; };
+		A7CD071515161555007A8E1D /* sha1.c in Sources */ = {isa = PBXBuildFile; fileRef = A7A7C9DA147AA2EE004D8756 /* sha1.c */; settings = {COMPILER_FLAGS = "-fno-objc-arc"; }; };
+		A7CD071615161555007A8E1D /* OAAttachment.m in Sources */ = {isa = PBXBuildFile; fileRef = A7A7C9DD147AA2EE004D8756 /* OAAttachment.m */; settings = {COMPILER_FLAGS = "-fno-objc-arc"; }; };
+		A7CD071715161555007A8E1D /* OACall.m in Sources */ = {isa = PBXBuildFile; fileRef = A7A7C9DF147AA2EE004D8756 /* OACall.m */; settings = {COMPILER_FLAGS = "-fno-objc-arc"; }; };
+		A7CD071815161555007A8E1D /* OAConsumer.m in Sources */ = {isa = PBXBuildFile; fileRef = A7A7C9E1147AA2EE004D8756 /* OAConsumer.m */; settings = {COMPILER_FLAGS = "-fno-objc-arc"; }; };
+		A7CD071915161555007A8E1D /* OADataFetcher.m in Sources */ = {isa = PBXBuildFile; fileRef = A7A7C9E3147AA2EE004D8756 /* OADataFetcher.m */; settings = {COMPILER_FLAGS = "-fno-objc-arc"; }; };
+		A7CD071A15161555007A8E1D /* OAHMAC_SHA1SignatureProvider.m in Sources */ = {isa = PBXBuildFile; fileRef = A7A7C9E5147AA2EE004D8756 /* OAHMAC_SHA1SignatureProvider.m */; settings = {COMPILER_FLAGS = "-fno-objc-arc"; }; };
+		A7CD071B15161555007A8E1D /* OAMutableURLRequest.m in Sources */ = {isa = PBXBuildFile; fileRef = A7A7C9E7147AA2EE004D8756 /* OAMutableURLRequest.m */; settings = {COMPILER_FLAGS = "-fno-objc-arc"; }; };
+		A7CD071C15161555007A8E1D /* OAPlaintextSignatureProvider.m in Sources */ = {isa = PBXBuildFile; fileRef = A7A7C9E9147AA2EE004D8756 /* OAPlaintextSignatureProvider.m */; settings = {COMPILER_FLAGS = "-fno-objc-arc"; }; };
+		A7CD071D15161555007A8E1D /* OAProblem.m in Sources */ = {isa = PBXBuildFile; fileRef = A7A7C9EB147AA2EE004D8756 /* OAProblem.m */; settings = {COMPILER_FLAGS = "-fno-objc-arc"; }; };
+		A7CD071E15161555007A8E1D /* OARequestParameter.m in Sources */ = {isa = PBXBuildFile; fileRef = A7A7C9ED147AA2EE004D8756 /* OARequestParameter.m */; settings = {COMPILER_FLAGS = "-fno-objc-arc"; }; };
+		A7CD071F15161555007A8E1D /* OAServiceTicket.m in Sources */ = {isa = PBXBuildFile; fileRef = A7A7C9EF147AA2EE004D8756 /* OAServiceTicket.m */; settings = {COMPILER_FLAGS = "-fno-objc-arc"; }; };
+		A7CD072015161555007A8E1D /* OAToken.m in Sources */ = {isa = PBXBuildFile; fileRef = A7A7C9F3147AA2EE004D8756 /* OAToken.m */; settings = {COMPILER_FLAGS = "-fno-objc-arc"; }; };
+		A7CD072115161555007A8E1D /* OATokenManager.m in Sources */ = {isa = PBXBuildFile; fileRef = A7A7C9F5147AA2EE004D8756 /* OATokenManager.m */; settings = {COMPILER_FLAGS = "-fno-objc-arc"; }; };
+		A7CD072215161555007A8E1D /* ZPAuthenticationDialog.m in Sources */ = {isa = PBXBuildFile; fileRef = A74348D6147AB37A00DA6FC3 /* ZPAuthenticationDialog.m */; };
+		A7CD072315161555007A8E1D /* ZPServerResponseXMLParser.m in Sources */ = {isa = PBXBuildFile; fileRef = A7A3F952147BBCCA00CA7266 /* ZPServerResponseXMLParser.m */; };
+		A7CD072415161555007A8E1D /* ZPZoteroItem.m in Sources */ = {isa = PBXBuildFile; fileRef = A7692D83147D112D000C1A8F /* ZPZoteroItem.m */; };
+		A7CD072515161555007A8E1D /* ZPZoteroLibrary.m in Sources */ = {isa = PBXBuildFile; fileRef = A72853F8147E319600D3FE97 /* ZPZoteroLibrary.m */; };
+		A7CD072615161555007A8E1D /* ZPZoteroCollection.m in Sources */ = {isa = PBXBuildFile; fileRef = A72853FC147E31B500D3FE97 /* ZPZoteroCollection.m */; };
+		A7CD072715161555007A8E1D /* FMDatabase.m in Sources */ = {isa = PBXBuildFile; fileRef = A7A54B0614878E4F00EBAD80 /* FMDatabase.m */; settings = {COMPILER_FLAGS = "-fno-objc-arc"; }; };
+		A7CD072815161555007A8E1D /* FMDatabaseAdditions.m in Sources */ = {isa = PBXBuildFile; fileRef = A7A54B0814878E4F00EBAD80 /* FMDatabaseAdditions.m */; settings = {COMPILER_FLAGS = "-fno-objc-arc"; }; };
+		A7CD072915161555007A8E1D /* FMResultSet.m in Sources */ = {isa = PBXBuildFile; fileRef = A7A54B0A14878E4F00EBAD80 /* FMResultSet.m */; settings = {COMPILER_FLAGS = "-fno-objc-arc"; }; };
+		A7CD072A15161555007A8E1D /* DSActivityView.m in Sources */ = {isa = PBXBuildFile; fileRef = A7A54B1014878EE000EBAD80 /* DSActivityView.m */; };
+		A7CD072B15161555007A8E1D /* ZPAuthenticationProcess.m in Sources */ = {isa = PBXBuildFile; fileRef = A7B5180A14880CE700806EED /* ZPAuthenticationProcess.m */; };
+		A7CD072C15161555007A8E1D /* ZPItemDetailViewController.m in Sources */ = {isa = PBXBuildFile; fileRef = A79ED822148B2683003EE77C /* ZPItemDetailViewController.m */; };
+		A7CD072D15161555007A8E1D /* iCarousel.m in Sources */ = {isa = PBXBuildFile; fileRef = A7CC252C1493E14D00FDEAF4 /* iCarousel.m */; settings = {COMPILER_FLAGS = " -fno-objc-arc"; }; };
+		A7CD072E15161555007A8E1D /* ZPZoteroAttachment.m in Sources */ = {isa = PBXBuildFile; fileRef = A716C0361494E9DE00BD6025 /* ZPZoteroAttachment.m */; };
+		A7CD072F15161555007A8E1D /* NSObject+SBJson.m in Sources */ = {isa = PBXBuildFile; fileRef = A716C0391495131E00BD6025 /* NSObject+SBJson.m */; };
+		A7CD073015161555007A8E1D /* SBJsonParser.m in Sources */ = {isa = PBXBuildFile; fileRef = A716C03C1495131E00BD6025 /* SBJsonParser.m */; };
+		A7CD073115161555007A8E1D /* SBJsonStreamParser.m in Sources */ = {isa = PBXBuildFile; fileRef = A716C03E1495131E00BD6025 /* SBJsonStreamParser.m */; };
+		A7CD073215161555007A8E1D /* SBJsonStreamParserAccumulator.m in Sources */ = {isa = PBXBuildFile; fileRef = A716C0401495131E00BD6025 /* SBJsonStreamParserAccumulator.m */; };
+		A7CD073315161555007A8E1D /* SBJsonStreamParserAdapter.m in Sources */ = {isa = PBXBuildFile; fileRef = A716C0421495131E00BD6025 /* SBJsonStreamParserAdapter.m */; };
+		A7CD073415161555007A8E1D /* SBJsonStreamParserState.m in Sources */ = {isa = PBXBuildFile; fileRef = A716C0441495131E00BD6025 /* SBJsonStreamParserState.m */; };
+		A7CD073515161555007A8E1D /* SBJsonStreamWriter.m in Sources */ = {isa = PBXBuildFile; fileRef = A716C0461495131E00BD6025 /* SBJsonStreamWriter.m */; };
+		A7CD073615161555007A8E1D /* SBJsonStreamWriterAccumulator.m in Sources */ = {isa = PBXBuildFile; fileRef = A716C0481495131F00BD6025 /* SBJsonStreamWriterAccumulator.m */; };
+		A7CD073715161555007A8E1D /* SBJsonStreamWriterState.m in Sources */ = {isa = PBXBuildFile; fileRef = A716C04A1495131F00BD6025 /* SBJsonStreamWriterState.m */; };
+		A7CD073815161555007A8E1D /* SBJsonTokeniser.m in Sources */ = {isa = PBXBuildFile; fileRef = A716C04C1495131F00BD6025 /* SBJsonTokeniser.m */; };
+		A7CD073915161555007A8E1D /* SBJsonUTF8Stream.m in Sources */ = {isa = PBXBuildFile; fileRef = A716C04E1495131F00BD6025 /* SBJsonUTF8Stream.m */; };
+		A7CD073A15161555007A8E1D /* SBJsonWriter.m in Sources */ = {isa = PBXBuildFile; fileRef = A716C0501495131F00BD6025 /* SBJsonWriter.m */; };
+		A7CD073B15161555007A8E1D /* ZPDatabase.m in Sources */ = {isa = PBXBuildFile; fileRef = A7025018149B0BB1004F2AAB /* ZPDatabase.m */; };
+		A7CD073C15161555007A8E1D /* ZPCacheController.m in Sources */ = {isa = PBXBuildFile; fileRef = A702501C149B33E1004F2AAB /* ZPCacheController.m */; };
+		A7CD073D15161555007A8E1D /* ZPPreferences.m in Sources */ = {isa = PBXBuildFile; fileRef = A702501F149C6C3D004F2AAB /* ZPPreferences.m */; };
+		A7CD073E15161555007A8E1D /* ZPServerResponseXMLParserLibrary.m in Sources */ = {isa = PBXBuildFile; fileRef = A7025071149C8D8F004F2AAB /* ZPServerResponseXMLParserLibrary.m */; };
+		A7CD073F15161555007A8E1D /* ZPServerResponseXMLParserCollection.m in Sources */ = {isa = PBXBuildFile; fileRef = A7025074149C8F9A004F2AAB /* ZPServerResponseXMLParserCollection.m */; };
+		A7CD074015161555007A8E1D /* ZPServerResponseXMLParserItem.m in Sources */ = {isa = PBXBuildFile; fileRef = A7025077149C91A1004F2AAB /* ZPServerResponseXMLParserItem.m */; };
+		A7CD074115161555007A8E1D /* ZPZoteroDataObject.m in Sources */ = {isa = PBXBuildFile; fileRef = A79299C2149E0CFE000F8B42 /* ZPZoteroDataObject.m */; };
+		A7CD074215161555007A8E1D /* ZPZoteroNote.m in Sources */ = {isa = PBXBuildFile; fileRef = A76D3C6614A9F3F3000C3ED9 /* ZPZoteroNote.m */; };
+		A7CD074315161555007A8E1D /* ASIHTTPRequest.m in Sources */ = {isa = PBXBuildFile; fileRef = A76D3C7D14AD9D12000C3ED9 /* ASIHTTPRequest.m */; settings = {COMPILER_FLAGS = "-fno-objc-arc"; }; };
+		A7CD074415161555007A8E1D /* Reachability.m in Sources */ = {isa = PBXBuildFile; fileRef = A76D3C8014AD9F2E000C3ED9 /* Reachability.m */; settings = {COMPILER_FLAGS = "-fno-objc-arc"; }; };
+		A7CD074515161555007A8E1D /* ASIAuthenticationDialog.m in Sources */ = {isa = PBXBuildFile; fileRef = A76D3C8314AD9FA6000C3ED9 /* ASIAuthenticationDialog.m */; settings = {COMPILER_FLAGS = "-fno-objc-arc"; }; };
+		A7CD074615161555007A8E1D /* ASIDataCompressor.m in Sources */ = {isa = PBXBuildFile; fileRef = A76D3C8514AD9FA7000C3ED9 /* ASIDataCompressor.m */; settings = {COMPILER_FLAGS = "-fno-objc-arc"; }; };
+		A7CD074715161555007A8E1D /* ASIDataDecompressor.m in Sources */ = {isa = PBXBuildFile; fileRef = A76D3C8714AD9FA7000C3ED9 /* ASIDataDecompressor.m */; settings = {COMPILER_FLAGS = "-fno-objc-arc"; }; };
+		A7CD074815161555007A8E1D /* ASIInputStream.m in Sources */ = {isa = PBXBuildFile; fileRef = A76D3C8C14AD9FB5000C3ED9 /* ASIInputStream.m */; settings = {COMPILER_FLAGS = "-fno-objc-arc"; }; };
+		A7CD074915161555007A8E1D /* ZPLocalization.m in Sources */ = {isa = PBXBuildFile; fileRef = A7D3C08214AEE70F00DB975D /* ZPLocalization.m */; };
+		A7CD074A15161555007A8E1D /* ZPQuicklookController.m in Sources */ = {isa = PBXBuildFile; fileRef = A793153D14B185E800E1ABF0 /* ZPQuicklookController.m */; };
+		A7CD074B15161555007A8E1D /* ZPLogger.m in Sources */ = {isa = PBXBuildFile; fileRef = A7F72BC014B984920059617D /* ZPLogger.m */; };
+		A7CD074C15161555007A8E1D /* ZPItemListViewController.m in Sources */ = {isa = PBXBuildFile; fileRef = A77B98DE14DE5CDB00132E9B /* ZPItemListViewController.m */; };
+		A7CD074D15161555007A8E1D /* ZPCacheStatusToolbarController.m in Sources */ = {isa = PBXBuildFile; fileRef = A7D5E2DB14F5690700593A39 /* ZPCacheStatusToolbarController.m */; };
+		A7CD074E15161555007A8E1D /* ZPAttachmentThumbnailFactory.m in Sources */ = {isa = PBXBuildFile; fileRef = A7D5E2DE14F624F500593A39 /* ZPAttachmentThumbnailFactory.m */; };
+		A7CD075015161555007A8E1D /* libThree20UICommon.a in Frameworks */ = {isa = PBXBuildFile; fileRef = 3201088596B4756681693704 /* libThree20UICommon.a */; };
+		A7CD075115161555007A8E1D /* libThree20.a in Frameworks */ = {isa = PBXBuildFile; fileRef = 320D7DCCE32703ACAB9A45E4 /* libThree20.a */; };
+		A7CD075215161555007A8E1D /* libThree20UINavigator.a in Frameworks */ = {isa = PBXBuildFile; fileRef = 320A737074758E53BA54BE94 /* libThree20UINavigator.a */; };
+		A7CD075315161555007A8E1D /* libThree20Core.a in Frameworks */ = {isa = PBXBuildFile; fileRef = 320A2827FEC940B25BC42C64 /* libThree20Core.a */; };
+		A7CD075415161555007A8E1D /* libThree20UI.a in Frameworks */ = {isa = PBXBuildFile; fileRef = 320F2C48872C2E2C4DF86204 /* libThree20UI.a */; };
+		A7CD075515161555007A8E1D /* libThree20Network.a in Frameworks */ = {isa = PBXBuildFile; fileRef = 320A5A189C235877202780D4 /* libThree20Network.a */; };
+		A7CD075615161555007A8E1D /* libThree20Style.a in Frameworks */ = {isa = PBXBuildFile; fileRef = 320CC833B8AF0ACFD35E6224 /* libThree20Style.a */; };
+		A7CD075715161555007A8E1D /* libz.dylib in Frameworks */ = {isa = PBXBuildFile; fileRef = A7F8637F14C21D8800021662 /* libz.dylib */; };
+		A7CD075815161555007A8E1D /* QuickLook.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = A7D3C07F14AEDE7B00DB975D /* QuickLook.framework */; };
+		A7CD075915161555007A8E1D /* CoreGraphics.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = A7200DD814718DC0004347C9 /* CoreGraphics.framework */; };
+		A7CD075A15161555007A8E1D /* MobileCoreServices.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = A76D3C7714AD97D6000C3ED9 /* MobileCoreServices.framework */; };
+		A7CD075B15161555007A8E1D /* SystemConfiguration.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = A76D3C7514AD97CB000C3ED9 /* SystemConfiguration.framework */; };
+		A7CD075C15161555007A8E1D /* CFNetwork.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = A76D3C7314AD97BA000C3ED9 /* CFNetwork.framework */; };
+		A7CD075D15161555007A8E1D /* QuartzCore.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 320AF8492C47A4D819F7C450 /* QuartzCore.framework */; };
+		A7CD075E15161555007A8E1D /* libxml2.dylib in Frameworks */ = {isa = PBXBuildFile; fileRef = A7A7CA0E147AA339004D8756 /* libxml2.dylib */; };
+		A7CD075F15161555007A8E1D /* Security.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = A7A7CA0C147AA329004D8756 /* Security.framework */; };
+		A7CD076015161555007A8E1D /* libsqlite3.dylib in Frameworks */ = {isa = PBXBuildFile; fileRef = A7200DF7147193C0004347C9 /* libsqlite3.dylib */; };
+		A7CD076115161555007A8E1D /* UIKit.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = A7200DD414718DC0004347C9 /* UIKit.framework */; };
+		A7CD076215161555007A8E1D /* Foundation.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = A7200DD614718DC0004347C9 /* Foundation.framework */; };
+		A7CD076415161555007A8E1D /* Three20.bundle in Resources */ = {isa = PBXBuildFile; fileRef = 320B6C86F11D9990244A9730 /* Three20.bundle */; };
+		A7CD076515161555007A8E1D /* InfoPlist.strings in Resources */ = {isa = PBXBuildFile; fileRef = A7200DDD14718DC0004347C9 /* InfoPlist.strings */; };
+		A7CD076615161555007A8E1D /* MainStoryboard_iPhone.storyboard in Resources */ = {isa = PBXBuildFile; fileRef = A786F7771476A56200B35B92 /* MainStoryboard_iPhone.storyboard */; };
+		A7CD076715161555007A8E1D /* database.sql in Resources */ = {isa = PBXBuildFile; fileRef = A7A3F94F147BAB6C00CA7266 /* database.sql */; };
+		A7CD076815161555007A8E1D /* Settings.bundle in Resources */ = {isa = PBXBuildFile; fileRef = A73D635014879D15007999F3 /* Settings.bundle */; };
+		A7CD076915161555007A8E1D /* MainStoryboard_iPad.storyboard in Resources */ = {isa = PBXBuildFile; fileRef = A72C3CA61487C9DA00F6744E /* MainStoryboard_iPad.storyboard */; };
+		A7CD076A15161555007A8E1D /* Default-Landscape~ipad.png in Resources */ = {isa = PBXBuildFile; fileRef = A78B7F12149091B8008303BA /* Default-Landscape~ipad.png */; };
+		A7CD076B15161555007A8E1D /* Default-Portrait~ipad.png in Resources */ = {isa = PBXBuildFile; fileRef = A78B7F1414909285008303BA /* Default-Portrait~ipad.png */; };
+		A7CD076C15161555007A8E1D /* gear20x20.png in Resources */ = {isa = PBXBuildFile; fileRef = A77B991914E0701800132E9B /* gear20x20.png */; };
+		A7CD076D15161555007A8E1D /* gear40x40.png in Resources */ = {isa = PBXBuildFile; fileRef = A77B991A14E0701800132E9B /* gear40x40.png */; };
+		A7CD076E15161555007A8E1D /* barbutton_image_up_state.png in Resources */ = {isa = PBXBuildFile; fileRef = A7D6DA5014F4CA3500420FF1 /* barbutton_image_up_state.png */; };
+		A7CD076F15161555007A8E1D /* barbutton_image_down_state.png in Resources */ = {isa = PBXBuildFile; fileRef = A7D6DA5114F4CA3500420FF1 /* barbutton_image_down_state.png */; };
+		A7CD07781516156F007A8E1D /* AppIcon72x72-beta.png in Resources */ = {isa = PBXBuildFile; fileRef = A7CD067A151612DE007A8E1D /* AppIcon72x72-beta.png */; };
+		A7CD077B15162EE4007A8E1D /* AppIcon72x72.png in Resources */ = {isa = PBXBuildFile; fileRef = A7CD077A15162EE4007A8E1D /* AppIcon72x72.png */; };
+		A7CD078315162FA7007A8E1D /* AppIcon144x144-beta.png in Resources */ = {isa = PBXBuildFile; fileRef = A7CD078215162FA7007A8E1D /* AppIcon144x144-beta.png */; };
+		A7CD078515162FC9007A8E1D /* AppIcon144x144.png in Resources */ = {isa = PBXBuildFile; fileRef = A7CD078415162FC9007A8E1D /* AppIcon144x144.png */; };
 		A7D3C08014AEDE7B00DB975D /* QuickLook.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = A7D3C07F14AEDE7B00DB975D /* QuickLook.framework */; };
 		A7D3C08314AEE71000DB975D /* ZPLocalization.m in Sources */ = {isa = PBXBuildFile; fileRef = A7D3C08214AEE70F00DB975D /* ZPLocalization.m */; };
 		A7D5E2DC14F5690700593A39 /* ZPCacheStatusToolbarController.m in Sources */ = {isa = PBXBuildFile; fileRef = A7D5E2DB14F5690700593A39 /* ZPCacheStatusToolbarController.m */; };
@@ -209,6 +309,55 @@
 			proxyType = 2;
 			remoteGlobalIDString = BEF31F3A0F352DF5000DE5D2;
 			remoteInfo = Three20UI;
+		};
+		A7CD06FD15161555007A8E1D /* PBXContainerItemProxy */ = {
+			isa = PBXContainerItemProxy;
+			containerPortal = 3201088596B4756681693700 /* Three20UICommon.xcodeproj */;
+			proxyType = 1;
+			remoteGlobalIDString = BEF31F390F352DF5000DE5D2;
+			remoteInfo = Three20UICommon;
+		};
+		A7CD06FF15161555007A8E1D /* PBXContainerItemProxy */ = {
+			isa = PBXContainerItemProxy;
+			containerPortal = 320D7DCCE32703ACAB9A45E0 /* Three20.xcodeproj */;
+			proxyType = 1;
+			remoteGlobalIDString = BEF31F390F352DF5000DE5D2;
+			remoteInfo = Three20;
+		};
+		A7CD070115161555007A8E1D /* PBXContainerItemProxy */ = {
+			isa = PBXContainerItemProxy;
+			containerPortal = 320A737074758E53BA54BE90 /* Three20UINavigator.xcodeproj */;
+			proxyType = 1;
+			remoteGlobalIDString = BEF31F390F352DF5000DE5D2;
+			remoteInfo = Three20UINavigator;
+		};
+		A7CD070315161555007A8E1D /* PBXContainerItemProxy */ = {
+			isa = PBXContainerItemProxy;
+			containerPortal = 320A2827FEC940B25BC42C60 /* Three20Core.xcodeproj */;
+			proxyType = 1;
+			remoteGlobalIDString = BEF31F390F352DF5000DE5D2;
+			remoteInfo = Three20Core;
+		};
+		A7CD070515161555007A8E1D /* PBXContainerItemProxy */ = {
+			isa = PBXContainerItemProxy;
+			containerPortal = 320F2C48872C2E2C4DF86200 /* Three20UI.xcodeproj */;
+			proxyType = 1;
+			remoteGlobalIDString = BEF31F390F352DF5000DE5D2;
+			remoteInfo = Three20UI;
+		};
+		A7CD070715161555007A8E1D /* PBXContainerItemProxy */ = {
+			isa = PBXContainerItemProxy;
+			containerPortal = 320A5A189C235877202780D0 /* Three20Network.xcodeproj */;
+			proxyType = 1;
+			remoteGlobalIDString = BEF31F390F352DF5000DE5D2;
+			remoteInfo = Three20Network;
+		};
+		A7CD070915161555007A8E1D /* PBXContainerItemProxy */ = {
+			isa = PBXContainerItemProxy;
+			containerPortal = 320CC833B8AF0ACFD35E6220 /* Three20Style.xcodeproj */;
+			proxyType = 1;
+			remoteGlobalIDString = BEF31F390F352DF5000DE5D2;
+			remoteInfo = Three20Style;
 		};
 		A7FB43B614C9CC8600B39F8F /* PBXContainerItemProxy */ = {
 			isa = PBXContainerItemProxy;
@@ -354,9 +503,6 @@
 		A76D3C8714AD9FA7000C3ED9 /* ASIDataDecompressor.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; name = ASIDataDecompressor.m; path = "asi-http-request/Classes/ASIDataDecompressor.m"; sourceTree = "<group>"; };
 		A76D3C8B14AD9FB4000C3ED9 /* ASIInputStream.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; name = ASIInputStream.h; path = "asi-http-request/Classes/ASIInputStream.h"; sourceTree = "<group>"; };
 		A76D3C8C14AD9FB5000C3ED9 /* ASIInputStream.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; name = ASIInputStream.m; path = "asi-http-request/Classes/ASIInputStream.m"; sourceTree = "<group>"; };
-		A776EE7B14908AE20087B8FA /* 72x72.png */ = {isa = PBXFileReference; lastKnownFileType = image.png; name = 72x72.png; path = ../Icons/72x72.png; sourceTree = "<group>"; };
-		A776EE7D14908AED0087B8FA /* 57x57.png */ = {isa = PBXFileReference; lastKnownFileType = image.png; name = 57x57.png; path = ../Icons/57x57.png; sourceTree = "<group>"; };
-		A776EE7F14908AF30087B8FA /* 114x114.png */ = {isa = PBXFileReference; lastKnownFileType = image.png; name = 114x114.png; path = ../Icons/114x114.png; sourceTree = "<group>"; };
 		A77B98DD14DE5CDB00132E9B /* ZPItemListViewController.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = ZPItemListViewController.h; sourceTree = "<group>"; };
 		A77B98DE14DE5CDB00132E9B /* ZPItemListViewController.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = ZPItemListViewController.m; sourceTree = "<group>"; };
 		A77B991914E0701800132E9B /* gear20x20.png */ = {isa = PBXFileReference; lastKnownFileType = image.png; name = gear20x20.png; path = Icons/gear20x20.png; sourceTree = SOURCE_ROOT; };
@@ -429,6 +575,12 @@
 		A7B5180A14880CE700806EED /* ZPAuthenticationProcess.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = ZPAuthenticationProcess.m; sourceTree = "<group>"; };
 		A7CC252B1493E14D00FDEAF4 /* iCarousel.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = iCarousel.h; sourceTree = "<group>"; };
 		A7CC252C1493E14D00FDEAF4 /* iCarousel.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = iCarousel.m; sourceTree = "<group>"; };
+		A7CD067A151612DE007A8E1D /* AppIcon72x72-beta.png */ = {isa = PBXFileReference; lastKnownFileType = image.png; name = "AppIcon72x72-beta.png"; path = "../Icons/AppIcon72x72-beta.png"; sourceTree = "<group>"; };
+		A7CD077515161555007A8E1D /* ZotPad beta.app */ = {isa = PBXFileReference; explicitFileType = wrapper.application; includeInIndex = 0; path = "ZotPad beta.app"; sourceTree = BUILT_PRODUCTS_DIR; };
+		A7CD077715161556007A8E1D /* ZotPad beta-Info.plist */ = {isa = PBXFileReference; lastKnownFileType = text.plist.xml; name = "ZotPad beta-Info.plist"; path = "/Users/mronkko/Documents/Software/ZotPad/ZotPad beta-Info.plist"; sourceTree = "<absolute>"; };
+		A7CD077A15162EE4007A8E1D /* AppIcon72x72.png */ = {isa = PBXFileReference; lastKnownFileType = image.png; name = AppIcon72x72.png; path = Icons/AppIcon72x72.png; sourceTree = SOURCE_ROOT; };
+		A7CD078215162FA7007A8E1D /* AppIcon144x144-beta.png */ = {isa = PBXFileReference; lastKnownFileType = image.png; name = "AppIcon144x144-beta.png"; path = "../Icons/AppIcon144x144-beta.png"; sourceTree = "<group>"; };
+		A7CD078415162FC9007A8E1D /* AppIcon144x144.png */ = {isa = PBXFileReference; lastKnownFileType = image.png; name = AppIcon144x144.png; path = ../Icons/AppIcon144x144.png; sourceTree = "<group>"; };
 		A7D3C07F14AEDE7B00DB975D /* QuickLook.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; name = QuickLook.framework; path = System/Library/Frameworks/QuickLook.framework; sourceTree = SDKROOT; };
 		A7D3C08114AEE70F00DB975D /* ZPLocalization.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = ZPLocalization.h; sourceTree = "<group>"; };
 		A7D3C08214AEE70F00DB975D /* ZPLocalization.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = ZPLocalization.m; sourceTree = "<group>"; };
@@ -468,6 +620,32 @@
 				A7200DF8147193C0004347C9 /* libsqlite3.dylib in Frameworks */,
 				A7200DD514718DC0004347C9 /* UIKit.framework in Frameworks */,
 				A7200DD714718DC0004347C9 /* Foundation.framework in Frameworks */,
+			);
+			runOnlyForDeploymentPostprocessing = 0;
+		};
+		A7CD074F15161555007A8E1D /* Frameworks */ = {
+			isa = PBXFrameworksBuildPhase;
+			buildActionMask = 2147483647;
+			files = (
+				A7CD075015161555007A8E1D /* libThree20UICommon.a in Frameworks */,
+				A7CD075115161555007A8E1D /* libThree20.a in Frameworks */,
+				A7CD075215161555007A8E1D /* libThree20UINavigator.a in Frameworks */,
+				A7CD075315161555007A8E1D /* libThree20Core.a in Frameworks */,
+				A7CD075415161555007A8E1D /* libThree20UI.a in Frameworks */,
+				A7CD075515161555007A8E1D /* libThree20Network.a in Frameworks */,
+				A7CD075615161555007A8E1D /* libThree20Style.a in Frameworks */,
+				A7CD075715161555007A8E1D /* libz.dylib in Frameworks */,
+				A7CD075815161555007A8E1D /* QuickLook.framework in Frameworks */,
+				A7CD075915161555007A8E1D /* CoreGraphics.framework in Frameworks */,
+				A7CD075A15161555007A8E1D /* MobileCoreServices.framework in Frameworks */,
+				A7CD075B15161555007A8E1D /* SystemConfiguration.framework in Frameworks */,
+				A7CD075C15161555007A8E1D /* CFNetwork.framework in Frameworks */,
+				A7CD075D15161555007A8E1D /* QuartzCore.framework in Frameworks */,
+				A7CD075E15161555007A8E1D /* libxml2.dylib in Frameworks */,
+				A7CD075F15161555007A8E1D /* Security.framework in Frameworks */,
+				A7CD076015161555007A8E1D /* libsqlite3.dylib in Frameworks */,
+				A7CD076115161555007A8E1D /* UIKit.framework in Frameworks */,
+				A7CD076215161555007A8E1D /* Foundation.framework in Frameworks */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
@@ -609,6 +787,7 @@
 			isa = PBXGroup;
 			children = (
 				A7200DD014718DC0004347C9 /* ZotPad.app */,
+				A7CD077515161555007A8E1D /* ZotPad beta.app */,
 			);
 			name = Products;
 			sourceTree = "<group>";
@@ -668,6 +847,7 @@
 				A73D635014879D15007999F3 /* Settings.bundle */,
 				320B6C86F11D9990244A9730 /* Three20.bundle */,
 				A7200DDC14718DC0004347C9 /* ZotPad-Info.plist */,
+				A7CD077715161556007A8E1D /* ZotPad beta-Info.plist */,
 				A7200DDD14718DC0004347C9 /* InfoPlist.strings */,
 				A7200DE014718DC0004347C9 /* main.m */,
 				A7200DE214718DC0004347C9 /* ZotPad-Prefix.pch */,
@@ -762,9 +942,10 @@
 		A78B7F0A14908DFF008303BA /* AppIcons */ = {
 			isa = PBXGroup;
 			children = (
-				A776EE7F14908AF30087B8FA /* 114x114.png */,
-				A776EE7D14908AED0087B8FA /* 57x57.png */,
-				A776EE7B14908AE20087B8FA /* 72x72.png */,
+				A7CD078415162FC9007A8E1D /* AppIcon144x144.png */,
+				A7CD078215162FA7007A8E1D /* AppIcon144x144-beta.png */,
+				A7CD077A15162EE4007A8E1D /* AppIcon72x72.png */,
+				A7CD067A151612DE007A8E1D /* AppIcon72x72-beta.png */,
 			);
 			name = AppIcons;
 			sourceTree = "<group>";
@@ -912,13 +1093,37 @@
 			productReference = A7200DD014718DC0004347C9 /* ZotPad.app */;
 			productType = "com.apple.product-type.application";
 		};
+		A7CD06FB15161555007A8E1D /* ZotPad beta */ = {
+			isa = PBXNativeTarget;
+			buildConfigurationList = A7CD077215161555007A8E1D /* Build configuration list for PBXNativeTarget "ZotPad beta" */;
+			buildPhases = (
+				A7CD070A15161555007A8E1D /* Sources */,
+				A7CD074F15161555007A8E1D /* Frameworks */,
+				A7CD076315161555007A8E1D /* Resources */,
+			);
+			buildRules = (
+			);
+			dependencies = (
+				A7CD06FC15161555007A8E1D /* PBXTargetDependency */,
+				A7CD06FE15161555007A8E1D /* PBXTargetDependency */,
+				A7CD070015161555007A8E1D /* PBXTargetDependency */,
+				A7CD070215161555007A8E1D /* PBXTargetDependency */,
+				A7CD070415161555007A8E1D /* PBXTargetDependency */,
+				A7CD070615161555007A8E1D /* PBXTargetDependency */,
+				A7CD070815161555007A8E1D /* PBXTargetDependency */,
+			);
+			name = "ZotPad beta";
+			productName = ZotPad;
+			productReference = A7CD077515161555007A8E1D /* ZotPad beta.app */;
+			productType = "com.apple.product-type.application";
+		};
 /* End PBXNativeTarget section */
 
 /* Begin PBXProject section */
 		A7200DC714718DBF004347C9 /* Project object */ = {
 			isa = PBXProject;
 			attributes = {
-				LastUpgradeCheck = 0420;
+				LastUpgradeCheck = 0430;
 			};
 			buildConfigurationList = A7200DCA14718DBF004347C9 /* Build configuration list for PBXProject "ZotPad" */;
 			compatibilityVersion = "Xcode 3.2";
@@ -964,6 +1169,7 @@
 			projectRoot = "";
 			targets = (
 				A7200DCF14718DC0004347C9 /* ZotPad */,
+				A7CD06FB15161555007A8E1D /* ZotPad beta */,
 			);
 		};
 /* End PBXProject section */
@@ -1080,15 +1286,35 @@
 				A7A3F950147BAB6C00CA7266 /* database.sql in Resources */,
 				A73D635114879D15007999F3 /* Settings.bundle in Resources */,
 				A72C3CA71487C9DA00F6744E /* MainStoryboard_iPad.storyboard in Resources */,
-				A776EE7C14908AE20087B8FA /* 72x72.png in Resources */,
-				A776EE7E14908AED0087B8FA /* 57x57.png in Resources */,
-				A776EE8014908AF30087B8FA /* 114x114.png in Resources */,
 				A78B7F13149091B8008303BA /* Default-Landscape~ipad.png in Resources */,
 				A78B7F1514909285008303BA /* Default-Portrait~ipad.png in Resources */,
 				A77B991B14E0701800132E9B /* gear20x20.png in Resources */,
 				A77B991C14E0701800132E9B /* gear40x40.png in Resources */,
 				A7D6DA5214F4CA3500420FF1 /* barbutton_image_up_state.png in Resources */,
 				A7D6DA5314F4CA3500420FF1 /* barbutton_image_down_state.png in Resources */,
+				A7CD077B15162EE4007A8E1D /* AppIcon72x72.png in Resources */,
+				A7CD078515162FC9007A8E1D /* AppIcon144x144.png in Resources */,
+			);
+			runOnlyForDeploymentPostprocessing = 0;
+		};
+		A7CD076315161555007A8E1D /* Resources */ = {
+			isa = PBXResourcesBuildPhase;
+			buildActionMask = 2147483647;
+			files = (
+				A7CD076415161555007A8E1D /* Three20.bundle in Resources */,
+				A7CD076515161555007A8E1D /* InfoPlist.strings in Resources */,
+				A7CD076615161555007A8E1D /* MainStoryboard_iPhone.storyboard in Resources */,
+				A7CD076715161555007A8E1D /* database.sql in Resources */,
+				A7CD076815161555007A8E1D /* Settings.bundle in Resources */,
+				A7CD076915161555007A8E1D /* MainStoryboard_iPad.storyboard in Resources */,
+				A7CD076A15161555007A8E1D /* Default-Landscape~ipad.png in Resources */,
+				A7CD076B15161555007A8E1D /* Default-Portrait~ipad.png in Resources */,
+				A7CD076C15161555007A8E1D /* gear20x20.png in Resources */,
+				A7CD076D15161555007A8E1D /* gear40x40.png in Resources */,
+				A7CD076E15161555007A8E1D /* barbutton_image_up_state.png in Resources */,
+				A7CD076F15161555007A8E1D /* barbutton_image_down_state.png in Resources */,
+				A7CD07781516156F007A8E1D /* AppIcon72x72-beta.png in Resources */,
+				A7CD078315162FA7007A8E1D /* AppIcon144x144-beta.png in Resources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
@@ -1170,6 +1396,81 @@
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
+		A7CD070A15161555007A8E1D /* Sources */ = {
+			isa = PBXSourcesBuildPhase;
+			buildActionMask = 2147483647;
+			files = (
+				A7CD070B15161555007A8E1D /* main.m in Sources */,
+				A7CD070C15161555007A8E1D /* ZPAppDelegate.m in Sources */,
+				A7CD070D15161555007A8E1D /* ZPLibraryAndCollectionListViewController.m in Sources */,
+				A7CD070E15161555007A8E1D /* ZPDataLayer.m in Sources */,
+				A7CD070F15161555007A8E1D /* ZPServerConnection.m in Sources */,
+				A7CD071015161555007A8E1D /* NSMutableURLRequest+Parameters.m in Sources */,
+				A7CD071115161555007A8E1D /* NSString+URLEncoding.m in Sources */,
+				A7CD071215161555007A8E1D /* NSURL+Base.m in Sources */,
+				A7CD071315161555007A8E1D /* Base64Transcoder.c in Sources */,
+				A7CD071415161555007A8E1D /* hmac.c in Sources */,
+				A7CD071515161555007A8E1D /* sha1.c in Sources */,
+				A7CD071615161555007A8E1D /* OAAttachment.m in Sources */,
+				A7CD071715161555007A8E1D /* OACall.m in Sources */,
+				A7CD071815161555007A8E1D /* OAConsumer.m in Sources */,
+				A7CD071915161555007A8E1D /* OADataFetcher.m in Sources */,
+				A7CD071A15161555007A8E1D /* OAHMAC_SHA1SignatureProvider.m in Sources */,
+				A7CD071B15161555007A8E1D /* OAMutableURLRequest.m in Sources */,
+				A7CD071C15161555007A8E1D /* OAPlaintextSignatureProvider.m in Sources */,
+				A7CD071D15161555007A8E1D /* OAProblem.m in Sources */,
+				A7CD071E15161555007A8E1D /* OARequestParameter.m in Sources */,
+				A7CD071F15161555007A8E1D /* OAServiceTicket.m in Sources */,
+				A7CD072015161555007A8E1D /* OAToken.m in Sources */,
+				A7CD072115161555007A8E1D /* OATokenManager.m in Sources */,
+				A7CD072215161555007A8E1D /* ZPAuthenticationDialog.m in Sources */,
+				A7CD072315161555007A8E1D /* ZPServerResponseXMLParser.m in Sources */,
+				A7CD072415161555007A8E1D /* ZPZoteroItem.m in Sources */,
+				A7CD072515161555007A8E1D /* ZPZoteroLibrary.m in Sources */,
+				A7CD072615161555007A8E1D /* ZPZoteroCollection.m in Sources */,
+				A7CD072715161555007A8E1D /* FMDatabase.m in Sources */,
+				A7CD072815161555007A8E1D /* FMDatabaseAdditions.m in Sources */,
+				A7CD072915161555007A8E1D /* FMResultSet.m in Sources */,
+				A7CD072A15161555007A8E1D /* DSActivityView.m in Sources */,
+				A7CD072B15161555007A8E1D /* ZPAuthenticationProcess.m in Sources */,
+				A7CD072C15161555007A8E1D /* ZPItemDetailViewController.m in Sources */,
+				A7CD072D15161555007A8E1D /* iCarousel.m in Sources */,
+				A7CD072E15161555007A8E1D /* ZPZoteroAttachment.m in Sources */,
+				A7CD072F15161555007A8E1D /* NSObject+SBJson.m in Sources */,
+				A7CD073015161555007A8E1D /* SBJsonParser.m in Sources */,
+				A7CD073115161555007A8E1D /* SBJsonStreamParser.m in Sources */,
+				A7CD073215161555007A8E1D /* SBJsonStreamParserAccumulator.m in Sources */,
+				A7CD073315161555007A8E1D /* SBJsonStreamParserAdapter.m in Sources */,
+				A7CD073415161555007A8E1D /* SBJsonStreamParserState.m in Sources */,
+				A7CD073515161555007A8E1D /* SBJsonStreamWriter.m in Sources */,
+				A7CD073615161555007A8E1D /* SBJsonStreamWriterAccumulator.m in Sources */,
+				A7CD073715161555007A8E1D /* SBJsonStreamWriterState.m in Sources */,
+				A7CD073815161555007A8E1D /* SBJsonTokeniser.m in Sources */,
+				A7CD073915161555007A8E1D /* SBJsonUTF8Stream.m in Sources */,
+				A7CD073A15161555007A8E1D /* SBJsonWriter.m in Sources */,
+				A7CD073B15161555007A8E1D /* ZPDatabase.m in Sources */,
+				A7CD073C15161555007A8E1D /* ZPCacheController.m in Sources */,
+				A7CD073D15161555007A8E1D /* ZPPreferences.m in Sources */,
+				A7CD073E15161555007A8E1D /* ZPServerResponseXMLParserLibrary.m in Sources */,
+				A7CD073F15161555007A8E1D /* ZPServerResponseXMLParserCollection.m in Sources */,
+				A7CD074015161555007A8E1D /* ZPServerResponseXMLParserItem.m in Sources */,
+				A7CD074115161555007A8E1D /* ZPZoteroDataObject.m in Sources */,
+				A7CD074215161555007A8E1D /* ZPZoteroNote.m in Sources */,
+				A7CD074315161555007A8E1D /* ASIHTTPRequest.m in Sources */,
+				A7CD074415161555007A8E1D /* Reachability.m in Sources */,
+				A7CD074515161555007A8E1D /* ASIAuthenticationDialog.m in Sources */,
+				A7CD074615161555007A8E1D /* ASIDataCompressor.m in Sources */,
+				A7CD074715161555007A8E1D /* ASIDataDecompressor.m in Sources */,
+				A7CD074815161555007A8E1D /* ASIInputStream.m in Sources */,
+				A7CD074915161555007A8E1D /* ZPLocalization.m in Sources */,
+				A7CD074A15161555007A8E1D /* ZPQuicklookController.m in Sources */,
+				A7CD074B15161555007A8E1D /* ZPLogger.m in Sources */,
+				A7CD074C15161555007A8E1D /* ZPItemListViewController.m in Sources */,
+				A7CD074D15161555007A8E1D /* ZPCacheStatusToolbarController.m in Sources */,
+				A7CD074E15161555007A8E1D /* ZPAttachmentThumbnailFactory.m in Sources */,
+			);
+			runOnlyForDeploymentPostprocessing = 0;
+		};
 /* End PBXSourcesBuildPhase section */
 
 /* Begin PBXTargetDependency section */
@@ -1207,6 +1508,41 @@
 			isa = PBXTargetDependency;
 			name = Three20UI;
 			targetProxy = 320F2C48872C2E2C4DF86202 /* PBXContainerItemProxy */;
+		};
+		A7CD06FC15161555007A8E1D /* PBXTargetDependency */ = {
+			isa = PBXTargetDependency;
+			name = Three20UICommon;
+			targetProxy = A7CD06FD15161555007A8E1D /* PBXContainerItemProxy */;
+		};
+		A7CD06FE15161555007A8E1D /* PBXTargetDependency */ = {
+			isa = PBXTargetDependency;
+			name = Three20;
+			targetProxy = A7CD06FF15161555007A8E1D /* PBXContainerItemProxy */;
+		};
+		A7CD070015161555007A8E1D /* PBXTargetDependency */ = {
+			isa = PBXTargetDependency;
+			name = Three20UINavigator;
+			targetProxy = A7CD070115161555007A8E1D /* PBXContainerItemProxy */;
+		};
+		A7CD070215161555007A8E1D /* PBXTargetDependency */ = {
+			isa = PBXTargetDependency;
+			name = Three20Core;
+			targetProxy = A7CD070315161555007A8E1D /* PBXContainerItemProxy */;
+		};
+		A7CD070415161555007A8E1D /* PBXTargetDependency */ = {
+			isa = PBXTargetDependency;
+			name = Three20UI;
+			targetProxy = A7CD070515161555007A8E1D /* PBXContainerItemProxy */;
+		};
+		A7CD070615161555007A8E1D /* PBXTargetDependency */ = {
+			isa = PBXTargetDependency;
+			name = Three20Network;
+			targetProxy = A7CD070715161555007A8E1D /* PBXContainerItemProxy */;
+		};
+		A7CD070815161555007A8E1D /* PBXTargetDependency */ = {
+			isa = PBXTargetDependency;
+			name = Three20Style;
+			targetProxy = A7CD070915161555007A8E1D /* PBXContainerItemProxy */;
 		};
 /* End PBXTargetDependency section */
 
@@ -1336,6 +1672,56 @@
 			};
 			name = Release;
 		};
+		A7CD077315161555007A8E1D /* Debug */ = {
+			isa = XCBuildConfiguration;
+			buildSettings = {
+				ALTERNATE_GROUP = 70000;
+				CODE_SIGN_IDENTITY = "iPhone Developer";
+				FRAMEWORK_SEARCH_PATHS = (
+					"$(inherited)",
+					"\"$(DEVELOPER_FRAMEWORKS_DIR)\"",
+				);
+				GCC_PRECOMPILE_PREFIX_HEADER = YES;
+				GCC_PREFIX_HEADER = "ZotPad/ZotPad-Prefix.pch";
+				INFOPLIST_FILE = "ZotPad beta-Info.plist";
+				INSTALL_GROUP = 70000;
+				LIBRARY_SEARCH_PATHS = (
+					"$(inherited)",
+					"\"$(SRCROOT)\"",
+				);
+				PRODUCT_NAME = "ZotPad beta";
+				PROVISIONING_PROFILE = "";
+				SKIP_INSTALL = NO;
+				TARGETED_DEVICE_FAMILY = 2;
+				WRAPPER_EXTENSION = app;
+			};
+			name = Debug;
+		};
+		A7CD077415161555007A8E1D /* Release */ = {
+			isa = XCBuildConfiguration;
+			buildSettings = {
+				ALTERNATE_GROUP = 70000;
+				CODE_SIGN_IDENTITY = "iPhone Developer";
+				FRAMEWORK_SEARCH_PATHS = (
+					"$(inherited)",
+					"\"$(DEVELOPER_FRAMEWORKS_DIR)\"",
+				);
+				GCC_PRECOMPILE_PREFIX_HEADER = YES;
+				GCC_PREFIX_HEADER = "ZotPad/ZotPad-Prefix.pch";
+				INFOPLIST_FILE = "ZotPad beta-Info.plist";
+				INSTALL_GROUP = 70000;
+				LIBRARY_SEARCH_PATHS = (
+					"$(inherited)",
+					"\"$(SRCROOT)\"",
+				);
+				PRODUCT_NAME = "ZotPad beta";
+				PROVISIONING_PROFILE = "";
+				SKIP_INSTALL = NO;
+				TARGETED_DEVICE_FAMILY = 2;
+				WRAPPER_EXTENSION = app;
+			};
+			name = Release;
+		};
 /* End XCBuildConfiguration section */
 
 /* Begin XCConfigurationList section */
@@ -1353,6 +1739,15 @@
 			buildConfigurations = (
 				A7200DF214718DC1004347C9 /* Debug */,
 				A7200DF314718DC1004347C9 /* Release */,
+			);
+			defaultConfigurationIsVisible = 0;
+			defaultConfigurationName = Release;
+		};
+		A7CD077215161555007A8E1D /* Build configuration list for PBXNativeTarget "ZotPad beta" */ = {
+			isa = XCConfigurationList;
+			buildConfigurations = (
+				A7CD077315161555007A8E1D /* Debug */,
+				A7CD077415161555007A8E1D /* Release */,
 			);
 			defaultConfigurationIsVisible = 0;
 			defaultConfigurationName = Release;
