@@ -44,6 +44,7 @@
 		A7200DEB14718DC1004347C9 /* ZPLibraryAndCollectionListViewController.m in Sources */ = {isa = PBXBuildFile; fileRef = A7200DEA14718DC1004347C9 /* ZPLibraryAndCollectionListViewController.m */; };
 		A7200DF614718F44004347C9 /* ZPDataLayer.m in Sources */ = {isa = PBXBuildFile; fileRef = A7200DF514718F44004347C9 /* ZPDataLayer.m */; };
 		A7200DF8147193C0004347C9 /* libsqlite3.dylib in Frameworks */ = {isa = PBXBuildFile; fileRef = A7200DF7147193C0004347C9 /* libsqlite3.dylib */; };
+		A727ED4F151B12C6001E626B /* ZPFileChannel_DropBox.m in Sources */ = {isa = PBXBuildFile; fileRef = A7CD0788151651C2007A8E1D /* ZPFileChannel_DropBox.m */; };
 		A72853F9147E319700D3FE97 /* ZPZoteroLibrary.m in Sources */ = {isa = PBXBuildFile; fileRef = A72853F8147E319600D3FE97 /* ZPZoteroLibrary.m */; };
 		A72853FD147E31B600D3FE97 /* ZPZoteroCollection.m in Sources */ = {isa = PBXBuildFile; fileRef = A72853FC147E31B500D3FE97 /* ZPZoteroCollection.m */; };
 		A72C3CA71487C9DA00F6744E /* MainStoryboard_iPad.storyboard in Resources */ = {isa = PBXBuildFile; fileRef = A72C3CA61487C9DA00F6744E /* MainStoryboard_iPad.storyboard */; };
@@ -79,7 +80,6 @@
 		A7A7C9F8147AA2EE004D8756 /* NSMutableURLRequest+Parameters.m in Sources */ = {isa = PBXBuildFile; fileRef = A7A7C9D0147AA2EE004D8756 /* NSMutableURLRequest+Parameters.m */; settings = {COMPILER_FLAGS = "-fno-objc-arc"; }; };
 		A7A7C9F9147AA2EE004D8756 /* NSString+URLEncoding.m in Sources */ = {isa = PBXBuildFile; fileRef = A7A7C9D2147AA2EE004D8756 /* NSString+URLEncoding.m */; settings = {COMPILER_FLAGS = "-fno-objc-arc"; }; };
 		A7A7C9FA147AA2EE004D8756 /* NSURL+Base.m in Sources */ = {isa = PBXBuildFile; fileRef = A7A7C9D4147AA2EE004D8756 /* NSURL+Base.m */; settings = {COMPILER_FLAGS = "-fno-objc-arc"; }; };
-		A7A7C9FB147AA2EE004D8756 /* Base64Transcoder.c in Sources */ = {isa = PBXBuildFile; fileRef = A7A7C9D6147AA2EE004D8756 /* Base64Transcoder.c */; settings = {COMPILER_FLAGS = "-fno-objc-arc"; }; };
 		A7A7C9FC147AA2EE004D8756 /* hmac.c in Sources */ = {isa = PBXBuildFile; fileRef = A7A7C9D8147AA2EE004D8756 /* hmac.c */; settings = {COMPILER_FLAGS = "-fno-objc-arc"; }; };
 		A7A7C9FD147AA2EE004D8756 /* sha1.c in Sources */ = {isa = PBXBuildFile; fileRef = A7A7C9DA147AA2EE004D8756 /* sha1.c */; settings = {COMPILER_FLAGS = "-fno-objc-arc"; }; };
 		A7A7C9FE147AA2EE004D8756 /* OAAttachment.m in Sources */ = {isa = PBXBuildFile; fileRef = A7A7C9DD147AA2EE004D8756 /* OAAttachment.m */; settings = {COMPILER_FLAGS = "-fno-objc-arc"; }; };
@@ -106,7 +106,6 @@
 		A7CD071015161555007A8E1D /* NSMutableURLRequest+Parameters.m in Sources */ = {isa = PBXBuildFile; fileRef = A7A7C9D0147AA2EE004D8756 /* NSMutableURLRequest+Parameters.m */; settings = {COMPILER_FLAGS = "-fno-objc-arc"; }; };
 		A7CD071115161555007A8E1D /* NSString+URLEncoding.m in Sources */ = {isa = PBXBuildFile; fileRef = A7A7C9D2147AA2EE004D8756 /* NSString+URLEncoding.m */; settings = {COMPILER_FLAGS = "-fno-objc-arc"; }; };
 		A7CD071215161555007A8E1D /* NSURL+Base.m in Sources */ = {isa = PBXBuildFile; fileRef = A7A7C9D4147AA2EE004D8756 /* NSURL+Base.m */; settings = {COMPILER_FLAGS = "-fno-objc-arc"; }; };
-		A7CD071315161555007A8E1D /* Base64Transcoder.c in Sources */ = {isa = PBXBuildFile; fileRef = A7A7C9D6147AA2EE004D8756 /* Base64Transcoder.c */; settings = {COMPILER_FLAGS = "-fno-objc-arc"; }; };
 		A7CD071415161555007A8E1D /* hmac.c in Sources */ = {isa = PBXBuildFile; fileRef = A7A7C9D8147AA2EE004D8756 /* hmac.c */; settings = {COMPILER_FLAGS = "-fno-objc-arc"; }; };
 		A7CD071515161555007A8E1D /* sha1.c in Sources */ = {isa = PBXBuildFile; fileRef = A7A7C9DA147AA2EE004D8756 /* sha1.c */; settings = {COMPILER_FLAGS = "-fno-objc-arc"; }; };
 		A7CD071615161555007A8E1D /* OAAttachment.m in Sources */ = {isa = PBXBuildFile; fileRef = A7A7C9DD147AA2EE004D8756 /* OAAttachment.m */; settings = {COMPILER_FLAGS = "-fno-objc-arc"; }; };
@@ -546,8 +545,6 @@
 		A7A7C9D2147AA2EE004D8756 /* NSString+URLEncoding.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = "NSString+URLEncoding.m"; sourceTree = "<group>"; };
 		A7A7C9D3147AA2EE004D8756 /* NSURL+Base.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = "NSURL+Base.h"; sourceTree = "<group>"; };
 		A7A7C9D4147AA2EE004D8756 /* NSURL+Base.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = "NSURL+Base.m"; sourceTree = "<group>"; };
-		A7A7C9D6147AA2EE004D8756 /* Base64Transcoder.c */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.c; path = Base64Transcoder.c; sourceTree = "<group>"; };
-		A7A7C9D7147AA2EE004D8756 /* Base64Transcoder.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = Base64Transcoder.h; sourceTree = "<group>"; };
 		A7A7C9D8147AA2EE004D8756 /* hmac.c */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.c; path = hmac.c; sourceTree = "<group>"; };
 		A7A7C9D9147AA2EE004D8756 /* hmac.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = hmac.h; sourceTree = "<group>"; };
 		A7A7C9DA147AA2EE004D8756 /* sha1.c */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.c; path = sha1.c; sourceTree = "<group>"; };
@@ -1061,8 +1058,6 @@
 		A7A7C9D5147AA2EE004D8756 /* Crypto */ = {
 			isa = PBXGroup;
 			children = (
-				A7A7C9D6147AA2EE004D8756 /* Base64Transcoder.c */,
-				A7A7C9D7147AA2EE004D8756 /* Base64Transcoder.h */,
 				A7A7C9D8147AA2EE004D8756 /* hmac.c */,
 				A7A7C9D9147AA2EE004D8756 /* hmac.h */,
 				A7A7C9DA147AA2EE004D8756 /* sha1.c */,
@@ -1376,7 +1371,6 @@
 				A7A7C9F8147AA2EE004D8756 /* NSMutableURLRequest+Parameters.m in Sources */,
 				A7A7C9F9147AA2EE004D8756 /* NSString+URLEncoding.m in Sources */,
 				A7A7C9FA147AA2EE004D8756 /* NSURL+Base.m in Sources */,
-				A7A7C9FB147AA2EE004D8756 /* Base64Transcoder.c in Sources */,
 				A7A7C9FC147AA2EE004D8756 /* hmac.c in Sources */,
 				A7A7C9FD147AA2EE004D8756 /* sha1.c in Sources */,
 				A7A7C9FE147AA2EE004D8756 /* OAAttachment.m in Sources */,
@@ -1456,7 +1450,6 @@
 				A7CD071015161555007A8E1D /* NSMutableURLRequest+Parameters.m in Sources */,
 				A7CD071115161555007A8E1D /* NSString+URLEncoding.m in Sources */,
 				A7CD071215161555007A8E1D /* NSURL+Base.m in Sources */,
-				A7CD071315161555007A8E1D /* Base64Transcoder.c in Sources */,
 				A7CD071415161555007A8E1D /* hmac.c in Sources */,
 				A7CD071515161555007A8E1D /* sha1.c in Sources */,
 				A7CD071615161555007A8E1D /* OAAttachment.m in Sources */,
@@ -1520,6 +1513,7 @@
 				A7CD0794151657B9007A8E1D /* ZPFileChannel_ZoteroStorage.m in Sources */,
 				A7CD0798151657C5007A8E1D /* ZPFileChannel_WebDAV.m in Sources */,
 				A7CD079C151657D6007A8E1D /* ZPFileChannel_LocalNetworkShare.m in Sources */,
+				A727ED4F151B12C6001E626B /* ZPFileChannel_DropBox.m in Sources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};

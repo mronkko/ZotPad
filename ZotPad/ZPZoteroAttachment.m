@@ -11,6 +11,11 @@
 
 #import "ZPZoteroAttachment.h"
 
+NSInteger const LINK_MODE_IMPORTED_FILE = 0;
+NSInteger const LINK_MODE_IMPORTED_URL = 1;
+NSInteger const LINK_MODE_LINKED_FILE = 2;
+NSInteger const LINK_MODE_LINKED_URL = 3;
+
 @implementation ZPZoteroAttachment
 
 

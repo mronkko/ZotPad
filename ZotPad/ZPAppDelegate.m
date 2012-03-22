@@ -27,7 +27,6 @@
     [defaults setObject:@"" forKey:@"userID"];
     [defaults setObject:@"" forKey:@"OAuthKey"];
     */
-    
     [[ZPPreferences instance] checkAndProcessApplicationResetPreferences];
     [[ZPPreferences instance] reload];
     

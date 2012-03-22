@@ -26,12 +26,12 @@ static NSCache* _fileTypeImageCache;
 
 -(UIImage*) getFiletypeImage:(ZPZoteroAttachment*)attachment height:(NSInteger)height width:(NSInteger)width{
     
-    NSString* key = [NSString stringWithFormat:@"%@%ix%i",attachment.attachmentType,height,width];
+    NSString* key = [NSString stringWithFormat:@"%@%ix%i",attachment.mimeType,height,width];
     
     UIImage* image = [_fileTypeImageCache objectForKey:key];
     
     if(image==NULL){
-        NSLog(@"Getting file type image for %@ (%ix%i)",attachment.attachmentType,height,width);
+        NSLog(@"Getting file type image for %@ (%ix%i)",attachment.mimeType,height,width);
         
         // Source: http://stackoverflow.com/questions/5876895/using-built-in-icons-for-mime-type-or-uti-type-in-ios
         
@@ -40,7 +40,7 @@ static NSCache* _fileTypeImageCache;
         UIDocumentInteractionController* docController = [UIDocumentInteractionController interactionControllerWithURL:fooUrl];
         
         //Need to convert from mime type to a UTI to be able to get icons for the document
-        CFStringRef mime = (__bridge CFStringRef) attachment.attachmentType;
+        CFStringRef mime = (__bridge CFStringRef) attachment.mimeType;
         NSString *uti = (__bridge NSString*) UTTypeCreatePreferredIdentifierForTag(kUTTagClassMIMEType,mime, NULL);
         
         //Tell the doc controller what UTI type we want

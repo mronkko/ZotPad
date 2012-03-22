@@ -28,7 +28,7 @@
 			<key>Key</key>
 			<string>webdavpassword</string>
 			<key>DefaultValue</key>
-			<string>Managed by keychain</string>
+			<string>Will be asked later</string>
 		</dict>
 	</array>
 	<key>StringsTable</key>

@@ -235,22 +235,39 @@
     //Add a label over the view
     NSString* extraInfo;
     
-    
-    if([attachment fileExists] && ![attachment.attachmentType isEqualToString:@"application/pdf"]){
-        extraInfo = [@"Preview not supported for " stringByAppendingString:attachment.attachmentType];
+    if([attachment.linkMode intValue]== LINK_MODE_IMPORTED_FILE || [attachment.linkMode intValue] == LINK_MODE_IMPORTED_URL){
+        if([attachment fileExists] && ![attachment.mimeType isEqualToString:@"application/pdf"]){
+            extraInfo = [@"Preview not supported for " stringByAppendingString:attachment.mimeType];
+        }
+        else if(![attachment fileExists] ){
+            
+            if([[ZPPreferences instance] online]){
+                NSInteger size = [attachment.attachmentSize intValue];
+                if(size>0) extraInfo = [NSString stringWithFormat:@"Tap to download %i KB.",size/1024];
+                else extraInfo = [NSString stringWithFormat:@"Tap to download (size unknown).",size/1024];
+            }
+            else  extraInfo = @"File has not been downloaded";
+        }
     }
-    else if(![attachment fileExists] ){
-        if([[ZPPreferences instance] online]) extraInfo = [NSString stringWithFormat:@"Tap to download %i KB.",[attachment.attachmentLength intValue]/1024];
-        else  extraInfo = @"File has not been downloaded";
+    else if ([attachment.linkMode intValue]== LINK_MODE_LINKED_URL) {
+        if([[ZPPreferences instance] online]){
+            extraInfo = @"Preview not supported for linked URL";
+        }
+        else {
+            extraInfo = @"Linked URL cannot be viewed in offline mode";
+        }
     }
-    
+    else if ([attachment.linkMode intValue]== LINK_MODE_LINKED_FILE) {
+        extraInfo = @"Linked files cannot be viewed from ZotPad";
+    }
+
     //Add information over the thumbnail
     
     
     UILabel* label = [[UILabel alloc] init];
     
-    if(extraInfo!=NULL) label.text = [NSString stringWithFormat:@"%@ \n\n(%@)", attachment.attachmentTitle, extraInfo];
-    else label.text = [NSString stringWithFormat:@"%@", attachment.attachmentTitle];
+    if(extraInfo!=NULL) label.text = [NSString stringWithFormat:@"%@ \n\n(%@)", attachment.title, extraInfo];
+    else label.text = [NSString stringWithFormat:@"%@", attachment.title];
     
     label.textColor = [UIColor whiteColor];
     label.backgroundColor = [UIColor clearColor];
@@ -279,7 +296,7 @@
     view.backgroundColor = [UIColor whiteColor];
     
     UIImageView* imageView = NULL;
-    if(attachment.fileExists && [attachment.attachmentType isEqualToString:@"application/pdf"]){
+    if(attachment.fileExists && [attachment.mimeType isEqualToString:@"application/pdf"]){
 
         UIImage* image = [_previewCache objectForKey:attachment.fileSystemPath];
         
@@ -291,7 +308,7 @@
             NSInvocationOperation* operation  = [[NSInvocationOperation alloc] initWithTarget:self selector:@selector(_renderThumbnailFromPDFFile:) object:attachment]; 
             //Create operation and queue it for background retrieval
             [_imageRenderQueue addOperation:operation];
-            NSLog(@"Added file %@ to preview render queue. Operations in queue now %i",attachment.attachmentTitle,[_imageRenderQueue operationCount]);
+            NSLog(@"Added file %@ to preview render queue. Operations in queue now %i",attachment.title,[_imageRenderQueue operationCount]);
         }
         else if((NSObject*)image != [NSNull null]){
             NSLog(@"Got an image from cache %@",attachment.fileSystemPath);

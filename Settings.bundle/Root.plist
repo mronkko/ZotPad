@@ -173,8 +173,6 @@
 			<string>PSChildPaneSpecifier</string>
 			<key>Title</key>
 			<string>Configure WebDAV</string>
-			<key>Key</key>
-			<string>File</string>
 			<key>File</key>
 			<string>WebDAV</string>
 		</dict>
@@ -190,13 +188,11 @@
 		</dict>
 		<dict>
 			<key>Type</key>
-			<string>PSTitleValueSpecifier</string>
+			<string>PSChildPaneSpecifier</string>
 			<key>Title</key>
 			<string>Configure DropBox</string>
-			<key>DefaultValue</key>
-			<string>Configured automatically</string>
-			<key>Key</key>
-			<string>dropboxconfiguration</string>
+			<key>File</key>
+			<string>DropBox</string>
 		</dict>
 		<dict>
 			<key>Type</key>
@@ -213,12 +209,9 @@
 			<string>PSChildPaneSpecifier</string>
 			<key>Title</key>
 			<string>Configure local network share</string>
-			<key>Key</key>
-			<string>File</string>
 			<key>File</key>
 			<string>samba</string>
 		</dict>
-
 		<dict>
 			<key>FooterText</key>
 			<string>These preferences will reset ZotPad data when it is next started.</string>

@@ -97,7 +97,7 @@ static ZPQuicklookController* _instance;
     
     UIAlertView* progressAlert;
 
-    progressAlert = [[UIAlertView alloc] initWithTitle: [NSString stringWithFormat:@"Downloading (%i KB)",[attachment.attachmentLength intValue]/1024]
+    progressAlert = [[UIAlertView alloc] initWithTitle: [NSString stringWithFormat:@"Downloading (%i KB)",[attachment.attachmentSize intValue]/1024]
                                                 message: nil
                                                delegate: self
                                       cancelButtonTitle: nil

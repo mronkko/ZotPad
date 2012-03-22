@@ -837,7 +837,7 @@ static ZPCacheController* _instance = nil;
 - (void) _updateCacheSizeAfterAddingAttachment:(ZPZoteroAttachment*)attachment{
     if(_sizeOfDocumentsFolder!=0){
         
-        _sizeOfDocumentsFolder = _sizeOfDocumentsFolder + [attachment.attachmentLength intValue]/1024;
+        _sizeOfDocumentsFolder = _sizeOfDocumentsFolder + [attachment.attachmentSize intValue]/1024;
 
 //        NSLog(@"Cache size after adding %@ to cache is %i",attachment.fileSystemPath,_sizeOfDocumentsFolder);
 
