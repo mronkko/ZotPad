@@ -210,7 +210,9 @@ static ZPDatabase* _instance = nil;
 
                 for (object in objectBatch){
                     NSArray* arguments = [self dbFieldValuesForObject:object fieldsNames:dbFieldNames];
-                    if(![_database executeUpdate:insertSQLBase withArgumentsInArray:arguments]) [NSException raise:@"Database error" format:@"Error executing query %@ with arguments %@",insertSQLBase,arguments];
+                    if(![_database executeUpdate:insertSQLBase withArgumentsInArray:arguments]){
+                        [NSException raise:@"Database error" format:@"Error executing query %@ with arguments %@",insertSQLBase,arguments];   
+                    }
 
                 }
                 //Finally raise an exception for the whole query if it failed
@@ -741,18 +743,20 @@ Deletes items, notes, and attachments based in array of keys from a library
 
 
 
-- (void) addAttributesToItem:(ZPZoteroItem *)item{
+- (NSDictionary*) attributesForItemWithKey:(NSString *)key{
     
     NSDictionary* results = NULL;
     @synchronized(self){
-        FMResultSet* resultSet = [_database executeQuery: @"SELECT * FROM items WHERE itemKey=? LIMIT 1",item.key];
+        FMResultSet* resultSet = [_database executeQuery: @"SELECT * FROM items WHERE itemKey=? LIMIT 1",key];
         
         if ([resultSet next]) {
             results = [resultSet resultDict];
         }
+        else results = [NSDictionary dictionaryWithObject:key forKey:@"itemKey"];
+
         [resultSet close];
     }
-    if(results!=NULL) [item configureWithDictionary:results];
+    return results;
 }
 
 
@@ -883,11 +887,13 @@ Deletes items, notes, and attachments based in array of keys from a library
 - (void) addAttachmentsToItem: (ZPZoteroItem*) item  {
     
     @synchronized(self){
-        FMResultSet* resultSet = [_database executeQuery: @"SELECT * FROM attachments WHERE parentItemKey = ? AND attachmentURL IS NOT NULL",item.key];
+        FMResultSet* resultSet = [_database executeQuery: @"SELECT * FROM attachments WHERE parentItemKey = ?",item.key];
         
         NSMutableArray* attachments = [[NSMutableArray alloc] init];
         while([resultSet next]) {
-            [attachments addObject:[ZPZoteroAttachment dataObjectWithDictionary:[resultSet resultDict]]];
+            NSDictionary* dict = [resultSet resultDict];
+            ZPZoteroAttachment* attachment = [ZPZoteroAttachment dataObjectWithDictionary:dict];
+            [attachments addObject:attachment];
         }
         
         [resultSet close];
@@ -903,7 +909,7 @@ Deletes items, notes, and attachments based in array of keys from a library
         
         NSMutableArray* returnArray = [NSMutableArray array];
         
-        FMResultSet* resultSet = [_database executeQuery: @"SELECT * FROM attachments WHERE attachmentURL IS NOT NULL ORDER BY CASE WHEN lastViewed IS NULL THEN 0 ELSE 1 end, lastViewed ASC, cacheTimestamp ASC"];
+        FMResultSet* resultSet = [_database executeQuery: @"SELECT * FROM attachments ORDER BY CASE WHEN lastViewed IS NULL THEN 0 ELSE 1 end, lastViewed ASC, cacheTimestamp ASC"];
         
         while([resultSet next]){
             ZPZoteroAttachment* attachment = (ZPZoteroAttachment*) [ZPZoteroAttachment dataObjectWithDictionary:[resultSet resultDict]];
@@ -929,10 +935,10 @@ Deletes items, notes, and attachments based in array of keys from a library
         FMResultSet* resultSet;
         
         if(collectionKey==NULL){
-            resultSet= [_database executeQuery: @"SELECT * FROM attachments, items WHERE parentItemKey = items.itemKey AND items.libraryID = ? AND attachmentURL IS NOT NULL ORDER BY attachments.cacheTimestamp DESC",libraryID];
+            resultSet= [_database executeQuery: @"SELECT * FROM attachments, items WHERE parentItemKey = items.itemKey AND items.libraryID = ? ORDER BY attachments.cacheTimestamp DESC",libraryID];
         }
         else{
-            resultSet= [_database executeQuery: @"SELECT * FROM attachments, collectionItems WHERE parentItemKey = itemsKey AND collectionKey = ? AND attachmentURL IS NOT NULL ORDER BY attachments.cacheTimestamp DESC",collectionKey];
+            resultSet= [_database executeQuery: @"SELECT * FROM attachments, collectionItems WHERE parentItemKey = itemsKey AND collectionKey = ? ORDER BY attachments.cacheTimestamp DESC",collectionKey];
         }
         
         while([resultSet next]){

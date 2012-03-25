@@ -146,6 +146,11 @@ static ZPPreferences* _instance = nil;
     
 }
 
+-(BOOL) useDropbox{
+    NSUserDefaults* defaults = [NSUserDefaults standardUserDefaults];
+    return [[defaults objectForKey:@"dropbox"] boolValue];
+}
+
 -(NSString*) username{
     NSUserDefaults* defaults = [NSUserDefaults standardUserDefaults];
     return [defaults objectForKey:@"username"];

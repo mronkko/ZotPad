@@ -136,27 +136,7 @@
 			<key>Type</key>
 			<string>PSGroupSpecifier</string>
 			<key>Title</key>
-			<string>File download and upload channnels</string>
-		</dict>
-		<dict>
-			<key>Type</key>
-			<string>PSToggleSwitchSpecifier</string>
-			<key>Title</key>
-			<string>Zotero storage</string>
-			<key>Key</key>
-			<string>zoterostorage</string>
-			<key>DefaultValue</key>
-			<true/>
-		</dict>
-		<dict>
-			<key>Type</key>
-			<string>PSTitleValueSpecifier</string>
-			<key>Title</key>
-			<string>Configure Zotero Storage</string>
-			<key>DefaultValue</key>
-			<string>Configured automatically</string>
-			<key>Key</key>
-			<string>zoterostorageconfiguration</string>
+			<string>Additional file channnels</string>
 		</dict>
 		<dict>
 			<key>Type</key>
@@ -185,14 +165,6 @@
 			<string>dropbox</string>
 			<key>DefaultValue</key>
 			<false/>
-		</dict>
-		<dict>
-			<key>Type</key>
-			<string>PSChildPaneSpecifier</string>
-			<key>Title</key>
-			<string>Configure DropBox</string>
-			<key>File</key>
-			<string>DropBox</string>
 		</dict>
 		<dict>
 			<key>Type</key>

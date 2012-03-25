@@ -41,7 +41,7 @@
 #import "ZPPreferences.h"
 
 #import "ZPFileChannel.h"
-#import "ZPFileChannel_DropBox.h"
+#import "ZPFileChannel_Dropbox.h"
 #import "ZPFileChannel_WebDAV.h"
 #import "ZPFileChannel_ZoteroStorage.h"
 #import "ZPFileChannel_LocalNetworkShare.h"
@@ -77,7 +77,7 @@ const NSInteger ZPServerConnectionRequestTopLevelKeys = 9;
     _activeRequestCount = 0;
     _fileChannels = [NSArray arrayWithObjects:[[ZPFileChannel_ZoteroStorage alloc] init], 
                      [[ZPFileChannel_WebDAV alloc] init], 
-                     [[ZPFileChannel_DropBox alloc] init], 
+                     [[ZPFileChannel_Dropbox alloc] init], 
                      [[ZPFileChannel_LocalNetworkShare alloc] init], nil];
     return self;
 }
@@ -320,7 +320,7 @@ const NSInteger ZPServerConnectionRequestTopLevelKeys = 9;
     //Request attachments for the single item
 
     if(item.numChildren >0){
-        [parameters setObject:@"none" forKey:@"content"];
+        [parameters setObject:@"json" forKey:@"content"];
         parserDelegate =  [self makeServerRequest:ZPServerConnectionRequestSingleItemChildren withParameters:parameters];
         
         NSMutableArray* attachments = NULL;
@@ -502,39 +502,38 @@ const NSInteger ZPServerConnectionRequestTopLevelKeys = 9;
 }
 
 
-/*
+#pragma mark - Asynchronous file downloads
 
- Methods for dowloading files
- 
- */
-
--(void) downloadAttachment:(ZPZoteroAttachment*)attachment{
-    [self downloadAttachment:attachment withUIProgressView:NULL];
-}
-
-
--(void) downloadAttachment:(ZPZoteroAttachment*)attachment withUIProgressView:(UIProgressView*) progressView{
+-(void) startDownloadingAttachment:(ZPZoteroAttachment*)attachment{
         
-    NSString* tempFile = [NSTemporaryDirectory() stringByAppendingPathComponent:[NSString stringWithFormat:@"ZP%@%i",attachment.key,[[NSDate date] timeIntervalSince1970]*1000000]];
-    NSLog(@"Temporary download file is %@",tempFile);
-    
-
     _activeRequestCount++;
-    
+
     //First request starts the network indicator
     if(_activeRequestCount==1) [[UIApplication sharedApplication] setNetworkActivityIndicatorVisible:YES];
 
-    //Loop over file channels and attempt to download the file
+    //Use the first channel
+    [[_fileChannels objectAtIndex:0] startDownloadingAttachment:attachment];
+
+}
+-(void) finishedDownloadingAttachment:(ZPZoteroAttachment*)attachment toFileAtPath:(NSString*) tempFile usingFileChannel:(ZPFileChannel*)fileChannel{
+
+    _activeRequestCount--;
     
-    BOOL gotFile = FALSE;
-    
-    for(ZPFileChannel* fileChannel in _fileChannels){
-        gotFile = [fileChannel download:attachment intoTempFile:tempFile withUIProgressView:progressView];
-        if(gotFile) break;
+    if(tempFile == NULL){
+        //No file file received, try the next channel 
+        NSInteger index = [_fileChannels indexOfObject:fileChannel]+1;
+        if(index < [_fileChannels count]){
+            _activeRequestCount++;
+            [[_fileChannels objectAtIndex:index] startDownloadingAttachment:attachment];
+        }
+        //In case of no more options to retry downloading, notify that downloading of this attachment has been finished.
+        //It is up to the observers to determine if downloading was succesful
+        else {
+            [[ZPDataLayer instance] notifyAttachmentDownloadCompleted:attachment];
+        }
     }
-    
-    if(gotFile){
-        //If we got a file, move it to the right plae
+    else{
+        //If we got a file, move it to the right place
         
         NSDictionary *_documentFileAttributes = [[NSFileManager defaultManager] fileAttributesAtPath:tempFile traverseLink:YES];
         
@@ -550,52 +549,30 @@ const NSInteger ZPServerConnectionRequestTopLevelKeys = 9;
             u_int8_t attrValue = 1;
             setxattr(filePath, attrName, &attrValue, sizeof(attrValue), 0, 0);
             
-            
-            
             //We need to do this in a different thread so that the current thread does not count towards the operations count
             [[ZPDataLayer instance] performSelectorInBackground:@selector(notifyAttachmentDownloadCompleted:) withObject:attachment];
+
         }
+        [[ZPDataLayer instance] notifyAttachmentDownloadCompleted:attachment];
+
     }
-    
-    _activeRequestCount--;
     
     //First request starts the network indicator
     if(_activeRequestCount==0) [[UIApplication sharedApplication] setNetworkActivityIndicatorVisible:NO];
-
+    
 }
 
--(void) downloadAttachmentFromZoteroServer:(ZPZoteroAttachment*)attachment toTempFile:(NSString*)filePath withUIProgressView:(UIProgressView*) progressView{
- 
-    NSString* oauthkey =  [[ZPPreferences instance] OAuthKey];
-    
-    NSString* urlString;
-    
-    NSInteger libraryID= [attachment.libraryID intValue];
-    
-    if(libraryID==1 || libraryID == 0){
-        urlString = [NSString stringWithFormat:@"https://api.zotero.org/users/%@",[[ZPPreferences instance] userID]];
+-(void) cancelDownloadingAttachment:(ZPZoteroAttachment*)attachment{
+    //Loop over the file channels and cancel downloading of this attachment
+    for(ZPFileChannel* channnel in _fileChannels){
+        [channnel cancelDownloadingAttachment:attachment];
     }
-    else{
-        urlString = [NSString stringWithFormat:@"https://api.zotero.org/groups/%i",libraryID];        
-    }
-    
-    NSURL* url = [NSURL URLWithString:[NSString stringWithFormat:@"%@/items/@%/file?key=%@",urlString, attachment.key, oauthkey]];
-    ASIHTTPRequest *request = [ASIHTTPRequest requestWithURL:url];
-    
-    if(progressView!=NULL){
-        [request setDownloadProgressDelegate:progressView];
-    }
-    else{
-        //No need to track progress for background downloads
-        request.showAccurateProgress=FALSE;
-    }
+}
 
-    [request setDownloadDestinationPath:filePath];
-    
-
-    [request startSynchronous];
-
-    
+-(void) useProgressView:(UIProgressView*) progressView forAttachment:(ZPZoteroAttachment*)attachment{
+    for(ZPFileChannel* channnel in _fileChannels){
+        [channnel useProgressView:progressView forAttachment:attachment];
+    }
 }
 
 

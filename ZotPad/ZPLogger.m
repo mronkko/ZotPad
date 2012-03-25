@@ -24,8 +24,12 @@ void ZPLog(NSObject* source,int line,NSString* format, ...){
         timeWhenAppStarted = [NSDate date]; 
         debugClasses = [NSMutableArray array ];
         
+        
+//        [debugClasses addObject:@"ZPAttachmentThumbnailFactory"];
+        [debugClasses addObject:@"ZPFileChannel_ZoteroStorage"];
+        [debugClasses addObject:@"ZPFileChannel_Dropbox"];
         [debugClasses addObject:@"ZPServerConnection"];
-        [debugClasses addObject:@"ZPItemListViewController"];
+//        [debugClasses addObject:@"ZPItemListViewController"];
 //        [debugClasses addObject:@"ZPServerResponseXMLParser"];
 //        [debugClasses addObject:@"ZPServerResponseXMLParserItem"];
 //        [debugClasses addObject:@"ZPPreferences"];
@@ -33,7 +37,7 @@ void ZPLog(NSObject* source,int line,NSString* format, ...){
 //        [debugClasses addObject:@"ZPDataLayer"];
 //        [debugClasses addObject:@"ZPAppDelegate"];
 //        [debugClasses addObject:@"ZPDatabase"];
-        [debugClasses addObject:@"ZPAuthenticationDialog"];
+//        [debugClasses addObject:@"ZPAuthenticationDialog"];
 //        [debugClasses addObject:@"ZPFileThumbnailAndQuicklookController"];
 //        [debugClasses addObject:@"ZPItemDetailViewController"];
 //        [debugClasses addObject:@"ZPUncachedItemsOperation"];

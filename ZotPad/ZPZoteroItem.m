@@ -8,6 +8,7 @@
 
 #import "ZPZoteroItem.h"
 #import "ZPZoteroAttachment.h"
+#import "ZPZoteroNote.h"
 #import "ZPDatabase.h"
 
 @implementation ZPZoteroItem
@@ -35,40 +36,37 @@ static NSCache* _objectCache = NULL;
     
     NSString* key = [fields objectForKey:@"itemKey"];
     
-    if(key == NULL)
-        [NSException raise:@"Key is null" format:@"ZPZoteroItem cannot be instantiated with NULL key"];
-    if([key isEqualToString:@""])
+    if(key == NULL || [key isEqual:@""])
         [NSException raise:@"Key is empty" format:@"ZPZoteroItem cannot be instantiated with empty key"];
-    
-    
+        
     if(_objectCache == NULL) _objectCache = [[NSCache alloc] init];
     
     ZPZoteroItem* obj= [_objectCache objectForKey:key];
     
-    //It is possible that subclasses of this class have already been instantiated with this key, so we need to reinstantiate the object
-    
-    if(obj==NULL || ! [obj isKindOfClass:[self class]]){
-        ZPZoteroItem* newObj= [[self alloc] init];
+    if(obj==NULL){
+        NSString* type = [fields objectForKey:@"itemType"];
+        ZPZoteroItem* newObj;
+        if([type isEqualToString:@"note"])
+            newObj = [[ZPZoteroNote alloc] init];
+        else if([type isEqualToString:@"attachment"])
+            newObj = [[ZPZoteroAttachment alloc] init];
+        else 
+            newObj = [[ZPZoteroItem alloc] init];
+
         newObj->_key=key;
-        newObj->_title=obj.title;
+           
         [newObj configureWithDictionary:fields];
         [_objectCache setObject:newObj  forKey:key];
         obj=newObj;
     }
     else [obj configureWithDictionary:fields];
 
-    //If the item does not have library id, it needs to be reconfigured. This can happen if we are initializing an item as an attachment.
-    
-    if(obj.libraryID == NULL) [[ZPDatabase instance] addAttributesToItem:obj] ;
-
     return obj;
 }
 
 +(id) dataObjectWithKey:(NSObject*) key{
     
-    if(key == NULL)
-        [NSException raise:@"Key is null" format:@"ZPZoteroItem cannot be instantiated with NULL key"];
-    if([key isEqual:@""])
+    if(key == NULL || [key isEqual:@""])
         [NSException raise:@"Key is empty" format:@"ZPZoteroItem cannot be instantiated with empty key"];
 
     
@@ -76,19 +74,15 @@ static NSCache* _objectCache = NULL;
     
     ZPZoteroItem* obj= [_objectCache objectForKey:key];
     
-    //It is possible that subclasses of this class have already been instantiated with this key, so we need to reinstantiate the object
     
-    if(obj==NULL || ! [obj isKindOfClass:[self class]]){
+    if(obj==NULL){
 
-        obj= [[self alloc] init];
-        obj->_key=(NSString*)key;
+        NSDictionary* attributes = [[ZPDatabase instance] attributesForItemWithKey:(NSString*)key];
         
-        //Retrieve data for this item from DB
-        [[ZPDatabase instance] addAttributesToItem:obj] ;
-
-        
-        [_objectCache setObject:obj  forKey:key];
+        obj = (ZPZoteroItem*) [self dataObjectWithDictionary:attributes];
     }
+
+
     return obj;
 }
 
@@ -224,7 +218,7 @@ static NSCache* _objectCache = NULL;
             //If there is a setter for this field, set it.
             
             NSString* setterString = [key stringByReplacingCharactersInRange:NSMakeRange(0,1)  
-                                                                 withString:[[setterString substringToIndex:1] capitalizedString]];
+                                                                 withString:[[key substringToIndex:1] capitalizedString]];
             
             //Make a setter and use it if it exists
             setterString = [[@"set" stringByAppendingString:setterString]stringByAppendingString: @":"];

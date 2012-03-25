@@ -11,6 +11,12 @@ integer ids from the server.
 
 PRAGMA synchronous=OFF;
 
+CREATE TABLE IF NOT EXISTS version ( 
+    version INTEGER PRIMARY KEY
+);
+
+INSERT INTO version VALUES (2);
+
 /*
 
 Group is the same as library. My library is not stored, because it will
@@ -64,10 +70,11 @@ CREATE INDEX notes_parentItemKey ON notes (parentItemKey);
 CREATE TABLE IF NOT EXISTS attachments (
     parentItemKey TEXT NOT NULL,
     itemKey TEXT PRIMARY KEY,
+    title TEXT NOT NULL,
     cacheTimestamp TEXT NOT NULL,
     linkMode NOT NULL,
     mimeType TEXT NOT NULL,
-    existsOnZoteroServer INT DEFAULT 0,
+    existsOnZoteroServer INT NOT NULL,
     attachmentSize INT DEFAULT NULL,
     lastViewed TIMESTAMP DEFAULT NULL
 );

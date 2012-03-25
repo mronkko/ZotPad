@@ -25,6 +25,19 @@ NSInteger const LINK_MODE_LINKED_URL = 3;
 @synthesize attachmentSize;
 @synthesize existsOnZoteroServer;
 
++(id) dataObjectWithDictionary:(NSDictionary *)fields{
+    NSMutableDictionary* dict = [NSMutableDictionary dictionaryWithDictionary:fields ];
+    [dict setObject:@"attachment" forKey:@"itemType"];
+    ZPZoteroAttachment* attachment = (ZPZoteroAttachment*) [super dataObjectWithDictionary:dict];
+    
+    //Set some default values
+    if(attachment.existsOnZoteroServer == nil){
+        attachment.existsOnZoteroServer = [NSNumber numberWithBool:NO];   
+    }
+    
+    return attachment;
+}
+
 // An alias for setParentCollectionKey
 - (void) setParentKey:(NSString*)key{
     [self setParentItemKey:key];    
@@ -84,6 +97,10 @@ NSInteger const LINK_MODE_LINKED_URL = 3;
 }
 
 -(BOOL) fileExists{
+    //The title must not be null
+    if(self.title == nil){
+        [NSException raise:@"Title of an item cannot be null" format:@""];
+    }
     NSString* fsPath = [self fileSystemPath];
     if(fsPath == NULL)
         return false;

@@ -8,6 +8,7 @@
 
 #import "ZPFileChannel.h"
 
-@interface ZPFileChannel_ZoteroStorage : ZPFileChannel
+@interface ZPFileChannel_ZoteroStorage : ZPFileChannel{
+}
 
 @end

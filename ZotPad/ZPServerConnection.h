@@ -15,7 +15,7 @@
 #import "ZPZoteroCollection.h"
 #import "ZPZoteroLibrary.h"
 #import "ZPZoteroAttachment.h"
-
+#import "ZPFileChannel.h"
 
 @interface ZPServerConnection : NSObject{
         
@@ -46,8 +46,12 @@
 //This retrieves single item details and notes and attachments associated with that item
 -(ZPZoteroItem*) retrieveSingleItemDetailsFromServer:(ZPZoteroItem*)item;
 
--(void) downloadAttachment:(ZPZoteroAttachment*)attachment;
--(void) downloadAttachment:(ZPZoteroAttachment*)attachment withUIProgressView:(UIProgressView*) progressView;
+// Asynchronous downloading of files
+-(void) startDownloadingAttachment:(ZPZoteroAttachment*)attachment;
+-(void) finishedDownloadingAttachment:(ZPZoteroAttachment*)attachment toFileAtPath:(NSString*) tempFile usingFileChannel:(ZPFileChannel*)fileChannel;
+-(void) cancelDownloadingAttachment:(ZPZoteroAttachment*)attachment;
+-(void) useProgressView:(UIProgressView*) progressView forAttachment:(ZPZoteroAttachment*)attachment;
+
 
 -(void) downloadAttachmentFromZoteroServer:(ZPZoteroAttachment*)attachment toTempFile:(NSString*)filePath withUIProgressView:(UIProgressView*) progressView;
 

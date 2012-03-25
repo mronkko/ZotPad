@@ -32,6 +32,7 @@
 
 -(BOOL) useCache;
 -(BOOL) online;
+-(BOOL) useDropbox;
 
 -(NSInteger) maxCacheSize;
 

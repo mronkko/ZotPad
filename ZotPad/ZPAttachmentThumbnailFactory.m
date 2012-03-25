@@ -9,6 +9,7 @@
 #import "ZPAttachmentThumbnailFactory.h"
 #import <MobileCoreServices/MobileCoreServices.h>
 #import <QuartzCore/QuartzCore.h>
+#import "ZPLogger.h"
 
 @implementation ZPAttachmentThumbnailFactory
 

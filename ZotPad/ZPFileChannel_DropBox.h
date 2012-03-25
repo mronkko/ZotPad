@@ -7,7 +7,10 @@
 //
 
 #import <Foundation/Foundation.h>
+#import <DropboxSDK/DropboxSDK.h>
 #import "ZPFileChannel.h"
-@interface ZPFileChannel_DropBox : ZPFileChannel
+@interface ZPFileChannel_Dropbox : ZPFileChannel <DBRestClientDelegate>{
+    NSMutableDictionary* progressViewsByRequest;
+}
 
 @end

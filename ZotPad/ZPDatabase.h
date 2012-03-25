@@ -51,7 +51,7 @@
 // Methods for filling data into existing objects
 - (void) addAttributesToGroupLibrary:(ZPZoteroLibrary*) library;
 - (void) addAttributesToCollection:(ZPZoteroCollection*) collection;
-- (void) addAttributesToItem:(ZPZoteroItem *)item;
+- (NSDictionary*) attributesForItemWithKey:(NSString *)key;
 
 
 - (void) addCreatorsToItem: (ZPZoteroItem*) item;

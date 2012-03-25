@@ -16,12 +16,12 @@
 #import "ZPServerConnection.h"
 
 #import "ZPPreferences.h"
-
+#import "ZPDataLayer.h"
 #import "ZPLogger.h"
 
 
 @interface ZPQuicklookController(){
-    ZPZoteroAttachment* _currentAttachment;
+    ZPZoteroAttachment* _activeAttachment;
 }
 - (void) _downloadWithProgressAlert:(ZPZoteroAttachment *)attachment;
 - (void) _downloadAttachment:(ZPZoteroAttachment *)attachment withUIProgressView:(UIProgressView*) progressView progressAlert:(UIAlertView*)progressAlert;
@@ -91,46 +91,68 @@ static ZPQuicklookController* _instance;
 
 
 
-#pragma mark Item downloading
+#pragma mark - Item downloading and alert view
 
 - (void) _downloadWithProgressAlert:(ZPZoteroAttachment *)attachment {
     
-    UIAlertView* progressAlert;
-
-    progressAlert = [[UIAlertView alloc] initWithTitle: [NSString stringWithFormat:@"Downloading (%i KB)",[attachment.attachmentSize intValue]/1024]
+    NSString* title;
+    if (attachment.attachmentSize != [NSNull null]){
+        title = [NSString stringWithFormat:@"Downloading (%i KB)",[attachment.attachmentSize intValue]/1024];
+    }
+    else {
+        title = @"Locating and downloading";
+    }
+    
+    _progressAlert = [[UIAlertView alloc] initWithTitle: title
                                                 message: nil
                                                delegate: self
-                                      cancelButtonTitle: nil
+                                      cancelButtonTitle: @"Cancel"
                                       otherButtonTitles: nil];
+    
+    _activeAttachment = attachment;
     
     // Create the progress bar and add it to the alert
     UIProgressView *progressView = [[UIProgressView alloc] initWithFrame:CGRectMake(30.0f, 80.0f, 225.0f, 90.0f)];
-    [progressAlert addSubview:progressView];
+    [_progressAlert addSubview:progressView];
     [progressView setProgressViewStyle: UIProgressViewStyleBar];
-    [progressAlert show];
+    [_progressAlert show];
     
-    //Create an invocation
-    SEL selector = @selector(_downloadAttachment:withUIProgressView:progressAlert:);
-    
-    NSMethodSignature* signature = [[self class] instanceMethodSignatureForSelector:selector];
-    NSInvocation* invocation  = [NSInvocation invocationWithMethodSignature:signature];
-    [invocation setTarget:self];
-    [invocation setSelector:selector];
-    
-    //Set arguments
-    [invocation setArgument:&attachment atIndex:2];
-    [invocation setArgument:&progressView atIndex:3];
-    [invocation setArgument:&progressAlert atIndex:4];
-    
-    [invocation performSelectorInBackground:@selector(invoke) withObject:NULL];
+    [[ZPDataLayer instance] registerAttachmentObserver:self];
+    // Start downloading
+    [[ZPServerConnection instance] startDownloadingAttachment:attachment];
+    [[ZPServerConnection instance] useProgressView:progressView forAttachment:attachment];
 }
 
-- (void) _downloadAttachment:(ZPZoteroAttachment *)attachment withUIProgressView:(UIProgressView*) progressView progressAlert:(UIAlertView*)progressAlert{
-    [[ZPServerConnection instance] downloadAttachment:attachment withUIProgressView:progressView];
-    [progressAlert dismissWithClickedButtonIndex:0 animated:YES];
-    [_fileURLs addObject:attachment.fileSystemPath];
-    [self performSelectorOnMainThread:@selector(_displayQuickLook) withObject:NULL waitUntilDone:NO];
+- (void)alertView:(UIAlertView *)alertView clickedButtonAtIndex:(NSInteger)buttonIndex{
+    if(_activeAttachment!=NULL){
+        [[ZPServerConnection instance] cancelDownloadingAttachment: _activeAttachment];
+    }
 }
 
+-(void) notifyAttachmentDownloadCompleted:(ZPZoteroAttachment*) attachment{
+
+    if (_activeAttachment == attachment){
+        
+        //No need to be notified about new completed downloads
+        [[ZPDataLayer instance] removeAttachmentObserver:self];
+
+        _activeAttachment = NULL;
+        if(attachment.fileExists){
+            [_progressAlert dismissWithClickedButtonIndex:0 animated:YES];
+            [_fileURLs addObject:attachment.fileSystemPath];
+            [self performSelectorOnMainThread:@selector(_displayQuicklook) withObject:NULL waitUntilDone:NO];
+        }
+        else{
+            //Remove the progressView and show an error message instead
+            for(UIView* view in [_progressAlert subviews]){
+                [view removeFromSuperview];
+                UILabel* label= [[UILabel alloc] initWithFrame:CGRectMake(30.0f, 80.0f, 225.0f, 90.0f)];
+                [label setText:@"The file could not be downloaded."];
+                [_progressAlert addSubview:label];
+            }
+        }
+        _progressAlert = NULL;
+    }
+}
 
 @end

@@ -11,6 +11,8 @@
 #import "ZPPreferences.h"
 #import "ZPLogger.h"
 #import "ZPLocalization.h"
+#import <DropboxSDK/DropboxSDK.h>
+#import "ZPDatabase.h"
 
 @implementation ZPAppDelegate
 
@@ -27,6 +29,11 @@
     [defaults setObject:@"" forKey:@"userID"];
     [defaults setObject:@"" forKey:@"OAuthKey"];
     */
+    
+    //Uncomment these to always reset the app after launch
+    [[ZPDatabase instance] resetDatabase];
+    [[ZPCacheController instance] performSelectorInBackground:@selector(purgeAllAttachmentFilesFromCache) withObject:NULL];
+
     [[ZPPreferences instance] checkAndProcessApplicationResetPreferences];
     [[ZPPreferences instance] reload];
     
@@ -98,6 +105,20 @@
     NSLog(@"Terminating");
 
     
+}
+
+- (BOOL)application:(UIApplication *)application handleOpenURL:(NSURL *)url {
+    
+    //DropBox authentication
+    if ([[DBSession sharedSession] handleOpenURL:url]) {
+        if ([[DBSession sharedSession] isLinked]) {
+            NSLog(@"App linked successfully!");
+            // At this point you can start making API calls
+        }
+        return YES;
+    }
+    // Add whatever other url handling code your app requires here
+    return NO;
 }
 
 @end

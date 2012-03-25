@@ -38,7 +38,7 @@
             _bibContent=TRUE;
         }
         //Item as JSON content
-        else if([elementName isEqualToString:@"zapi:subcontent"] && [@"json" isEqualToString:[attributeDict objectForKey:@"zapi:type"]]){
+        else if(([elementName isEqualToString:@"zapi:subcontent"] || [elementName isEqualToString:@"content"]) && [@"json" isEqualToString:[attributeDict objectForKey:@"zapi:type"]]){
             _jsonContent=TRUE;
         }
     }

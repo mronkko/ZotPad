@@ -34,7 +34,7 @@
 - (BOOL) _useAbstractCell:(NSIndexPath*)indexPath;
 -(void) _configurePreview:(UIView*) view withAttachment:(ZPZoteroAttachment*)attachment;
 -(void) _configurePreviewLabel:(UIView*)view withAttachment:(ZPZoteroAttachment*)attachment;
--(void) _renderThumbnailFromPDFFile:(ZPZoteroAttachment*)attachment;
+-(void) objectCache:(ZPZoteroAttachment*)attachment;
     
 -(void) _reloadAttachmentInCarousel:(ZPZoteroItem*)attachment;
 -(void) _reloadCarouselItemAtIndex:(NSInteger) index;
@@ -242,9 +242,11 @@
         else if(![attachment fileExists] ){
             
             if([[ZPPreferences instance] online]){
-                NSInteger size = [attachment.attachmentSize intValue];
-                if(size>0) extraInfo = [NSString stringWithFormat:@"Tap to download %i KB.",size/1024];
-                else extraInfo = [NSString stringWithFormat:@"Tap to download (size unknown).",size/1024];
+                if(attachment.attachmentSize != [NSNull null]){
+                    NSInteger size = [attachment.attachmentSize intValue];
+                    extraInfo = [NSString stringWithFormat:@"Tap to download %i KB.",size/1024];
+                }
+                else extraInfo = @"Tap to locate and download.";
             }
             else  extraInfo = @"File has not been downloaded";
         }
@@ -305,7 +307,7 @@
             [_previewCache setObject:[NSNull null] forKey:attachment.fileSystemPath];
             
             //Create an invocation
-            NSInvocationOperation* operation  = [[NSInvocationOperation alloc] initWithTarget:self selector:@selector(_renderThumbnailFromPDFFile:) object:attachment]; 
+            NSInvocationOperation* operation  = [[NSInvocationOperation alloc] initWithTarget:self selector:@selector(objectCache:) object:attachment]; 
             //Create operation and queue it for background retrieval
             [_imageRenderQueue addOperation:operation];
             NSLog(@"Added file %@ to preview render queue. Operations in queue now %i",attachment.title,[_imageRenderQueue operationCount]);
@@ -343,7 +345,7 @@
 }
 
 
--(void) _renderThumbnailFromPDFFile:(ZPZoteroAttachment*)attachment{
+-(void) objectCache:(ZPZoteroAttachment*)attachment{
     
     //
     // Renders a first page of a PDF as an image

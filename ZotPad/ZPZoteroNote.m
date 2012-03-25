@@ -10,6 +10,12 @@
 
 @implementation ZPZoteroNote
 
++(id) dataObjectWithDictionary:(NSDictionary *)fields{
+    NSMutableDictionary* dict = [NSMutableDictionary dictionaryWithDictionary:fields ];
+    [dict setObject:@"note" forKey:@"itemType"];
+    return [super dataObjectWithDictionary:dict];
+}
+
 // An alias for setParentCollectionKey
 - (void) setParentKey:(NSString*)key{
     [self setParentItemKey:key];    

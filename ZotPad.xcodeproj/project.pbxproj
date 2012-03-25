@@ -44,7 +44,6 @@
 		A7200DEB14718DC1004347C9 /* ZPLibraryAndCollectionListViewController.m in Sources */ = {isa = PBXBuildFile; fileRef = A7200DEA14718DC1004347C9 /* ZPLibraryAndCollectionListViewController.m */; };
 		A7200DF614718F44004347C9 /* ZPDataLayer.m in Sources */ = {isa = PBXBuildFile; fileRef = A7200DF514718F44004347C9 /* ZPDataLayer.m */; };
 		A7200DF8147193C0004347C9 /* libsqlite3.dylib in Frameworks */ = {isa = PBXBuildFile; fileRef = A7200DF7147193C0004347C9 /* libsqlite3.dylib */; };
-		A727ED4F151B12C6001E626B /* ZPFileChannel_DropBox.m in Sources */ = {isa = PBXBuildFile; fileRef = A7CD0788151651C2007A8E1D /* ZPFileChannel_DropBox.m */; };
 		A72853F9147E319700D3FE97 /* ZPZoteroLibrary.m in Sources */ = {isa = PBXBuildFile; fileRef = A72853F8147E319600D3FE97 /* ZPZoteroLibrary.m */; };
 		A72853FD147E31B600D3FE97 /* ZPZoteroCollection.m in Sources */ = {isa = PBXBuildFile; fileRef = A72853FC147E31B500D3FE97 /* ZPZoteroCollection.m */; };
 		A72C3CA71487C9DA00F6744E /* MainStoryboard_iPad.storyboard in Resources */ = {isa = PBXBuildFile; fileRef = A72C3CA61487C9DA00F6744E /* MainStoryboard_iPad.storyboard */; };
@@ -200,7 +199,6 @@
 		A7CD077B15162EE4007A8E1D /* AppIcon72x72.png in Resources */ = {isa = PBXBuildFile; fileRef = A7CD077A15162EE4007A8E1D /* AppIcon72x72.png */; };
 		A7CD078315162FA7007A8E1D /* AppIcon144x144-beta.png in Resources */ = {isa = PBXBuildFile; fileRef = A7CD078215162FA7007A8E1D /* AppIcon144x144-beta.png */; };
 		A7CD078515162FC9007A8E1D /* AppIcon144x144.png in Resources */ = {isa = PBXBuildFile; fileRef = A7CD078415162FC9007A8E1D /* AppIcon144x144.png */; };
-		A7CD0789151651C2007A8E1D /* ZPFileChannel_DropBox.m in Sources */ = {isa = PBXBuildFile; fileRef = A7CD0788151651C2007A8E1D /* ZPFileChannel_DropBox.m */; };
 		A7CD078B15165269007A8E1D /* DropboxSDK.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = A7CD078A15165269007A8E1D /* DropboxSDK.framework */; };
 		A7CD078C15165269007A8E1D /* DropboxSDK.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = A7CD078A15165269007A8E1D /* DropboxSDK.framework */; };
 		A7CD078F151652E9007A8E1D /* ZPFileChannel.m in Sources */ = {isa = PBXBuildFile; fileRef = A7CD078E151652E9007A8E1D /* ZPFileChannel.m */; };
@@ -211,6 +209,7 @@
 		A7CD0798151657C5007A8E1D /* ZPFileChannel_WebDAV.m in Sources */ = {isa = PBXBuildFile; fileRef = A7CD0796151657C5007A8E1D /* ZPFileChannel_WebDAV.m */; };
 		A7CD079B151657D6007A8E1D /* ZPFileChannel_LocalNetworkShare.m in Sources */ = {isa = PBXBuildFile; fileRef = A7CD079A151657D6007A8E1D /* ZPFileChannel_LocalNetworkShare.m */; };
 		A7CD079C151657D6007A8E1D /* ZPFileChannel_LocalNetworkShare.m in Sources */ = {isa = PBXBuildFile; fileRef = A7CD079A151657D6007A8E1D /* ZPFileChannel_LocalNetworkShare.m */; };
+		A7CFD5C1151F22BB00B0AD0A /* ZPFileChannel_Dropbox.m in Sources */ = {isa = PBXBuildFile; fileRef = A7CFD5C0151F22BB00B0AD0A /* ZPFileChannel_Dropbox.m */; };
 		A7D3C08014AEDE7B00DB975D /* QuickLook.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = A7D3C07F14AEDE7B00DB975D /* QuickLook.framework */; };
 		A7D3C08314AEE71000DB975D /* ZPLocalization.m in Sources */ = {isa = PBXBuildFile; fileRef = A7D3C08214AEE70F00DB975D /* ZPLocalization.m */; };
 		A7D5E2DC14F5690700593A39 /* ZPCacheStatusToolbarController.m in Sources */ = {isa = PBXBuildFile; fileRef = A7D5E2DB14F5690700593A39 /* ZPCacheStatusToolbarController.m */; };
@@ -589,8 +588,6 @@
 		A7CD077A15162EE4007A8E1D /* AppIcon72x72.png */ = {isa = PBXFileReference; lastKnownFileType = image.png; name = AppIcon72x72.png; path = Icons/AppIcon72x72.png; sourceTree = SOURCE_ROOT; };
 		A7CD078215162FA7007A8E1D /* AppIcon144x144-beta.png */ = {isa = PBXFileReference; lastKnownFileType = image.png; name = "AppIcon144x144-beta.png"; path = "../Icons/AppIcon144x144-beta.png"; sourceTree = "<group>"; };
 		A7CD078415162FC9007A8E1D /* AppIcon144x144.png */ = {isa = PBXFileReference; lastKnownFileType = image.png; name = AppIcon144x144.png; path = ../Icons/AppIcon144x144.png; sourceTree = "<group>"; };
-		A7CD0787151651C2007A8E1D /* ZPFileChannel_DropBox.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = ZPFileChannel_DropBox.h; sourceTree = "<group>"; };
-		A7CD0788151651C2007A8E1D /* ZPFileChannel_DropBox.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = ZPFileChannel_DropBox.m; sourceTree = "<group>"; };
 		A7CD078A15165269007A8E1D /* DropboxSDK.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; path = DropboxSDK.framework; sourceTree = "<group>"; };
 		A7CD078D151652E9007A8E1D /* ZPFileChannel.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = ZPFileChannel.h; sourceTree = "<group>"; };
 		A7CD078E151652E9007A8E1D /* ZPFileChannel.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = ZPFileChannel.m; sourceTree = "<group>"; };
@@ -600,6 +597,8 @@
 		A7CD0796151657C5007A8E1D /* ZPFileChannel_WebDAV.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = ZPFileChannel_WebDAV.m; sourceTree = "<group>"; };
 		A7CD0799151657D6007A8E1D /* ZPFileChannel_LocalNetworkShare.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = ZPFileChannel_LocalNetworkShare.h; sourceTree = "<group>"; };
 		A7CD079A151657D6007A8E1D /* ZPFileChannel_LocalNetworkShare.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = ZPFileChannel_LocalNetworkShare.m; sourceTree = "<group>"; };
+		A7CFD5BF151F22BB00B0AD0A /* ZPFileChannel_Dropbox.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = ZPFileChannel_Dropbox.h; sourceTree = "<group>"; };
+		A7CFD5C0151F22BB00B0AD0A /* ZPFileChannel_Dropbox.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = ZPFileChannel_Dropbox.m; sourceTree = "<group>"; };
 		A7D3C07F14AEDE7B00DB975D /* QuickLook.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; name = QuickLook.framework; path = System/Library/Frameworks/QuickLook.framework; sourceTree = SDKROOT; };
 		A7D3C08114AEE70F00DB975D /* ZPLocalization.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = ZPLocalization.h; sourceTree = "<group>"; };
 		A7D3C08214AEE70F00DB975D /* ZPLocalization.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = ZPLocalization.m; sourceTree = "<group>"; };
@@ -739,6 +738,7 @@
 		A702506E149C8BE8004F2AAB /* Server connection */ = {
 			isa = PBXGroup;
 			children = (
+				A7CD078615164DFA007A8E1D /* File channels */,
 				A702506F149C8D3D004F2AAB /* Response parsers */,
 				A7B5180914880CE600806EED /* ZPAuthenticationProcess.h */,
 				A7B5180A14880CE700806EED /* ZPAuthenticationProcess.m */,
@@ -908,7 +908,6 @@
 		A72853FF147E343A00D3FE97 /* Data layer */ = {
 			isa = PBXGroup;
 			children = (
-				A7CD078615164DFA007A8E1D /* File channels */,
 				A7200DF414718F44004347C9 /* ZPDataLayer.h */,
 				A7200DF514718F44004347C9 /* ZPDataLayer.m */,
 				A702501B149B33E1004F2AAB /* ZPCacheController.h */,
@@ -1079,8 +1078,8 @@
 		A7CD078615164DFA007A8E1D /* File channels */ = {
 			isa = PBXGroup;
 			children = (
-				A7CD0787151651C2007A8E1D /* ZPFileChannel_DropBox.h */,
-				A7CD0788151651C2007A8E1D /* ZPFileChannel_DropBox.m */,
+				A7CFD5BF151F22BB00B0AD0A /* ZPFileChannel_Dropbox.h */,
+				A7CFD5C0151F22BB00B0AD0A /* ZPFileChannel_Dropbox.m */,
 				A7CD078D151652E9007A8E1D /* ZPFileChannel.h */,
 				A7CD078E151652E9007A8E1D /* ZPFileChannel.m */,
 				A7CD0791151657B9007A8E1D /* ZPFileChannel_ZoteroStorage.h */,
@@ -1430,7 +1429,6 @@
 				A77B98DF14DE5CDB00132E9B /* ZPItemListViewController.m in Sources */,
 				A7D5E2DC14F5690700593A39 /* ZPCacheStatusToolbarController.m in Sources */,
 				A7D5E2DF14F624F600593A39 /* ZPAttachmentThumbnailFactory.m in Sources */,
-				A7CD0789151651C2007A8E1D /* ZPFileChannel_DropBox.m in Sources */,
 				A7CD078F151652E9007A8E1D /* ZPFileChannel.m in Sources */,
 				A7CD0793151657B9007A8E1D /* ZPFileChannel_ZoteroStorage.m in Sources */,
 				A7CD0797151657C5007A8E1D /* ZPFileChannel_WebDAV.m in Sources */,
@@ -1513,7 +1511,7 @@
 				A7CD0794151657B9007A8E1D /* ZPFileChannel_ZoteroStorage.m in Sources */,
 				A7CD0798151657C5007A8E1D /* ZPFileChannel_WebDAV.m in Sources */,
 				A7CD079C151657D6007A8E1D /* ZPFileChannel_LocalNetworkShare.m in Sources */,
-				A727ED4F151B12C6001E626B /* ZPFileChannel_DropBox.m in Sources */,
+				A7CFD5C1151F22BB00B0AD0A /* ZPFileChannel_Dropbox.m in Sources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
