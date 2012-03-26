@@ -769,7 +769,7 @@ static ZPCacheController* _instance = nil;
 
 
 -(void) notifyAttachmentDownloadCompleted:(ZPZoteroAttachment*) attachment{
-    [self _updateCacheSizeAfterAddingAttachment:attachment];
+    if(attachment.fileExists) [self _updateCacheSizeAfterAddingAttachment:attachment];
     [self _checkQueues];
 }
 
@@ -837,7 +837,9 @@ static ZPCacheController* _instance = nil;
 - (void) _updateCacheSizeAfterAddingAttachment:(ZPZoteroAttachment*)attachment{
     if(_sizeOfDocumentsFolder!=0){
         
-        _sizeOfDocumentsFolder = _sizeOfDocumentsFolder + [attachment.attachmentSize intValue]/1024;
+        NSDictionary *_documentFileAttributes = [[NSFileManager defaultManager] fileAttributesAtPath:attachment.fileSystemPath traverseLink:YES];
+        _sizeOfDocumentsFolder += [_documentFileAttributes fileSize]/1024;
+
 
 //        NSLog(@"Cache size after adding %@ to cache is %i",attachment.fileSystemPath,_sizeOfDocumentsFolder);
 

@@ -14,10 +14,6 @@
 
 @implementation ZPFileChannel_ZoteroStorage
 
-- (id) init {
-    self= [super init];
-
-}
 
 -(void) startDownloadingAttachment:(ZPZoteroAttachment*)attachment{
 
@@ -44,10 +40,7 @@
         ASIHTTPRequest *request = [ASIHTTPRequest requestWithURL:url];
         
 
-        @synchronized(self){
-            [requestsByAttachment setObject:request forKey:attachment];
-            [attachmentsByRequest setObject:attachment forKey:request];
-        }
+        [self linkAttachment:attachment withRequest:request];
         
         //Easier to just always use accurate progress. There should not be a significant performance penalty
         request.showAccurateProgress=TRUE;
@@ -66,23 +59,16 @@
 }
 -(void) cancelDownloadingAttachment:(ZPZoteroAttachment*)attachment{
 
-    ASIHTTPRequest* request;
-    @synchronized(self){
-        request = [requestsByAttachment objectForKey:attachment];
-    }
+    ASIHTTPRequest* request = [self requestWithAttachment:attachment];
     
     if(request != NULL){
         [request cancel];
-
         [self cleanupAfterFinishingAttachment:attachment];
     }
 }
 -(void) useProgressView:(UIProgressView*) progressView forAttachment:(ZPZoteroAttachment*)attachment{
     
-    ASIHTTPRequest* request;
-    @synchronized(self){
-        request = [requestsByAttachment objectForKey:attachment];
-    }
+    ASIHTTPRequest* request = [self requestWithAttachment:attachment];
     
     if(request != NULL){
         [request setDownloadProgressDelegate:progressView];
@@ -90,10 +76,7 @@
 }
 
 - (void)requestFinished:(ASIHTTPRequest *)request{
-    ZPZoteroAttachment* attachment;
-    @synchronized(self){
-        attachment = [attachmentsByRequest objectForKey:request];
-    }
+    ZPZoteroAttachment* attachment = [self attachmentWithRequest:request];
     [[ZPServerConnection instance] finishedDownloadingAttachment:attachment toFileAtPath:[request downloadDestinationPath] usingFileChannel:self];
 
     [self cleanupAfterFinishingAttachment:attachment];
@@ -102,10 +85,7 @@
 - (void)requestFailed:(ASIHTTPRequest *)request{
     NSError *error = [request error];
     NSLog(@"File download from Zotero server failed: %@",[error description]);
-    ZPZoteroAttachment* attachment;
-    @synchronized(self){
-        attachment = [attachmentsByRequest objectForKey:request];
-    }
+    ZPZoteroAttachment* attachment = [self attachmentWithRequest:request];
     [[ZPServerConnection instance] finishedDownloadingAttachment:attachment toFileAtPath:NULL usingFileChannel:self];
     
     [self cleanupAfterFinishingAttachment:attachment];

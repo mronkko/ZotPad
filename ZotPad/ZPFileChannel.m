@@ -14,8 +14,8 @@
 
 -(id) init{
     self = [super init];
-    requestsByAttachment = [[NSMutableDictionary alloc] init];
-    attachmentsByRequest = [[NSMutableDictionary alloc] init];
+    _requestsByAttachment = [[NSMutableDictionary alloc] init];
+    _attachmentsByRequest = [[NSMutableDictionary alloc] init];
     return self;
 }
 
@@ -29,11 +29,36 @@
 -(void) useProgressView:(UIProgressView*) progressView forAttachment:(ZPZoteroAttachment*)attachment{
     //Does nothing by default
 }
+-(void) linkAttachment:(ZPZoteroAttachment*)attachment withRequest:(NSObject*)request{
+    @synchronized(self){
+        [_requestsByAttachment setObject:request forKey:attachment.key];
+        [_attachmentsByRequest setObject:attachment forKey:[self keyForRequest:request]];
+    }
+}
+-(NSObject*) keyForRequest:(NSObject*)request{
+    return [NSNumber numberWithInt: request];
+}
+-(id) requestWithAttachment:(ZPZoteroAttachment*)attachment{
+    id ret;
+    @synchronized(self){
+        ret = [_requestsByAttachment objectForKey:attachment.key];
+    }
+    return ret;
+}
+-(ZPZoteroAttachment*) attachmentWithRequest:(NSObject*)request{
+    id ret;
+    @synchronized(self){
+        ret = [_attachmentsByRequest objectForKey:[self keyForRequest:request]];
+    }
+    return ret;
+
+}
+
 -(void) cleanupAfterFinishingAttachment:(ZPZoteroAttachment*)attachment{
     @synchronized(self){
-        NSObject* request = [requestsByAttachment objectForKey:attachment];
-        [requestsByAttachment removeObjectForKey:attachment];
-        [attachmentsByRequest removeObjectForKey:request];
+        NSObject* request = [self requestWithAttachment:attachment];
+        [_requestsByAttachment removeObjectForKey:attachment.key];
+        [_attachmentsByRequest removeObjectForKey:[self keyForRequest:request]];
     }
 }
 

@@ -104,7 +104,7 @@ static ZPQuicklookController* _instance;
     }
     
     _progressAlert = [[UIAlertView alloc] initWithTitle: title
-                                                message: nil
+                                                message: @" "
                                                delegate: self
                                       cancelButtonTitle: @"Cancel"
                                       otherButtonTitles: nil];
@@ -112,7 +112,7 @@ static ZPQuicklookController* _instance;
     _activeAttachment = attachment;
     
     // Create the progress bar and add it to the alert
-    UIProgressView *progressView = [[UIProgressView alloc] initWithFrame:CGRectMake(30.0f, 80.0f, 225.0f, 90.0f)];
+    UIProgressView *progressView = [[UIProgressView alloc] initWithFrame:CGRectMake(30.0f, 55.0f, 225.0f, 90.0f)];
     [_progressAlert addSubview:progressView];
     [progressView setProgressViewStyle: UIProgressViewStyleBar];
     [_progressAlert show];
@@ -145,11 +145,9 @@ static ZPQuicklookController* _instance;
         else{
             //Remove the progressView and show an error message instead
             for(UIView* view in [_progressAlert subviews]){
-                [view removeFromSuperview];
-                UILabel* label= [[UILabel alloc] initWithFrame:CGRectMake(30.0f, 80.0f, 225.0f, 90.0f)];
-                [label setText:@"The file could not be downloaded."];
-                [_progressAlert addSubview:label];
+                if([view isKindOfClass:[UIProgressView class]]) [view removeFromSuperview];
             }
+            [_progressAlert setMessage:@"Dowloading failed"];
         }
         _progressAlert = NULL;
     }
