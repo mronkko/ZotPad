@@ -26,6 +26,14 @@ do
 	/opt/local/bin/convert -size ${size}x$size xc:none -fill white -draw \
     "roundRectangle 0,0 $size,$size $corner,$corner" temp2.png \
     -compose SrcIn -composite AppIcon${size}x$size-beta-precomposed.png
+
+    /opt/local/bin/convert -draw "image Screen 0,0 0,0 'temp1.png'" \
+    AppIcon${size}x$size.png temp2.png
+
+	
+	/opt/local/bin/convert -size ${size}x$size xc:none -fill white -draw \
+    "roundRectangle 0,0 $size,$size $corner,$corner" temp2.png \
+    -compose SrcIn -composite AppIcon${size}x$size-precomposed.png
     
     
 done

@@ -28,14 +28,14 @@ void ZPLog(NSObject* source,int line,NSString* format, ...){
 //        [debugClasses addObject:@"ZPAttachmentThumbnailFactory"];
         [debugClasses addObject:@"ZPFileChannel_ZoteroStorage"];
         [debugClasses addObject:@"ZPFileChannel_Dropbox"];
-        [debugClasses addObject:@"ZPServerConnection"];
+//        [debugClasses addObject:@"ZPServerConnection"];
 //        [debugClasses addObject:@"ZPItemListViewController"];
 //        [debugClasses addObject:@"ZPServerResponseXMLParser"];
 //        [debugClasses addObject:@"ZPServerResponseXMLParserItem"];
 //        [debugClasses addObject:@"ZPPreferences"];
 //        [debugClasses addObject:@"ZPCacheController"];
 //        [debugClasses addObject:@"ZPDataLayer"];
-//        [debugClasses addObject:@"ZPAppDelegate"];
+        [debugClasses addObject:@"ZPAppDelegate"];
 //        [debugClasses addObject:@"ZPDatabase"];
 //        [debugClasses addObject:@"ZPAuthenticationDialog"];
 //        [debugClasses addObject:@"ZPFileThumbnailAndQuicklookController"];

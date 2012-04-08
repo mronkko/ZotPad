@@ -695,7 +695,7 @@
                 
                 ZPZoteroAttachment* attachment = [item.attachments objectAtIndex:0];
                 
-                UIImage* image = [[ZPAttachmentThumbnailFactory instance] getFiletypeImage:attachment height:articleThumbnail.frame.size.height width:articleThumbnail.frame.size.width];
+                UIImage* image = [[ZPAttachmentThumbnailFactory instance] getFiletypeImageForAttachment:attachment height:articleThumbnail.frame.size.height width:articleThumbnail.frame.size.width];
                 [articleThumbnail setImage:image forState:UIControlStateNormal];
                 [articleThumbnail setEnabled:(attachment.fileExists || [[ZPPreferences instance] online])];
             }

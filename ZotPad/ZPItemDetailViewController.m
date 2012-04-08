@@ -322,7 +322,7 @@
     }
     
     if(imageView == NULL){
-        imageView = [[UIImageView alloc] initWithImage:[[ZPAttachmentThumbnailFactory instance] getFiletypeImage:attachment height:ATTACHMENT_IMAGE_HEIGHT width:ATTACHMENT_IMAGE_WIDTH]];
+        imageView = [[UIImageView alloc] initWithImage:[[ZPAttachmentThumbnailFactory instance] getFiletypeImageForAttachment:attachment height:ATTACHMENT_IMAGE_HEIGHT width:ATTACHMENT_IMAGE_WIDTH]];
     }
 
     [view addSubview:imageView];

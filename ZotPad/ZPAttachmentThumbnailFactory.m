@@ -25,7 +25,32 @@ static NSCache* _fileTypeImageCache;
     return _instance;
 }
 
--(UIImage*) getFiletypeImage:(ZPZoteroAttachment*)attachment height:(NSInteger)height width:(NSInteger)width{
+//TODO: Refactor: remove redundant code
+
+-(UIImage*) getFiletypeImageForURL:(NSURL*)url height:(NSInteger)height width:(NSInteger)width{
+
+    UIDocumentInteractionController* docController = [UIDocumentInteractionController interactionControllerWithURL:url];
+
+    UIImage* image;
+
+    //Get the largest image that can fit
+    
+    for(UIImage* icon in docController.icons) {
+        
+        if(icon.size.width<width && icon.size.height<height) image=icon;
+        else{
+            if(image==NULL) image=icon;
+            break;   
+        }
+    }
+    
+    NSLog(@"Using image with size ( %f x %f )",image.size.width,image.size.height);
+    
+    return image;
+
+}
+
+-(UIImage*) getFiletypeImageForAttachment:(ZPZoteroAttachment*)attachment height:(NSInteger)height width:(NSInteger)width{
     
     NSString* key = [NSString stringWithFormat:@"%@%ix%i",attachment.mimeType,height,width];
     

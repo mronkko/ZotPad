@@ -12,6 +12,7 @@
 @interface ZPAttachmentThumbnailFactory : NSObject
 
 +(ZPAttachmentThumbnailFactory*) instance;
--(UIImage*) getFiletypeImage:(ZPZoteroAttachment*)attachment height:(NSInteger)height width:(NSInteger)width;
+-(UIImage*) getFiletypeImageForURL:(NSURL*)url height:(NSInteger)height width:(NSInteger)width;
+-(UIImage*) getFiletypeImageForAttachment:(ZPZoteroAttachment*)attachment height:(NSInteger)height width:(NSInteger)width;
 
 @end
