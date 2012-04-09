@@ -26,16 +26,16 @@ void ZPLog(NSObject* source,int line,NSString* format, ...){
         
         
 //        [debugClasses addObject:@"ZPAttachmentThumbnailFactory"];
-        [debugClasses addObject:@"ZPFileChannel_ZoteroStorage"];
-        [debugClasses addObject:@"ZPFileChannel_Dropbox"];
+//        [debugClasses addObject:@"ZPFileChannel_ZoteroStorage"];
+//        [debugClasses addObject:@"ZPFileChannel_Dropbox"];
 //        [debugClasses addObject:@"ZPServerConnection"];
-//        [debugClasses addObject:@"ZPItemListViewController"];
+        [debugClasses addObject:@"ZPItemListViewController"];
 //        [debugClasses addObject:@"ZPServerResponseXMLParser"];
 //        [debugClasses addObject:@"ZPServerResponseXMLParserItem"];
 //        [debugClasses addObject:@"ZPPreferences"];
 //        [debugClasses addObject:@"ZPCacheController"];
 //        [debugClasses addObject:@"ZPDataLayer"];
-        [debugClasses addObject:@"ZPAppDelegate"];
+//        [debugClasses addObject:@"ZPAppDelegate"];
 //        [debugClasses addObject:@"ZPDatabase"];
 //        [debugClasses addObject:@"ZPAuthenticationDialog"];
 //        [debugClasses addObject:@"ZPFileThumbnailAndQuicklookController"];
@@ -48,7 +48,7 @@ void ZPLog(NSObject* source,int line,NSString* format, ...){
 
     
     NSString* name = NSStringFromClass([source class]);
-    if(! [name hasPrefix:@"ZP"] || [debugClasses containsObject:name]){
+    if(! [name hasPrefix:@"ZP"] || [debugClasses containsObject:name] ){
         
         NSTimeInterval milliseconds = -([timeWhenAppStarted timeIntervalSinceNow] * 1000);
 //        NSString* logPrefix = [NSString stringWithFormat:@"%i - %@:%i ",milliseconds,name,line];

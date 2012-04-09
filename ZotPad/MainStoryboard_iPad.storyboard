@@ -1,10 +1,12 @@
-<?xml version="1.0" encoding="UTF-8"?>
-<document type="com.apple.InterfaceBuilder3.CocoaTouch.Storyboard.XIB" version="1.0" toolsVersion="1938" systemVersion="10K549" targetRuntime="iOS.CocoaTouch.iPad" propertyAccessControl="none" initialViewController="5">
+<?xml version="1.0" encoding="UTF-8" standalone="no"?>
+<document type="com.apple.InterfaceBuilder3.CocoaTouch.Storyboard.XIB" version="1.1" toolsVersion="2182" systemVersion="11D50d" targetRuntime="iOS.CocoaTouch.iPad" propertyAccessControl="none" initialViewController="5">
     <dependencies>
+        <deployment defaultVersion="1296" identifier="iOS"/>
         <development defaultVersion="4200" identifier="xcode"/>
-        <plugIn identifier="com.apple.InterfaceBuilder.IBCocoaTouchPlugin" version="933"/>
+        <plugIn identifier="com.apple.InterfaceBuilder.IBCocoaTouchPlugin" version="1181"/>
     </dependencies>
     <scenes>
+        <!--Navigation Controller - Libraries-->
         <scene sceneID="14">
             <objects>
                 <placeholder placeholderIdentifier="IBFirstResponder" id="13" sceneMemberID="firstResponder"/>
@@ -23,6 +25,7 @@
             </objects>
             <point key="canvasLocation" x="432" y="-178"/>
         </scene>
+        <!--Item List View Controller - Detail-->
         <scene sceneID="16">
             <objects>
                 <placeholder placeholderIdentifier="IBFirstResponder" id="15" sceneMemberID="firstResponder"/>
@@ -43,7 +46,7 @@
                                             <rect key="frame" x="0.0" y="0.0" width="683" height="78"/>
                                             <autoresizingMask key="autoresizingMask"/>
                                             <subviews>
-                                                <label opaque="NO" clipsSubviews="YES" userInteractionEnabled="NO" tag="1" contentMode="left" text="Title" lineBreakMode="tailTruncation" numberOfLines="2" adjustsFontSizeToFit="NO" minimumFontSize="1" id="9jR-nJ-7x4">
+                                                <label opaque="NO" clipsSubviews="YES" userInteractionEnabled="NO" tag="1" contentMode="left" text="Title" lineBreakMode="tailTruncation" numberOfLines="2" minimumFontSize="1" adjustsFontSizeToFit="NO" id="9jR-nJ-7x4">
                                                     <rect key="frame" x="75" y="2" width="588" height="21"/>
                                                     <autoresizingMask key="autoresizingMask" flexibleMaxX="YES" flexibleMaxY="YES"/>
                                                     <accessibility key="accessibilityConfiguration">
@@ -64,7 +67,7 @@
                                                     <nil key="highlightedColor"/>
                                                 </label>
                                                 <view tag="4" contentMode="scaleToFill" id="YxE-dZ-KIH" customClass="UIButton">
-                                                    <rect key="frame" x="2" y="2" width="70" height="74"/>
+                                                    <rect key="frame" x="0.0" y="2" width="70" height="74"/>
                                                     <autoresizingMask key="autoresizingMask" flexibleMaxX="YES" flexibleMaxY="YES"/>
                                                     <color key="backgroundColor" white="1" alpha="1" colorSpace="custom" customColorSpace="calibratedWhite"/>
                                                     <accessibility key="accessibilityConfiguration">
@@ -193,6 +196,7 @@
             </objects>
             <point key="canvasLocation" x="446" y="686"/>
         </scene>
+        <!--Item Detail View Controller - Item details-->
         <scene sceneID="PKa-gh-Q4w">
             <objects>
                 <placeholder placeholderIdentifier="IBFirstResponder" id="yVr-5j-UP4" userLabel="First Responder" sceneMemberID="firstResponder"/>
@@ -246,10 +250,10 @@
                                         <rect key="frame" x="0.0" y="99" width="723" height="45"/>
                                         <autoresizingMask key="autoresizingMask"/>
                                         <view key="contentView" opaque="NO" clipsSubviews="YES" multipleTouchEnabled="YES" contentMode="center">
-                                            <rect key="frame" x="45" y="1" width="633" height="43"/>
+                                            <rect key="frame" x="45" y="0.0" width="633" height="43"/>
                                             <autoresizingMask key="autoresizingMask"/>
                                             <subviews>
-                                                <label opaque="NO" clipsSubviews="YES" userInteractionEnabled="NO" tag="1" contentMode="left" text="Abstract" lineBreakMode="tailTruncation" adjustsFontSizeToFit="NO" minimumFontSize="10" id="ThI-kg-9Uy">
+                                                <label opaque="NO" clipsSubviews="YES" userInteractionEnabled="NO" tag="1" contentMode="left" text="Abstract" lineBreakMode="tailTruncation" minimumFontSize="10" adjustsFontSizeToFit="NO" id="ThI-kg-9Uy">
                                                     <rect key="frame" x="10" y="10" width="70" height="21"/>
                                                     <autoresizingMask key="autoresizingMask" flexibleMaxX="YES" flexibleMaxY="YES"/>
                                                     <fontDescription key="fontDescription" type="boldSystem" pointSize="17"/>
@@ -292,22 +296,25 @@
             </objects>
             <point key="canvasLocation" x="1360" y="686"/>
         </scene>
+        <!--Split View Controller-->
         <scene sceneID="18">
             <objects>
                 <placeholder placeholderIdentifier="IBFirstResponder" id="17" sceneMemberID="firstResponder"/>
-                <splitViewController id="5" sceneMemberID="viewController">
+                <splitViewController id="5" customClass="ZPSplitViewController" sceneMemberID="viewController">
                     <toolbarItems/>
                     <simulatedStatusBarMetrics key="simulatedStatusBarMetrics" statusBarStyle="blackTranslucent"/>
                     <simulatedOrientationMetrics key="simulatedOrientationMetrics" orientation="landscapeRight"/>
                     <connections>
                         <segue destination="3" kind="relationship" relationship="masterViewController" id="9"/>
                         <segue destination="42" kind="relationship" relationship="detailViewController" id="53"/>
-                        <segue destination="bpw-6z-DmG" kind="modal" identifier="AuthenticationSeque" modalPresentationStyle="pageSheet" id="jVu-Eo-vW4"/>
+                        <segue destination="bpw-6z-DmG" kind="modal" identifier="Authentication" modalPresentationStyle="pageSheet" id="jVu-Eo-vW4"/>
+                        <segue destination="kAN-bf-1Nz" kind="modal" identifier="ReceivedFile" modalPresentationStyle="formSheet" modalTransitionStyle="crossDissolve" id="QC5-ct-Juo"/>
                     </connections>
                 </splitViewController>
             </objects>
             <point key="canvasLocation" x="-711" y="-178"/>
         </scene>
+        <!--Library And Collection List View Controller - Libraries-->
         <scene sceneID="24">
             <objects>
                 <placeholder placeholderIdentifier="IBFirstResponder" id="23" sceneMemberID="firstResponder"/>
@@ -343,6 +350,7 @@
             </objects>
             <point key="canvasLocation" x="897" y="-178"/>
         </scene>
+        <!--Table View Controller - Items-->
         <scene sceneID="Zza-eC-TaA">
             <objects>
                 <placeholder placeholderIdentifier="IBFirstResponder" id="uuF-id-wBA" userLabel="First Responder" sceneMemberID="firstResponder"/>
@@ -360,7 +368,7 @@
                                     <rect key="frame" x="0.0" y="0.0" width="320" height="78"/>
                                     <autoresizingMask key="autoresizingMask"/>
                                     <subviews>
-                                        <label opaque="NO" clipsSubviews="YES" userInteractionEnabled="NO" tag="1" contentMode="left" text="Title" lineBreakMode="tailTruncation" numberOfLines="2" adjustsFontSizeToFit="NO" minimumFontSize="1" id="axH-Yp-Nz2">
+                                        <label opaque="NO" clipsSubviews="YES" userInteractionEnabled="NO" tag="1" contentMode="left" text="Title" lineBreakMode="tailTruncation" numberOfLines="2" minimumFontSize="1" adjustsFontSizeToFit="NO" id="axH-Yp-Nz2">
                                             <rect key="frame" x="5" y="0.0" width="698" height="21"/>
                                             <autoresizingMask key="autoresizingMask" flexibleMaxX="YES" flexibleMaxY="YES"/>
                                             <fontDescription key="fontDescription" type="boldSystem" pointSize="14"/>
@@ -412,6 +420,7 @@
             </objects>
             <point key="canvasLocation" x="1355" y="-178"/>
         </scene>
+        <!--Authentication Dialog - Login to Zotero-->
         <scene sceneID="kZo-Vw-R2l">
             <objects>
                 <placeholder placeholderIdentifier="IBFirstResponder" id="tOl-Er-2a8" userLabel="First Responder" sceneMemberID="firstResponder"/>
@@ -448,6 +457,23 @@
             </objects>
             <point key="canvasLocation" x="-438" y="-1375"/>
         </scene>
+        <!--File Import View Controller-->
+        <scene sceneID="Kpf-Ol-18o">
+            <objects>
+                <placeholder placeholderIdentifier="IBFirstResponder" id="Zot-dS-Ubc" userLabel="First Responder" sceneMemberID="firstResponder"/>
+                <viewController id="kAN-bf-1Nz" customClass="ZPFileImportViewController" sceneMemberID="viewController">
+                    <view key="view" contentMode="scaleToFill" id="l64-kU-A9B">
+                        <rect key="frame" x="0.0" y="0.0" width="540" height="620"/>
+                        <autoresizingMask key="autoresizingMask" flexibleMaxX="YES" flexibleMaxY="YES"/>
+                        <color key="backgroundColor" white="1" alpha="1" colorSpace="custom" customColorSpace="calibratedWhite"/>
+                        <simulatedOrientationMetrics key="simulatedOrientationMetrics" orientation="landscapeRight"/>
+                    </view>
+                    <modalFormSheetSimulatedSizeMetrics key="simulatedDestinationMetrics"/>
+                </viewController>
+            </objects>
+            <point key="canvasLocation" x="526" y="-1354"/>
+        </scene>
+        <!--Navigation Controller-->
         <scene sceneID="50">
             <objects>
                 <placeholder placeholderIdentifier="IBFirstResponder" id="49" userLabel="First Responder" sceneMemberID="firstResponder"/>
@@ -487,6 +513,9 @@
                 <relationship kind="outlet" name="webView" candidateClass="UIWebView"/>
             </relationships>
         </class>
+        <class className="ZPFileImportViewController" superclassName="UIViewController">
+            <source key="sourceIdentifier" type="project" relativePath="./Classes/ZPFileImportViewController.h"/>
+        </class>
         <class className="ZPItemDetailViewController" superclassName="UIViewController">
             <source key="sourceIdentifier" type="project" relativePath="./Classes/ZPItemDetailViewController.h"/>
             <relationships>
@@ -506,6 +535,9 @@
         </class>
         <class className="ZPLibraryAndCollectionListViewController" superclassName="UITableViewController">
             <source key="sourceIdentifier" type="project" relativePath="./Classes/ZPLibraryAndCollectionListViewController.h"/>
+        </class>
+        <class className="ZPSplitViewController" superclassName="UISplitViewController">
+            <source key="sourceIdentifier" type="project" relativePath="./Classes/ZPSplitViewController.h"/>
         </class>
         <class className="iCarousel" superclassName="UIView">
             <source key="sourceIdentifier" type="project" relativePath="./Classes/iCarousel.h"/>

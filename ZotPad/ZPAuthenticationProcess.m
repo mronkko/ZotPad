@@ -47,16 +47,16 @@ static ZPAuthenticationProcess* _instance = nil;
         sleep(.1);
     }    
     
-    [self performSelectorOnMainThread:@selector(showAuthenticationSeque) withObject:nil waitUntilDone:NO];
+    [self performSelectorOnMainThread:@selector(showAuthenticationSegue) withObject:nil waitUntilDone:NO];
 
 }
 
--(void)showAuthenticationSeque{
+-(void)showAuthenticationSegue{
 
     [self makeOAuthRequest: NULL];
 
     UIViewController* root = [UIApplication sharedApplication].delegate.window.rootViewController;        
-    [root performSegueWithIdentifier:@"AuthenticationSeque" sender:root];
+    [root performSegueWithIdentifier:@"Authentication" sender:root];
     
 }
 -(BOOL) isActive{

@@ -31,4 +31,7 @@ extern NSInteger const LINK_MODE_LINKED_URL;
 - (NSString*) fileSystemPath;
 - (BOOL) fileExists;
 
+// returns an object based on file system path
++(ZPZoteroAttachment*) dataObjectForAttachedFile:(NSString*) filename;
+
 @end

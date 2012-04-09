@@ -14,6 +14,8 @@
 #import "ZPAttachmentThumbnailFactory.h"
 #import "ZPAppDelegate.h"
 #import "ZPLogger.h"
+#import "Three20/Three20.h"
+
 
 //TODO: Refactor so that these would not be needed
 #import "ZPServerConnection.h"
@@ -695,8 +697,10 @@
                 
                 ZPZoteroAttachment* attachment = [item.attachments objectAtIndex:0];
                 
+                
                 UIImage* image = [[ZPAttachmentThumbnailFactory instance] getFiletypeImageForAttachment:attachment height:articleThumbnail.frame.size.height width:articleThumbnail.frame.size.width];
-                [articleThumbnail setImage:image forState:UIControlStateNormal];
+                [articleThumbnail setBackgroundImage:image forState:UIControlStateNormal];
+                articleThumbnail.contentMode = UIViewContentModeScaleAspectFit;
                 [articleThumbnail setEnabled:(attachment.fileExists || [[ZPPreferences instance] online])];
             }
             else{
@@ -725,26 +729,30 @@
         NSString* currentItemKey = [_itemKeysShown objectAtIndex: indexPath.row]; 
         [target setSelectedItem:(ZPZoteroItem*)[ZPZoteroItem dataObjectWithKey:currentItemKey]];
         
-        // Set the navigation controller
-        UITableViewController * simpleItemListViewController = [self.storyboard instantiateViewControllerWithIdentifier:@"NavigationItemListView"];
-        simpleItemListViewController.navigationItem.hidesBackButton = YES;
         
-        @synchronized(self){
-            [simpleItemListViewController.tableView setDelegate: self];
-            [simpleItemListViewController.tableView setDataSource: self];
-            _tableView = simpleItemListViewController.tableView;
+        // Set the navigation controller in iPad
+        
+        if ([[UIDevice currentDevice] userInterfaceIdiom] == UIUserInterfaceIdiomPad) {
+            
+            UITableViewController * simpleItemListViewController = [self.storyboard instantiateViewControllerWithIdentifier:@"NavigationItemListView"];
+            simpleItemListViewController.navigationItem.hidesBackButton = YES;
+            
+            @synchronized(self){
+                [simpleItemListViewController.tableView setDelegate: self];
+                [simpleItemListViewController.tableView setDataSource: self];
+                _tableView = simpleItemListViewController.tableView;
+            }
+            [simpleItemListViewController.tableView selectRowAtIndexPath:indexPath animated:NO scrollPosition:UITableViewScrollPositionMiddle]; 
+            
+            ZPAppDelegate* appDelegate = (ZPAppDelegate*)[[UIApplication sharedApplication] delegate];
+            
+            UINavigationController* navigationController = [[(UISplitViewController*)appDelegate.window.rootViewController viewControllers] objectAtIndex:0];
+            
+            //Set the cache status display
+            [simpleItemListViewController setToolbarItems:[[navigationController topViewController] toolbarItems]];
+            
+            [navigationController pushViewController:simpleItemListViewController animated:YES];
         }
-        [simpleItemListViewController.tableView selectRowAtIndexPath:indexPath animated:NO scrollPosition:UITableViewScrollPositionMiddle]; 
-
-        ZPAppDelegate* appDelegate = (ZPAppDelegate*)[[UIApplication sharedApplication] delegate];
-        
-        UINavigationController* navigationController = [[(UISplitViewController*)appDelegate.window.rootViewController viewControllers] objectAtIndex:0];
-
-        //Set the cache status display
-        [simpleItemListViewController setToolbarItems:[[navigationController topViewController] toolbarItems]];
-        
-        [navigationController pushViewController:simpleItemListViewController animated:YES];
-
         
     }
     

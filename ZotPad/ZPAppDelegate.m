@@ -14,11 +14,7 @@
 #import <DropboxSDK/DropboxSDK.h>
 #import "ZPDatabase.h"
 #import "ZPAttachmentThumbnailFactory.h"
-#include <QuartzCore/QuartzCore.h>
-
-// The size fo the thumbnail that will be shown for an incoming file
-#define ATTACHMENT_IMAGE_HEIGHT 580
-#define ATTACHMENT_IMAGE_WIDTH 423
+#import "ZPFileImportViewController.h"
 
 
 @implementation ZPAppDelegate
@@ -38,8 +34,8 @@
     */
     
     //Uncomment these to always reset the app after launch
-    [[ZPDatabase instance] resetDatabase];
-    [[ZPCacheController instance] performSelectorInBackground:@selector(purgeAllAttachmentFilesFromCache) withObject:NULL];
+    //[[ZPDatabase instance] resetDatabase];
+    //[[ZPCacheController instance] performSelectorInBackground:@selector(purgeAllAttachmentFilesFromCache) withObject:NULL];
 
     [[ZPPreferences instance] checkAndProcessApplicationResetPreferences];
     [[ZPPreferences instance] reload];
@@ -128,49 +124,7 @@
               
         NSLog(@"Received file %@",url);
         
-        //TODO: Refactor: Consider a better place for the code for this alert.
-
-        
-        UIAlertView *alertView = [[UIAlertView alloc] initWithTitle:[NSString stringWithFormat:@"Received file from %@",sourceApplication]
-                                                          message:nil
-                                                         delegate:nil
-                                                cancelButtonTitle:nil
-                                                otherButtonTitles:nil];
-
-        UIView* fileView = [[UIView alloc] initWithFrame:CGRectMake(0, 0, ATTACHMENT_IMAGE_WIDTH, ATTACHMENT_IMAGE_HEIGHT)];
-
-        fileView.layer.borderWidth = 2.0f;
-        fileView.backgroundColor = [UIColor whiteColor];
-        
-        UIImageView* imageView = [[UIImageView alloc] initWithImage:[[ZPAttachmentThumbnailFactory instance] getFiletypeImageForURL:url height:ATTACHMENT_IMAGE_HEIGHT width:ATTACHMENT_IMAGE_WIDTH]];
-        [fileView addSubview:imageView];
-        imageView.center = fileView.center;
-
-        //Add a label over the view
-        
-        UILabel* label = [[UILabel alloc] init];
-        label.text = [[url pathComponents] lastObject];
-        
-        label.textColor = [UIColor whiteColor];
-        label.backgroundColor = [UIColor clearColor];
-        label.textAlignment = UITextAlignmentCenter;
-        label.lineBreakMode = UILineBreakModeWordWrap;
-        label.numberOfLines = 5;
-        label.frame=CGRectMake(50, 200, fileView.frame.size.width-100, fileView.frame.size.height-400);
-        
-        UIView* background = [[UIView alloc] init];
-        background.frame=CGRectMake(40, 190, fileView.frame.size.width-80, fileView.frame.size.height-380);
-        background.backgroundColor=[UIColor blackColor];
-        background.alpha = 0.5;
-        background.layer.cornerRadius = 8;
-        
-        [fileView addSubview:background];
-        [fileView addSubview:label];
-
-        
-        [alertView addSubview:fileView];
-        [alertView show];
-        
+        [self.window.rootViewController performSegueWithIdentifier:@"ReceivedFile" sender:url];
         return YES;
     }
     // Add whatever other url handling code your app requires here

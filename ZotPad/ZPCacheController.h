@@ -53,6 +53,6 @@
 -(void) addToLibrariesQueue:(ZPZoteroLibrary*)object priority:(BOOL)priority;
 -(void) addToCollectionsQueue:(ZPZoteroCollection*)object priority:(BOOL)priority;
 -(void) addToItemQueue:(NSArray*)items libraryID:(NSNumber*)libraryID priority:(BOOL)priority;
-
+-(void) addAttachmentToUploadQueue:(ZPZoteroAttachment*) attachment withNewFile:(NSURL*)urlToFile; 
 
 @end

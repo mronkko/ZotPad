@@ -152,20 +152,40 @@
 }
 
 
+// On iPad the item list is always shown if library and collection list is visible
+
 - (void)tableView:(UITableView *)aTableView didSelectRowAtIndexPath:(NSIndexPath *)indexPath {
     
     /*
      When a row is selected, set the detail view controller's library and collection and refresh
      */
     
-    ZPZoteroDataObject* node = [self->_content objectAtIndex: indexPath.row];
-    self.detailViewController.libraryID = [node libraryID];
-    self.detailViewController.collectionKey = [node key];
+    if (self.detailViewController != NULL) {
 
-    //Clear search when changing collection. This is how Zotero behaves
-    [self.detailViewController clearSearch];
-    [self.detailViewController configureView];
-    
+        ZPZoteroDataObject* node = [self->_content objectAtIndex: indexPath.row];
+        self.detailViewController.libraryID = [node libraryID];
+        self.detailViewController.collectionKey = [node key];
+        
+        //Clear search when changing collection. This is how Zotero behaves
+        [self.detailViewController clearSearch];
+        [self.detailViewController configureView];
+    }    
+}
+
+// On iPhone the item list is shown with a segue
+
+-(void) prepareForSegue:(UIStoryboardSegue *)segue sender:(id)sender{
+    if([segue.identifier isEqualToString:@"PushItemList"]){
+        ZPItemListViewController* target = (ZPItemListViewController*) segue.destinationViewController;
+        ZPZoteroDataObject* node = [self->_content objectAtIndex: self.tableView.indexPathForSelectedRow.row];
+        target.libraryID = [node libraryID];
+        target.collectionKey = [node key];
+        
+        //Clear search when changing collection. This is how Zotero behaves
+        [target clearSearch];
+        [target configureView];
+        
+    }
 }
 
 - (void) tableView: (UITableView *) aTableView accessoryButtonTappedForRowWithIndexPath: (NSIndexPath *) indexPath

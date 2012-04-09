@@ -495,15 +495,18 @@ static ZPCacheController* _instance = nil;
 }
 
 -(void) refreshActiveItem:(ZPZoteroItem*) item {
-    if(item == NULL) [NSException raise:@"Item cannot be null" format:@"Method refresh active item was called with an argument that was null."];
+    if(item == NULL){
+        [NSException raise:@"Item cannot be null" format:@"Method refresh active item was called with an argument that was null."];
+    }
     [self performSelectorInBackground:@selector(_updateItemDetailsFromServer:) withObject:item];
     
 }
 
 -(void) _updateItemDetailsFromServer:(ZPZoteroItem*)item{
 
-    if(item == NULL) [NSException raise:@"Item cannot be null" format:@"Method _updateItemDetailsFromServer was called with an argument that was null."];
-
+    if(item == NULL){
+        [NSException raise:@"Item cannot be null" format:@"Method _updateItemDetailsFromServer was called with an argument that was null."];
+    }
     _activeItemKey = item.key;
     
     item = [[ZPServerConnection instance] retrieveSingleItemDetailsFromServer:item];

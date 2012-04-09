@@ -8,7 +8,6 @@
 
 #import <UIKit/UIKit.h>
 #import "../DSActivityView/Sources/DSActivityView.h"
-#import "Three20/Three20.h"
 #import "ZPItemListViewController.h"
 #import "ZPItemDetailViewController.h"
 

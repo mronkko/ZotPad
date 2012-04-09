@@ -19,10 +19,15 @@
 
 #import "ZPPreferences.h"
 
-#define ATTACHMENT_VIEW_HEIGHT 600
+//Define 
 
-#define ATTACHMENT_IMAGE_HEIGHT 580
-#define ATTACHMENT_IMAGE_WIDTH 423
+#define IPAD UI_USER_INTERFACE_IDIOM() == UIUserInterfaceIdiomPad
+
+#define ATTACHMENT_VIEW_HEIGHT (IPAD ? 600 : 400)
+#define ATTACHMENT_IMAGE_HEIGHT (IPAD ? 580 : 380)
+#define ATTACHMENT_IMAGE_WIDTH (IPAD ? 423 : 269)
+#define ATTACHMENT_LABEL_HEIGHT_MULTIPLIER (IPAD ? .3 : .4)
+#define ATTACHMENT_LABEL_WIDTH_MULTIPLIER (IPAD ? .7 : .8)
 
 @interface ZPItemDetailViewController(){
     NSOperationQueue* _imageRenderQueue;
@@ -91,8 +96,12 @@
 {
     //We need the dimensions of the view to be set before reconfiguring.
     [self configure];
-    //Set self as a delegate for the navigation controller so that we know when the view is being dismissed by the navigation controller and know to pop the other navigation controller.
-    [self.navigationController setDelegate:self];
+
+    if ([[UIDevice currentDevice] userInterfaceIdiom] == UIUserInterfaceIdiomPad) {
+        //Set self as a delegate for the navigation controller so that we know when the view is being dismissed by the navigation controller and know to pop the other navigation controller.
+        [self.navigationController setDelegate:self];
+    }
+    
     [super viewWillAppear:animated];
 
 }
@@ -103,11 +112,14 @@
     
 }
 
+-(void) didRotateFromInterfaceOrientation:(UIInterfaceOrientation)fromInterfaceOrientation{
 
-- (void)willRotateToInterfaceOrientation:(UIInterfaceOrientation)toInterfaceOrientation duration:(NSTimeInterval)duration{
-    UIView* attachmentView = [self.view viewWithTag:2];
-    [attachmentView setAutoresizingMask:UIViewAutoresizingFlexibleWidth];
-    [_detailTableView setAutoresizingMask:UIViewAutoresizingFlexibleWidth];
+    //Start with the frame for the carousel
+    CGRect contentRect = _carousel.frame;
+    
+    contentRect.size.height = contentRect.size.height + [_detailTableView contentSize].height;;
+    
+    [(UIScrollView*)self.view setContentSize: contentRect.size];
 }
 
 - (BOOL)shouldAutorotateToInterfaceOrientation:(UIInterfaceOrientation)interfaceOrientation
@@ -116,12 +128,22 @@
     return YES;
 }
 
+- (void)viewWillDisappear:(BOOL)animated
+{
+    
+    [[ZPDataLayer instance] removeItemObserver:self];
+    
+	[super viewWillDisappear:animated];
+}
+
 
 - (void)didReceiveMemoryWarning
 {
     [super didReceiveMemoryWarning];
     [_previewCache removeAllObjects];
 }
+
+#pragma mark - Configure view and subviews
 
 -(void) configure{
     
@@ -206,28 +228,6 @@
     }
     
 }
-- (void)viewWillDisappear:(BOOL)animated
-{
-    //Pop the item navigator away from the navigator.
-    
-    
-    [[ZPDataLayer instance] removeItemObserver:self];
-    
-	[super viewWillDisappear:animated];
-}
-
-- (void)navigationController:(UINavigationController *)navigationController willShowViewController:(UIViewController *)viewController animated:(BOOL)animated{
-
-    if(viewController != self){
-        //Pop the other controller if something else than self is showing
-        ZPAppDelegate* appDelegate = (ZPAppDelegate*)[[UIApplication sharedApplication] delegate];
-        
-        [[[(UISplitViewController*)appDelegate.window.rootViewController viewControllers] objectAtIndex:0] popViewControllerAnimated:YES];
-
-        //Remove delegate because we no longer need to pop the other controller
-        [navigationController setDelegate:NULL];
-    }
-}
 
 
 -(void) _configurePreviewLabel:(UIView*)view withAttachment:(ZPZoteroAttachment*)attachment{
@@ -276,13 +276,15 @@
     label.textAlignment = UITextAlignmentCenter;
     label.lineBreakMode = UILineBreakModeWordWrap;
     label.numberOfLines = 5;
-    label.frame=CGRectMake(50, 200, view.frame.size.width-100, view.frame.size.height-400);
+    label.frame=CGRectMake(0,0, view.frame.size.width*ATTACHMENT_LABEL_WIDTH_MULTIPLIER*.9, view.frame.size.height*ATTACHMENT_LABEL_HEIGHT_MULTIPLIER*.9);
+    label.center = view.center;
     
     UIView* background = [[UIView alloc] init];
-    background.frame=CGRectMake(40, 190, view.frame.size.width-80, view.frame.size.height-380);
+    background.frame=CGRectMake(0, 0, view.frame.size.width*ATTACHMENT_LABEL_WIDTH_MULTIPLIER, view.frame.size.height*ATTACHMENT_LABEL_HEIGHT_MULTIPLIER);
     background.backgroundColor=[UIColor blackColor];
     background.alpha = 0.5;
     background.layer.cornerRadius = 8;
+    background.center = view.center;
     
     [view addSubview:background];
     [view addSubview:label];
@@ -323,6 +325,7 @@
     
     if(imageView == NULL){
         imageView = [[UIImageView alloc] initWithImage:[[ZPAttachmentThumbnailFactory instance] getFiletypeImageForAttachment:attachment height:ATTACHMENT_IMAGE_HEIGHT width:ATTACHMENT_IMAGE_WIDTH]];
+        imageView.contentMode = UIViewContentModeScaleAspectFit;
     }
 
     [view addSubview:imageView];
@@ -333,6 +336,7 @@
     
 }
 
+#pragma mark - Preview and icon rendering
 
 -(CGRect)_getDimensionsWithImage:(UIImage*) image{    
     
@@ -380,6 +384,22 @@
     [self performSelectorOnMainThread:@selector(_reloadAttachmentInCarousel:) withObject:attachment waitUntilDone:NO];
     
 }
+
+#pragma mark - Navigation controller delegate
+
+- (void)navigationController:(UINavigationController *)navigationController willShowViewController:(UIViewController *)viewController animated:(BOOL)animated{
+    
+    if(viewController != self){
+        //Pop the other controller if something else than self is showing
+        ZPAppDelegate* appDelegate = (ZPAppDelegate*)[[UIApplication sharedApplication] delegate];
+        
+        [[[(UISplitViewController*)appDelegate.window.rootViewController viewControllers] objectAtIndex:0] popViewControllerAnimated:YES];
+        
+        //Remove delegate because we no longer need to pop the other controller
+        [navigationController setDelegate:NULL];
+    }
+}
+
 /*
  
  sections
@@ -389,6 +409,8 @@
  
 
 */
+
+#pragma mark - Tableview delegate
 
 - (NSInteger)numberOfSectionsInTableView:(UITableView*)tableView {
     return 3;
@@ -432,10 +454,31 @@
     if(tableView==_detailTableView && [self _useAbstractCell:indexPath]){
         
         NSString *text = [self _textAtIndexPath:indexPath isTitle:false];
-        CGSize textSize = [text sizeWithFont:[UIFont systemFontOfSize:14]
-                           constrainedToSize:CGSizeMake(_detailTableView.frame.size.width-100, 1000.0f)];
+
+        //The view has small margins
+        NSInteger textWidth;
+        NSInteger margins;
         
-        return textSize.height + 100;
+        if ([[UIDevice currentDevice] userInterfaceIdiom] == UIUserInterfaceIdiomPad) {
+            margins=10;
+            if (UIDeviceOrientationIsLandscape([UIDevice currentDevice].orientation)) textWidth=500;
+            else textWidth = 500;
+        }
+        else{
+            margins=100;
+            if (UIDeviceOrientationIsLandscape([UIDevice currentDevice].orientation)){
+                textWidth = 460;
+            }
+            else{
+                textWidth = 300;   
+            }
+        }
+
+        CGSize textSize = [text sizeWithFont:[UIFont systemFontOfSize:14]
+                           constrainedToSize:CGSizeMake(textWidth, 1000.0f)];
+        
+        
+        return textSize.height+margins;
        
     }
     return tableView.rowHeight;
@@ -533,7 +576,7 @@
         // Configure the cell
         UITextView* textView = (UITextView*) [cell viewWithTag:2];
         textView.text = [self _textAtIndexPath:indexPath isTitle:FALSE];
-        textView.frame= CGRectMake(textView.frame.origin.x, textView.frame.origin.y, textView.frame.size.width, [self tableView:tableView heightForRowAtIndexPath:indexPath]-50);
+        //textView.frame= CGRectMake(textView.frame.origin.x, textView.frame.origin.y, textView.frame.size.width, [self tableView:tableView heightForRowAtIndexPath:indexPath]-50);
         
     }
     else {
@@ -578,51 +621,10 @@
     }
 }
 
-/*
-    
- This takes care of both the details table and table that constains the list of items in the navigator
- 
- */
 
 
-#pragma mark-
-#pragma mark Observer methods
 
-/*
-    These are called by data layer to notify that more information about an item has become available from the server
- */
-
--(void) notifyItemAvailable:(ZPZoteroItem*) item{
-    
-    if([item.key isEqualToString:_currentItem.key]){
-        _currentItem = item;
-        [_activityIndicator startAnimating];
-        [self _reconfigureCarousel];
-        [self performSelectorOnMainThread:@selector(_reconfigureDetailTableView:) withObject:[NSNumber numberWithBool:TRUE] waitUntilDone:NO];
-
-        [_activityIndicator stopAnimating];
-
-    }
-}
-
--(void) notifyAttachmentDownloadCompleted:(ZPZoteroAttachment*) attachment{
-    [self _reloadAttachmentInCarousel:attachment];
-}
-
--(void) _reloadAttachmentInCarousel:(ZPZoteroItem*)attachment {
-    NSInteger index = [_currentItem.attachments indexOfObject:attachment];
-    if(index !=NSNotFound){
-        [self performSelectorOnMainThread:@selector(_reloadCarouselItemAtIndex:) withObject:[NSNumber numberWithInt:index] waitUntilDone:YES];
-    }
-}
-
--(void) _reloadCarouselItemAtIndex:(NSInteger) index{
-    [_carousel reloadItemAtIndex:index animated:YES];
-}
-
-
-#pragma mark -
-#pragma mark iCarousel methods
+#pragma mark - iCarousel delegate
 
 //Show the currently selected item in quicklook if tapped
 
@@ -668,6 +670,38 @@
     return view;
 }
 
-#pragma mark -
+#pragma mark - Observer methods
+
+/*
+ These are called by data layer to notify that more information about an item has become available from the server
+ */
+
+-(void) notifyItemAvailable:(ZPZoteroItem*) item{
+    
+    if([item.key isEqualToString:_currentItem.key]){
+        _currentItem = item;
+        [_activityIndicator startAnimating];
+        [self _reconfigureCarousel];
+        [self performSelectorOnMainThread:@selector(_reconfigureDetailTableView:) withObject:[NSNumber numberWithBool:TRUE] waitUntilDone:NO];
+        
+        [_activityIndicator stopAnimating];
+        
+    }
+}
+
+-(void) notifyAttachmentDownloadCompleted:(ZPZoteroAttachment*) attachment{
+    [self _reloadAttachmentInCarousel:attachment];
+}
+
+-(void) _reloadAttachmentInCarousel:(ZPZoteroItem*)attachment {
+    NSInteger index = [_currentItem.attachments indexOfObject:attachment];
+    if(index !=NSNotFound){
+        [self performSelectorOnMainThread:@selector(_reloadCarouselItemAtIndex:) withObject:[NSNumber numberWithInt:index] waitUntilDone:YES];
+    }
+}
+
+-(void) _reloadCarouselItemAtIndex:(NSInteger) index{
+    [_carousel reloadItemAtIndex:index animated:YES];
+}
 
 @end

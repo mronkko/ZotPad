@@ -72,15 +72,12 @@ static NSCache* _fileTypeImageCache;
         //Tell the doc controller what UTI type we want
         docController.UTI = uti;
         
-        //Get the largest image that can fit
+        //Get the smalles image that does not fit anymore and scale it down
         
         for(UIImage* icon in docController.icons) {
             
-            if(icon.size.width<width && icon.size.height<height) image=icon;
-            else{
-                if(image==NULL) image=icon;
-                break;   
-            }
+            image=icon;
+            if(icon.size.width>width && icon.size.height>height) break;   
         }
         
         NSLog(@"Using image with size ( %f x %f )",image.size.width,image.size.height);

@@ -38,6 +38,7 @@ NSInteger const LINK_MODE_LINKED_URL = 3;
     return attachment;
 }
 
+
 // An alias for setParentCollectionKey
 - (void) setParentKey:(NSString*)key{
     [self setParentItemKey:key];    
@@ -53,6 +54,18 @@ NSInteger const LINK_MODE_LINKED_URL = 3;
     else{
         return _parentItemKey;
     }
+}
+
++(ZPZoteroAttachment*) dataObjectForAttachedFile:(NSString*) filename{
+
+    //Strip the file ending
+    filename = [[filename lastPathComponent] stringByDeletingPathExtension];
+    
+    //Get the key from the filename
+    NSString* key =[[filename componentsSeparatedByString: @"_"] lastObject];
+    
+    return (ZPZoteroAttachment*) [self dataObjectWithKey:key];
+    
 }
 
 - (NSString*) fileSystemPath{
