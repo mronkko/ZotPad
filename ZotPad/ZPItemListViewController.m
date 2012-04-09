@@ -797,7 +797,7 @@
     NSInteger buttonCount;
 
     if ([[UIDevice currentDevice] userInterfaceIdiom] == UIUserInterfaceIdiomPad) buttonCount = 6;
-    else buttonCount = 4;
+    else buttonCount = 3;
     
     for(NSInteger i = 1; i<=buttonCount; ++i){
         //Because this preference is not used anywhere else, it is accessed directly.
@@ -824,6 +824,7 @@
         button.frame = CGRectMake(0,0, 101, 30);
         [button setImage:[UIImage imageNamed:@"barbutton_image_up_state.png"] forState:UIControlStateNormal];
         [button setImage:[UIImage imageNamed:@"barbutton_image_down_state.png"] forState:UIControlStateHighlighted];
+
         
         UILabel* label = [[UILabel alloc] initWithFrame:CGRectMake(0,0, 90, 30)];
         

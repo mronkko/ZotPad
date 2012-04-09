@@ -29,13 +29,13 @@
     //Manual override for userID and Key. Useful for running the code in debugger with other people's credentials.
     /*
     NSUserDefaults* defaults = [NSUserDefaults standardUserDefaults];
-    [defaults setObject:@"" forKey:@"userID"];
-    [defaults setObject:@"" forKey:@"OAuthKey"];
-    */
+    [defaults setObject:@"17500" forKey:@"userID"];
+    [defaults setObject:@"J3Y32BI90WU57ChMRs5ZryN6" forKey:@"OAuthKey"];
     
     //Uncomment these to always reset the app after launch
-    //[[ZPDatabase instance] resetDatabase];
-    //[[ZPCacheController instance] performSelectorInBackground:@selector(purgeAllAttachmentFilesFromCache) withObject:NULL];
+    [[ZPDatabase instance] resetDatabase];
+    [[ZPCacheController instance] performSelectorInBackground:@selector(purgeAllAttachmentFilesFromCache) withObject:NULL];
+     */
 
     [[ZPPreferences instance] checkAndProcessApplicationResetPreferences];
     [[ZPPreferences instance] reload];
