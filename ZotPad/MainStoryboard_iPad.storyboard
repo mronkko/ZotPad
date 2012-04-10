@@ -73,6 +73,9 @@
                                                     <accessibility key="accessibilityConfiguration">
                                                         <accessibilityTraits key="traits" none="YES" button="YES" image="YES"/>
                                                     </accessibility>
+                                                    <connections>
+                                                        <action selector="attachmentThumbnailPressed:" destination="4" eventType="touchUpInside" id="avB-xk-GEP"/>
+                                                    </connections>
                                                 </view>
                                                 <view clipsSubviews="YES" tag="3" contentMode="scaleToFill" id="3me-IS-Kgf" customClass="TTStyledTextLabel">
                                                     <rect key="frame" x="75" y="37" width="588" height="30"/>

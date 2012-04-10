@@ -19,11 +19,13 @@ NSInteger const LINK_MODE_LINKED_URL = 3;
 @implementation ZPZoteroAttachment
 
 
-@synthesize mimeType;
+@synthesize contentType;
 @synthesize lastViewed;
 @synthesize linkMode;
 @synthesize attachmentSize;
 @synthesize existsOnZoteroServer;
+@synthesize filename;
+@synthesize URL;
 
 +(id) dataObjectWithDictionary:(NSDictionary *)fields{
     NSMutableDictionary* dict = [NSMutableDictionary dictionaryWithDictionary:fields ];
@@ -70,12 +72,20 @@ NSInteger const LINK_MODE_LINKED_URL = 3;
 
 - (NSString*) fileSystemPath{
     
-    NSRange lastPeriod = [[super title] rangeOfString:@"." options:NSBackwardsSearch];
-    
     NSString* path;
-    if(lastPeriod.location == NSNotFound) path = [[super title] stringByAppendingFormat:@"_",_key];
-    else path = [[super title] stringByReplacingCharactersInRange:lastPeriod
-                                                                    withString:[NSString stringWithFormat:@"_%@.",_key]];
+    //Imported URLs are stored as ZIP files
+    
+    if([self.linkMode isEqualToString:@"imported_url"] ){
+        path = [[self filename] stringByAppendingFormat:@"_%@.zip",_key];
+    }
+    else{
+        NSRange lastPeriod = [[self filename] rangeOfString:@"." options:NSBackwardsSearch];
+        
+        
+        if(lastPeriod.location == NSNotFound) path = [[self filename] stringByAppendingFormat:@"_%@",_key];
+        else path = [[self filename] stringByReplacingCharactersInRange:lastPeriod
+                                                             withString:[NSString stringWithFormat:@"_%@.",_key]];
+    }
     return  [[NSSearchPathForDirectoriesInDomains(NSDocumentDirectory, NSUserDomainMask, YES) objectAtIndex:0] stringByAppendingPathComponent:path];
 
 }
@@ -110,9 +120,9 @@ NSInteger const LINK_MODE_LINKED_URL = 3;
 }
 
 -(BOOL) fileExists{
-    //The title must not be null
-    if(self.title == nil){
-        [NSException raise:@"Title of an item cannot be null" format:@""];
+    //If there is no known filename for the item, then the item cannot exists in cache
+    if(self.filename == nil || self.filename == [NSNull null]){
+        return false;
     }
     NSString* fsPath = [self fileSystemPath];
     if(fsPath == NULL)

@@ -235,9 +235,9 @@
     //Add a label over the view
     NSString* extraInfo;
     
-    if([attachment.linkMode intValue]== LINK_MODE_IMPORTED_FILE || [attachment.linkMode intValue] == LINK_MODE_IMPORTED_URL){
-        if([attachment fileExists] && ![attachment.mimeType isEqualToString:@"application/pdf"]){
-            extraInfo = [@"Preview not supported for " stringByAppendingString:attachment.mimeType];
+    if([attachment.linkMode isEqualToString:@"imported_file"] || [attachment.linkMode isEqualToString:@"imported_url"] ){
+        if([attachment fileExists] && ![attachment.contentType isEqualToString:@"application/pdf"]){
+            extraInfo = [@"Preview not supported for " stringByAppendingString:attachment.contentType];
         }
         else if(![attachment fileExists] ){
             
@@ -246,12 +246,12 @@
                     NSInteger size = [attachment.attachmentSize intValue];
                     extraInfo = [NSString stringWithFormat:@"Tap to download %i KB.",size/1024];
                 }
-                else extraInfo = @"Tap to locate and download.";
+                else extraInfo = @"Tap to download.";
             }
             else  extraInfo = @"File has not been downloaded";
         }
     }
-    else if ([attachment.linkMode intValue]== LINK_MODE_LINKED_URL) {
+    else if ([attachment.linkMode isEqualToString:@"linked_url"] ) {
         if([[ZPPreferences instance] online]){
             extraInfo = @"Preview not supported for linked URL";
         }
@@ -259,7 +259,7 @@
             extraInfo = @"Linked URL cannot be viewed in offline mode";
         }
     }
-    else if ([attachment.linkMode intValue]== LINK_MODE_LINKED_FILE) {
+    else if ([attachment.linkMode isEqualToString:@"linked_file"] ) {
         extraInfo = @"Linked files cannot be viewed from ZotPad";
     }
 
@@ -300,7 +300,7 @@
     view.backgroundColor = [UIColor whiteColor];
     
     UIImageView* imageView = NULL;
-    if(attachment.fileExists && [attachment.mimeType isEqualToString:@"application/pdf"]){
+    if(attachment.fileExists && [attachment.contentType isEqualToString:@"application/pdf"]){
 
         UIImage* image = [_previewCache objectForKey:attachment.fileSystemPath];
         
@@ -325,6 +325,7 @@
     
     if(imageView == NULL){
         imageView = [[UIImageView alloc] initWithImage:[[ZPAttachmentThumbnailFactory instance] getFiletypeImageForAttachment:attachment height:ATTACHMENT_IMAGE_HEIGHT width:ATTACHMENT_IMAGE_WIDTH]];
+        imageView.frame = CGRectMake(0,0,  ATTACHMENT_IMAGE_WIDTH, ATTACHMENT_IMAGE_HEIGHT);
         imageView.contentMode = UIViewContentModeScaleAspectFit;
     }
 

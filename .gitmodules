@@ -19,3 +19,6 @@
 [submodule "asi-http-request"]
 	path = asi-http-request
 	url = https://github.com/pokeb/asi-http-request.git
+[submodule "QSUtilities"]
+	path = QSUtilities
+	url = https://github.com/mikeho/QSUtilities.git

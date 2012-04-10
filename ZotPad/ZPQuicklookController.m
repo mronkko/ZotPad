@@ -19,6 +19,11 @@
 #import "ZPDataLayer.h"
 #import "ZPLogger.h"
 
+//Unzipping and base64 decoding
+#import "ZipArchive.h"
+#import "QSStrings.h"
+
+
 
 @interface ZPQuicklookController(){
     ZPZoteroAttachment* _activeAttachment;
@@ -26,11 +31,14 @@
 - (void) _downloadWithProgressAlert:(ZPZoteroAttachment *)attachment;
 - (void) _downloadAttachment:(ZPZoteroAttachment *)attachment withUIProgressView:(UIProgressView*) progressView progressAlert:(UIAlertView*)progressAlert;
 - (void) _displayQuicklook;
+- (void) _addAttachmentToQuicklook:(ZPZoteroAttachment *)attachment;
+
 @end
 
 
 
 @implementation ZPQuicklookController
+
 
 static ZPQuicklookController* _instance;
 
@@ -62,8 +70,43 @@ static ZPQuicklookController* _instance;
         if([[ZPPreferences instance] online] && [[ZPServerConnection instance] hasInternetConnection]) [self _downloadWithProgressAlert:attachment];
     }
     else {
-        [_fileURLs addObject:attachment.fileSystemPath];
+        [self _addAttachmentToQuicklook:attachment];
         [self _displayQuicklook];
+    }
+}
+
+
+- (void) _addAttachmentToQuicklook:(ZPZoteroAttachment *)attachment{
+    
+    // Imported URLs need to be unzipped
+    if([attachment.linkMode isEqualToString:@"imported_url"] ){
+        
+        NSString* tempDir = NSTemporaryDirectory();
+        ZipArchive* zipArchive = [[ZipArchive alloc] init];
+        [zipArchive UnzipOpenFile:attachment.fileSystemPath];
+        [zipArchive UnzipFileTo:tempDir overWrite:YES];
+        [zipArchive UnzipCloseFile];
+
+        //List the unzipped files and decode them
+        
+        NSArray* files = [[NSFileManager defaultManager]contentsOfDirectoryAtPath:tempDir error:NULL];
+        
+        for (NSString* file in files){
+            NSLog(@"Unzipped file %@ into temp dir %@",file,tempDir);
+            // The filenames end with %ZB64, which needs to be removed
+            NSString* toBeDecoded = [file substringToIndex:[file length] - 5];
+            NSData* decodedData = [QSStrings decodeBase64WithString:toBeDecoded] ;
+            NSString* decodedFilename = [[NSString alloc] initWithData:decodedData encoding:NSUTF8StringEncoding];
+            NSLog(@"Decoded %@ as %@",toBeDecoded, decodedFilename);
+        
+            [[NSFileManager defaultManager] moveItemAtPath:[tempDir stringByAppendingPathComponent:file] toPath:[tempDir stringByAppendingPathComponent:decodedFilename] error:NULL];
+
+        }
+        
+        [_fileURLs addObject:[tempDir stringByAppendingPathComponent:attachment.filename]];
+    }
+    else{
+        [_fileURLs addObject:attachment.fileSystemPath];
     }
 }
 
@@ -100,7 +143,7 @@ static ZPQuicklookController* _instance;
         title = [NSString stringWithFormat:@"Downloading (%i KB)",[attachment.attachmentSize intValue]/1024];
     }
     else {
-        title = @"Locating and downloading";
+        title = @"Downloading";
     }
     
     _progressAlert = [[UIAlertView alloc] initWithTitle: title
@@ -139,7 +182,7 @@ static ZPQuicklookController* _instance;
         _activeAttachment = NULL;
         if(attachment.fileExists){
             [_progressAlert dismissWithClickedButtonIndex:0 animated:YES];
-            [_fileURLs addObject:attachment.fileSystemPath];
+            [self _addAttachmentToQuicklook:attachment];
             [self performSelectorOnMainThread:@selector(_displayQuicklook) withObject:NULL waitUntilDone:NO];
         }
         else{

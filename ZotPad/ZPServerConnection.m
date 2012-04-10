@@ -540,8 +540,8 @@ const NSInteger ZPServerConnectionRequestTopLevelKeys = 9;
         if([_documentFileAttributes fileSize]>0){
             
             //Move the file to the right place
-            
-            [[NSFileManager defaultManager] moveItemAtPath:tempFile toPath:[attachment fileSystemPath] error:NULL];
+            NSString* targetPath = [attachment fileSystemPath];
+            [[NSFileManager defaultManager] moveItemAtPath:tempFile toPath:targetPath error:NULL];
             
             //Set this file as not cached
             const char* filePath = [[attachment fileSystemPath] fileSystemRepresentation];

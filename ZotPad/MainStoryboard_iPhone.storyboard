@@ -114,6 +114,9 @@
                                                     <accessibility key="accessibilityConfiguration">
                                                         <accessibilityTraits key="traits" none="YES" button="YES" image="YES"/>
                                                     </accessibility>
+                                                    <connections>
+                                                        <action selector="attachmentThumbnailPressed:" destination="21" eventType="touchUpOutside" id="jIM-Xv-mEj"/>
+                                                    </connections>
                                                 </view>
                                                 <view clipsSubviews="YES" tag="3" contentMode="redraw" id="CfO-Fh-tel" customClass="TTStyledTextLabel">
                                                     <rect key="frame" x="75" y="37" width="230" height="30"/>

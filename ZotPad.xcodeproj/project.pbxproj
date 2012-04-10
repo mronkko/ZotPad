@@ -49,6 +49,16 @@
 		A72C3CA71487C9DA00F6744E /* MainStoryboard_iPad.storyboard in Resources */ = {isa = PBXBuildFile; fileRef = A72C3CA61487C9DA00F6744E /* MainStoryboard_iPad.storyboard */; };
 		A73D635114879D15007999F3 /* Settings.bundle in Resources */ = {isa = PBXBuildFile; fileRef = A73D635014879D15007999F3 /* Settings.bundle */; };
 		A74348D7147AB37A00DA6FC3 /* ZPAuthenticationDialog.m in Sources */ = {isa = PBXBuildFile; fileRef = A74348D6147AB37A00DA6FC3 /* ZPAuthenticationDialog.m */; };
+		A75E185F153405740046988C /* ioapi.c in Sources */ = {isa = PBXBuildFile; fileRef = A75E1855153405740046988C /* ioapi.c */; };
+		A75E1860153405740046988C /* ioapi.c in Sources */ = {isa = PBXBuildFile; fileRef = A75E1855153405740046988C /* ioapi.c */; };
+		A75E1861153405740046988C /* mztools.c in Sources */ = {isa = PBXBuildFile; fileRef = A75E1857153405740046988C /* mztools.c */; };
+		A75E1862153405740046988C /* mztools.c in Sources */ = {isa = PBXBuildFile; fileRef = A75E1857153405740046988C /* mztools.c */; };
+		A75E1863153405740046988C /* unzip.c in Sources */ = {isa = PBXBuildFile; fileRef = A75E1859153405740046988C /* unzip.c */; };
+		A75E1864153405740046988C /* unzip.c in Sources */ = {isa = PBXBuildFile; fileRef = A75E1859153405740046988C /* unzip.c */; };
+		A75E1865153405740046988C /* zip.c in Sources */ = {isa = PBXBuildFile; fileRef = A75E185B153405740046988C /* zip.c */; };
+		A75E1866153405740046988C /* zip.c in Sources */ = {isa = PBXBuildFile; fileRef = A75E185B153405740046988C /* zip.c */; };
+		A75E1867153405740046988C /* ZipArchive.mm in Sources */ = {isa = PBXBuildFile; fileRef = A75E185E153405740046988C /* ZipArchive.mm */; };
+		A75E1868153405740046988C /* ZipArchive.mm in Sources */ = {isa = PBXBuildFile; fileRef = A75E185E153405740046988C /* ZipArchive.mm */; settings = {COMPILER_FLAGS = "-fno-objc-arc"; }; };
 		A7692D84147D112D000C1A8F /* ZPZoteroItem.m in Sources */ = {isa = PBXBuildFile; fileRef = A7692D83147D112D000C1A8F /* ZPZoteroItem.m */; };
 		A76D3C6714A9F3F3000C3ED9 /* ZPZoteroNote.m in Sources */ = {isa = PBXBuildFile; fileRef = A76D3C6614A9F3F3000C3ED9 /* ZPZoteroNote.m */; };
 		A76D3C7414AD97BB000C3ED9 /* CFNetwork.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = A76D3C7314AD97BA000C3ED9 /* CFNetwork.framework */; };
@@ -214,6 +224,10 @@
 		A7D3C08314AEE71000DB975D /* ZPLocalization.m in Sources */ = {isa = PBXBuildFile; fileRef = A7D3C08214AEE70F00DB975D /* ZPLocalization.m */; };
 		A7D5E2DC14F5690700593A39 /* ZPCacheStatusToolbarController.m in Sources */ = {isa = PBXBuildFile; fileRef = A7D5E2DB14F5690700593A39 /* ZPCacheStatusToolbarController.m */; };
 		A7D5E2DF14F624F600593A39 /* ZPAttachmentThumbnailFactory.m in Sources */ = {isa = PBXBuildFile; fileRef = A7D5E2DE14F624F500593A39 /* ZPAttachmentThumbnailFactory.m */; };
+		A7D762011534165D00E76EA1 /* QSStrings.m in Sources */ = {isa = PBXBuildFile; fileRef = A7D761F41534165D00E76EA1 /* QSStrings.m */; };
+		A7D762021534165D00E76EA1 /* QSStrings.m in Sources */ = {isa = PBXBuildFile; fileRef = A7D761F41534165D00E76EA1 /* QSStrings.m */; settings = {COMPILER_FLAGS = "-fno-objc-arc"; }; };
+		A7D76209153417F200E76EA1 /* GTMNSString+HTML.m in Sources */ = {isa = PBXBuildFile; fileRef = A7D76208153417F200E76EA1 /* GTMNSString+HTML.m */; };
+		A7D7620A153417F200E76EA1 /* GTMNSString+HTML.m in Sources */ = {isa = PBXBuildFile; fileRef = A7D76208153417F200E76EA1 /* GTMNSString+HTML.m */; settings = {COMPILER_FLAGS = "-fno-objc-arc"; }; };
 		A7F249D6153306ED00537B54 /* Default@2x.png in Resources */ = {isa = PBXBuildFile; fileRef = A7F249D5153306ED00537B54 /* Default@2x.png */; };
 		A7F249D81533072300537B54 /* Default-Landscape~ipad.png in Resources */ = {isa = PBXBuildFile; fileRef = A7F249D71533072300537B54 /* Default-Landscape~ipad.png */; };
 		A7F249DA1533072A00537B54 /* Default-Portrait~ipad.png in Resources */ = {isa = PBXBuildFile; fileRef = A7F249D91533072A00537B54 /* Default-Portrait~ipad.png */; };
@@ -512,6 +526,17 @@
 		A73D635014879D15007999F3 /* Settings.bundle */ = {isa = PBXFileReference; explicitFileType = wrapper.application; name = Settings.bundle; path = ../Settings.bundle; sourceTree = "<group>"; };
 		A74348D5147AB37A00DA6FC3 /* ZPAuthenticationDialog.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = ZPAuthenticationDialog.h; sourceTree = "<group>"; };
 		A74348D6147AB37A00DA6FC3 /* ZPAuthenticationDialog.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = ZPAuthenticationDialog.m; sourceTree = "<group>"; };
+		A75E1854153405740046988C /* crypt.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = crypt.h; sourceTree = "<group>"; };
+		A75E1855153405740046988C /* ioapi.c */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.c; path = ioapi.c; sourceTree = "<group>"; };
+		A75E1856153405740046988C /* ioapi.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = ioapi.h; sourceTree = "<group>"; };
+		A75E1857153405740046988C /* mztools.c */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.c; path = mztools.c; sourceTree = "<group>"; };
+		A75E1858153405740046988C /* mztools.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = mztools.h; sourceTree = "<group>"; };
+		A75E1859153405740046988C /* unzip.c */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.c; path = unzip.c; sourceTree = "<group>"; };
+		A75E185A153405740046988C /* unzip.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = unzip.h; sourceTree = "<group>"; };
+		A75E185B153405740046988C /* zip.c */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.c; path = zip.c; sourceTree = "<group>"; };
+		A75E185C153405740046988C /* zip.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = zip.h; sourceTree = "<group>"; };
+		A75E185D153405740046988C /* ZipArchive.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = ZipArchive.h; sourceTree = "<group>"; };
+		A75E185E153405740046988C /* ZipArchive.mm */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.objcpp; path = ZipArchive.mm; sourceTree = "<group>"; };
 		A7692D82147D112D000C1A8F /* ZPZoteroItem.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = ZPZoteroItem.h; sourceTree = "<group>"; };
 		A7692D83147D112D000C1A8F /* ZPZoteroItem.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = ZPZoteroItem.m; sourceTree = "<group>"; };
 		A76D3C6514A9F3F3000C3ED9 /* ZPZoteroNote.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = ZPZoteroNote.h; sourceTree = "<group>"; };
@@ -631,6 +656,12 @@
 		A7D5E2DB14F5690700593A39 /* ZPCacheStatusToolbarController.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = ZPCacheStatusToolbarController.m; sourceTree = "<group>"; };
 		A7D5E2DD14F624F500593A39 /* ZPAttachmentThumbnailFactory.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = ZPAttachmentThumbnailFactory.h; sourceTree = "<group>"; };
 		A7D5E2DE14F624F500593A39 /* ZPAttachmentThumbnailFactory.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = ZPAttachmentThumbnailFactory.m; sourceTree = "<group>"; };
+		A7D761F31534165D00E76EA1 /* QSStrings.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = QSStrings.h; sourceTree = "<group>"; };
+		A7D761F41534165D00E76EA1 /* QSStrings.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = QSStrings.m; sourceTree = "<group>"; };
+		A7D76206153417F200E76EA1 /* GTMDefines.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = GTMDefines.h; sourceTree = "<group>"; };
+		A7D76207153417F200E76EA1 /* GTMNSString+HTML.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = "GTMNSString+HTML.h"; sourceTree = "<group>"; };
+		A7D76208153417F200E76EA1 /* GTMNSString+HTML.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = "GTMNSString+HTML.m"; sourceTree = "<group>"; };
+		A7D7620B1534180F00E76EA1 /* QSUtilities.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; name = QSUtilities.h; path = QSUtilities/QSUtilities.h; sourceTree = SOURCE_ROOT; };
 		A7F249D5153306ED00537B54 /* Default@2x.png */ = {isa = PBXFileReference; lastKnownFileType = image.png; name = "Default@2x.png"; path = "../Default@2x.png"; sourceTree = "<group>"; };
 		A7F249D71533072300537B54 /* Default-Landscape~ipad.png */ = {isa = PBXFileReference; lastKnownFileType = image.png; name = "Default-Landscape~ipad.png"; path = "../Default-Landscape~ipad.png"; sourceTree = "<group>"; };
 		A7F249D91533072A00537B54 /* Default-Portrait~ipad.png */ = {isa = PBXFileReference; lastKnownFileType = image.png; name = "Default-Portrait~ipad.png"; path = "../Default-Portrait~ipad.png"; sourceTree = "<group>"; };
@@ -852,6 +883,8 @@
 		A7200DD314718DC0004347C9 /* Frameworks */ = {
 			isa = PBXGroup;
 			children = (
+				A7D761E81534165D00E76EA1 /* QSUtilities */,
+				A75E1852153405740046988C /* ZipArchive */,
 				A7CD078A15165269007A8E1D /* DropboxSDK.framework */,
 				3201088596B4756681693700 /* Three20UICommon.xcodeproj */,
 				320D7DCCE32703ACAB9A45E0 /* Three20.xcodeproj */,
@@ -980,6 +1013,32 @@
 				A76D3C6614A9F3F3000C3ED9 /* ZPZoteroNote.m */,
 			);
 			name = "Data objects";
+			sourceTree = "<group>";
+		};
+		A75E1852153405740046988C /* ZipArchive */ = {
+			isa = PBXGroup;
+			children = (
+				A75E1853153405740046988C /* minizip */,
+				A75E185D153405740046988C /* ZipArchive.h */,
+				A75E185E153405740046988C /* ZipArchive.mm */,
+			);
+			path = ZipArchive;
+			sourceTree = SOURCE_ROOT;
+		};
+		A75E1853153405740046988C /* minizip */ = {
+			isa = PBXGroup;
+			children = (
+				A75E1854153405740046988C /* crypt.h */,
+				A75E1855153405740046988C /* ioapi.c */,
+				A75E1856153405740046988C /* ioapi.h */,
+				A75E1857153405740046988C /* mztools.c */,
+				A75E1858153405740046988C /* mztools.h */,
+				A75E1859153405740046988C /* unzip.c */,
+				A75E185A153405740046988C /* unzip.h */,
+				A75E185B153405740046988C /* zip.c */,
+				A75E185C153405740046988C /* zip.h */,
+			);
+			path = minizip;
 			sourceTree = "<group>";
 		};
 		A76D3C7B14AD9CEF000C3ED9 /* ASIHTTPRequest */ = {
@@ -1153,6 +1212,27 @@
 				A7F249FA1533179700537B54 /* barbutton_image_up_state~iphone.png */,
 			);
 			name = "In-App icons";
+			sourceTree = "<group>";
+		};
+		A7D761E81534165D00E76EA1 /* QSUtilities */ = {
+			isa = PBXGroup;
+			children = (
+				A7D76205153417F200E76EA1 /* GTM */,
+				A7D761F31534165D00E76EA1 /* QSStrings.h */,
+				A7D761F41534165D00E76EA1 /* QSStrings.m */,
+			);
+			path = QSUtilities;
+			sourceTree = SOURCE_ROOT;
+		};
+		A7D76205153417F200E76EA1 /* GTM */ = {
+			isa = PBXGroup;
+			children = (
+				A7D7620B1534180F00E76EA1 /* QSUtilities.h */,
+				A7D76206153417F200E76EA1 /* GTMDefines.h */,
+				A7D76207153417F200E76EA1 /* GTMNSString+HTML.h */,
+				A7D76208153417F200E76EA1 /* GTMNSString+HTML.m */,
+			);
+			path = GTM;
 			sourceTree = "<group>";
 		};
 /* End PBXGroup section */
@@ -1503,6 +1583,13 @@
 				A7CD079B151657D6007A8E1D /* ZPFileChannel_LocalNetworkShare.m in Sources */,
 				A79E6FE41531A06C00612DD9 /* ZPFileImportViewController.m in Sources */,
 				A79E6FE81531B00100612DD9 /* ZPSplitViewController.m in Sources */,
+				A75E185F153405740046988C /* ioapi.c in Sources */,
+				A75E1861153405740046988C /* mztools.c in Sources */,
+				A75E1863153405740046988C /* unzip.c in Sources */,
+				A75E1865153405740046988C /* zip.c in Sources */,
+				A75E1867153405740046988C /* ZipArchive.mm in Sources */,
+				A7D762011534165D00E76EA1 /* QSStrings.m in Sources */,
+				A7D76209153417F200E76EA1 /* GTMNSString+HTML.m in Sources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
@@ -1584,6 +1671,13 @@
 				A7CFD5C1151F22BB00B0AD0A /* ZPFileChannel_Dropbox.m in Sources */,
 				A79E6FE51531A07C00612DD9 /* ZPFileImportViewController.m in Sources */,
 				A79E6FE91531B00500612DD9 /* ZPSplitViewController.m in Sources */,
+				A75E1860153405740046988C /* ioapi.c in Sources */,
+				A75E1862153405740046988C /* mztools.c in Sources */,
+				A75E1864153405740046988C /* unzip.c in Sources */,
+				A75E1866153405740046988C /* zip.c in Sources */,
+				A75E1868153405740046988C /* ZipArchive.mm in Sources */,
+				A7D762021534165D00E76EA1 /* QSStrings.m in Sources */,
+				A7D7620A153417F200E76EA1 /* GTMNSString+HTML.m in Sources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
@@ -1812,6 +1906,7 @@
 				PROVISIONING_PROFILE = "";
 				SKIP_INSTALL = NO;
 				TARGETED_DEVICE_FAMILY = "1,2";
+				USER_HEADER_SEARCH_PATHS = "\"$(BUILT_PRODUCTS_DIR)/../three20\" \"$(BUILT_PRODUCTS_DIR)/../../three20\" $(BUILT_PRODUCTS_DIR)/../../three20 Three20/Build/Products/three20 $(BUILT_PRODUCTS_DIR)/../three20 $(BUILT_PRODUCTS_DIR)/Three20 Three20/Build/Products/three20";
 				WRAPPER_EXTENSION = app;
 			};
 			name = Debug;
@@ -1838,6 +1933,7 @@
 				PROVISIONING_PROFILE = "";
 				SKIP_INSTALL = NO;
 				TARGETED_DEVICE_FAMILY = "1,2";
+				USER_HEADER_SEARCH_PATHS = "\"$(BUILT_PRODUCTS_DIR)/../three20\" \"$(BUILT_PRODUCTS_DIR)/../../three20\" $(BUILT_PRODUCTS_DIR)/../../three20 Three20/Build/Products/three20 $(BUILT_PRODUCTS_DIR)/../three20 $(BUILT_PRODUCTS_DIR)/Three20 Three20/Build/Products/three20";
 				WRAPPER_EXTENSION = app;
 			};
 			name = Release;

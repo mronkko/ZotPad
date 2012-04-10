@@ -111,8 +111,9 @@
                 NSString* type=[attributeDict objectForKey:@"type"];
                 NSString* length=[attributeDict objectForKey:@"length"];
                 
-                if(type!=NULL && length!=NULL){
-                    [self _setField:@"existsOnZoteroServer" toValue:[NSNumber numberWithInt:1]];
+                [self _setField:@"existsOnZoteroServer" toValue:[NSNumber numberWithInt:1]];
+
+                if(length!=NULL){
                     [self _setField:@"attachmentSize" toValue:[NSNumber numberWithInt:[length intValue]]];
                 }
             }
