@@ -217,8 +217,8 @@
 		A7CD0794151657B9007A8E1D /* ZPFileChannel_ZoteroStorage.m in Sources */ = {isa = PBXBuildFile; fileRef = A7CD0792151657B9007A8E1D /* ZPFileChannel_ZoteroStorage.m */; };
 		A7CD0797151657C5007A8E1D /* ZPFileChannel_WebDAV.m in Sources */ = {isa = PBXBuildFile; fileRef = A7CD0796151657C5007A8E1D /* ZPFileChannel_WebDAV.m */; };
 		A7CD0798151657C5007A8E1D /* ZPFileChannel_WebDAV.m in Sources */ = {isa = PBXBuildFile; fileRef = A7CD0796151657C5007A8E1D /* ZPFileChannel_WebDAV.m */; };
-		A7CD079B151657D6007A8E1D /* ZPFileChannel_LocalNetworkShare.m in Sources */ = {isa = PBXBuildFile; fileRef = A7CD079A151657D6007A8E1D /* ZPFileChannel_LocalNetworkShare.m */; };
-		A7CD079C151657D6007A8E1D /* ZPFileChannel_LocalNetworkShare.m in Sources */ = {isa = PBXBuildFile; fileRef = A7CD079A151657D6007A8E1D /* ZPFileChannel_LocalNetworkShare.m */; };
+		A7CD079B151657D6007A8E1D /* ZPFileChannel_Samba.m in Sources */ = {isa = PBXBuildFile; fileRef = A7CD079A151657D6007A8E1D /* ZPFileChannel_Samba.m */; };
+		A7CD079C151657D6007A8E1D /* ZPFileChannel_Samba.m in Sources */ = {isa = PBXBuildFile; fileRef = A7CD079A151657D6007A8E1D /* ZPFileChannel_Samba.m */; };
 		A7CFD5C1151F22BB00B0AD0A /* ZPFileChannel_Dropbox.m in Sources */ = {isa = PBXBuildFile; fileRef = A7CFD5C0151F22BB00B0AD0A /* ZPFileChannel_Dropbox.m */; };
 		A7D3C08014AEDE7B00DB975D /* QuickLook.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = A7D3C07F14AEDE7B00DB975D /* QuickLook.framework */; };
 		A7D3C08314AEE71000DB975D /* ZPLocalization.m in Sources */ = {isa = PBXBuildFile; fileRef = A7D3C08214AEE70F00DB975D /* ZPLocalization.m */; };
@@ -228,6 +228,22 @@
 		A7D762021534165D00E76EA1 /* QSStrings.m in Sources */ = {isa = PBXBuildFile; fileRef = A7D761F41534165D00E76EA1 /* QSStrings.m */; settings = {COMPILER_FLAGS = "-fno-objc-arc"; }; };
 		A7D76209153417F200E76EA1 /* GTMNSString+HTML.m in Sources */ = {isa = PBXBuildFile; fileRef = A7D76208153417F200E76EA1 /* GTMNSString+HTML.m */; };
 		A7D7620A153417F200E76EA1 /* GTMNSString+HTML.m in Sources */ = {isa = PBXBuildFile; fileRef = A7D76208153417F200E76EA1 /* GTMNSString+HTML.m */; settings = {COMPILER_FLAGS = "-fno-objc-arc"; }; };
+		A7F186981537E1A200DA46ED /* Tango.c in Sources */ = {isa = PBXBuildFile; fileRef = A7F186661537E1A200DA46ED /* Tango.c */; };
+		A7F186991537E1A200DA46ED /* Tango_Close.c in Sources */ = {isa = PBXBuildFile; fileRef = A7F186681537E1A200DA46ED /* Tango_Close.c */; };
+		A7F1869A1537E1A200DA46ED /* Tango_Echo.c in Sources */ = {isa = PBXBuildFile; fileRef = A7F1866A1537E1A200DA46ED /* Tango_Echo.c */; };
+		A7F1869B1537E1A200DA46ED /* Tango_Find2First.c in Sources */ = {isa = PBXBuildFile; fileRef = A7F1866C1537E1A200DA46ED /* Tango_Find2First.c */; };
+		A7F1869C1537E1A200DA46ED /* Tango_LogOff.c in Sources */ = {isa = PBXBuildFile; fileRef = A7F1866E1537E1A200DA46ED /* Tango_LogOff.c */; };
+		A7F1869D1537E1A200DA46ED /* Tango_NegotiateProtocol.c in Sources */ = {isa = PBXBuildFile; fileRef = A7F186701537E1A200DA46ED /* Tango_NegotiateProtocol.c */; };
+		A7F1869E1537E1A200DA46ED /* Tango_NT_Create.c in Sources */ = {isa = PBXBuildFile; fileRef = A7F186721537E1A200DA46ED /* Tango_NT_Create.c */; };
+		A7F1869F1537E1A200DA46ED /* tango_Read.c in Sources */ = {isa = PBXBuildFile; fileRef = A7F186741537E1A200DA46ED /* tango_Read.c */; };
+		A7F186A01537E1A200DA46ED /* Tango_SessionSetup.c in Sources */ = {isa = PBXBuildFile; fileRef = A7F186761537E1A200DA46ED /* Tango_SessionSetup.c */; };
+		A7F186A11537E1A200DA46ED /* Tango_TreeConnect.c in Sources */ = {isa = PBXBuildFile; fileRef = A7F186781537E1A200DA46ED /* Tango_TreeConnect.c */; };
+		A7F186A21537E1A200DA46ED /* Tango_TreeDisconnect.c in Sources */ = {isa = PBXBuildFile; fileRef = A7F1867A1537E1A200DA46ED /* Tango_TreeDisconnect.c */; };
+		A7F186A31537E1A200DA46ED /* Tango_Write.c in Sources */ = {isa = PBXBuildFile; fileRef = A7F1867C1537E1A200DA46ED /* Tango_Write.c */; };
+		A7F186A41537E1A200DA46ED /* TangoBase.c in Sources */ = {isa = PBXBuildFile; fileRef = A7F1867E1537E1A200DA46ED /* TangoBase.c */; };
+		A7F186A51537E1A200DA46ED /* tangoConnection.m in Sources */ = {isa = PBXBuildFile; fileRef = A7F186811537E1A200DA46ED /* tangoConnection.m */; };
+		A7F186A61537E1A200DA46ED /* tangoFileInfo.m in Sources */ = {isa = PBXBuildFile; fileRef = A7F186831537E1A200DA46ED /* tangoFileInfo.m */; };
+		A7F186A91537E1A200DA46ED /* TangoSecurity.c in Sources */ = {isa = PBXBuildFile; fileRef = A7F186881537E1A200DA46ED /* TangoSecurity.c */; };
 		A7F249D6153306ED00537B54 /* Default@2x.png in Resources */ = {isa = PBXBuildFile; fileRef = A7F249D5153306ED00537B54 /* Default@2x.png */; };
 		A7F249D81533072300537B54 /* Default-Landscape~ipad.png in Resources */ = {isa = PBXBuildFile; fileRef = A7F249D71533072300537B54 /* Default-Landscape~ipad.png */; };
 		A7F249DA1533072A00537B54 /* Default-Portrait~ipad.png in Resources */ = {isa = PBXBuildFile; fileRef = A7F249D91533072A00537B54 /* Default-Portrait~ipad.png */; };
@@ -644,8 +660,8 @@
 		A7CD0792151657B9007A8E1D /* ZPFileChannel_ZoteroStorage.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = ZPFileChannel_ZoteroStorage.m; sourceTree = "<group>"; };
 		A7CD0795151657C5007A8E1D /* ZPFileChannel_WebDAV.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = ZPFileChannel_WebDAV.h; sourceTree = "<group>"; };
 		A7CD0796151657C5007A8E1D /* ZPFileChannel_WebDAV.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = ZPFileChannel_WebDAV.m; sourceTree = "<group>"; };
-		A7CD0799151657D6007A8E1D /* ZPFileChannel_LocalNetworkShare.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = ZPFileChannel_LocalNetworkShare.h; sourceTree = "<group>"; };
-		A7CD079A151657D6007A8E1D /* ZPFileChannel_LocalNetworkShare.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = ZPFileChannel_LocalNetworkShare.m; sourceTree = "<group>"; };
+		A7CD0799151657D6007A8E1D /* ZPFileChannel_Samba.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = ZPFileChannel_Samba.h; sourceTree = "<group>"; };
+		A7CD079A151657D6007A8E1D /* ZPFileChannel_Samba.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = ZPFileChannel_Samba.m; sourceTree = "<group>"; };
 		A7CFD5BF151F22BB00B0AD0A /* ZPFileChannel_Dropbox.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = ZPFileChannel_Dropbox.h; sourceTree = "<group>"; };
 		A7CFD5C0151F22BB00B0AD0A /* ZPFileChannel_Dropbox.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = ZPFileChannel_Dropbox.m; sourceTree = "<group>"; };
 		A7D3C07F14AEDE7B00DB975D /* QuickLook.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; name = QuickLook.framework; path = System/Library/Frameworks/QuickLook.framework; sourceTree = SDKROOT; };
@@ -662,6 +678,39 @@
 		A7D76207153417F200E76EA1 /* GTMNSString+HTML.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = "GTMNSString+HTML.h"; sourceTree = "<group>"; };
 		A7D76208153417F200E76EA1 /* GTMNSString+HTML.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = "GTMNSString+HTML.m"; sourceTree = "<group>"; };
 		A7D7620B1534180F00E76EA1 /* QSUtilities.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; name = QSUtilities.h; path = QSUtilities/QSUtilities.h; sourceTree = SOURCE_ROOT; };
+		A7F186661537E1A200DA46ED /* Tango.c */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.c; path = Tango.c; sourceTree = "<group>"; };
+		A7F186671537E1A200DA46ED /* Tango.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = Tango.h; sourceTree = "<group>"; };
+		A7F186681537E1A200DA46ED /* Tango_Close.c */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.c; path = Tango_Close.c; sourceTree = "<group>"; };
+		A7F186691537E1A200DA46ED /* Tango_Close.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = Tango_Close.h; sourceTree = "<group>"; };
+		A7F1866A1537E1A200DA46ED /* Tango_Echo.c */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.c; path = Tango_Echo.c; sourceTree = "<group>"; };
+		A7F1866B1537E1A200DA46ED /* Tango_Echo.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = Tango_Echo.h; sourceTree = "<group>"; };
+		A7F1866C1537E1A200DA46ED /* Tango_Find2First.c */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.c; path = Tango_Find2First.c; sourceTree = "<group>"; };
+		A7F1866D1537E1A200DA46ED /* Tango_Find2First.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = Tango_Find2First.h; sourceTree = "<group>"; };
+		A7F1866E1537E1A200DA46ED /* Tango_LogOff.c */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.c; path = Tango_LogOff.c; sourceTree = "<group>"; };
+		A7F1866F1537E1A200DA46ED /* Tango_LogOff.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = Tango_LogOff.h; sourceTree = "<group>"; };
+		A7F186701537E1A200DA46ED /* Tango_NegotiateProtocol.c */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.c; path = Tango_NegotiateProtocol.c; sourceTree = "<group>"; };
+		A7F186711537E1A200DA46ED /* Tango_NegotiateProtocol.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = Tango_NegotiateProtocol.h; sourceTree = "<group>"; };
+		A7F186721537E1A200DA46ED /* Tango_NT_Create.c */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.c; path = Tango_NT_Create.c; sourceTree = "<group>"; };
+		A7F186731537E1A200DA46ED /* Tango_NT_Create.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = Tango_NT_Create.h; sourceTree = "<group>"; };
+		A7F186741537E1A200DA46ED /* tango_Read.c */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.c; path = tango_Read.c; sourceTree = "<group>"; };
+		A7F186751537E1A200DA46ED /* tango_Read.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = tango_Read.h; sourceTree = "<group>"; };
+		A7F186761537E1A200DA46ED /* Tango_SessionSetup.c */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.c; path = Tango_SessionSetup.c; sourceTree = "<group>"; };
+		A7F186771537E1A200DA46ED /* Tango_SessionSetup.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = Tango_SessionSetup.h; sourceTree = "<group>"; };
+		A7F186781537E1A200DA46ED /* Tango_TreeConnect.c */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.c; path = Tango_TreeConnect.c; sourceTree = "<group>"; };
+		A7F186791537E1A200DA46ED /* Tango_TreeConnect.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = Tango_TreeConnect.h; sourceTree = "<group>"; };
+		A7F1867A1537E1A200DA46ED /* Tango_TreeDisconnect.c */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.c; path = Tango_TreeDisconnect.c; sourceTree = "<group>"; };
+		A7F1867B1537E1A200DA46ED /* Tango_TreeDisconnect.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = Tango_TreeDisconnect.h; sourceTree = "<group>"; };
+		A7F1867C1537E1A200DA46ED /* Tango_Write.c */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.c; path = Tango_Write.c; sourceTree = "<group>"; };
+		A7F1867D1537E1A200DA46ED /* Tango_Write.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = Tango_Write.h; sourceTree = "<group>"; };
+		A7F1867E1537E1A200DA46ED /* TangoBase.c */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.c; path = TangoBase.c; sourceTree = "<group>"; };
+		A7F1867F1537E1A200DA46ED /* TangoBase.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = TangoBase.h; sourceTree = "<group>"; };
+		A7F186801537E1A200DA46ED /* tangoConnection.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = tangoConnection.h; sourceTree = "<group>"; };
+		A7F186811537E1A200DA46ED /* tangoConnection.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = tangoConnection.m; sourceTree = "<group>"; };
+		A7F186821537E1A200DA46ED /* tangoFileInfo.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = tangoFileInfo.h; sourceTree = "<group>"; };
+		A7F186831537E1A200DA46ED /* tangoFileInfo.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = tangoFileInfo.m; sourceTree = "<group>"; };
+		A7F186881537E1A200DA46ED /* TangoSecurity.c */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.c; path = TangoSecurity.c; sourceTree = "<group>"; };
+		A7F186891537E1A200DA46ED /* TangoSecurity.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = TangoSecurity.h; sourceTree = "<group>"; };
+		A7F1868C1537E1A200DA46ED /* TangoTypes.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = TangoTypes.h; sourceTree = "<group>"; };
 		A7F249D5153306ED00537B54 /* Default@2x.png */ = {isa = PBXFileReference; lastKnownFileType = image.png; name = "Default@2x.png"; path = "../Default@2x.png"; sourceTree = "<group>"; };
 		A7F249D71533072300537B54 /* Default-Landscape~ipad.png */ = {isa = PBXFileReference; lastKnownFileType = image.png; name = "Default-Landscape~ipad.png"; path = "../Default-Landscape~ipad.png"; sourceTree = "<group>"; };
 		A7F249D91533072A00537B54 /* Default-Portrait~ipad.png */ = {isa = PBXFileReference; lastKnownFileType = image.png; name = "Default-Portrait~ipad.png"; path = "../Default-Portrait~ipad.png"; sourceTree = "<group>"; };
@@ -883,6 +932,7 @@
 		A7200DD314718DC0004347C9 /* Frameworks */ = {
 			isa = PBXGroup;
 			children = (
+				A7F186641537E1A200DA46ED /* tango */,
 				A7D761E81534165D00E76EA1 /* QSUtilities */,
 				A75E1852153405740046988C /* ZipArchive */,
 				A7CD078A15165269007A8E1D /* DropboxSDK.framework */,
@@ -1193,8 +1243,8 @@
 				A7CD0792151657B9007A8E1D /* ZPFileChannel_ZoteroStorage.m */,
 				A7CD0795151657C5007A8E1D /* ZPFileChannel_WebDAV.h */,
 				A7CD0796151657C5007A8E1D /* ZPFileChannel_WebDAV.m */,
-				A7CD0799151657D6007A8E1D /* ZPFileChannel_LocalNetworkShare.h */,
-				A7CD079A151657D6007A8E1D /* ZPFileChannel_LocalNetworkShare.m */,
+				A7CD0799151657D6007A8E1D /* ZPFileChannel_Samba.h */,
+				A7CD079A151657D6007A8E1D /* ZPFileChannel_Samba.m */,
 			);
 			name = "File channels";
 			sourceTree = "<group>";
@@ -1233,6 +1283,54 @@
 				A7D76208153417F200E76EA1 /* GTMNSString+HTML.m */,
 			);
 			path = GTM;
+			sourceTree = "<group>";
+		};
+		A7F186641537E1A200DA46ED /* tango */ = {
+			isa = PBXGroup;
+			children = (
+				A7F186651537E1A200DA46ED /* Classes */,
+			);
+			path = tango;
+			sourceTree = "<group>";
+		};
+		A7F186651537E1A200DA46ED /* Classes */ = {
+			isa = PBXGroup;
+			children = (
+				A7F186661537E1A200DA46ED /* Tango.c */,
+				A7F186671537E1A200DA46ED /* Tango.h */,
+				A7F186681537E1A200DA46ED /* Tango_Close.c */,
+				A7F186691537E1A200DA46ED /* Tango_Close.h */,
+				A7F1866A1537E1A200DA46ED /* Tango_Echo.c */,
+				A7F1866B1537E1A200DA46ED /* Tango_Echo.h */,
+				A7F1866C1537E1A200DA46ED /* Tango_Find2First.c */,
+				A7F1866D1537E1A200DA46ED /* Tango_Find2First.h */,
+				A7F1866E1537E1A200DA46ED /* Tango_LogOff.c */,
+				A7F1866F1537E1A200DA46ED /* Tango_LogOff.h */,
+				A7F186701537E1A200DA46ED /* Tango_NegotiateProtocol.c */,
+				A7F186711537E1A200DA46ED /* Tango_NegotiateProtocol.h */,
+				A7F186721537E1A200DA46ED /* Tango_NT_Create.c */,
+				A7F186731537E1A200DA46ED /* Tango_NT_Create.h */,
+				A7F186741537E1A200DA46ED /* tango_Read.c */,
+				A7F186751537E1A200DA46ED /* tango_Read.h */,
+				A7F186761537E1A200DA46ED /* Tango_SessionSetup.c */,
+				A7F186771537E1A200DA46ED /* Tango_SessionSetup.h */,
+				A7F186781537E1A200DA46ED /* Tango_TreeConnect.c */,
+				A7F186791537E1A200DA46ED /* Tango_TreeConnect.h */,
+				A7F1867A1537E1A200DA46ED /* Tango_TreeDisconnect.c */,
+				A7F1867B1537E1A200DA46ED /* Tango_TreeDisconnect.h */,
+				A7F1867C1537E1A200DA46ED /* Tango_Write.c */,
+				A7F1867D1537E1A200DA46ED /* Tango_Write.h */,
+				A7F1867E1537E1A200DA46ED /* TangoBase.c */,
+				A7F1867F1537E1A200DA46ED /* TangoBase.h */,
+				A7F186801537E1A200DA46ED /* tangoConnection.h */,
+				A7F186811537E1A200DA46ED /* tangoConnection.m */,
+				A7F186821537E1A200DA46ED /* tangoFileInfo.h */,
+				A7F186831537E1A200DA46ED /* tangoFileInfo.m */,
+				A7F186881537E1A200DA46ED /* TangoSecurity.c */,
+				A7F186891537E1A200DA46ED /* TangoSecurity.h */,
+				A7F1868C1537E1A200DA46ED /* TangoTypes.h */,
+			);
+			path = Classes;
 			sourceTree = "<group>";
 		};
 /* End PBXGroup section */
@@ -1580,7 +1678,7 @@
 				A7CD078F151652E9007A8E1D /* ZPFileChannel.m in Sources */,
 				A7CD0793151657B9007A8E1D /* ZPFileChannel_ZoteroStorage.m in Sources */,
 				A7CD0797151657C5007A8E1D /* ZPFileChannel_WebDAV.m in Sources */,
-				A7CD079B151657D6007A8E1D /* ZPFileChannel_LocalNetworkShare.m in Sources */,
+				A7CD079B151657D6007A8E1D /* ZPFileChannel_Samba.m in Sources */,
 				A79E6FE41531A06C00612DD9 /* ZPFileImportViewController.m in Sources */,
 				A79E6FE81531B00100612DD9 /* ZPSplitViewController.m in Sources */,
 				A75E185F153405740046988C /* ioapi.c in Sources */,
@@ -1590,6 +1688,22 @@
 				A75E1867153405740046988C /* ZipArchive.mm in Sources */,
 				A7D762011534165D00E76EA1 /* QSStrings.m in Sources */,
 				A7D76209153417F200E76EA1 /* GTMNSString+HTML.m in Sources */,
+				A7F186981537E1A200DA46ED /* Tango.c in Sources */,
+				A7F186991537E1A200DA46ED /* Tango_Close.c in Sources */,
+				A7F1869A1537E1A200DA46ED /* Tango_Echo.c in Sources */,
+				A7F1869B1537E1A200DA46ED /* Tango_Find2First.c in Sources */,
+				A7F1869C1537E1A200DA46ED /* Tango_LogOff.c in Sources */,
+				A7F1869D1537E1A200DA46ED /* Tango_NegotiateProtocol.c in Sources */,
+				A7F1869E1537E1A200DA46ED /* Tango_NT_Create.c in Sources */,
+				A7F1869F1537E1A200DA46ED /* tango_Read.c in Sources */,
+				A7F186A01537E1A200DA46ED /* Tango_SessionSetup.c in Sources */,
+				A7F186A11537E1A200DA46ED /* Tango_TreeConnect.c in Sources */,
+				A7F186A21537E1A200DA46ED /* Tango_TreeDisconnect.c in Sources */,
+				A7F186A31537E1A200DA46ED /* Tango_Write.c in Sources */,
+				A7F186A41537E1A200DA46ED /* TangoBase.c in Sources */,
+				A7F186A51537E1A200DA46ED /* tangoConnection.m in Sources */,
+				A7F186A61537E1A200DA46ED /* tangoFileInfo.m in Sources */,
+				A7F186A91537E1A200DA46ED /* TangoSecurity.c in Sources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
@@ -1667,7 +1781,7 @@
 				A7CD0790151652E9007A8E1D /* ZPFileChannel.m in Sources */,
 				A7CD0794151657B9007A8E1D /* ZPFileChannel_ZoteroStorage.m in Sources */,
 				A7CD0798151657C5007A8E1D /* ZPFileChannel_WebDAV.m in Sources */,
-				A7CD079C151657D6007A8E1D /* ZPFileChannel_LocalNetworkShare.m in Sources */,
+				A7CD079C151657D6007A8E1D /* ZPFileChannel_Samba.m in Sources */,
 				A7CFD5C1151F22BB00B0AD0A /* ZPFileChannel_Dropbox.m in Sources */,
 				A79E6FE51531A07C00612DD9 /* ZPFileImportViewController.m in Sources */,
 				A79E6FE91531B00500612DD9 /* ZPSplitViewController.m in Sources */,

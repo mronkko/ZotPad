@@ -22,3 +22,6 @@
 [submodule "QSUtilities"]
 	path = QSUtilities
 	url = https://github.com/mikeho/QSUtilities.git
+[submodule "tango"]
+	path = tango
+	url = https://github.com/38leinaD/tango.git

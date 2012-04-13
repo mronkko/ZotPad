@@ -33,6 +33,9 @@
 -(BOOL) useCache;
 -(BOOL) online;
 -(BOOL) useDropbox;
+-(BOOL) useSamba;
+-(NSString*) sambaAddress;
+-(NSString*) sambaURL;
 
 -(NSInteger) maxCacheSize;
 

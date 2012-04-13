@@ -44,7 +44,7 @@
 #import "ZPFileChannel_Dropbox.h"
 #import "ZPFileChannel_WebDAV.h"
 #import "ZPFileChannel_ZoteroStorage.h"
-#import "ZPFileChannel_LocalNetworkShare.h"
+#import "ZPFileChannel_Samba.h"
 
 //Private methods
 
@@ -78,7 +78,7 @@ const NSInteger ZPServerConnectionRequestTopLevelKeys = 9;
     _fileChannels = [NSArray arrayWithObjects:[[ZPFileChannel_ZoteroStorage alloc] init], 
                      [[ZPFileChannel_WebDAV alloc] init], 
                      [[ZPFileChannel_Dropbox alloc] init], 
-                     [[ZPFileChannel_LocalNetworkShare alloc] init], nil];
+                     [[ZPFileChannel_Samba alloc] init], nil];
     return self;
 }
 

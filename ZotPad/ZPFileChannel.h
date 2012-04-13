@@ -11,12 +11,18 @@
 @interface ZPFileChannel : NSObject {
     NSMutableDictionary* _requestsByAttachment;
     NSMutableDictionary* _attachmentsByRequest;
+    
+    //Some file channels require username and password, so these are stored in this superclass
+    NSString* _username;
+    NSString* _password;
 }
 
 -(void) startDownloadingAttachment:(ZPZoteroAttachment*)attachment;
 -(void) cancelDownloadingAttachment:(ZPZoteroAttachment*)attachment;
 -(void) useProgressView:(UIProgressView*) progressView forAttachment:(ZPZoteroAttachment*)attachment;
 
+-(NSString*) username;
+-(NSString*) password;
 
 -(void) cleanupAfterFinishingAttachment:(ZPZoteroAttachment*)attachment;
 -(void) linkAttachment:(ZPZoteroAttachment*)attachment withRequest:(NSObject*)request;

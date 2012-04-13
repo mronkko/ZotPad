@@ -7,7 +7,11 @@
 //
 
 #import "ZPFileChannel.h"
+#import "tangoConnection.h"
 
-@interface ZPFileChannel_LocalNetworkShare : ZPFileChannel
+@interface ZPFileChannel_Samba : ZPFileChannel {
+}
+
+
 
 @end

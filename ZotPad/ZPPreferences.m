@@ -151,6 +151,18 @@ static ZPPreferences* _instance = nil;
     return [[defaults objectForKey:@"dropbox"] boolValue];
 }
 
+-(BOOL) useSamba{
+    NSUserDefaults* defaults = [NSUserDefaults standardUserDefaults];
+    return [[defaults objectForKey:@"dropbox"] boolValue];
+}
+-(NSString*) sambaURL{
+    NSUserDefaults* defaults = [NSUserDefaults standardUserDefaults];
+    return [defaults objectForKey:@"sambaurl"];
+}
+-(NSString*) sambaUsername{
+    NSUserDefaults* defaults = [NSUserDefaults standardUserDefaults];
+    return [defaults objectForKey:@"sambausername"];
+}
 -(NSString*) username{
     NSUserDefaults* defaults = [NSUserDefaults standardUserDefaults];
     return [defaults objectForKey:@"username"];
