@@ -39,6 +39,8 @@ void ZPLog(NSObject* source,int line,NSString* format, ...){
 //        [debugClasses addObject:@"ZPDatabase"];
 //        [debugClasses addObject:@"ZPAuthenticationDialog"];
 //        [debugClasses addObject:@"ZPQuicklookController"];
+//        [debugClasses addObject:@"ZPAuthenticationDialog"];
+//        [debugClasses addObject:@"ZPFileThumbnailAndQuicklookController"];
 //        [debugClasses addObject:@"ZPItemDetailViewController"];
 //        [debugClasses addObject:@"ZPUncachedItemsOperation"];
   

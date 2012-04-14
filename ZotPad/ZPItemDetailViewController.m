@@ -16,7 +16,7 @@
 #import "ZPLogger.h"
 #import "ZPAttachmentThumbnailFactory.h"
 #import "ZPAppDelegate.h"
-
+#import "ZPServerConnection.h"
 #import "ZPPreferences.h"
 
 //Define 
@@ -147,7 +147,7 @@
 
 -(void) configure{
     
-    if([[ZPPreferences instance] online]){
+    if([ZPServerConnection instance]!=NULL){
         [_activityIndicator startAnimating];
         [[ZPDataLayer instance] updateItemDetailsFromServer:_currentItem];
     }
