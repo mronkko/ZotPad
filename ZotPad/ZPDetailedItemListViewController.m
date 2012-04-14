@@ -72,7 +72,7 @@
         [_itemListController configureCachedKeys:cacheKeys];
     }
 
-    if(![[ZPPreferences instance] online]){
+    if([ZPServerConnection instance]==NULL){
         [_itemListController configureUncachedKeys:[NSArray array]];
     }
     else{
@@ -189,7 +189,7 @@ static ZPDetailedItemListViewController* _instance = nil;
         
         if(_libraryID!=0){
             
-            if([[ZPPreferences instance] online]) [_activityIndicator startAnimating];
+            if([ZPServerConnection instance]!=NULL) [_activityIndicator startAnimating];
             
             
             //This queue is only used for retrieving key lists for uncahced items, so we can just invalidate all previous requests

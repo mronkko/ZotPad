@@ -14,7 +14,7 @@
 #import "ZPLocalization.h"
 #import "ZPFileThumbnailAndQuicklookController.h"
 #import "ZPLogger.h"
-
+#import "ZPServerConnection.h"
 #import "ZPPreferences.h"
 
 #define ATTACHMENT_VIEW_HEIGHT 600
@@ -133,7 +133,7 @@ static ZPItemDetailViewController* _instance;
     _previewController = [[ZPFileThumbnailAndQuicklookController alloc] initWithItem:_currentItem viewController:self maxHeight:ATTACHMENT_IMAGE_HEIGHT maxWidth:ATTACHMENT_IMAGE_WIDTH];
 
     
-    if([[ZPPreferences instance] online]){
+    if([ZPServerConnection instance]!=NULL){
         [_activityIndicator startAnimating];
         [[ZPDataLayer instance] updateItemDetailsFromServer:_currentItem];
     }

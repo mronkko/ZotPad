@@ -97,7 +97,7 @@ static NSCache* _fileTypeImageCache;
     }
 
     if(! attachment.fileExists){
-        if([[ZPPreferences instance] online] && [[ZPServerConnection instance] hasInternetConnection]) [self _downloadWithProgressAlert:attachment];
+        if([ZPServerConnection instance]!=NULL) [self _downloadWithProgressAlert:attachment];
     }
     else {
         
@@ -163,7 +163,7 @@ static NSCache* _fileTypeImageCache;
     [button setImage:image forState:UIControlStateNormal];
     [button setNeedsDisplay];
     
-    if(attachment.fileExists || [[ZPPreferences instance] online]){
+    if(attachment.fileExists || [ZPServerConnection instance]!=NULL){
         [button setAlpha:1];
         [button addTarget:self action:@selector(buttonTapped:) 
             forControlEvents:UIControlEventTouchUpInside];

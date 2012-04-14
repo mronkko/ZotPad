@@ -48,12 +48,11 @@ static ZPAuthenticationDialog* _instance = nil;
     
 }
 
-- (void)setKeyAndLoadZoteroSite:(NSString*) key{
-    NSLog(@"Starting loading Zotero website");
-    
-    //TODO: Implement default parameters hat would access the group libraries as well http://www.zotero.org/support/dev/server_api/oauth
-    
-    NSString *urlAddress = [NSString stringWithFormat:@"https://www.zotero.org/oauth/authorize?oauth_token=%@&library_access=1&notes_access=1&write_access=1&all_groups=write",key];
+// Takes the user back to start
+
+- (IBAction)loadFirstPage:(id)sender{
+
+    NSString *urlAddress = [NSString stringWithFormat:@"https://www.zotero.org/oauth/authorize?oauth_token=%@&library_access=1&notes_access=1&write_access=1&all_groups=write",_key];
     
     //Create a URL object.
     NSURL *url = [NSURL URLWithString:urlAddress];
@@ -63,23 +62,27 @@ static ZPAuthenticationDialog* _instance = nil;
     
     //Load the request in the UIWebView.
     [[self webView] loadRequest:requestObj];
+    
 
+    
+}
+
+- (void)setKeyAndLoadZoteroSite:(NSString*) key{
+    
+    _key = key;
+
+    NSLog(@"Starting loading Zotero website");
+    
+    [self loadFirstPage:NULL];
     
     NSLog(@"Done loading");
 
 }
 - (BOOL)webView:(UIWebView *)webView shouldStartLoadWithRequest:(NSURLRequest *)request navigationType:(UIWebViewNavigationType)navigationType{
 
-    NSLog(@"Requesting new page %@ method: %@",request.mainDocumentURL,request.HTTPMethod);
-    //These are valid URL prefixes in the authentication workflow and should be loaded
-    NSArray* validURLs = [NSArray arrayWithObjects:@"https://www.zotero.org/oauth/authorize?oauth_token=",
-                          @"https://www.zotero.org/settings/keys/new?oauth=1&oauth_token=",
-                          @"https://www.zotero.org/?oauth_token=",
-                          @"https://www.zotero.org/user/logout",
-                          @"https://www.zotero.org/user/login",nil];
-    
 
     NSString* urlString = [[request mainDocumentURL] absoluteString];
+    NSLog(@"Start loading URL %@",urlString);
     
     //If we are redirected to the front page, we do not need to show the web browser any more
     
@@ -94,18 +97,8 @@ static ZPAuthenticationDialog* _instance = nil;
             
         return FALSE;
     }
-    //All POST requests are loaded
-    else if([request.HTTPMethod isEqualToString:@"POST"]) return TRUE;
-    //Loop through the white list and load the url if it should be loaded
-    else{
-        NSString* validURL;
-        for(validURL in validURLs){
-            if([urlString hasPrefix:validURL]) return TRUE;
-        }
-    }
-
-    NSLog(@"URL %@ is not whitelisted in the authentication sequence",urlString);
-    return FALSE;
+    
+    return TRUE;
 }
 
 - (void)webViewDidStartLoad:(UIWebView *)webView{

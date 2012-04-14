@@ -13,6 +13,7 @@
 @interface ZPAuthenticationDialog : UIViewController <UIApplicationDelegate, UIWebViewDelegate> {
     UIWebView* webView;
     DSActivityView* _activityView;
+    NSString* _key;
 
 }
 
@@ -23,6 +24,6 @@
 +(ZPAuthenticationDialog*) instance;
 
 - (void)setKeyAndLoadZoteroSite:(NSString*)key;
-
+- (IBAction)loadFirstPage:(id)sender;
 
 @end

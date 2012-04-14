@@ -33,7 +33,7 @@ void ZPLog(NSObject* source,int line,NSString* format, ...){
 //        [debugClasses addObject:@"ZPDataLayer"];
 //        [debugClasses addObject:@"ZPAppDelegate"];
 //        [debugClasses addObject:@"ZPDatabase"];
-//        [debugClasses addObject:@"ZPAuthenticationDialog"];
+        [debugClasses addObject:@"ZPAuthenticationDialog"];
 //        [debugClasses addObject:@"ZPFileThumbnailAndQuicklookController"];
 //        [debugClasses addObject:@"ZPItemDetailViewController"];
 //        [debugClasses addObject:@"ZPUncachedItemsOperation"];

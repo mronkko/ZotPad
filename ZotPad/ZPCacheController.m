@@ -491,15 +491,16 @@ static ZPCacheController* _instance = nil;
     _activeItemKey = item.key;
     
     item = [[ZPServerConnection instance] retrieveSingleItemDetailsFromServer:item];
-    NSMutableArray* items = [NSMutableArray arrayWithObject:item];
-    [items addObjectsFromArray:item.attachments];
-    [items addObjectsFromArray:item.notes];
-    
-    [self _cacheItemsAndAttachToParentsIfNeeded:items];
-
-    //The method call above will only fire a notification if the item was actually updated. Fire it here again so that we will always get a notification and know that the item has been updated.
-    [[ZPDataLayer instance] notifyItemsAvailable:[NSArray arrayWithObject:item]];
-       
+    if(item != NULL){
+        NSMutableArray* items = [NSMutableArray arrayWithObject:item];
+        [items addObjectsFromArray:item.attachments];
+        [items addObjectsFromArray:item.notes];
+        
+        [self _cacheItemsAndAttachToParentsIfNeeded:items];
+        
+        //The method call above will only fire a notification if the item was actually updated. Fire it here again so that we will always get a notification and know that the item has been updated.
+        [[ZPDataLayer instance] notifyItemsAvailable:[NSArray arrayWithObject:item]];
+    }       
 }
 
 -(void) setActiveLibrary:(NSNumber*)libraryID collection:(NSString*)collectionKey{
