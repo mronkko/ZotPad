@@ -75,8 +75,8 @@ const NSInteger ZPServerConnectionRequestTopLevelKeys = 9;
     self = [super init];
         
     _activeRequestCount = 0;
-    _fileChannels = [NSArray arrayWithObjects:[[ZPFileChannel_ZoteroStorage alloc] init], 
-                     [[ZPFileChannel_WebDAV alloc] init], 
+    _fileChannels = [NSArray arrayWithObjects:[[ZPFileChannel_WebDAV alloc] init], 
+                     [[ZPFileChannel_ZoteroStorage alloc] init], 
                      [[ZPFileChannel_Dropbox alloc] init], 
                      [[ZPFileChannel_Samba alloc] init], nil];
     return self;

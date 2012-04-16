@@ -40,6 +40,12 @@ NSInteger const LINK_MODE_LINKED_URL = 3;
     return attachment;
 }
 
+- (NSNumber*) libraryID{
+    //Child attachments
+    if(super.libraryID==NULL) return [ZPZoteroItem dataObjectWithKey:self.parentItemKey].libraryID;
+    //Standalone attachments
+    else return super.libraryID;
+}
 
 // An alias for setParentCollectionKey
 - (void) setParentKey:(NSString*)key{

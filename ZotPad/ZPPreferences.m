@@ -150,18 +150,22 @@ static ZPPreferences* _instance = nil;
     NSUserDefaults* defaults = [NSUserDefaults standardUserDefaults];
     return [[defaults objectForKey:@"dropbox"] boolValue];
 }
+-(BOOL) useWebDAV{
+    NSUserDefaults* defaults = [NSUserDefaults standardUserDefaults];
+    return [[defaults objectForKey:@"webdav"] boolValue];
+}
+-(NSString*) webDAVURL{
+    NSUserDefaults* defaults = [NSUserDefaults standardUserDefaults];
+    return [defaults objectForKey:@"webdavurl"];
+}
 
 -(BOOL) useSamba{
     NSUserDefaults* defaults = [NSUserDefaults standardUserDefaults];
-    return [[defaults objectForKey:@"dropbox"] boolValue];
+    return [[defaults objectForKey:@"samba"] boolValue];
 }
 -(NSString*) sambaURL{
     NSUserDefaults* defaults = [NSUserDefaults standardUserDefaults];
     return [defaults objectForKey:@"sambaurl"];
-}
--(NSString*) sambaUsername{
-    NSUserDefaults* defaults = [NSUserDefaults standardUserDefaults];
-    return [defaults objectForKey:@"sambausername"];
 }
 -(NSString*) username{
     NSUserDefaults* defaults = [NSUserDefaults standardUserDefaults];

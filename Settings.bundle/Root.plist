@@ -150,11 +150,11 @@
 		</dict>
 		<dict>
 			<key>Type</key>
-			<string>PSChildPaneSpecifier</string>
+			<string>PSTextFieldSpecifier</string>
 			<key>Title</key>
-			<string>Configure WebDAV</string>
-			<key>File</key>
-			<string>WebDAV</string>
+			<string>WebDAV address</string>
+			<key>Key</key>
+			<string>webdavurl</string>
 		</dict>
 		<dict>
 			<key>Type</key>
@@ -178,11 +178,11 @@
 		</dict>
 		<dict>
 			<key>Type</key>
-			<string>PSChildPaneSpecifier</string>
+			<string>PSTextFieldSpecifier</string>
 			<key>Title</key>
-			<string>Configure local network share</string>
-			<key>File</key>
-			<string>samba</string>
+			<string>Network share address</string>
+			<key>Key</key>
+			<string>sambaurl</string>
 		</dict>
 		<dict>
 			<key>FooterText</key>

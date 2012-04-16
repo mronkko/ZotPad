@@ -234,23 +234,39 @@
     
     //Add a label over the view
     NSString* extraInfo;
+
+    //Imported files and URLs have files that can be downloaded
     
     if([attachment.linkMode isEqualToString:@"imported_file"] || [attachment.linkMode isEqualToString:@"imported_url"] ){
         if([attachment fileExists] && ![attachment.contentType isEqualToString:@"application/pdf"]){
             extraInfo = [@"Preview not supported for " stringByAppendingString:attachment.contentType];
         }
+        
         else if(![attachment fileExists] ){
             
             if([[ZPPreferences instance] online]){
-                if(attachment.attachmentSize != [NSNull null]){
-                    NSInteger size = [attachment.attachmentSize intValue];
-                    extraInfo = [NSString stringWithFormat:@"Tap to download %i KB.",size/1024];
+
+                NSString* source;
+                
+                if([[ZPPreferences instance] useWebDAV] && attachment.libraryID) source = @"WebDAV";
+                else if (attachment.existsOnZoteroServer) source = @"Zotero";
+                else if ([[ZPPreferences instance] useDropbox]) source = @"Dropbox";
+                else if ([[ZPPreferences instance] useSamba]) source = @"network drive";
+            
+                if(source != NULL){
+                    if(attachment.attachmentSize != [NSNull null]){
+                        NSInteger size = [attachment.attachmentSize intValue];
+                        extraInfo = [NSString stringWithFormat:@"Download from %@ (%i KB)",source,size/1024];
+                    }
+                    else extraInfo = @"Download from %@, source (unknown size)";
                 }
-                else extraInfo = @"Tap to download.";
             }
             else  extraInfo = @"File has not been downloaded";
         }
     }
+    
+    // Linked URL will be shown in directly from web 
+    
     else if ([attachment.linkMode isEqualToString:@"linked_url"] ) {
         if([[ZPPreferences instance] online]){
             extraInfo = @"Preview not supported for linked URL";
@@ -259,6 +275,9 @@
             extraInfo = @"Linked URL cannot be viewed in offline mode";
         }
     }
+    
+    //Linked files are available only on the computer where they were created
+    
     else if ([attachment.linkMode isEqualToString:@"linked_file"] ) {
         extraInfo = @"Linked files cannot be viewed from ZotPad";
     }

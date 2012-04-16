@@ -22,6 +22,22 @@
 		A7025072149C8D8F004F2AAB /* ZPServerResponseXMLParserLibrary.m in Sources */ = {isa = PBXBuildFile; fileRef = A7025071149C8D8F004F2AAB /* ZPServerResponseXMLParserLibrary.m */; };
 		A7025075149C8F9A004F2AAB /* ZPServerResponseXMLParserCollection.m in Sources */ = {isa = PBXBuildFile; fileRef = A7025074149C8F9A004F2AAB /* ZPServerResponseXMLParserCollection.m */; };
 		A7025078149C91A1004F2AAB /* ZPServerResponseXMLParserItem.m in Sources */ = {isa = PBXBuildFile; fileRef = A7025077149C91A1004F2AAB /* ZPServerResponseXMLParserItem.m */; };
+		A708EC90153C0BF70083A506 /* Tango.c in Sources */ = {isa = PBXBuildFile; fileRef = A7F186661537E1A200DA46ED /* Tango.c */; };
+		A708EC91153C0BFA0083A506 /* Tango_Close.c in Sources */ = {isa = PBXBuildFile; fileRef = A7F186681537E1A200DA46ED /* Tango_Close.c */; };
+		A708EC92153C0BFE0083A506 /* Tango_Echo.c in Sources */ = {isa = PBXBuildFile; fileRef = A7F1866A1537E1A200DA46ED /* Tango_Echo.c */; };
+		A708EC93153C0C030083A506 /* Tango_Find2First.c in Sources */ = {isa = PBXBuildFile; fileRef = A7F1866C1537E1A200DA46ED /* Tango_Find2First.c */; };
+		A708EC94153C0C060083A506 /* Tango_LogOff.c in Sources */ = {isa = PBXBuildFile; fileRef = A7F1866E1537E1A200DA46ED /* Tango_LogOff.c */; };
+		A708EC95153C0C0B0083A506 /* Tango_NegotiateProtocol.c in Sources */ = {isa = PBXBuildFile; fileRef = A7F186701537E1A200DA46ED /* Tango_NegotiateProtocol.c */; };
+		A708EC96153C0C100083A506 /* Tango_NT_Create.c in Sources */ = {isa = PBXBuildFile; fileRef = A7F186721537E1A200DA46ED /* Tango_NT_Create.c */; };
+		A708EC97153C0C260083A506 /* TangoSecurity.c in Sources */ = {isa = PBXBuildFile; fileRef = A7F186881537E1A200DA46ED /* TangoSecurity.c */; };
+		A708EC98153C0C2B0083A506 /* tangoFileInfo.m in Sources */ = {isa = PBXBuildFile; fileRef = A7F186831537E1A200DA46ED /* tangoFileInfo.m */; settings = {COMPILER_FLAGS = "-fno-objc-arc"; }; };
+		A708EC99153C0C4A0083A506 /* tango_Read.c in Sources */ = {isa = PBXBuildFile; fileRef = A7F186741537E1A200DA46ED /* tango_Read.c */; };
+		A708EC9A153C0C4E0083A506 /* Tango_SessionSetup.c in Sources */ = {isa = PBXBuildFile; fileRef = A7F186761537E1A200DA46ED /* Tango_SessionSetup.c */; };
+		A708EC9B153C0C510083A506 /* Tango_TreeConnect.c in Sources */ = {isa = PBXBuildFile; fileRef = A7F186781537E1A200DA46ED /* Tango_TreeConnect.c */; };
+		A708EC9C153C0C530083A506 /* Tango_TreeDisconnect.c in Sources */ = {isa = PBXBuildFile; fileRef = A7F1867A1537E1A200DA46ED /* Tango_TreeDisconnect.c */; };
+		A708EC9D153C0C560083A506 /* Tango_Write.c in Sources */ = {isa = PBXBuildFile; fileRef = A7F1867C1537E1A200DA46ED /* Tango_Write.c */; };
+		A708EC9E153C0C590083A506 /* TangoBase.c in Sources */ = {isa = PBXBuildFile; fileRef = A7F1867E1537E1A200DA46ED /* TangoBase.c */; };
+		A708EC9F153C0C5E0083A506 /* tangoConnection.m in Sources */ = {isa = PBXBuildFile; fileRef = A7F186811537E1A200DA46ED /* tangoConnection.m */; settings = {COMPILER_FLAGS = "-fno-objc-arc"; }; };
 		A716C0371494E9DF00BD6025 /* ZPZoteroAttachment.m in Sources */ = {isa = PBXBuildFile; fileRef = A716C0361494E9DE00BD6025 /* ZPZoteroAttachment.m */; };
 		A716C0511495131F00BD6025 /* NSObject+SBJson.m in Sources */ = {isa = PBXBuildFile; fileRef = A716C0391495131E00BD6025 /* NSObject+SBJson.m */; };
 		A716C0521495131F00BD6025 /* SBJsonParser.m in Sources */ = {isa = PBXBuildFile; fileRef = A716C03C1495131E00BD6025 /* SBJsonParser.m */; };
@@ -74,6 +90,8 @@
 		A786F7781476A56200B35B92 /* MainStoryboard_iPhone.storyboard in Resources */ = {isa = PBXBuildFile; fileRef = A786F7771476A56200B35B92 /* MainStoryboard_iPhone.storyboard */; };
 		A79299C3149E0CFE000F8B42 /* ZPZoteroDataObject.m in Sources */ = {isa = PBXBuildFile; fileRef = A79299C2149E0CFE000F8B42 /* ZPZoteroDataObject.m */; };
 		A793153E14B185E800E1ABF0 /* ZPQuicklookController.m in Sources */ = {isa = PBXBuildFile; fileRef = A793153D14B185E800E1ABF0 /* ZPQuicklookController.m */; };
+		A7936ED4153B4AA00063D77B /* KeychainItemWrapper.m in Sources */ = {isa = PBXBuildFile; fileRef = A7936ED3153B4AA00063D77B /* KeychainItemWrapper.m */; };
+		A7936ED5153B4AA00063D77B /* KeychainItemWrapper.m in Sources */ = {isa = PBXBuildFile; fileRef = A7936ED3153B4AA00063D77B /* KeychainItemWrapper.m */; settings = {COMPILER_FLAGS = "-fno-objc-arc"; }; };
 		A79E6FE41531A06C00612DD9 /* ZPFileImportViewController.m in Sources */ = {isa = PBXBuildFile; fileRef = A79E6FE31531A06C00612DD9 /* ZPFileImportViewController.m */; };
 		A79E6FE51531A07C00612DD9 /* ZPFileImportViewController.m in Sources */ = {isa = PBXBuildFile; fileRef = A79E6FE31531A06C00612DD9 /* ZPFileImportViewController.m */; };
 		A79E6FE81531B00100612DD9 /* ZPSplitViewController.m in Sources */ = {isa = PBXBuildFile; fileRef = A79E6FE71531B00100612DD9 /* ZPSplitViewController.m */; };
@@ -580,6 +598,8 @@
 		A79299C2149E0CFE000F8B42 /* ZPZoteroDataObject.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = ZPZoteroDataObject.m; sourceTree = "<group>"; };
 		A793153C14B185E800E1ABF0 /* ZPQuicklookController.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = ZPQuicklookController.h; sourceTree = "<group>"; };
 		A793153D14B185E800E1ABF0 /* ZPQuicklookController.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = ZPQuicklookController.m; sourceTree = "<group>"; };
+		A7936ED2153B4AA00063D77B /* KeychainItemWrapper.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = KeychainItemWrapper.h; sourceTree = "<group>"; };
+		A7936ED3153B4AA00063D77B /* KeychainItemWrapper.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = KeychainItemWrapper.m; sourceTree = "<group>"; };
 		A79E6FE21531A06C00612DD9 /* ZPFileImportViewController.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = ZPFileImportViewController.h; sourceTree = "<group>"; };
 		A79E6FE31531A06C00612DD9 /* ZPFileImportViewController.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = ZPFileImportViewController.m; sourceTree = "<group>"; };
 		A79E6FE61531B00000612DD9 /* ZPSplitViewController.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = ZPSplitViewController.h; sourceTree = "<group>"; };
@@ -932,6 +952,7 @@
 		A7200DD314718DC0004347C9 /* Frameworks */ = {
 			isa = PBXGroup;
 			children = (
+				A7936ED6153B4AEA0063D77B /* KeychainItemWrapper */,
 				A7F186641537E1A200DA46ED /* tango */,
 				A7D761E81534165D00E76EA1 /* QSUtilities */,
 				A75E1852153405740046988C /* ZipArchive */,
@@ -1136,6 +1157,15 @@
 				A7F249D5153306ED00537B54 /* Default@2x.png */,
 			);
 			name = "Launch images";
+			sourceTree = "<group>";
+		};
+		A7936ED6153B4AEA0063D77B /* KeychainItemWrapper */ = {
+			isa = PBXGroup;
+			children = (
+				A7936ED2153B4AA00063D77B /* KeychainItemWrapper.h */,
+				A7936ED3153B4AA00063D77B /* KeychainItemWrapper.m */,
+			);
+			name = KeychainItemWrapper;
 			sourceTree = "<group>";
 		};
 		A7A54B0414878E2600EBAD80 /* FMDB */ = {
@@ -1704,6 +1734,7 @@
 				A7F186A51537E1A200DA46ED /* tangoConnection.m in Sources */,
 				A7F186A61537E1A200DA46ED /* tangoFileInfo.m in Sources */,
 				A7F186A91537E1A200DA46ED /* TangoSecurity.c in Sources */,
+				A7936ED4153B4AA00063D77B /* KeychainItemWrapper.m in Sources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
@@ -1792,6 +1823,23 @@
 				A75E1868153405740046988C /* ZipArchive.mm in Sources */,
 				A7D762021534165D00E76EA1 /* QSStrings.m in Sources */,
 				A7D7620A153417F200E76EA1 /* GTMNSString+HTML.m in Sources */,
+				A7936ED5153B4AA00063D77B /* KeychainItemWrapper.m in Sources */,
+				A708EC90153C0BF70083A506 /* Tango.c in Sources */,
+				A708EC91153C0BFA0083A506 /* Tango_Close.c in Sources */,
+				A708EC92153C0BFE0083A506 /* Tango_Echo.c in Sources */,
+				A708EC93153C0C030083A506 /* Tango_Find2First.c in Sources */,
+				A708EC94153C0C060083A506 /* Tango_LogOff.c in Sources */,
+				A708EC95153C0C0B0083A506 /* Tango_NegotiateProtocol.c in Sources */,
+				A708EC96153C0C100083A506 /* Tango_NT_Create.c in Sources */,
+				A708EC97153C0C260083A506 /* TangoSecurity.c in Sources */,
+				A708EC98153C0C2B0083A506 /* tangoFileInfo.m in Sources */,
+				A708EC99153C0C4A0083A506 /* tango_Read.c in Sources */,
+				A708EC9A153C0C4E0083A506 /* Tango_SessionSetup.c in Sources */,
+				A708EC9B153C0C510083A506 /* Tango_TreeConnect.c in Sources */,
+				A708EC9C153C0C530083A506 /* Tango_TreeDisconnect.c in Sources */,
+				A708EC9D153C0C560083A506 /* Tango_Write.c in Sources */,
+				A708EC9E153C0C590083A506 /* TangoBase.c in Sources */,
+				A708EC9F153C0C5E0083A506 /* tangoConnection.m in Sources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
