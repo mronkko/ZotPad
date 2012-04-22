@@ -178,6 +178,15 @@ static ZPDataLayer* _instance = nil;
         }
 }
 
+-(void) notifyAttachmentDownloadStarted:(ZPZoteroAttachment*) attachment{
+    NSEnumerator* e = [_attachmentObservers objectEnumerator];
+    NSObject* id;
+    
+    while( id= [e nextObject]) {
+        [(NSObject <ZPAttachmentObserver>*) id notifyAttachmentDownloadStarted:attachment];
+    }
+}
+
 
 //Adds and removes observers. Because of concurrency issues we are not using mutable sets here.
 -(void) registerItemObserver:(NSObject<ZPItemObserver>*)observer{

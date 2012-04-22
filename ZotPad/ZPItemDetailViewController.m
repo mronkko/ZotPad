@@ -14,32 +14,25 @@
 #import "ZPLocalization.h"
 #import "ZPQuicklookController.h"
 #import "ZPLogger.h"
-#import "ZPAttachmentThumbnailFactory.h"
+#import "ZPFileTypeIconFactory.h"
 #import "ZPAppDelegate.h"
 #import "ZPServerConnection.h"
 #import "ZPPreferences.h"
+#import "ZPAttachmentPreviewViewController.h"
 
 //Define 
 
 #define IPAD UI_USER_INTERFACE_IDIOM() == UIUserInterfaceIdiomPad
 
 #define ATTACHMENT_VIEW_HEIGHT (IPAD ? 600 : 400)
-#define ATTACHMENT_IMAGE_HEIGHT (IPAD ? 580 : 380)
-#define ATTACHMENT_IMAGE_WIDTH (IPAD ? 423 : 269)
-#define ATTACHMENT_LABEL_HEIGHT_MULTIPLIER (IPAD ? .3 : .4)
-#define ATTACHMENT_LABEL_WIDTH_MULTIPLIER (IPAD ? .7 : .8)
 
-@interface ZPItemDetailViewController(){
-    NSOperationQueue* _imageRenderQueue;
-}
+@interface ZPItemDetailViewController()
+
 - (void) _reconfigureDetailTableView:(BOOL)animated;
 - (void) _reconfigureCarousel;
 - (NSString*) _textAtIndexPath:(NSIndexPath*)indexPath isTitle:(BOOL)isTitle;
 
 - (BOOL) _useAbstractCell:(NSIndexPath*)indexPath;
--(void) _configurePreview:(UIView*) view withAttachment:(ZPZoteroAttachment*)attachment;
--(void) _configurePreviewLabel:(UIView*)view withAttachment:(ZPZoteroAttachment*)attachment;
--(void) objectCache:(ZPZoteroAttachment*)attachment;
     
 -(void) _reloadAttachmentInCarousel:(ZPZoteroItem*)attachment;
 -(void) _reloadCarouselItemAtIndex:(NSInteger) index;
@@ -64,15 +57,8 @@
     [super viewDidLoad];
     
     [[ZPDataLayer instance] registerItemObserver:self];
-    [[ZPDataLayer instance] registerAttachmentObserver:self];
 
     _detailTableView.scrollEnabled = FALSE;
-    
-    _imageRenderQueue = [[NSOperationQueue alloc] init];
-    [_imageRenderQueue setMaxConcurrentOperationCount:3];
-
-    _previewCache = [[NSCache alloc] init];
-    [_previewCache setCountLimit:20];
     
     //configure carousel
     _carousel.type = iCarouselTypeCoverFlow2;    
@@ -158,7 +144,6 @@
     [self _reconfigureCarousel];
 
 
-
     if(_currentItem.creatorSummary!=NULL && ! [_currentItem.creatorSummary isEqualToString:@""]){
         if(_currentItem.year!=0){
             self.navigationItem.title=[NSString stringWithFormat:@"%@ (%i) %@",_currentItem.creatorSummary,_currentItem.year,_currentItem.title];
@@ -177,7 +162,6 @@
     if([_currentItem.attachments count]==0) [_carousel setHidden:TRUE];
     else{
         [_carousel setHidden:FALSE];
-        [_carousel performSelectorOnMainThread:@selector(reloadData) withObject:NULL waitUntilDone:NO];
         [_carousel setScrollEnabled:[_currentItem.attachments count]>1];
     }
 }
@@ -229,181 +213,6 @@
     
 }
 
-
--(void) _configurePreviewLabel:(UIView*)view withAttachment:(ZPZoteroAttachment*)attachment{
-    
-    //Add a label over the view
-    NSString* extraInfo;
-
-    //Imported files and URLs have files that can be downloaded
-    
-    if([attachment.linkMode isEqualToString:@"imported_file"] || [attachment.linkMode isEqualToString:@"imported_url"] ){
-        if([attachment fileExists] && ![attachment.contentType isEqualToString:@"application/pdf"]){
-            extraInfo = [@"Preview not supported for " stringByAppendingString:attachment.contentType];
-        }
-        
-        else if(![attachment fileExists] ){
-            
-            if([[ZPPreferences instance] online]){
-
-                NSString* source;
-                
-                if([[ZPPreferences instance] useWebDAV] && attachment.libraryID) source = @"WebDAV";
-                else if (attachment.existsOnZoteroServer) source = @"Zotero";
-                else if ([[ZPPreferences instance] useDropbox]) source = @"Dropbox";
-                else if ([[ZPPreferences instance] useSamba]) source = @"network drive";
-            
-                if(source != NULL){
-                    if(attachment.attachmentSize != [NSNull null]){
-                        NSInteger size = [attachment.attachmentSize intValue];
-                        extraInfo = [NSString stringWithFormat:@"Download from %@ (%i KB)",source,size/1024];
-                    }
-                    else extraInfo = @"Download from %@, source (unknown size)";
-                }
-            }
-            else  extraInfo = @"File has not been downloaded";
-        }
-    }
-    
-    // Linked URL will be shown in directly from web 
-    
-    else if ([attachment.linkMode isEqualToString:@"linked_url"] ) {
-        if([[ZPPreferences instance] online]){
-            extraInfo = @"Preview not supported for linked URL";
-        }
-        else {
-            extraInfo = @"Linked URL cannot be viewed in offline mode";
-        }
-    }
-    
-    //Linked files are available only on the computer where they were created
-    
-    else if ([attachment.linkMode isEqualToString:@"linked_file"] ) {
-        extraInfo = @"Linked files cannot be viewed from ZotPad";
-    }
-
-    //Add information over the thumbnail
-    
-    
-    UILabel* label = [[UILabel alloc] init];
-    
-    if(extraInfo!=NULL) label.text = [NSString stringWithFormat:@"%@ \n\n(%@)", attachment.title, extraInfo];
-    else label.text = [NSString stringWithFormat:@"%@", attachment.title];
-    
-    label.textColor = [UIColor whiteColor];
-    label.backgroundColor = [UIColor clearColor];
-    label.textAlignment = UITextAlignmentCenter;
-    label.lineBreakMode = UILineBreakModeWordWrap;
-    label.numberOfLines = 5;
-    label.frame=CGRectMake(0,0, view.frame.size.width*ATTACHMENT_LABEL_WIDTH_MULTIPLIER*.9, view.frame.size.height*ATTACHMENT_LABEL_HEIGHT_MULTIPLIER*.9);
-    label.center = view.center;
-    
-    UIView* background = [[UIView alloc] init];
-    background.frame=CGRectMake(0, 0, view.frame.size.width*ATTACHMENT_LABEL_WIDTH_MULTIPLIER, view.frame.size.height*ATTACHMENT_LABEL_HEIGHT_MULTIPLIER);
-    background.backgroundColor=[UIColor blackColor];
-    background.alpha = 0.5;
-    background.layer.cornerRadius = 8;
-    background.center = view.center;
-    
-    [view addSubview:background];
-    [view addSubview:label];
-}
-
--(void) _configurePreview:(UIView*)view withAttachment:(ZPZoteroAttachment*)attachment{
-    
-    
-    for(UIView* subview in view.subviews){
-        [subview removeFromSuperview];
-    }
-    view.layer.borderWidth = 2.0f;
-    view.backgroundColor = [UIColor whiteColor];
-    
-    UIImageView* imageView = NULL;
-    if(attachment.fileExists && [attachment.contentType isEqualToString:@"application/pdf"]){
-
-        UIImage* image = [_previewCache objectForKey:attachment.fileSystemPath];
-        
-        if(image == NULL){
-            NSLog(@"Start rendering %@",attachment.fileSystemPath);
-            [_previewCache setObject:[NSNull null] forKey:attachment.fileSystemPath];
-            
-            //Create an invocation
-            NSInvocationOperation* operation  = [[NSInvocationOperation alloc] initWithTarget:self selector:@selector(objectCache:) object:attachment]; 
-            //Create operation and queue it for background retrieval
-            [_imageRenderQueue addOperation:operation];
-            NSLog(@"Added file %@ to preview render queue. Operations in queue now %i",attachment.title,[_imageRenderQueue operationCount]);
-        }
-        else if((NSObject*)image != [NSNull null]){
-            NSLog(@"Got an image from cache %@",attachment.fileSystemPath);
-            imageView = [[UIImageView alloc] initWithImage:image];
-            view.layer.frame = [self _getDimensionsWithImage:image];
-            imageView.layer.frame = [self _getDimensionsWithImage:image];
-        }
-        else NSLog(@"Image is being rendered %@",attachment.fileSystemPath);
-    }
-    
-    if(imageView == NULL){
-        imageView = [[UIImageView alloc] initWithImage:[[ZPAttachmentThumbnailFactory instance] getFiletypeImageForAttachment:attachment height:ATTACHMENT_IMAGE_HEIGHT width:ATTACHMENT_IMAGE_WIDTH]];
-        imageView.frame = CGRectMake(0,0,  ATTACHMENT_IMAGE_WIDTH, ATTACHMENT_IMAGE_HEIGHT);
-        imageView.contentMode = UIViewContentModeScaleAspectFit;
-    }
-
-    [view addSubview:imageView];
-    imageView.center = view.center;
-    
-    //Configure label
-    [self _configurePreviewLabel:view withAttachment:attachment];
-    
-}
-
-#pragma mark - Preview and icon rendering
-
--(CGRect)_getDimensionsWithImage:(UIImage*) image{    
-    
-    float scalingFactor = ATTACHMENT_IMAGE_HEIGHT/image.size.height;
-    
-    if(ATTACHMENT_IMAGE_HEIGHT/image.size.width<scalingFactor) scalingFactor = ATTACHMENT_IMAGE_WIDTH/image.size.width;
-    
-    return CGRectMake(0,0,image.size.width*scalingFactor,image.size.height*scalingFactor);
-    
-}
-
-
--(void) objectCache:(ZPZoteroAttachment*)attachment{
-    
-    //
-    // Renders a first page of a PDF as an image
-    //
-    // Source: http://stackoverflow.com/questions/5658993/creating-pdf-thumbnail-in-iphone
-    //
-    NSString* filename = attachment.fileSystemPath;
-    
-    NSLog(@"Start rendering pdf %@",filename);
-    
-    NSURL *pdfUrl = [NSURL fileURLWithPath:filename];
-    CGPDFDocumentRef document = CGPDFDocumentCreateWithURL((__bridge_retained CFURLRef)pdfUrl);
-    
-    
-    CGPDFPageRef pageRef = CGPDFDocumentGetPage(document, 1);
-    CGRect pageRect = CGPDFPageGetBoxRect(pageRef, kCGPDFCropBox);
-    
-    UIGraphicsBeginImageContext(pageRect.size);
-    CGContextRef context = UIGraphicsGetCurrentContext();
-    CGContextTranslateCTM(context, CGRectGetMinX(pageRect),CGRectGetMaxY(pageRect));
-    CGContextScaleCTM(context, 1, -1);  
-    CGContextTranslateCTM(context, -(pageRect.origin.x), -(pageRect.origin.y));
-    CGContextDrawPDFPage(context, pageRef);
-    
-    UIImage* image = UIGraphicsGetImageFromCurrentImageContext();
-    UIGraphicsEndImageContext();
-    
-    NSLog(@"Done rendering pdf %@",filename);
-    
-    [_previewCache setObject:image forKey:filename];
-
-    [self performSelectorOnMainThread:@selector(_reloadAttachmentInCarousel:) withObject:attachment waitUntilDone:NO];
-    
-}
 
 #pragma mark - Navigation controller delegate
 
@@ -650,7 +459,11 @@
 
 - (void)carousel:(iCarousel *)carousel didSelectItemAtIndex:(NSInteger)index{
     if([carousel currentItemIndex] == index){
-        [[ZPQuicklookController instance] openItemInQuickLook:_currentItem attachmentIndex:index sourceView:self];
+        ZPZoteroAttachment* attachment = [_currentItem.attachments objectAtIndex:index];
+
+        if([attachment fileExists]) [[ZPQuicklookController instance] openItemInQuickLook:attachment sourceView:self];
+        else [[ZPServerConnection instance] startDownloadingAttachment:attachment];      
+              
     }
 }
 
@@ -676,17 +489,18 @@
 - (UIView *)carousel:(iCarousel *)carousel viewForItemAtIndex:(NSUInteger)index reusingView:(UIView*)view
 {
     
-    ZPZoteroAttachment* attachment = [_currentItem.attachments objectAtIndex:index];
-    //TOOD: Recycle views    
-    view = [[UIView alloc] initWithFrame:CGRectMake(0, 0, ATTACHMENT_IMAGE_WIDTH, ATTACHMENT_IMAGE_HEIGHT)];
-    [self _configurePreview:view withAttachment:attachment];
-        
-    return view;
+    UIStoryboard *storyboard = self.storyboard;
+    ZPAttachmentPreviewViewController* attachmentViewController = [storyboard instantiateViewControllerWithIdentifier:@"AttachmentPreview"];
+    
+    attachmentViewController.attachment= [_currentItem.attachments objectAtIndex:index];
+    attachmentViewController.allowDownloading = TRUE;
+    attachmentViewController.usePreview = TRUE;
+    attachmentViewController.showLabel = TRUE;
+    return attachmentViewController.view;
 }
 
 //This is implemented because it is a mandatory protocol method
 - (UIView *)carousel:(iCarousel *)carousel placeholderViewAtIndex:(NSUInteger)index reusingView:(UIView *)view{
-    if(view==NULL) return view = [[UIView alloc] initWithFrame:CGRectMake(0, 0, ATTACHMENT_IMAGE_WIDTH, ATTACHMENT_IMAGE_HEIGHT)];
     return view;
 }
 
@@ -701,16 +515,15 @@
     if([item.key isEqualToString:_currentItem.key]){
         _currentItem = item;
         [_activityIndicator startAnimating];
-        [self _reconfigureCarousel];
+        if([_carousel numberOfItems]!= item.attachments.count){
+            [self _reconfigureCarousel];
+            [_carousel performSelectorOnMainThread:@selector(reloadData) withObject:NULL waitUntilDone:NO];
+        }
         [self performSelectorOnMainThread:@selector(_reconfigureDetailTableView:) withObject:[NSNumber numberWithBool:TRUE] waitUntilDone:NO];
         
         [_activityIndicator stopAnimating];
         
     }
-}
-
--(void) notifyAttachmentDownloadCompleted:(ZPZoteroAttachment*) attachment{
-    [self _reloadAttachmentInCarousel:attachment];
 }
 
 -(void) _reloadAttachmentInCarousel:(ZPZoteroItem*)attachment {

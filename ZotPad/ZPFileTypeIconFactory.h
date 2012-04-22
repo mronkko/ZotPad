@@ -9,9 +9,9 @@
 #import <Foundation/Foundation.h>
 #import "ZPZoteroAttachment.h"
 
-@interface ZPAttachmentThumbnailFactory : NSObject
+@interface ZPFileTypeIconFactory : NSObject
 
-+(ZPAttachmentThumbnailFactory*) instance;
++(ZPFileTypeIconFactory*) instance;
 -(UIImage*) getFiletypeImageForURL:(NSURL*)url height:(NSInteger)height width:(NSInteger)width;
 -(UIImage*) getFiletypeImageForAttachment:(ZPZoteroAttachment*)attachment height:(NSInteger)height width:(NSInteger)width;
 

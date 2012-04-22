@@ -13,7 +13,6 @@
 #import "ZPLocalization.h"
 #import <DropboxSDK/DropboxSDK.h>
 #import "ZPDatabase.h"
-#import "ZPAttachmentThumbnailFactory.h"
 #import "ZPFileImportViewController.h"
 
 

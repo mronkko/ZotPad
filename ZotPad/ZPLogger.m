@@ -44,6 +44,7 @@ void ZPLog(NSObject* source,int line,NSString* format, ...){
 //        [debugClasses addObject:@"ZPItemDetailViewController"];
 //        [debugClasses addObject:@"ZPUncachedItemsOperation"];
         [debugClasses addObject:@"ZPFileChannel_WebDAV"];
+//        [debugClasses addObject:@"ZPAttachmentPreviewViewController"];
   
         
 

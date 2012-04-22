@@ -154,9 +154,14 @@ static ZPPreferences* _instance = nil;
     NSUserDefaults* defaults = [NSUserDefaults standardUserDefaults];
     return [[defaults objectForKey:@"webdav"] boolValue];
 }
+-(void) setUseWebDAV:(BOOL) value{
+    NSUserDefaults* defaults = [NSUserDefaults standardUserDefaults];
+    [defaults setObject:[NSNumber numberWithBool:value] forKey:@"webdav"];
+}
+
 -(NSString*) webDAVURL{
     NSUserDefaults* defaults = [NSUserDefaults standardUserDefaults];
-    return [defaults objectForKey:@"webdavurl"];
+    return [[defaults objectForKey:@"webdavurl"] stringByTrimmingCharactersInSet:[NSCharacterSet whitespaceAndNewlineCharacterSet]];
 }
 
 -(BOOL) useSamba{
@@ -165,7 +170,7 @@ static ZPPreferences* _instance = nil;
 }
 -(NSString*) sambaURL{
     NSUserDefaults* defaults = [NSUserDefaults standardUserDefaults];
-    return [defaults objectForKey:@"sambaurl"];
+    return [[defaults objectForKey:@"sambaurl"] stringByTrimmingCharactersInSet:[NSCharacterSet whitespaceAndNewlineCharacterSet]];
 }
 -(NSString*) username{
     NSUserDefaults* defaults = [NSUserDefaults standardUserDefaults];

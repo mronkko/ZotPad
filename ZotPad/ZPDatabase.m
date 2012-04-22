@@ -618,7 +618,8 @@ static ZPDatabase* _instance = nil;
             resultSet= [_database executeQuery:@"SELECT *, (SELECT count(*) FROM collections WHERE parentCollectionKey = parent.collectionKey) AS numChildren FROM collections parent WHERE libraryID=? AND parentCollectionKey = ? ORDER BY LOWER(title)",libraryID,collectionKey];
         
         while([resultSet next]) {
-            [returnArray addObject:[ZPZoteroCollection dataObjectWithDictionary:[resultSet resultDict]]];
+            NSDictionary* dict = [resultSet resultDict];
+            [returnArray addObject:[ZPZoteroCollection dataObjectWithDictionary:dict]];
             
         }
         [resultSet close];

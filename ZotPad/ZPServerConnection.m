@@ -511,6 +511,8 @@ const NSInteger ZPServerConnectionRequestTopLevelKeys = 9;
     //First request starts the network indicator
     if(_activeRequestCount==1) [[UIApplication sharedApplication] setNetworkActivityIndicatorVisible:YES];
 
+    [[ZPDataLayer instance] notifyAttachmentDownloadStarted:attachment];
+
     //Use the first channel
     [[_fileChannels objectAtIndex:0] startDownloadingAttachment:attachment];
 

@@ -19,6 +19,7 @@
 @property (retain) NSString* userID;
 @property (retain) NSString* username;
 @property (retain) NSString* currentCacheSize;
+@property BOOL useWebDAV;
 
 +(ZPPreferences*) instance;
 -(BOOL) cacheMetadataAllLibraries;
@@ -33,7 +34,6 @@
 -(BOOL) useCache;
 -(BOOL) online;
 -(BOOL) useDropbox;
--(BOOL) useWebDAV;
 -(BOOL) useSamba;
 -(NSString*) webDAVURL;
 -(NSString*) sambaURL;

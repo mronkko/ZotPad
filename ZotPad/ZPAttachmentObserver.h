@@ -12,6 +12,7 @@
 @protocol ZPAttachmentObserver <NSObject>
 
 -(void) notifyAttachmentDownloadCompleted:(ZPZoteroAttachment*) attachment;
+-(void) notifyAttachmentDownloadStarted:(ZPZoteroAttachment*) attachment;
 
 
 

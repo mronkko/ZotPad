@@ -34,24 +34,15 @@
         
             NSLog(@"The item is from My Library, proceeding with WebDAV download");
             
-            /*
-             if(_password == NULL || _username == NULL){
-             //Get the username from keychain
-             
-             KeychainItemWrapper *keychain = 
-             [[KeychainItemWrapper alloc] initWithIdentifier:@"ZotPadWebDAV" accessGroup:nil];
-             
-             // Get username from keychain (if it exists)
-             //TODO: Is __bridge correct here
-             _username = [keychain objectForKey:(__bridge id)kSecAttrAccount];
-             _username = [keychain objectForKey:(__bridge id)kSecValueData];
-             
-             }
-             */
             //Setup the request 
-            NSURL *url = [NSURL URLWithString:[[[ZPPreferences instance] webDAVURL] stringByAppendingFormat:@"/%@.zip", attachment.key]]; 
-            ASIHTTPRequest *request = [ASIHTTPRequest requestWithURL:url]; 
+            NSString* WebDAVRoot = [[ZPPreferences instance] webDAVURL];
+            NSString* key =  attachment.key;
+            NSString* urlString = [WebDAVRoot stringByAppendingFormat:@"/%@.zip",key];
+            NSURL *url = [NSURL URLWithString:urlString]; 
             
+            NSLog(@"Downloading from WebDAV %@",urlString);
+            
+            ASIHTTPRequest *request = [ASIHTTPRequest requestWithURL:url]; 
             
             [self linkAttachment:attachment withRequest:request];
             
@@ -60,19 +51,15 @@
             
             NSString* tempFile = [NSTemporaryDirectory() stringByAppendingPathComponent:[NSString stringWithFormat:@"ZP%@%i",attachment.key,[[NSDate date] timeIntervalSince1970]*1000000]];
             [request setDownloadDestinationPath:tempFile];
-            //        [request setUsername:_username];
-            //        [request setPassword:_password];
+
+            //For some reason authentication using digest fails if persistent connections are in use
+            [request setShouldAttemptPersistentConnection:NO];
             [request setShouldPresentAuthenticationDialog:YES];
+            [request setUseKeychainPersistence:YES];
+            [request setRequestMethod:@"GET"];
             [request setDelegate:self];
             [request startAsynchronous];
             
-            /*                                                      
-             KeychainItemWrapper *keychain = 
-             [[KeychainItemWrapper alloc] initWithIdentifier:@"ZotPadSamba" accessGroup:nil];
-             
-             [keychain setObject:_username forKey:(__bridge id)kSecAttrAccount];
-             [keychain setObject:_password forKey:(__bridge id)kSecValueData];   
-             */        
         }
     }
     // If WebDAV is not in use, just notify that we are done
@@ -132,12 +119,26 @@
     
     //If there was an authentication issue, reauthenticat
     if(error.code == 3){
-            
+        UIAlertView *message = [[UIAlertView alloc] initWithTitle:@"Authentication failed"
+                                                          message:@"Authenticating with WebDAV server failed."
+                                                         delegate:self
+                                                cancelButtonTitle:@"Cancel"
+                                                otherButtonTitles:@"Disable WebDAV",nil];
+        
+        [message show];
     }
     else{
         [[ZPServerConnection instance] finishedDownloadingAttachment:attachment toFileAtPath:NULL usingFileChannel:self];
         [self cleanupAfterFinishingAttachment:attachment];
     } 
+}
+
+- (void)alertView:(UIAlertView *)alertView clickedButtonAtIndex:(NSInteger)buttonIndex
+{
+    //Disable webdav
+    if(buttonIndex == 1){
+        [[ZPPreferences instance] setUseWebDAV:FALSE];
+    }
 }
 
 @end

@@ -8,6 +8,6 @@
 
 #import "ZPFileChannel.h"
 
-@interface ZPFileChannel_WebDAV : ZPFileChannel
+@interface ZPFileChannel_WebDAV : ZPFileChannel <UIAlertViewDelegate>
 
 @end

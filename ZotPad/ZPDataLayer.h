@@ -64,6 +64,7 @@
 -(void) notifyLibraryWithCollectionsAvailable:(ZPZoteroLibrary*) library;
 
 -(void) notifyAttachmentDownloadCompleted:(ZPZoteroAttachment*) attachment;
+-(void) notifyAttachmentDownloadStarted:(ZPZoteroAttachment*) attachment;
 
 
 

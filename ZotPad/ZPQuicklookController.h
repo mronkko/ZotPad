@@ -15,14 +15,13 @@
 //For showing file thumbnails
 #import <QuickLook/QuickLook.h>
 
-@interface ZPQuicklookController : NSObject <QLPreviewControllerDataSource, ZPAttachmentObserver, UIAlertViewDelegate>{
+@interface ZPQuicklookController : NSObject <QLPreviewControllerDataSource>{
     NSMutableArray* _fileURLs;
     UIViewController* _source;
-    UIAlertView* _progressAlert;
 }
 
 +(ZPQuicklookController*) instance;
--(void) openItemInQuickLook:(ZPZoteroItem*)item attachmentIndex:(NSInteger)index sourceView:(UIViewController*)view;
+-(void) openItemInQuickLook:(ZPZoteroItem*)attachment sourceView:(UIViewController*)view;
 -(void) displayQuicklook;
 
 @end

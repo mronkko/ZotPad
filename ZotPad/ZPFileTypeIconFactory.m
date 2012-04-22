@@ -6,20 +6,20 @@
 //  Copyright (c) 2012 __MyCompanyName__. All rights reserved.
 //
 
-#import "ZPAttachmentThumbnailFactory.h"
+#import "ZPFileTypeIconFactory.h"
 #import <MobileCoreServices/MobileCoreServices.h>
 #import <QuartzCore/QuartzCore.h>
 #import "ZPLogger.h"
 
-@implementation ZPAttachmentThumbnailFactory
+@implementation ZPFileTypeIconFactory
 
 
-static ZPAttachmentThumbnailFactory* _instance;
+static ZPFileTypeIconFactory* _instance;
 static NSCache* _fileTypeImageCache;
 
-+(ZPAttachmentThumbnailFactory*) instance{
++(ZPFileTypeIconFactory*) instance{
     if(_instance == NULL){
-        _instance = [[ZPAttachmentThumbnailFactory alloc] init];
+        _instance = [[ZPFileTypeIconFactory alloc] init];
         _fileTypeImageCache = [[NSCache alloc] init];
     }
     return _instance;

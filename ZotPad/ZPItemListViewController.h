@@ -40,6 +40,8 @@
 @property (nonatomic, retain) IBOutlet UISearchBar* searchBar;
 @property (nonatomic, retain) IBOutlet UIToolbar* toolBar;
 @property (nonatomic, retain) IBOutlet UITableView* tableView;
+@property (nonatomic, retain) IBOutlet UIGestureRecognizer* tapRecognizer;
+
 @property (nonatomic, retain) ZPItemDetailViewController* itemDetailViewController;
 
 @property (nonatomic, retain) NSArray* itemKeysShown;

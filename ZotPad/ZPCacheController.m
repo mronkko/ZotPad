@@ -777,6 +777,11 @@ static ZPCacheController* _instance = nil;
     [self _checkQueues];
 }
 
+//This is a mandatory method for the protocol. 
+
+-(void) notifyAttachmentDownloadStarted:(ZPZoteroAttachment*) attachment{
+}
+
 - (void) purgeAllAttachmentFilesFromCache{
     
     NSString* _documentsDirectory = [NSSearchPathForDirectoriesInDomains(NSDocumentDirectory, NSUserDomainMask, YES)  objectAtIndex:0];
