@@ -25,3 +25,9 @@
 [submodule "tango"]
 	path = tango
 	url = https://github.com/38leinaD/tango.git
+[submodule "Oxygen-Icons"]
+	path = Oxygen-Icons
+	url = https://github.com/chadnickbok/Oxygen-Icons.git
+[submodule "SVGKit"]
+	path = SVGKit
+	url = https://github.com/reklis/SVGKit.git
