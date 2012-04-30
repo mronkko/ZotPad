@@ -703,7 +703,19 @@ Deletes items, notes, and attachments based in array of keys from a library
  */
 
 -(NSArray*) writeItems:(NSArray*)items {
-    
+    /*
+     Check that all items have keys and item types defined
+     */
+    ZPZoteroItem* item;
+    for(item in items){
+        if(item.key==NULL){
+            [NSException raise:@"Item key cannot be null" format:@""];
+        }
+        if(item.itemType==NULL){
+            [NSException raise:@"Item type cannot be null" format:@""];
+        }
+
+    }
     return [self writeObjects:items intoTable:@"items" checkTimestamp:YES];
         
 }

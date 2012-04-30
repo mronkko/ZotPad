@@ -10,6 +10,7 @@
 // TODO: Implement linked files or at least some kind of info that they are not supported
 
 #import "ZPZoteroAttachment.h"
+#import "ZPDatabase.h"
 
 NSInteger const LINK_MODE_IMPORTED_FILE = 0;
 NSInteger const LINK_MODE_IMPORTED_URL = 1;
@@ -36,7 +37,7 @@ NSInteger const LINK_MODE_LINKED_URL = 3;
     if(attachment.existsOnZoteroServer == nil){
         attachment.existsOnZoteroServer = [NSNumber numberWithBool:NO];   
     }
-    
+
     return attachment;
 }
 
@@ -108,7 +109,6 @@ NSInteger const LINK_MODE_LINKED_URL = 3;
 }
 
 - (NSArray*) attachments{
-    
     return [NSArray arrayWithObject:self];
 }
 

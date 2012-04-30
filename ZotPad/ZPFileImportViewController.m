@@ -8,7 +8,6 @@
 
 #import "ZPFileImportViewController.h"
 #include <QuartzCore/QuartzCore.h>
-#import "ZPFileTypeIconFactory.h"
 #import "Three20/Three20.h"
 #import "ZPDataLayer.h"
 #import "ZPServerConnection.h"
@@ -38,7 +37,7 @@
 }
 - (void)viewWillAppear:(BOOL)animated{
     
-    UIImage* fileImage = [[ZPFileTypeIconFactory instance] getFiletypeImageForURL:url height:self.view.frame.size.height width:self.view.frame.size.width];
+    UIImage* fileImage = NULL;
     
     UIImageView* fileImageView = [[UIImageView alloc] initWithImage:fileImage];
     fileImageView.center = self.view.center;

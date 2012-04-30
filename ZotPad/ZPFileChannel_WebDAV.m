@@ -12,13 +12,59 @@
 #import "KeychainItemWrapper.h"
 #import "ZPServerConnection.h"
 #import "ASIHTTPRequest.h"
+#import "ZPLogger.h"
 
 //Unzipping and base64 decoding
 #import "ZipArchive.h"
 #import "QSStrings.h"
 
+// This is needed bacause WebDAV requests contain actually two request. 
+
+@interface ZPFileChannel_WebDAV_ProgressDelegate : NSObject <ASIHTTPRequestDelegate>{
+    long long length;
+    long long received;
+}
+-(id) initWithUIProgressView:(UIProgressView*)view;
+
+@property (retain) UIProgressView* progressView;
+
+@end
+
+@implementation ZPFileChannel_WebDAV_ProgressDelegate
+
+@synthesize progressView;
+
+-(id) initWithUIProgressView:(UIProgressView*)view{
+    self = [super init];
+    progressView = view;
+    length = 0;
+    received = 0;
+    return self;
+}
+
+- (void)request:(ASIHTTPRequest *)request didReceiveBytes:(long long)bytes{
+    received += bytes;
+
+    //Only update the progress view when the file has started downloading.
+    
+    if([request responseStatusCode] == 200){
+        float progress = (float)received/length;
+        [self.progressView setProgress:progress];
+    }
+}
+- (void)request:(ASIHTTPRequest *)request incrementDownloadSizeBy:(long long)newLength{
+    length += newLength;
+}
+
+@end
+
 @implementation ZPFileChannel_WebDAV
 
+- (id) init{
+    self= [super init];
+    progressDelegates = [[NSMutableDictionary alloc] init];
+    return self;
+}
 
 -(void) startDownloadingAttachment:(ZPZoteroAttachment*)attachment{
     
@@ -58,6 +104,7 @@
             [request setUseKeychainPersistence:YES];
             [request setRequestMethod:@"GET"];
             [request setDelegate:self];
+            [request setShowAccurateProgress:TRUE];
             [request startAsynchronous];
             
         }
@@ -80,7 +127,19 @@
     ASIHTTPRequest* request = [self requestWithAttachment:attachment];
     
     if(request != NULL){
-        [request setDownloadProgressDelegate:progressView];
+        ZPFileChannel_WebDAV_ProgressDelegate* progressDelegate;
+        @synchronized(progressDelegates){
+            progressDelegate = [progressDelegates objectForKey:[NSNumber numberWithInt: attachment]];
+            
+            if(progressDelegate == NULL){
+                progressDelegate  = [[ZPFileChannel_WebDAV_ProgressDelegate alloc] initWithUIProgressView:progressView];
+                [progressDelegates setObject:progressDelegate forKey:[NSNumber numberWithInt: attachment]];
+            }
+            else{
+                progressDelegate.progressView = progressView;
+            }
+        }
+        [request setDownloadProgressDelegate:progressDelegate];
     }
 }
 
@@ -100,6 +159,8 @@
         [zipArchive UnzipFileTo:tempFile overWrite:YES];
         [zipArchive UnzipCloseFile];
         
+        //Use the first unzipped file
+        tempFile = [tempFile stringByAppendingPathComponent:[[[NSFileManager defaultManager]contentsOfDirectoryAtPath:tempFile error:NULL] objectAtIndex:0]];
         
     }
     else {
@@ -133,6 +194,12 @@
     } 
 }
 
+-(void) cleanupAfterFinishingAttachment:(ZPZoteroAttachment *)attachment{
+    @synchronized(progressDelegates){
+        [progressDelegates removeObjectForKey:[NSNumber numberWithInt: attachment]];
+    }
+
+}
 - (void)alertView:(UIAlertView *)alertView clickedButtonAtIndex:(NSInteger)buttonIndex
 {
     //Disable webdav

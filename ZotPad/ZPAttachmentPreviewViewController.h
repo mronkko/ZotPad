@@ -11,7 +11,7 @@
 #import "ZPAttachmentObserver.h"
 
 
-@interface ZPAttachmentPreviewViewController : UIViewController <ZPAttachmentObserver, UIWebViewDelegate>{
+@interface ZPAttachmentPreviewViewController : UIViewController <ZPAttachmentObserver, UIWebViewDelegate, UIGestureRecognizerDelegate>{
 }
 
 
@@ -27,5 +27,6 @@
 @property BOOL showLabel;
 
 +(void) renderFileTypeIconForAttachment:(ZPZoteroAttachment*) attachment intoImageView:(UIImageView*) fileImage;
+
 
 @end

@@ -10,6 +10,7 @@
 #import "ZPLogger.h"
 #import "ZPDatabase.h"
 #import "ZPCacheController.h"
+#import "ASIHTTPRequest.h"
 
 @implementation ZPPreferences
 
@@ -52,18 +53,24 @@ static ZPPreferences* _instance = nil;
         return;
     }
     
-    NSDictionary *settings = [NSDictionary dictionaryWithContentsOfFile:[settingsBundle stringByAppendingPathComponent:@"Root.plist"]];
-    NSArray *preferences = [settings objectForKey:@"PreferenceSpecifiers"];
+
+    NSMutableDictionary *defaultsToRegister = [[NSMutableDictionary alloc] init];
+
+    NSArray* preferenceFiles = [NSArray arrayWithObjects:@"Root.plist", @"samba.plist", nil];
     
-    NSMutableDictionary *defaultsToRegister = [[NSMutableDictionary alloc] initWithCapacity:[preferences count]];
-    for(NSDictionary *prefSpecification in preferences) {
-        NSString *key = [prefSpecification objectForKey:@"Key"];
-        NSObject* defaultValue = [prefSpecification objectForKey:@"DefaultValue"];
-        if(key && defaultValue) {
-            [defaultsToRegister setObject:defaultValue forKey:key];
+    NSString* preferenceFile;
+    for(preferenceFile in preferenceFiles){
+        NSDictionary *settings = [NSDictionary dictionaryWithContentsOfFile:[settingsBundle stringByAppendingPathComponent:preferenceFile]];
+        NSArray *preferences = [settings objectForKey:@"PreferenceSpecifiers"];
+        
+        for(NSDictionary *prefSpecification in preferences) {
+            NSString *key = [prefSpecification objectForKey:@"Key"];
+            NSObject* defaultValue = [prefSpecification objectForKey:@"DefaultValue"];
+            if(key && defaultValue) {
+                [defaultsToRegister setObject:defaultValue forKey:key];
+            }
         }
-    }
-    
+    }    
     [defaults registerDefaults:defaultsToRegister];
 
     _metadataCacheLevel = [defaults integerForKey:@"preemptivecachemetadata"];
@@ -105,7 +112,18 @@ static ZPPreferences* _instance = nil;
     [defaults removeObjectForKey:@"username"];
     [defaults removeObjectForKey:@"userID"];
     [defaults removeObjectForKey:@"OAuthKey"];
-
+    
+    //Empty the key chain
+    
+    NSURLCredentialStorage *store = [NSURLCredentialStorage sharedCredentialStorage];
+    for (NSURLProtectionSpace *space in [store allCredentials]) {
+        NSDictionary *userCredentialMap = [store credentialsForProtectionSpace:space];
+        for (NSString *user in userCredentialMap) {
+            NSURLCredential *credential = [userCredentialMap objectForKey:user];
+            [store removeCredential:credential forProtectionSpace:space];
+        }
+    }
+    
 }
 
 -(NSInteger) maxCacheSize{
@@ -168,10 +186,16 @@ static ZPPreferences* _instance = nil;
     NSUserDefaults* defaults = [NSUserDefaults standardUserDefaults];
     return [[defaults objectForKey:@"samba"] boolValue];
 }
--(NSString*) sambaURL{
+-(NSString*) sambaShareName{
     NSUserDefaults* defaults = [NSUserDefaults standardUserDefaults];
-    return [[defaults objectForKey:@"sambaurl"] stringByTrimmingCharactersInSet:[NSCharacterSet whitespaceAndNewlineCharacterSet]];
+    return [defaults stringForKey:@"sambashare"];
 }
+
+-(void) setUseSamba:(BOOL) value{
+    NSUserDefaults* defaults = [NSUserDefaults standardUserDefaults];
+    [defaults setObject:[NSNumber numberWithBool:value] forKey:@"samba"];
+}
+
 -(NSString*) username{
     NSUserDefaults* defaults = [NSUserDefaults standardUserDefaults];
     return [defaults objectForKey:@"username"];

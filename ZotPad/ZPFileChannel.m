@@ -35,6 +35,18 @@
         [_attachmentsByRequest setObject:attachment forKey:[self keyForRequest:request]];
     }
 }
+
+-(NSString*) username{
+    return _username;
+}
+-(NSString*) password{
+    return _password;
+}
+-(void) setUsername:(NSString*)username andPassword:(NSString*)password{
+    _username = username;
+    _password = password;
+}
+
 -(NSObject*) keyForRequest:(NSObject*)request{
     return [NSNumber numberWithInt: request];
 }

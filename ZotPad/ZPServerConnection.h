@@ -21,6 +21,7 @@
         
     NSInteger _activeRequestCount;
     NSArray* _fileChannels;
+    NSMutableSet* _activeDownloads;
 }
 
 // This class is used as a singleton
@@ -51,7 +52,7 @@
 -(void) finishedDownloadingAttachment:(ZPZoteroAttachment*)attachment toFileAtPath:(NSString*) tempFile usingFileChannel:(ZPFileChannel*)fileChannel;
 -(void) cancelDownloadingAttachment:(ZPZoteroAttachment*)attachment;
 -(void) useProgressView:(UIProgressView*) progressView forAttachment:(ZPZoteroAttachment*)attachment;
-
+-(BOOL) isAttachmentDownloading:(ZPZoteroAttachment*)attachment;
 -(BOOL) canUploadVersionForAttachment:(ZPZoteroAttachment*)attachment;
 
 -(void) downloadAttachmentFromZoteroServer:(ZPZoteroAttachment*)attachment toTempFile:(NSString*)filePath withUIProgressView:(UIProgressView*) progressView;

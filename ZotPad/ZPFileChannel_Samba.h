@@ -9,9 +9,15 @@
 #import "ZPFileChannel.h"
 #import "tangoConnection.h"
 
-@interface ZPFileChannel_Samba : ZPFileChannel {
+
+@interface ZPFileChannel_Samba : ZPFileChannel <NSNetServiceBrowserDelegate, UIAlertViewDelegate>{
 }
 
+@property (retain) NSString* hostname;
+@property (retain) NSArray* knownServers;
 
+-(void)disableSamba;
+-(void)cancelCurrent;
+-(void)dialogDismissed;
 
 @end

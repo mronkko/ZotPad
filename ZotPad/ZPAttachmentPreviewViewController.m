@@ -18,7 +18,9 @@
 
 #define CHUNK 16384
 
-@interface ZPAttachmentPreviewViewController ()
+@interface ZPAttachmentPreviewViewController (){
+    UIGestureRecognizer* _tapRecognizer;
+}
 
 -(void) _configurePreview;
 -(void) _configureTitleLabel;
@@ -72,7 +74,7 @@ static ZPAttachmentPreviewViewController* _webViewDelegate;
 - (void)viewDidLoad
 {
     [super viewDidLoad];
-    
+    NSLog(@"Loading view for ZPAttachmentPreviewViewController %x",self);
 
     [self _configurePreview];
     
@@ -112,56 +114,63 @@ static ZPAttachmentPreviewViewController* _webViewDelegate;
     
     self.downloadLabel.hidden = FALSE;
     
-    //Imported files and URLs have files that can be downloaded
-    
-    if(([attachment.linkMode isEqualToString:@"imported_file"] || [attachment.linkMode isEqualToString:@"imported_url"] )
-        && ! [attachment fileExists]){
-        
-        //Register self as observer for item downloads
-        
-        [[ZPDataLayer instance] registerAttachmentObserver:self];
-        
-        if([[ZPPreferences instance] online]){
-            
-            NSString* source;
-            
-            if([[ZPPreferences instance] useWebDAV] && attachment.libraryID) source = @"WebDAV";
-            else if (attachment.existsOnZoteroServer) source = @"Zotero";
-            else if ([[ZPPreferences instance] useDropbox]) source = @"Dropbox";
-            else if ([[ZPPreferences instance] useSamba]) source = @"network drive";
-            
-            if(source != NULL){
-                if(attachment.attachmentSize != [NSNull null]){
-                    NSInteger size = [attachment.attachmentSize intValue];
-                    self.downloadLabel.text =  [NSString stringWithFormat:@"Download from %@ (%i KB)",source,size/1024];
-                }
-                self.downloadLabel.text = [NSString stringWithFormat:@"Download from %@ (unknown size)",source];
-            }
-            else {
-                self.downloadLabel.text = @"File cannot be found for download";
-            }
-        }
-        else  self.downloadLabel.text = @"File cannot be downloaded when offline";
+    if([[ZPServerConnection instance] isAttachmentDownloading:self.attachment]){
+        [self notifyAttachmentDownloadStarted:attachment];
     }
-    
-    // Linked URL will be shown in directly from web 
-    
-    else if ([attachment.linkMode isEqualToString:@"linked_url"] &&
-            !  [[ZPPreferences instance] online]){
-        self.downloadLabel.text = @"Linked URL cannot be viewed in offline mode";
-        
-    }
-    
-    //Linked files are available only on the computer where they were created
-    
-    else if ([attachment.linkMode isEqualToString:@"linked_file"] ) {
-        self.downloadLabel.text = @"Linked files cannot be viewed from ZotPad";
-    }
-    
     else{
-        self.downloadLabel.hidden = TRUE;
-    }
-    
+
+        //Imported files and URLs have files that can be downloaded
+
+        if(([attachment.linkMode isEqualToString:@"imported_file"] || [attachment.linkMode isEqualToString:@"imported_url"] )
+           && ! [attachment fileExists]){
+            
+            //Register self as observer for item downloads
+            
+            [[ZPDataLayer instance] registerAttachmentObserver:self];
+            
+            if([[ZPPreferences instance] online]){
+                
+                //TODO: Check if already downloading.
+                
+                NSString* source;
+                
+                if([[ZPPreferences instance] useWebDAV] && [attachment.libraryID intValue] == 1) source = @"WebDAV";
+                else if (attachment.existsOnZoteroServer) source = @"Zotero";
+                else if ([[ZPPreferences instance] useDropbox]) source = @"Dropbox";
+                else if ([[ZPPreferences instance] useSamba]) source = @"network drive";
+                
+                if(source != NULL){
+                    if(attachment.attachmentSize != [NSNull null]){
+                        NSInteger size = [attachment.attachmentSize intValue];
+                        self.downloadLabel.text =  [NSString stringWithFormat:@"Download from %@ (%i KB)",source,size/1024];
+                    }
+                    self.downloadLabel.text = [NSString stringWithFormat:@"Download from %@ (unknown size)",source];
+                }
+                else {
+                    self.downloadLabel.text = @"File cannot be found for download";
+                }
+            }
+            else  self.downloadLabel.text = @"File cannot be downloaded when offline";
+        }
+        
+        // Linked URL will be shown in directly from web 
+        
+        else if ([attachment.linkMode isEqualToString:@"linked_url"] &&
+                 !  [[ZPPreferences instance] online]){
+            self.downloadLabel.text = @"Linked URL cannot be viewed in offline mode";
+            
+        }
+        
+        //Linked files are available only on the computer where they were created
+        
+        else if ([attachment.linkMode isEqualToString:@"linked_file"] ) {
+            self.downloadLabel.text = @"Linked files cannot be viewed from ZotPad";
+        }
+        
+        else{
+            self.downloadLabel.hidden = TRUE;
+        }
+    }    
 }
 
 -(void) _configureTitleLabel{
@@ -233,7 +242,7 @@ static ZPAttachmentPreviewViewController* _webViewDelegate;
     
     NSString* cacheKey = [filename stringByAppendingFormat:@"-%ix%i",width,height];
 
-    NSLog(@"Getting icon for %@",cacheKey);
+//    NSLog(@"Getting icon for %@",cacheKey);
     
     UIImage* cacheImage = NULL;
     BOOL render = false;
@@ -352,7 +361,7 @@ static ZPAttachmentPreviewViewController* _webViewDelegate;
     }
     //We have a cached image
     else{
-        NSLog(@"Using cached image %@",cacheKey);
+//        NSLog(@"Using cached image %@",cacheKey);
         
         fileImage.image = cacheImage;
     }
@@ -378,6 +387,9 @@ static ZPAttachmentPreviewViewController* _webViewDelegate;
 
 -(void) _captureWebViewContent:(UIWebView *)webview forCacheKey:(NSString*) cacheKey;{
 
+    // TODO: Check that the image is not blank
+    // http://stackoverflow.com/questions/4735899/how-to-check-if-a-uiimage-is-blank-empty-transparent
+    
     //If the view is still visible, capture the content
     if (webview.window && webview.superview) {
         
@@ -492,6 +504,8 @@ static ZPAttachmentPreviewViewController* _webViewDelegate;
             self.downloadLabel.text = @"Download failed. Tap to retry";
         }
         self.progressView.hidden = TRUE;
+        self.view.userInteractionEnabled = TRUE;
+
     }
 }
 -(void) notifyAttachmentDownloadStarted:(ZPZoteroAttachment*) attachment{
@@ -499,9 +513,10 @@ static ZPAttachmentPreviewViewController* _webViewDelegate;
         [[ZPServerConnection instance] useProgressView:self.progressView forAttachment:self.attachment];
         self.downloadLabel.text = @"Downloading";
         self.progressView.hidden = FALSE;
+        self.progressView.progress = 0;
+        self.view.userInteractionEnabled = FALSE;
     }
     
 }
-
 
 @end

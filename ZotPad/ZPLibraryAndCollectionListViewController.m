@@ -160,6 +160,8 @@
      When a row is selected, set the detail view controller's library and collection and refresh
      */
     
+    //TODO: If there is no detail indicator, reload child collections from Zotero.
+    
     if (self.detailViewController != NULL) {
 
         ZPZoteroDataObject* node = [self->_content objectAtIndex: indexPath.row];
@@ -193,6 +195,8 @@
     /*
      Drill down to a library or collection
     */
+    
+    //TODO: Reload child collections
     
     ZPLibraryAndCollectionListViewController* subController = [[ZPLibraryAndCollectionListViewController alloc] initWithStyle: UITableViewStylePlain];
 	subController.detailViewController = self.detailViewController;

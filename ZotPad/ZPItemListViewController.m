@@ -11,7 +11,6 @@
 #import "../DSActivityView/Sources/DSActivityView.h"
 #import "ZPLocalization.h"
 #import "ZPPreferences.h"
-#import "ZPFileTypeIconFactory.h"
 #import "ZPAppDelegate.h"
 #import "ZPLogger.h"
 #import "Three20/Three20.h"

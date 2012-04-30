@@ -25,3 +25,6 @@
 [submodule "Oxygen-Icons"]
 	path = Oxygen-Icons
 	url = https://github.com/chadnickbok/Oxygen-Icons.git
+[submodule "CocoaAsyncSocket"]
+	path = CocoaAsyncSocket
+	url = https://github.com/robbiehanson/CocoaAsyncSocket

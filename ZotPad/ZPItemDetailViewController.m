@@ -14,7 +14,6 @@
 #import "ZPLocalization.h"
 #import "ZPQuicklookController.h"
 #import "ZPLogger.h"
-#import "ZPFileTypeIconFactory.h"
 #import "ZPAppDelegate.h"
 #import "ZPServerConnection.h"
 #import "ZPPreferences.h"
@@ -26,7 +25,9 @@
 
 #define ATTACHMENT_VIEW_HEIGHT (IPAD ? 600 : 400)
 
-@interface ZPItemDetailViewController()
+@interface ZPItemDetailViewController(){
+    NSMutableDictionary* _cachedViewControllers;
+}
 
 - (void) _reconfigureDetailTableView:(BOOL)animated;
 - (void) _reconfigureCarousel;
@@ -75,7 +76,7 @@
     UIBarButtonItem* barButton = [[UIBarButtonItem alloc] initWithCustomView:_activityIndicator];
     self.navigationItem.rightBarButtonItem = barButton;
 
-
+    _cachedViewControllers = [[NSMutableDictionary alloc] init];
 }
 
 - (void)viewWillAppear:(BOOL)animated
@@ -455,19 +456,6 @@
 
 #pragma mark - iCarousel delegate
 
-//Show the currently selected item in quicklook if tapped
-
-- (void)carousel:(iCarousel *)carousel didSelectItemAtIndex:(NSInteger)index{
-    if([carousel currentItemIndex] == index){
-        ZPZoteroAttachment* attachment = [_currentItem.attachments objectAtIndex:index];
-
-        if([attachment fileExists]) [[ZPQuicklookController instance] openItemInQuickLook:attachment sourceView:self];
-        else [[ZPServerConnection instance] startDownloadingAttachment:attachment];      
-              
-    }
-}
-
-
 
 - (NSUInteger)numberOfPlaceholdersInCarousel:(iCarousel *)carousel{
     return 0;
@@ -488,10 +476,23 @@
 
 - (UIView *)carousel:(iCarousel *)carousel viewForItemAtIndex:(NSUInteger)index reusingView:(UIView*)view
 {
+    ZPAttachmentPreviewViewController* attachmentViewController;
     
-    UIStoryboard *storyboard = self.storyboard;
-    ZPAttachmentPreviewViewController* attachmentViewController = [storyboard instantiateViewControllerWithIdentifier:@"AttachmentPreview"];
-    
+    if(view==NULL){
+        UIStoryboard *storyboard = self.storyboard;
+        attachmentViewController = [storyboard instantiateViewControllerWithIdentifier:@"AttachmentPreview"];
+        @synchronized(_cachedViewControllers){
+            [_cachedViewControllers setObject:attachmentViewController forKey:[NSNumber numberWithInt:view]];
+        }
+        NSLog(@"Instantiated attahcment view controller %x",attachmentViewController);
+    }
+    else{
+        @synchronized(_cachedViewControllers){
+            attachmentViewController = [_cachedViewControllers objectForKey:[NSNumber numberWithInt:view]];
+        }
+        NSLog(@"Instantiated attahcment view controller %x",attachmentViewController);
+    }
+
     attachmentViewController.attachment= [_currentItem.attachments objectAtIndex:index];
     attachmentViewController.allowDownloading = TRUE;
     attachmentViewController.usePreview = TRUE;
@@ -502,6 +503,24 @@
 //This is implemented because it is a mandatory protocol method
 - (UIView *)carousel:(iCarousel *)carousel placeholderViewAtIndex:(NSUInteger)index reusingView:(UIView *)view{
     return view;
+}
+
+- (void)carousel:(iCarousel *)carousel didSelectItemAtIndex:(NSInteger)index{
+    if([carousel currentItemIndex] == index){
+        
+        ZPZoteroAttachment* attachment = [_currentItem.attachments objectAtIndex:index]; 
+        
+        if([attachment fileExists]) [[ZPQuicklookController instance] openItemInQuickLook:attachment sourceView:self];
+        else{
+            ZPServerConnection* connection = [ZPServerConnection instance];
+            
+            if(connection!=NULL && ! [connection isAttachmentDownloading:attachment]){
+                [connection startDownloadingAttachment:attachment];   
+            }
+            
+        }
+
+    }
 }
 
 #pragma mark - Observer methods

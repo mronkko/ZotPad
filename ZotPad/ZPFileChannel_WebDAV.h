@@ -8,6 +8,8 @@
 
 #import "ZPFileChannel.h"
 
-@interface ZPFileChannel_WebDAV : ZPFileChannel <UIAlertViewDelegate>
+@interface ZPFileChannel_WebDAV : ZPFileChannel <UIAlertViewDelegate>{
+    NSMutableDictionary* progressDelegates;
+}
 
 @end

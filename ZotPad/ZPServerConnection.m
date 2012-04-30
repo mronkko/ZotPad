@@ -79,6 +79,8 @@ const NSInteger ZPServerConnectionRequestTopLevelKeys = 9;
                      [[ZPFileChannel_ZoteroStorage alloc] init], 
                      [[ZPFileChannel_Dropbox alloc] init], 
                      [[ZPFileChannel_Samba alloc] init], nil];
+    _activeDownloads= [[NSMutableSet alloc] init];
+    
     return self;
 }
 
@@ -505,19 +507,33 @@ const NSInteger ZPServerConnectionRequestTopLevelKeys = 9;
 #pragma mark - Asynchronous file downloads
 
 -(void) startDownloadingAttachment:(ZPZoteroAttachment*)attachment{
-        
+    
+    @synchronized(_activeDownloads){
+        //Do not download item if it is already being downloaded
+        if([_activeDownloads containsObject:attachment]) return;
+        [_activeDownloads addObject:attachment];
+    }
+
     _activeRequestCount++;
 
     //First request starts the network indicator
     if(_activeRequestCount==1) [[UIApplication sharedApplication] setNetworkActivityIndicatorVisible:YES];
 
-    [[ZPDataLayer instance] notifyAttachmentDownloadStarted:attachment];
-
     //Use the first channel
     [[_fileChannels objectAtIndex:0] startDownloadingAttachment:attachment];
 
+    [[ZPDataLayer instance] notifyAttachmentDownloadStarted:attachment];
+
 }
+
+/*
+ This is called always when an item finishes downloading regardless of whether it was succcesful or not.
+ */
 -(void) finishedDownloadingAttachment:(ZPZoteroAttachment*)attachment toFileAtPath:(NSString*) tempFile usingFileChannel:(ZPFileChannel*)fileChannel{
+
+    @synchronized(_activeDownloads){
+        [_activeDownloads removeObject:attachment];
+    }
 
     _activeRequestCount--;
     
@@ -575,6 +591,13 @@ const NSInteger ZPServerConnectionRequestTopLevelKeys = 9;
     for(ZPFileChannel* channnel in _fileChannels){
         [channnel useProgressView:progressView forAttachment:attachment];
     }
+}
+
+-(BOOL) isAttachmentDownloading:(ZPZoteroAttachment*)attachment{
+    @synchronized(_activeDownloads){
+        return [_activeDownloads containsObject:attachment];
+    }
+
 }
 
 

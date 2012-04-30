@@ -5,30 +5,14 @@
 	<key>PreferenceSpecifiers</key>
 	<array>
 		<dict>
-			<key>Type</key>
-			<string>PSTextFieldSpecifier</string>
-			<key>Title</key>
-			<string>URL</string>
-			<key>Key</key>
-			<string>sambaurl</string>
-		</dict>
-		<dict>
-			<key>Type</key>
-			<string>PSTextFieldSpecifier</string>
-			<key>Title</key>
-			<string>Username</string>
-			<key>Key</key>
-			<string>sambausername</string>
-		</dict>
-		<dict>
-			<key>Type</key>
-			<string>PSTitleValueSpecifier</string>
-			<key>Title</key>
-			<string>Password</string>
-			<key>Key</key>
-			<string>sambapassword</string>
 			<key>DefaultValue</key>
-			<string>Will be asked later</string>
+			<string>storage</string>
+			<key>Type</key>
+			<string>PSTextFieldSpecifier</string>
+			<key>Title</key>
+			<string>Share name</string>
+			<key>Key</key>
+			<string>sambashare</string>
 		</dict>
 	</array>
 	<key>StringsTable</key>

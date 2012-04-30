@@ -25,26 +25,26 @@ void ZPLog(NSObject* source,int line,NSString* format, ...){
         debugClasses = [NSMutableArray array ];
         
         
-//        [debugClasses addObject:@"ZPAttachmentThumbnailFactory"];
-//        [debugClasses addObject:@"ZPFileChannel_ZoteroStorage"];
-//        [debugClasses addObject:@"ZPFileChannel_Dropbox"];
-//        [debugClasses addObject:@"ZPServerConnection"];
-//        [debugClasses addObject:@"ZPItemListViewController"];
-//        [debugClasses addObject:@"ZPServerResponseXMLParser"];
-//        [debugClasses addObject:@"ZPServerResponseXMLParserItem"];
-//        [debugClasses addObject:@"ZPPreferences"];
-//        [debugClasses addObject:@"ZPCacheController"];
-//        [debugClasses addObject:@"ZPDataLayer"];
-//        [debugClasses addObject:@"ZPAppDelegate"];
-//        [debugClasses addObject:@"ZPDatabase"];
-//        [debugClasses addObject:@"ZPAuthenticationDialog"];
-//        [debugClasses addObject:@"ZPQuicklookController"];
-//        [debugClasses addObject:@"ZPAuthenticationDialog"];
-//        [debugClasses addObject:@"ZPFileThumbnailAndQuicklookController"];
-//        [debugClasses addObject:@"ZPItemDetailViewController"];
-//        [debugClasses addObject:@"ZPUncachedItemsOperation"];
-        [debugClasses addObject:@"ZPFileChannel_WebDAV"];
-//        [debugClasses addObject:@"ZPAttachmentPreviewViewController"];
+        //        [debugClasses addObject:@"ZPAppDelegate"];
+        //[debugClasses addObject:@"ZPAttachmentPreviewViewController"];
+        //        [debugClasses addObject:@"ZPAuthenticationDialog"];
+        //        [debugClasses addObject:@"ZPCacheController"];
+        //        [debugClasses addObject:@"ZPDatabase"];
+        //        [debugClasses addObject:@"ZPDataLayer"];
+        //        [debugClasses addObject:@"ZPFileChannel_Dropbox"];
+        [debugClasses addObject:@"ZPFileChannel_Samba"];
+        //        [debugClasses addObject:@"ZPFileChannel_WebDAV"];
+        //        [debugClasses addObject:@"ZPFileChannel_ZoteroStorage"];
+        //        [debugClasses addObject:@"ZPFileThumbnailAndQuicklookController"];
+        //[debugClasses addObject:@"ZPItemDetailViewController"];
+        //        [debugClasses addObject:@"ZPItemListViewController"];
+        //        [debugClasses addObject:@"ZPPreferences"];
+        //        [debugClasses addObject:@"ZPQuicklookController"];
+        //        [debugClasses addObject:@"ZPServerConnection"];
+        //        [debugClasses addObject:@"ZPServerResponseXMLParser"];
+        //        [debugClasses addObject:@"ZPServerResponseXMLParserItem"];
+        //        [debugClasses addObject:@"ZPUncachedItemsOperation"];
+        //        [debugClasses addObject:@"ZPZoteroItem"];
   
         
 

@@ -46,6 +46,7 @@ CREATE TABLE IF NOT EXISTS items (
     libraryID INT,
     title TEXT,
     fullCitation TEXT NOT NULL,
+    itemType TEXT NOT NULL,
     cacheTimestamp TEXT DEFAULT NULL
 );
 

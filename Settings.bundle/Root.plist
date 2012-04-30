@@ -135,6 +135,8 @@
 		<dict>
 			<key>Type</key>
 			<string>PSGroupSpecifier</string>
+			<key>FooterText</key>
+			<string>Usernames and passwords will be asked when needed and stored securely in keychain. </string>
 			<key>Title</key>
 			<string>Additional file channnels</string>
 		</dict>
@@ -170,7 +172,7 @@
 			<key>Type</key>
 			<string>PSToggleSwitchSpecifier</string>
 			<key>Title</key>
-			<string>Local network share</string>
+			<string>Local SMB share</string>
 			<key>Key</key>
 			<string>samba</string>
 			<key>DefaultValue</key>
@@ -178,11 +180,11 @@
 		</dict>
 		<dict>
 			<key>Type</key>
-			<string>PSTextFieldSpecifier</string>
+			<string>PSChildPaneSpecifier</string>
 			<key>Title</key>
-			<string>Network share address</string>
-			<key>Key</key>
-			<string>sambaurl</string>
+			<string>Advanced SMB settings</string>
+			<key>File</key>
+			<string>samba</string>
 		</dict>
 		<dict>
 			<key>FooterText</key>
