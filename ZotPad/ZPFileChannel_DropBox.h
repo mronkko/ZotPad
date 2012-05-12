@@ -11,6 +11,8 @@
 #import "ZPFileChannel.h"
 @interface ZPFileChannel_Dropbox : ZPFileChannel <DBRestClientDelegate>{
     NSMutableDictionary* progressViewsByRequest;
+    NSMutableDictionary* downloadCountsByRequest;
+
 }
 
 @end
