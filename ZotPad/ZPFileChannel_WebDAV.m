@@ -148,9 +148,12 @@
     
     NSString* tempFile; 
 
-    if([attachment.linkMode intValue] == LINK_MODE_IMPORTED_FILE ){
+    if([attachment.linkMode intValue] == LINK_MODE_IMPORTED_URL && [attachment.contentType isEqualToString:@"text/html"]){
+        tempFile = [request downloadDestinationPath];
+    }
 
-    //Unzip the attachment
+    else {
+        //Unzip the attachment
         ZipArchive* zipArchive = [[ZipArchive alloc] init];
         [zipArchive UnzipOpenFile:[request downloadDestinationPath]];
         
@@ -161,10 +164,6 @@
         
         //Use the first unzipped file
         tempFile = [tempFile stringByAppendingPathComponent:[[[NSFileManager defaultManager]contentsOfDirectoryAtPath:tempFile error:NULL] objectAtIndex:0]];
-        
-    }
-    else {
-        tempFile = [request downloadDestinationPath];
     }
 
     [[ZPServerConnection instance] finishedDownloadingAttachment:attachment toFileAtPath:tempFile usingFileChannel:self];

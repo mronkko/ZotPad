@@ -521,12 +521,17 @@ static ZPAttachmentPreviewViewController* _webViewDelegate;
     UIImage* image = UIGraphicsGetImageFromCurrentImageContext();
     UIGraphicsEndImageContext();
     
-    NSLog(@"Done rendering pdf %@",filename);
-    
-    [_previewCache setObject:image forKey:filename];
-    
-    [self performSelectorOnMainThread:@selector(_showPDFPreview:) withObject:image waitUntilDone:NO];
-    
+    if(image != NULL){
+        NSLog(@"Done rendering pdf %@",filename);
+        [_previewCache setObject:image forKey:filename];
+        [self performSelectorOnMainThread:@selector(_showPDFPreview:) withObject:image waitUntilDone:NO];
+    } 
+    else{
+        NSLog(@"Rendering pdf failed %@. File is now deleted because it is most likely corrupted",filename);
+        [[[UIAlertView alloc] initWithTitle:@"File error" message:[NSString stringWithFormat:@"A downloaded attachment file (%@) could not be opened because it seems to be corrupted. The file will be now deleted and needs to be downloaded again.",attachment.filename]
+                                  delegate:NULL cancelButtonTitle:@"OK" otherButtonTitles:nil] show];
+        [[NSFileManager defaultManager] removeItemAtPath:filename error:NULL];
+    }
 }
 #pragma mark - Attachment download observer protocol methods
 
