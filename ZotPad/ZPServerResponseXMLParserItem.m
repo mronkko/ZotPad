@@ -77,6 +77,24 @@
         
         [fields removeObjectForKey:@"creators"];
         [fields removeObjectForKey:@"tags"];
+        
+        NSString* linkModeString = [fields objectForKey:@"linkMode"];
+        
+        if(linkModeString!=NULL){
+            NSInteger linkMode;
+            if([linkModeString isEqualToString:@"imported_file"]) linkMode = LINK_MODE_IMPORTED_FILE;
+            else if([linkModeString isEqualToString:@"imported_url"]) linkMode = LINK_MODE_IMPORTED_URL;
+            else if([linkModeString isEqualToString:@"linked_url"]) linkMode = LINK_MODE_LINKED_URL;
+            else if([linkModeString isEqualToString:@"linked_file"]) linkMode = LINK_MODE_LINKED_FILE;
+            
+            //If we get garbage, throw exception
+            else [[NSException alloc] initWithName:@"Invalid link mode" reason:@"Server returned invalid link mode for attachment" userInfo:NULL];
+
+            [super _setField:@"linkMode" toValue:[NSNumber numberWithInt:linkMode]];
+            [fields removeObjectForKey:@"linkMode"];
+            
+        }
+
         [(ZPZoteroItem*) _currentElement setFields:fields];
         
     }

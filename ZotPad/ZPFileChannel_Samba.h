@@ -7,7 +7,6 @@
 //
 
 #import "ZPFileChannel.h"
-#import "tangoConnection.h"
 
 
 @interface ZPFileChannel_Samba : ZPFileChannel <NSNetServiceBrowserDelegate, UIAlertViewDelegate>{

@@ -147,8 +147,8 @@
     ZPZoteroAttachment* attachment = [self attachmentWithRequest:request];
     
     NSString* tempFile; 
-    //Everything that is not linked_url needs to be unzipped
-    if(! [attachment.linkMode isEqualToString:@"imported_url"] ){
+
+    if([attachment.linkMode intValue] == LINK_MODE_IMPORTED_FILE ){
 
     //Unzip the attachment
         ZipArchive* zipArchive = [[ZipArchive alloc] init];

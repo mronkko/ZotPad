@@ -26,7 +26,7 @@ NSInteger const LINK_MODE_LINKED_URL = 3;
 @synthesize attachmentSize;
 @synthesize existsOnZoteroServer;
 @synthesize filename;
-@synthesize URL;
+@synthesize url;
 
 +(id) dataObjectWithDictionary:(NSDictionary *)fields{
     NSMutableDictionary* dict = [NSMutableDictionary dictionaryWithDictionary:fields ];
@@ -82,7 +82,7 @@ NSInteger const LINK_MODE_LINKED_URL = 3;
     NSString* path;
     //Imported URLs are stored as ZIP files
     
-    if([self.linkMode isEqualToString:@"imported_url"] ){
+    if([self.linkMode intValue] == LINK_MODE_IMPORTED_URL ){
         path = [[self filename] stringByAppendingFormat:@"_%@.zip",_key];
     }
     else{

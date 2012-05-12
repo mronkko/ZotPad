@@ -169,24 +169,6 @@
 			<false/>
 		</dict>
 		<dict>
-			<key>Type</key>
-			<string>PSToggleSwitchSpecifier</string>
-			<key>Title</key>
-			<string>Local SMB share</string>
-			<key>Key</key>
-			<string>samba</string>
-			<key>DefaultValue</key>
-			<false/>
-		</dict>
-		<dict>
-			<key>Type</key>
-			<string>PSChildPaneSpecifier</string>
-			<key>Title</key>
-			<string>Advanced SMB settings</string>
-			<key>File</key>
-			<string>samba</string>
-		</dict>
-		<dict>
 			<key>FooterText</key>
 			<string>These preferences will reset ZotPad data when it is next started.</string>
 			<key>Type</key>

@@ -7,8 +7,6 @@
 //
 
 #import "ZPFileChannel_Samba.h"
-#import "tangoConnection.h"
-#import "tangoFileInfo.h"
 #import "ZPPreferences.h"
 #import "ZPServerConnection.h"
 #import "KeychainItemWrapper.h"
@@ -167,7 +165,7 @@
 
 -(void) _downloadAttachment:(ZPZoteroAttachment*)attachment{
 
-    
+/*    
     NSString* share = [NSString stringWithFormat:@"\\\\%@\\%@",_hostname,[[ZPPreferences instance] sambaShareName]];
 
     NSLog(@"Creating connection");
@@ -202,7 +200,7 @@
     tango_close(connection);
     tango_release(connection);
 
-    
+ */   
 }
 
 

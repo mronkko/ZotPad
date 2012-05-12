@@ -248,7 +248,6 @@
 @synthesize itemKeysShown = _itemKeysShown;
 @synthesize itemDetailViewController =  _itemDetailViewController;
 
-@synthesize tapRecognizer;
 
 - (void)didReceiveMemoryWarning
 {
@@ -707,12 +706,17 @@
                 
                 // Enable or disable depending whether file is available or not
                 
-                if(attachment.fileExists){
+                if(attachment.fileExists || ([attachment.linkMode intValue] == LINK_MODE_LINKED_URL && [ZPServerConnection instance])){
                     articleThumbnail.alpha = 1;
                     articleThumbnail.userInteractionEnabled = TRUE;
+                    
+                    //If there is no gesture recognizer, create and add one
+                    if(articleThumbnail.gestureRecognizers.count ==0){
+                        [articleThumbnail addGestureRecognizer: [[UITapGestureRecognizer alloc] initWithTarget:self action:@selector(attachmentThumbnailPressed:)]];
+                    }
                 }
                 else{
-                    articleThumbnail.alpha = .5;
+                    articleThumbnail.alpha = .3;
                     articleThumbnail.userInteractionEnabled = FALSE;
                 }
             }
@@ -724,10 +728,6 @@
     return cell;
 }
 
-//TODO: Implement this
-- (void)tableView:(UITableView *)tableView didSelectRowAtIndexPath:(NSIndexPath *)indexPath{
-    
-}
 
 - (void)prepareForSegue:(UIStoryboardSegue *)segue sender:(id)sender{
     // Make sure your segue name in storyboard is the same as this line
@@ -992,7 +992,9 @@
 -(IBAction) attachmentThumbnailPressed:(id)sender{
 
     //Get the table cell.
-    UITableViewCell* cell = (UITableViewCell* )[[sender superview] superview];
+    UITapGestureRecognizer* gr = (UITapGestureRecognizer*)  sender;
+    UIView* imageView = [gr view];
+    UITableViewCell* cell = (UITableViewCell* )[[imageView superview] superview];
     
     //Get the row of this cell
     NSInteger row = [_tableView indexPathForCell:cell].row;

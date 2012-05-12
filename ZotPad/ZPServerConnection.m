@@ -77,8 +77,10 @@ const NSInteger ZPServerConnectionRequestTopLevelKeys = 9;
     _activeRequestCount = 0;
     _fileChannels = [NSArray arrayWithObjects:[[ZPFileChannel_WebDAV alloc] init], 
                      [[ZPFileChannel_ZoteroStorage alloc] init], 
-                     [[ZPFileChannel_Dropbox alloc] init], 
-                     [[ZPFileChannel_Samba alloc] init], nil];
+                     [[ZPFileChannel_Dropbox alloc] init], nil];
+    
+    // If a working samba implementation appears, this should be added [[ZPFileChannel_Samba alloc] init]
+    
     _activeDownloads= [[NSMutableSet alloc] init];
     
     return self;
@@ -514,16 +516,22 @@ const NSInteger ZPServerConnectionRequestTopLevelKeys = 9;
         [_activeDownloads addObject:attachment];
     }
 
-    _activeRequestCount++;
+    //Check if the file can be downloade
+    
+    if([attachment.existsOnZoteroServer intValue] == 1 || 
+       [[ZPPreferences instance] useDropbox] ||
+       ([attachment.libraryID intValue]==1 && [[ZPPreferences instance] useWebDAV])){
 
-    //First request starts the network indicator
-    if(_activeRequestCount==1) [[UIApplication sharedApplication] setNetworkActivityIndicatorVisible:YES];
-
-    //Use the first channel
-    [[_fileChannels objectAtIndex:0] startDownloadingAttachment:attachment];
-
-    [[ZPDataLayer instance] notifyAttachmentDownloadStarted:attachment];
-
+        _activeRequestCount++;
+        
+        //First request starts the network indicator
+        if(_activeRequestCount==1) [[UIApplication sharedApplication] setNetworkActivityIndicatorVisible:YES];
+        
+        //Use the first channel
+        [[_fileChannels objectAtIndex:0] startDownloadingAttachment:attachment];
+        
+        [[ZPDataLayer instance] notifyAttachmentDownloadStarted:attachment];
+    }
 }
 
 /*

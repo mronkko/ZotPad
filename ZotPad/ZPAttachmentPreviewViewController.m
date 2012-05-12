@@ -113,7 +113,7 @@ static ZPAttachmentPreviewViewController* _webViewDelegate;
     
     
     self.downloadLabel.hidden = FALSE;
-    
+
     if([[ZPServerConnection instance] isAttachmentDownloading:self.attachment]){
         [self notifyAttachmentDownloadStarted:attachment];
     }
@@ -121,7 +121,7 @@ static ZPAttachmentPreviewViewController* _webViewDelegate;
 
         //Imported files and URLs have files that can be downloaded
 
-        if(([attachment.linkMode isEqualToString:@"imported_file"] || [attachment.linkMode isEqualToString:@"imported_url"] )
+        if(([attachment.linkMode intValue] == LINK_MODE_IMPORTED_FILE || [attachment.linkMode intValue] == LINK_MODE_IMPORTED_URL )
            && ! [attachment fileExists]){
             
             //Register self as observer for item downloads
@@ -135,7 +135,7 @@ static ZPAttachmentPreviewViewController* _webViewDelegate;
                 NSString* source;
                 
                 if([[ZPPreferences instance] useWebDAV] && [attachment.libraryID intValue] == 1) source = @"WebDAV";
-                else if (attachment.existsOnZoteroServer) source = @"Zotero";
+                else if ([attachment.existsOnZoteroServer intValue]==1) source = @"Zotero";
                 else if ([[ZPPreferences instance] useDropbox]) source = @"Dropbox";
                 else if ([[ZPPreferences instance] useSamba]) source = @"network drive";
                 
@@ -144,7 +144,9 @@ static ZPAttachmentPreviewViewController* _webViewDelegate;
                         NSInteger size = [attachment.attachmentSize intValue];
                         self.downloadLabel.text =  [NSString stringWithFormat:@"Download from %@ (%i KB)",source,size/1024];
                     }
-                    self.downloadLabel.text = [NSString stringWithFormat:@"Download from %@ (unknown size)",source];
+                    else{
+                        self.downloadLabel.text = [NSString stringWithFormat:@"Download from %@ (unknown size)",source];
+                    }
                 }
                 else {
                     self.downloadLabel.text = @"File cannot be found for download";
@@ -155,7 +157,7 @@ static ZPAttachmentPreviewViewController* _webViewDelegate;
         
         // Linked URL will be shown in directly from web 
         
-        else if ([attachment.linkMode isEqualToString:@"linked_url"] &&
+        else if ([attachment.linkMode intValue] == LINK_MODE_LINKED_URL &&
                  !  [[ZPPreferences instance] online]){
             self.downloadLabel.text = @"Linked URL cannot be viewed in offline mode";
             
@@ -163,7 +165,7 @@ static ZPAttachmentPreviewViewController* _webViewDelegate;
         
         //Linked files are available only on the computer where they were created
         
-        else if ([attachment.linkMode isEqualToString:@"linked_file"] ) {
+        else if ([attachment.linkMode intValue] == LINK_MODE_LINKED_FILE) {
             self.downloadLabel.text = @"Linked files cannot be viewed from ZotPad";
         }
         
@@ -183,7 +185,7 @@ static ZPAttachmentPreviewViewController* _webViewDelegate;
     if([attachment fileExists] && ![attachment.contentType isEqualToString:@"application/pdf"]){
         extraInfo = [@"Preview not supported for " stringByAppendingString:attachment.contentType];
     }
-    else if ([attachment.linkMode isEqualToString:@"linked_url"] &&
+    else if ([attachment.linkMode intValue] == LINK_MODE_LINKED_URL &&
              [[ZPPreferences instance] online]){
         extraInfo = @"Preview not supported for linked URL";
         
@@ -387,8 +389,6 @@ static ZPAttachmentPreviewViewController* _webViewDelegate;
 
 -(void) _captureWebViewContent:(UIWebView *)webview forCacheKey:(NSString*) cacheKey;{
 
-    // TODO: Check that the image is not blank
-    // http://stackoverflow.com/questions/4735899/how-to-check-if-a-uiimage-is-blank-empty-transparent
     
     //If the view is still visible, capture the content
     if (webview.window && webview.superview) {
@@ -416,23 +416,51 @@ static ZPAttachmentPreviewViewController* _webViewDelegate;
             [[NSFileManager defaultManager] createDirectoryAtPath:cachePath withIntermediateDirectories:NO attributes:nil error:&error];
         }
         
-        [UIImagePNGRepresentation(image) writeToFile:[cachePath stringByAppendingPathComponent:[cacheKey stringByAppendingString:@".png"]] atomically:YES];
         
-        [(UIImageView*) webview.superview setImage:image];
-        [webview removeFromSuperview];
+        NSData* imageData = UIImagePNGRepresentation(image);
         
+        //Create a blank image and compare to check that the image that we got is not blank.
         
-        @synchronized(_fileIconCache){
-            [_fileIconCache setObject:image forKey:cacheKey];
+        if ([UIScreen instancesRespondToSelector:@selector(scale)] && [[UIScreen mainScreen] scale] == 2.0f) {
+            UIGraphicsBeginImageContextWithOptions(size, NO, 2.0f);
+        } else {
+            UIGraphicsBeginImageContext(size);
         }
-        @synchronized(_viewsWaitingForImage){
-            NSMutableArray* array= [_viewsWaitingForImage objectForKey:cacheKey];
-            if(array != NULL){
-                [_viewsWaitingForImage removeObjectForKey:cacheKey];
-                for(UIImageView* view in array){
-                    NSLog(@"Redrawing with cached image %@",cacheKey);
-                    
-                    view.image = image;
+        
+        UIWebView* blankView = [[UIWebView alloc] initWithFrame:webview.frame];
+        [blankView loadHTMLString:@"<html></html>" baseURL:NULL];
+        [blankView.layer renderInContext:UIGraphicsGetCurrentContext()];
+        UIImage *blankImage = UIGraphicsGetImageFromCurrentImageContext();
+        UIGraphicsEndImageContext();
+        
+        if([UIImagePNGRepresentation(blankImage) isEqualToData:imageData]){
+            @synchronized(_fileIconCache){
+                
+                NSLog(@"View %i produced a blank image. Clearing cahce for image %@",webview, cacheKey);
+                
+                [_fileIconCache removeObjectForKey:cacheKey];
+            }
+            
+        }
+        else{
+            [imageData writeToFile:[cachePath stringByAppendingPathComponent:[cacheKey stringByAppendingString:@".png"]] atomically:YES];
+            
+            [(UIImageView*) webview.superview setImage:image];
+            [webview removeFromSuperview];
+            
+            
+            @synchronized(_fileIconCache){
+                [_fileIconCache setObject:image forKey:cacheKey];
+            }
+            @synchronized(_viewsWaitingForImage){
+                NSMutableArray* array= [_viewsWaitingForImage objectForKey:cacheKey];
+                if(array != NULL){
+                    [_viewsWaitingForImage removeObjectForKey:cacheKey];
+                    for(UIImageView* view in array){
+                        NSLog(@"Redrawing with cached image %@",cacheKey);
+                        
+                        view.image = image;
+                    }
                 }
             }
         }
@@ -492,7 +520,6 @@ static ZPAttachmentPreviewViewController* _webViewDelegate;
     [self performSelectorOnMainThread:@selector(_showPDFPreview) withObject:image waitUntilDone:NO];
     
 }
-
 #pragma mark - Attachment download observer protocol methods
 
 -(void) notifyAttachmentDownloadCompleted:(ZPZoteroAttachment*) attachment{

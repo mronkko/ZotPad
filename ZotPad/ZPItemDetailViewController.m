@@ -510,8 +510,13 @@
         
         ZPZoteroAttachment* attachment = [_currentItem.attachments objectAtIndex:index]; 
         
-        if([attachment fileExists]) [[ZPQuicklookController instance] openItemInQuickLook:attachment sourceView:self];
-        else{
+        if([attachment fileExists] ||
+           ([attachment.linkMode intValue] == LINK_MODE_LINKED_URL && [ZPServerConnection instance]))
+            [[ZPQuicklookController instance] openItemInQuickLook:attachment sourceView:self];
+
+        else if([attachment.linkMode intValue] == LINK_MODE_IMPORTED_FILE || 
+                [attachment.linkMode intValue] == LINK_MODE_IMPORTED_URL){
+            
             ZPServerConnection* connection = [ZPServerConnection instance];
             
             if(connection!=NULL && ! [connection isAttachmentDownloading:attachment]){

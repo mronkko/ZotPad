@@ -62,8 +62,17 @@ static ZPQuicklookController* _instance;
  
     
     [[ZPDatabase instance] updateViewedTimestamp:attachment];
+    if([attachment.linkMode intValue] == LINK_MODE_LINKED_URL){
+        NSString* urlString = [[(ZPZoteroItem*)[ZPZoteroItem dataObjectWithKey:attachment.parentItemKey] fields] objectForKey:@"url"];
+
+        //Links will be opened with safari.
+        NSURL* url = [NSURL URLWithString: urlString];
+        [[UIApplication sharedApplication] openURL:url];
+    }
     
-    if(! attachment.fileExists){
+    //This should never be shown, but it is implemented just to be suser 
+    
+    else if(! attachment.fileExists){
         UIAlertView *message = [[UIAlertView alloc] initWithTitle:@"File not found"
                                                           message:[NSString stringWithFormat:@"The file %@ was not found on ZotPad.",attachment.filename]
                                                          delegate:nil
@@ -82,7 +91,7 @@ static ZPQuicklookController* _instance;
 - (void) _addAttachmentToQuicklook:(ZPZoteroAttachment *)attachment{
     
     // Imported URLs need to be unzipped
-    if([attachment.linkMode isEqualToString:@"imported_url"] ){
+    if([attachment.linkMode intValue] == LINK_MODE_IMPORTED_URL ){
         
         NSString* tempDir = NSTemporaryDirectory();
         ZipArchive* zipArchive = [[ZipArchive alloc] init];
@@ -106,10 +115,10 @@ static ZPQuicklookController* _instance;
 
         }
         
-        [_fileURLs addObject:[tempDir stringByAppendingPathComponent:attachment.filename]];
+        [_fileURLs addObject:[NSURL fileURLWithPath:[tempDir stringByAppendingPathComponent:attachment.filename]]];
     }
     else{
-        [_fileURLs addObject:attachment.fileSystemPath];
+        [_fileURLs addObject:[NSURL fileURLWithPath:attachment.fileSystemPath]];
     }
 }
 
@@ -132,7 +141,7 @@ static ZPQuicklookController* _instance;
 
 
 - (id <QLPreviewItem>) previewController: (QLPreviewController *) controller previewItemAtIndex: (NSInteger) index{
-    return [NSURL fileURLWithPath:[_fileURLs objectAtIndex:index]];
+    return [_fileURLs objectAtIndex:index];
 }
 
 
