@@ -21,7 +21,7 @@ extern NSInteger const LINK_MODE_LINKED_URL;
 
 @property (retain) NSString* parentItemKey;
 @property (retain) NSString* contentType;
-@property (retain) NSString* linkMode;
+@property (retain) NSNumber* linkMode;
 @property (retain) NSNumber* existsOnZoteroServer;
 @property (retain) NSNumber* attachmentSize;
 @property (retain) NSString* lastViewed;
