@@ -19,12 +19,6 @@
 [submodule "QSUtilities"]
 	path = QSUtilities
 	url = https://github.com/mikeho/QSUtilities.git
-[submodule "tango"]
-	path = tango
-	url = https://github.com/38leinaD/tango.git
 [submodule "Oxygen-Icons"]
 	path = Oxygen-Icons
 	url = https://github.com/chadnickbok/Oxygen-Icons.git
-[submodule "CocoaAsyncSocket"]
-	path = CocoaAsyncSocket
-	url = https://github.com/robbiehanson/CocoaAsyncSocket
