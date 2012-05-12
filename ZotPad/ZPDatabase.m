@@ -900,7 +900,7 @@ Deletes items, notes, and attachments based in array of keys from a library
 - (void) addAttachmentsToItem: (ZPZoteroItem*) item  {
     
     @synchronized(self){
-        FMResultSet* resultSet = [_database executeQuery: @"SELECT * FROM attachments WHERE parentItemKey = ?",item.key];
+        FMResultSet* resultSet = [_database executeQuery: @"SELECT * FROM attachments WHERE parentItemKey = ? ORDER BY title ASC",item.key];
         
         NSMutableArray* attachments = [[NSMutableArray alloc] init];
         while([resultSet next]) {

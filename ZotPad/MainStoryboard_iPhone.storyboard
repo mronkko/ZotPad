@@ -73,17 +73,12 @@
                         <autoresizingMask key="autoresizingMask" flexibleMaxX="YES" flexibleMaxY="YES"/>
                         <subviews>
                             <tableView clipsSubviews="YES" contentMode="scaleToFill" alwaysBounceVertical="YES" showsHorizontalScrollIndicator="NO" dataMode="prototypes" style="plain" rowHeight="73" sectionHeaderHeight="22" sectionFooterHeight="22" id="6Rf-2s-aC2">
-                                <rect key="frame" x="0.0" y="0.0" width="320" height="372"/>
+                                <rect key="frame" x="0.0" y="44" width="320" height="328"/>
                                 <autoresizingMask key="autoresizingMask" widthSizable="YES" heightSizable="YES"/>
                                 <color key="backgroundColor" white="1" alpha="1" colorSpace="calibratedWhite"/>
-                                <searchBar key="tableHeaderView" contentMode="redraw" id="a9j-k3-LWh">
-                                    <rect key="frame" x="0.0" y="0.0" width="320" height="44"/>
-                                    <autoresizingMask key="autoresizingMask" widthSizable="YES" flexibleMaxY="YES"/>
-                                    <textInputTraits key="textInputTraits"/>
-                                </searchBar>
                                 <prototypes>
                                     <tableViewCell clipsSubviews="YES" contentMode="scaleToFill" selectionStyle="none" accessoryType="disclosureIndicator" hidesAccessoryWhenEditing="NO" indentationLevel="1" indentationWidth="0.0" reuseIdentifier="ZoteroItemCell" id="jTr-Jh-Mgd">
-                                        <rect key="frame" x="0.0" y="66" width="320" height="73"/>
+                                        <rect key="frame" x="0.0" y="22" width="320" height="73"/>
                                         <autoresizingMask key="autoresizingMask"/>
                                         <view key="contentView" opaque="NO" clipsSubviews="YES" multipleTouchEnabled="YES" contentMode="center">
                                             <rect key="frame" x="0.0" y="0.0" width="300" height="72"/>
@@ -131,7 +126,7 @@
                                         </connections>
                                     </tableViewCell>
                                     <tableViewCell contentMode="scaleToFill" selectionStyle="none" hidesAccessoryWhenEditing="NO" indentationLevel="1" indentationWidth="0.0" reuseIdentifier="ChooseLibraryCell" id="Q4B-EX-EQq">
-                                        <rect key="frame" x="0.0" y="139" width="320" height="73"/>
+                                        <rect key="frame" x="0.0" y="95" width="320" height="73"/>
                                         <autoresizingMask key="autoresizingMask"/>
                                         <view key="contentView" opaque="NO" clipsSubviews="YES" multipleTouchEnabled="YES" contentMode="center">
                                             <rect key="frame" x="0.0" y="0.0" width="320" height="72"/>
@@ -150,7 +145,7 @@
                                         <color key="backgroundColor" white="1" alpha="1" colorSpace="calibratedWhite"/>
                                     </tableViewCell>
                                     <tableViewCell contentMode="scaleToFill" selectionStyle="none" hidesAccessoryWhenEditing="NO" indentationLevel="1" indentationWidth="0.0" reuseIdentifier="LoadingCell" rowHeight="80" id="D2Z-iH-se4">
-                                        <rect key="frame" x="0.0" y="212" width="320" height="80"/>
+                                        <rect key="frame" x="0.0" y="168" width="320" height="80"/>
                                         <autoresizingMask key="autoresizingMask"/>
                                         <view key="contentView" opaque="NO" clipsSubviews="YES" multipleTouchEnabled="YES" contentMode="center">
                                             <rect key="frame" x="0.0" y="0.0" width="320" height="79"/>
@@ -173,7 +168,7 @@
                                         <color key="backgroundColor" white="1" alpha="1" colorSpace="calibratedWhite"/>
                                     </tableViewCell>
                                     <tableViewCell contentMode="scaleToFill" selectionStyle="none" hidesAccessoryWhenEditing="NO" indentationLevel="1" indentationWidth="0.0" reuseIdentifier="NoItemsCell" id="EJM-55-AeB">
-                                        <rect key="frame" x="0.0" y="292" width="320" height="73"/>
+                                        <rect key="frame" x="0.0" y="248" width="320" height="73"/>
                                         <autoresizingMask key="autoresizingMask"/>
                                         <view key="contentView" opaque="NO" clipsSubviews="YES" multipleTouchEnabled="YES" contentMode="center">
                                             <rect key="frame" x="0.0" y="0.0" width="320" height="72"/>
@@ -192,7 +187,7 @@
                                         <color key="backgroundColor" white="1" alpha="1" colorSpace="calibratedWhite"/>
                                     </tableViewCell>
                                     <tableViewCell contentMode="scaleToFill" selectionStyle="none" hidesAccessoryWhenEditing="NO" indentationLevel="1" indentationWidth="0.0" reuseIdentifier="BlankCell" id="ymc-2K-aiO">
-                                        <rect key="frame" x="0.0" y="365" width="320" height="73"/>
+                                        <rect key="frame" x="0.0" y="321" width="320" height="73"/>
                                         <autoresizingMask key="autoresizingMask"/>
                                         <view key="contentView" opaque="NO" clipsSubviews="YES" multipleTouchEnabled="YES" contentMode="center">
                                             <rect key="frame" x="0.0" y="0.0" width="320" height="72"/>
@@ -212,11 +207,20 @@
                                 <autoresizingMask key="autoresizingMask" widthSizable="YES" flexibleMinY="YES"/>
                                 <items/>
                             </toolbar>
+                            <searchBar contentMode="redraw" id="a9j-k3-LWh">
+                                <rect key="frame" x="0.0" y="0.0" width="320" height="44"/>
+                                <autoresizingMask key="autoresizingMask" widthSizable="YES" flexibleMaxY="YES"/>
+                                <textInputTraits key="textInputTraits"/>
+                                <connections>
+                                    <outlet property="delegate" destination="21" id="44i-g1-xlS"/>
+                                </connections>
+                            </searchBar>
                         </subviews>
                         <color key="backgroundColor" white="1" alpha="1" colorSpace="custom" customColorSpace="calibratedWhite"/>
                     </view>
                     <navigationItem key="navigationItem" title="Items" id="26"/>
                     <connections>
+                        <outlet property="searchBar" destination="a9j-k3-LWh" id="JgR-a5-2p1"/>
                         <outlet property="tableView" destination="6Rf-2s-aC2" id="koE-Kd-U2f"/>
                         <outlet property="toolBar" destination="d3t-PQ-BeY" id="w71-zo-H1a"/>
                     </connections>
@@ -288,8 +292,8 @@
                                 <autoresizingMask key="autoresizingMask" flexibleMaxX="YES" flexibleMaxY="YES"/>
                             </imageView>
                             <view alpha="0.5" contentMode="scaleToFill" id="TLz-gg-am0">
-                                <rect key="frame" x="20" y="100" width="229" height="176"/>
-                                <autoresizingMask key="autoresizingMask" widthSizable="YES" heightSizable="YES"/>
+                                <rect key="frame" x="20" y="102" width="229" height="176"/>
+                                <autoresizingMask key="autoresizingMask" flexibleMinX="YES" flexibleMaxX="YES" flexibleMinY="YES" flexibleMaxY="YES"/>
                                 <subviews>
                                     <label hidden="YES" opaque="NO" clipsSubviews="YES" userInteractionEnabled="NO" tag="1" contentMode="left" text="Label" lineBreakMode="tailTruncation" baselineAdjustment="alignBaselines" minimumFontSize="10" id="cjU-a5-haR">
                                         <rect key="frame" x="20" y="128" width="189" height="23"/>
@@ -325,7 +329,7 @@
                                 <color key="backgroundColor" cocoaTouchSystemColor="darkTextColor"/>
                             </view>
                         </subviews>
-                        <color key="backgroundColor" white="1" alpha="1" colorSpace="custom" customColorSpace="calibratedWhite"/>
+                        <color key="backgroundColor" white="1" alpha="1" colorSpace="calibratedWhite"/>
                         <gestureRecognizers/>
                     </view>
                     <nil key="simulatedStatusBarMetrics"/>
@@ -599,75 +603,6 @@
     <resources>
         <image name="closeButton.png" width="10" height="10"/>
     </resources>
-    <classes>
-        <class className="TTStyledTextLabel" superclassName="UIView">
-            <source key="sourceIdentifier" type="project" relativePath="./Classes/TTStyledTextLabel.h"/>
-        </class>
-        <class className="ZPAttachmentPreviewViewController" superclassName="UIViewController">
-            <source key="sourceIdentifier" type="project" relativePath="./Classes/ZPAttachmentPreviewViewController.h"/>
-            <relationships>
-                <relationship kind="outlet" name="cancelButton" candidateClass="UIButton"/>
-                <relationship kind="outlet" name="downloadLabel" candidateClass="UILabel"/>
-                <relationship kind="outlet" name="fileImage" candidateClass="UIImageView"/>
-                <relationship kind="outlet" name="labelBackground" candidateClass="UIView"/>
-                <relationship kind="outlet" name="progressView" candidateClass="UIProgressView"/>
-                <relationship kind="outlet" name="titleLabel" candidateClass="UILabel"/>
-            </relationships>
-        </class>
-        <class className="ZPAuthenticationDialog" superclassName="UIViewController">
-            <source key="sourceIdentifier" type="project" relativePath="./Classes/ZPAuthenticationDialog.h"/>
-            <relationships>
-                <relationship kind="action" name="loadFirstPage:"/>
-                <relationship kind="outlet" name="webView" candidateClass="UIWebView"/>
-            </relationships>
-        </class>
-        <class className="ZPDownloadAuthenticationDialogViewController" superclassName="UIViewController">
-            <source key="sourceIdentifier" type="project" relativePath="./Classes/ZPDownloadAuthenticationDialogViewController.h"/>
-            <relationships>
-                <relationship kind="action" name="cancel:"/>
-                <relationship kind="action" name="login:"/>
-                <relationship kind="outlet" name="navigationItem" candidateClass="UINavigationItem"/>
-            </relationships>
-        </class>
-        <class className="ZPFileImportViewController" superclassName="UIViewController">
-            <source key="sourceIdentifier" type="project" relativePath="./Classes/ZPFileImportViewController.h"/>
-        </class>
-        <class className="ZPItemDetailViewController" superclassName="UIViewController">
-            <source key="sourceIdentifier" type="project" relativePath="./Classes/ZPItemDetailViewController.h"/>
-            <relationships>
-                <relationship kind="outlet" name="carousel" candidateClass="iCarousel"/>
-                <relationship kind="outlet" name="detailTableView" candidateClass="UITableView"/>
-            </relationships>
-        </class>
-        <class className="ZPItemListViewController" superclassName="UIViewController">
-            <source key="sourceIdentifier" type="project" relativePath="./Classes/ZPItemListViewController.h"/>
-            <relationships>
-                <relationship kind="action" name="attachmentThumbnailPressed:"/>
-                <relationship kind="action" name="sortButtonPressed:"/>
-                <relationship kind="outlet" name="searchBar" candidateClass="UISearchBar"/>
-                <relationship kind="outlet" name="tableView" candidateClass="UITableView"/>
-                <relationship kind="outlet" name="tapRecognizer" candidateClass="UIGestureRecognizer"/>
-                <relationship kind="outlet" name="toolBar" candidateClass="UIToolbar"/>
-            </relationships>
-        </class>
-        <class className="ZPLibraryAndCollectionListViewController" superclassName="UITableViewController">
-            <source key="sourceIdentifier" type="project" relativePath="./Classes/ZPLibraryAndCollectionListViewController.h"/>
-        </class>
-        <class className="ZPSambaServerPickerDialog" superclassName="UIViewController">
-            <source key="sourceIdentifier" type="project" relativePath="./Classes/ZPSambaServerPickerDialog.h"/>
-            <relationships>
-                <relationship kind="action" name="cancelSamba:"/>
-                <relationship kind="action" name="disableSamba:"/>
-            </relationships>
-        </class>
-        <class className="iCarousel" superclassName="UIView">
-            <source key="sourceIdentifier" type="project" relativePath="./Classes/iCarousel.h"/>
-            <relationships>
-                <relationship kind="outlet" name="dataSource"/>
-                <relationship kind="outlet" name="delegate"/>
-            </relationships>
-        </class>
-    </classes>
     <simulatedMetricsContainer key="defaultSimulatedMetrics">
         <simulatedStatusBarMetrics key="statusBar"/>
         <simulatedOrientationMetrics key="orientation"/>

@@ -341,10 +341,16 @@ const NSInteger ZPServerConnectionRequestTopLevelKeys = 9;
             }
         }
         
+         
         if(notes != NULL) item.notes = notes;
         else item.notes = [NSArray array];
         
-        if(attachments != NULL) item.attachments = attachments;
+        if(attachments != NULL){
+            [attachments sortUsingDescriptors:[NSArray arrayWithObject:[[NSSortDescriptor alloc] initWithKey:@"title" ascending:TRUE]]];
+            if(![attachments isEqual:item.attachments]){
+                item.attachments = attachments;   
+            }
+        }
         else item.attachments = [NSArray array];
     
     }

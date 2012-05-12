@@ -82,7 +82,7 @@ NSInteger const LINK_MODE_LINKED_URL = 3;
     NSString* path;
     //Imported URLs are stored as ZIP files
     
-    if([self.linkMode intValue] == LINK_MODE_IMPORTED_URL ){
+    if([self.linkMode intValue] == LINK_MODE_IMPORTED_URL && [self.contentType isEqualToString:@"text/html"]){
         path = [[self filename] stringByAppendingFormat:@"_%@.zip",_key];
     }
     else{

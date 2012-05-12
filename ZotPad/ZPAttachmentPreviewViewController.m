@@ -480,9 +480,17 @@ static ZPAttachmentPreviewViewController* _webViewDelegate;
 -(void) _showPDFPreview:(UIImage*) image {
     CGRect frame = [self _getDimensionsWithImage:image];
     self.fileImage.layer.frame = frame;
-    self.view.layer.frame = frame;
-    
-    self.fileImage.image = image;
+    self.fileImage.center = self.view.center;
+    self.fileImage.layer.borderWidth = 2.0f;
+    self.fileImage.layer.borderColor = [UIColor blackColor].CGColor;
+    [self.fileImage setBackgroundColor:[UIColor whiteColor]]; 
+
+    self.fileImage.image=image;
+
+    //Set the old bacground transparent
+    self.view.layer.borderColor = [UIColor clearColor].CGColor;
+    [self.view setBackgroundColor:[UIColor clearColor]]; 
+
 }
 
 -(void) _renderPDFPreview{
@@ -517,7 +525,7 @@ static ZPAttachmentPreviewViewController* _webViewDelegate;
     
     [_previewCache setObject:image forKey:filename];
     
-    [self performSelectorOnMainThread:@selector(_showPDFPreview) withObject:image waitUntilDone:NO];
+    [self performSelectorOnMainThread:@selector(_showPDFPreview:) withObject:image waitUntilDone:NO];
     
 }
 #pragma mark - Attachment download observer protocol methods
@@ -526,6 +534,7 @@ static ZPAttachmentPreviewViewController* _webViewDelegate;
     if(attachment == self.attachment){
         if(attachment.fileExists){
             self.downloadLabel.text = @"Tap to view";
+            if([attachment.contentType isEqualToString:@"application/pdf"]) [self _renderPDFPreview];
         }
         else{
             self.downloadLabel.text = @"Download failed. Tap to retry";

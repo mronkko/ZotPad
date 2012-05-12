@@ -519,7 +519,9 @@
             
             ZPServerConnection* connection = [ZPServerConnection instance];
             
+            
             if(connection!=NULL && ! [connection isAttachmentDownloading:attachment]){
+                NSLog(@"Started downloading file %@ in index %i",attachment.title,index);
                 [connection startDownloadingAttachment:attachment];   
             }
             

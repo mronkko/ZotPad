@@ -91,9 +91,15 @@ static ZPQuicklookController* _instance;
 - (void) _addAttachmentToQuicklook:(ZPZoteroAttachment *)attachment{
     
     // Imported URLs need to be unzipped
-    if([attachment.linkMode intValue] == LINK_MODE_IMPORTED_URL ){
+    if([attachment.linkMode intValue] == LINK_MODE_IMPORTED_URL && [attachment.contentType isEqualToString:@"text/html"]){
         
-        NSString* tempDir = NSTemporaryDirectory();
+        NSString* tempDir = [NSTemporaryDirectory() stringByAppendingPathComponent:attachment.key];
+        
+        if([[NSFileManager defaultManager] fileExistsAtPath:tempDir]){
+            [[NSFileManager defaultManager] removeItemAtPath:tempDir error:NULL];
+        }
+        [[NSFileManager defaultManager] createDirectoryAtPath:tempDir 
+                                  withIntermediateDirectories:YES attributes:nil error:nil];
         ZipArchive* zipArchive = [[ZipArchive alloc] init];
         [zipArchive UnzipOpenFile:attachment.fileSystemPath];
         [zipArchive UnzipFileTo:tempDir overWrite:YES];

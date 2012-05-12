@@ -141,21 +141,19 @@
 #pragma mark - Helper class for configuring sort buttons
 
 @interface ZPItemListViewController_sortHelper: UITableViewController{
-    UIPopoverController* _popover;
-    UIButton* _targetButton;
     NSArray* _fieldTitles;
     NSArray* _fieldValues;
 }
 
 @property (retain) UIPopoverController* popover;
 @property (retain) UIButton* targetButton;
+@property (retain) UITableView* tableView;
 
 @end
 
 @implementation ZPItemListViewController_sortHelper
 
-@synthesize popover = _popover;
-@synthesize targetButton = _targetButton;
+@synthesize popover, targetButton;
 
 -(id) init{
     self=[super init];
@@ -177,12 +175,9 @@
     
     _fieldValues = sortedFieldValues;
     
-    
-    self.tableView = [[UITableView alloc] init];
+    self.navigationItem.title = @"Choose sort field";
     self.tableView.delegate =self;
     self.tableView.dataSource =self;
-    
-    _popover = [[UIPopoverController alloc] initWithContentViewController:self];
 
     return self;
 }
@@ -202,13 +197,18 @@
     NSString* orderField = [_fieldValues objectAtIndex:indexPath.row];
     //Because this preference is not used anywhere else, it is accessed directly.
     NSUserDefaults* defaults = [NSUserDefaults standardUserDefaults];
-    [defaults setObject:orderField forKey:[NSString stringWithFormat: @"itemListView_sortButton%i",_targetButton.tag]];
+    [defaults setObject:orderField forKey:[NSString stringWithFormat: @"itemListView_sortButton%i",self.targetButton.tag]];
 
-    UILabel* label = (UILabel*)[_targetButton.subviews objectAtIndex:1];
+    UILabel* label = (UILabel*)[self.targetButton.subviews objectAtIndex:1];
     
     [label setText:[ZPLocalization getLocalizationStringWithKey:orderField type:@"field"]];
     
-    [_popover dismissPopoverAnimated:YES];
+    if ([[UIDevice currentDevice] userInterfaceIdiom] == UIUserInterfaceIdiomPad) {
+        [self.popover dismissPopoverAnimated:YES];
+    }
+    else{
+        [self dismissModalViewControllerAnimated:YES];
+    }
 }
 
 @end
@@ -219,6 +219,7 @@
 @interface ZPItemListViewController (){
     NSOperationQueue* _uiEventQueue;
     ZPItemListViewController_sortHelper* _sortHelper;
+    UIView* _overlay;
 }
 
 @property (strong, nonatomic) UIPopoverController *masterPopoverController;
@@ -980,13 +981,27 @@
     }
     
     if(_sortHelper == NULL){
-        _sortHelper = [[ZPItemListViewController_sortHelper alloc] init];        
+        _sortHelper = [[ZPItemListViewController_sortHelper alloc] init]; 
+        //TODO: iPhone support
+        if ([[UIDevice currentDevice] userInterfaceIdiom] == UIUserInterfaceIdiomPad) {
+            _sortHelper.popover = [[UIPopoverController alloc] initWithContentViewController:_sortHelper];
+        }
+            
     }
     
-    if([_sortHelper.popover isPopoverVisible]) [_sortHelper.popover dismissPopoverAnimated:YES];
-        
+    if ([[UIDevice currentDevice] userInterfaceIdiom] == UIUserInterfaceIdiomPad) {
+        if([_sortHelper.popover isPopoverVisible]) [_sortHelper.popover dismissPopoverAnimated:YES];
+    }
     _sortHelper.targetButton = (UIButton*) button.customView;
-    [_sortHelper.popover presentPopoverFromBarButtonItem:button permittedArrowDirections: UIPopoverArrowDirectionAny animated:YES];
+
+    if ([[UIDevice currentDevice] userInterfaceIdiom] == UIUserInterfaceIdiomPad) {
+        [_sortHelper.popover presentPopoverFromBarButtonItem:button permittedArrowDirections: UIPopoverArrowDirectionAny animated:YES];
+    }
+    else{
+        UINavigationController* controller = [[UINavigationController alloc] init];
+        controller.viewControllers=[NSArray arrayWithObject:_sortHelper];
+        [self presentModalViewController:controller animated:YES];
+    }
 }
 
 -(IBAction) attachmentThumbnailPressed:(id)sender{
@@ -1013,11 +1028,33 @@
 
 - (void)searchBarSearchButtonClicked:(UISearchBar *)sourceSearchBar{
     
+    [self doneSearchingClicked:NULL];
+    
     if(![[sourceSearchBar text] isEqualToString:_searchString]){
         _searchString = [sourceSearchBar text];
         [self configureView];
     }
-    [sourceSearchBar resignFirstResponder ];
 }
 
+- (void) searchBarTextDidBeginEditing:(UISearchBar *)theSearchBar {
+    
+    _overlay = [[UIView alloc] initWithFrame:self.tableView.bounds];
+    _overlay.backgroundColor = [UIColor grayColor];
+    _overlay.alpha = 0.5;
+    _overlay.autoresizingMask = UIViewAutoresizingFlexibleWidth|UIViewAutoresizingFlexibleHeight;
+    self.tableView.scrollEnabled = NO;
+
+    [self.tableView addSubview:_overlay];
+
+    //Add the done button.
+    self.navigationItem.rightBarButtonItem = [[UIBarButtonItem alloc]
+                                               initWithBarButtonSystemItem:UIBarButtonSystemItemDone
+                                               target:self action:@selector(doneSearchingClicked:)];
+}
+- (void) doneSearchingClicked:(id) source{
+    self.navigationItem.rightBarButtonItem = NULL;
+    [self.searchBar resignFirstResponder];
+    [_overlay removeFromSuperview];
+    self.tableView.scrollEnabled = TRUE;
+}
 @end
