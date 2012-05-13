@@ -24,8 +24,8 @@ always exists.
 
 */
 
-CREATE TABLE IF NOT EXISTS groups ( 
-    groupID INTEGER PRIMARY KEY,
+CREATE TABLE IF NOT EXISTS libraries ( 
+    libraryID INTEGER PRIMARY KEY,
     title TEXT NOT NULL,
     cacheTimestamp TEXT DEFAULT NULL
 );

@@ -24,6 +24,7 @@
 #import "ZPServerConnection.h"
 #import "ZPAuthenticationDialog.h"
 #import "ZPServerResponseXMLParser.h"
+#import "ZPServerResponseXMLParserKeyPermissions.h"
 #import "ZPServerResponseXMLParserItem.h"
 #import "ZPServerResponseXMLParserLibrary.h"
 #import "ZPServerResponseXMLParserCollection.h"
@@ -69,6 +70,7 @@ const NSInteger ZPServerConnectionRequestSingleItem = 6;
 const NSInteger ZPServerConnectionRequestSingleItemChildren = 7;
 const NSInteger ZPServerConnectionRequestKeys = 8;
 const NSInteger ZPServerConnectionRequestTopLevelKeys = 9;
+const NSInteger ZPServerConnectionRequestPermissions = 10;
 
 -(id)init
 {
@@ -149,8 +151,25 @@ const NSInteger ZPServerConnectionRequestTopLevelKeys = 9;
     //If we receive a 403 (forbidden) error, delete the authorization key because we know that it is
     //no longer valid.
     if([(NSHTTPURLResponse*)response statusCode]==403){
-        NSLog(@"The authorization key is no longer valid.");
-        [[ZPPreferences instance] resetUserCredentials];
+        @synchronized(self){
+            
+            if([[ZPPreferences instance] online] && [self authenticated]){
+                //Check if the key is valid at all. If not, reauthenticate only then. 
+                
+                NSArray* librariesThatCanBeAccessed = [[self makeServerRequest:ZPServerConnectionRequestKeys withParameters:NULL] parsedElements];
+                
+                if(librariesThatCanBeAccessed == NULL || [librariesThatCanBeAccessed count]==0){ 
+                    NSLog(@"The authorization key is no longer valid.");
+                    
+                    //Set ZotPad offline and ask the user what to do
+                    [[ZPPreferences instance] setOnline:FALSE];
+                    
+                    [[[UIAlertView alloc] initWithTitle:@"Authentication error"
+                                                                    message:@"ZotPad is not authorized to access any of your libraries on the Zotero server and is working now in offline mode. This can occur if your access key has been revoked or communications to Zotero server is blocked."
+                                               delegate:self cancelButtonTitle:@"Stay offline" otherButtonTitles:@"Check key", @"New key",nil] show];
+                }
+            }
+        }
     }
     
     _activeRequestCount--;
@@ -181,8 +200,10 @@ const NSInteger ZPServerConnectionRequestTopLevelKeys = 9;
         }
         
         // Groups and collections
-        
-        if(type==ZPServerConnectionRequestGroups){
+        if(type==ZPServerConnectionRequestPermissions){
+            urlString = [NSString stringWithFormat:@"%@keys/%@",urlString,oauthkey];
+        }
+        else if(type==ZPServerConnectionRequestGroups){
             urlString = [NSString stringWithFormat:@"%@groups?key=%@&content=none",urlString,oauthkey];
         }
         else if (type==ZPServerConnectionRequestCollections){
@@ -248,7 +269,7 @@ const NSInteger ZPServerConnectionRequestTopLevelKeys = 9;
     if(responseData!=NULL){
 
         ZPServerResponseXMLParser* parserDelegate = NULL;
-
+        
         if(type == ZPServerConnectionRequestKeys || type == ZPServerConnectionRequestTopLevelKeys){
             //We do not use a parser for item keys because it is not XML. The itemkey format is kind of afterthough, so we will just parse it differentlys
             
@@ -262,13 +283,22 @@ const NSInteger ZPServerConnectionRequestTopLevelKeys = 9;
 
             [parserDelegate setParsedElements:itemKeys];
         }
-        
-        
+        //TODO refactor parsers to use the same superclass
+        else if(type == ZPServerConnectionRequestPermissions){
+            ZPServerResponseXMLParserKeyPermissions* keyParser = [[ZPServerResponseXMLParserKeyPermissions alloc] init];
+
+            NSXMLParser* parser = [[NSXMLParser alloc] initWithData:responseData];
+            [parser setDelegate:keyParser];
+            [parser parse];
+            
+            parserDelegate = [[ZPServerResponseXMLParser alloc] init];
+            [parserDelegate setParsedElements:[keyParser results]];
+        }
         else{
             NSXMLParser* parser = [[NSXMLParser alloc] initWithData:responseData];
 
         //Choose the parser based on what we expect to receive
-        
+            
             if(type==ZPServerConnectionRequestGroups){
                 parserDelegate =  [[ZPServerResponseXMLParserLibrary alloc] init];    
             }
@@ -278,7 +308,6 @@ const NSInteger ZPServerConnectionRequestTopLevelKeys = 9;
             else if (type==ZPServerConnectionRequestItems || type == ZPServerConnectionRequestSingleItem || type== ZPServerConnectionRequestItemsAndChildren || type== ZPServerConnectionRequestSingleItemChildren){
                 parserDelegate =  [[ZPServerResponseXMLParserItem alloc] init];    
             }
-        
               
             [parser setDelegate: parserDelegate];
             [parser parse];
@@ -358,9 +387,15 @@ const NSInteger ZPServerConnectionRequestTopLevelKeys = 9;
 }
 
 -(NSArray*) retrieveLibrariesFromServer{
-        
-    //Retrieve all libraries from the server
+
     
+    //Retrieve access rights of this key
+    NSArray* librariesThatCanBeAccessed = [[self makeServerRequest:ZPServerConnectionRequestPermissions withParameters:NULL] parsedElements];
+    
+    if([librariesThatCanBeAccessed count]==0) return NULL;
+    
+    
+    //Retrieve all groups from the server
 
     ZPServerResponseXMLParser* parserDelegate =  [self makeServerRequest:ZPServerConnectionRequestGroups withParameters:NULL];
 
@@ -383,7 +418,24 @@ const NSInteger ZPServerConnectionRequestTopLevelKeys = 9;
         returnArray=[returnArray arrayByAddingObjectsFromArray:parserDelegate.parsedElements];
     }
     
+    //Are group specifid permissions in use
     
+    if([librariesThatCanBeAccessed indexOfObject:@"all"]==NSNotFound){
+        NSMutableArray* newArray= [[NSMutableArray alloc] init];
+        
+        //enumerate through the permissions and build list of libraries
+        NSString* libraryID;
+        for(libraryID in librariesThatCanBeAccessed){
+            [newArray addObject:[ZPZoteroLibrary dataObjectWithKey:[NSNumber numberWithInt:[libraryID intValue]]]];
+        }
+        returnArray = newArray;
+    }
+    
+    //Is my library available
+    else if([librariesThatCanBeAccessed indexOfObject:@"1"]!=NSNotFound){
+        returnArray = [[NSArray arrayWithObject:[ZPZoteroLibrary dataObjectWithKey:[NSNumber numberWithInt:1]]] arrayByAddingObjectsFromArray:returnArray];
+    }
+            
     return returnArray;
     
 }
@@ -612,6 +664,23 @@ const NSInteger ZPServerConnectionRequestTopLevelKeys = 9;
         return [_activeDownloads containsObject:attachment];
     }
 
+}
+
+#pragma mark - UIAlertView delegate methods
+
+- (void)alertView:(UIAlertView *)alertView clickedButtonAtIndex:(NSInteger)buttonIndex{
+    
+    if(buttonIndex == 0){
+        //Stay offline button, do nothing
+    }
+    else if(buttonIndex == 1){
+        [[UIApplication sharedApplication] openURL:[NSString stringWithFormat:@"https://www.zotero.org/settings/keys/edit/%@",[[ZPPreferences instance] OAuthKey]]];
+    }
+    else if(buttonIndex == 2 ){
+        //New key button
+        [[ZPPreferences instance] resetUserCredentials];
+        [[ZPPreferences instance] setOnline:TRUE];
+    }
 }
 
 

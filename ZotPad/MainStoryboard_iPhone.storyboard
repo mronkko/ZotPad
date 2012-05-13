@@ -238,10 +238,16 @@
                         <autoresizingMask key="autoresizingMask" flexibleMaxX="YES" flexibleMaxY="YES"/>
                         <subviews>
                             <navigationBar contentMode="scaleToFill" id="kl2-xy-Cyg">
-                                <rect key="frame" x="0.0" y="0.0" width="320" height="74"/>
+                                <rect key="frame" x="0.0" y="0.0" width="320" height="44"/>
                                 <autoresizingMask key="autoresizingMask" widthSizable="YES" flexibleMaxY="YES"/>
                                 <items>
-                                    <navigationItem prompt="Login to Zotero" id="ptL-59-1VP"/>
+                                    <navigationItem title="Login to Zotero" id="ptL-59-1VP">
+                                        <barButtonItem key="rightBarButtonItem" title="Back to start" id="Qx1-LJ-U0z">
+                                            <connections>
+                                                <action selector="loadFirstPage:" destination="mdR-2R-M4d" id="thO-Cp-GqI"/>
+                                            </connections>
+                                        </barButtonItem>
+                                    </navigationItem>
                                 </items>
                             </navigationBar>
                             <webView contentMode="scaleToFill" id="2j9-TS-bj8">
@@ -313,18 +319,6 @@
                                         <rect key="frame" x="20" y="156" width="189" height="9"/>
                                         <autoresizingMask key="autoresizingMask" flexibleMaxX="YES" flexibleMaxY="YES"/>
                                     </progressView>
-                                    <button opaque="NO" contentMode="scaleToFill" contentHorizontalAlignment="center" contentVerticalAlignment="center" lineBreakMode="middleTruncation" id="Zda-xJ-UR2">
-                                        <rect key="frame" x="205" y="146" width="29" height="29"/>
-                                        <autoresizingMask key="autoresizingMask" flexibleMaxX="YES" flexibleMaxY="YES"/>
-                                        <fontDescription key="fontDescription" type="boldSystem" size="button"/>
-                                        <state key="normal" image="closeButton.png">
-                                            <color key="titleColor" red="0.19607843137254902" green="0.30980392156862746" blue="0.52156862745098043" alpha="1" colorSpace="calibratedRGB"/>
-                                            <color key="titleShadowColor" white="0.5" alpha="1" colorSpace="calibratedWhite"/>
-                                        </state>
-                                        <state key="highlighted">
-                                            <color key="titleColor" white="1" alpha="1" colorSpace="calibratedWhite"/>
-                                        </state>
-                                    </button>
                                 </subviews>
                                 <color key="backgroundColor" cocoaTouchSystemColor="darkTextColor"/>
                             </view>
@@ -338,7 +332,6 @@
                     <simulatedOrientationMetrics key="simulatedOrientationMetrics"/>
                     <freeformSimulatedSizeMetrics key="simulatedDestinationMetrics"/>
                     <connections>
-                        <outlet property="cancelButton" destination="Zda-xJ-UR2" id="OlL-LN-kj3"/>
                         <outlet property="downloadLabel" destination="cjU-a5-haR" id="6EC-7j-mcP"/>
                         <outlet property="fileImage" destination="Wmv-1P-rbV" id="y93-AI-vmv"/>
                         <outlet property="labelBackground" destination="TLz-gg-am0" id="K7b-ol-gWJ"/>
@@ -600,9 +593,74 @@
             <point key="canvasLocation" x="1344" y="64"/>
         </scene>
     </scenes>
-    <resources>
-        <image name="closeButton.png" width="10" height="10"/>
-    </resources>
+    <classes>
+        <class className="TTStyledTextLabel" superclassName="UIView">
+            <source key="sourceIdentifier" type="project" relativePath="./Classes/TTStyledTextLabel.h"/>
+        </class>
+        <class className="ZPAttachmentPreviewViewController" superclassName="UIViewController">
+            <source key="sourceIdentifier" type="project" relativePath="./Classes/ZPAttachmentPreviewViewController.h"/>
+            <relationships>
+                <relationship kind="outlet" name="cancelButton" candidateClass="UIButton"/>
+                <relationship kind="outlet" name="downloadLabel" candidateClass="UILabel"/>
+                <relationship kind="outlet" name="fileImage" candidateClass="UIImageView"/>
+                <relationship kind="outlet" name="labelBackground" candidateClass="UIView"/>
+                <relationship kind="outlet" name="progressView" candidateClass="UIProgressView"/>
+                <relationship kind="outlet" name="titleLabel" candidateClass="UILabel"/>
+            </relationships>
+        </class>
+        <class className="ZPAuthenticationDialog" superclassName="UIViewController">
+            <source key="sourceIdentifier" type="project" relativePath="./Classes/ZPAuthenticationDialog.h"/>
+            <relationships>
+                <relationship kind="action" name="loadFirstPage:"/>
+                <relationship kind="outlet" name="webView" candidateClass="UIWebView"/>
+            </relationships>
+        </class>
+        <class className="ZPDownloadAuthenticationDialogViewController" superclassName="UIViewController">
+            <source key="sourceIdentifier" type="project" relativePath="./Classes/ZPDownloadAuthenticationDialogViewController.h"/>
+            <relationships>
+                <relationship kind="action" name="cancel:"/>
+                <relationship kind="action" name="login:"/>
+                <relationship kind="outlet" name="navigationItem" candidateClass="UINavigationItem"/>
+            </relationships>
+        </class>
+        <class className="ZPFileImportViewController" superclassName="UIViewController">
+            <source key="sourceIdentifier" type="project" relativePath="./Classes/ZPFileImportViewController.h"/>
+        </class>
+        <class className="ZPItemDetailViewController" superclassName="UIViewController">
+            <source key="sourceIdentifier" type="project" relativePath="./Classes/ZPItemDetailViewController.h"/>
+            <relationships>
+                <relationship kind="outlet" name="carousel" candidateClass="iCarousel"/>
+                <relationship kind="outlet" name="detailTableView" candidateClass="UITableView"/>
+            </relationships>
+        </class>
+        <class className="ZPItemListViewController" superclassName="UIViewController">
+            <source key="sourceIdentifier" type="project" relativePath="./Classes/ZPItemListViewController.h"/>
+            <relationships>
+                <relationship kind="action" name="attachmentThumbnailPressed:"/>
+                <relationship kind="action" name="sortButtonPressed:"/>
+                <relationship kind="outlet" name="searchBar" candidateClass="UISearchBar"/>
+                <relationship kind="outlet" name="tableView" candidateClass="UITableView"/>
+                <relationship kind="outlet" name="toolBar" candidateClass="UIToolbar"/>
+            </relationships>
+        </class>
+        <class className="ZPLibraryAndCollectionListViewController" superclassName="UITableViewController">
+            <source key="sourceIdentifier" type="project" relativePath="./Classes/ZPLibraryAndCollectionListViewController.h"/>
+        </class>
+        <class className="ZPSambaServerPickerDialog" superclassName="UIViewController">
+            <source key="sourceIdentifier" type="project" relativePath="./Classes/ZPSambaServerPickerDialog.h"/>
+            <relationships>
+                <relationship kind="action" name="cancelSamba:"/>
+                <relationship kind="action" name="disableSamba:"/>
+            </relationships>
+        </class>
+        <class className="iCarousel" superclassName="UIView">
+            <source key="sourceIdentifier" type="project" relativePath="./Classes/iCarousel.h"/>
+            <relationships>
+                <relationship kind="outlet" name="dataSource"/>
+                <relationship kind="outlet" name="delegate"/>
+            </relationships>
+        </class>
+    </classes>
     <simulatedMetricsContainer key="defaultSimulatedMetrics">
         <simulatedStatusBarMetrics key="statusBar"/>
         <simulatedOrientationMetrics key="orientation"/>

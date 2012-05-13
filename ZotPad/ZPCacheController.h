@@ -37,15 +37,14 @@
 
 +(ZPCacheController*) instance;
 
-// Activates the cache controller
--(void) activate;
 
 // These methods tell the cache that the user is currently viewing something
 //-(void) setCurrentCollection:(NSString*) collectionKey;
 //-(void) setCurrentLibrary:(NSNumber*) libraryID;
 //-(void) setCurrentItem:(NSString*) itemKey;
 -(void) updateLibrariesAndCollectionsFromServer;
-- (void) purgeAllAttachmentFilesFromCache;
+-(void) updateCollectionsForLibraryFromServer:(ZPZoteroLibrary*) libraryID;
+-(void) purgeAllAttachmentFilesFromCache;
 
 -(void) refreshActiveItem:(ZPZoteroItem*) item;
 -(void) setActiveLibrary:(NSNumber*)libraryID collection:(NSString*)collectionKey;

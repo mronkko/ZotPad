@@ -20,6 +20,7 @@
 @property (retain) NSString* username;
 @property (retain) NSString* currentCacheSize;
 @property (readonly) NSString* sambaShareName;
+@property BOOL online;
 
 @property BOOL useWebDAV;
 @property BOOL useSamba;
@@ -35,7 +36,6 @@
 -(BOOL) cacheAttachmentsActiveItem;
 
 -(BOOL) useCache;
--(BOOL) online;
 -(BOOL) useDropbox;
 -(NSString*) webDAVURL;
 

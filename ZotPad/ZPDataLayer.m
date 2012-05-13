@@ -78,8 +78,7 @@ static ZPDataLayer* _instance = nil;
  */
 
 - (NSArray*) libraries {
-    NSArray* ret=[NSArray arrayWithObject:[ZPZoteroLibrary dataObjectWithKey:[NSNumber numberWithInt:1]]];
-    return [ret arrayByAddingObjectsFromArray:[[ZPDatabase instance] groupLibraries]];
+    return [[ZPDatabase instance] libraries];
 }
 
 
@@ -90,7 +89,8 @@ static ZPDataLayer* _instance = nil;
  */
 
 - (NSArray*) collectionsForLibrary : (NSNumber*)currentlibraryID withParentCollection:(NSString*)currentcollectionKey {
-	
+
+    [[ZPCacheController instance] performSelectorInBackground:@selector(updateCollectionsForLibraryFromServer:) withObject:[ZPZoteroLibrary dataObjectWithKey:currentlibraryID]];
     return [[ZPDatabase instance] collectionsForLibrary:currentlibraryID withParentCollection:currentcollectionKey];
 
 }
@@ -159,23 +159,23 @@ static ZPDataLayer* _instance = nil;
 
 -(void) notifyLibraryWithCollectionsAvailable:(ZPZoteroLibrary*) library{
     
-
-        NSEnumerator* e = [_libraryObservers objectEnumerator];
-        NSObject* id;
-        
-        while( id= [e nextObject]) {
-            [(NSObject <ZPLibraryObserver>*) id notifyLibraryWithCollectionsAvailable:library];
-        }
+    NSLog(@"Library %@ is available",library.title);
+    NSEnumerator* e = [_libraryObservers objectEnumerator];
+    NSObject* id;
+    
+    while( id= [e nextObject]) {
+        [(NSObject <ZPLibraryObserver>*) id notifyLibraryWithCollectionsAvailable:library];
+    }
 }
 
 
 -(void) notifyAttachmentDownloadCompleted:(ZPZoteroAttachment*) attachment{
-        NSEnumerator* e = [_attachmentObservers objectEnumerator];
-        NSObject* id;
-        
-        while( id= [e nextObject]) {
-            [(NSObject <ZPAttachmentObserver>*) id notifyAttachmentDownloadCompleted:attachment];
-        }
+    NSEnumerator* e = [_attachmentObservers objectEnumerator];
+    NSObject* id;
+    
+    while( id= [e nextObject]) {
+        [(NSObject <ZPAttachmentObserver>*) id notifyAttachmentDownloadCompleted:attachment];
+    }
 }
 
 -(void) notifyAttachmentDownloadStarted:(ZPZoteroAttachment*) attachment{

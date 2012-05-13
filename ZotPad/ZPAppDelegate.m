@@ -39,8 +39,6 @@
     [[ZPPreferences instance] checkAndProcessApplicationResetPreferences];
     [[ZPPreferences instance] reload];
     
-    //Set up a background operation for retrieving data
-    [[ZPCacheController instance] activate];
     
     // Override point for customization after application launch.
     if ([[UIDevice currentDevice] userInterfaceIdiom] == UIUserInterfaceIdiomPad) {

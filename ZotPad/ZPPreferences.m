@@ -161,7 +161,13 @@ static ZPPreferences* _instance = nil;
 
 -(BOOL) online{
     return (_mode != 2);
-    
+}
+
+-(void) setOnline:(BOOL)online{
+    if(online) _mode = 1;
+    else _mode = 2;
+    NSUserDefaults* defaults = [NSUserDefaults standardUserDefaults];
+    [defaults setObject:[NSNumber numberWithInt:_mode] forKey:@"mode"];
 }
 
 -(BOOL) useDropbox{

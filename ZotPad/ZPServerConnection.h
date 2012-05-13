@@ -17,11 +17,12 @@
 #import "ZPZoteroAttachment.h"
 #import "ZPFileChannel.h"
 
-@interface ZPServerConnection : NSObject{
+@interface ZPServerConnection : NSObject <UIAlertViewDelegate>{
         
     NSInteger _activeRequestCount;
     NSArray* _fileChannels;
     NSMutableSet* _activeDownloads;
+ 
 }
 
 // This class is used as a singleton

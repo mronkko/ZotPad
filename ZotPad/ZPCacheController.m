@@ -68,6 +68,10 @@
     NSNumber* _activelibraryID;
     NSString* _activeCollectionKey;
     NSString* _activeItemKey;
+    
+    //Variables indicating if we are currently refreshing lobraries and collectiosn from server
+    BOOL _isRefresingLibraries;
+    NSMutableSet* _librariesWhoseCollectionsAreBeingRefreshed;
 }
 
 -(void) _checkQueues;
@@ -94,7 +98,6 @@
 - (void) _cleanUpCache;
 - (void) _updateCacheSizeAfterAddingAttachment:(ZPZoteroAttachment*)attachment;
 
--(void) _updateCollectionsForLibraryFromServer:(ZPZoteroLibrary*) libraryID;
 
 @end
 
@@ -127,8 +130,14 @@ static ZPCacheController* _instance = nil;
     //Register as observer so that we can follow the size of the cache
     [[ZPDataLayer instance] registerAttachmentObserver:self];
     
+    //Observe new libraries so that we know
+    [[ZPDataLayer instance] registerLibraryObserver:self];
+
     _sizeOfDocumentsFolder = 0;    [self performSelectorInBackground:@selector(_scanAndSetSizeOfDocumentsFolder) withObject:NULL];
 	
+    _isRefresingLibraries =FALSE;
+    _librariesWhoseCollectionsAreBeingRefreshed = [[NSMutableSet alloc] init];
+
     
     return self;
 }
@@ -151,13 +160,6 @@ static ZPCacheController* _instance = nil;
     NSInteger maxCacheSize = [[ZPPreferences instance] maxCacheSize];
     NSInteger cacheSizePercent = _sizeOfDocumentsFolder*100/ maxCacheSize;
     [_statusView setCacheUsed:cacheSizePercent];
-
-}
-
--(void) activate{
-    
-    [[ZPDataLayer instance] registerLibraryObserver:self];
-    [self performSelectorInBackground:@selector(updateLibrariesAndCollectionsFromServer) withObject:NULL];
 
 }
 
@@ -723,38 +725,59 @@ static ZPCacheController* _instance = nil;
     
 -(void) updateLibrariesAndCollectionsFromServer{
 
-    //My library  
-    [self performSelectorInBackground:@selector(_updateCollectionsForLibraryFromServer:) withObject:[ZPZoteroLibrary dataObjectWithKey:[NSNumber numberWithInt:1]]];
-
-    NSLog(@"Loading group library information from server");
-    NSArray* libraries = [[ZPServerConnection instance] retrieveLibrariesFromServer];
-
-    if(libraries!=NULL){
+    if(! _isRefresingLibraries){
+        _isRefresingLibraries = TRUE;
+ 
+        NSLog(@"Loading library information from server");
+        NSArray* libraries = [[ZPServerConnection instance] retrieveLibrariesFromServer];
         
-        NSEnumerator* e = [libraries objectEnumerator];
-        
-        ZPZoteroLibrary* library;
-        
-        while ( library = (ZPZoteroLibrary*) [e nextObject]) {
+        if(libraries!=NULL){
             
-            [self performSelectorInBackground:@selector(_updateCollectionsForLibraryFromServer:) withObject:library];
+            NSEnumerator* e = [libraries objectEnumerator];
             
+            ZPZoteroLibrary* library;
+            
+            while ( library = (ZPZoteroLibrary*) [e nextObject]) {
+                
+                [self performSelectorInBackground:@selector(updateCollectionsForLibraryFromServer:) withObject:library];
+                
+            }
+            [[ZPDatabase instance] writeLibraries:libraries];
         }
-        [[ZPDatabase instance] writeLibraries:libraries];
-    }    
-}
-
--(void) _updateCollectionsForLibraryFromServer:(ZPZoteroLibrary*) library{
-    NSLog(@"Loading collections for library %@",library.libraryID);
-    
-    NSArray* collections = [[ZPServerConnection instance] retrieveCollectionsForLibraryFromServer:library.libraryID];
-    if(collections!=NULL){
-        [[ZPDatabase instance] writeCollections:collections toLibrary:library];
-        [[ZPDataLayer instance] notifyLibraryWithCollectionsAvailable:library];
+        
+        _isRefresingLibraries = FALSE;
     }
-
 }
 
+-(void) updateCollectionsForLibraryFromServer:(ZPZoteroLibrary*) library{
+
+    
+    BOOL shouldRefresh = FALSE;
+    @synchronized(_librariesWhoseCollectionsAreBeingRefreshed){
+        if(! [_librariesWhoseCollectionsAreBeingRefreshed containsObject:library.libraryID]){
+            shouldRefresh = TRUE;
+            [_librariesWhoseCollectionsAreBeingRefreshed addObject:library.libraryID];
+        }
+    }
+    
+    if(shouldRefresh){
+        NSLog(@"Loading collections for library %@",library.title);
+
+        NSArray* collections = [[ZPServerConnection instance] retrieveCollectionsForLibraryFromServer:library.libraryID];
+        if(collections!=NULL){
+            [[ZPDatabase instance] writeCollections:collections toLibrary:library];
+            [[ZPDataLayer instance] notifyLibraryWithCollectionsAvailable:library];
+        }
+        @synchronized(_librariesWhoseCollectionsAreBeingRefreshed){
+//            NSLog(@"Removing lock on libray %@ number of locks %i",library.libraryID,[_librariesWhoseCollectionsAreBeingRefreshed count]);
+            [_librariesWhoseCollectionsAreBeingRefreshed removeObject:library.libraryID];
+//            NSLog(@"Count after removing lock %i",[_librariesWhoseCollectionsAreBeingRefreshed count]);
+        }
+    }
+}
+
+#pragma mark -
+#pragma mark Notifier methods for metadata
 
 
 

@@ -595,6 +595,8 @@
 		A79ED823148B2683003EE77C /* ZPItemDetailViewController.m in Sources */ = {isa = PBXBuildFile; fileRef = A79ED822148B2683003EE77C /* ZPItemDetailViewController.m */; };
 		A7A3F950147BAB6C00CA7266 /* database.sql in Resources */ = {isa = PBXBuildFile; fileRef = A7A3F94F147BAB6C00CA7266 /* database.sql */; };
 		A7A3F953147BBCCB00CA7266 /* ZPServerResponseXMLParser.m in Sources */ = {isa = PBXBuildFile; fileRef = A7A3F952147BBCCA00CA7266 /* ZPServerResponseXMLParser.m */; };
+		A7A4432C155FE5ED005FF5B4 /* ZPServerResponseXMLParserKeyPermissions.m in Sources */ = {isa = PBXBuildFile; fileRef = A7A4432B155FE5ED005FF5B4 /* ZPServerResponseXMLParserKeyPermissions.m */; };
+		A7A4432D155FE5ED005FF5B4 /* ZPServerResponseXMLParserKeyPermissions.m in Sources */ = {isa = PBXBuildFile; fileRef = A7A4432B155FE5ED005FF5B4 /* ZPServerResponseXMLParserKeyPermissions.m */; };
 		A7A54B0B14878E4F00EBAD80 /* FMDatabase.m in Sources */ = {isa = PBXBuildFile; fileRef = A7A54B0614878E4F00EBAD80 /* FMDatabase.m */; settings = {COMPILER_FLAGS = "-fno-objc-arc"; }; };
 		A7A54B0C14878E4F00EBAD80 /* FMDatabaseAdditions.m in Sources */ = {isa = PBXBuildFile; fileRef = A7A54B0814878E4F00EBAD80 /* FMDatabaseAdditions.m */; settings = {COMPILER_FLAGS = "-fno-objc-arc"; }; };
 		A7A54B0D14878E4F00EBAD80 /* FMResultSet.m in Sources */ = {isa = PBXBuildFile; fileRef = A7A54B0A14878E4F00EBAD80 /* FMResultSet.m */; settings = {COMPILER_FLAGS = "-fno-objc-arc"; }; };
@@ -1344,6 +1346,8 @@
 		A7A3F94F147BAB6C00CA7266 /* database.sql */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = text; lineEnding = 0; path = database.sql; sourceTree = "<group>"; };
 		A7A3F951147BBCCA00CA7266 /* ZPServerResponseXMLParser.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = ZPServerResponseXMLParser.h; sourceTree = "<group>"; };
 		A7A3F952147BBCCA00CA7266 /* ZPServerResponseXMLParser.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = ZPServerResponseXMLParser.m; sourceTree = "<group>"; };
+		A7A4432A155FE5ED005FF5B4 /* ZPServerResponseXMLParserKeyPermissions.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = ZPServerResponseXMLParserKeyPermissions.h; sourceTree = "<group>"; };
+		A7A4432B155FE5ED005FF5B4 /* ZPServerResponseXMLParserKeyPermissions.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = ZPServerResponseXMLParserKeyPermissions.m; sourceTree = "<group>"; };
 		A7A54B0514878E4F00EBAD80 /* FMDatabase.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; name = FMDatabase.h; path = FMDB/src/FMDatabase.h; sourceTree = "<group>"; };
 		A7A54B0614878E4F00EBAD80 /* FMDatabase.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; name = FMDatabase.m; path = FMDB/src/FMDatabase.m; sourceTree = "<group>"; };
 		A7A54B0714878E4F00EBAD80 /* FMDatabaseAdditions.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; name = FMDatabaseAdditions.h; path = FMDB/src/FMDatabaseAdditions.h; sourceTree = "<group>"; };
@@ -1595,6 +1599,8 @@
 				A7025074149C8F9A004F2AAB /* ZPServerResponseXMLParserCollection.m */,
 				A7025076149C91A1004F2AAB /* ZPServerResponseXMLParserItem.h */,
 				A7025077149C91A1004F2AAB /* ZPServerResponseXMLParserItem.m */,
+				A7A4432A155FE5ED005FF5B4 /* ZPServerResponseXMLParserKeyPermissions.h */,
+				A7A4432B155FE5ED005FF5B4 /* ZPServerResponseXMLParserKeyPermissions.m */,
 			);
 			name = "Response parsers";
 			sourceTree = "<group>";
@@ -3141,6 +3147,7 @@
 				A708ECAF153DAF340083A506 /* ZPAttachmentPreviewViewController.m in Sources */,
 				A7D687DB154D24F5007F4F2D /* ZPDownloadAuthenticationDialogViewController.m in Sources */,
 				A7D687E3154D70E3007F4F2D /* ZPSambaServerPickerDialog.m in Sources */,
+				A7A4432C155FE5ED005FF5B4 /* ZPServerResponseXMLParserKeyPermissions.m in Sources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
@@ -3232,6 +3239,7 @@
 				A708ECB0153DAF340083A506 /* ZPAttachmentPreviewViewController.m in Sources */,
 				A7D687DC154D24F5007F4F2D /* ZPDownloadAuthenticationDialogViewController.m in Sources */,
 				A7D687E4154DB726007F4F2D /* ZPSambaServerPickerDialog.m in Sources */,
+				A7A4432D155FE5ED005FF5B4 /* ZPServerResponseXMLParserKeyPermissions.m in Sources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};

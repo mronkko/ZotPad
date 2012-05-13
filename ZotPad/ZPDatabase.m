@@ -138,7 +138,9 @@ static ZPDatabase* _instance = nil;
         while (sqlString = [e nextObject]) {
             if(! [[sqlString stringByTrimmingCharactersInSet:
                    [NSCharacterSet whitespaceAndNewlineCharacterSet]] isEqualToString:@""]){
-                if(![_database executeUpdate:sqlString]) [NSException raise:@"Database error" format:@"Error executing query %@",sqlString];
+                if(![_database executeUpdate:sqlString]){
+                    [NSException raise:@"Database error" format:@"Error executing query %@",sqlString];   
+                }
             }
         }
         
@@ -492,13 +494,13 @@ static ZPDatabase* _instance = nil;
  */
 
 -(void) writeLibraries:(NSArray*)libraries{
-    [self writeObjects:libraries intoTable:@"groups" checkTimestamp:FALSE];
+    [self writeObjects:libraries intoTable:@"libraries" checkTimestamp:FALSE];
     
 }
 
 - (void) setUpdatedTimestampForLibrary:(NSNumber*)libraryID toValue:(NSString*)updatedTimestamp{
     @synchronized(self){
-        [_database executeUpdate:@"UPDATE groups SET cacheTimestamp = ? WHERE groupID = ?",updatedTimestamp,libraryID];
+        [_database executeUpdate:@"UPDATE libraries SET cacheTimestamp = ? WHERE libraryID = ?",updatedTimestamp,libraryID];
     }
 }
 
@@ -508,13 +510,13 @@ static ZPDatabase* _instance = nil;
  
  */
 
-- (NSArray*) groupLibraries{
+- (NSArray*) libraries{
     NSMutableArray* returnArray = [[NSMutableArray alloc] init];
 
     //Group libraries
     @synchronized(self){
         
-        FMResultSet* resultSet = [_database executeQuery:@"SELECT *, (SELECT count(*) FROM collections WHERE libraryID=groupID AND parentCollectionKey IS NULL) AS numChildren FROM groups ORDER BY LOWER(title)"];
+        FMResultSet* resultSet = [_database executeQuery:@"SELECT *, (SELECT count(*) FROM collections WHERE libraryID=libraryID AND parentCollectionKey IS NULL) AS numChildren FROM libraries ORDER BY libraryID <> 1 ,LOWER(title)"];
         
         while([resultSet next]) {
             [returnArray addObject:[ZPZoteroLibrary dataObjectWithDictionary:[resultSet resultDict]]];
@@ -531,7 +533,7 @@ static ZPDatabase* _instance = nil;
 - (void) addAttributesToGroupLibrary:(ZPZoteroLibrary*) library{
     @synchronized(self){
         
-        FMResultSet* resultSet = [_database executeQuery:@"SELECT *, (SELECT count(*) FROM collections WHERE libraryID=groupID AND parentCollectionKey IS NULL) AS numChildren FROM groups WHERE groupID = ?  LIMIT 1",library.libraryID];
+        FMResultSet* resultSet = [_database executeQuery:@"SELECT *, (SELECT count(*) FROM collections WHERE libraryID=libraryID AND parentCollectionKey IS NULL) AS numChildren FROM libraries WHERE libraryID = ?  LIMIT 1",library.libraryID];
         
         if([resultSet next]){
             [library configureWithDictionary:[resultSet resultDict]];
@@ -803,7 +805,9 @@ Deletes items, notes, and attachments based in array of keys from a library
     [self writeObjects:creators intoTable:@"creators" checkTimestamp:FALSE];
  
     @synchronized(self){
-        if(![_database executeUpdate:deleteSQL]) [NSException raise:@"Database error" format:@"Error executing query %@",deleteSQL];
+        if(![_database executeUpdate:deleteSQL]){
+            [NSException raise:@"Database error" format:@"Error executing query %@",deleteSQL];   
+        }
     }
 }
 

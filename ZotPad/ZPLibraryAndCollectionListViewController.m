@@ -57,16 +57,6 @@
     //UIBarButtonItem* barButton = [[UIBarButtonItem alloc] initWithCustomView:_activityIndicator];
     //self.navigationItem.rightBarButtonItem = barButton;
 
-    //[self performSelectorInBackground:@selector(_refreshLibrariesAndCollections) withObject:NULL];
-
-    //If the current library is not defined, show a list of libraries
-    if(self->_currentlibraryID == 0){
-        self->_content = [[ZPDataLayer instance] libraries];
-    }
-    //If a library is chosen, show collections level collections for that library
-    else{
-        self->_content = [[ZPDataLayer instance] collectionsForLibrary:self->_currentlibraryID withParentCollection:self->_currentCollectionKey];        
-    }
 
     //Show Cache controller status
     ZPCacheStatusToolbarController* statusController = [[ZPCacheStatusToolbarController alloc] init];
@@ -90,6 +80,18 @@
 - (void)viewWillAppear:(BOOL)animated
 {
     [super viewWillAppear:animated];
+    
+    //If the current library is not defined, show a list of libraries
+    if(self->_currentlibraryID == 0){
+        [[ZPCacheController instance] performSelectorInBackground:@selector(updateLibrariesAndCollectionsFromServer) withObject:NULL];
+        self->_content = [[ZPDataLayer instance] libraries];
+    }
+    //If a library is chosen, show collections level collections for that library
+    else{
+        [[ZPCacheController instance] performSelectorInBackground:@selector(updateCollectionsForLibraryFromServer:) withObject:[ZPZoteroLibrary dataObjectWithKey:_currentlibraryID]];
+        self->_content = [[ZPDataLayer instance] collectionsForLibrary:self->_currentlibraryID withParentCollection:self->_currentCollectionKey];        
+    }
+
 }
 
 - (void)viewDidAppear:(BOOL)animated
@@ -110,6 +112,30 @@
 	[super viewDidDisappear:animated];
 }
 
+// On iPhone the item list is shown with a segue
+
+-(void) prepareForSegue:(UIStoryboardSegue *)segue sender:(id)sender{
+    if([segue.identifier isEqualToString:@"PushItemList"]){
+        ZPItemListViewController* target = (ZPItemListViewController*) segue.destinationViewController;
+        ZPZoteroDataObject* node = [self->_content objectAtIndex: self.tableView.indexPathForSelectedRow.row];
+        target.libraryID = [node libraryID];
+        target.collectionKey = [node key];
+        
+        //Clear search when changing collection. This is how Zotero behaves
+        [target clearSearch];
+        [target configureView];
+        
+    }
+}
+
+- (BOOL)shouldAutorotateToInterfaceOrientation:(UIInterfaceOrientation)interfaceOrientation
+{
+    
+    // Return YES for supported orientations
+    return YES;
+}
+
+
 #pragma mark - 
 #pragma mark Table view data source and delegate methods
 
@@ -124,9 +150,6 @@
     
      NSString *CellIdentifier = @"CollectionCell";
     
-    // TODO:
-    // Read this http://stackoverflow.com/questions/7911588/should-xcode-storyboard-support-segues-from-a-uitableview-with-dynamic-prototy
-    // Fix iPhone seque from navigator cell to detail view
     
     // Dequeue or create a cell of the appropriate type.
     UITableViewCell *cell = [tableView dequeueReusableCellWithIdentifier:CellIdentifier];
@@ -160,8 +183,6 @@
      When a row is selected, set the detail view controller's library and collection and refresh
      */
     
-    //TODO: If there is no detail indicator, reload child collections from Zotero.
-    
     if (self.detailViewController != NULL) {
 
         ZPZoteroDataObject* node = [self->_content objectAtIndex: indexPath.row];
@@ -174,21 +195,6 @@
     }    
 }
 
-// On iPhone the item list is shown with a segue
-
--(void) prepareForSegue:(UIStoryboardSegue *)segue sender:(id)sender{
-    if([segue.identifier isEqualToString:@"PushItemList"]){
-        ZPItemListViewController* target = (ZPItemListViewController*) segue.destinationViewController;
-        ZPZoteroDataObject* node = [self->_content objectAtIndex: self.tableView.indexPathForSelectedRow.row];
-        target.libraryID = [node libraryID];
-        target.collectionKey = [node key];
-        
-        //Clear search when changing collection. This is how Zotero behaves
-        [target clearSearch];
-        [target configureView];
-        
-    }
-}
 
 - (void) tableView: (UITableView *) aTableView accessoryButtonTappedForRowWithIndexPath: (NSIndexPath *) indexPath
 {
@@ -196,7 +202,6 @@
      Drill down to a library or collection
     */
     
-    //TODO: Reload child collections
     
     ZPLibraryAndCollectionListViewController* subController = [[ZPLibraryAndCollectionListViewController alloc] initWithStyle: UITableViewStylePlain];
 	subController.detailViewController = self.detailViewController;
@@ -209,12 +214,6 @@
 }
 
 
-- (BOOL)shouldAutorotateToInterfaceOrientation:(UIInterfaceOrientation)interfaceOrientation
-{
-    
-    // Return YES for supported orientations
-    return YES;
-}
 
 
 
@@ -222,37 +221,103 @@
 #pragma mark Notified methods
 
 -(void) notifyLibraryWithCollectionsAvailable:(ZPZoteroLibrary*) library{
+
+    //If this is a library that we are not showing now, just return;
     
+    if(self->_currentlibraryID != NULL && ! [_currentlibraryID isEqualToNumber:library.libraryID]) return;
     
     if([NSThread isMainThread]){
         
-        NSIndexPath* selected = [[self tableView] indexPathForSelectedRow];
-        //If we are showing the libraries view, reload the data
+        //Loop over the existing content to see if we need to refresh the content of the cells that are already showing
         
-        //If the current library is not defined, show a list of libraries
-        if(self->_currentlibraryID == 0){
-            [ZPZoteroLibrary dropCache]; //TODO: Figure a more elegant solution
-            self->_content = [[ZPDataLayer instance] libraries];
+        ZPZoteroDataObject* shownObject;
+        NSInteger index=-1;
+        
+        for(shownObject in _content){
+            index++;
+
+            UITableViewCell* cell = [self.tableView cellForRowAtIndexPath:[NSIndexPath indexPathForRow:index inSection:0]];
+            //Check accessory button
+            BOOL noAccessory = cell.accessoryType == UITableViewCellAccessoryNone;
+            if(shownObject.hasChildren && noAccessory){
+                cell.accessoryType = UITableViewCellAccessoryDetailDisclosureButton;
+            }
+            else if(!shownObject.hasChildren && ! noAccessory){
+                cell.accessoryType = UITableViewCellAccessoryNone;
+            }
+            
+            //Check title
+            
+            if(![cell.textLabel.text isEqualToString:shownObject.title]){
+                cell.textLabel.text = shownObject.title;
+            }
         }
-        //If a library is chosen, show collections level collections for that library
-        else{
-            [ZPZoteroCollection dropCache]; //TODO: Figure a more elegant solution
-            self->_content = [[ZPDataLayer instance] collectionsForLibrary:self->_currentlibraryID withParentCollection:self->_currentCollectionKey];        
+        
+        //Then check if we need to insert, delete, or move cells
+        
+        NSArray* newContent;
+        
+        if(_currentlibraryID == NULL){
+            newContent = [[ZPDataLayer instance] libraries];        
+        }
+        else if([_currentlibraryID isEqualToNumber:library.libraryID]){
+            newContent = [[ZPDataLayer instance] collectionsForLibrary:self->_currentlibraryID withParentCollection:self->_currentCollectionKey];        
+        }
+
+        NSMutableArray* deleteArray = [[NSMutableArray alloc] init ];
+        NSMutableArray* insertArray = [[NSMutableArray alloc] init ];
+
+        NSMutableArray* shownContent = [NSMutableArray arrayWithArray:_content];
+        
+        index=-1;
+        ZPZoteroDataObject* newObject;
+        
+        //First check which need to be inserted
+        for(newObject in newContent){
+            index++;
+            
+            NSInteger oldIndexOfNewObject= [shownContent indexOfObject:newObject];
+                
+            if(oldIndexOfNewObject == NSNotFound){
+                [insertArray addObject:[NSIndexPath indexPathForRow:index inSection:0]];
+                [shownContent insertObject:newObject atIndex:index];
+            }
         }
         
-        //TODO: Instead of realoding everything, this method should just add or update the library that it receives
+        //Then check which need to be deleted
+
+        index=-1;
         
-        UITableView* tableView = [self tableView];
-        [tableView reloadData];
+        for(shownObject in [NSArray arrayWithArray:shownContent]){
+            index++;
+            NSInteger newIndexOfOldObject= [newContent indexOfObject:shownObject];
+
+            if(newIndexOfOldObject == NSNotFound){
+                //If the new object does not exist in th old array, insert it
+                [deleteArray addObject:[NSIndexPath indexPathForRow:index inSection:0]];
+                [shownContent removeObjectAtIndex:index];
+            }
+        }
+
+        _content = shownContent;
         
-        if(selected!=NULL) [[self tableView] selectRowAtIndexPath:selected animated:FALSE scrollPosition:UITableViewScrollPositionNone];
+        [self.tableView beginUpdates];
+         
+        if([insertArray count]>0){
+            [self.tableView insertRowsAtIndexPaths:insertArray withRowAnimation:UITableViewRowAnimationAutomatic];
+        }
+        if([deleteArray count]>0){
+            [self.tableView deleteRowsAtIndexPaths:deleteArray withRowAnimation:UITableViewRowAnimationAutomatic];
+        }
         
-        //TODO: Figure out a way to keep the activity view spinning until the last library is loaded.
-        //[_activityIndicator stopAnimating];
+        [self.tableView endUpdates];
+        
+    //TODO: Figure out a way to keep the activity view spinning until the last library is loaded.
+    //[_activityIndicator stopAnimating];
         
     }
     else{
-        [self performSelectorOnMainThread:@selector( notifyLibraryWithCollectionsAvailable:) withObject:library waitUntilDone:NO];
+        [self performSelectorOnMainThread:@selector( notifyLibraryWithCollectionsAvailable:) withObject:library waitUntilDone:YES];
     }
     
 }
