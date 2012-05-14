@@ -1,9 +1,6 @@
 [submodule "FMDB"]
 	path = FMDB
 	url = https://github.com/mronkko/fmdb.git
-[submodule "Three20"]
-	path = Three20
-	url = https://github.com/facebook/three20.git
 [submodule "OAuthConsumer"]
 	path = OAuthConsumer
 	url = https://github.com/jdg/oauthconsumer.git
@@ -22,3 +19,9 @@
 [submodule "Oxygen-Icons"]
 	path = Oxygen-Icons
 	url = https://github.com/chadnickbok/Oxygen-Icons.git
+[submodule "OHAttributedLabel"]
+	path = OHAttributedLabel
+	url = https://github.com/AliSoftware/OHAttributedLabel.git
+[submodule "DTCoreText"]
+	path = DTCoreText
+	url = https://github.com/Cocoanetics/DTCoreText.git

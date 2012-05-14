@@ -15,7 +15,8 @@
 #import "ZPPreferences.h"
 #import "ZPAppDelegate.h"
 #import "ZPLogger.h"
-#import "Three20/Three20.h"
+#import "../OHAttributedLabel/OHAttributedLabel.h"
+#import "DTCoreText.h"
 #import "ZPAttachmentPreviewViewController.h"
 
 //TODO: Refactor so that these would not be needed
@@ -673,7 +674,7 @@
         
         //Publication as a formatted label
         
-        TTStyledTextLabel* publishedInLabel = (TTStyledTextLabel *)[cell viewWithTag:3];
+        OHAttributedLabel* publishedInLabel = (OHAttributedLabel*)[cell viewWithTag:3];
 
         
         
@@ -685,11 +686,11 @@
                 publishedIn=@"";   
             }
             
-            TTStyledText* text = [TTStyledText textFromXHTML:[publishedIn stringByReplacingOccurrencesOfString:@"&" 
-                                                                                                    withString:@"&amp;"] lineBreaks:YES URLs:NO];
+            NSAttributedString* text = [[NSAttributedString alloc] initWithHTML:[publishedIn dataUsingEncoding:NSUTF8StringEncoding] documentAttributes:NULL];
+                                        
             //Font size of TTStyledTextLabel cannot be set in interface builder, so must be done here
             [publishedInLabel setFont:[UIFont systemFontOfSize:[UIFont smallSystemFontSize]]];
-            [publishedInLabel setText:text];
+            [publishedInLabel setAttributedText:text];
         }
         
         //Attachment icon

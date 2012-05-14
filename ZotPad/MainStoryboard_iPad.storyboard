@@ -66,7 +66,7 @@
                                                     <color key="textColor" cocoaTouchSystemColor="darkTextColor"/>
                                                     <nil key="highlightedColor"/>
                                                 </label>
-                                                <view clipsSubviews="YES" tag="3" contentMode="scaleToFill" id="3me-IS-Kgf" customClass="TTStyledTextLabel">
+                                                <view clipsSubviews="YES" tag="3" contentMode="scaleToFill" id="3me-IS-Kgf" customClass="OHAttributedLabel">
                                                     <rect key="frame" x="75" y="37" width="588" height="30"/>
                                                     <autoresizingMask key="autoresizingMask" flexibleMaxX="YES" flexibleMaxY="YES"/>
                                                     <color key="backgroundColor" white="1" alpha="1" colorSpace="custom" customColorSpace="calibratedWhite"/>
@@ -562,8 +562,11 @@
         </scene>
     </scenes>
     <classes>
-        <class className="TTStyledTextLabel" superclassName="UIView">
-            <source key="sourceIdentifier" type="project" relativePath="./Classes/TTStyledTextLabel.h"/>
+        <class className="OHAttributedLabel" superclassName="UILabel">
+            <source key="sourceIdentifier" type="project" relativePath="./Classes/OHAttributedLabel.h"/>
+            <relationships>
+                <relationship kind="outlet" name="delegate"/>
+            </relationships>
         </class>
         <class className="ZPAttachmentPreviewViewController" superclassName="UIViewController">
             <source key="sourceIdentifier" type="project" relativePath="./Classes/ZPAttachmentPreviewViewController.h"/>

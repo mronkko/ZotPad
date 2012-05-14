@@ -10,7 +10,6 @@
 
 #import "ZPFileImportViewController.h"
 #include <QuartzCore/QuartzCore.h>
-#import "Three20/Three20.h"
 #import "ZPDataLayer.h"
 #import "ZPServerConnection.h"
 #import "ZPCacheController.h"
@@ -38,7 +37,7 @@
     
 }
 - (void)viewWillAppear:(BOOL)animated{
-    
+    /*
     UIImage* fileImage = NULL;
     
     UIImageView* fileImageView = [[UIImageView alloc] initWithImage:fileImage];
@@ -99,7 +98,8 @@
     background.center = self.view.center;
     
     [self.view addSubview:background];
-    [self.view addSubview:label];   
+    [self.view addSubview:label];  
+     */
 }
 
 - (void)viewDidAppear:(BOOL)animated{
