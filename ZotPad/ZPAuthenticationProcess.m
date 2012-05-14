@@ -6,6 +6,8 @@
 //  Copyright (c) 2011 __MyCompanyName__. All rights reserved.
 //
 
+#import "ZPCore.h"
+
 #import "ZPAuthenticationProcess.h"
 #import "ZPAuthenticationDialog.h"
 #import "ZPCacheController.h"

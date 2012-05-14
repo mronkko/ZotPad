@@ -11,6 +11,8 @@
 
 #include <sys/xattr.h>
 
+#import "ZPCore.h"
+
 
 #import "ZPDatabase.h"
 
@@ -516,7 +518,7 @@ static ZPDatabase* _instance = nil;
     //Group libraries
     @synchronized(self){
         
-        FMResultSet* resultSet = [_database executeQuery:@"SELECT *, (SELECT count(*) FROM collections WHERE libraryID=libraryID AND parentCollectionKey IS NULL) AS numChildren FROM libraries ORDER BY libraryID <> 1 ,LOWER(title)"];
+        FMResultSet* resultSet = [_database executeQuery:@"SELECT *, (SELECT count(*) FROM collections WHERE libraryID=libraries.libraryID AND parentCollectionKey IS NULL) AS numChildren FROM libraries ORDER BY libraryID <> 1 ,LOWER(title)"];
         
         while([resultSet next]) {
             [returnArray addObject:[ZPZoteroLibrary dataObjectWithDictionary:[resultSet resultDict]]];

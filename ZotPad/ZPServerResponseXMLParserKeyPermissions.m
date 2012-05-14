@@ -6,6 +6,8 @@
 //  Copyright (c) 2012 Helsiki University of Technology. All rights reserved.
 //
 
+#import "ZPCore.h"
+
 #import "ZPServerResponseXMLParserKeyPermissions.h"
 
 @implementation ZPServerResponseXMLParserKeyPermissions

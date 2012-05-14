@@ -6,7 +6,8 @@
 //  Copyright (c) 2011 __MyCompanyName__. All rights reserved.
 //
 
-#import "ZPZoteroCollection.h"
+
+#import "ZPCore.h"
 #import "ZPDatabase.h"
 
 @implementation ZPZoteroCollection

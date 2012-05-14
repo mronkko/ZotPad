@@ -7,9 +7,8 @@
 //
 
 
-// TODO: Implement linked files or at least some kind of info that they are not supported
 
-#import "ZPZoteroAttachment.h"
+#import "ZPCore.h"
 #import "ZPDatabase.h"
 
 NSInteger const LINK_MODE_IMPORTED_FILE = 0;

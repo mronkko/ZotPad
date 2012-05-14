@@ -6,6 +6,8 @@
 //  Copyright (c) 2011 __MyCompanyName__. All rights reserved.
 //
 
+#import "ZPCore.h"
+
 #import "ZPItemDetailViewController.h"
 #import "ZPLibraryAndCollectionListViewController.h"
 #import "ZPItemListViewController.h"
@@ -81,8 +83,6 @@
 
 - (void)viewWillAppear:(BOOL)animated
 {
-    //We need the dimensions of the view to be set before reconfiguring.
-    [self configure];
 
     if ([[UIDevice currentDevice] userInterfaceIdiom] == UIUserInterfaceIdiomPad) {
         //Set self as a delegate for the navigation controller so that we know when the view is being dismissed by the navigation controller and know to pop the other navigation controller.

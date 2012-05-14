@@ -28,6 +28,7 @@
     DSBezelActivityView* _activityView;
     ZPItemDetailViewController* _itemDetailViewController;
     UITableView* _tableView;
+    UITableView* _ownedTableView;
     UIToolbar* _toolBar;
     NSInteger _tagForActiveSortButton;
     UIActivityIndicatorView* _activityIndicator;
@@ -40,7 +41,6 @@
 @property (nonatomic, retain) IBOutlet UISearchBar* searchBar;
 @property (nonatomic, retain) IBOutlet UIToolbar* toolBar;
 @property (nonatomic, retain) IBOutlet UITableView* tableView;
-;
 
 @property (nonatomic, retain) ZPItemDetailViewController* itemDetailViewController;
 

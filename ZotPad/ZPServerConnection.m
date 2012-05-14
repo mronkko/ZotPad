@@ -7,6 +7,7 @@
 //
 
 
+
 #include <sys/xattr.h>
 
 //Some of these are needed to determine if network connection is available.
@@ -19,6 +20,8 @@
 #import <netdb.h>
 
 #import <SystemConfiguration/SystemConfiguration.h>
+
+#import "ZPCore.h"
 
 #import "ZPAppDelegate.h"
 #import "ZPServerConnection.h"

@@ -49,6 +49,8 @@
 //
 //  (This description is not updated for the current cahce logic)
 
+#import "ZPCore.h"
+
 
 #import "ZPCacheController.h"
 #import "ZPPreferences.h"

@@ -7,14 +7,9 @@
 //  Copyright (c) 2011 __MyCompanyName__. All rights reserved.
 //
 
-#import "ZPDataLayer.h"
+#import "ZPCore.h"
 
-//Data objects
-#import "ZPZoteroLibrary.h"
-#import "ZPZoteroCollection.h"
-#import "ZPZoteroItem.h"
-#import "ZPZoteroAttachment.h"
-#import "ZPZoteroNote.h"
+#import "ZPDataLayer.h"
 
 //Cache
 #import "ZPCacheController.h"

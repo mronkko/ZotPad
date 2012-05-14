@@ -6,6 +6,8 @@
 //  Copyright (c) 2011 __MyCompanyName__. All rights reserved.
 //
 
+#import "ZPCore.h"
+
 #import "ZPItemListViewController.h"
 #import "ZPDataLayer.h"
 #import "../DSActivityView/Sources/DSActivityView.h"
@@ -147,7 +149,7 @@
 
 @property (retain) UIPopoverController* popover;
 @property (retain) UIButton* targetButton;
-@property (retain) UITableView* tableView;
+
 
 @end
 
@@ -242,7 +244,7 @@
 
 @synthesize masterPopoverController = _masterPopoverController;
 
-@synthesize tableView = _tableView;
+@synthesize tableView = _ownedTableView;
 @synthesize searchBar = _searchBar;
 @synthesize toolBar = _toolBar;
 
@@ -511,9 +513,13 @@
     //NSLog(@"Modifying the table. Inserts %i Reloads %i, Max length %@, Item key array length %i",[insertIndexPaths count],[reloadIndexPaths count],tableLength,[_itemKeysShown count]);
     //    [_tableView beginUpdates];
     //NSLog(@"Insert index paths %@",insertIndexPaths);
-    if([insertIndexPaths count]>0) [_tableView insertRowsAtIndexPaths:insertIndexPaths withRowAnimation:_animations];
+    if([insertIndexPaths count]>0){
+        [_tableView insertRowsAtIndexPaths:insertIndexPaths withRowAnimation:_animations];   
+    }
     //NSLog(@"Reload index paths %@",reloadIndexPaths);
-    if([reloadIndexPaths count]>0) [_tableView reloadRowsAtIndexPaths:reloadIndexPaths withRowAnimation:_animations];
+    if([reloadIndexPaths count]>0){
+        [_tableView reloadRowsAtIndexPaths:reloadIndexPaths withRowAnimation:_animations];   
+    }
     
     if([tableLength intValue]<[_itemKeysShown count]){
         NSMutableArray* deleteIndexPaths = [NSMutableArray array];
@@ -532,12 +538,13 @@
     
     //    [_tableView endUpdates];
 }
+/*
 -(void) _updateRowForItem:(ZPZoteroItem*)item{
     NSIndexPath* indexPath = [NSIndexPath indexPathForRow:[_itemKeysShown indexOfObject:item.key] inSection:0];
     //Do not reload cell if it is selected
     //if(! [[_tableView indexPathForSelectedRow] isEqual:indexPath]) [_tableView reloadRowsAtIndexPaths:[NSArray arrayWithObject:indexPath] withRowAnimation:_animations];
 }
-
+*/
 
 -(void) notifyItemAvailable:(ZPZoteroItem *)item{
     
@@ -576,8 +583,9 @@
             }
         }
     }    
-}- (void) _refreshCellAtIndexPaths:(NSArray*)indexPaths{
-    [self.tableView reloadRowsAtIndexPaths:indexPaths withRowAnimation:UITableViewRowAnimationFade];
+}
+- (void) _refreshCellAtIndexPaths:(NSArray*)indexPaths{
+    [_tableView reloadRowsAtIndexPaths:indexPaths withRowAnimation:UITableViewRowAnimationFade];
 
 }
 
@@ -729,20 +737,24 @@
     return cell;
 }
 
+- (void)tableView:(UITableView *)tableView didSelectRowAtIndexPath:(NSIndexPath *)indexPath{
+    if(_itemDetailViewController != NULL){
 
-- (void)prepareForSegue:(UIStoryboardSegue *)segue sender:(id)sender{
-    // Make sure your segue name in storyboard is the same as this line
-    if ([[segue identifier] isEqualToString:@"PushItemDetailView"])
-    {
-        ZPItemDetailViewController* target = (ZPItemDetailViewController*)[segue destinationViewController];
-        
         // Get the selected row from the item list
         NSIndexPath* indexPath = [_tableView indexPathForSelectedRow];
         
         // Get the key for the selected item 
         NSString* currentItemKey = [_itemKeysShown objectAtIndex: indexPath.row]; 
-        [target setSelectedItem:(ZPZoteroItem*)[ZPZoteroItem dataObjectWithKey:currentItemKey]];
-        
+        [_itemDetailViewController setSelectedItem:(ZPZoteroItem*)[ZPZoteroItem dataObjectWithKey:currentItemKey]];
+        [_itemDetailViewController configure];
+    }
+}
+
+- (void)prepareForSegue:(UIStoryboardSegue *)segue sender:(id)sender{
+    // Make sure your segue name in storyboard is the same as this line
+    if ([[segue identifier] isEqualToString:@"PushItemDetailView"])
+    {
+        _itemDetailViewController = (ZPItemDetailViewController*)[segue destinationViewController];
         
         // Set the navigation controller in iPad
         
@@ -751,12 +763,14 @@
             UITableViewController * simpleItemListViewController = [self.storyboard instantiateViewControllerWithIdentifier:@"NavigationItemListView"];
             simpleItemListViewController.navigationItem.hidesBackButton = YES;
             
+            // Get the selected row from the item list
+            NSIndexPath* indexPath = [_tableView indexPathForSelectedRow];
+            
             @synchronized(self){
                 [simpleItemListViewController.tableView setDelegate: self];
                 [simpleItemListViewController.tableView setDataSource: self];
                 _tableView = simpleItemListViewController.tableView;
             }
-            [simpleItemListViewController.tableView selectRowAtIndexPath:indexPath animated:NO scrollPosition:UITableViewScrollPositionMiddle]; 
             
             ZPAppDelegate* appDelegate = (ZPAppDelegate*)[[UIApplication sharedApplication] delegate];
             
@@ -766,6 +780,7 @@
             [simpleItemListViewController setToolbarItems:[[navigationController topViewController] toolbarItems]];
             
             [navigationController pushViewController:simpleItemListViewController animated:YES];
+            [simpleItemListViewController.tableView selectRowAtIndexPath:indexPath animated:NO scrollPosition:UITableViewScrollPositionMiddle]; 
         }
         
     }
@@ -882,6 +897,10 @@
 - (void)viewWillAppear:(BOOL)animated
 {
     [super viewWillAppear:animated];
+    
+    //If the view controller was previously targeting the item navigator, change this
+    _tableView = _ownedTableView;
+    
 }
 
 - (void)viewDidAppear:(BOOL)animated
@@ -1037,14 +1056,15 @@
 }
 
 - (void) searchBarTextDidBeginEditing:(UISearchBar *)theSearchBar {
-    
-    _overlay = [[UIView alloc] initWithFrame:self.tableView.bounds];
+
+    CGRect frame = _tableView.bounds;
+    _overlay = [[UIView alloc] initWithFrame:frame];
     _overlay.backgroundColor = [UIColor grayColor];
     _overlay.alpha = 0.5;
     _overlay.autoresizingMask = UIViewAutoresizingFlexibleWidth|UIViewAutoresizingFlexibleHeight;
-    self.tableView.scrollEnabled = NO;
+    _tableView.scrollEnabled = NO;
 
-    [self.tableView addSubview:_overlay];
+    [_tableView addSubview:_overlay];
 
     //Add the done button.
     self.navigationItem.rightBarButtonItem = [[UIBarButtonItem alloc]
@@ -1055,6 +1075,6 @@
     self.navigationItem.rightBarButtonItem = NULL;
     [self.searchBar resignFirstResponder];
     [_overlay removeFromSuperview];
-    self.tableView.scrollEnabled = TRUE;
+    _tableView.scrollEnabled = TRUE;
 }
 @end

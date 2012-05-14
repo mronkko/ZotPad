@@ -9,7 +9,6 @@
 #import <Foundation/Foundation.h>
 #import "ZPZoteroItem.h"
 
-
 extern NSInteger const LINK_MODE_IMPORTED_FILE;
 extern NSInteger const LINK_MODE_IMPORTED_URL;
 extern NSInteger const LINK_MODE_LINKED_FILE;

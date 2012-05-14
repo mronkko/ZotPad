@@ -6,10 +6,10 @@
 //  Copyright (c) 2011 __MyCompanyName__. All rights reserved.
 //
 
+#import "ZPCore.h"
 #import "ZPAppDelegate.h"
 #import "ZPCacheController.h"
 #import "ZPPreferences.h"
-#import "ZPLogger.h"
 #import "ZPLocalization.h"
 #import <DropboxSDK/DropboxSDK.h>
 #import "ZPDatabase.h"
@@ -24,6 +24,8 @@
 
 - (BOOL)application:(UIApplication *)application didFinishLaunchingWithOptions:(NSDictionary *)launchOptions
 {
+    [TestFlight setDeviceIdentifier:[[UIDevice currentDevice] uniqueIdentifier]];
+    [TestFlight takeOff:@"5e753f234f33fc2bddf4437600037fbf_NjcyMjEyMDEyLTA0LTA5IDE0OjUyOjU0LjE4MDQwMg"];
     
     //Manual override for userID and Key. Useful for running the code in debugger with other people's credentials.
     /*

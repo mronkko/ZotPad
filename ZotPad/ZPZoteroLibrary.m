@@ -6,7 +6,7 @@
 //  Copyright (c) 2011 __MyCompanyName__. All rights reserved.
 //
 
-#import "ZPZoteroLibrary.h"
+#import "ZPCore.h"
 #import "ZPDatabase.h"
 
 @implementation ZPZoteroLibrary
@@ -66,9 +66,6 @@ static NSCache* _objectCache = NULL;
     [_objectCache removeAllObjects];
 }
 
--(NSNumber*) groupID{
-    return [self libraryID];
-}
 
 
 @end

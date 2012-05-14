@@ -10,7 +10,6 @@
 #import <Foundation/Foundation.h>
 #import "ZPZoteroDataObject.h"
 
-
 @interface ZPZoteroItem : ZPZoteroDataObject{
     NSNumber* _numTags;
     NSString* _fullCitation;

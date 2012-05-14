@@ -10,6 +10,8 @@
 //
 
 #import <Foundation/Foundation.h>
+#import "ZPCore.h"
+
 #import "ZPItemListViewController.h"
 #import "ZPZoteroItem.h"
 #import "ZPZoteroAttachment.h"

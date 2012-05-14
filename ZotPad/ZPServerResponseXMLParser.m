@@ -6,6 +6,8 @@
 //  Copyright (c) 2011 __MyCompanyName__. All rights reserved.
 //
 
+#import "ZPCore.h"
+
 #import "ZPServerResponseXMLParser.h"
 #import "ZPLogger.h"
 

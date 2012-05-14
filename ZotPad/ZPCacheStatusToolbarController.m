@@ -6,6 +6,7 @@
 //  Copyright (c) 2012 __MyCompanyName__. All rights reserved.
 //
 
+#import "ZPCore.h"
 #import "ZPCacheStatusToolbarController.h"
 #import "ZPCacheController.h"
 

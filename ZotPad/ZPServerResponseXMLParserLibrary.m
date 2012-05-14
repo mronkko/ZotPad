@@ -6,6 +6,8 @@
 //  Copyright (c) 2011 __MyCompanyName__. All rights reserved.
 //
 
+#import "ZPCore.h"
+
 #import "ZPServerResponseXMLParserLibrary.h"
 #import "ZPZoteroLibrary.h"
 
@@ -30,9 +32,12 @@
     else if([field isEqualToString:@"updated"]){
         [(ZPZoteroLibrary*) _currentElement setServerTimestamp:value];
     }
+    //TODO: Libraries have items and collections as children. Make a clear separation here. 
+    /*
     else if([field isEqualToString:@"zapi:numItems"]){
         [(ZPZoteroLibrary*) _currentElement setNumChildren:[NSNumber numberWithInt:[value intValue]]];
     }
+    */
     else{
         [super _setField:field toValue:value];
     }

@@ -75,7 +75,7 @@
                                                     </accessibility>
                                                 </view>
                                                 <imageView userInteractionEnabled="NO" tag="4" contentMode="scaleToFill" id="gYA-bR-Crd">
-                                                    <rect key="frame" x="0.0" y="4" width="70" height="70"/>
+                                                    <rect key="frame" x="0.0" y="4" width="67" height="63"/>
                                                     <autoresizingMask key="autoresizingMask" flexibleMaxX="YES" flexibleMaxY="YES"/>
                                                 </imageView>
                                             </subviews>
@@ -186,7 +186,6 @@
                         <outlet property="searchBar" destination="5Lp-vc-vaz" id="j30-li-jVf"/>
                         <outlet property="tableView" destination="J8S-Ym-8C6" id="m5W-Om-e7X"/>
                         <outlet property="toolBar" destination="OEM-9Y-d5F" id="3lr-dk-DX1"/>
-                        <outlet property="view" destination="26" id="VwB-Lj-80j"/>
                     </connections>
                 </viewController>
             </objects>
@@ -517,7 +516,7 @@
                                 <rect key="frame" x="20" y="90" width="383" height="383"/>
                                 <autoresizingMask key="autoresizingMask" flexibleMaxX="YES" flexibleMaxY="YES"/>
                             </imageView>
-                            <view contentMode="scaleToFill" id="6L9-7Q-tiU">
+                            <view alpha="0.5" contentMode="scaleToFill" id="6L9-7Q-tiU">
                                 <rect key="frame" x="40" y="176" width="343" height="217"/>
                                 <autoresizingMask key="autoresizingMask" widthSizable="YES" heightSizable="YES"/>
                                 <subviews>
@@ -535,12 +534,12 @@
                                         <color key="textColor" white="1" alpha="1" colorSpace="custom" customColorSpace="calibratedWhite"/>
                                         <nil key="highlightedColor"/>
                                     </label>
-                                    <progressView opaque="NO" tag="3" contentMode="scaleToFill" progress="0.5" id="gBo-F3-4IU">
+                                    <progressView hidden="YES" opaque="NO" tag="3" contentMode="scaleToFill" progress="0.5" id="gBo-F3-4IU">
                                         <rect key="frame" x="20" y="188" width="303" height="9"/>
                                         <autoresizingMask key="autoresizingMask" flexibleMaxX="YES" flexibleMaxY="YES"/>
                                     </progressView>
                                 </subviews>
-                                <color key="backgroundColor" white="0.33333333333333331" alpha="1" colorSpace="calibratedWhite"/>
+                                <color key="backgroundColor" cocoaTouchSystemColor="darkTextColor"/>
                             </view>
                         </subviews>
                         <color key="backgroundColor" white="1" alpha="1" colorSpace="custom" customColorSpace="calibratedWhite"/>

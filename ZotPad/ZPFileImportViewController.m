@@ -6,6 +6,8 @@
 //  Copyright (c) 2012 Helsiki University of Technology. All rights reserved.
 //
 
+#import "ZPCore.h"
+
 #import "ZPFileImportViewController.h"
 #include <QuartzCore/QuartzCore.h>
 #import "Three20/Three20.h"

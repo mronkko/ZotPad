@@ -553,6 +553,12 @@
 		A72853F9147E319700D3FE97 /* ZPZoteroLibrary.m in Sources */ = {isa = PBXBuildFile; fileRef = A72853F8147E319600D3FE97 /* ZPZoteroLibrary.m */; };
 		A72853FD147E31B600D3FE97 /* ZPZoteroCollection.m in Sources */ = {isa = PBXBuildFile; fileRef = A72853FC147E31B500D3FE97 /* ZPZoteroCollection.m */; };
 		A72C3CA71487C9DA00F6744E /* MainStoryboard_iPad.storyboard in Resources */ = {isa = PBXBuildFile; fileRef = A72C3CA61487C9DA00F6744E /* MainStoryboard_iPad.storyboard */; };
+		A73D1BFD1560E234002D4A2D /* libTestFlight.a in Frameworks */ = {isa = PBXBuildFile; fileRef = A73D1BF91560E234002D4A2D /* libTestFlight.a */; };
+		A73D1BFE1560E234002D4A2D /* libTestFlight.a in Frameworks */ = {isa = PBXBuildFile; fileRef = A73D1BF91560E234002D4A2D /* libTestFlight.a */; };
+		A73D1BFF1560E234002D4A2D /* README.txt in Resources */ = {isa = PBXBuildFile; fileRef = A73D1BFA1560E234002D4A2D /* README.txt */; };
+		A73D1C001560E234002D4A2D /* README.txt in Resources */ = {isa = PBXBuildFile; fileRef = A73D1BFA1560E234002D4A2D /* README.txt */; };
+		A73D1C011560E234002D4A2D /* release_notes.txt in Resources */ = {isa = PBXBuildFile; fileRef = A73D1BFB1560E234002D4A2D /* release_notes.txt */; };
+		A73D1C021560E234002D4A2D /* release_notes.txt in Resources */ = {isa = PBXBuildFile; fileRef = A73D1BFB1560E234002D4A2D /* release_notes.txt */; };
 		A73D635114879D15007999F3 /* Settings.bundle in Resources */ = {isa = PBXBuildFile; fileRef = A73D635014879D15007999F3 /* Settings.bundle */; };
 		A74348D7147AB37A00DA6FC3 /* ZPAuthenticationDialog.m in Sources */ = {isa = PBXBuildFile; fileRef = A74348D6147AB37A00DA6FC3 /* ZPAuthenticationDialog.m */; };
 		A75E185F153405740046988C /* ioapi.c in Sources */ = {isa = PBXBuildFile; fileRef = A75E1855153405740046988C /* ioapi.c */; };
@@ -1290,6 +1296,10 @@
 		A72853FB147E31B500D3FE97 /* ZPZoteroCollection.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = ZPZoteroCollection.h; sourceTree = "<group>"; };
 		A72853FC147E31B500D3FE97 /* ZPZoteroCollection.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = ZPZoteroCollection.m; sourceTree = "<group>"; };
 		A72C3CA61487C9DA00F6744E /* MainStoryboard_iPad.storyboard */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = file.storyboard; path = MainStoryboard_iPad.storyboard; sourceTree = "<group>"; };
+		A73D1BF91560E234002D4A2D /* libTestFlight.a */ = {isa = PBXFileReference; lastKnownFileType = archive.ar; path = libTestFlight.a; sourceTree = "<group>"; };
+		A73D1BFA1560E234002D4A2D /* README.txt */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = text; path = README.txt; sourceTree = "<group>"; };
+		A73D1BFB1560E234002D4A2D /* release_notes.txt */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = text; path = release_notes.txt; sourceTree = "<group>"; };
+		A73D1BFC1560E234002D4A2D /* TestFlight.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = TestFlight.h; sourceTree = "<group>"; };
 		A73D635014879D15007999F3 /* Settings.bundle */ = {isa = PBXFileReference; explicitFileType = wrapper.application; name = Settings.bundle; path = ../Settings.bundle; sourceTree = "<group>"; };
 		A74348D5147AB37A00DA6FC3 /* ZPAuthenticationDialog.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = ZPAuthenticationDialog.h; sourceTree = "<group>"; };
 		A74348D6147AB37A00DA6FC3 /* ZPAuthenticationDialog.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = ZPAuthenticationDialog.m; sourceTree = "<group>"; };
@@ -1348,6 +1358,7 @@
 		A7A3F952147BBCCA00CA7266 /* ZPServerResponseXMLParser.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = ZPServerResponseXMLParser.m; sourceTree = "<group>"; };
 		A7A4432A155FE5ED005FF5B4 /* ZPServerResponseXMLParserKeyPermissions.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = ZPServerResponseXMLParserKeyPermissions.h; sourceTree = "<group>"; };
 		A7A4432B155FE5ED005FF5B4 /* ZPServerResponseXMLParserKeyPermissions.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = ZPServerResponseXMLParserKeyPermissions.m; sourceTree = "<group>"; };
+		A7A4432E1560D770005FF5B4 /* ZPCore.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = ZPCore.h; sourceTree = "<group>"; };
 		A7A54B0514878E4F00EBAD80 /* FMDatabase.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; name = FMDatabase.h; path = FMDB/src/FMDatabase.h; sourceTree = "<group>"; };
 		A7A54B0614878E4F00EBAD80 /* FMDatabase.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; name = FMDatabase.m; path = FMDB/src/FMDatabase.m; sourceTree = "<group>"; };
 		A7A54B0714878E4F00EBAD80 /* FMDatabaseAdditions.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; name = FMDatabaseAdditions.h; path = FMDB/src/FMDatabaseAdditions.h; sourceTree = "<group>"; };
@@ -1479,6 +1490,7 @@
 				A7200DD514718DC0004347C9 /* UIKit.framework in Frameworks */,
 				A7200DD714718DC0004347C9 /* Foundation.framework in Frameworks */,
 				A7CD078B15165269007A8E1D /* DropboxSDK.framework in Frameworks */,
+				A73D1BFD1560E234002D4A2D /* libTestFlight.a in Frameworks */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
@@ -1506,6 +1518,7 @@
 				A7CD076115161555007A8E1D /* UIKit.framework in Frameworks */,
 				A7CD076215161555007A8E1D /* Foundation.framework in Frameworks */,
 				A7CD078C15165269007A8E1D /* DropboxSDK.framework in Frameworks */,
+				A73D1BFE1560E234002D4A2D /* libTestFlight.a in Frameworks */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
@@ -1917,6 +1930,7 @@
 		A7200DD314718DC0004347C9 /* Frameworks */ = {
 			isa = PBXGroup;
 			children = (
+				A73D1BF81560E234002D4A2D /* TestFlightSDK1 */,
 				A7936ED6153B4AEA0063D77B /* KeychainItemWrapper */,
 				A7D761E81534165D00E76EA1 /* QSUtilities */,
 				A75E1852153405740046988C /* ZipArchive */,
@@ -1953,6 +1967,7 @@
 		A7200DDA14718DC0004347C9 /* ZotPad */ = {
 			isa = PBXGroup;
 			children = (
+				A7A4432E1560D770005FF5B4 /* ZPCore.h */,
 				A7285400147E346800D3FE97 /* Data objects */,
 				A72853FE147E33F400D3FE97 /* UI and delegate files */,
 				A72853FF147E343A00D3FE97 /* Data layer */,
@@ -2049,6 +2064,17 @@
 				A76D3C6614A9F3F3000C3ED9 /* ZPZoteroNote.m */,
 			);
 			name = "Data objects";
+			sourceTree = "<group>";
+		};
+		A73D1BF81560E234002D4A2D /* TestFlightSDK1 */ = {
+			isa = PBXGroup;
+			children = (
+				A73D1BF91560E234002D4A2D /* libTestFlight.a */,
+				A73D1BFA1560E234002D4A2D /* README.txt */,
+				A73D1BFB1560E234002D4A2D /* release_notes.txt */,
+				A73D1BFC1560E234002D4A2D /* TestFlight.h */,
+			);
+			path = TestFlightSDK1;
 			sourceTree = "<group>";
 		};
 		A75E1852153405740046988C /* ZipArchive */ = {
@@ -2769,6 +2795,8 @@
 				A708F137153F0FAC0083A506 /* x-office-contact.svgz in Resources */,
 				A708F139153F0FAC0083A506 /* x-office-document.svgz in Resources */,
 				A708F13B153F0FAC0083A506 /* x-office-spreadsheet.svgz in Resources */,
+				A73D1BFF1560E234002D4A2D /* README.txt in Resources */,
+				A73D1C011560E234002D4A2D /* release_notes.txt in Resources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
@@ -3054,6 +3082,8 @@
 				A708F138153F0FAC0083A506 /* x-office-contact.svgz in Resources */,
 				A708F13A153F0FAC0083A506 /* x-office-document.svgz in Resources */,
 				A708F13C153F0FAC0083A506 /* x-office-spreadsheet.svgz in Resources */,
+				A73D1C001560E234002D4A2D /* README.txt in Resources */,
+				A73D1C021560E234002D4A2D /* release_notes.txt in Resources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
@@ -3415,6 +3445,7 @@
 				LIBRARY_SEARCH_PATHS = (
 					"$(inherited)",
 					"\"$(SRCROOT)\"",
+					"\"$(SRCROOT)/TestFlightSDK1\"",
 				);
 				PRODUCT_NAME = "$(TARGET_NAME)";
 				PROVISIONING_PROFILE = "";
@@ -3441,6 +3472,7 @@
 				LIBRARY_SEARCH_PATHS = (
 					"$(inherited)",
 					"\"$(SRCROOT)\"",
+					"\"$(SRCROOT)/TestFlightSDK1\"",
 				);
 				PRODUCT_NAME = "$(TARGET_NAME)";
 				PROVISIONING_PROFILE = "";
@@ -3475,6 +3507,7 @@
 				LIBRARY_SEARCH_PATHS = (
 					"$(inherited)",
 					"\"$(SRCROOT)\"",
+					"\"$(SRCROOT)/TestFlightSDK1\"",
 				);
 				PRODUCT_NAME = "ZotPad beta";
 				PROVISIONING_PROFILE = "";
@@ -3491,6 +3524,7 @@
 			buildSettings = {
 				ALTERNATE_GROUP = 70000;
 				CODE_SIGN_IDENTITY = "iPhone Developer";
+				COPY_PHASE_STRIP = NO;
 				FRAMEWORK_SEARCH_PATHS = (
 					"$(inherited)",
 					"\"$(DEVELOPER_FRAMEWORKS_DIR)\"",
@@ -3511,6 +3545,7 @@
 				LIBRARY_SEARCH_PATHS = (
 					"$(inherited)",
 					"\"$(SRCROOT)\"",
+					"\"$(SRCROOT)/TestFlightSDK1\"",
 				);
 				PRODUCT_NAME = "ZotPad beta";
 				PROVISIONING_PROFILE = "";

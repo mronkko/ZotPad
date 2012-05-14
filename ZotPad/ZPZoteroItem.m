@@ -6,11 +6,8 @@
 //  Copyright (c) 2011 __MyCompanyName__. All rights reserved.
 //
 
-#import "ZPZoteroItem.h"
-#import "ZPZoteroAttachment.h"
-#import "ZPZoteroNote.h"
+#import "ZPCore.h"
 #import "ZPDatabase.h"
-#import "ZPLogger.h"
 
 @implementation ZPZoteroItem
 
