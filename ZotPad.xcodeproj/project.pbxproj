@@ -8,7 +8,6 @@
 
 /* Begin PBXBuildFile section */
 		320AF8492C47A4D819F7C451 /* QuartzCore.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 320AF8492C47A4D819F7C450 /* QuartzCore.framework */; };
-		320B6C86F11D9990244A9731 /* Three20.bundle in Resources */ = {isa = PBXBuildFile; fileRef = 320B6C86F11D9990244A9730 /* Three20.bundle */; };
 		A7025019149B0BB1004F2AAB /* ZPDatabase.m in Sources */ = {isa = PBXBuildFile; fileRef = A7025018149B0BB1004F2AAB /* ZPDatabase.m */; };
 		A702501D149B33E1004F2AAB /* ZPCacheController.m in Sources */ = {isa = PBXBuildFile; fileRef = A702501C149B33E1004F2AAB /* ZPCacheController.m */; };
 		A7025020149C6C3E004F2AAB /* ZPPreferences.m in Sources */ = {isa = PBXBuildFile; fileRef = A702501F149C6C3D004F2AAB /* ZPPreferences.m */; };
@@ -670,23 +669,6 @@
 		A7BD5F5E156122F6003252EA /* NSString+Paragraphs.m in Sources */ = {isa = PBXBuildFile; fileRef = A7BD5F18156122F6003252EA /* NSString+Paragraphs.m */; };
 		A7BD5F5F156122F6003252EA /* NSString+UTF8Cleaner.m in Sources */ = {isa = PBXBuildFile; fileRef = A7BD5F1A156122F6003252EA /* NSString+UTF8Cleaner.m */; };
 		A7BD5F60156122F6003252EA /* UIDevice+DTVersion.m in Sources */ = {isa = PBXBuildFile; fileRef = A7BD5F1C156122F6003252EA /* UIDevice+DTVersion.m */; };
-		A7BD5F61156122F6003252EA /* MacUnitTest-Info.plist in Resources */ = {isa = PBXBuildFile; fileRef = A7BD5F1E156122F6003252EA /* MacUnitTest-Info.plist */; };
-		A7BD5F62156122F6003252EA /* CustomFont.plist in Resources */ = {isa = PBXBuildFile; fileRef = A7BD5F21156122F6003252EA /* CustomFont.plist */; };
-		A7BD5F63156122F6003252EA /* Emoji.html in Resources */ = {isa = PBXBuildFile; fileRef = A7BD5F22156122F6003252EA /* Emoji.html */; };
-		A7BD5F64156122F6003252EA /* Empty_and_Unclosed_Paragraphs.html in Resources */ = {isa = PBXBuildFile; fileRef = A7BD5F23156122F6003252EA /* Empty_and_Unclosed_Paragraphs.html */; };
-		A7BD5F65156122F6003252EA /* ListTest.plist in Resources */ = {isa = PBXBuildFile; fileRef = A7BD5F24156122F6003252EA /* ListTest.plist */; };
-		A7BD5F66156122F6003252EA /* MalformedURL.html in Resources */ = {isa = PBXBuildFile; fileRef = A7BD5F25156122F6003252EA /* MalformedURL.html */; };
-		A7BD5F67156122F6003252EA /* NavTag.html in Resources */ = {isa = PBXBuildFile; fileRef = A7BD5F26156122F6003252EA /* NavTag.html */; };
-		A7BD5F68156122F6003252EA /* PreWhitespace.html in Resources */ = {isa = PBXBuildFile; fileRef = A7BD5F27156122F6003252EA /* PreWhitespace.html */; };
-		A7BD5F69156122F6003252EA /* PreWhitespace.plist in Resources */ = {isa = PBXBuildFile; fileRef = A7BD5F28156122F6003252EA /* PreWhitespace.plist */; };
-		A7BD5F6A156122F6003252EA /* Video.plist in Resources */ = {isa = PBXBuildFile; fileRef = A7BD5F29156122F6003252EA /* Video.plist */; };
-		A7BD5F6B156122F6003252EA /* WarAndPeace.plist in Resources */ = {isa = PBXBuildFile; fileRef = A7BD5F2A156122F6003252EA /* WarAndPeace.plist */; };
-		A7BD5F6C156122F6003252EA /* MacUnitTest.m in Sources */ = {isa = PBXBuildFile; fileRef = A7BD5F2D156122F6003252EA /* MacUnitTest.m */; };
-		A7BD5F6D156122F6003252EA /* NSAttributedStringHTMLTest.m in Sources */ = {isa = PBXBuildFile; fileRef = A7BD5F2F156122F6003252EA /* NSAttributedStringHTMLTest.m */; };
-		A7BD5F6E156122F6003252EA /* NSString+SlashEscaping.m in Sources */ = {isa = PBXBuildFile; fileRef = A7BD5F31156122F6003252EA /* NSString+SlashEscaping.m */; };
-		A7BD5F6F156122F6003252EA /* NSStringHTMLTest.m in Sources */ = {isa = PBXBuildFile; fileRef = A7BD5F33156122F6003252EA /* NSStringHTMLTest.m */; };
-		A7BD5F70156122F6003252EA /* UIColorHTMLTest.m in Sources */ = {isa = PBXBuildFile; fileRef = A7BD5F35156122F6003252EA /* UIColorHTMLTest.m */; };
-		A7BD5F71156122F6003252EA /* UnitTest-Info.plist in Resources */ = {isa = PBXBuildFile; fileRef = A7BD5F36156122F6003252EA /* UnitTest-Info.plist */; };
 		A7CC252F1493E14E00FDEAF4 /* iCarousel.m in Sources */ = {isa = PBXBuildFile; fileRef = A7CC252C1493E14D00FDEAF4 /* iCarousel.m */; settings = {COMPILER_FLAGS = " -fno-objc-arc"; }; };
 		A7CD070B15161555007A8E1D /* main.m in Sources */ = {isa = PBXBuildFile; fileRef = A7200DE014718DC0004347C9 /* main.m */; };
 		A7CD070C15161555007A8E1D /* ZPAppDelegate.m in Sources */ = {isa = PBXBuildFile; fileRef = A7200DE414718DC0004347C9 /* ZPAppDelegate.m */; };
@@ -766,7 +748,6 @@
 		A7CD076015161555007A8E1D /* libsqlite3.dylib in Frameworks */ = {isa = PBXBuildFile; fileRef = A7200DF7147193C0004347C9 /* libsqlite3.dylib */; };
 		A7CD076115161555007A8E1D /* UIKit.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = A7200DD414718DC0004347C9 /* UIKit.framework */; };
 		A7CD076215161555007A8E1D /* Foundation.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = A7200DD614718DC0004347C9 /* Foundation.framework */; };
-		A7CD076415161555007A8E1D /* Three20.bundle in Resources */ = {isa = PBXBuildFile; fileRef = 320B6C86F11D9990244A9730 /* Three20.bundle */; };
 		A7CD076515161555007A8E1D /* InfoPlist.strings in Resources */ = {isa = PBXBuildFile; fileRef = A7200DDD14718DC0004347C9 /* InfoPlist.strings */; };
 		A7CD076615161555007A8E1D /* MainStoryboard_iPhone.storyboard in Resources */ = {isa = PBXBuildFile; fileRef = A786F7771476A56200B35B92 /* MainStoryboard_iPhone.storyboard */; };
 		A7CD076715161555007A8E1D /* database.sql in Resources */ = {isa = PBXBuildFile; fileRef = A7A3F94F147BAB6C00CA7266 /* database.sql */; };
@@ -864,7 +845,6 @@
 
 /* Begin PBXFileReference section */
 		320AF8492C47A4D819F7C450 /* QuartzCore.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.frameworks; name = QuartzCore.framework; path = System/Library/Frameworks/QuartzCore.framework; sourceTree = SDKROOT; };
-		320B6C86F11D9990244A9730 /* Three20.bundle */ = {isa = PBXFileReference; lastKnownFileType = "wrapper.plug-in"; name = Three20.bundle; path = Three20/src/Three20.bundle; sourceTree = SOURCE_ROOT; };
 		A7025017149B0BB1004F2AAB /* ZPDatabase.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = ZPDatabase.h; sourceTree = "<group>"; };
 		A7025018149B0BB1004F2AAB /* ZPDatabase.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = ZPDatabase.m; sourceTree = "<group>"; };
 		A702501A149B2D6D004F2AAB /* ZPLibraryObserver.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = ZPLibraryObserver.h; sourceTree = "<group>"; };
@@ -1384,30 +1364,6 @@
 		A7BD5F1A156122F6003252EA /* NSString+UTF8Cleaner.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = "NSString+UTF8Cleaner.m"; sourceTree = "<group>"; };
 		A7BD5F1B156122F6003252EA /* UIDevice+DTVersion.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = "UIDevice+DTVersion.h"; sourceTree = "<group>"; };
 		A7BD5F1C156122F6003252EA /* UIDevice+DTVersion.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = "UIDevice+DTVersion.m"; sourceTree = "<group>"; };
-		A7BD5F1E156122F6003252EA /* MacUnitTest-Info.plist */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = text.plist.xml; path = "MacUnitTest-Info.plist"; sourceTree = "<group>"; };
-		A7BD5F1F156122F6003252EA /* MacUnitTest-Prefix.pch */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = "MacUnitTest-Prefix.pch"; sourceTree = "<group>"; };
-		A7BD5F21156122F6003252EA /* CustomFont.plist */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = text.plist.xml; path = CustomFont.plist; sourceTree = "<group>"; };
-		A7BD5F22156122F6003252EA /* Emoji.html */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = text.html; path = Emoji.html; sourceTree = "<group>"; };
-		A7BD5F23156122F6003252EA /* Empty_and_Unclosed_Paragraphs.html */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = text.html; path = Empty_and_Unclosed_Paragraphs.html; sourceTree = "<group>"; };
-		A7BD5F24156122F6003252EA /* ListTest.plist */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = text.plist.xml; path = ListTest.plist; sourceTree = "<group>"; };
-		A7BD5F25156122F6003252EA /* MalformedURL.html */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = text.html; path = MalformedURL.html; sourceTree = "<group>"; };
-		A7BD5F26156122F6003252EA /* NavTag.html */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = text.html; path = NavTag.html; sourceTree = "<group>"; };
-		A7BD5F27156122F6003252EA /* PreWhitespace.html */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = text.html; path = PreWhitespace.html; sourceTree = "<group>"; };
-		A7BD5F28156122F6003252EA /* PreWhitespace.plist */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = text.plist.xml; path = PreWhitespace.plist; sourceTree = "<group>"; };
-		A7BD5F29156122F6003252EA /* Video.plist */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = text.plist.xml; path = Video.plist; sourceTree = "<group>"; };
-		A7BD5F2A156122F6003252EA /* WarAndPeace.plist */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = text.plist.xml; path = WarAndPeace.plist; sourceTree = "<group>"; };
-		A7BD5F2C156122F6003252EA /* MacUnitTest.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = MacUnitTest.h; sourceTree = "<group>"; };
-		A7BD5F2D156122F6003252EA /* MacUnitTest.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = MacUnitTest.m; sourceTree = "<group>"; };
-		A7BD5F2E156122F6003252EA /* NSAttributedStringHTMLTest.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = NSAttributedStringHTMLTest.h; sourceTree = "<group>"; };
-		A7BD5F2F156122F6003252EA /* NSAttributedStringHTMLTest.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = NSAttributedStringHTMLTest.m; sourceTree = "<group>"; };
-		A7BD5F30156122F6003252EA /* NSString+SlashEscaping.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = "NSString+SlashEscaping.h"; sourceTree = "<group>"; };
-		A7BD5F31156122F6003252EA /* NSString+SlashEscaping.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = "NSString+SlashEscaping.m"; sourceTree = "<group>"; };
-		A7BD5F32156122F6003252EA /* NSStringHTMLTest.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = NSStringHTMLTest.h; sourceTree = "<group>"; };
-		A7BD5F33156122F6003252EA /* NSStringHTMLTest.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = NSStringHTMLTest.m; sourceTree = "<group>"; };
-		A7BD5F34156122F6003252EA /* UIColorHTMLTest.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = UIColorHTMLTest.h; sourceTree = "<group>"; };
-		A7BD5F35156122F6003252EA /* UIColorHTMLTest.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = UIColorHTMLTest.m; sourceTree = "<group>"; };
-		A7BD5F36156122F6003252EA /* UnitTest-Info.plist */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = text.plist.xml; path = "UnitTest-Info.plist"; sourceTree = "<group>"; };
-		A7BD5F37156122F6003252EA /* UnitTest-Prefix.pch */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = "UnitTest-Prefix.pch"; sourceTree = "<group>"; };
 		A7CC252B1493E14D00FDEAF4 /* iCarousel.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = iCarousel.h; sourceTree = "<group>"; };
 		A7CC252C1493E14D00FDEAF4 /* iCarousel.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = iCarousel.m; sourceTree = "<group>"; };
 		A7CD067A151612DE007A8E1D /* AppIcon72x72-beta.png */ = {isa = PBXFileReference; lastKnownFileType = image.png; name = "AppIcon72x72-beta.png"; path = "../Icons/AppIcon72x72-beta.png"; sourceTree = "<group>"; };
@@ -1909,7 +1865,6 @@
 				A78B7F0F149090D2008303BA /* Launch images */,
 				A78B7F0A14908DFF008303BA /* AppIcons */,
 				A73D635014879D15007999F3 /* Settings.bundle */,
-				320B6C86F11D9990244A9730 /* Three20.bundle */,
 				A7200DDC14718DC0004347C9 /* ZotPad-Info.plist */,
 				A7CD077715161556007A8E1D /* ZotPad beta-Info.plist */,
 				A7200DDD14718DC0004347C9 /* InfoPlist.strings */,
@@ -2195,7 +2150,6 @@
 				A7BD5ECA156122F6003252EA /* DTCoreText-Info.plist */,
 				A7BD5ECB156122F6003252EA /* DTCoreText-Prefix.pch */,
 				A7BD5ECC156122F6003252EA /* Source */,
-				A7BD5F1D156122F6003252EA /* Test */,
 			);
 			name = Core;
 			path = DTCoreText/Core;
@@ -2284,53 +2238,6 @@
 				A7BD5F1A156122F6003252EA /* NSString+UTF8Cleaner.m */,
 				A7BD5F1B156122F6003252EA /* UIDevice+DTVersion.h */,
 				A7BD5F1C156122F6003252EA /* UIDevice+DTVersion.m */,
-			);
-			path = Source;
-			sourceTree = "<group>";
-		};
-		A7BD5F1D156122F6003252EA /* Test */ = {
-			isa = PBXGroup;
-			children = (
-				A7BD5F1E156122F6003252EA /* MacUnitTest-Info.plist */,
-				A7BD5F1F156122F6003252EA /* MacUnitTest-Prefix.pch */,
-				A7BD5F20156122F6003252EA /* Resources */,
-				A7BD5F2B156122F6003252EA /* Source */,
-				A7BD5F36156122F6003252EA /* UnitTest-Info.plist */,
-				A7BD5F37156122F6003252EA /* UnitTest-Prefix.pch */,
-			);
-			path = Test;
-			sourceTree = "<group>";
-		};
-		A7BD5F20156122F6003252EA /* Resources */ = {
-			isa = PBXGroup;
-			children = (
-				A7BD5F21156122F6003252EA /* CustomFont.plist */,
-				A7BD5F22156122F6003252EA /* Emoji.html */,
-				A7BD5F23156122F6003252EA /* Empty_and_Unclosed_Paragraphs.html */,
-				A7BD5F24156122F6003252EA /* ListTest.plist */,
-				A7BD5F25156122F6003252EA /* MalformedURL.html */,
-				A7BD5F26156122F6003252EA /* NavTag.html */,
-				A7BD5F27156122F6003252EA /* PreWhitespace.html */,
-				A7BD5F28156122F6003252EA /* PreWhitespace.plist */,
-				A7BD5F29156122F6003252EA /* Video.plist */,
-				A7BD5F2A156122F6003252EA /* WarAndPeace.plist */,
-			);
-			path = Resources;
-			sourceTree = "<group>";
-		};
-		A7BD5F2B156122F6003252EA /* Source */ = {
-			isa = PBXGroup;
-			children = (
-				A7BD5F2C156122F6003252EA /* MacUnitTest.h */,
-				A7BD5F2D156122F6003252EA /* MacUnitTest.m */,
-				A7BD5F2E156122F6003252EA /* NSAttributedStringHTMLTest.h */,
-				A7BD5F2F156122F6003252EA /* NSAttributedStringHTMLTest.m */,
-				A7BD5F30156122F6003252EA /* NSString+SlashEscaping.h */,
-				A7BD5F31156122F6003252EA /* NSString+SlashEscaping.m */,
-				A7BD5F32156122F6003252EA /* NSStringHTMLTest.h */,
-				A7BD5F33156122F6003252EA /* NSStringHTMLTest.m */,
-				A7BD5F34156122F6003252EA /* UIColorHTMLTest.h */,
-				A7BD5F35156122F6003252EA /* UIColorHTMLTest.m */,
 			);
 			path = Source;
 			sourceTree = "<group>";
@@ -2515,7 +2422,6 @@
 			isa = PBXResourcesBuildPhase;
 			buildActionMask = 2147483647;
 			files = (
-				320B6C86F11D9990244A9731 /* Three20.bundle in Resources */,
 				A7200DDF14718DC0004347C9 /* InfoPlist.strings in Resources */,
 				A786F7781476A56200B35B92 /* MainStoryboard_iPhone.storyboard in Resources */,
 				A7A3F950147BAB6C00CA7266 /* database.sql in Resources */,
@@ -2789,18 +2695,6 @@
 				A73D1C011560E234002D4A2D /* release_notes.txt in Resources */,
 				A7BD5F38156122F6003252EA /* DTCoreText-Info.plist in Resources */,
 				A7BD5F3A156122F6003252EA /* default.css in Resources */,
-				A7BD5F61156122F6003252EA /* MacUnitTest-Info.plist in Resources */,
-				A7BD5F62156122F6003252EA /* CustomFont.plist in Resources */,
-				A7BD5F63156122F6003252EA /* Emoji.html in Resources */,
-				A7BD5F64156122F6003252EA /* Empty_and_Unclosed_Paragraphs.html in Resources */,
-				A7BD5F65156122F6003252EA /* ListTest.plist in Resources */,
-				A7BD5F66156122F6003252EA /* MalformedURL.html in Resources */,
-				A7BD5F67156122F6003252EA /* NavTag.html in Resources */,
-				A7BD5F68156122F6003252EA /* PreWhitespace.html in Resources */,
-				A7BD5F69156122F6003252EA /* PreWhitespace.plist in Resources */,
-				A7BD5F6A156122F6003252EA /* Video.plist in Resources */,
-				A7BD5F6B156122F6003252EA /* WarAndPeace.plist in Resources */,
-				A7BD5F71156122F6003252EA /* UnitTest-Info.plist in Resources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
@@ -2808,7 +2702,6 @@
 			isa = PBXResourcesBuildPhase;
 			buildActionMask = 2147483647;
 			files = (
-				A7CD076415161555007A8E1D /* Three20.bundle in Resources */,
 				A7CD076515161555007A8E1D /* InfoPlist.strings in Resources */,
 				A7CD076615161555007A8E1D /* MainStoryboard_iPhone.storyboard in Resources */,
 				A7CD076715161555007A8E1D /* database.sql in Resources */,
@@ -3223,11 +3116,6 @@
 				A7BD5F5E156122F6003252EA /* NSString+Paragraphs.m in Sources */,
 				A7BD5F5F156122F6003252EA /* NSString+UTF8Cleaner.m in Sources */,
 				A7BD5F60156122F6003252EA /* UIDevice+DTVersion.m in Sources */,
-				A7BD5F6C156122F6003252EA /* MacUnitTest.m in Sources */,
-				A7BD5F6D156122F6003252EA /* NSAttributedStringHTMLTest.m in Sources */,
-				A7BD5F6E156122F6003252EA /* NSString+SlashEscaping.m in Sources */,
-				A7BD5F6F156122F6003252EA /* NSStringHTMLTest.m in Sources */,
-				A7BD5F70156122F6003252EA /* UIColorHTMLTest.m in Sources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
@@ -3483,7 +3371,8 @@
 			isa = XCBuildConfiguration;
 			buildSettings = {
 				ALTERNATE_GROUP = 70000;
-				CODE_SIGN_IDENTITY = "iPhone Developer";
+				CODE_SIGN_IDENTITY = "iPhone Distribution: Mikko Ronkko";
+				"CODE_SIGN_IDENTITY[sdk=iphoneos*]" = "iPhone Distribution: Mikko Ronkko";
 				FRAMEWORK_SEARCH_PATHS = (
 					"$(inherited)",
 					"\"$(DEVELOPER_FRAMEWORKS_DIR)\"",
@@ -3504,7 +3393,8 @@
 					"\"$(SRCROOT)/TestFlightSDK1\"",
 				);
 				PRODUCT_NAME = "ZotPad beta";
-				PROVISIONING_PROFILE = "";
+				PROVISIONING_PROFILE = "B51B8E32-44BC-46E0-BF9C-72FA45F96E31";
+				"PROVISIONING_PROFILE[sdk=iphoneos*]" = "B51B8E32-44BC-46E0-BF9C-72FA45F96E31";
 				PUBLIC_HEADERS_FOLDER_PATH = "$(CONTENTS_FOLDER_PATH)/PrivateHeaders";
 				REZ_SEARCH_PATHS = (
 					"$(BUILT_PRODUCTS_DIR)/../../three20/**",
@@ -3522,7 +3412,8 @@
 			isa = XCBuildConfiguration;
 			buildSettings = {
 				ALTERNATE_GROUP = 70000;
-				CODE_SIGN_IDENTITY = "iPhone Developer";
+				CODE_SIGN_IDENTITY = "iPhone Distribution: Mikko Ronkko";
+				"CODE_SIGN_IDENTITY[sdk=iphoneos*]" = "iPhone Distribution: Mikko Ronkko";
 				COPY_PHASE_STRIP = NO;
 				FRAMEWORK_SEARCH_PATHS = (
 					"$(inherited)",
@@ -3548,7 +3439,8 @@
 					"\"$(SRCROOT)/TestFlightSDK1\"",
 				);
 				PRODUCT_NAME = "ZotPad beta";
-				PROVISIONING_PROFILE = "";
+				PROVISIONING_PROFILE = "B51B8E32-44BC-46E0-BF9C-72FA45F96E31";
+				"PROVISIONING_PROFILE[sdk=iphoneos*]" = "B51B8E32-44BC-46E0-BF9C-72FA45F96E31";
 				PUBLIC_HEADERS_FOLDER_PATH = "$(CONTENTS_FOLDER_PATH)/PrivateHeaders";
 				REZ_SEARCH_PATHS = (
 					"$(BUILT_PRODUCTS_DIR)/../three20",

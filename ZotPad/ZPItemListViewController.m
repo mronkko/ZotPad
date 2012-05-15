@@ -539,13 +539,13 @@
     
     //    [_tableView endUpdates];
 }
-/*
+
 -(void) _updateRowForItem:(ZPZoteroItem*)item{
     NSIndexPath* indexPath = [NSIndexPath indexPathForRow:[_itemKeysShown indexOfObject:item.key] inSection:0];
     //Do not reload cell if it is selected
-    //if(! [[_tableView indexPathForSelectedRow] isEqual:indexPath]) [_tableView reloadRowsAtIndexPaths:[NSArray arrayWithObject:indexPath] withRowAnimation:_animations];
+    if(! [[_tableView indexPathForSelectedRow] isEqual:indexPath]) [_tableView reloadRowsAtIndexPaths:[NSArray arrayWithObject:indexPath] withRowAnimation:_animations];
 }
-*/
+
 
 -(void) notifyItemAvailable:(ZPZoteroItem *)item{
     
@@ -585,11 +585,12 @@
         }
     }    
 }
+/*
 - (void) _refreshCellAtIndexPaths:(NSArray*)indexPaths{
     [_tableView reloadRowsAtIndexPaths:indexPaths withRowAnimation:UITableViewRowAnimationFade];
 
 }
-
+*/
 #pragma mark - Table view data source and delegate methods
 
 
