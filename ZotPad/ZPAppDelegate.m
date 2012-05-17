@@ -14,7 +14,7 @@
 #import <DropboxSDK/DropboxSDK.h>
 #import "ZPDatabase.h"
 #import "ZPFileImportViewController.h"
-
+#import "ZPFileChannel_Dropbox.h"
 
 @implementation ZPAppDelegate
 
@@ -32,19 +32,25 @@
     NSUserDefaults* defaults = [NSUserDefaults standardUserDefaults];
     [defaults setObject:@"" forKey:@"userID"];
     [defaults setObject:@"" forKey:@"OAuthKey"];
-    
+
     //Uncomment these to always reset the app after launch
     [[ZPDatabase instance] resetDatabase];
     [[ZPCacheController instance] performSelectorInBackground:@selector(purgeAllAttachmentFilesFromCache) withObject:NULL];
-     */
+    */
 
     [[ZPPreferences instance] checkAndProcessApplicationResetPreferences];
     [[ZPPreferences instance] reload];
-    
+    [ZPFileChannel_Dropbox linkDroboxIfNeeded];
+
     
     // Override point for customization after application launch.
     if ([[UIDevice currentDevice] userInterfaceIdiom] == UIUserInterfaceIdiomPad) {
         UISplitViewController *splitViewController = (UISplitViewController *)self.window.rootViewController;
+
+        if ([splitViewController respondsToSelector:@selector(setPresentsWithGesture:)]) {
+            [splitViewController setPresentsWithGesture:NO];
+        }
+
         UINavigationController *navigationController = [splitViewController.viewControllers lastObject];
         splitViewController.delegate = (id)navigationController.topViewController;
     }
@@ -87,6 +93,8 @@
      */
     
     [[ZPPreferences instance] reload];
+    [ZPFileChannel_Dropbox linkDroboxIfNeeded];
+
 
 }
 
@@ -122,8 +130,8 @@
     else{
               
         NSLog(@"Received file %@",url);
-        
-        [self.window.rootViewController performSegueWithIdentifier:@"ReceivedFile" sender:url];
+        [[[UIAlertView alloc] initWithTitle:@"Not implemented" message:@"This feature has not been fully implemented and is currently disabled. The file is ignored by ZotPad" delegate:NULL cancelButtonTitle:@"Cancel" otherButtonTitles: nil] show];
+        //[self.window.rootViewController performSegueWithIdentifier:@"ReceivedFile" sender:url];
         return YES;
     }
     // Add whatever other url handling code your app requires here

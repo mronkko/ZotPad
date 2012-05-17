@@ -297,7 +297,9 @@ static ZPAttachmentPreviewViewController* _webViewDelegate;
         }
         //Else start rendering
         else{
-
+            if(![NSThread isMainThread]){
+                [NSException raise:@"Rendering must be done in the main thread" format:@""];
+            }
             UIWebView* webview = [[UIWebView alloc] initWithFrame:frame];
             
             NSLog(@"Start rendering cached image %@ with view %i",cacheKey,webview);

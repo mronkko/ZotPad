@@ -92,7 +92,7 @@
 -(void) _checkIfAttachmentExistsAndQueueForDownload:(ZPZoteroAttachment*)attachment;
 
 //TODO: refactor this method
--(void) _checkIfAttachmenstExistAndQueueForDownload:(NSArray*)parentKeys;
+-(void) _checkIfAttachmentsExistWithParentKeysAndQueueForDownload:(NSArray*)parentKeys;
 
 - (unsigned long long int) _documentsFolderSize;
 - (void) _scanAndSetSizeOfDocumentsFolder;
@@ -116,9 +116,6 @@ static ZPCacheController* _instance = nil;
     //Initialize OperationQueues for retrieving data from server and writing it to cache
     _serverRequestQueue = [[NSOperationQueue alloc] init];
     [_serverRequestQueue setMaxConcurrentOperationCount:4];
-
-    _fileDownloadQueue  = [[NSOperationQueue alloc] init];
-    [_fileDownloadQueue  setMaxConcurrentOperationCount:2];
     
     //These collections contain things that we need to cache. These have been checked so that we know that they are either missing or outdated
     
@@ -182,18 +179,17 @@ static ZPCacheController* _instance = nil;
 
         [_statusView setFileDownloads:[_filesToDownload count]];
 
-        //Only cache up to 95% full
-        while([_fileDownloadQueue operationCount] < [_fileDownloadQueue maxConcurrentOperationCount] && [_filesToDownload count] >0 && _sizeOfDocumentsFolder < 0.95*[[ZPPreferences instance] maxCacheSize]){
-            ZPZoteroAttachment* attachment = [_filesToDownload objectAtIndex:0];
-            
-            [_filesToDownload removeObjectAtIndex:0];
-//            NSLog(@"Queueing download %@ Files in queue %i", attachment.attachmentTitle ,[_filesToDownload count]);
-            NSOperation* downloadOperation = [[NSInvocationOperation alloc] initWithTarget:[ZPServerConnection instance] selector:@selector(downloadAttachment:) object:attachment];
-            
-            [_fileDownloadQueue addOperation:downloadOperation];
-        }        
-    }
-    
+        if([_filesToDownload count]>0){
+            //Only cache up to 95% full
+            if(_sizeOfDocumentsFolder < 0.95*[[ZPPreferences instance] maxCacheSize]){
+                if([ZPServerConnection instance] && [[ZPServerConnection instance] numberOfFilesDownloading] <1){
+                    ZPZoteroAttachment* attachment = [_filesToDownload objectAtIndex:0];
+                    [_filesToDownload removeObjectAtIndex:0];
+                    [[ZPServerConnection instance] startDownloadingAttachment:attachment];
+                }
+            }        
+        }
+    }    
 }
 
 -(void) _checkMetadataQueue{
@@ -550,7 +546,7 @@ static ZPCacheController* _instance = nil;
     
     //Add attachments to queue
     NSArray* itemKeysToCheck = [[ZPDatabase instance] getItemKeysForLibrary:libraryID collectionKey:collectionKey searchString:NULL orderField:NULL sortDescending:FALSE];
-    [self performSelectorInBackground:@selector(_checkIfAttachmenstExistAndQueueForDownload:) withObject:itemKeysToCheck];
+    [self performSelectorInBackground:@selector(_checkIfAttachmentsExistWithParentKeysAndQueueForDownload:) withObject:itemKeysToCheck];
     
     //Check if the container needs a refresh
     if(collectionKey == NULL){
@@ -562,10 +558,24 @@ static ZPCacheController* _instance = nil;
     
 }
 
--(void) _checkIfAttachmenstExistAndQueueForDownload:(NSArray*)parentKeys{
+-(void) _checkIfAttachmentsExistWithParentKeysAndQueueForDownload:(NSArray*)parentKeys{
 
     for(NSString* key in parentKeys){
         ZPZoteroItem* item = (ZPZoteroItem*) [ZPZoteroItem dataObjectWithKey:key];
+
+/*        TFLog([NSString stringWithFormat:@"Checking if attachment exists for item with key %@",key]);
+        if(item == NULL){
+            TFLog(@"Item is NULL");
+        }
+        if(! [item isKindOfClass:[ZPZoteroItem class]]){
+            TFLog(@"Item is not Zotero item");
+        }
+        NSNumber* libraryID=item.libraryID;
+        NSInteger libraryInt=[libraryID intValue];
+        TFLog([NSString stringWithFormat:@"In library %i",libraryInt]);
+        TFLog(item.fullCitation);
+        TFLog([NSString stringWithFormat:@"Number of attachments %u",[item.attachments count]]);
+  */      
         for(ZPZoteroAttachment* attachment in item.attachments){
             [self _checkIfAttachmentExistsAndQueueForDownload:attachment];
         }    

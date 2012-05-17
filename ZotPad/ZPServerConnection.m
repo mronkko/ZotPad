@@ -569,6 +569,10 @@ const NSInteger ZPServerConnectionRequestPermissions = 10;
 
 #pragma mark - Asynchronous file downloads
 
+-(NSInteger) numberOfFilesDownloading{
+    return [_activeDownloads count];
+}
+
 -(void) startDownloadingAttachment:(ZPZoteroAttachment*)attachment{
     
     @synchronized(_activeDownloads){

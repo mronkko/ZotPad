@@ -3371,8 +3371,8 @@
 			isa = XCBuildConfiguration;
 			buildSettings = {
 				ALTERNATE_GROUP = 70000;
-				CODE_SIGN_IDENTITY = "iPhone Distribution: Mikko Ronkko";
-				"CODE_SIGN_IDENTITY[sdk=iphoneos*]" = "iPhone Distribution: Mikko Ronkko";
+				CODE_SIGN_IDENTITY = "iPhone Developer";
+				"CODE_SIGN_IDENTITY[sdk=iphoneos*]" = "iPhone Developer";
 				FRAMEWORK_SEARCH_PATHS = (
 					"$(inherited)",
 					"\"$(DEVELOPER_FRAMEWORKS_DIR)\"",
@@ -3393,8 +3393,8 @@
 					"\"$(SRCROOT)/TestFlightSDK1\"",
 				);
 				PRODUCT_NAME = "ZotPad beta";
-				PROVISIONING_PROFILE = "B51B8E32-44BC-46E0-BF9C-72FA45F96E31";
-				"PROVISIONING_PROFILE[sdk=iphoneos*]" = "B51B8E32-44BC-46E0-BF9C-72FA45F96E31";
+				PROVISIONING_PROFILE = "";
+				"PROVISIONING_PROFILE[sdk=iphoneos*]" = "";
 				PUBLIC_HEADERS_FOLDER_PATH = "$(CONTENTS_FOLDER_PATH)/PrivateHeaders";
 				REZ_SEARCH_PATHS = (
 					"$(BUILT_PRODUCTS_DIR)/../../three20/**",
@@ -3412,8 +3412,8 @@
 			isa = XCBuildConfiguration;
 			buildSettings = {
 				ALTERNATE_GROUP = 70000;
-				CODE_SIGN_IDENTITY = "iPhone Distribution: Mikko Ronkko";
-				"CODE_SIGN_IDENTITY[sdk=iphoneos*]" = "iPhone Distribution: Mikko Ronkko";
+				CODE_SIGN_IDENTITY = "iPhone Developer";
+				"CODE_SIGN_IDENTITY[sdk=iphoneos*]" = "iPhone Developer";
 				COPY_PHASE_STRIP = NO;
 				FRAMEWORK_SEARCH_PATHS = (
 					"$(inherited)",
@@ -3439,8 +3439,8 @@
 					"\"$(SRCROOT)/TestFlightSDK1\"",
 				);
 				PRODUCT_NAME = "ZotPad beta";
-				PROVISIONING_PROFILE = "B51B8E32-44BC-46E0-BF9C-72FA45F96E31";
-				"PROVISIONING_PROFILE[sdk=iphoneos*]" = "B51B8E32-44BC-46E0-BF9C-72FA45F96E31";
+				PROVISIONING_PROFILE = "";
+				"PROVISIONING_PROFILE[sdk=iphoneos*]" = "";
 				PUBLIC_HEADERS_FOLDER_PATH = "$(CONTENTS_FOLDER_PATH)/PrivateHeaders";
 				REZ_SEARCH_PATHS = (
 					"$(BUILT_PRODUCTS_DIR)/../three20",

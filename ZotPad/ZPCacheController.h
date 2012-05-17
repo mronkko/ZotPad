@@ -25,7 +25,6 @@
     
     // An operation que to fetch items in the background
     NSOperationQueue* _serverRequestQueue;
-    NSOperationQueue* _fileDownloadQueue;
 
     
     unsigned long long int _sizeOfDocumentsFolder;

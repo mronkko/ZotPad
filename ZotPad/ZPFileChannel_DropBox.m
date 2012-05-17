@@ -21,31 +21,43 @@
 
 @implementation ZPFileChannel_Dropbox
 
--(id) init{
++(void)linkDroboxIfNeeded{
+    if([[ZPPreferences instance] useDropbox]){
+        if([DBSession sharedSession]==NULL){
+            TFLog(@"Starting Dropbox");
+            DBSession* dbSession =
+            [[DBSession alloc]
+             initWithAppKey:@"or7xa2bxhzit1ws"
+             appSecret:@"6azju842azhs5oz"
+             root:kDBRootAppFolder];
+            [DBSession setSharedSession:dbSession];
+            
+            //Link with dropBox account if not already linked
+            if (![[DBSession sharedSession] isLinked]) {
+                TFLog(@"Linking Dropbox");
+                [[DBSession sharedSession] link];
+            }
+        }
+    }
+}
+-(id) init{ 
     
+    [ZPFileChannel_Dropbox linkDroboxIfNeeded];
+
     self = [super init]; 
-    DBSession* dbSession =
-    [[DBSession alloc]
-     initWithAppKey:@"or7xa2bxhzit1ws"
-     appSecret:@"6azju842azhs5oz"
-     root:kDBRootAppFolder];
-    [DBSession setSharedSession:dbSession];
     
     progressViewsByRequest = [[NSMutableDictionary alloc] init];
     downloadCountsByRequest = [[NSMutableDictionary alloc] init];
-
+    
     return self;
 }
 
 -(void) startDownloadingAttachment:(ZPZoteroAttachment*)attachment{
     
     if([[ZPPreferences instance] useDropbox]){
-        
         //Link with dropBox account if not already linked
         
-        if (![[DBSession sharedSession] isLinked]) {
-            [[DBSession sharedSession] link];
-        }
+        [ZPFileChannel_Dropbox linkDroboxIfNeeded];
 
         //TODO: consider pooling these
         DBRestClient* restClient = [[DBRestClient alloc] initWithSession:[DBSession sharedSession]];

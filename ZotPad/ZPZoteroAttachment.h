@@ -16,6 +16,8 @@ extern NSInteger const LINK_MODE_LINKED_URL;
 
 @interface ZPZoteroAttachment : ZPZoteroItem{
     NSString* _parentItemKey;
+    NSString* _contentType;
+    NSNumber* _linkMode;
 }
 
 @property (retain) NSString* parentItemKey;

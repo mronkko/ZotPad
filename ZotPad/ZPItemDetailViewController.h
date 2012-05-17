@@ -14,10 +14,9 @@
 #import "ZPQuicklookController.h"
 #import "ZPItemObserver.h"
 
-@interface ZPItemDetailViewController : UIViewController <UITableViewDataSource, UITableViewDelegate, iCarouselDataSource,
+@interface ZPItemDetailViewController : UITableViewController <iCarouselDataSource,
     iCarouselDelegate, ZPItemObserver, ZPAttachmentObserver, UINavigationControllerDelegate >{
     ZPZoteroItem* _currentItem;
-    UITableView* _detailTableView;
     iCarousel* _carousel;
     UIActivityIndicatorView* _activityIndicator;
     NSInteger _detailTitleWidth;
@@ -27,10 +26,6 @@
 
 - (void) configure;
 
-@property (nonatomic, retain) IBOutlet iCarousel* carousel;
 @property (nonatomic, retain) ZPZoteroItem* selectedItem;
-
-//This contains sections about the item details
-@property (retain) IBOutlet UITableView* detailTableView;
 
 @end

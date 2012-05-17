@@ -49,6 +49,7 @@
 -(ZPZoteroItem*) retrieveSingleItemDetailsFromServer:(ZPZoteroItem*)item;
 
 // Asynchronous downloading of files
+-(NSInteger) numberOfFilesDownloading;
 -(void) startDownloadingAttachment:(ZPZoteroAttachment*)attachment;
 -(void) finishedDownloadingAttachment:(ZPZoteroAttachment*)attachment toFileAtPath:(NSString*) tempFile usingFileChannel:(ZPFileChannel*)fileChannel;
 -(void) cancelDownloadingAttachment:(ZPZoteroAttachment*)attachment;

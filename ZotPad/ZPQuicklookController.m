@@ -29,6 +29,7 @@
 
 @interface ZPQuicklookController(){
     ZPZoteroAttachment* _activeAttachment;
+    QLPreviewController* _quicklook;
 }
 - (void) _displayQuicklook;
 - (void) _addAttachmentToQuicklook:(ZPZoteroAttachment *)attachment;
@@ -51,11 +52,15 @@ static ZPQuicklookController* _instance;
 
 -(id) init{
     self = [super init];
+    _quicklook = [[QLPreviewController alloc] init];
+    [_quicklook setDataSource:self];
+    [_quicklook setDelegate:self];
+    
     _fileURLs = [[NSMutableArray alloc] init];
     return self;
 }
 
--(void) openItemInQuickLook:(ZPZoteroAttachment*)attachment sourceView:(UIViewController*)view{
+-(void) openItemInQuickLook:(ZPZoteroAttachment*)attachment sourceView:(UIView*)view{
     
     _source = view;
     // Mark this file as recently viewed. This will be done also in the case
@@ -132,15 +137,15 @@ static ZPQuicklookController* _instance;
 
 
 - (void) _displayQuicklook{
-    QLPreviewController *quicklook = [[QLPreviewController alloc] init];
-    [quicklook setDataSource:self];
-    [quicklook setCurrentPreviewItemIndex:[_fileURLs count]-1];
-    [_source presentModalViewController:quicklook animated:YES];
+    [_quicklook reloadData];
+    [_quicklook setCurrentPreviewItemIndex:[_fileURLs count]-1];
+    UIViewController* root = [UIApplication sharedApplication].delegate.window.rootViewController;        
+    [root presentModalViewController:_quicklook animated:YES];
     
 }
 
 
-#pragma mark QuickLook delegate methods
+#pragma mark - Quick Look data source methods
 
 - (NSInteger) numberOfPreviewItemsInPreviewController: (QLPreviewController *) controller 
 {
@@ -152,6 +157,28 @@ static ZPQuicklookController* _instance;
     return [_fileURLs objectAtIndex:index];
 }
 
+#pragma mark - Quick Look delegate methods
 
+//Needed to provide zoom effect
+
+- (CGRect)previewController:(QLPreviewController *)controller frameForPreviewItem:(id <QLPreviewItem>)item inSourceView:(UIView **)view{
+    *view = _source;
+    CGRect frame = _source.frame;
+    return frame; 
+} 
+
+
+- (UIImage *)previewController:(QLPreviewController *)controller transitionImageForPreviewItem:(id <QLPreviewItem>)item contentRect:(CGRect *)contentRect{
+    if([_source isKindOfClass:[UIImageView class]]) return [(UIImageView*) _source image];
+    else{
+        UIImageView* imageView = (UIImageView*) [_source viewWithTag:1];
+        return imageView.image;
+    }
+}
+
+// Should URL be opened
+- (BOOL)previewController:(QLPreviewController *)controller shouldOpenURL:(NSURL *)url forPreviewItem:(id <QLPreviewItem>)item{
+    return YES;
+}
 
 @end

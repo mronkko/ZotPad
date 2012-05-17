@@ -48,8 +48,6 @@
 
 
 @synthesize selectedItem = _currentItem;
-@synthesize detailTableView = _detailTableView;
-@synthesize carousel = _carousel;
 
 #pragma mark - View lifecycle
 
@@ -61,16 +59,15 @@
     
     [[ZPDataLayer instance] registerItemObserver:self];
 
-    _detailTableView.scrollEnabled = FALSE;
-    
     //configure carousel
+    _carousel = [[iCarousel alloc] initWithFrame:CGRectMake(0,0, 
+                                                            self.view.frame.size.width,
+                                                            ATTACHMENT_VIEW_HEIGHT)];
     _carousel.type = iCarouselTypeCoverFlow2;    
-
-    //Configure attachment section.     
-    UIView* attachmentView = [self.view viewWithTag:2];
-    [attachmentView setFrame:CGRectMake(0,0, 
-                                        self.view.frame.size.width,
-                                        ATTACHMENT_VIEW_HEIGHT)];
+    [_carousel setDataSource:self];
+    [_carousel setDelegate:self];
+    
+    self.tableView.tableHeaderView = _carousel;
 
     //Configure activity indicator.
     _activityIndicator = [[UIActivityIndicatorView alloc] initWithFrame:CGRectMake(0,0,20, 20)];
@@ -96,17 +93,6 @@
 - (void)viewDidAppear:(BOOL)animated
 {
     [super viewDidAppear:animated];
-    
-}
-
--(void) didRotateFromInterfaceOrientation:(UIInterfaceOrientation)fromInterfaceOrientation{
-
-    //Start with the frame for the carousel
-    CGRect contentRect = _carousel.frame;
-    
-    contentRect.size.height = contentRect.size.height + [_detailTableView contentSize].height;;
-    
-    [(UIScrollView*)self.view setContentSize: contentRect.size];
 }
 
 - (BOOL)shouldAutorotateToInterfaceOrientation:(UIInterfaceOrientation)interfaceOrientation
@@ -160,10 +146,13 @@
 
 }
 - (void) _reconfigureCarousel{
-    if([_currentItem.attachments count]==0) [_carousel setHidden:TRUE];
+    if([_currentItem.attachments count]==0){
+        [_carousel setHidden:TRUE];
+    }
     else{
         [_carousel setHidden:FALSE];
         [_carousel setScrollEnabled:[_currentItem.attachments count]>1];
+        [_carousel performSelectorOnMainThread:@selector(reloadData) withObject:NULL waitUntilDone:NO];
     }
 }
 
@@ -172,45 +161,8 @@
     
     //Configure the size of the detail view table.
     
-    
-    [_detailTableView reloadData];
-
-    UILabel* label= [self tableView:_detailTableView cellForRowAtIndexPath:[NSIndexPath indexPathForRow:0 inSection:0]].textLabel;
-
-    _detailTitleWidth = 0;
-
-    for(NSString* key in _currentItem.fields){
-        NSInteger fittedWidth = [key sizeWithFont:label.font].width;
-        if(fittedWidth > _detailTitleWidth){
-            _detailTitleWidth = fittedWidth;
-        }
-    }
-
-    [_detailTableView layoutIfNeeded];
-    
-    CGFloat contentHeight = _detailTableView.contentSize.height;
-    
-    if(animated){
-        [UIView animateWithDuration:0.5 animations:^{
-            [_detailTableView setFrame:CGRectMake(0, 
-                                                  ([_currentItem.attachments count]>0)*ATTACHMENT_VIEW_HEIGHT, 
-                                                  self.view.frame.size.width, 
-                                                  [_detailTableView contentSize].height)];
-            
-            
-            [(UIScrollView*) self.view setContentSize:CGSizeMake(self.view.frame.size.width, ([_currentItem.attachments count]>0)*ATTACHMENT_VIEW_HEIGHT + contentHeight)];
-        }];
-    }
-    else{
-        [_detailTableView setFrame:CGRectMake(0, 
-                                              ([_currentItem.attachments count]>0)*ATTACHMENT_VIEW_HEIGHT, 
-                                              self.view.frame.size.width, 
-                                              [_detailTableView contentSize].height)];
-        
-        
-        [(UIScrollView*) self.view setContentSize:CGSizeMake(self.view.frame.size.width, ([_currentItem.attachments count]>0)*ATTACHMENT_VIEW_HEIGHT + contentHeight)];
-        [_detailTableView setNeedsDisplay];
-    }
+    [self.tableView reloadData];
+    [self.tableView layoutIfNeeded];
     
 }
 
@@ -281,21 +233,21 @@
 {
 
     //Abstract is treated a bit differently
-    if(tableView==_detailTableView && [self _useAbstractCell:indexPath]){
+    if(tableView==self.tableView && [self _useAbstractCell:indexPath]){
         
         NSString *text = [self _textAtIndexPath:indexPath isTitle:false];
 
-        //The view has small margins
         NSInteger textWidth;
-        NSInteger margins;
+ 
+        //Margins includes margins and title.
+
+        NSInteger margins=110;
         
         if ([[UIDevice currentDevice] userInterfaceIdiom] == UIUserInterfaceIdiomPad) {
-            margins=10;
-            if (UIDeviceOrientationIsLandscape([UIDevice currentDevice].orientation)) textWidth=500;
-            else textWidth = 500;
+            if (UIDeviceOrientationIsLandscape([UIDevice currentDevice].orientation)) textWidth=663;
+            else textWidth = 678;
         }
         else{
-            margins=100;
             if (UIDeviceOrientationIsLandscape([UIDevice currentDevice].orientation)){
                 textWidth = 460;
             }
@@ -402,12 +354,10 @@
         {
             cell = [[UITableViewCell alloc] initWithStyle:UITableViewCellStyleDefault reuseIdentifier:CellIdentifier];
         }
-        
+
         // Configure the cell
-        UITextView* textView = (UITextView*) [cell viewWithTag:2];
+        UILabel* textView = (UILabel*) [cell viewWithTag:2];
         textView.text = [self _textAtIndexPath:indexPath isTitle:FALSE];
-        //textView.frame= CGRectMake(textView.frame.origin.x, textView.frame.origin.y, textView.frame.size.width, [self tableView:tableView heightForRowAtIndexPath:indexPath]-50);
-        
     }
     else {
         NSString* CellIdentifier = @"ItemDetailCell";        
@@ -423,7 +373,7 @@
         cell.textLabel.text = [self _textAtIndexPath:indexPath isTitle:TRUE];
         cell.detailTextLabel.text = [self _textAtIndexPath:indexPath isTitle:FALSE];
     }
-	return ( cell );
+	return  cell;
 }
 
 
@@ -431,7 +381,7 @@
     
     // Item details
     
-    if(aTableView == _detailTableView){
+    if(aTableView == self.tableView){
         
     }
     
@@ -484,13 +434,11 @@
         @synchronized(_cachedViewControllers){
             [_cachedViewControllers setObject:attachmentViewController forKey:[NSNumber numberWithInt:view]];
         }
-        NSLog(@"Instantiated attahcment view controller %x",attachmentViewController);
     }
     else{
         @synchronized(_cachedViewControllers){
             attachmentViewController = [_cachedViewControllers objectForKey:[NSNumber numberWithInt:view]];
         }
-        NSLog(@"Instantiated attahcment view controller %x",attachmentViewController);
     }
 
     attachmentViewController.attachment= [_currentItem.attachments objectAtIndex:index];
@@ -511,9 +459,13 @@
         ZPZoteroAttachment* attachment = [_currentItem.attachments objectAtIndex:index]; 
         
         if([attachment fileExists] ||
-           ([attachment.linkMode intValue] == LINK_MODE_LINKED_URL && [ZPServerConnection instance]))
-            [[ZPQuicklookController instance] openItemInQuickLook:attachment sourceView:self];
-
+           ([attachment.linkMode intValue] == LINK_MODE_LINKED_URL && [ZPServerConnection instance])){
+            UIView* sourceView;
+            for(sourceView in _carousel.visibleItemViews){
+                if([carousel indexOfItemView:sourceView] == index) break;
+            }
+            [[ZPQuicklookController instance] openItemInQuickLook:attachment sourceView:sourceView];
+        }
         else if([attachment.linkMode intValue] == LINK_MODE_IMPORTED_FILE || 
                 [attachment.linkMode intValue] == LINK_MODE_IMPORTED_URL){
             
@@ -542,8 +494,10 @@
         _currentItem = item;
         [_activityIndicator startAnimating];
         if([_carousel numberOfItems]!= item.attachments.count){
-            [self _reconfigureCarousel];
-            [_carousel performSelectorOnMainThread:@selector(reloadData) withObject:NULL waitUntilDone:NO];
+// This used to be animated, but it is now simply always displayed
+            //            [UIView animateWithDuration:0.5 animations:^{
+                [self _reconfigureCarousel];
+//          }];
         }
         [self performSelectorOnMainThread:@selector(_reconfigureDetailTableView:) withObject:[NSNumber numberWithBool:TRUE] waitUntilDone:NO];
         

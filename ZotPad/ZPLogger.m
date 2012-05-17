@@ -28,12 +28,12 @@ void ZPLog(NSObject* source,int line,NSString* format, ...){
         //        [debugClasses addObject:@"ZPAppDelegate"];
         //[debugClasses addObject:@"ZPAttachmentPreviewViewController"];
         //        [debugClasses addObject:@"ZPAuthenticationDialog"];
-        //        [debugClasses addObject:@"ZPCacheController"];
+                [debugClasses addObject:@"ZPCacheController"];
         //        [debugClasses addObject:@"ZPDatabase"];
         //        [debugClasses addObject:@"ZPDataLayer"];
-        //[debugClasses addObject:@"ZPFileChannel_Dropbox"];
-        //[debugClasses addObject:@"ZPFileChannel_WebDAV"];
-        //[debugClasses addObject:@"ZPFileChannel_ZoteroStorage"];
+        [debugClasses addObject:@"ZPFileChannel_Dropbox"];
+        [debugClasses addObject:@"ZPFileChannel_WebDAV"];
+        [debugClasses addObject:@"ZPFileChannel_ZoteroStorage"];
         //[debugClasses addObject:@"ZPItemDetailViewController"];
         //        [debugClasses addObject:@"ZPItemListViewController"];
         //[debugClasses addObject:@"ZPLibraryAndCollectionListViewController"];

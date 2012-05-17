@@ -271,7 +271,17 @@
         
         if([NSThread isMainThread]){
             
+            //Set the navigation item
             
+            if(_collectionKey != NULL){
+                ZPZoteroCollection* currentCollection = [ZPZoteroCollection dataObjectWithKey:_collectionKey];
+                self.navigationItem.title = currentCollection.title;
+            }
+            else {
+                ZPZoteroLibrary* currentLibrary = [ZPZoteroLibrary dataObjectWithKey:_libraryID];
+                self.navigationItem.title = currentLibrary.title;
+            }
+
             if (self.masterPopoverController != nil) {
                 [self.masterPopoverController dismissPopoverAnimated:YES];
             }
@@ -676,7 +686,7 @@
         //Publication as a formatted label
         
         OHAttributedLabel* publishedInLabel = (OHAttributedLabel*)[cell viewWithTag:3];
-
+      
         
         
         if(publishedInLabel != NULL){
@@ -764,6 +774,7 @@
             
             UITableViewController * simpleItemListViewController = [self.storyboard instantiateViewControllerWithIdentifier:@"NavigationItemListView"];
             simpleItemListViewController.navigationItem.hidesBackButton = YES;
+            simpleItemListViewController.clearsSelectionOnViewWillAppear = NO;
             
             // Get the selected row from the item list
             NSIndexPath* indexPath = [_tableView indexPathForSelectedRow];
@@ -1037,7 +1048,7 @@
     
     ZPZoteroItem* item = (ZPZoteroItem*) [ZPZoteroItem dataObjectWithKey:[_itemKeysShown objectAtIndex:row]];
     
-    [[ZPQuicklookController instance] openItemInQuickLook:[item.attachments objectAtIndex:0] sourceView:self];
+    [[ZPQuicklookController instance] openItemInQuickLook:[item.attachments objectAtIndex:0] sourceView:imageView];
 
 }
 

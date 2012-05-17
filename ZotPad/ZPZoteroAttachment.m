@@ -18,10 +18,7 @@ NSInteger const LINK_MODE_LINKED_URL = 3;
 
 @implementation ZPZoteroAttachment
 
-
-@synthesize contentType;
 @synthesize lastViewed;
-@synthesize linkMode;
 @synthesize attachmentSize;
 @synthesize existsOnZoteroServer;
 @synthesize filename;
@@ -94,6 +91,25 @@ NSInteger const LINK_MODE_LINKED_URL = 3;
     }
     return  [[NSSearchPathForDirectoriesInDomains(NSDocumentDirectory, NSUserDomainMask, YES) objectAtIndex:0] stringByAppendingPathComponent:path];
 
+}
+
+-(void) setContentType:(NSString *)contentType{
+    if(contentType != [NSNull null]){
+        _contentType = contentType;
+    }
+}
+-(NSString*) contentType{
+    return  _contentType;
+}
+-(void) setLinkMode:(NSNumber *)linkMode{
+    _linkMode = linkMode;
+    //set text/HTML as the default type for links
+    if([_linkMode intValue]==LINK_MODE_LINKED_URL && _contentType == NULL){
+        _contentType = @"text/html";
+    }
+}
+-(NSNumber*)linkMode{
+    return _linkMode;
 }
 
 - (NSArray*) creators{

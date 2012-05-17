@@ -15,4 +15,6 @@
 
 }
 
++(void)linkDroboxIfNeeded;
+
 @end

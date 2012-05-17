@@ -61,6 +61,7 @@
     NSArray* toolBarItems = [NSArray arrayWithObjects: [[UIBarButtonItem alloc] initWithCustomView:statusController.view], nil];
     [self setToolbarItems:toolBarItems];
 
+    self.clearsSelectionOnViewWillAppear = NO;
     
 	// Do any additional setup after loading the view, typically from a nib.
     
