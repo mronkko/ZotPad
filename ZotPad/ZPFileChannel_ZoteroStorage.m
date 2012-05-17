@@ -52,6 +52,8 @@
         
         [request setDelegate:self];
         [request startAsynchronous];
+        NSLog(@"Downloading %@ from Zotero started",attachment.filename);
+
     }
     //If the file does not exist on Zotero server, tell that we are finished
     else{
@@ -79,6 +81,8 @@
 
 - (void)requestFinished:(ASIHTTPRequest *)request{
     ZPZoteroAttachment* attachment = [self attachmentWithRequest:request];
+    NSLog(@"Downloading %@ from Zotero succesfully finished",attachment.filename);
+
     [[ZPServerConnection instance] finishedDownloadingAttachment:attachment toFileAtPath:[request downloadDestinationPath] usingFileChannel:self];
 
     [self cleanupAfterFinishingAttachment:attachment];
@@ -86,8 +90,8 @@
 
 - (void)requestFailed:(ASIHTTPRequest *)request{
     NSError *error = [request error];
-    NSLog(@"File download from Zotero server failed: %@",[error description]);
     ZPZoteroAttachment* attachment = [self attachmentWithRequest:request];
+    NSLog(@"Downloading %@ from Zotero server failed: %@",attachment.filename, [error description]);
     [[ZPServerConnection instance] finishedDownloadingAttachment:attachment toFileAtPath:NULL usingFileChannel:self];
     
     [self cleanupAfterFinishingAttachment:attachment];

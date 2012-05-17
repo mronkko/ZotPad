@@ -79,7 +79,7 @@ static ZPPreferences* _instance = nil;
     _attachmentsCacheLevel = [defaults integerForKey:@"preemptivecacheattachmentfiles"];
     _mode = [defaults integerForKey:@"mode"];
     float rawmax = [defaults floatForKey:@"cachesizemax"];
-    _maxCacheSize = rawmax*1048576;
+    _maxCacheSize = rawmax*1024*1024;
     
     NSLog(@"NSUserDefaults dump: %@",[defaults dictionaryRepresentation]);
     
@@ -127,7 +127,7 @@ static ZPPreferences* _instance = nil;
     }
     
 }
-
+// Max cache size in kilo bytes
 -(NSInteger) maxCacheSize{
     return _maxCacheSize;
 }

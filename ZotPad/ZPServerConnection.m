@@ -573,11 +573,12 @@ const NSInteger ZPServerConnectionRequestPermissions = 10;
     return [_activeDownloads count];
 }
 
--(void) startDownloadingAttachment:(ZPZoteroAttachment*)attachment{
+-(BOOL) checkIfCanBeDownloadedAndStartDownloadingAttachment:(ZPZoteroAttachment*)attachment{
     
     @synchronized(_activeDownloads){
         //Do not download item if it is already being downloaded
         if([_activeDownloads containsObject:attachment]) return;
+        NSLog(@"Added %@ to active downloads. Number of files downloading is %i",attachment.filename,[_activeDownloads count]);
         [_activeDownloads addObject:attachment];
     }
 
@@ -596,6 +597,14 @@ const NSInteger ZPServerConnectionRequestPermissions = 10;
         [[_fileChannels objectAtIndex:0] startDownloadingAttachment:attachment];
         
         [[ZPDataLayer instance] notifyAttachmentDownloadStarted:attachment];
+        return TRUE;
+    }
+    else{
+        @synchronized(_activeDownloads){
+            [_activeDownloads removeObject:attachment];
+            NSLog(@"Did not start downloading %@. Number of files downloading is %i",attachment.filename,[_activeDownloads count]);
+        }
+return FALSE;
     }
 }
 
@@ -604,12 +613,6 @@ const NSInteger ZPServerConnectionRequestPermissions = 10;
  */
 -(void) finishedDownloadingAttachment:(ZPZoteroAttachment*)attachment toFileAtPath:(NSString*) tempFile usingFileChannel:(ZPFileChannel*)fileChannel{
 
-    @synchronized(_activeDownloads){
-        [_activeDownloads removeObject:attachment];
-    }
-
-    _activeRequestCount--;
-    
     if(tempFile == NULL){
         //No file file received, try the next channel 
         NSInteger index = [_fileChannels indexOfObject:fileChannel]+1;
@@ -620,6 +623,13 @@ const NSInteger ZPServerConnectionRequestPermissions = 10;
         //In case of no more options to retry downloading, notify that downloading of this attachment has been finished.
         //It is up to the observers to determine if downloading was succesful
         else {
+            @synchronized(_activeDownloads){
+                [_activeDownloads removeObject:attachment];
+                NSLog(@"Finished downloading %@. Number of files downloading is %i",attachment.filename,[_activeDownloads count]);
+            }
+            
+            _activeRequestCount--;
+
             [[ZPDataLayer instance] notifyAttachmentDownloadCompleted:attachment];
         }
     }
@@ -640,11 +650,17 @@ const NSInteger ZPServerConnectionRequestPermissions = 10;
             u_int8_t attrValue = 1;
             setxattr(filePath, attrName, &attrValue, sizeof(attrValue), 0, 0);
             
-            //We need to do this in a different thread so that the current thread does not count towards the operations count
-            [[ZPDataLayer instance] performSelectorInBackground:@selector(notifyAttachmentDownloadCompleted:) withObject:attachment];
 
         }
-        [[ZPDataLayer instance] notifyAttachmentDownloadCompleted:attachment];
+        @synchronized(_activeDownloads){
+            [_activeDownloads removeObject:attachment];
+            NSLog(@"Finished downloading %@. Number of files downloading is %i",attachment.filename,[_activeDownloads count]);
+        }
+        
+        _activeRequestCount--;
+
+        //We need to do this in a different thread so that the current thread does not count towards the operations count
+        [[ZPDataLayer instance] performSelectorInBackground:@selector(notifyAttachmentDownloadCompleted:) withObject:attachment];
 
     }
     

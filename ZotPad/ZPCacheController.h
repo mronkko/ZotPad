@@ -26,7 +26,7 @@
     // An operation que to fetch items in the background
     NSOperationQueue* _serverRequestQueue;
 
-    
+    // Size of the folder in kilo bytes    
     unsigned long long int _sizeOfDocumentsFolder;
     
     ZPCacheStatusToolbarController* _statusView;

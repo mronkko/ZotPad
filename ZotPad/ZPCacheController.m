@@ -129,7 +129,7 @@ static ZPCacheController* _instance = nil;
     //Register as observer so that we can follow the size of the cache
     [[ZPDataLayer instance] registerAttachmentObserver:self];
     
-    //Observe new libraries so that we know
+    //Observe new libraries so that we know to cache them
     [[ZPDataLayer instance] registerLibraryObserver:self];
 
     _sizeOfDocumentsFolder = 0;    [self performSelectorInBackground:@selector(_scanAndSetSizeOfDocumentsFolder) withObject:NULL];
@@ -137,7 +137,25 @@ static ZPCacheController* _instance = nil;
     _isRefresingLibraries =FALSE;
     _librariesWhoseCollectionsAreBeingRefreshed = [[NSMutableSet alloc] init];
 
-    
+    /*
+    Start building cache immediately if the user has chosen to cache all libraries
+     */
+     
+    if([[ZPPreferences instance] cacheAttachmentsAllLibraries] || [[ZPPreferences instance] cacheMetadataAllLibraries]){
+        NSArray* libraries = [[ZPDatabase instance] libraries];
+        
+        ZPZoteroLibrary* library;
+        for(library in libraries){
+            if([[ZPPreferences instance] cacheAttachmentsAllLibraries]){
+                NSArray* itemKeysToCheck = [[ZPDatabase instance] getItemKeysForLibrary:library.libraryID collectionKey:NULL searchString:NULL orderField:NULL sortDescending:FALSE];
+                [self performSelectorInBackground:@selector(_checkIfAttachmentsExistWithParentKeysAndQueueForDownload:) withObject:itemKeysToCheck];
+            }
+            if([[ZPPreferences instance] cacheMetadataAllLibraries]){
+                [self performSelectorInBackground:@selector(_checkIfLibraryNeedsCacheRefreshAndQueue:) withObject:library.libraryID];   
+            }
+        }
+    }
+     
     return self;
 }
 
@@ -179,13 +197,19 @@ static ZPCacheController* _instance = nil;
 
         [_statusView setFileDownloads:[_filesToDownload count]];
 
+//        NSLog(@"There are %i files in cache download queue",[_filesToDownload count]);
+
         if([_filesToDownload count]>0){
             //Only cache up to 95% full
             if(_sizeOfDocumentsFolder < 0.95*[[ZPPreferences instance] maxCacheSize]){
+//                NSLog(@"There is space on device");
                 if([ZPServerConnection instance] && [[ZPServerConnection instance] numberOfFilesDownloading] <1){
                     ZPZoteroAttachment* attachment = [_filesToDownload objectAtIndex:0];
                     [_filesToDownload removeObjectAtIndex:0];
-                    [[ZPServerConnection instance] startDownloadingAttachment:attachment];
+                    while ( ![[ZPServerConnection instance] checkIfCanBeDownloadedAndStartDownloadingAttachment:attachment] && [_filesToDownload count] >0){
+                        attachment = [_filesToDownload objectAtIndex:0];
+                        [_filesToDownload removeObjectAtIndex:0];
+                    }
                 }
             }        
         }
@@ -223,9 +247,19 @@ static ZPCacheController* _instance = nil;
                 //Choose a library to retrieve
                 NSMutableArray* keyArray = [_itemKeysToRetrieve objectForKey:_activelibraryID];
                 NSEnumerator* e = [_itemKeysToRetrieve keyEnumerator];
-                NSNumber* libraryID = _activelibraryID;
+                NSNumber* libraryID = NULL;
             
-                while((keyArray == NULL || [keyArray count]==0) && (libraryID = [e nextObject])) keyArray = [_itemKeysToRetrieve objectForKey:keyArray];
+                //If the active library does not have anything to retrieve, loop over all libraries to see if there is something to retrieve
+                
+                while(keyArray == NULL || [keyArray count]==0){
+                    if( !( libraryID = [e nextObject])){
+                        break;
+                        
+                    }
+                    keyArray = [_itemKeysToRetrieve objectForKey:libraryID];
+                    
+
+                }
                 
                 //If we found a non-empty que, queue item retrival
                 if(keyArray != NULL && [keyArray count]>0){
@@ -872,7 +906,9 @@ static ZPCacheController* _instance = nil;
     
     for (NSString* _documentFilePath in directoryContent) {
         NSDictionary *_documentFileAttributes = [[NSFileManager defaultManager] fileAttributesAtPath:[_documentsDirectory stringByAppendingPathComponent:_documentFilePath] traverseLink:YES];
-        _documentsFolderSize += [_documentFileAttributes fileSize]/1024;
+        NSInteger thisSize = [_documentFileAttributes fileSize]/1024;
+        _documentsFolderSize += thisSize;
+        NSLog(@"Cache size is %i after including %@ (%i)",(NSInteger) _documentsFolderSize,_documentFilePath,thisSize);
     }
     
     return _documentsFolderSize;
@@ -883,6 +919,7 @@ static ZPCacheController* _instance = nil;
         
         NSDictionary *_documentFileAttributes = [[NSFileManager defaultManager] fileAttributesAtPath:attachment.fileSystemPath traverseLink:YES];
         _sizeOfDocumentsFolder += [_documentFileAttributes fileSize]/1024;
+        NSLog(@"Cache size is %i after adding %@ (%i)",(NSInteger)_sizeOfDocumentsFolder,attachment.fileSystemPath,[_documentFileAttributes fileSize]/1024);
 
 
 //        NSLog(@"Cache size after adding %@ to cache is %i",attachment.fileSystemPath,_sizeOfDocumentsFolder);
@@ -905,11 +942,26 @@ static ZPCacheController* _instance = nil;
     for (NSString* _documentFilePath in directoryContent) {
         NSString* path = [_documentsDirectory stringByAppendingPathComponent:_documentFilePath];
 
-        if(![paths containsObject:path] && ! [path hasSuffix:@"zotpad.sqlite"] && ! [path hasSuffix:@"zotpad.sqlite-journal"]){
-            NSDictionary *_documentFileAttributes = [[NSFileManager defaultManager] fileAttributesAtPath:path traverseLink:YES];
-            _sizeOfDocumentsFolder -= [_documentFileAttributes fileSize]/1024;
-            NSLog(@"Deleting orphaned file %@ cache size now %i",path,_sizeOfDocumentsFolder);
-            [[NSFileManager defaultManager] removeItemAtPath:path error: NULL];
+        if(! [path hasSuffix:@"zotpad.sqlite"] && ! [path hasSuffix:@"zotpad.sqlite-journal"]){
+            
+            // The strings from DB and file system have different encodings. Because of this, we cannot scan the array using built-in functions, but need to loop over it
+            NSString* pathFromDB;
+            BOOL found = FALSE;
+            for(pathFromDB in paths){
+                if([pathFromDB compare:path] == NSOrderedSame){
+                    found=TRUE;
+                    break;
+                }
+            }
+            
+            // If the file was not found in DB, delete it
+            
+            if(! found){
+                NSDictionary *_documentFileAttributes = [[NSFileManager defaultManager] fileAttributesAtPath:path traverseLink:YES];
+                _sizeOfDocumentsFolder -= [_documentFileAttributes fileSize]/1024;
+                NSLog(@"Deleting orphaned file %@ cache size now %i",path,_sizeOfDocumentsFolder);
+                [[NSFileManager defaultManager] removeItemAtPath:path error: NULL];
+            }
         }
     }
     
@@ -917,9 +969,10 @@ static ZPCacheController* _instance = nil;
     NSString* path;
     for(path in paths){
         NSDictionary *_documentFileAttributes = [[NSFileManager defaultManager] fileAttributesAtPath:path traverseLink:YES];
+        NSInteger oldSize= _sizeOfDocumentsFolder;
         _sizeOfDocumentsFolder -= [_documentFileAttributes fileSize]/1024;
         [[NSFileManager defaultManager] removeItemAtPath:path error: NULL];
-        NSLog(@"Deleting old file to reclaim space %@ cache size now %i",path,_sizeOfDocumentsFolder);
+        NSLog(@"Deleting old file to reclaim space %@ cache was %i and is now %i",path,oldSize, _sizeOfDocumentsFolder);
         if (_sizeOfDocumentsFolder<=[[ZPPreferences instance] maxCacheSize]) break;
     }
 

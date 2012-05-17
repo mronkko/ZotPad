@@ -309,7 +309,7 @@
         if(isTitle) return [ZPLocalization getLocalizationStringWithKey:[creator objectForKey:@"creatorType"] type:@"creatorType" ];
         else{
             NSString* lastName = [creator objectForKey:@"lastName"];
-            if(lastName==NULL || [lastName isEqualToString:@""]){
+            if(lastName==NULL || lastName==[NSNull null] || [lastName isEqualToString:@""]){
                 return [creator objectForKey:@"shortName"];
             }
             else{
@@ -474,7 +474,7 @@
             
             if(connection!=NULL && ! [connection isAttachmentDownloading:attachment]){
                 NSLog(@"Started downloading file %@ in index %i",attachment.title,index);
-                [connection startDownloadingAttachment:attachment];   
+                [connection checkIfCanBeDownloadedAndStartDownloadingAttachment:attachment];   
             }
             
         }

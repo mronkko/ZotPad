@@ -51,6 +51,7 @@
 			<string>Max cache size</string>
 			<key>Values</key>
 			<array>
+				<real>0.1</real>
 				<real>0.5</real>
 				<integer>1</integer>
 				<integer>2</integer>
@@ -60,6 +61,7 @@
 			</array>
 			<key>Titles</key>
 			<array>
+				<string>100 MB</string>
 				<string>500 MB</string>
 				<string>1 GB</string>
 				<string>2 GB</string>
