@@ -187,7 +187,13 @@ static ZPPreferences* _instance = nil;
 
 -(NSString*) webDAVURL{
     NSUserDefaults* defaults = [NSUserDefaults standardUserDefaults];
-    return [[defaults objectForKey:@"webdavurl"] stringByTrimmingCharactersInSet:[NSCharacterSet whitespaceAndNewlineCharacterSet]];
+    NSString* ret = [[defaults objectForKey:@"webdavurl"] stringByTrimmingCharactersInSet:[NSCharacterSet whitespaceAndNewlineCharacterSet]];
+    
+    //String trailing slash
+    if([ret hasSuffix:@"/"]){
+        ret = [ret substringToIndex:[ret length] - 1];
+    }
+    return ret;
 }
 
 -(BOOL) useSamba{

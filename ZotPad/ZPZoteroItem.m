@@ -11,8 +11,9 @@
 
 @implementation ZPZoteroItem
 
-@synthesize fullCitation = _fullCitation;
-@synthesize numTags = _numTags;
+@synthesize fullCitation;
+@synthesize numTags;
+@synthesize attachments = _attachments;
 
 static NSCache* _objectCache = NULL;
 
@@ -105,16 +106,16 @@ static NSCache* _objectCache = NULL;
     //If there are no authors.
     if([[self creators] count]==0){
         //Anything after the first closing parenthesis is publication details
-        NSRange range = [_fullCitation rangeOfString:@")"];
+        NSRange range = [self.fullCitation rangeOfString:@")"];
         if(range.location != NSNotFound){
-            return [[_fullCitation substringFromIndex:(range.location+1)] stringByTrimmingCharactersInSet:[NSCharacterSet characterSetWithCharactersInString:@"., "]];   
+            return [[self.fullCitation substringFromIndex:(range.location+1)] stringByTrimmingCharactersInSet:[NSCharacterSet characterSetWithCharactersInString:@"., "]];   
         }
     }
 
     //If that did not give us publication details, return everything after the title
     
     NSString* title = self.title;
-    NSRange range = [_fullCitation rangeOfString:title];
+    NSRange range = [self.fullCitation rangeOfString:title];
     
     //Sometimes the title can contain characters that are not formatted properly by the CSL parser on Zotero server. In this case we will use less strict matching
     
@@ -123,7 +124,7 @@ static NSCache* _objectCache = NULL;
         NSRegularExpression* regex = [NSRegularExpression regularExpressionWithPattern:@"[^a-z0-9]"
                                                                                options:NSRegularExpressionCaseInsensitive
                                                                                  error:NULL];
-        NSString* tempFull = [regex stringByReplacingMatchesInString:_fullCitation options:NULL range:NSMakeRange(0, [_fullCitation length]) withTemplate:@" "];
+        NSString* tempFull = [regex stringByReplacingMatchesInString:self.fullCitation options:NULL range:NSMakeRange(0, [self.fullCitation length]) withTemplate:@" "];
         NSString* tempTitle = [regex stringByReplacingMatchesInString:title options:NULL range:NSMakeRange(0, [title length]) withTemplate:@" "];
         range = [tempFull rangeOfString:tempTitle];
     }
@@ -133,10 +134,10 @@ static NSCache* _objectCache = NULL;
     if(range.location!=NSNotFound){
         //Anything after the first space after the title is publication details
         NSInteger index = range.location+range.length;
-        range = [_fullCitation rangeOfString:@" " options:0 range:NSMakeRange(index, ([_fullCitation length]-index))];
+        range = [self.fullCitation rangeOfString:@" " options:0 range:NSMakeRange(index, ([self.fullCitation length]-index))];
         index = (range.location+1);
-        if(index<[_fullCitation length]){
-            NSString* publicationTitle = [_fullCitation substringFromIndex:index];
+        if(index<[self.fullCitation length]){
+            NSString* publicationTitle = [self.fullCitation substringFromIndex:index];
             return [publicationTitle stringByTrimmingCharactersInSet:[NSCharacterSet characterSetWithCharactersInString:@"., "]];
         }
     }
@@ -152,7 +153,7 @@ static NSCache* _objectCache = NULL;
 
     //Anything before the first parenthesis in an APA citation is author unless it is in italic
     
-    NSString* authors = (NSString*)[[_fullCitation componentsSeparatedByString:@" ("] objectAtIndex:0];
+    NSString* authors = (NSString*)[[self.fullCitation componentsSeparatedByString:@" ("] objectAtIndex:0];
     
     if([authors rangeOfString:@"<i>"].location == NSNotFound){
         return authors;
@@ -197,9 +198,6 @@ static NSCache* _objectCache = NULL;
         [[ZPDatabase instance] addAttachmentsToItem:self];
     }
     return _attachments;
-}
-- (void) setAttachments:(NSArray *)attachments{
-    _attachments = attachments;
 }
 
 - (NSDictionary*) fields{

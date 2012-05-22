@@ -11,13 +11,11 @@
 #import "ZPZoteroDataObject.h"
 
 @interface ZPZoteroItem : ZPZoteroDataObject{
-    NSNumber* _numTags;
-    NSString* _fullCitation;
     
-    NSArray* _creators;
-    NSArray* _attachments;
-    NSArray* _notes;
-    NSDictionary* _fields;
+    __strong NSArray* _creators;
+    __strong NSArray* _attachments;
+    __strong NSArray* _notes;
+    __strong NSDictionary* _fields;
 
     BOOL _isStandaloneAttachment;
     BOOL _isStandaloneNote;

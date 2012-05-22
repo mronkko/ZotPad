@@ -247,7 +247,7 @@ static ZPCacheController* _instance = nil;
                 //Choose a library to retrieve
                 NSMutableArray* keyArray = [_itemKeysToRetrieve objectForKey:_activelibraryID];
                 NSEnumerator* e = [_itemKeysToRetrieve keyEnumerator];
-                NSNumber* libraryID = NULL;
+                NSNumber* libraryID = _activelibraryID;
             
                 //If the active library does not have anything to retrieve, loop over all libraries to see if there is something to retrieve
                 
@@ -263,6 +263,11 @@ static ZPCacheController* _instance = nil;
                 
                 //If we found a non-empty que, queue item retrival
                 if(keyArray != NULL && [keyArray count]>0){
+                    
+                    if(libraryID == NULL){
+                        [NSException raise:@"LibraryID cannot be NULL" format:@""];
+                    }
+                    
                     NSArray* keysToRetrieve;
                     @synchronized(keyArray){
                         NSRange range = NSMakeRange(0, MIN(NUMBER_OF_ITEMS_TO_RETRIEVE,[keyArray count]));
@@ -597,22 +602,22 @@ static ZPCacheController* _instance = nil;
     for(NSString* key in parentKeys){
         ZPZoteroItem* item = (ZPZoteroItem*) [ZPZoteroItem dataObjectWithKey:key];
 
-/*        TFLog([NSString stringWithFormat:@"Checking if attachment exists for item with key %@",key]);
-        if(item == NULL){
-            TFLog(@"Item is NULL");
+        //Troubleshooting
+        
+        //TODO: Remove this workaround
+        NSArray* attachments = item.attachments;
+        
+        if(! [attachments isKindOfClass:[NSArray class]]){
+            //For troubleshooting crashes
+            TFLog([NSString stringWithFormat:@"In ZPCacheController A class of type %@ was used as attachment array for item (%@) with key %@ in library %@",
+                   [[attachments class] description],[[item class] description],item.key,item.libraryID]);
+            item.attachments = NULL;
         }
-        if(! [item isKindOfClass:[ZPZoteroItem class]]){
-            TFLog(@"Item is not Zotero item");
+        else{
+            for(ZPZoteroAttachment* attachment in attachments){
+                [self _checkIfAttachmentExistsAndQueueForDownload:attachment];
+            }
         }
-        NSNumber* libraryID=item.libraryID;
-        NSInteger libraryInt=[libraryID intValue];
-        TFLog([NSString stringWithFormat:@"In library %i",libraryInt]);
-        TFLog(item.fullCitation);
-        TFLog([NSString stringWithFormat:@"Number of attachments %u",[item.attachments count]]);
-  */      
-        for(ZPZoteroAttachment* attachment in item.attachments){
-            [self _checkIfAttachmentExistsAndQueueForDownload:attachment];
-        }    
     }
 }
 
@@ -908,7 +913,7 @@ static ZPCacheController* _instance = nil;
         NSDictionary *_documentFileAttributes = [[NSFileManager defaultManager] fileAttributesAtPath:[_documentsDirectory stringByAppendingPathComponent:_documentFilePath] traverseLink:YES];
         NSInteger thisSize = [_documentFileAttributes fileSize]/1024;
         _documentsFolderSize += thisSize;
-        NSLog(@"Cache size is %i after including %@ (%i)",(NSInteger) _documentsFolderSize,_documentFilePath,thisSize);
+        //NSLog(@"Cache size is %i after including %@ (%i)",(NSInteger) _documentsFolderSize,_documentFilePath,thisSize);
     }
     
     return _documentsFolderSize;
@@ -919,7 +924,7 @@ static ZPCacheController* _instance = nil;
         
         NSDictionary *_documentFileAttributes = [[NSFileManager defaultManager] fileAttributesAtPath:attachment.fileSystemPath traverseLink:YES];
         _sizeOfDocumentsFolder += [_documentFileAttributes fileSize]/1024;
-        NSLog(@"Cache size is %i after adding %@ (%i)",(NSInteger)_sizeOfDocumentsFolder,attachment.fileSystemPath,[_documentFileAttributes fileSize]/1024);
+        //NSLog(@"Cache size is %i after adding %@ (%i)",(NSInteger)_sizeOfDocumentsFolder,attachment.fileSystemPath,[_documentFileAttributes fileSize]/1024);
 
 
 //        NSLog(@"Cache size after adding %@ to cache is %i",attachment.fileSystemPath,_sizeOfDocumentsFolder);

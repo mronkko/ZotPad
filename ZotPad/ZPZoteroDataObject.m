@@ -10,11 +10,7 @@
 
 @implementation ZPZoteroDataObject
 
-@synthesize key = _key;
-@synthesize title =  _title;
-@synthesize libraryID =_libraryID;
-@synthesize cacheTimestamp = _cacheTimestamp;
-@synthesize serverTimestamp = _serverTimestamp;
+@synthesize key, title, libraryID, cacheTimestamp, serverTimestamp;
 
 /*
  

@@ -67,7 +67,7 @@
 
 -(void) notifyAttachmentDownloadCompleted:(ZPZoteroAttachment*) attachment;
 -(void) notifyAttachmentDownloadStarted:(ZPZoteroAttachment*) attachment;
-
+-(void) notifyAttachmentDownloadFailed:(ZPZoteroAttachment*) attachment withError:(NSError*) error;
 
 
 

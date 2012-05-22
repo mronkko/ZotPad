@@ -155,6 +155,8 @@
 		<dict>
 			<key>Type</key>
 			<string>PSTextFieldSpecifier</string>
+			<key>KeyboardType</key>
+			<string>URL</string>
 			<key>Title</key>
 			<string>WebDAV address</string>
 			<key>Key</key>

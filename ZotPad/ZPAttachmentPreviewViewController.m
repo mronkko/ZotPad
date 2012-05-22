@@ -540,28 +540,38 @@ static ZPAttachmentPreviewViewController* _webViewDelegate;
 #pragma mark - Attachment download observer protocol methods
 
 -(void) notifyAttachmentDownloadCompleted:(ZPZoteroAttachment*) attachment{
+    
     if(attachment == self.attachment){
-        if(attachment.fileExists){
-            self.downloadLabel.text = @"Tap to view";
-            if([attachment.contentType isEqualToString:@"application/pdf"]) [self _renderPDFPreview];
+        if ([NSThread isMainThread]){
+            NSLog(@"Finished downloading %@",attachment.filename);
+            if(attachment.fileExists){
+                NSLog(@"Success");
+                self.downloadLabel.text = @"Tap to view";
+                if([attachment.contentType isEqualToString:@"application/pdf"]) [self _renderPDFPreview];
+            }
+            else{
+                NSLog(@"Failure");
+                self.downloadLabel.text = @"Download failed. Tap to retry";
+            }
+            self.progressView.hidden = TRUE;
+            self.view.userInteractionEnabled = TRUE;
+            
         }
-        else{
-            self.downloadLabel.text = @"Download failed. Tap to retry";
-        }
-        self.progressView.hidden = TRUE;
-        self.view.userInteractionEnabled = TRUE;
-
+        else [self performSelectorOnMainThread:@selector(notifyAttachmentDownloadCompleted:) withObject:attachment waitUntilDone:NO];
     }
 }
 -(void) notifyAttachmentDownloadStarted:(ZPZoteroAttachment*) attachment{
     if(attachment == self.attachment){
-        [[ZPServerConnection instance] useProgressView:self.progressView forAttachment:self.attachment];
-        self.downloadLabel.text = @"Downloading";
-        self.progressView.hidden = FALSE;
-        self.progressView.progress = 0;
-        self.view.userInteractionEnabled = FALSE;
+        if ([NSThread isMainThread]){
+            [[ZPServerConnection instance] useProgressView:self.progressView forAttachment:self.attachment];
+            self.downloadLabel.text = @"Downloading";
+            self.progressView.hidden = FALSE;
+            self.progressView.progress = 0;
+            self.view.userInteractionEnabled = FALSE;
+        }
+        else [self performSelectorOnMainThread:@selector(notifyAttachmentDownloadStarted:) withObject:attachment waitUntilDone:NO];
     }
-    
+
 }
 
 @end

@@ -19,6 +19,8 @@
 #import "ZipArchive.h"
 #import "QSStrings.h"
 
+// https://www.dropbox.com/account#applications
+
 @implementation ZPFileChannel_Dropbox
 
 +(void)linkDroboxIfNeeded{
@@ -31,12 +33,13 @@
              appSecret:@"6azju842azhs5oz"
              root:kDBRootAppFolder];
             [DBSession setSharedSession:dbSession];
-            
-            //Link with dropBox account if not already linked
-            if (![[DBSession sharedSession] isLinked]) {
-                TFLog(@"Linking Dropbox");
-                [[DBSession sharedSession] link];
-            }
+        }
+
+        //Link with dropBox account if not already linked
+        BOOL linked =[[DBSession sharedSession] isLinked];
+        if (!linked) {
+            TFLog(@"Linking Dropbox");
+            [[DBSession sharedSession] link];
         }
     }
 }
@@ -56,7 +59,7 @@
     
     if([[ZPPreferences instance] useDropbox]){
         //Link with dropBox account if not already linked
-        
+        TFLog(@"Attempting to download attachment %@ from DropBox",attachment.key);
         [ZPFileChannel_Dropbox linkDroboxIfNeeded];
 
         //TODO: consider pooling these
@@ -117,6 +120,12 @@
 - (void)restClient:(DBRestClient *)client loadMetadataFailedWithError:(NSError *)error {
     
     NSLog(@"Error loading metadata: %@", error);
+    
+    //If we are not linked, link
+    if(error.code==401){
+        TFLog(@"Linking Dropbox");
+        [[DBSession sharedSession] link];
+    }
     
     ZPZoteroAttachment* attachment = [self attachmentWithRequest:client];
     [[ZPServerConnection instance] finishedDownloadingAttachment:attachment toFileAtPath:NULL usingFileChannel:self];
@@ -206,6 +215,12 @@
 
 - (void)restClient:(DBRestClient*)client loadFileFailedWithError:(NSError*)error {
     NSLog(@"There was an error loading the file - %@", error);
+
+    //If we are not linked, link
+    if(error.code==401){
+        TFLog(@"Linking Dropbox");
+        [[DBSession sharedSession] link];
+    }
 
     ZPZoteroAttachment* attachment = [self attachmentWithRequest:client];
     [[ZPServerConnection instance] finishedDownloadingAttachment:attachment toFileAtPath:NULL usingFileChannel:self];

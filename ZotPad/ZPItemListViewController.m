@@ -570,7 +570,7 @@
                 [_itemKeysNotInCache removeObject:item.key];
                 found=TRUE;
             }
-            //            //NSLog(@"Item keys not in cache deacreased to %i after removing key %@",[_itemKeysNotInCache count],item.key);
+            NSLog(@"Item keys not in cache deacreased to %i after removing key %@",[_itemKeysNotInCache count],item.key);
             
             //Update the view if we have received sufficient number of new items
             update = ([_itemKeysNotInCache count] % SIZE_OF_DATABASE_UPDATE_BATCH ==0 ||
@@ -658,6 +658,10 @@
     if(item==NULL){
         cell = [aTableView dequeueReusableCellWithIdentifier:@"LoadingCell"]; 
         //NSLog(@"Cell identifier is LoadingCell");
+        
+        //Row number
+        UILabel* rowNumber = (UILabel *) [cell viewWithTag:5];
+        if(rowNumber != NULL) rowNumber.text=[NSString stringWithFormat:@"%i",indexPath.row+1];
     }
     else{
         
@@ -721,7 +725,7 @@
                 ZPZoteroAttachment* attachment = [item.attachments objectAtIndex:0];
             
                 
-                NSLog(@"ImageView for row %i is %i",indexPath.row,articleThumbnail);
+                //NSLog(@"ImageView for row %i is %i",indexPath.row,articleThumbnail);
 
                 [ZPAttachmentPreviewViewController renderFileTypeIconForAttachment:attachment intoImageView:articleThumbnail];
                 
@@ -745,6 +749,10 @@
                 [articleThumbnail setHidden:TRUE];
             }
         }
+        
+        //Row number
+        UILabel* rowNumber = (UILabel *) [cell viewWithTag:5];
+        if(rowNumber != NULL) rowNumber.text=[NSString stringWithFormat:@"%i",indexPath.row+1];
     }
     return cell;
 }

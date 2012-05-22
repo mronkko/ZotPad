@@ -28,7 +28,10 @@
     [TestFlight takeOff:@"5e753f234f33fc2bddf4437600037fbf_NjcyMjEyMDEyLTA0LTA5IDE0OjUyOjU0LjE4MDQwMg"];
     
     //Manual override for userID and Key. Useful for running the code in debugger with other people's credentials.
+    
+
     /*
+    
     NSUserDefaults* defaults = [NSUserDefaults standardUserDefaults];
     [defaults setObject:@"" forKey:@"userID"];
     [defaults setObject:@"" forKey:@"OAuthKey"];
@@ -37,11 +40,10 @@
     [[ZPDatabase instance] resetDatabase];
     [[ZPCacheController instance] performSelectorInBackground:@selector(purgeAllAttachmentFilesFromCache) withObject:NULL];
     */
-
+    
     [[ZPPreferences instance] checkAndProcessApplicationResetPreferences];
     [[ZPPreferences instance] reload];
-    [ZPFileChannel_Dropbox linkDroboxIfNeeded];
-
+     
     
     // Override point for customization after application launch.
     if ([[UIDevice currentDevice] userInterfaceIdiom] == UIUserInterfaceIdiomPad) {
@@ -54,19 +56,24 @@
         UINavigationController *navigationController = [splitViewController.viewControllers lastObject];
         splitViewController.delegate = (id)navigationController.topViewController;
     }
-    
-    NSLog(@"Started");
+
+    //These will trigger authentication
+
+    [ZPFileChannel_Dropbox linkDroboxIfNeeded];
+    [[ZPCacheController instance] performSelectorInBackground:@selector(updateLibrariesAndCollectionsFromServer) withObject:NULL];
+
+    TFLog(@"Started");
     
     return YES;
 }
 
 - (void)applicationDidReceiveMemoryWarning:(UIApplication *)application{
-    NSLog(@"Start freeing memory");
+    TFLog(@"Start freeing memory");
     [ZPZoteroItem dropCache];
     [ZPZoteroCollection dropCache];
     [ZPZoteroLibrary dropCache];
     [ZPLocalization dropCache];
-    NSLog(@"Done freeing memory");
+    TFLog(@"Done freeing memory");
 
 }
 
@@ -122,7 +129,7 @@
     //DropBox authentication
     if ([[DBSession sharedSession] handleOpenURL:url]) {
         if ([[DBSession sharedSession] isLinked]) {
-            NSLog(@"App linked successfully!");
+            TFLog(@"App linked successfully with DropBox");
             // At this point you can start making API calls
         }
         return YES;

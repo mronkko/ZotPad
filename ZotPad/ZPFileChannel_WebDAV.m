@@ -165,7 +165,14 @@
         [zipArchive UnzipCloseFile];
         
         //Use the first unzipped file
-        tempFile = [tempFile stringByAppendingPathComponent:[[[NSFileManager defaultManager]contentsOfDirectoryAtPath:tempFile error:NULL] objectAtIndex:0]];
+        NSArray* unzippedFiles = [[NSFileManager defaultManager]contentsOfDirectoryAtPath:tempFile error:NULL];
+        if([unzippedFiles count]!=1){
+            TFLog([NSString stringWithFormat:@"Normal attachment files downloaded from WebDAV should have one file inside a zip. Attachment with key %@ downloaded from URL %@ had %i files in the zip",attachment.key,request.url,[unzippedFiles count]]);
+            tempFile = NULL;
+        }
+        else{
+            tempFile = [tempFile stringByAppendingPathComponent:[unzippedFiles objectAtIndex:0]];
+        }
     }
 
     [[ZPServerConnection instance] finishedDownloadingAttachment:attachment toFileAtPath:tempFile usingFileChannel:self];
@@ -175,7 +182,7 @@
 
 - (void)requestFailed:(ASIHTTPRequest *)request{
     NSError *error = [request error];
-    NSLog(@"File download from Zotero server failed: %@",[error description]);
+    TFLog(@"File download from Zotero server failed: %@",[error description]);
 
     ZPZoteroAttachment* attachment = [self attachmentWithRequest:request];
     
