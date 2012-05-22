@@ -25,7 +25,3 @@
 [submodule "DTCoreText"]
 	path = DTCoreText
 	url = https://github.com/Cocoanetics/DTCoreText.git
-
-[submodule "EGOTableViewPullRefresh"]
-	path = EGOTableViewPullRefresh
-	url = https://github.com/enormego/EGOTableViewPullRefresh.git
