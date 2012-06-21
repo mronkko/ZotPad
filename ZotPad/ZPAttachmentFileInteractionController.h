@@ -12,16 +12,19 @@
 
 #import <Foundation/Foundation.h>
 
+//For sending attachments with email
+#import <MessageUI/MessageUI.h>
+
 //For showing file thumbnails
 #import <QuickLook/QuickLook.h>
 
-@interface ZPQuicklookController : NSObject <QLPreviewControllerDataSource, QLPreviewControllerDelegate>{
-    NSMutableArray* _fileURLs;
+@interface ZPAttachmentFileInteractionController: NSObject <UIActionSheetDelegate>{
+//<QLPreviewControllerDataSource, QLPreviewControllerDelegate>{
     UIView* _source;
 }
 
-+(ZPQuicklookController*) instance;
--(void) openItemInQuickLook:(ZPZoteroItem*)attachment sourceView:(UIView*)view;
+-(id) initWithAttachment:(ZPZoteroItem*)attachment sourceView:(UIView*)view;
+-(void) presentOptionsMenuFromBarButtonItem:(UIBarButtonItem*)button;
 -(void) displayQuicklook;
 
 @end
