@@ -11,12 +11,13 @@
 #import "ZPAttachmentObserver.h"
 
 
-@interface ZPAttachmentPreviewViewController : UIViewController <ZPAttachmentObserver, UIWebViewDelegate, UIGestureRecognizerDelegate>{
+@interface ZPAttachmentIconViewController : UIViewController <ZPAttachmentObserver, UIWebViewDelegate, UIGestureRecognizerDelegate>{
 }
 
 
 @property (nonatomic, retain) IBOutlet UILabel* titleLabel;
 @property (nonatomic, retain) IBOutlet UILabel* downloadLabel;
+@property (nonatomic, retain) IBOutlet UILabel* errorLabel;
 @property (nonatomic, retain) IBOutlet UIView* labelBackground;
 @property (nonatomic, retain) IBOutlet UIImageView* fileImage;
 @property (nonatomic, retain) IBOutlet UIProgressView* progressView;

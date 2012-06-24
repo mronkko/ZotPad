@@ -14,8 +14,8 @@
 		A7025072149C8D8F004F2AAB /* ZPServerResponseXMLParserLibrary.m in Sources */ = {isa = PBXBuildFile; fileRef = A7025071149C8D8F004F2AAB /* ZPServerResponseXMLParserLibrary.m */; };
 		A7025075149C8F9A004F2AAB /* ZPServerResponseXMLParserCollection.m in Sources */ = {isa = PBXBuildFile; fileRef = A7025074149C8F9A004F2AAB /* ZPServerResponseXMLParserCollection.m */; };
 		A7025078149C91A1004F2AAB /* ZPServerResponseXMLParserItem.m in Sources */ = {isa = PBXBuildFile; fileRef = A7025077149C91A1004F2AAB /* ZPServerResponseXMLParserItem.m */; };
-		A708ECAF153DAF340083A506 /* ZPAttachmentPreviewViewController.m in Sources */ = {isa = PBXBuildFile; fileRef = A708ECAE153DAF340083A506 /* ZPAttachmentPreviewViewController.m */; };
-		A708ECB0153DAF340083A506 /* ZPAttachmentPreviewViewController.m in Sources */ = {isa = PBXBuildFile; fileRef = A708ECAE153DAF340083A506 /* ZPAttachmentPreviewViewController.m */; };
+		A708ECAF153DAF340083A506 /* ZPAttachmentIconViewController.m in Sources */ = {isa = PBXBuildFile; fileRef = A708ECAE153DAF340083A506 /* ZPAttachmentIconViewController.m */; };
+		A708ECB0153DAF340083A506 /* ZPAttachmentIconViewController.m in Sources */ = {isa = PBXBuildFile; fileRef = A708ECAE153DAF340083A506 /* ZPAttachmentIconViewController.m */; };
 		A708EF45153F0FAB0083A506 /* application-epub+zip.svgz in Resources */ = {isa = PBXBuildFile; fileRef = A708EE49153F0FAA0083A506 /* application-epub+zip.svgz */; };
 		A708EF46153F0FAB0083A506 /* application-epub+zip.svgz in Resources */ = {isa = PBXBuildFile; fileRef = A708EE49153F0FAA0083A506 /* application-epub+zip.svgz */; };
 		A708EF47153F0FAB0083A506 /* application-illustrator.svgz in Resources */ = {isa = PBXBuildFile; fileRef = A708EE4A153F0FAA0083A506 /* application-illustrator.svgz */; };
@@ -563,6 +563,8 @@
 		A75E1866153405740046988C /* zip.c in Sources */ = {isa = PBXBuildFile; fileRef = A75E185B153405740046988C /* zip.c */; };
 		A75E1867153405740046988C /* ZipArchive.mm in Sources */ = {isa = PBXBuildFile; fileRef = A75E185E153405740046988C /* ZipArchive.mm */; };
 		A75E1868153405740046988C /* ZipArchive.mm in Sources */ = {isa = PBXBuildFile; fileRef = A75E185E153405740046988C /* ZipArchive.mm */; settings = {COMPILER_FLAGS = "-fno-objc-arc"; }; };
+		A765747B15965E1000761F6B /* ZPPreviewController.m in Sources */ = {isa = PBXBuildFile; fileRef = A765747A15965E0F00761F6B /* ZPPreviewController.m */; };
+		A765747C15965E1000761F6B /* ZPPreviewController.m in Sources */ = {isa = PBXBuildFile; fileRef = A765747A15965E0F00761F6B /* ZPPreviewController.m */; };
 		A7692D84147D112D000C1A8F /* ZPZoteroItem.m in Sources */ = {isa = PBXBuildFile; fileRef = A7692D83147D112D000C1A8F /* ZPZoteroItem.m */; };
 		A76D3C6714A9F3F3000C3ED9 /* ZPZoteroNote.m in Sources */ = {isa = PBXBuildFile; fileRef = A76D3C6614A9F3F3000C3ED9 /* ZPZoteroNote.m */; };
 		A76D3C7414AD97BB000C3ED9 /* CFNetwork.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = A76D3C7314AD97BA000C3ED9 /* CFNetwork.framework */; };
@@ -577,7 +579,7 @@
 		A77B98DF14DE5CDB00132E9B /* ZPItemListViewController.m in Sources */ = {isa = PBXBuildFile; fileRef = A77B98DE14DE5CDB00132E9B /* ZPItemListViewController.m */; };
 		A786F7781476A56200B35B92 /* MainStoryboard_iPhone.storyboard in Resources */ = {isa = PBXBuildFile; fileRef = A786F7771476A56200B35B92 /* MainStoryboard_iPhone.storyboard */; };
 		A79299C3149E0CFE000F8B42 /* ZPZoteroDataObject.m in Sources */ = {isa = PBXBuildFile; fileRef = A79299C2149E0CFE000F8B42 /* ZPZoteroDataObject.m */; };
-		A793153E14B185E800E1ABF0 /* ZPQuicklookController.m in Sources */ = {isa = PBXBuildFile; fileRef = A793153D14B185E800E1ABF0 /* ZPQuicklookController.m */; };
+		A793153E14B185E800E1ABF0 /* ZPAttachmentFileInteractionController.m in Sources */ = {isa = PBXBuildFile; fileRef = A793153D14B185E800E1ABF0 /* ZPAttachmentFileInteractionController.m */; };
 		A7936ED4153B4AA00063D77B /* KeychainItemWrapper.m in Sources */ = {isa = PBXBuildFile; fileRef = A7936ED3153B4AA00063D77B /* KeychainItemWrapper.m */; };
 		A7936ED5153B4AA00063D77B /* KeychainItemWrapper.m in Sources */ = {isa = PBXBuildFile; fileRef = A7936ED3153B4AA00063D77B /* KeychainItemWrapper.m */; settings = {COMPILER_FLAGS = "-fno-objc-arc"; }; };
 		A79E6FE41531A06C00612DD9 /* ZPFileImportViewController.m in Sources */ = {isa = PBXBuildFile; fileRef = A79E6FE31531A06C00612DD9 /* ZPFileImportViewController.m */; };
@@ -703,7 +705,7 @@
 		A7CD072A15161555007A8E1D /* DSActivityView.m in Sources */ = {isa = PBXBuildFile; fileRef = A7A54B1014878EE000EBAD80 /* DSActivityView.m */; };
 		A7CD072B15161555007A8E1D /* ZPAuthenticationProcess.m in Sources */ = {isa = PBXBuildFile; fileRef = A7B5180A14880CE700806EED /* ZPAuthenticationProcess.m */; };
 		A7CD072C15161555007A8E1D /* ZPItemDetailViewController.m in Sources */ = {isa = PBXBuildFile; fileRef = A79ED822148B2683003EE77C /* ZPItemDetailViewController.m */; };
-		A7CD072D15161555007A8E1D /* iCarousel.m in Sources */ = {isa = PBXBuildFile; fileRef = A7CC252C1493E14D00FDEAF4 /* iCarousel.m */; settings = {COMPILER_FLAGS = " -fno-objc-arc"; }; };
+		A7CD072D15161555007A8E1D /* iCarousel.m in Sources */ = {isa = PBXBuildFile; fileRef = A7CC252C1493E14D00FDEAF4 /* iCarousel.m */; };
 		A7CD072E15161555007A8E1D /* ZPZoteroAttachment.m in Sources */ = {isa = PBXBuildFile; fileRef = A716C0361494E9DE00BD6025 /* ZPZoteroAttachment.m */; };
 		A7CD072F15161555007A8E1D /* NSObject+SBJson.m in Sources */ = {isa = PBXBuildFile; fileRef = A716C0391495131E00BD6025 /* NSObject+SBJson.m */; };
 		A7CD073015161555007A8E1D /* SBJsonParser.m in Sources */ = {isa = PBXBuildFile; fileRef = A716C03C1495131E00BD6025 /* SBJsonParser.m */; };
@@ -732,7 +734,7 @@
 		A7CD074715161555007A8E1D /* ASIDataDecompressor.m in Sources */ = {isa = PBXBuildFile; fileRef = A76D3C8714AD9FA7000C3ED9 /* ASIDataDecompressor.m */; settings = {COMPILER_FLAGS = "-fno-objc-arc"; }; };
 		A7CD074815161555007A8E1D /* ASIInputStream.m in Sources */ = {isa = PBXBuildFile; fileRef = A76D3C8C14AD9FB5000C3ED9 /* ASIInputStream.m */; settings = {COMPILER_FLAGS = "-fno-objc-arc"; }; };
 		A7CD074915161555007A8E1D /* ZPLocalization.m in Sources */ = {isa = PBXBuildFile; fileRef = A7D3C08214AEE70F00DB975D /* ZPLocalization.m */; };
-		A7CD074A15161555007A8E1D /* ZPQuicklookController.m in Sources */ = {isa = PBXBuildFile; fileRef = A793153D14B185E800E1ABF0 /* ZPQuicklookController.m */; };
+		A7CD074A15161555007A8E1D /* ZPAttachmentFileInteractionController.m in Sources */ = {isa = PBXBuildFile; fileRef = A793153D14B185E800E1ABF0 /* ZPAttachmentFileInteractionController.m */; };
 		A7CD074B15161555007A8E1D /* ZPLogger.m in Sources */ = {isa = PBXBuildFile; fileRef = A7F72BC014B984920059617D /* ZPLogger.m */; };
 		A7CD074C15161555007A8E1D /* ZPItemListViewController.m in Sources */ = {isa = PBXBuildFile; fileRef = A77B98DE14DE5CDB00132E9B /* ZPItemListViewController.m */; };
 		A7CD074D15161555007A8E1D /* ZPCacheStatusToolbarController.m in Sources */ = {isa = PBXBuildFile; fileRef = A7D5E2DB14F5690700593A39 /* ZPCacheStatusToolbarController.m */; };
@@ -765,16 +767,10 @@
 		A7CD0794151657B9007A8E1D /* ZPFileChannel_ZoteroStorage.m in Sources */ = {isa = PBXBuildFile; fileRef = A7CD0792151657B9007A8E1D /* ZPFileChannel_ZoteroStorage.m */; };
 		A7CD0797151657C5007A8E1D /* ZPFileChannel_WebDAV.m in Sources */ = {isa = PBXBuildFile; fileRef = A7CD0796151657C5007A8E1D /* ZPFileChannel_WebDAV.m */; };
 		A7CD0798151657C5007A8E1D /* ZPFileChannel_WebDAV.m in Sources */ = {isa = PBXBuildFile; fileRef = A7CD0796151657C5007A8E1D /* ZPFileChannel_WebDAV.m */; };
-		A7CD079B151657D6007A8E1D /* ZPFileChannel_Samba.m in Sources */ = {isa = PBXBuildFile; fileRef = A7CD079A151657D6007A8E1D /* ZPFileChannel_Samba.m */; };
-		A7CD079C151657D6007A8E1D /* ZPFileChannel_Samba.m in Sources */ = {isa = PBXBuildFile; fileRef = A7CD079A151657D6007A8E1D /* ZPFileChannel_Samba.m */; };
 		A7CFD5C1151F22BB00B0AD0A /* ZPFileChannel_Dropbox.m in Sources */ = {isa = PBXBuildFile; fileRef = A7CFD5C0151F22BB00B0AD0A /* ZPFileChannel_Dropbox.m */; };
 		A7D3C08014AEDE7B00DB975D /* QuickLook.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = A7D3C07F14AEDE7B00DB975D /* QuickLook.framework */; };
 		A7D3C08314AEE71000DB975D /* ZPLocalization.m in Sources */ = {isa = PBXBuildFile; fileRef = A7D3C08214AEE70F00DB975D /* ZPLocalization.m */; };
 		A7D5E2DC14F5690700593A39 /* ZPCacheStatusToolbarController.m in Sources */ = {isa = PBXBuildFile; fileRef = A7D5E2DB14F5690700593A39 /* ZPCacheStatusToolbarController.m */; };
-		A7D687DB154D24F5007F4F2D /* ZPDownloadAuthenticationDialogViewController.m in Sources */ = {isa = PBXBuildFile; fileRef = A7D687DA154D24F5007F4F2D /* ZPDownloadAuthenticationDialogViewController.m */; };
-		A7D687DC154D24F5007F4F2D /* ZPDownloadAuthenticationDialogViewController.m in Sources */ = {isa = PBXBuildFile; fileRef = A7D687DA154D24F5007F4F2D /* ZPDownloadAuthenticationDialogViewController.m */; };
-		A7D687E3154D70E3007F4F2D /* ZPSambaServerPickerDialog.m in Sources */ = {isa = PBXBuildFile; fileRef = A7D687E2154D70E3007F4F2D /* ZPSambaServerPickerDialog.m */; };
-		A7D687E4154DB726007F4F2D /* ZPSambaServerPickerDialog.m in Sources */ = {isa = PBXBuildFile; fileRef = A7D687E2154D70E3007F4F2D /* ZPSambaServerPickerDialog.m */; };
 		A7D762011534165D00E76EA1 /* QSStrings.m in Sources */ = {isa = PBXBuildFile; fileRef = A7D761F41534165D00E76EA1 /* QSStrings.m */; };
 		A7D762021534165D00E76EA1 /* QSStrings.m in Sources */ = {isa = PBXBuildFile; fileRef = A7D761F41534165D00E76EA1 /* QSStrings.m */; settings = {COMPILER_FLAGS = "-fno-objc-arc"; }; };
 		A7D76209153417F200E76EA1 /* GTMNSString+HTML.m in Sources */ = {isa = PBXBuildFile; fileRef = A7D76208153417F200E76EA1 /* GTMNSString+HTML.m */; };
@@ -806,6 +802,13 @@
 /* End PBXBuildFile section */
 
 /* Begin PBXContainerItemProxy section */
+		A74246D2158CE3CC00B9DF91 /* PBXContainerItemProxy */ = {
+			isa = PBXContainerItemProxy;
+			containerPortal = A7BD5EAB15612114003252EA /* DTCoreText.xcodeproj */;
+			proxyType = 2;
+			remoteGlobalIDString = A7F7EFCD1573603100F5A4D0;
+			remoteInfo = "Static Library (no DTFoundation)";
+		};
 		A7BD5EB815612114003252EA /* PBXContainerItemProxy */ = {
 			isa = PBXContainerItemProxy;
 			containerPortal = A7BD5EAB15612114003252EA /* DTCoreText.xcodeproj */;
@@ -858,8 +861,8 @@
 		A7025074149C8F9A004F2AAB /* ZPServerResponseXMLParserCollection.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = ZPServerResponseXMLParserCollection.m; sourceTree = "<group>"; };
 		A7025076149C91A1004F2AAB /* ZPServerResponseXMLParserItem.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = ZPServerResponseXMLParserItem.h; sourceTree = "<group>"; };
 		A7025077149C91A1004F2AAB /* ZPServerResponseXMLParserItem.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = ZPServerResponseXMLParserItem.m; sourceTree = "<group>"; };
-		A708ECAD153DAF330083A506 /* ZPAttachmentPreviewViewController.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = ZPAttachmentPreviewViewController.h; sourceTree = "<group>"; };
-		A708ECAE153DAF340083A506 /* ZPAttachmentPreviewViewController.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = ZPAttachmentPreviewViewController.m; sourceTree = "<group>"; };
+		A708ECAD153DAF330083A506 /* ZPAttachmentIconViewController.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = ZPAttachmentIconViewController.h; sourceTree = "<group>"; };
+		A708ECAE153DAF340083A506 /* ZPAttachmentIconViewController.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = ZPAttachmentIconViewController.m; sourceTree = "<group>"; };
 		A708EE49153F0FAA0083A506 /* application-epub+zip.svgz */ = {isa = PBXFileReference; lastKnownFileType = file; name = "application-epub+zip.svgz"; path = "Oxygen-Icons/scalable/mimetypes/application-epub+zip.svgz"; sourceTree = SOURCE_ROOT; };
 		A708EE4A153F0FAA0083A506 /* application-illustrator.svgz */ = {isa = PBXFileReference; lastKnownFileType = file; name = "application-illustrator.svgz"; path = "Oxygen-Icons/scalable/mimetypes/application-illustrator.svgz"; sourceTree = SOURCE_ROOT; };
 		A708EE4B153F0FAA0083A506 /* application-javascript.svgz */ = {isa = PBXFileReference; lastKnownFileType = file; name = "application-javascript.svgz"; path = "Oxygen-Icons/scalable/mimetypes/application-javascript.svgz"; sourceTree = SOURCE_ROOT; };
@@ -1178,6 +1181,8 @@
 		A75E185C153405740046988C /* zip.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = zip.h; sourceTree = "<group>"; };
 		A75E185D153405740046988C /* ZipArchive.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = ZipArchive.h; sourceTree = "<group>"; };
 		A75E185E153405740046988C /* ZipArchive.mm */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.objcpp; path = ZipArchive.mm; sourceTree = "<group>"; };
+		A765747915965E0F00761F6B /* ZPPreviewController.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = ZPPreviewController.h; sourceTree = "<group>"; };
+		A765747A15965E0F00761F6B /* ZPPreviewController.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = ZPPreviewController.m; sourceTree = "<group>"; };
 		A7692D82147D112D000C1A8F /* ZPZoteroItem.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = ZPZoteroItem.h; sourceTree = "<group>"; };
 		A7692D83147D112D000C1A8F /* ZPZoteroItem.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = ZPZoteroItem.m; sourceTree = "<group>"; };
 		A76D3C6514A9F3F3000C3ED9 /* ZPZoteroNote.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = ZPZoteroNote.h; sourceTree = "<group>"; };
@@ -1203,8 +1208,8 @@
 		A786F7771476A56200B35B92 /* MainStoryboard_iPhone.storyboard */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = file.storyboard; path = MainStoryboard_iPhone.storyboard; sourceTree = "<group>"; };
 		A79299C1149E0CFE000F8B42 /* ZPZoteroDataObject.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = ZPZoteroDataObject.h; sourceTree = "<group>"; };
 		A79299C2149E0CFE000F8B42 /* ZPZoteroDataObject.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = ZPZoteroDataObject.m; sourceTree = "<group>"; };
-		A793153C14B185E800E1ABF0 /* ZPQuicklookController.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = ZPQuicklookController.h; sourceTree = "<group>"; };
-		A793153D14B185E800E1ABF0 /* ZPQuicklookController.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = ZPQuicklookController.m; sourceTree = "<group>"; };
+		A793153C14B185E800E1ABF0 /* ZPAttachmentFileInteractionController.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = ZPAttachmentFileInteractionController.h; sourceTree = "<group>"; };
+		A793153D14B185E800E1ABF0 /* ZPAttachmentFileInteractionController.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = ZPAttachmentFileInteractionController.m; sourceTree = "<group>"; };
 		A7936ED2153B4AA00063D77B /* KeychainItemWrapper.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = KeychainItemWrapper.h; sourceTree = "<group>"; };
 		A7936ED3153B4AA00063D77B /* KeychainItemWrapper.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = KeychainItemWrapper.m; sourceTree = "<group>"; };
 		A79E6FE21531A06C00612DD9 /* ZPFileImportViewController.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = ZPFileImportViewController.h; sourceTree = "<group>"; };
@@ -1379,8 +1384,6 @@
 		A7CD0792151657B9007A8E1D /* ZPFileChannel_ZoteroStorage.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = ZPFileChannel_ZoteroStorage.m; sourceTree = "<group>"; };
 		A7CD0795151657C5007A8E1D /* ZPFileChannel_WebDAV.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = ZPFileChannel_WebDAV.h; sourceTree = "<group>"; };
 		A7CD0796151657C5007A8E1D /* ZPFileChannel_WebDAV.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = ZPFileChannel_WebDAV.m; sourceTree = "<group>"; };
-		A7CD0799151657D6007A8E1D /* ZPFileChannel_Samba.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = ZPFileChannel_Samba.h; sourceTree = "<group>"; };
-		A7CD079A151657D6007A8E1D /* ZPFileChannel_Samba.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = ZPFileChannel_Samba.m; sourceTree = "<group>"; };
 		A7CFD5BF151F22BB00B0AD0A /* ZPFileChannel_Dropbox.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = ZPFileChannel_Dropbox.h; sourceTree = "<group>"; };
 		A7CFD5C0151F22BB00B0AD0A /* ZPFileChannel_Dropbox.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = ZPFileChannel_Dropbox.m; sourceTree = "<group>"; };
 		A7D3C07F14AEDE7B00DB975D /* QuickLook.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; name = QuickLook.framework; path = System/Library/Frameworks/QuickLook.framework; sourceTree = SDKROOT; };
@@ -1389,10 +1392,6 @@
 		A7D4A1801494B1B700935847 /* ZPItemObserver.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = ZPItemObserver.h; sourceTree = "<group>"; };
 		A7D5E2DA14F5690700593A39 /* ZPCacheStatusToolbarController.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = ZPCacheStatusToolbarController.h; sourceTree = "<group>"; };
 		A7D5E2DB14F5690700593A39 /* ZPCacheStatusToolbarController.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = ZPCacheStatusToolbarController.m; sourceTree = "<group>"; };
-		A7D687D9154D24F5007F4F2D /* ZPDownloadAuthenticationDialogViewController.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = ZPDownloadAuthenticationDialogViewController.h; sourceTree = "<group>"; };
-		A7D687DA154D24F5007F4F2D /* ZPDownloadAuthenticationDialogViewController.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = ZPDownloadAuthenticationDialogViewController.m; sourceTree = "<group>"; };
-		A7D687E1154D70E3007F4F2D /* ZPSambaServerPickerDialog.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = ZPSambaServerPickerDialog.h; sourceTree = "<group>"; };
-		A7D687E2154D70E3007F4F2D /* ZPSambaServerPickerDialog.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = ZPSambaServerPickerDialog.m; sourceTree = "<group>"; };
 		A7D761F31534165D00E76EA1 /* QSStrings.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = QSStrings.h; sourceTree = "<group>"; };
 		A7D761F41534165D00E76EA1 /* QSStrings.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = QSStrings.m; sourceTree = "<group>"; };
 		A7D76206153417F200E76EA1 /* GTMDefines.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = GTMDefines.h; sourceTree = "<group>"; };
@@ -1496,6 +1495,41 @@
 				A7A4432B155FE5ED005FF5B4 /* ZPServerResponseXMLParserKeyPermissions.m */,
 			);
 			name = "Response parsers";
+			sourceTree = "<group>";
+		};
+		A70399AC1597034E002F4293 /* Item list */ = {
+			isa = PBXGroup;
+			children = (
+				A77B98DD14DE5CDB00132E9B /* ZPItemListViewController.h */,
+				A77B98DE14DE5CDB00132E9B /* ZPItemListViewController.m */,
+			);
+			name = "Item list";
+			sourceTree = "<group>";
+		};
+		A70399AD15970371002F4293 /* Item details */ = {
+			isa = PBXGroup;
+			children = (
+				A79ED821148B2683003EE77C /* ZPItemDetailViewController.h */,
+				A79ED822148B2683003EE77C /* ZPItemDetailViewController.m */,
+				A793153C14B185E800E1ABF0 /* ZPAttachmentFileInteractionController.h */,
+				A793153D14B185E800E1ABF0 /* ZPAttachmentFileInteractionController.m */,
+				A765747915965E0F00761F6B /* ZPPreviewController.h */,
+				A765747A15965E0F00761F6B /* ZPPreviewController.m */,
+				A708ECAD153DAF330083A506 /* ZPAttachmentIconViewController.h */,
+				A708ECAE153DAF340083A506 /* ZPAttachmentIconViewController.m */,
+			);
+			name = "Item details";
+			sourceTree = "<group>";
+		};
+		A70399AF159703CD002F4293 /* Dialogs */ = {
+			isa = PBXGroup;
+			children = (
+				A79E6FE21531A06C00612DD9 /* ZPFileImportViewController.h */,
+				A79E6FE31531A06C00612DD9 /* ZPFileImportViewController.m */,
+				A74348D5147AB37A00DA6FC3 /* ZPAuthenticationDialog.h */,
+				A74348D6147AB37A00DA6FC3 /* ZPAuthenticationDialog.m */,
+			);
+			name = Dialogs;
 			sourceTree = "<group>";
 		};
 		A708EE48153F0F750083A506 /* Mime icons */ = {
@@ -1845,9 +1879,11 @@
 		A7200DDA14718DC0004347C9 /* ZotPad */ = {
 			isa = PBXGroup;
 			children = (
+				A7200DE314718DC0004347C9 /* ZPAppDelegate.h */,
+				A7200DE414718DC0004347C9 /* ZPAppDelegate.m */,
 				A7A4432E1560D770005FF5B4 /* ZPCore.h */,
 				A7285400147E346800D3FE97 /* Data objects */,
-				A72853FE147E33F400D3FE97 /* UI and delegate files */,
+				A72853FE147E33F400D3FE97 /* User interface */,
 				A72853FF147E343A00D3FE97 /* Data layer */,
 				A702506E149C8BE8004F2AAB /* Server connection */,
 				A7200DDB14718DC0004347C9 /* Supporting Files */,
@@ -1870,45 +1906,31 @@
 				A7200DDD14718DC0004347C9 /* InfoPlist.strings */,
 				A7200DE014718DC0004347C9 /* main.m */,
 				A7200DE214718DC0004347C9 /* ZotPad-Prefix.pch */,
-				A7A3F94F147BAB6C00CA7266 /* database.sql */,
 			);
 			name = "Supporting Files";
 			sourceTree = "<group>";
 		};
-		A72853FE147E33F400D3FE97 /* UI and delegate files */ = {
+		A72853FE147E33F400D3FE97 /* User interface */ = {
 			isa = PBXGroup;
 			children = (
-				A7200DE314718DC0004347C9 /* ZPAppDelegate.h */,
-				A7200DE414718DC0004347C9 /* ZPAppDelegate.m */,
-				A79E6FE21531A06C00612DD9 /* ZPFileImportViewController.h */,
-				A79E6FE31531A06C00612DD9 /* ZPFileImportViewController.m */,
-				A7D5E2DA14F5690700593A39 /* ZPCacheStatusToolbarController.h */,
-				A7D5E2DB14F5690700593A39 /* ZPCacheStatusToolbarController.m */,
-				A7200DE914718DC1004347C9 /* ZPLibraryAndCollectionListViewController.h */,
-				A7200DEA14718DC1004347C9 /* ZPLibraryAndCollectionListViewController.m */,
-				A77B98DD14DE5CDB00132E9B /* ZPItemListViewController.h */,
-				A77B98DE14DE5CDB00132E9B /* ZPItemListViewController.m */,
-				A79ED821148B2683003EE77C /* ZPItemDetailViewController.h */,
-				A79ED822148B2683003EE77C /* ZPItemDetailViewController.m */,
-				A793153C14B185E800E1ABF0 /* ZPQuicklookController.h */,
-				A793153D14B185E800E1ABF0 /* ZPQuicklookController.m */,
-				A74348D5147AB37A00DA6FC3 /* ZPAuthenticationDialog.h */,
-				A74348D6147AB37A00DA6FC3 /* ZPAuthenticationDialog.m */,
-				A7D3C08114AEE70F00DB975D /* ZPLocalization.h */,
-				A7D3C08214AEE70F00DB975D /* ZPLocalization.m */,
 				A786F7771476A56200B35B92 /* MainStoryboard_iPhone.storyboard */,
 				A72C3CA61487C9DA00F6744E /* MainStoryboard_iPad.storyboard */,
-				A79E6FE61531B00000612DD9 /* ZPSplitViewController.h */,
 				A79E6FE71531B00100612DD9 /* ZPSplitViewController.m */,
-				A708ECAD153DAF330083A506 /* ZPAttachmentPreviewViewController.h */,
-				A708ECAE153DAF340083A506 /* ZPAttachmentPreviewViewController.m */,
+				A79E6FE61531B00000612DD9 /* ZPSplitViewController.h */,
+				A7D3C08114AEE70F00DB975D /* ZPLocalization.h */,
+				A7D3C08214AEE70F00DB975D /* ZPLocalization.m */,
+				A7CD2322156B73A7001EA24A /* Library and collections list */,
+				A70399AC1597034E002F4293 /* Item list */,
+				A70399AD15970371002F4293 /* Item details */,
+				A70399AF159703CD002F4293 /* Dialogs */,
 			);
-			name = "UI and delegate files";
+			name = "User interface";
 			sourceTree = "<group>";
 		};
 		A72853FF147E343A00D3FE97 /* Data layer */ = {
 			isa = PBXGroup;
 			children = (
+				A7A3F94F147BAB6C00CA7266 /* database.sql */,
 				A7200DF414718F44004347C9 /* ZPDataLayer.h */,
 				A7200DF514718F44004347C9 /* ZPDataLayer.m */,
 				A702501B149B33E1004F2AAB /* ZPCacheController.h */,
@@ -2140,6 +2162,7 @@
 				A7BD5EBD15612114003252EA /* libDTCoreText.a */,
 				A7BD5EBF15612114003252EA /* UnitTest.octest */,
 				A7BD5EC115612114003252EA /* MacUnitTest.octest */,
+				A74246D3158CE3CC00B9DF91 /* libDTCoreText_no_DTFoundation.a */,
 			);
 			name = Products;
 			sourceTree = "<group>";
@@ -2255,10 +2278,6 @@
 		A7CD078615164DFA007A8E1D /* File channels */ = {
 			isa = PBXGroup;
 			children = (
-				A7D687E1154D70E3007F4F2D /* ZPSambaServerPickerDialog.h */,
-				A7D687E2154D70E3007F4F2D /* ZPSambaServerPickerDialog.m */,
-				A7D687D9154D24F5007F4F2D /* ZPDownloadAuthenticationDialogViewController.h */,
-				A7D687DA154D24F5007F4F2D /* ZPDownloadAuthenticationDialogViewController.m */,
 				A7CFD5BF151F22BB00B0AD0A /* ZPFileChannel_Dropbox.h */,
 				A7CFD5C0151F22BB00B0AD0A /* ZPFileChannel_Dropbox.m */,
 				A7CD078D151652E9007A8E1D /* ZPFileChannel.h */,
@@ -2267,10 +2286,19 @@
 				A7CD0792151657B9007A8E1D /* ZPFileChannel_ZoteroStorage.m */,
 				A7CD0795151657C5007A8E1D /* ZPFileChannel_WebDAV.h */,
 				A7CD0796151657C5007A8E1D /* ZPFileChannel_WebDAV.m */,
-				A7CD0799151657D6007A8E1D /* ZPFileChannel_Samba.h */,
-				A7CD079A151657D6007A8E1D /* ZPFileChannel_Samba.m */,
 			);
 			name = "File channels";
+			sourceTree = "<group>";
+		};
+		A7CD2322156B73A7001EA24A /* Library and collections list */ = {
+			isa = PBXGroup;
+			children = (
+				A7D5E2DA14F5690700593A39 /* ZPCacheStatusToolbarController.h */,
+				A7D5E2DB14F5690700593A39 /* ZPCacheStatusToolbarController.m */,
+				A7200DE914718DC1004347C9 /* ZPLibraryAndCollectionListViewController.h */,
+				A7200DEA14718DC1004347C9 /* ZPLibraryAndCollectionListViewController.m */,
+			);
+			name = "Library and collections list";
 			sourceTree = "<group>";
 		};
 		A7D6DA4F14F4CA0B00420FF1 /* In-App icons */ = {
@@ -2380,6 +2408,13 @@
 /* End PBXProject section */
 
 /* Begin PBXReferenceProxy section */
+		A74246D3158CE3CC00B9DF91 /* libDTCoreText_no_DTFoundation.a */ = {
+			isa = PBXReferenceProxy;
+			fileType = archive.ar;
+			path = libDTCoreText_no_DTFoundation.a;
+			remoteRef = A74246D2158CE3CC00B9DF91 /* PBXContainerItemProxy */;
+			sourceTree = BUILT_PRODUCTS_DIR;
+		};
 		A7BD5EB915612114003252EA /* DemoApp.app */ = {
 			isa = PBXReferenceProxy;
 			fileType = wrapper.application;
@@ -3053,14 +3088,13 @@
 				A76D3C8A14AD9FA7000C3ED9 /* ASIDataDecompressor.m in Sources */,
 				A76D3C8D14AD9FB5000C3ED9 /* ASIInputStream.m in Sources */,
 				A7D3C08314AEE71000DB975D /* ZPLocalization.m in Sources */,
-				A793153E14B185E800E1ABF0 /* ZPQuicklookController.m in Sources */,
+				A793153E14B185E800E1ABF0 /* ZPAttachmentFileInteractionController.m in Sources */,
 				A7F72BC114B984920059617D /* ZPLogger.m in Sources */,
 				A77B98DF14DE5CDB00132E9B /* ZPItemListViewController.m in Sources */,
 				A7D5E2DC14F5690700593A39 /* ZPCacheStatusToolbarController.m in Sources */,
 				A7CD078F151652E9007A8E1D /* ZPFileChannel.m in Sources */,
 				A7CD0793151657B9007A8E1D /* ZPFileChannel_ZoteroStorage.m in Sources */,
 				A7CD0797151657C5007A8E1D /* ZPFileChannel_WebDAV.m in Sources */,
-				A7CD079B151657D6007A8E1D /* ZPFileChannel_Samba.m in Sources */,
 				A79E6FE41531A06C00612DD9 /* ZPFileImportViewController.m in Sources */,
 				A79E6FE81531B00100612DD9 /* ZPSplitViewController.m in Sources */,
 				A75E185F153405740046988C /* ioapi.c in Sources */,
@@ -3071,9 +3105,7 @@
 				A7D762011534165D00E76EA1 /* QSStrings.m in Sources */,
 				A7D76209153417F200E76EA1 /* GTMNSString+HTML.m in Sources */,
 				A7936ED4153B4AA00063D77B /* KeychainItemWrapper.m in Sources */,
-				A708ECAF153DAF340083A506 /* ZPAttachmentPreviewViewController.m in Sources */,
-				A7D687DB154D24F5007F4F2D /* ZPDownloadAuthenticationDialogViewController.m in Sources */,
-				A7D687E3154D70E3007F4F2D /* ZPSambaServerPickerDialog.m in Sources */,
+				A708ECAF153DAF340083A506 /* ZPAttachmentIconViewController.m in Sources */,
 				A7A4432C155FE5ED005FF5B4 /* ZPServerResponseXMLParserKeyPermissions.m in Sources */,
 				A7BD5EA315611F28003252EA /* NSAttributedString+Attributes.m in Sources */,
 				A7BD5EA415611F28003252EA /* OHAttributedLabel.m in Sources */,
@@ -3116,6 +3148,7 @@
 				A7BD5F5E156122F6003252EA /* NSString+Paragraphs.m in Sources */,
 				A7BD5F5F156122F6003252EA /* NSString+UTF8Cleaner.m in Sources */,
 				A7BD5F60156122F6003252EA /* UIDevice+DTVersion.m in Sources */,
+				A765747B15965E1000761F6B /* ZPPreviewController.m in Sources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
@@ -3185,14 +3218,13 @@
 				A7CD074715161555007A8E1D /* ASIDataDecompressor.m in Sources */,
 				A7CD074815161555007A8E1D /* ASIInputStream.m in Sources */,
 				A7CD074915161555007A8E1D /* ZPLocalization.m in Sources */,
-				A7CD074A15161555007A8E1D /* ZPQuicklookController.m in Sources */,
+				A7CD074A15161555007A8E1D /* ZPAttachmentFileInteractionController.m in Sources */,
 				A7CD074B15161555007A8E1D /* ZPLogger.m in Sources */,
 				A7CD074C15161555007A8E1D /* ZPItemListViewController.m in Sources */,
 				A7CD074D15161555007A8E1D /* ZPCacheStatusToolbarController.m in Sources */,
 				A7CD0790151652E9007A8E1D /* ZPFileChannel.m in Sources */,
 				A7CD0794151657B9007A8E1D /* ZPFileChannel_ZoteroStorage.m in Sources */,
 				A7CD0798151657C5007A8E1D /* ZPFileChannel_WebDAV.m in Sources */,
-				A7CD079C151657D6007A8E1D /* ZPFileChannel_Samba.m in Sources */,
 				A7CFD5C1151F22BB00B0AD0A /* ZPFileChannel_Dropbox.m in Sources */,
 				A79E6FE51531A07C00612DD9 /* ZPFileImportViewController.m in Sources */,
 				A79E6FE91531B00500612DD9 /* ZPSplitViewController.m in Sources */,
@@ -3204,12 +3236,11 @@
 				A7D762021534165D00E76EA1 /* QSStrings.m in Sources */,
 				A7D7620A153417F200E76EA1 /* GTMNSString+HTML.m in Sources */,
 				A7936ED5153B4AA00063D77B /* KeychainItemWrapper.m in Sources */,
-				A708ECB0153DAF340083A506 /* ZPAttachmentPreviewViewController.m in Sources */,
-				A7D687DC154D24F5007F4F2D /* ZPDownloadAuthenticationDialogViewController.m in Sources */,
-				A7D687E4154DB726007F4F2D /* ZPSambaServerPickerDialog.m in Sources */,
+				A708ECB0153DAF340083A506 /* ZPAttachmentIconViewController.m in Sources */,
 				A7A4432D155FE5ED005FF5B4 /* ZPServerResponseXMLParserKeyPermissions.m in Sources */,
 				A7BD5EA915611F41003252EA /* OHAttributedLabel.m in Sources */,
 				A7BD5EAA15611F46003252EA /* NSAttributedString+Attributes.m in Sources */,
+				A765747C15965E1000761F6B /* ZPPreviewController.m in Sources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};

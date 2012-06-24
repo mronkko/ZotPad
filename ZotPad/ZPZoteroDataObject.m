@@ -52,14 +52,17 @@
 
 - (BOOL)isEqual:(id)anObject{
     if([anObject isKindOfClass:[self class]]){
-        if(_key == nil) return [_libraryID isEqual:[(ZPZoteroDataObject*) anObject libraryID]];
-        else return [_key isEqualToString:[(ZPZoteroDataObject*) anObject key]];
+        if(self.key == nil) return [self.libraryID isEqual:[(ZPZoteroDataObject*) anObject libraryID]];
+        else return [self.key isEqualToString:[(ZPZoteroDataObject*) anObject key]];
     }
     else return FALSE;
 }
 
 -(BOOL) needsToBeWrittenToCache{
-    return ! [_serverTimestamp isEqualToString:_cacheTimestamp];
+    NSString* ts1 = self.cacheTimestamp;
+    NSString* ts2 = self.serverTimestamp;
+    BOOL write = ! [ts2 isEqualToString:ts1];
+    return write;
 }
 -(BOOL) hasChildren{
     return _numChildren>0;

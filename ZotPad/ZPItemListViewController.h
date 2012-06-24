@@ -11,13 +11,11 @@
 #import "ZPItemListViewController.h"
 #import "ZPItemDetailViewController.h"
 
-
-@interface ZPItemListViewController : UIViewController <UISplitViewControllerDelegate, UISearchBarDelegate, UITableViewDelegate, UITableViewDataSource, ZPItemObserver>{
+@interface ZPItemListViewController : UIViewController <UISplitViewControllerDelegate, UISearchBarDelegate, ZPItemObserver>{
 
     //This is an array instead of a mutable array because of thread safety
     NSArray* _itemKeysShown;
     NSMutableArray* _itemKeysNotInCache;
-    
     
     NSString* _searchString;
     NSString* _collectionKey;
@@ -35,7 +33,7 @@
     NSInteger _animations;
     BOOL _hasContent;
     BOOL _invalidated;
-    
+
 }
 
 @property (nonatomic, retain) IBOutlet UISearchBar* searchBar;

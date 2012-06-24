@@ -12,7 +12,7 @@
 @interface ZPFileChannel_Dropbox : ZPFileChannel <DBRestClientDelegate>{
     NSMutableDictionary* progressViewsByRequest;
     NSMutableDictionary* downloadCountsByRequest;
-
+    NSMutableDictionary* remoteVersions;
 }
 
 +(void)linkDroboxIfNeeded;

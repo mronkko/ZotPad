@@ -362,6 +362,10 @@ static ZPCacheController* _instance = nil;
     for(item in items){
         if( [item needsToBeWrittenToCache]){
 
+            //TODO: Refactor. This is very confusing. 
+            
+            item.cacheTimestamp = item.serverTimestamp;
+            
             if([item isKindOfClass:[ZPZoteroAttachment class]]){       
                 ZPZoteroAttachment* attachment = (ZPZoteroAttachment*) item;
 
@@ -848,12 +852,24 @@ static ZPCacheController* _instance = nil;
 
 -(void) notifyAttachmentDownloadCompleted:(ZPZoteroAttachment*) attachment{
     if(attachment.fileExists) [self _updateCacheSizeAfterAddingAttachment:attachment];
-    [self _checkQueues];
+    [self performSelectorInBackground:@selector(_checkQueues) withObject:NULL];
 }
 
+-(void) notifyAttachmentDownloadFailed:(ZPZoteroAttachment *)attachment withError:(NSError *)error{
+    [self performSelectorInBackground:@selector(_checkQueues) withObject:NULL];
+}
 //This is a mandatory method for the protocol. 
 
 -(void) notifyAttachmentDownloadStarted:(ZPZoteroAttachment*) attachment{
+}
+
+-(void) notifyAttachmentDeleted:(ZPZoteroAttachment*) attachment fileAttributes:(NSDictionary*) fileAttributes{
+    if(_sizeOfDocumentsFolder!=0){
+        
+        _sizeOfDocumentsFolder += [fileAttributes fileSize]/1024;
+        if(_sizeOfDocumentsFolder>=[[ZPPreferences instance] maxCacheSize]) [self _cleanUpCache];
+        [self _updateCacheSizePreference];
+    }
 }
 
 - (void) purgeAllAttachmentFilesFromCache{
@@ -936,13 +952,14 @@ static ZPCacheController* _instance = nil;
 
 - (void) _cleanUpCache{
     
-    NSArray* paths = [[ZPDatabase instance] getCachedAttachmentsOrderedByRemovalPriority];
+    NSArray* attachments = [[ZPDatabase instance] getCachedAttachmentsOrderedByRemovalPriority];
 
     //Delete orphaned files
     
     NSString* _documentsDirectory = [NSSearchPathForDirectoriesInDomains(NSDocumentDirectory, NSUserDomainMask, YES)  objectAtIndex:0];
     NSArray *directoryContent = [[NSFileManager defaultManager] contentsOfDirectoryAtPath:_documentsDirectory error:NULL];
     
+    ZPZoteroAttachment* attachment;
     
     for (NSString* _documentFilePath in directoryContent) {
         NSString* path = [_documentsDirectory stringByAppendingPathComponent:_documentFilePath];
@@ -952,7 +969,9 @@ static ZPCacheController* _instance = nil;
             // The strings from DB and file system have different encodings. Because of this, we cannot scan the array using built-in functions, but need to loop over it
             NSString* pathFromDB;
             BOOL found = FALSE;
-            for(pathFromDB in paths){
+         
+            for(attachment in attachments){
+                pathFromDB=attachment.fileSystemPath;
                 if([pathFromDB compare:path] == NSOrderedSame){
                     found=TRUE;
                     break;
@@ -970,14 +989,18 @@ static ZPCacheController* _instance = nil;
         }
     }
     
+    //TODO: refactor file removals to a separate method
+    
     //Delete attachment files until the size of the cache is below the maximum size
-    NSString* path;
-    for(path in paths){
+    for(attachment in attachments){
+        NSString* path = attachment.fileSystemPath;
         NSDictionary *_documentFileAttributes = [[NSFileManager defaultManager] fileAttributesAtPath:path traverseLink:YES];
-        NSInteger oldSize= _sizeOfDocumentsFolder;
-        _sizeOfDocumentsFolder -= [_documentFileAttributes fileSize]/1024;
+
         [[NSFileManager defaultManager] removeItemAtPath:path error: NULL];
-        NSLog(@"Deleting old file to reclaim space %@ cache was %i and is now %i",path,oldSize, _sizeOfDocumentsFolder);
+
+        //This will also update the cache size
+        [[ZPDataLayer instance] notifyAttachmentDeleted:attachment fileAttributes:_documentFileAttributes];
+
         if (_sizeOfDocumentsFolder<=[[ZPPreferences instance] maxCacheSize]) break;
     }
 

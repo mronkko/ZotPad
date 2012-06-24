@@ -9,16 +9,11 @@
 #import <Foundation/Foundation.h>
 
 @interface ZPZoteroDataObject : NSObject{
-    NSString* _title;
-    NSString* _key;
-    NSNumber* _libraryID;
-    NSString* _cacheTimestamp;
-    NSString* _serverTimestamp;
     NSInteger _numChildren;
 }
 @property (retain) NSString* title;
 @property (retain) NSNumber* libraryID;
-@property (retain, readonly) NSString* key;
+@property (retain) NSString* key;
 
 // Important: This field stores the number of all items including items that are attachments to parent items. 
 

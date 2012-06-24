@@ -26,7 +26,7 @@
 }
 - (NSString*) parentItemKey{
     if(_parentItemKey == NULL){
-        return _key;
+        return self.key;
     }
     else{
         return _parentItemKey;

@@ -14,6 +14,7 @@
 -(void) notifyAttachmentDownloadCompleted:(ZPZoteroAttachment*) attachment;
 -(void) notifyAttachmentDownloadFailed:(ZPZoteroAttachment*) attachment withError:(NSError*) error;
 -(void) notifyAttachmentDownloadStarted:(ZPZoteroAttachment*) attachment;
+-(void) notifyAttachmentDeleted:(ZPZoteroAttachment*) attachment fileAttributes:(NSDictionary*) fileAttributes;
 
 
 

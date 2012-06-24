@@ -23,6 +23,7 @@
     NSArray* _collections;
 }
 
+@property (retain) NSString* dateAdded;
 @property (retain) NSString* fullCitation;
 @property (readonly) NSString* creatorSummary;
 @property (readonly) NSString* publicationDetails;

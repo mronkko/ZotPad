@@ -21,9 +21,11 @@
     return self;
 }
 
+-(int) fileChannelType{
+    return 0;
+}
 -(void) startDownloadingAttachment:(ZPZoteroAttachment*)attachment{
-    //By default just call the finish method
-    [[ZPServerConnection instance] finishedDownloadingAttachment:attachment toFileAtPath:NULL usingFileChannel:self];
+    //Does nothing by default
 }
 -(void) cancelDownloadingAttachment:(ZPZoteroAttachment*)attachment{
     //Does nothing by default

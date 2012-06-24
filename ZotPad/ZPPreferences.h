@@ -19,11 +19,10 @@
 @property (retain) NSString* userID;
 @property (retain) NSString* username;
 @property (retain) NSString* currentCacheSize;
-@property (readonly) NSString* sambaShareName;
+
 @property BOOL online;
 
 @property BOOL useWebDAV;
-@property BOOL useSamba;
 
 +(ZPPreferences*) instance;
 -(BOOL) cacheMetadataAllLibraries;
@@ -35,10 +34,13 @@
 -(BOOL) cacheAttachmentsActiveCollection;
 -(BOOL) cacheAttachmentsActiveItem;
 
+-(NSString*) defaultApplicationForContentType:(NSString*) type;
+-(void) setDefaultApplication:(NSString*) application forContentType:(NSString*) type;
+
 -(BOOL) useCache;
 -(BOOL) useDropbox;
--(NSString*) webDAVURL;
 
+-(NSString*) webDAVURL;
 -(NSInteger) maxCacheSize;
 
 -(void) resetUserCredentials;

@@ -26,7 +26,7 @@ static NSCache* _objectCache = NULL;
     
     if(obj==NULL){
         obj= [[ZPZoteroLibrary alloc] init];
-        obj->_libraryID=libraryID;
+        obj.libraryID=libraryID;
         [obj configureWithDictionary:fields];
         [_objectCache setObject:obj  forKey:libraryID];
     }
@@ -46,7 +46,7 @@ static NSCache* _objectCache = NULL;
     
     if(obj==NULL){
         obj= [[ZPZoteroLibrary alloc] init];
-        obj->_libraryID=(NSNumber*)libraryID;
+        obj.libraryID=(NSNumber*)libraryID;
 
         if([obj.libraryID intValue]==1){
             obj.title = @"My Library";

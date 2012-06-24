@@ -21,7 +21,7 @@
 #import "ZPZoteroLibrary.h"
 #import "ZPZoteroCollection.h"
 
-@interface ZPDataLayer : NSObject {
+@interface ZPDataLayer : NSObject{
     
     
     //These sets are immutable due to concurrency issues
@@ -68,6 +68,7 @@
 -(void) notifyAttachmentDownloadCompleted:(ZPZoteroAttachment*) attachment;
 -(void) notifyAttachmentDownloadStarted:(ZPZoteroAttachment*) attachment;
 -(void) notifyAttachmentDownloadFailed:(ZPZoteroAttachment*) attachment withError:(NSError*) error;
+-(void) notifyAttachmentDeleted:(ZPZoteroAttachment*) attachment fileAttributes:(NSDictionary*) fileAttributes;
 
 
 

@@ -100,6 +100,9 @@
         [(ZPZoteroItem*) _currentElement setFields:fields];
         
     }
+    else if([key isEqualToString:@"published"]){
+        [super _setField:@"dateAdded" toValue:value];
+    }
     else if([key isEqualToString:@"updated"]){
         [super _setField:@"serverTimestamp" toValue:value];
     }

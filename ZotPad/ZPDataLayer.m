@@ -109,8 +109,8 @@ static ZPDataLayer* _instance = nil;
 //These are hard coded for now. 
 - (NSArray*) fieldsThatCanBeUsedForSorting{
 
-    return [NSArray arrayWithObjects: @"dateModified", @"title", @"creator", @"type", @"date", @"publisher", @"publicationTitle", @"journalAbbreviation", @"language", @"accessDate", @"libraryCatalog", @"callNumber", @"rights", nil];
-    //These are available through the API, but not used: @"dateAdded" @"addedBy" @"numItems"
+    return [NSArray arrayWithObjects: @"dateAdded", @"dateModified", @"title", @"creator", @"type", @"date", @"publisher", @"publicationTitle", @"journalAbbreviation", @"language", @"accessDate", @"libraryCatalog", @"callNumber", @"rights", nil];
+    //These are available through the API, but not used: @"addedBy" @"numItems"
 }
 
 
@@ -181,6 +181,27 @@ static ZPDataLayer* _instance = nil;
         [(NSObject <ZPAttachmentObserver>*) id notifyAttachmentDownloadStarted:attachment];
     }
 }
+
+-(void) notifyAttachmentDownloadFailed:(ZPZoteroAttachment*) attachment withError:(NSError*) error{
+    NSEnumerator* e = [_attachmentObservers objectEnumerator];
+    NSObject* id;
+    
+    while( id= [e nextObject]) {
+        [(NSObject <ZPAttachmentObserver>*) id notifyAttachmentDownloadFailed:attachment withError:error];
+    }
+    
+}
+
+-(void) notifyAttachmentDeleted:(ZPZoteroAttachment*) attachment fileAttributes:(NSDictionary*) fileAttributes{
+    NSEnumerator* e = [_attachmentObservers objectEnumerator];
+    NSObject* id;
+    
+    while( id= [e nextObject]) {
+        [(NSObject <ZPAttachmentObserver>*) id notifyAttachmentDeleted:attachment fileAttributes:fileAttributes];
+    }
+
+}
+
 
 
 //Adds and removes observers. Because of concurrency issues we are not using mutable sets here.

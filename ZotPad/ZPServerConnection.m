@@ -38,7 +38,7 @@
 #import "ZPZoteroNote.h"
 #import "ZPZoteroAttachment.h"
 #import "ZPDataLayer.h"
-
+#import "ZPDatabase.h"
 #import "ASIHTTPRequest.h"
 
 #import "ZPLogger.h"
@@ -80,9 +80,9 @@ const NSInteger ZPServerConnectionRequestPermissions = 10;
     self = [super init];
         
     _activeRequestCount = 0;
-    _fileChannels = [NSArray arrayWithObjects:[[ZPFileChannel_WebDAV alloc] init], 
-                     [[ZPFileChannel_ZoteroStorage alloc] init], 
-                     [[ZPFileChannel_Dropbox alloc] init], nil];
+    _fileChannel_WebDAV= [[ZPFileChannel_WebDAV alloc] init];
+    _fileChannel_Zotero = [[ZPFileChannel_ZoteroStorage alloc] init];
+    _fileChannel_Dropbox = [[ZPFileChannel_Dropbox alloc] init];
     
     // If a working samba implementation appears, this should be added [[ZPFileChannel_Samba alloc] init]
     
@@ -573,65 +573,52 @@ const NSInteger ZPServerConnectionRequestPermissions = 10;
     return [_activeDownloads count];
 }
 
+//TODO: Refactor: does this need to return a boolean? 
+
 -(BOOL) checkIfCanBeDownloadedAndStartDownloadingAttachment:(ZPZoteroAttachment*)attachment{
+    
+    //Check if the file can be downloade
+    
+    ZPFileChannel* downloadChannel = NULL;
+
+    if([[ZPPreferences instance] useDropbox]){
+        downloadChannel = _fileChannel_Dropbox;
+    }
+    else if([attachment.libraryID intValue]==1 && [[ZPPreferences instance] useWebDAV]){
+        downloadChannel = _fileChannel_WebDAV;
+    }
+    else if([attachment.existsOnZoteroServer intValue] == 1){
+        downloadChannel = _fileChannel_Zotero;
+    }
+    else return false;
     
     @synchronized(_activeDownloads){
         //Do not download item if it is already being downloaded
-        if([_activeDownloads containsObject:attachment]) return;
+        if([_activeDownloads containsObject:attachment]) return false;
         NSLog(@"Added %@ to active downloads. Number of files downloading is %i",attachment.filename,[_activeDownloads count]);
         [_activeDownloads addObject:attachment];
     }
 
-    //Check if the file can be downloade
+    _activeRequestCount++;
     
-    if([attachment.existsOnZoteroServer intValue] == 1 || 
-       [[ZPPreferences instance] useDropbox] ||
-       ([attachment.libraryID intValue]==1 && [[ZPPreferences instance] useWebDAV])){
+    //First request starts the network indicator
+    if(_activeRequestCount==1) [[UIApplication sharedApplication] setNetworkActivityIndicatorVisible:YES];
+    
+    //Use the first channel
+    [downloadChannel startDownloadingAttachment:attachment];
+    
+    [[ZPDataLayer instance] notifyAttachmentDownloadStarted:attachment];
 
-        _activeRequestCount++;
-        
-        //First request starts the network indicator
-        if(_activeRequestCount==1) [[UIApplication sharedApplication] setNetworkActivityIndicatorVisible:YES];
-        
-        //Use the first channel
-        [[_fileChannels objectAtIndex:0] startDownloadingAttachment:attachment];
-        
-        [[ZPDataLayer instance] notifyAttachmentDownloadStarted:attachment];
-        return TRUE;
-    }
-    else{
-        @synchronized(_activeDownloads){
-            [_activeDownloads removeObject:attachment];
-            NSLog(@"Did not start downloading %@. Number of files downloading is %i",attachment.filename,[_activeDownloads count]);
-        }
-return FALSE;
-    }
+    return TRUE;
 }
 
 /*
  This is called always when an item finishes downloading regardless of whether it was succcesful or not.
  */
--(void) finishedDownloadingAttachment:(ZPZoteroAttachment*)attachment toFileAtPath:(NSString*) tempFile usingFileChannel:(ZPFileChannel*)fileChannel{
+-(void) finishedDownloadingAttachment:(ZPZoteroAttachment*)attachment toFileAtPath:(NSString*) tempFile withVersionIdentifier:(NSString*) identifier usingFileChannel:(ZPFileChannel*)fileChannel{
 
     if(tempFile == NULL){
-        //No file file received, try the next channel 
-        NSInteger index = [_fileChannels indexOfObject:fileChannel]+1;
-        if(index < [_fileChannels count]){
-            _activeRequestCount++;
-            [[_fileChannels objectAtIndex:index] startDownloadingAttachment:attachment];
-        }
-        //In case of no more options to retry downloading, notify that downloading of this attachment has been finished.
-        //It is up to the observers to determine if downloading was succesful
-        else {
-            @synchronized(_activeDownloads){
-                [_activeDownloads removeObject:attachment];
-                NSLog(@"Finished downloading %@. Number of files downloading is %i",attachment.filename,[_activeDownloads count]);
-            }
-            
-            _activeRequestCount--;
-
-            [[ZPDataLayer instance] notifyAttachmentDownloadCompleted:attachment];
-        }
+        [NSException raise:@"File channel should not report success if file was not received" format:@""];
     }
     else{
         //If we got a file, move it to the right place
@@ -650,7 +637,12 @@ return FALSE;
             u_int8_t attrValue = 1;
             setxattr(filePath, attrName, &attrValue, sizeof(attrValue), 0, 0);
             
-
+            //Write version info to DB
+            attachment.versionSource = [NSNumber numberWithInt:fileChannel.fileChannelType];
+            attachment.versionIdentifier_receivedFromServer = identifier;
+            
+            [[ZPDatabase instance] writeAttachments:[NSArray arrayWithObject:attachment]];
+            
         }
         @synchronized(_activeDownloads){
             [_activeDownloads removeObject:attachment];
@@ -660,26 +652,41 @@ return FALSE;
         _activeRequestCount--;
 
         //We need to do this in a different thread so that the current thread does not count towards the operations count
-        [[ZPDataLayer instance] performSelectorInBackground:@selector(notifyAttachmentDownloadCompleted:) withObject:attachment];
+        [[ZPDataLayer instance] notifyAttachmentDownloadCompleted:attachment];
+
+        //Last request stops the network activity indicator
+        if(_activeRequestCount==0) [[UIApplication sharedApplication] setNetworkActivityIndicatorVisible:NO];
 
     }
     
-    //First request starts the network indicator
-    if(_activeRequestCount==0) [[UIApplication sharedApplication] setNetworkActivityIndicatorVisible:NO];
     
 }
+
+-(void) failedDownloadingAttachment:(ZPZoteroAttachment*)attachment withError:(NSError*) error usingFileChannel:(ZPFileChannel*)fileChannel{
+    @synchronized(_activeDownloads){
+        [_activeDownloads removeObject:attachment];
+        NSLog(@"Finished downloading %@. Number of files downloading is %i",attachment.filename,[_activeDownloads count]);
+    }
+    
+    _activeRequestCount--;
+    
+    //We need to do this in a different thread so that the current thread does not count towards the operations count
+    [[ZPDataLayer instance] notifyAttachmentDownloadFailed:attachment withError:error];
+
+}
+
 
 -(void) cancelDownloadingAttachment:(ZPZoteroAttachment*)attachment{
     //Loop over the file channels and cancel downloading of this attachment
-    for(ZPFileChannel* channnel in _fileChannels){
-        [channnel cancelDownloadingAttachment:attachment];
-    }
+    [_fileChannel_WebDAV cancelDownloadingAttachment:attachment];
+    [_fileChannel_Dropbox cancelDownloadingAttachment:attachment];
+    [_fileChannel_Zotero cancelDownloadingAttachment:attachment];    
 }
 
 -(void) useProgressView:(UIProgressView*) progressView forAttachment:(ZPZoteroAttachment*)attachment{
-    for(ZPFileChannel* channnel in _fileChannels){
-        [channnel useProgressView:progressView forAttachment:attachment];
-    }
+    [_fileChannel_WebDAV  useProgressView:progressView forAttachment:attachment];
+    [_fileChannel_Dropbox  useProgressView:progressView forAttachment:attachment];
+    [_fileChannel_Zotero  useProgressView:progressView forAttachment:attachment];
 }
 
 -(BOOL) isAttachmentDownloading:(ZPZoteroAttachment*)attachment{

@@ -18,6 +18,7 @@
 -(void) startDownloadingAttachment:(ZPZoteroAttachment*)attachment;
 -(void) cancelDownloadingAttachment:(ZPZoteroAttachment*)attachment;
 -(void) useProgressView:(UIProgressView*) progressView forAttachment:(ZPZoteroAttachment*)attachment;
+-(int) fileChannelType;
 
 -(NSString*) username;
 -(NSString*) password;

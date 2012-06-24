@@ -16,49 +16,45 @@
 
 @implementation ZPFileChannel_ZoteroStorage
 
+-(int) fileChannelType{
+    return VERSION_SOURCE_ZOTERO;
+}
 
 -(void) startDownloadingAttachment:(ZPZoteroAttachment*)attachment{
 
     
-    if([attachment.existsOnZoteroServer boolValue]){
-        
-        //Create the download URL
-        NSString* oauthkey =  [[ZPPreferences instance] OAuthKey];
-        NSString* urlString;
-        NSInteger libraryID= [attachment.libraryID intValue];
-        
-        if(libraryID==1 || libraryID == 0){
-            urlString = [NSString stringWithFormat:@"https://api.zotero.org/users/%@",[[ZPPreferences instance] userID]];
-        }
-        else{
-            urlString = [NSString stringWithFormat:@"https://api.zotero.org/groups/%i",libraryID];        
-        }
-        
-        urlString = [NSString stringWithFormat:@"%@/items/%@/file?key=%@",urlString, attachment.key, oauthkey];
-        
-        NSURL* url = [NSURL URLWithString:urlString];
-        
-        NSLog(@"Downloading attachment from %@",urlString);
-        ASIHTTPRequest *request = [ASIHTTPRequest requestWithURL:url];
-        
-
-        [self linkAttachment:attachment withRequest:request];
-        
-        //Easier to just always use accurate progress. There should not be a significant performance penalty
-        request.showAccurateProgress=TRUE;
-
-        NSString* tempFile = [NSTemporaryDirectory() stringByAppendingPathComponent:[NSString stringWithFormat:@"ZP%@%i",attachment.key,[[NSDate date] timeIntervalSince1970]*1000000]];
-        [request setDownloadDestinationPath:tempFile];
-        
-        [request setDelegate:self];
-        [request startAsynchronous];
-        NSLog(@"Downloading %@ from Zotero started",attachment.filename);
-
+    //Create the download URL
+    NSString* oauthkey =  [[ZPPreferences instance] OAuthKey];
+    NSString* urlString;
+    NSInteger libraryID= [attachment.libraryID intValue];
+    
+    if(libraryID==1 || libraryID == 0){
+        urlString = [NSString stringWithFormat:@"https://api.zotero.org/users/%@",[[ZPPreferences instance] userID]];
     }
-    //If the file does not exist on Zotero server, tell that we are finished
     else{
-         [[ZPServerConnection instance] finishedDownloadingAttachment:attachment toFileAtPath:NULL usingFileChannel:self];
+        urlString = [NSString stringWithFormat:@"https://api.zotero.org/groups/%i",libraryID];        
     }
+    
+    urlString = [NSString stringWithFormat:@"%@/items/%@/file?key=%@",urlString, attachment.key, oauthkey];
+    
+    NSURL* url = [NSURL URLWithString:urlString];
+    
+    NSLog(@"Downloading attachment from %@",urlString);
+    ASIHTTPRequest *request = [ASIHTTPRequest requestWithURL:url];
+    
+    
+    [self linkAttachment:attachment withRequest:request];
+    
+    //Easier to just always use accurate progress. There should not be a significant performance penalty
+    request.showAccurateProgress=TRUE;
+    
+    NSString* tempFile = [NSTemporaryDirectory() stringByAppendingPathComponent:[NSString stringWithFormat:@"ZP%@%i",attachment.key,[[NSDate date] timeIntervalSince1970]*1000000]];
+    [request setDownloadDestinationPath:tempFile];
+    
+    [request setDelegate:self];
+    [request startAsynchronous];
+    NSLog(@"Downloading %@ from Zotero started",attachment.filename);
+
    
 }
 -(void) cancelDownloadingAttachment:(ZPZoteroAttachment*)attachment{
@@ -83,7 +79,8 @@
     ZPZoteroAttachment* attachment = [self attachmentWithRequest:request];
     NSLog(@"Downloading %@ from Zotero succesfully finished",attachment.filename);
 
-    [[ZPServerConnection instance] finishedDownloadingAttachment:attachment toFileAtPath:[request downloadDestinationPath] usingFileChannel:self];
+    NSString* versionIdentifier = [[request responseHeaders] objectForKey:@"Etag"];
+    [[ZPServerConnection instance] finishedDownloadingAttachment:attachment toFileAtPath:[request downloadDestinationPath] withVersionIdentifier:versionIdentifier usingFileChannel:self];
 
     [self cleanupAfterFinishingAttachment:attachment];
 }
@@ -92,7 +89,7 @@
     NSError *error = [request error];
     ZPZoteroAttachment* attachment = [self attachmentWithRequest:request];
     NSLog(@"Downloading %@ from Zotero server failed: %@",attachment.filename, [error description]);
-    [[ZPServerConnection instance] finishedDownloadingAttachment:attachment toFileAtPath:NULL usingFileChannel:self];
+    [[ZPServerConnection instance] failedDownloadingAttachment:attachment withError:error usingFileChannel:self];
     
     [self cleanupAfterFinishingAttachment:attachment];
 

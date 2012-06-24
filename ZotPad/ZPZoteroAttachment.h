@@ -7,17 +7,25 @@
 //
 
 #import <Foundation/Foundation.h>
+
 #import "ZPZoteroItem.h"
+#import <QuickLook/QuickLook.h>
+
 
 extern NSInteger const LINK_MODE_IMPORTED_FILE;
 extern NSInteger const LINK_MODE_IMPORTED_URL;
 extern NSInteger const LINK_MODE_LINKED_FILE;
 extern NSInteger const LINK_MODE_LINKED_URL;
 
-@interface ZPZoteroAttachment : ZPZoteroItem{
-    NSString* _parentItemKey;
-    NSString* _contentType;
-    NSNumber* _linkMode;
+extern NSInteger const VERSION_SOURCE_DROPBOX;
+extern NSInteger const VERSION_SOURCE_ZOTERO;
+extern NSInteger const VERSION_SOURCE_WEBDAV;
+
+@interface ZPZoteroAttachment : ZPZoteroItem <QLPreviewItem>{
+    __strong NSString* _parentItemKey;
+    __strong NSNumber* _linkMode;
+    //TODO: Recycle content type strings
+    __strong NSString* _contentType;    
 }
 
 @property (retain) NSString* parentItemKey;
@@ -29,6 +37,13 @@ extern NSInteger const LINK_MODE_LINKED_URL;
 @property (retain) NSString* url;
 @property (retain) NSString* filename;
 	
+// Needed for versioning
+
+@property (retain) NSNumber* versionSource;
+@property (retain) NSString* versionIdentifier_receivedFromServer;
+@property (retain) NSString* versionIdentifier_sentOut;
+@property (retain) NSString* versionIdentifier_receivedLocally;
+
 // An alias for setParentItemKey
 - (void) setParentKey:(NSString*)key;
 - (NSString*) fileSystemPath;

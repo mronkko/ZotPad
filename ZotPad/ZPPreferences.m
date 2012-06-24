@@ -86,6 +86,17 @@ static ZPPreferences* _instance = nil;
 
 }
 
+-(NSString*) defaultApplicationForContentType:(NSString*) type{
+    NSUserDefaults* defaults = [NSUserDefaults standardUserDefaults];
+    return [defaults objectForKey:[@"defaultApp_" stringByAppendingString:type]];
+}
+
+-(void) setDefaultApplication:(NSString*) application forContentType:(NSString*) type{
+    NSUserDefaults* defaults = [NSUserDefaults standardUserDefaults];
+    return [defaults setObject:application forKey:[@"defaultApp_" stringByAppendingString:type]];    
+}
+
+
 -(void) checkAndProcessApplicationResetPreferences{
     
     NSUserDefaults* defaults = [NSUserDefaults standardUserDefaults];
@@ -174,15 +185,16 @@ static ZPPreferences* _instance = nil;
 
 -(BOOL) useDropbox{
     NSUserDefaults* defaults = [NSUserDefaults standardUserDefaults];
-    return [[defaults objectForKey:@"dropbox"] boolValue];
+    return [[defaults objectForKey:@"filechannel"] isEqualToString:@"dropbox"];
 }
 -(BOOL) useWebDAV{
     NSUserDefaults* defaults = [NSUserDefaults standardUserDefaults];
-    return [[defaults objectForKey:@"webdav"] boolValue];
+    return [[defaults objectForKey:@"filechannel"] isEqualToString:@"webdavzotero"];
 }
 -(void) setUseWebDAV:(BOOL) value{
     NSUserDefaults* defaults = [NSUserDefaults standardUserDefaults];
-    [defaults setObject:[NSNumber numberWithBool:value] forKey:@"webdav"];
+    if(value) [defaults setObject:@"webdavzotero" forKey:@"filechannel"];
+    else [defaults setObject:@"zotero" forKey:@"filechannel"];
 }
 
 -(NSString*) webDAVURL{
@@ -194,20 +206,6 @@ static ZPPreferences* _instance = nil;
         ret = [ret substringToIndex:[ret length] - 1];
     }
     return ret;
-}
-
--(BOOL) useSamba{
-    NSUserDefaults* defaults = [NSUserDefaults standardUserDefaults];
-    return [[defaults objectForKey:@"samba"] boolValue];
-}
--(NSString*) sambaShareName{
-    NSUserDefaults* defaults = [NSUserDefaults standardUserDefaults];
-    return [defaults stringForKey:@"sambashare"];
-}
-
--(void) setUseSamba:(BOOL) value{
-    NSUserDefaults* defaults = [NSUserDefaults standardUserDefaults];
-    [defaults setObject:[NSNumber numberWithBool:value] forKey:@"samba"];
 }
 
 -(NSString*) username{

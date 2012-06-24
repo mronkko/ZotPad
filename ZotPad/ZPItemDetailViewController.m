@@ -11,15 +11,15 @@
 #import "ZPItemDetailViewController.h"
 #import "ZPLibraryAndCollectionListViewController.h"
 #import "ZPItemListViewController.h"
-#import "ZPItemListViewController.h"
 #import "ZPDataLayer.h"
 #import "ZPLocalization.h"
-#import "ZPQuicklookController.h"
+#import "ZPAttachmentFileInteractionController.h"
+#import "ZPPreviewController.h"
 #import "ZPLogger.h"
 #import "ZPAppDelegate.h"
 #import "ZPServerConnection.h"
 #import "ZPPreferences.h"
-#import "ZPAttachmentPreviewViewController.h"
+#import "ZPAttachmentIconViewController.h"
 
 //Define 
 
@@ -29,18 +29,21 @@
 
 @interface ZPItemDetailViewController(){
     NSMutableDictionary* _cachedViewControllers;
+    ZPAttachmentFileInteractionController* _attachmentInteractionController;
 }
 
 - (void) _reconfigureDetailTableView:(BOOL)animated;
 - (void) _reconfigureCarousel;
 - (NSString*) _textAtIndexPath:(NSIndexPath*)indexPath isTitle:(BOOL)isTitle;
 
+- (void) _toggleActionButtonState;
+
 - (BOOL) _useAbstractCell:(NSIndexPath*)indexPath;
     
 -(void) _reloadAttachmentInCarousel:(ZPZoteroItem*)attachment;
 -(void) _reloadCarouselItemAtIndex:(NSInteger) index;
 
--(CGRect)_getDimensionsWithImage:(UIImage*) image; 
+-(CGRect) _getDimensionsWithImage:(UIImage*) image; 
 
 @end
 
@@ -48,6 +51,7 @@
 
 
 @synthesize selectedItem = _currentItem;
+@synthesize actionButton;
 
 #pragma mark - View lifecycle
 
@@ -58,6 +62,9 @@
     [super viewDidLoad];
     
     [[ZPDataLayer instance] registerItemObserver:self];
+
+    //Need so that we can toggle action button
+    [[ZPDataLayer instance] registerAttachmentObserver:self];
 
     //configure carousel
     _carousel = [[iCarousel alloc] initWithFrame:CGRectMake(0,0, 
@@ -73,9 +80,11 @@
     _activityIndicator = [[UIActivityIndicatorView alloc] initWithFrame:CGRectMake(0,0,20, 20)];
     [_activityIndicator hidesWhenStopped];
     UIBarButtonItem* barButton = [[UIBarButtonItem alloc] initWithCustomView:_activityIndicator];
-    self.navigationItem.rightBarButtonItem = barButton;
+    self.navigationItem.rightBarButtonItems = [NSArray arrayWithObjects:self.actionButton, barButton, nil];
 
     _cachedViewControllers = [[NSMutableDictionary alloc] init];
+    
+    [self _toggleActionButtonState];
 }
 
 - (void)viewWillAppear:(BOOL)animated
@@ -154,6 +163,7 @@
         [_carousel setScrollEnabled:[_currentItem.attachments count]>1];
         [_carousel performSelectorOnMainThread:@selector(reloadData) withObject:NULL waitUntilDone:NO];
     }
+    [self _toggleActionButtonState];
 }
 
 
@@ -164,6 +174,34 @@
     [self.tableView reloadData];
     [self.tableView layoutIfNeeded];
     
+}
+#pragma mark - Viewing and emailing
+
+- (IBAction) actionButtonPressed:(id)sender{
+    ZPZoteroAttachment* currentAttachment = [_currentItem.attachments objectAtIndex:[_carousel currentItemIndex]];
+    if(_attachmentInteractionController == NULL)  _attachmentInteractionController = [[ZPAttachmentFileInteractionController alloc] init];
+    [_attachmentInteractionController setAttachment:currentAttachment];
+    [_attachmentInteractionController presentOptionsMenuFromBarButtonItem:sender];
+}
+
+
+/*
+
+ Checks if the currently selected attachment has a file and enables or disables the activity buttone
+ 
+ */
+
+- (void) _toggleActionButtonState{
+    if([_currentItem.attachments count]==0){
+        self.actionButton.enabled = FALSE;
+    }
+    else{
+        NSInteger currentIndex = _carousel.currentItemIndex;
+        // Initially the iCarousel can return a negative index. This is probably a bug.
+        if(currentIndex <0) currentIndex = 0;
+        ZPZoteroAttachment* attachment = [_currentItem.attachments objectAtIndex:currentIndex];
+        self.actionButton.enabled = attachment.fileExists &! [attachment.contentType isEqualToString:@"text/html"];
+    }
 }
 
 
@@ -426,7 +464,7 @@
 
 - (UIView *)carousel:(iCarousel *)carousel viewForItemAtIndex:(NSUInteger)index reusingView:(UIView*)view
 {
-    ZPAttachmentPreviewViewController* attachmentViewController;
+    ZPAttachmentIconViewController* attachmentViewController;
     
     if(view==NULL){
         UIStoryboard *storyboard = self.storyboard;
@@ -464,7 +502,8 @@
             for(sourceView in _carousel.visibleItemViews){
                 if([carousel indexOfItemView:sourceView] == index) break;
             }
-            [[ZPQuicklookController instance] openItemInQuickLook:attachment sourceView:sourceView];
+            
+            [ZPPreviewController displayQuicklookWithAttachment:attachment sourceView:sourceView];
         }
         else if([attachment.linkMode intValue] == LINK_MODE_IMPORTED_FILE || 
                 [attachment.linkMode intValue] == LINK_MODE_IMPORTED_URL){
@@ -480,6 +519,10 @@
         }
 
     }
+}
+
+- (void)carouselCurrentItemIndexUpdated:(iCarousel *)carousel{
+    [self _toggleActionButtonState];
 }
 
 #pragma mark - Observer methods
@@ -516,5 +559,14 @@
 -(void) _reloadCarouselItemAtIndex:(NSInteger) index{
     [_carousel reloadItemAtIndex:index animated:YES];
 }
+
+-(void) notifyAttachmentDownloadCompleted:(ZPZoteroAttachment*) attachment{
+    //Check if this had an effect on our currently displayed item
+    [self _toggleActionButtonState];
+}
+
+-(void) notifyAttachmentDownloadFailed:(ZPZoteroAttachment*) attachment withError:(NSError*) error{}
+
+-(void) notifyAttachmentDownloadStarted:(ZPZoteroAttachment*) attachment{}
 
 @end

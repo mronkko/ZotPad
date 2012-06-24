@@ -140,17 +140,29 @@
 			<key>FooterText</key>
 			<string>Usernames and passwords will be asked when needed and stored securely in keychain. </string>
 			<key>Title</key>
-			<string>Additional file channnels</string>
+			<string>File service</string>
 		</dict>
 		<dict>
 			<key>Type</key>
-			<string>PSToggleSwitchSpecifier</string>
+			<string>PSMultiValueSpecifier</string>
 			<key>Title</key>
-			<string>WebDAV</string>
+			<string>Store files in</string>
 			<key>Key</key>
-			<string>webdav</string>
+			<string>filechannel</string>
 			<key>DefaultValue</key>
-			<false/>
+			<string>zotero</string>
+			<key>Titles</key>
+			<array>
+				<string>Zotero file storage</string>
+				<string>WebDAV (My Library) and Zotero file storage (Groups)</string>
+				<string>Dropbox</string>
+			</array>
+			<key>Values</key>
+			<array>
+				<string>zotero</string>
+				<string>webdavzotero</string>
+				<string>dropbox</string>
+			</array>
 		</dict>
 		<dict>
 			<key>Type</key>
@@ -161,16 +173,6 @@
 			<string>WebDAV address</string>
 			<key>Key</key>
 			<string>webdavurl</string>
-		</dict>
-		<dict>
-			<key>Type</key>
-			<string>PSToggleSwitchSpecifier</string>
-			<key>Title</key>
-			<string>DropBox</string>
-			<key>Key</key>
-			<string>dropbox</string>
-			<key>DefaultValue</key>
-			<false/>
 		</dict>
 		<dict>
 			<key>FooterText</key>

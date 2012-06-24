@@ -8,7 +8,7 @@
 
 #import "ZPCore.h"
 
-#import "ZPAttachmentPreviewViewController.h"
+#import "ZPAttachmentIconViewController.h"
 #import "ZPZoteroAttachment.h"
 #import "ZPPreferences.h"
 #import <QuartzCore/QuartzCore.h>
@@ -20,7 +20,7 @@
 
 #define CHUNK 16384
 
-@interface ZPAttachmentPreviewViewController (){
+@interface ZPAttachmentIconViewController (){
     UIGestureRecognizer* _tapRecognizer;
 }
 
@@ -37,9 +37,9 @@ static NSCache* _previewCache;
 static NSCache* _fileIconCache; 
 static NSMutableDictionary* _viewsWaitingForImage; 
 static NSMutableDictionary* _viewsThatAreRendering; 
-static ZPAttachmentPreviewViewController* _webViewDelegate;
+static ZPAttachmentIconViewController* _webViewDelegate;
 
-@implementation ZPAttachmentPreviewViewController
+@implementation ZPAttachmentIconViewController
 
 @synthesize titleLabel;
 @synthesize downloadLabel;
@@ -51,6 +51,7 @@ static ZPAttachmentPreviewViewController* _webViewDelegate;
 @synthesize usePreview;
 @synthesize showLabel;
 @synthesize labelBackground;
+@synthesize errorLabel;
 
 
 + (void)initialize{
@@ -61,7 +62,7 @@ static ZPAttachmentPreviewViewController* _webViewDelegate;
     [_fileIconCache setCountLimit:20];
     _viewsWaitingForImage = [[NSMutableDictionary alloc] init ];
     _viewsThatAreRendering = [[NSMutableDictionary alloc] init ];
-    _webViewDelegate = [[ZPAttachmentPreviewViewController alloc] init];
+    _webViewDelegate = [[ZPAttachmentIconViewController alloc] init];
 }
 
 - (id)initWithNibName:(NSString *)nibNameOrNil bundle:(NSBundle *)nibBundleOrNil
@@ -135,11 +136,9 @@ static ZPAttachmentPreviewViewController* _webViewDelegate;
                 //TODO: Check if already downloading.
                 
                 NSString* source;
-                
-                if([[ZPPreferences instance] useWebDAV] && [attachment.libraryID intValue] == 1) source = @"WebDAV";
+                if ([[ZPPreferences instance] useDropbox]) source = @"Dropbox";
+                else if([[ZPPreferences instance] useWebDAV] && [attachment.libraryID intValue] == 1) source = @"WebDAV";
                 else if ([attachment.existsOnZoteroServer intValue]==1) source = @"Zotero";
-                else if ([[ZPPreferences instance] useDropbox]) source = @"Dropbox";
-                else if ([[ZPPreferences instance] useSamba]) source = @"network drive";
                 
                 if(source != NULL){
                     if(attachment.attachmentSize != [NSNull null]){
@@ -216,7 +215,7 @@ static ZPAttachmentPreviewViewController* _webViewDelegate;
     }
     
     if(image == NULL){
-        [ZPAttachmentPreviewViewController renderFileTypeIconForAttachment:attachment intoImageView:self.fileImage];
+        [ZPAttachmentIconViewController renderFileTypeIconForAttachment:attachment intoImageView:self.fileImage];
     }
     else{
         [self _showPDFPreview:image];
@@ -543,29 +542,50 @@ static ZPAttachmentPreviewViewController* _webViewDelegate;
     
     if(attachment == self.attachment){
         if ([NSThread isMainThread]){
-            NSLog(@"Finished downloading %@",attachment.filename);
-            if(attachment.fileExists){
-                NSLog(@"Success");
-                self.downloadLabel.text = @"Tap to view";
-                if([attachment.contentType isEqualToString:@"application/pdf"]) [self _renderPDFPreview];
-            }
-            else{
-                NSLog(@"Failure");
-                self.downloadLabel.text = @"Download failed. Tap to retry";
-            }
+            NSLog(@"Success");
+            self.downloadLabel.text = @"Tap to view";
+            if([attachment.contentType isEqualToString:@"application/pdf"]) [self _renderPDFPreview];
             self.progressView.hidden = TRUE;
+            self.errorLabel.hidden = TRUE;
             self.view.userInteractionEnabled = TRUE;
             
         }
         else [self performSelectorOnMainThread:@selector(notifyAttachmentDownloadCompleted:) withObject:attachment waitUntilDone:NO];
     }
 }
+-(void) notifyAttachmentDownloadFailed:(ZPZoteroAttachment *)attachment withError:(NSError *)error{
+    
+    if(attachment == self.attachment){
+        if ([NSThread isMainThread]){
+            NSLog(@"Finished downloading %@",attachment.filename);
+            self.downloadLabel.text = [NSString stringWithFormat:@"Download failed. (%@: %i)",error.domain,error.code];
+            self.progressView.hidden = TRUE;
+            NSString* description = [error.userInfo objectForKey:@"error"];
+            if(description!=NULL){
+                self.errorLabel.text=description;
+                self.errorLabel.hidden = FALSE;
+            }
+            else{
+                self.errorLabel.hidden = TRUE;
+            }
+            self.view.userInteractionEnabled = TRUE;
+            
+        }
+        else{
+            dispatch_async(dispatch_get_main_queue(), ^{
+                [self notifyAttachmentDownloadFailed:attachment withError:error];
+            });
+        }
+    }
+}
+
 -(void) notifyAttachmentDownloadStarted:(ZPZoteroAttachment*) attachment{
     if(attachment == self.attachment){
         if ([NSThread isMainThread]){
             [[ZPServerConnection instance] useProgressView:self.progressView forAttachment:self.attachment];
             self.downloadLabel.text = @"Downloading";
             self.progressView.hidden = FALSE;
+            self.errorLabel.hidden = TRUE;
             self.progressView.progress = 0;
             self.view.userInteractionEnabled = FALSE;
         }
@@ -574,4 +594,21 @@ static ZPAttachmentPreviewViewController* _webViewDelegate;
 
 }
 
+-(void) notifyAttachmentDeleted:(ZPZoteroAttachment*) attachment fileAttributes:(NSDictionary*) fileAttributes{
+    if(attachment == self.attachment){
+        if ([NSThread isMainThread]){
+            NSLog(@"Attachment deleted %@",attachment.filename);
+            self.downloadLabel.text = @"Attachment file deleted";
+            self.progressView.hidden = TRUE;
+            self.errorLabel.hidden = TRUE;
+            self.view.userInteractionEnabled = TRUE;
+            
+        }
+        else{
+            dispatch_async(dispatch_get_main_queue(), ^{
+                [self notifyAttachmentDeleted:attachment fileAttributes:fileAttributes];
+            });
+        }
+    }
+}
 @end

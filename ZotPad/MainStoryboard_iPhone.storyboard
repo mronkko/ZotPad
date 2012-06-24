@@ -17,9 +17,9 @@
                     <connections>
                         <segue destination="12" kind="relationship" relationship="rootViewController" id="19"/>
                         <segue destination="mdR-2R-M4d" kind="modal" identifier="Authentication" id="hyc-84-qgP"/>
-                        <segue destination="AXS-C3-mVS" kind="modal" id="2qy-0H-ZAI"/>
+                        <segue destination="AXS-C3-mVS" kind="modal" identifier="ReceivedFile" id="2qy-0H-ZAI"/>
                         <segue destination="gV3-BB-bOE" kind="modal" identifier="ChooseSambaServer" id="Abx-gt-3iG"/>
-                        <segue destination="051-Oe-nom" kind="modal" id="Ta8-gj-x9b"/>
+                        <segue destination="051-Oe-nom" kind="modal" identifier="GenericLogin" id="Ta8-gj-x9b"/>
                     </connections>
                 </navigationController>
             </objects>
@@ -284,11 +284,11 @@
             </objects>
             <point key="canvasLocation" x="455" y="-638"/>
         </scene>
-        <!--Attachment Preview View Controller-->
+        <!--Attachment Icon View Controller-->
         <scene sceneID="5Sf-7V-bYY">
             <objects>
                 <placeholder placeholderIdentifier="IBFirstResponder" id="AKt-eq-wWw" userLabel="First Responder" sceneMemberID="firstResponder"/>
-                <viewController storyboardIdentifier="AttachmentPreview" autoresizesArchivedViewToFullSize="NO" id="887-2q-suK" customClass="ZPAttachmentPreviewViewController" sceneMemberID="viewController">
+                <viewController storyboardIdentifier="AttachmentPreview" autoresizesArchivedViewToFullSize="NO" id="887-2q-suK" customClass="ZPAttachmentIconViewController" sceneMemberID="viewController">
                     <view key="view" contentMode="scaleToFill" id="8pt-Qx-3Aj">
                         <rect key="frame" x="0.0" y="0.0" width="269" height="380"/>
                         <autoresizingMask key="autoresizingMask" widthSizable="YES" heightSizable="YES"/>
@@ -503,7 +503,7 @@
                 <placeholder placeholderIdentifier="IBFirstResponder" id="3aV-Sp-85X" userLabel="First Responder" sceneMemberID="firstResponder"/>
                 <viewController id="QRL-oX-VsM" customClass="ZPItemDetailViewController" sceneMemberID="viewController">
                     <tableView key="view" clipsSubviews="YES" contentMode="scaleToFill" alwaysBounceVertical="YES" showsHorizontalScrollIndicator="NO" dataMode="prototypes" style="grouped" separatorStyle="singleLineEtched" allowsSelection="NO" rowHeight="44" sectionHeaderHeight="10" sectionFooterHeight="10" id="4lQ-Ew-nJl">
-                        <rect key="frame" x="0.0" y="64" width="320" height="460"/>
+                        <rect key="frame" x="0.0" y="64" width="320" height="416"/>
                         <autoresizingMask key="autoresizingMask" widthSizable="YES" heightSizable="YES"/>
                         <color key="backgroundColor" cocoaTouchSystemColor="groupTableViewBackgroundColor"/>
                         <prototypes>
@@ -580,17 +580,6 @@
                 <relationship kind="outlet" name="delegate"/>
             </relationships>
         </class>
-        <class className="ZPAttachmentPreviewViewController" superclassName="UIViewController">
-            <source key="sourceIdentifier" type="project" relativePath="./Classes/ZPAttachmentPreviewViewController.h"/>
-            <relationships>
-                <relationship kind="outlet" name="cancelButton" candidateClass="UIButton"/>
-                <relationship kind="outlet" name="downloadLabel" candidateClass="UILabel"/>
-                <relationship kind="outlet" name="fileImage" candidateClass="UIImageView"/>
-                <relationship kind="outlet" name="labelBackground" candidateClass="UIView"/>
-                <relationship kind="outlet" name="progressView" candidateClass="UIProgressView"/>
-                <relationship kind="outlet" name="titleLabel" candidateClass="UILabel"/>
-            </relationships>
-        </class>
         <class className="ZPAuthenticationDialog" superclassName="UIViewController">
             <source key="sourceIdentifier" type="project" relativePath="./Classes/ZPAuthenticationDialog.h"/>
             <relationships>
@@ -609,7 +598,7 @@
         <class className="ZPFileImportViewController" superclassName="UIViewController">
             <source key="sourceIdentifier" type="project" relativePath="./Classes/ZPFileImportViewController.h"/>
         </class>
-        <class className="ZPItemDetailViewController" superclassName="UITableViewController">
+        <class className="ZPItemDetailViewController" superclassName="ZPPullRefreshTableViewController">
             <source key="sourceIdentifier" type="project" relativePath="./Classes/ZPItemDetailViewController.h"/>
         </class>
         <class className="ZPItemListViewController" superclassName="UIViewController">
@@ -622,8 +611,11 @@
                 <relationship kind="outlet" name="toolBar" candidateClass="UIToolbar"/>
             </relationships>
         </class>
-        <class className="ZPLibraryAndCollectionListViewController" superclassName="UITableViewController">
+        <class className="ZPLibraryAndCollectionListViewController" superclassName="ZPPullRefreshTableViewController">
             <source key="sourceIdentifier" type="project" relativePath="./Classes/ZPLibraryAndCollectionListViewController.h"/>
+        </class>
+        <class className="ZPPullRefreshTableViewController" superclassName="UITableViewController">
+            <source key="sourceIdentifier" type="project" relativePath="./Classes/ZPPullRefreshTableViewController.h"/>
         </class>
         <class className="ZPSambaServerPickerDialog" superclassName="UIViewController">
             <source key="sourceIdentifier" type="project" relativePath="./Classes/ZPSambaServerPickerDialog.h"/>

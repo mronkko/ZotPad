@@ -26,7 +26,7 @@ void ZPLog(NSObject* source,int line,NSString* format, ...){
         
         
         //        [debugClasses addObject:@"ZPAppDelegate"];
-        [debugClasses addObject:@"ZPAttachmentPreviewViewController"];
+        //[debugClasses addObject:@"ZPAttachmentPreviewViewController"];
         //        [debugClasses addObject:@"ZPAuthenticationDialog"];
         //        [debugClasses addObject:@"ZPCacheController"];
         //        [debugClasses addObject:@"ZPDatabase"];

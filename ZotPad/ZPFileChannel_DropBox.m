@@ -51,38 +51,37 @@
     
     progressViewsByRequest = [[NSMutableDictionary alloc] init];
     downloadCountsByRequest = [[NSMutableDictionary alloc] init];
+    remoteVersions = [[NSMutableDictionary alloc] init];
     
     return self;
 }
 
+-(int) fileChannelType{
+    return VERSION_SOURCE_DROPBOX;
+}
+
 -(void) startDownloadingAttachment:(ZPZoteroAttachment*)attachment{
     
-    if([[ZPPreferences instance] useDropbox]){
-        //Link with dropBox account if not already linked
-        TFLog(@"Attempting to download attachment %@ from DropBox",attachment.key);
-        [ZPFileChannel_Dropbox linkDroboxIfNeeded];
-
-        //TODO: consider pooling these
-        DBRestClient* restClient = [[DBRestClient alloc] initWithSession:[DBSession sharedSession]];
-        restClient.delegate = self;
-        
-        NSString* tempFile = [NSTemporaryDirectory() stringByAppendingPathComponent:[NSString stringWithFormat:@"ZP%@%i",attachment.key,[[NSDate date] timeIntervalSince1970]*1000000]];
-        
-        [self linkAttachment:attachment withRequest:restClient];
-
-        //If this is a website snapshot, we need to download all files
-        if([attachment.linkMode intValue] == LINK_MODE_IMPORTED_URL && [attachment.contentType isEqualToString:@"text/html"]){
-            //Get a list of files to be downloaded
-            [restClient loadMetadata:[NSString stringWithFormat:@"/%@/",attachment.key]];
-        }
-        else{
-            //Otherwise, download just one file
-            [restClient loadFile:[NSString stringWithFormat:@"/%@/%@",attachment.key,attachment.filename] intoPath:tempFile];
-        }
+    //Link with dropBox account if not already linked
+    TFLog(@"Attempting to download attachment %@ from DropBox",attachment.key);
+    [ZPFileChannel_Dropbox linkDroboxIfNeeded];
+    
+    //TODO: consider pooling these
+    DBRestClient* restClient = [[DBRestClient alloc] initWithSession:[DBSession sharedSession]];
+    restClient.delegate = self;
+    
+    [self linkAttachment:attachment withRequest:restClient];
+    
+    //If this is a website snapshot, we need to download all files
+    if([attachment.linkMode intValue] == LINK_MODE_IMPORTED_URL && [attachment.contentType isEqualToString:@"text/html"]){
+        //Get a list of files to be downloaded
+        [restClient loadMetadata:[NSString stringWithFormat:@"/%@/",attachment.key]];
     }
-    // If Dropbox is not in use, just notify that we are done
-    else [[ZPServerConnection instance] finishedDownloadingAttachment:attachment toFileAtPath:NULL usingFileChannel:self];
-
+    else{
+        //Otherwise, load metadata for the file
+        [restClient loadMetadata:[NSString stringWithFormat:@"/%@/%@",attachment.key,attachment.filename]];
+    }
+    
 }
 -(void) cancelDownloadingAttachment:(ZPZoteroAttachment*)attachment{
 
@@ -101,6 +100,8 @@
     }
 }
 - (void)restClient:(DBRestClient *)client loadedMetadata:(DBMetadata *)metadata {
+    
+    
     if (metadata.isDirectory) {
         ZPZoteroAttachment* attachment = [self attachmentWithRequest:client];
         NSLog(@"Folder '%@' contains:", metadata.path);
@@ -115,6 +116,13 @@
             [downloadCountsByRequest setObject:[NSNumber numberWithInt:[metadata.contents count]] forKey:[self keyForRequest:client]];
         }
     }
+    else{
+        //Set version of the file
+        ZPZoteroAttachment* attachment = [self attachmentWithRequest:client];
+        [remoteVersions setObject:metadata.rev forKey:attachment.key];
+        NSString* tempFile = [NSTemporaryDirectory() stringByAppendingPathComponent:[NSString stringWithFormat:@"ZP%@%i",attachment.key,[[NSDate date] timeIntervalSince1970]*1000000]];
+        [client loadFile:[NSString stringWithFormat:@"/%@/%@",attachment.key,attachment.filename] intoPath:tempFile];
+    }
 }
 
 - (void)restClient:(DBRestClient *)client loadMetadataFailedWithError:(NSError *)error {
@@ -128,8 +136,7 @@
     }
     
     ZPZoteroAttachment* attachment = [self attachmentWithRequest:client];
-    [[ZPServerConnection instance] finishedDownloadingAttachment:attachment toFileAtPath:NULL usingFileChannel:self];
-    
+    [[ZPServerConnection instance] failedDownloadingAttachment:attachment withError:error usingFileChannel:self];    
     [self cleanupAfterFinishingAttachment:attachment];
 
 }
@@ -202,13 +209,13 @@
             [[NSFileManager defaultManager] removeItemAtPath:tempPath error:NULL];
             
             localPath = zipFilePath;
-
-            [[ZPServerConnection instance] finishedDownloadingAttachment:attachment toFileAtPath:localPath usingFileChannel:self];
+            [[ZPServerConnection instance] finishedDownloadingAttachment:attachment toFileAtPath:localPath withVersionIdentifier:NULL usingFileChannel:self];
             [self cleanupAfterFinishingAttachment:attachment];
         }
     }
     else{
-        [[ZPServerConnection instance] finishedDownloadingAttachment:attachment toFileAtPath:localPath usingFileChannel:self];
+        NSString* versionIdentifier = [remoteVersions objectForKey:attachment.key];
+        [[ZPServerConnection instance] finishedDownloadingAttachment:attachment toFileAtPath:localPath withVersionIdentifier:versionIdentifier usingFileChannel:self];
         [self cleanupAfterFinishingAttachment:attachment];
     }
 }
@@ -223,8 +230,7 @@
     }
 
     ZPZoteroAttachment* attachment = [self attachmentWithRequest:client];
-    [[ZPServerConnection instance] finishedDownloadingAttachment:attachment toFileAtPath:NULL usingFileChannel:self];
-
+    [[ZPServerConnection instance] failedDownloadingAttachment:attachment withError:error usingFileChannel:self];
     [self cleanupAfterFinishingAttachment:attachment];
 
 }

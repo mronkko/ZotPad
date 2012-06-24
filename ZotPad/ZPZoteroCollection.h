@@ -10,7 +10,6 @@
 #import "ZPZoteroDataObject.h"
 
 @interface ZPZoteroCollection : ZPZoteroDataObject{
-    NSString* _parentCollectionKey;
 }
 
 @property (retain, nonatomic) NSString* parentCollectionKey;

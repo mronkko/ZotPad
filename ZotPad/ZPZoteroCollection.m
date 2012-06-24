@@ -12,7 +12,7 @@
 
 @implementation ZPZoteroCollection
 
-@synthesize parentCollectionKey=_parentCollectionKey;
+@synthesize parentCollectionKey;
 
 static NSCache* _objectCache = NULL;
 
@@ -30,7 +30,7 @@ static NSCache* _objectCache = NULL;
     
     if(obj==NULL){
         obj= [[ZPZoteroCollection alloc] init];
-        obj->_key = key;
+        obj.key = key;
         [obj configureWithDictionary:fields];
         [_objectCache setObject:obj  forKey:key];
     }
@@ -52,7 +52,7 @@ static NSCache* _objectCache = NULL;
     
     if(obj==NULL){
         obj= [[ZPZoteroCollection alloc] init];
-        obj->_key = (NSString*) key;
+        obj.key = (NSString*) key;
         [[ZPDatabase instance] addAttributesToCollection:obj];
         [_objectCache setObject:obj  forKey:key];
     }

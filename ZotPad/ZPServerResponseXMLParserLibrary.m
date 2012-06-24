@@ -29,6 +29,10 @@
     if (_currentElement == NULL){ 
         [super _setField:field toValue:value];
     }
+    else if([field isEqualToString:@"id"]){
+        [(ZPZoteroLibrary*) _currentElement setLibraryID:[NSNumber numberWithInt:[[[value componentsSeparatedByString:@"/"] lastObject] intValue]]];
+    }
+
     else if([field isEqualToString:@"updated"]){
         [(ZPZoteroLibrary*) _currentElement setServerTimestamp:value];
     }

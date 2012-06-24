@@ -11,8 +11,9 @@
 #import "ZPZoteroItem.h"
 #import "ZPAttachmentObserver.h"
 #import "iCarousel.h"
-#import "ZPQuicklookController.h"
+#import "ZPAttachmentFileInteractionController.h"
 #import "ZPItemObserver.h"
+
 
 @interface ZPItemDetailViewController : UITableViewController <iCarouselDataSource,
     iCarouselDelegate, ZPItemObserver, ZPAttachmentObserver, UINavigationControllerDelegate >{
@@ -25,7 +26,9 @@
 }
 
 - (void) configure;
+- (IBAction) actionButtonPressed:(id)sender;
 
+@property (nonatomic, retain) IBOutlet UIBarButtonItem* actionButton;
 @property (nonatomic, retain) ZPZoteroItem* selectedItem;
 
 @end

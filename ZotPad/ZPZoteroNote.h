@@ -10,7 +10,7 @@
 #import "ZPZoteroItem.h"
 
 @interface ZPZoteroNote : ZPZoteroItem{
-    NSString* _parentItemKey;
+    __strong NSString* _parentItemKey;
 }
 
 @property (retain) NSString* parentItemKey;

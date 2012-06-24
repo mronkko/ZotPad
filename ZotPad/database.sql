@@ -78,7 +78,11 @@ CREATE TABLE IF NOT EXISTS attachments (
     contentType TEXT DEFAULT NULL,
     existsOnZoteroServer INT NOT NULL,
     attachmentSize INT DEFAULT NULL,
-    lastViewed TIMESTAMP DEFAULT NULL
+    lastViewed TIMESTAMP DEFAULT NULL,
+    versionSource INT DEFAULT NULL,
+    versionIdentifier_receivedFromServer TEXT DEFAULT NULL, 
+    versionIdentifier_sentOut TEXT DEFAULT NULL, 
+    versionIdentifier_receivedLocally TEXT DEFAULT NULL
 );
 
 CREATE INDEX attachments_parentItemKey ON attachments (parentItemKey);

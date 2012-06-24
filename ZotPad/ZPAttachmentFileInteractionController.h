@@ -19,12 +19,9 @@
 #import <QuickLook/QuickLook.h>
 
 @interface ZPAttachmentFileInteractionController: NSObject <UIActionSheetDelegate>{
-//<QLPreviewControllerDataSource, QLPreviewControllerDelegate>{
-    UIView* _source;
 }
 
--(id) initWithAttachment:(ZPZoteroItem*)attachment sourceView:(UIView*)view;
+-(void) setAttachment:(ZPZoteroAttachment*)attachment;
 -(void) presentOptionsMenuFromBarButtonItem:(UIBarButtonItem*)button;
--(void) displayQuicklook;
 
 @end

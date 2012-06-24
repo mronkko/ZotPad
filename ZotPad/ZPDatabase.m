@@ -935,7 +935,7 @@ Deletes items, notes, and attachments based in array of keys from a library
             
             //If this attachment does have a file, add it to the list that we return;
             if(attachment.fileExists){
-                [returnArray addObject:attachment.fileSystemPath];
+                [returnArray addObject:attachment];
             }
         }
 
@@ -1121,6 +1121,9 @@ Deletes items, notes, and attachments based in array of keys from a library
         }
         else if([orderField isEqualToString:@"dateModified"]){
             sql=[sql stringByAppendingString:@" ORDER BY cacheTimestamp"];
+        }
+        else if([orderField isEqualToString:@"dateAdded"]){
+            sql=[sql stringByAppendingString:@" ORDER BY dateAdded"];
         }
         else if([orderField isEqualToString:@"title"]){
             sql=[sql stringByAppendingString:@" ORDER BY title"];

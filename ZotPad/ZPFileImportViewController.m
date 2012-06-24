@@ -103,7 +103,7 @@
 }
 
 - (void)viewDidAppear:(BOOL)animated{
-
+/*
     if(_status==0){
         ZPZoteroAttachment* attachment = [ZPZoteroAttachment dataObjectForAttachedFile:[self.url absoluteString]];
         //If we are online, check for conflicting files
@@ -157,7 +157,7 @@
     if([[NSFileManager defaultManager] fileExistsAtPath:dbPath]){
         [[NSFileManager defaultManager] removeItemAtPath: dbPath error:NULL];   
     }
-
+*/
 }
 - (void)viewDidUnload
 {

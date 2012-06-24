@@ -11,8 +11,7 @@
 
 @implementation ZPZoteroItem
 
-@synthesize fullCitation;
-@synthesize numTags;
+@synthesize fullCitation, numTags,dateAdded;
 @synthesize attachments = _attachments;
 
 static NSCache* _objectCache = NULL;
@@ -53,7 +52,7 @@ static NSCache* _objectCache = NULL;
         else 
             newObj = [[ZPZoteroItem alloc] init];
 
-        newObj->_key=key;
+        newObj.key=key;
         
         NSLog(@"Created data object %x key %@ type %@",newObj,key,type);
         
@@ -261,10 +260,5 @@ static NSCache* _objectCache = NULL;
     return [self key];
 }
 
--(NSString *) cacheTimestamp{
-    NSString* ts = [super cacheTimestamp];
-    if(ts == NULL) return [super serverTimestamp];
-    else return ts;
-}
 
 @end

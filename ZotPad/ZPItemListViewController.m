@@ -17,7 +17,8 @@
 #import "ZPLogger.h"
 #import "../OHAttributedLabel/OHAttributedLabel.h"
 #import "DTCoreText.h"
-#import "ZPAttachmentPreviewViewController.h"
+#import "ZPAttachmentIconViewController.h"
+#import "ZPPreviewController.h"
 
 //TODO: Refactor so that these would not be needed
 #import "ZPServerConnection.h"
@@ -701,7 +702,7 @@
                 publishedIn=@"";   
             }
             
-            NSAttributedString* text = [[NSAttributedString alloc] initWithHTML:[publishedIn dataUsingEncoding:NSUTF8StringEncoding] documentAttributes:NULL];
+            NSAttributedString* text = [[NSAttributedString alloc] initWithHTMLData:[publishedIn dataUsingEncoding:NSUTF8StringEncoding]  documentAttributes:NULL];
                                         
             //Font size of TTStyledTextLabel cannot be set in interface builder, so must be done here
             [publishedInLabel setFont:[UIFont systemFontOfSize:[UIFont smallSystemFontSize]]];
@@ -727,7 +728,7 @@
                 
                 //NSLog(@"ImageView for row %i is %i",indexPath.row,articleThumbnail);
 
-                [ZPAttachmentPreviewViewController renderFileTypeIconForAttachment:attachment intoImageView:articleThumbnail];
+                [ZPAttachmentIconViewController renderFileTypeIconForAttachment:attachment intoImageView:articleThumbnail];
                 
                 // Enable or disable depending whether file is available or not
                 
@@ -819,6 +820,10 @@
 	
     
     // Do any additional setup after loading the view, typically from a nib.
+    	
+	//  update the last update date
+	// [_refreshHeaderView refreshLastUpdatedDate];
+
     
     //Configure objects
     
@@ -1056,8 +1061,7 @@
     
     ZPZoteroItem* item = (ZPZoteroItem*) [ZPZoteroItem dataObjectWithKey:[_itemKeysShown objectAtIndex:row]];
     
-    [[ZPQuicklookController instance] openItemInQuickLook:[item.attachments objectAtIndex:0] sourceView:imageView];
-
+    [ZPPreviewController displayQuicklookWithAttachment:[item.attachments objectAtIndex:0] sourceView:imageView];
 }
 
 
