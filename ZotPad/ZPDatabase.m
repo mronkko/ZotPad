@@ -772,6 +772,20 @@ Deletes items, notes, and attachments based in array of keys from a library
         else results = [NSDictionary dictionaryWithObject:key forKey:@"itemKey"];
 
         [resultSet close];
+        
+        //TODO: Refactor
+        NSString* itemType = [results objectForKey:@"itemType"];
+        if(itemType == NULL || [itemType isEqualToString:@"attachment"]){                                       
+            resultSet = [_database executeQuery: @"SELECT * FROM attachments WHERE itemKey=? LIMIT 1",key];
+
+            if ([resultSet next]) {
+                NSMutableDictionary* dict = [NSMutableDictionary dictionaryWithDictionary:results];
+                [dict addEntriesFromDictionary: [resultSet resultDict]];
+                results=dict;
+            }
+            
+            [resultSet close];
+        }
     }
     return results;
 }

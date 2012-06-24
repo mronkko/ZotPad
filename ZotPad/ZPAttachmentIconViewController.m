@@ -108,7 +108,8 @@ static ZPAttachmentIconViewController* _webViewDelegate;
 
 - (BOOL)shouldAutorotateToInterfaceOrientation:(UIInterfaceOrientation)interfaceOrientation
 {
-    return (interfaceOrientation == UIInterfaceOrientationPortrait);
+    return TRUE;
+//    return (interfaceOrientation == UIInterfaceOrientationPortrait);
 }
 
 

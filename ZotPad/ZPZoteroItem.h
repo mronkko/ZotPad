@@ -39,4 +39,6 @@
 +(void) dropCache;
 -(NSArray*) collections;
 
+- (NSString*) shortCitation;
+
 @end

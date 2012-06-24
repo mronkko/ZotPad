@@ -69,7 +69,10 @@ NSInteger const VERSION_SOURCE_DROPBOX =3;
     //Get the key from the filename
     NSString* key =[[filename componentsSeparatedByString: @"_"] lastObject];
     
-    return (ZPZoteroAttachment*) [self dataObjectWithKey:key];
+    ZPZoteroAttachment* attachment= (ZPZoteroAttachment*) [self dataObjectWithKey:key];
+    if(attachment.filename == NULL) attachment = NULL;
+
+    return attachment;
     
 }
 
@@ -147,7 +150,7 @@ NSInteger const VERSION_SOURCE_DROPBOX =3;
     }
     NSString* fsPath = [self fileSystemPath];
     if(fsPath == NULL)
-        return false;
+        return false; 
     else
         return ([[NSFileManager defaultManager] fileExistsAtPath:fsPath]);
 }

@@ -28,9 +28,12 @@
 @interface ZPAttachmentFileInteractionController(){
     ZPZoteroAttachment* _activeAttachment;
     BOOL _fileCanBeOpened;
+    //This is not currently implemented
     BOOL _fileHasDefaultApp;
     UIActionSheet* _actionSheet;
     UIBarButtonItem* _sourceButton;
+    UIDocumentInteractionController* _docController;
+    BOOL _docControllerActionSheetShowing;
 }
 
 @end
@@ -61,7 +64,10 @@
     if(_actionSheet != NULL && _actionSheet.isVisible){
         [_actionSheet dismissWithClickedButtonIndex:-1 animated:YES];
     }
-    
+    else if(_docControllerActionSheetShowing){
+        [_docController dismissMenuAnimated:YES];
+        _docControllerActionSheetShowing = FALSE;
+    }
     else{
         NSURL* url= [NSURL fileURLWithPath:_activeAttachment.fileSystemPath];
         
@@ -93,7 +99,7 @@
             _fileHasDefaultApp = FALSE;
         }
         
-        [_actionSheet addButtonWithTitle:@"Email"];
+        if([MFMailComposeViewController canSendMail]) [_actionSheet addButtonWithTitle:@"Email"];
 // Not implemented        
 //        [_actionSheet addButtonWithTitle:@"Copy"];
 //        [_actionSheet addButtonWithTitle:@"Print"];
@@ -118,8 +124,10 @@
 
     }
     else{
+        //iPad does not have cancel button
         if(UI_USER_INTERFACE_IDIOM() == UIUserInterfaceIdiomPad) buttonIndex++;
-        else if(buttonIndex==1){
+    
+        if(buttonIndex==1){
             //Cancel
         }
         else{
@@ -133,13 +141,27 @@
             }
             else if(buttonIndex==3){
                 //Open in...
-                UIDocumentInteractionController* docController = [UIDocumentInteractionController interactionControllerWithURL:[NSURL URLWithString:_activeAttachment.fileSystemPath]];
-                [docController presentOpenInMenuFromBarButtonItem:_ animated:<#(BOOL)#>
+                _docController = [UIDocumentInteractionController interactionControllerWithURL:[NSURL fileURLWithPath:_activeAttachment.fileSystemPath]];
+                _docController.delegate = self;
+                _docControllerActionSheetShowing = YES;
+                [_docController presentOpenInMenuFromBarButtonItem:_sourceButton animated:YES];
             }
             else if(buttonIndex==4){
-                //Email
+                ZPZoteroItem* parentItem = [ZPZoteroItem dataObjectWithKey:_activeAttachment.parentItemKey];
+                MFMailComposeViewController *mailController = [[MFMailComposeViewController alloc] init];
+                [mailController setSubject:parentItem.shortCitation];
+                [mailController setMessageBody:[NSString stringWithFormat:@"<body>Please find the following file attached:<br>%@<br><br></body>",parentItem.fullCitation] isHTML:YES];
+                
+                //In the future, possibly include this small "advertisement"
+                //<small>Shared using <a href=\"http://www.zotpad.com\">ZotPad</a>, an iPad/iPhone client for Zotero</small>
+                
+                [mailController addAttachmentData:[NSData dataWithContentsOfFile:_activeAttachment.fileSystemPath ] mimeType:_activeAttachment.contentType fileName:_activeAttachment.filename];
+                mailController.mailComposeDelegate = self;
+                
+                UIViewController* root = [UIApplication sharedApplication].delegate.window.rootViewController;      
+                [root presentModalViewController:mailController animated:YES];                
             }
-            else if(buttonIndex==5){
+/*            else if(buttonIndex==5){
                 //Copy
                 // Not implemented        
 
@@ -148,13 +170,40 @@
                 //Print
                 // Not implemented        
 
-            }
+            }*/
         }
     }
 
     _actionSheet = NULL;
 }
 
+#pragma mark - UIDocumentInteractionControllerDelegate
+- (void) documentInteractionController: (UIDocumentInteractionController *) controller didEndSendingToApplication: (NSString *) application{
+    NSLog(@"Handed control to application %@",application);
+    
+    //Store the version identifier. This is later used to upload modified files to Zotero
+    
+    if(_activeAttachment.versionIdentifier_receivedLocally != NULL){
+        _activeAttachment.versionIdentifier_sentOut = _activeAttachment.versionIdentifier_receivedLocally;
+    }
+    else{
+        _activeAttachment.versionIdentifier_sentOut = _activeAttachment.versionIdentifier_receivedFromServer;
+    }
+    
+    [[ZPDatabase instance] writeAttachments:[NSArray arrayWithObject:_activeAttachment]];
+     
+    _docControllerActionSheetShowing = FALSE;
+}
 
+- (void) documentInteractionControllerDidDismissOpenInMenu: (UIDocumentInteractionController *) controller{
+    _docControllerActionSheetShowing = FALSE;
+}
+
+#pragma mark - MFMailComposeViewControllerDelegate
+
+-(void)mailComposeController:(MFMailComposeViewController*)controller didFinishWithResult:(MFMailComposeResult)result error:(NSError*)error {
+    UIViewController* root = [UIApplication sharedApplication].delegate.window.rootViewController;      
+    [root dismissModalViewControllerAnimated:YES];
+}
 
 @end

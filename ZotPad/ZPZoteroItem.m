@@ -261,4 +261,19 @@ static NSCache* _objectCache = NULL;
 }
 
 
+- (NSString*) shortCitation{
+
+    if(self.creatorSummary!=NULL && ! [self.creatorSummary isEqualToString:@""]){
+        if(self.year!=0){
+            return [NSString stringWithFormat:@"%@ (%i) %@",self.creatorSummary,self.year,self.title];
+        }
+        else{
+            return [NSString stringWithFormat:@"%@ (no date) %@",self.creatorSummary,self.title];;
+        }
+    }
+    else{
+        return self.title;
+    }
+}
+
 @end

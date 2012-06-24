@@ -13,6 +13,7 @@
 #import "ZPDataLayer.h"
 #import "ZPServerConnection.h"
 #import "ZPCacheController.h"
+#import "ZPAttachmentIconViewController.h"
 
 @interface ZPFileImportViewController ()
 
@@ -26,15 +27,7 @@
 - (void)viewDidLoad
 {
     [super viewDidLoad];
-	// Do any additional setup after loading the view.
-
-    //TODO: Refactor: move this into the storyboard
-
-    self.view.layer.borderWidth = 2.0f;
-    self.view.backgroundColor = [UIColor whiteColor];
-
-    
-    
+	
 }
 - (void)viewWillAppear:(BOOL)animated{
     /*
@@ -176,4 +169,5 @@
 - (void)alertView:(UIAlertView *)alertView clickedButtonAtIndex:(NSInteger)buttonIndex{
     [self dismissModalViewControllerAnimated:YES];
 }
+
 @end

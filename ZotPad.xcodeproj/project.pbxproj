@@ -14,6 +14,7 @@
 		A7025072149C8D8F004F2AAB /* ZPServerResponseXMLParserLibrary.m in Sources */ = {isa = PBXBuildFile; fileRef = A7025071149C8D8F004F2AAB /* ZPServerResponseXMLParserLibrary.m */; };
 		A7025075149C8F9A004F2AAB /* ZPServerResponseXMLParserCollection.m in Sources */ = {isa = PBXBuildFile; fileRef = A7025074149C8F9A004F2AAB /* ZPServerResponseXMLParserCollection.m */; };
 		A7025078149C91A1004F2AAB /* ZPServerResponseXMLParserItem.m in Sources */ = {isa = PBXBuildFile; fileRef = A7025077149C91A1004F2AAB /* ZPServerResponseXMLParserItem.m */; };
+		A70399B115979EC1002F4293 /* MessageUI.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = A70399B015979EC1002F4293 /* MessageUI.framework */; };
 		A708ECAF153DAF340083A506 /* ZPAttachmentIconViewController.m in Sources */ = {isa = PBXBuildFile; fileRef = A708ECAE153DAF340083A506 /* ZPAttachmentIconViewController.m */; };
 		A708ECB0153DAF340083A506 /* ZPAttachmentIconViewController.m in Sources */ = {isa = PBXBuildFile; fileRef = A708ECAE153DAF340083A506 /* ZPAttachmentIconViewController.m */; };
 		A708EF45153F0FAB0083A506 /* application-epub+zip.svgz in Resources */ = {isa = PBXBuildFile; fileRef = A708EE49153F0FAA0083A506 /* application-epub+zip.svgz */; };
@@ -861,6 +862,7 @@
 		A7025074149C8F9A004F2AAB /* ZPServerResponseXMLParserCollection.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = ZPServerResponseXMLParserCollection.m; sourceTree = "<group>"; };
 		A7025076149C91A1004F2AAB /* ZPServerResponseXMLParserItem.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = ZPServerResponseXMLParserItem.h; sourceTree = "<group>"; };
 		A7025077149C91A1004F2AAB /* ZPServerResponseXMLParserItem.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = ZPServerResponseXMLParserItem.m; sourceTree = "<group>"; };
+		A70399B015979EC1002F4293 /* MessageUI.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; name = MessageUI.framework; path = System/Library/Frameworks/MessageUI.framework; sourceTree = SDKROOT; };
 		A708ECAD153DAF330083A506 /* ZPAttachmentIconViewController.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = ZPAttachmentIconViewController.h; sourceTree = "<group>"; };
 		A708ECAE153DAF340083A506 /* ZPAttachmentIconViewController.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = ZPAttachmentIconViewController.m; sourceTree = "<group>"; };
 		A708EE49153F0FAA0083A506 /* application-epub+zip.svgz */ = {isa = PBXFileReference; lastKnownFileType = file; name = "application-epub+zip.svgz"; path = "Oxygen-Icons/scalable/mimetypes/application-epub+zip.svgz"; sourceTree = SOURCE_ROOT; };
@@ -1444,6 +1446,7 @@
 			isa = PBXFrameworksBuildPhase;
 			buildActionMask = 2147483647;
 			files = (
+				A70399B115979EC1002F4293 /* MessageUI.framework in Frameworks */,
 				A7BD5EC71561226B003252EA /* libDTCoreText.a in Frameworks */,
 				A7BD5EC6156121A3003252EA /* CoreText.framework in Frameworks */,
 				A7CD075D15161555007A8E1D /* QuartzCore.framework in Frameworks */,
@@ -1826,6 +1829,7 @@
 		A7200DC514718DBF004347C9 = {
 			isa = PBXGroup;
 			children = (
+				A70399B015979EC1002F4293 /* MessageUI.framework */,
 				A7200DDA14718DC0004347C9 /* ZotPad */,
 				A7200DD314718DC0004347C9 /* Frameworks */,
 				A7200DD114718DC0004347C9 /* Products */,

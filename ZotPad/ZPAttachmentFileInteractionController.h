@@ -18,7 +18,7 @@
 //For showing file thumbnails
 #import <QuickLook/QuickLook.h>
 
-@interface ZPAttachmentFileInteractionController: NSObject <UIActionSheetDelegate>{
+@interface ZPAttachmentFileInteractionController: NSObject <UIActionSheetDelegate, UIDocumentInteractionControllerDelegate, MFMailComposeViewControllerDelegate>{
 }
 
 -(void) setAttachment:(ZPZoteroAttachment*)attachment;

@@ -139,18 +139,8 @@
     [self _reconfigureDetailTableView:FALSE];
     [self _reconfigureCarousel];
 
-
-    if(_currentItem.creatorSummary!=NULL && ! [_currentItem.creatorSummary isEqualToString:@""]){
-        if(_currentItem.year!=0){
-            self.navigationItem.title=[NSString stringWithFormat:@"%@ (%i) %@",_currentItem.creatorSummary,_currentItem.year,_currentItem.title];
-        }
-        else{
-            self.navigationItem.title=[NSString stringWithFormat:@"%@ (no date) %@",_currentItem.creatorSummary,_currentItem.title];;
-        }
-    }
-    else{
-        self.navigationItem.title=_currentItem.title;
-    }
+    
+    self.navigationItem.title=_currentItem.shortCitation;
     
 
 }

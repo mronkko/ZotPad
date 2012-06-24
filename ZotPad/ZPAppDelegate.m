@@ -15,6 +15,7 @@
 #import "ZPDatabase.h"
 #import "ZPFileImportViewController.h"
 #import "ZPFileChannel_Dropbox.h"
+#import "ZPAttachmentIconViewController.h"
 
 @implementation ZPAppDelegate
 
@@ -139,8 +140,42 @@
     else{
               
         NSLog(@"Received file %@",url);
-        [[[UIAlertView alloc] initWithTitle:@"Not implemented" message:@"This feature has not been fully implemented and is currently disabled. The file is ignored by ZotPad" delegate:NULL cancelButtonTitle:@"Cancel" otherButtonTitles: nil] show];
-        //[self.window.rootViewController performSegueWithIdentifier:@"ReceivedFile" sender:url];
+        //[[[UIAlertView alloc] initWithTitle:@"Not implemented" message:@"This feature has not been fully implemented and is currently disabled. The file is ignored by ZotPad" delegate:NULL cancelButtonTitle:@"Cancel" otherButtonTitles: nil] show];
+        
+        //Is the file recognized?
+        
+        ZPZoteroAttachment* attachment = [ZPZoteroAttachment dataObjectForAttachedFile:url.absoluteString];
+        
+        if(attachment == NULL){
+            [[[UIAlertView alloc] initWithTitle:@"Unknown file" message:[NSString stringWithFormat:@"ZotPad could not identify a Zotero item for file '%@' received from %@. The file will be ignored.",[url lastPathComponent],[[sourceApplication componentsSeparatedByString:@"."] lastObject]] delegate:NULL cancelButtonTitle:@"Cancel" otherButtonTitles: nil] show];
+        }
+        else{
+            //TODO: Add the new file as a local version for the attachment and notify the cache controller to start uploading.
+            
+            ZPAttachmentIconViewController* attachmentViewController = [self.window.rootViewController.storyboard instantiateViewControllerWithIdentifier:@"AttachmentPreview"];
+            attachmentViewController.attachment = attachment;
+            attachmentViewController.modalPresentationStyle = UIModalPresentationFormSheet;
+            attachmentViewController.allowDownloading = FALSE;
+            attachmentViewController.usePreview = TRUE;
+            attachmentViewController.showLabel = TRUE;
+            
+            [self.window.rootViewController presentModalViewController:attachmentViewController animated:NO];
+
+            attachmentViewController.downloadLabel.text = [NSString stringWithFormat:@"Version from %@ prepared for uploading.", [[sourceApplication componentsSeparatedByString:@"."] lastObject]];
+
+            //TODO: Resize the modal view or add some margins around it
+            
+            [attachmentViewController.view addGestureRecognizer:[[UITapGestureRecognizer alloc] initWithTarget:self.window.rootViewController action:@selector(dismissModalViewControllerAnimated:)]];
+        }
+                                                                
+        
+        //Clean up inbox
+        NSString *dbPath = [[NSSearchPathForDirectoriesInDomains(NSDocumentDirectory, NSUserDomainMask, YES) objectAtIndex:0] stringByAppendingPathComponent:@"Inbox"];
+        
+        if([[NSFileManager defaultManager] fileExistsAtPath:dbPath]){
+            [[NSFileManager defaultManager] removeItemAtPath: dbPath error:NULL];   
+        }
+
         return YES;
     }
     // Add whatever other url handling code your app requires here
