@@ -11,7 +11,6 @@
 #import "ZPFileChannel_Dropbox.h"
 #import <DropboxSDK/DropboxSDK.h>
 #import "ZPPreferences.h"
-#import "ASIHTTPRequest.h"
 #import "ZPLogger.h"
 #import "ZPServerConnection.h"
 
@@ -19,7 +18,22 @@
 #import "ZipArchive.h"
 #import "QSStrings.h"
 
+
 // https://www.dropbox.com/account#applications
+
+@interface ZPDBRestClient : DBRestClient
+
+@property (retain) ZPZoteroAttachment* attachment;
+@property (retain) NSString* revision;
+
+@end
+
+@implementation ZPDBRestClient
+
+@synthesize attachment,revision;
+
+@end
+
 
 @implementation ZPFileChannel_Dropbox
 
@@ -43,6 +57,7 @@
         }
     }
 }
+
 -(id) init{ 
     
     [ZPFileChannel_Dropbox linkDroboxIfNeeded];
@@ -51,8 +66,7 @@
     
     progressViewsByRequest = [[NSMutableDictionary alloc] init];
     downloadCountsByRequest = [[NSMutableDictionary alloc] init];
-    remoteVersions = [[NSMutableDictionary alloc] init];
-    
+        
     return self;
 }
 
@@ -60,14 +74,20 @@
     return VERSION_SOURCE_DROPBOX;
 }
 
+-(NSObject*) keyForRequest:(NSObject*)request{
+    return [NSNumber numberWithInt: request];
+}
+
+#pragma mark - Downloads
+
 -(void) startDownloadingAttachment:(ZPZoteroAttachment*)attachment{
     
     //Link with dropBox account if not already linked
-    TFLog(@"Attempting to download attachment %@ from DropBox",attachment.key);
     [ZPFileChannel_Dropbox linkDroboxIfNeeded];
     
     //TODO: consider pooling these
-    DBRestClient* restClient = [[DBRestClient alloc] initWithSession:[DBSession sharedSession]];
+    ZPDBRestClient* restClient = [[ZPDBRestClient alloc] initWithSession:[DBSession sharedSession]];
+    restClient.attachment = attachment;
     restClient.delegate = self;
     
     [self linkAttachment:attachment withRequest:restClient];
@@ -90,7 +110,9 @@
     [restClient cancelFileLoad:[NSString stringWithFormat:@"/%@/%@",attachment.key,attachment.filename]];
     [self cleanupAfterFinishingAttachment:attachment];
 }
--(void) useProgressView:(UIProgressView*) progressView forAttachment:(ZPZoteroAttachment*)attachment{
+
+
+-(void) useProgressView:(UIProgressView*) progressView forDownloadingAttachment:(ZPZoteroAttachment*)attachment{
 
     
     DBRestClient* restClient = [self requestWithAttachment:attachment];
@@ -99,11 +121,46 @@
         [progressViewsByRequest setObject:progressView forKey:[self keyForRequest:restClient]];
     }
 }
-- (void)restClient:(DBRestClient *)client loadedMetadata:(DBMetadata *)metadata {
+
+#pragma mark - Uploads
+
+-(void) startUploadingAttachment:(ZPZoteroAttachment*)attachment{
+
+    //Link with dropBox account if not already linked
+
+    [ZPFileChannel_Dropbox linkDroboxIfNeeded];
     
+    //TODO: consider pooling these
+    ZPDBRestClient* restClient = [[ZPDBRestClient alloc] initWithSession:[DBSession sharedSession]];
+    restClient.attachment = attachment;
+    restClient.delegate = self;
     
+    [self linkAttachment:attachment withRequest:restClient];
+    
+    NSString* targetPath = [NSString stringWithFormat:@"/%@/",attachment.key];
+    
+    NSLog(@"Uploading file %@ to %@%@ (rev %@)",attachment.fileSystemPath_modified,targetPath,attachment.filename,attachment.versionIdentifier_local);
+    
+    [restClient uploadFile:attachment.filename toPath:targetPath withParentRev:attachment.versionIdentifier_local fromPath:attachment.fileSystemPath_modified];
+   // [restClient uploadFile:attachment.filename toPath:@"/" withParentRev:NULL fromPath:attachment.fileSystemPath_modified];
+
+}
+
+-(void) useProgressView:(UIProgressView *)progressView forUploadingAttachment:(ZPZoteroAttachment *)attachment{
+    DBRestClient* restClient = [self requestWithAttachment:attachment];
+    
+    @synchronized(progressViewsByRequest){
+        [progressViewsByRequest setObject:progressView forKey:[self keyForRequest:restClient]];
+    }
+
+}
+
+#pragma mark - Call backs
+
+- (void)restClient:(ZPDBRestClient*)client loadedMetadata:(DBMetadata *)metadata {
+        
     if (metadata.isDirectory) {
-        ZPZoteroAttachment* attachment = [self attachmentWithRequest:client];
+        ZPZoteroAttachment* attachment = client.attachment;
         NSLog(@"Folder '%@' contains:", metadata.path);
         NSString* basePath=[NSTemporaryDirectory() stringByAppendingPathComponent:[NSString stringWithFormat:@"ZP%@%i",attachment.key,[[NSDate date] timeIntervalSince1970]*1000000]];
         [[NSFileManager defaultManager] createDirectoryAtPath:basePath withIntermediateDirectories:YES attributes:NULL error:NULL];
@@ -118,14 +175,15 @@
     }
     else{
         //Set version of the file
-        ZPZoteroAttachment* attachment = [self attachmentWithRequest:client];
-        [remoteVersions setObject:metadata.rev forKey:attachment.key];
-        NSString* tempFile = [NSTemporaryDirectory() stringByAppendingPathComponent:[NSString stringWithFormat:@"ZP%@%i",attachment.key,[[NSDate date] timeIntervalSince1970]*1000000]];
-        [client loadFile:[NSString stringWithFormat:@"/%@/%@",attachment.key,attachment.filename] intoPath:tempFile];
+        ZPZoteroAttachment* attachment = client.attachment;
+        client.revision=metadata.rev;
+        NSLog(@"Start downloading file /%@/%@ (rev %@)",attachment.key,attachment.filename,client.revision);
+         NSString* tempFile = [NSTemporaryDirectory() stringByAppendingPathComponent:[NSString stringWithFormat:@"ZP%@%i",attachment.key,[[NSDate date] timeIntervalSince1970]*1000000]];
+        [client loadFile:[NSString stringWithFormat:@"/%@/%@",attachment.key,attachment.filename] atRev:client.revision intoPath:tempFile];
     }
 }
 
-- (void)restClient:(DBRestClient *)client loadMetadataFailedWithError:(NSError *)error {
+- (void)restClient:(ZPDBRestClient*) client loadMetadataFailedWithError:(NSError *)error {
     
     NSLog(@"Error loading metadata: %@", error);
     
@@ -135,15 +193,15 @@
         [[DBSession sharedSession] link];
     }
     
-    ZPZoteroAttachment* attachment = [self attachmentWithRequest:client];
+    ZPZoteroAttachment* attachment = client.attachment;
     [[ZPServerConnection instance] failedDownloadingAttachment:attachment withError:error usingFileChannel:self];    
     [self cleanupAfterFinishingAttachment:attachment];
 
 }
 
-- (void)restClient:(DBRestClient*)client loadProgress:(CGFloat)progress forFile:(NSString*)destPath{
+- (void)restClient:(ZPDBRestClient*)client loadProgress:(CGFloat)progress forFile:(NSString*)destPath{
 
-    ZPZoteroAttachment* attachment = [self attachmentWithRequest:client];
+    ZPZoteroAttachment* attachment = client.attachment;
     if(!([attachment.linkMode intValue] == LINK_MODE_IMPORTED_URL && [attachment.contentType isEqualToString:@"text/html"])){ 
         @synchronized(progressViewsByRequest){
             UIProgressView* progressView = [progressViewsByRequest objectForKey:[self keyForRequest:client]];
@@ -151,9 +209,9 @@
         }
     }
 }
-- (void)restClient:(DBRestClient*)client loadedFile:(NSString*)localPath {
+- (void)restClient:(ZPDBRestClient*)client loadedFile:(NSString*)localPath {
     
-    ZPZoteroAttachment* attachment = [self attachmentWithRequest:client];
+    ZPZoteroAttachment* attachment = client.attachment;
     
     //If this is a webpage snapshot
     if([attachment.linkMode intValue] == LINK_MODE_IMPORTED_URL && [attachment.contentType isEqualToString:@"text/html"]){
@@ -209,19 +267,21 @@
             [[NSFileManager defaultManager] removeItemAtPath:tempPath error:NULL];
             
             localPath = zipFilePath;
+            
+            //Website snapshots do not use revision info in Dropbox
+            
             [[ZPServerConnection instance] finishedDownloadingAttachment:attachment toFileAtPath:localPath withVersionIdentifier:NULL usingFileChannel:self];
             [self cleanupAfterFinishingAttachment:attachment];
         }
     }
     else{
-        NSString* versionIdentifier = [remoteVersions objectForKey:attachment.key];
-        [[ZPServerConnection instance] finishedDownloadingAttachment:attachment toFileAtPath:localPath withVersionIdentifier:versionIdentifier usingFileChannel:self];
+        [[ZPServerConnection instance] finishedDownloadingAttachment:attachment toFileAtPath:localPath withVersionIdentifier:client.revision usingFileChannel:self];
         [self cleanupAfterFinishingAttachment:attachment];
     }
 }
 
-- (void)restClient:(DBRestClient*)client loadFileFailedWithError:(NSError*)error {
-    NSLog(@"There was an error loading the file - %@", error);
+- (void)restClient:(ZPDBRestClient*)client loadFileFailedWithError:(NSError*)error {
+    NSLog(@"There was an error downloading the file - %@", error);
 
     //If we are not linked, link
     if(error.code==401){
@@ -229,11 +289,47 @@
         [[DBSession sharedSession] link];
     }
 
-    ZPZoteroAttachment* attachment = [self attachmentWithRequest:client];
+    ZPZoteroAttachment* attachment = client.attachment;
     [[ZPServerConnection instance] failedDownloadingAttachment:attachment withError:error usingFileChannel:self];
     [self cleanupAfterFinishingAttachment:attachment];
 
 }
+
+- (void)restClient:(ZPDBRestClient*)client uploadedFile:(NSString*)destPath from:(NSString*)srcPath 
+          metadata:(DBMetadata*)metadata{
+    
+    ZPZoteroAttachment* attachment = client.attachment;
+    
+    //The local file now has a new version identifier
+    attachment.versionIdentifier_local = metadata.rev;
+    
+    [[ZPServerConnection instance] finishedUploadingAttachment:attachment];
+    [self cleanupAfterFinishingAttachment:attachment];
+
+}
+- (void)restClient:(DBRestClient*)client uploadProgress:(CGFloat)progress forFile:(NSString*)destPath from:(NSString*)srcPath{
+
+    @synchronized(progressViewsByRequest){
+        UIProgressView* progressView = [progressViewsByRequest objectForKey:[self keyForRequest:client]];
+        if(progressView!=NULL) [progressView setProgress:progress];
+    }
+
+}
+- (void)restClient:(DBRestClient*)client uploadFileFailedWithError:(NSError*)error{
+    NSLog(@"There was an error uploading the file - %@", error);
+    
+    //If we are not linked, link
+    if(error.code==401){
+        TFLog(@"Linking Dropbox");
+        [[DBSession sharedSession] link];
+    }
+    
+    ZPZoteroAttachment* attachment = [(ZPDBRestClient* )client attachment];
+    [[ZPServerConnection instance] failedUploadingAttachment:attachment withError:error usingFileChannel:self];
+    [self cleanupAfterFinishingAttachment:attachment];
+}
+
+#pragma mark - Utility methdods
 
 -(void) cleanupAfterFinishingAttachment:(ZPZoteroAttachment*)attachment{
     
@@ -242,5 +338,6 @@
     }
     [super cleanupAfterFinishingAttachment:attachment];
 }
+
 
 @end

@@ -11,8 +11,10 @@
 
 @implementation ZPZoteroItem
 
-@synthesize fullCitation, numTags,dateAdded;
+@synthesize fullCitation, numTags,dateAdded,etag,jsonFromServer;
 @synthesize attachments = _attachments;
+
+//TODO: Consider what happens when the cache is purged. This may result in duplicate objects with the same key.
 
 static NSCache* _objectCache = NULL;
 

@@ -20,6 +20,7 @@
 #import "ZPServerConnection.h"
 #import "ZPPreferences.h"
 #import "ZPAttachmentIconViewController.h"
+#import "ZPAttachmentCarouselDelegate.h"
 
 //Define 
 
@@ -28,21 +29,13 @@
 #define ATTACHMENT_VIEW_HEIGHT (IPAD ? 600 : 400)
 
 @interface ZPItemDetailViewController(){
-    NSMutableDictionary* _cachedViewControllers;
     ZPAttachmentFileInteractionController* _attachmentInteractionController;
+    ZPAttachmentCarouselDelegate* _carouselDelegate;
 }
 
 - (void) _reconfigureDetailTableView:(BOOL)animated;
-- (void) _reconfigureCarousel;
 - (NSString*) _textAtIndexPath:(NSIndexPath*)indexPath isTitle:(BOOL)isTitle;
-
-- (void) _toggleActionButtonState;
-
 - (BOOL) _useAbstractCell:(NSIndexPath*)indexPath;
-    
--(void) _reloadAttachmentInCarousel:(ZPZoteroItem*)attachment;
--(void) _reloadCarouselItemAtIndex:(NSInteger) index;
-
 -(CGRect) _getDimensionsWithImage:(UIImage*) image; 
 
 @end
@@ -63,17 +56,24 @@
     
     [[ZPDataLayer instance] registerItemObserver:self];
 
-    //Need so that we can toggle action button
-    [[ZPDataLayer instance] registerAttachmentObserver:self];
-
     //configure carousel
     _carousel = [[iCarousel alloc] initWithFrame:CGRectMake(0,0, 
                                                             self.view.frame.size.width,
                                                             ATTACHMENT_VIEW_HEIGHT)];
-    _carousel.type = iCarouselTypeCoverFlow2;    
-    [_carousel setDataSource:self];
-    [_carousel setDelegate:self];
+    _carousel.type = iCarouselTypeCoverFlow2;
     
+    _carouselDelegate = [[ZPAttachmentCarouselDelegate alloc] init];
+    _carouselDelegate.actionButton=self.actionButton;
+    _carouselDelegate.carousel = _carousel;
+    _carouselDelegate.mode = ZPATTACHMENTICONGVIEWCONTROLLER_MODE_DOWNLOAD;
+    _carouselDelegate.show = ZPATTACHMENTICONGVIEWCONTROLLER_SHOW_ORIGINAL_OR_MODIFIED;
+    
+    [_carousel setDataSource:_carouselDelegate];
+    [_carousel setDelegate:_carouselDelegate];
+    
+    [[ZPDataLayer instance] registerAttachmentObserver:_carouselDelegate];
+    [[ZPDataLayer instance] registerItemObserver:_carouselDelegate];
+
     self.tableView.tableHeaderView = _carousel;
 
     //Configure activity indicator.
@@ -82,9 +82,6 @@
     UIBarButtonItem* barButton = [[UIBarButtonItem alloc] initWithCustomView:_activityIndicator];
     self.navigationItem.rightBarButtonItems = [NSArray arrayWithObjects:self.actionButton, barButton, nil];
 
-    _cachedViewControllers = [[NSMutableDictionary alloc] init];
-    
-    [self _toggleActionButtonState];
 }
 
 - (void)viewWillAppear:(BOOL)animated
@@ -114,6 +111,8 @@
 {
     
     [[ZPDataLayer instance] removeItemObserver:self];
+    [[ZPDataLayer instance] removeItemObserver:_carouselDelegate];
+    [[ZPDataLayer instance] removeAttachmentObserver:_carouselDelegate];
     
 	[super viewWillDisappear:animated];
 }
@@ -137,25 +136,13 @@
 
     
     [self _reconfigureDetailTableView:FALSE];
-    [self _reconfigureCarousel];
-
+    [_carouselDelegate configureWithZoteroItem:_currentItem];
+    [_carousel reloadData];
     
     self.navigationItem.title=_currentItem.shortCitation;
     
 
 }
-- (void) _reconfigureCarousel{
-    if([_currentItem.attachments count]==0){
-        [_carousel setHidden:TRUE];
-    }
-    else{
-        [_carousel setHidden:FALSE];
-        [_carousel setScrollEnabled:[_currentItem.attachments count]>1];
-        [_carousel performSelectorOnMainThread:@selector(reloadData) withObject:NULL waitUntilDone:NO];
-    }
-    [self _toggleActionButtonState];
-}
-
 
 - (void)_reconfigureDetailTableView:(BOOL)animated{
     
@@ -172,26 +159,6 @@
     if(_attachmentInteractionController == NULL)  _attachmentInteractionController = [[ZPAttachmentFileInteractionController alloc] init];
     [_attachmentInteractionController setAttachment:currentAttachment];
     [_attachmentInteractionController presentOptionsMenuFromBarButtonItem:sender];
-}
-
-
-/*
-
- Checks if the currently selected attachment has a file and enables or disables the activity buttone
- 
- */
-
-- (void) _toggleActionButtonState{
-    if([_currentItem.attachments count]==0){
-        self.actionButton.enabled = FALSE;
-    }
-    else{
-        NSInteger currentIndex = _carousel.currentItemIndex;
-        // Initially the iCarousel can return a negative index. This is probably a bug.
-        if(currentIndex <0) currentIndex = 0;
-        ZPZoteroAttachment* attachment = [_currentItem.attachments objectAtIndex:currentIndex];
-        self.actionButton.enabled = attachment.fileExists &! [attachment.contentType isEqualToString:@"text/html"];
-    }
 }
 
 
@@ -432,88 +399,6 @@
 
 
 
-#pragma mark - iCarousel delegate
-
-
-- (NSUInteger)numberOfPlaceholdersInCarousel:(iCarousel *)carousel{
-    return 0;
-}
-
-- (NSUInteger)numberOfItemsInCarousel:(iCarousel *)carousel
-{
-    if(_currentItem.attachments == NULL) return 0;
-    else return [_currentItem.attachments count];
-}
-
-
-- (NSUInteger) numberOfVisibleItemsInCarousel:(iCarousel*)carousel{
-    NSInteger numItems = [self numberOfItemsInCarousel:carousel];
-    NSInteger ret=  MAX(numItems,5);
-    return ret;
-}
-
-- (UIView *)carousel:(iCarousel *)carousel viewForItemAtIndex:(NSUInteger)index reusingView:(UIView*)view
-{
-    ZPAttachmentIconViewController* attachmentViewController;
-    
-    if(view==NULL){
-        UIStoryboard *storyboard = self.storyboard;
-        attachmentViewController = [storyboard instantiateViewControllerWithIdentifier:@"AttachmentPreview"];
-        @synchronized(_cachedViewControllers){
-            [_cachedViewControllers setObject:attachmentViewController forKey:[NSNumber numberWithInt:view]];
-        }
-    }
-    else{
-        @synchronized(_cachedViewControllers){
-            attachmentViewController = [_cachedViewControllers objectForKey:[NSNumber numberWithInt:view]];
-        }
-    }
-
-    attachmentViewController.attachment= [_currentItem.attachments objectAtIndex:index];
-    attachmentViewController.allowDownloading = TRUE;
-    attachmentViewController.usePreview = TRUE;
-    attachmentViewController.showLabel = TRUE;
-    return attachmentViewController.view;
-}
-
-//This is implemented because it is a mandatory protocol method
-- (UIView *)carousel:(iCarousel *)carousel placeholderViewAtIndex:(NSUInteger)index reusingView:(UIView *)view{
-    return view;
-}
-
-- (void)carousel:(iCarousel *)carousel didSelectItemAtIndex:(NSInteger)index{
-    if([carousel currentItemIndex] == index){
-        
-        ZPZoteroAttachment* attachment = [_currentItem.attachments objectAtIndex:index]; 
-        
-        if([attachment fileExists] ||
-           ([attachment.linkMode intValue] == LINK_MODE_LINKED_URL && [ZPServerConnection instance])){
-            UIView* sourceView;
-            for(sourceView in _carousel.visibleItemViews){
-                if([carousel indexOfItemView:sourceView] == index) break;
-            }
-            
-            [ZPPreviewController displayQuicklookWithAttachment:attachment sourceView:sourceView];
-        }
-        else if([attachment.linkMode intValue] == LINK_MODE_IMPORTED_FILE || 
-                [attachment.linkMode intValue] == LINK_MODE_IMPORTED_URL){
-            
-            ZPServerConnection* connection = [ZPServerConnection instance];
-            
-            
-            if(connection!=NULL && ! [connection isAttachmentDownloading:attachment]){
-                NSLog(@"Started downloading file %@ in index %i",attachment.title,index);
-                [connection checkIfCanBeDownloadedAndStartDownloadingAttachment:attachment];   
-            }
-            
-        }
-
-    }
-}
-
-- (void)carouselCurrentItemIndexUpdated:(iCarousel *)carousel{
-    [self _toggleActionButtonState];
-}
 
 #pragma mark - Observer methods
 
@@ -525,38 +410,12 @@
     
     if([item.key isEqualToString:_currentItem.key]){
         _currentItem = item;
-        [_activityIndicator startAnimating];
-        if([_carousel numberOfItems]!= item.attachments.count){
-// This used to be animated, but it is now simply always displayed
-            //            [UIView animateWithDuration:0.5 animations:^{
-                [self _reconfigureCarousel];
-//          }];
-        }
         [self performSelectorOnMainThread:@selector(_reconfigureDetailTableView:) withObject:[NSNumber numberWithBool:TRUE] waitUntilDone:NO];
-        
+
+        //If we had the activity indicator animating, stop it now because we are no longer waiting for data
         [_activityIndicator stopAnimating];
         
     }
 }
-
--(void) _reloadAttachmentInCarousel:(ZPZoteroItem*)attachment {
-    NSInteger index = [_currentItem.attachments indexOfObject:attachment];
-    if(index !=NSNotFound){
-        [self performSelectorOnMainThread:@selector(_reloadCarouselItemAtIndex:) withObject:[NSNumber numberWithInt:index] waitUntilDone:YES];
-    }
-}
-
--(void) _reloadCarouselItemAtIndex:(NSInteger) index{
-    [_carousel reloadItemAtIndex:index animated:YES];
-}
-
--(void) notifyAttachmentDownloadCompleted:(ZPZoteroAttachment*) attachment{
-    //Check if this had an effect on our currently displayed item
-    [self _toggleActionButtonState];
-}
-
--(void) notifyAttachmentDownloadFailed:(ZPZoteroAttachment*) attachment withError:(NSError*) error{}
-
--(void) notifyAttachmentDownloadStarted:(ZPZoteroAttachment*) attachment{}
 
 @end

@@ -159,7 +159,13 @@ static ZPPreviewControllerDelegate* _sharedDelegate;
         
         ZPPreviewController* quicklook = [[ZPPreviewController alloc] initWithAttachment:attachment sourceView:view];
         
-        UIViewController* root = [UIApplication sharedApplication].delegate.window.rootViewController;        
+        UIViewController* root = [UIApplication sharedApplication].delegate.window.rootViewController;
+
+        //Find the top most view controller.
+        
+        while(root.presentedViewController){
+            root = root.presentedViewController;
+        }
         [root presentModalViewController:quicklook animated:YES];
         
     }

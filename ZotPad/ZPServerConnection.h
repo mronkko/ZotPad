@@ -21,6 +21,7 @@
         
     NSInteger _activeRequestCount;
     NSMutableSet* _activeDownloads;
+    NSMutableSet* _activeUploads;
     
     ZPFileChannel* _fileChannel_WebDAV;
     ZPFileChannel* _fileChannel_Dropbox;
@@ -56,10 +57,16 @@
 -(void) finishedDownloadingAttachment:(ZPZoteroAttachment*)attachment toFileAtPath:(NSString*) tempFile withVersionIdentifier:(NSString*) identifier usingFileChannel:(ZPFileChannel*)fileChannel;
 -(void) failedDownloadingAttachment:(ZPZoteroAttachment*)attachment withError:(NSError*) error usingFileChannel:(ZPFileChannel*)fileChannel;
 -(void) cancelDownloadingAttachment:(ZPZoteroAttachment*)attachment;
--(void) useProgressView:(UIProgressView*) progressView forAttachment:(ZPZoteroAttachment*)attachment;
+-(void) useProgressView:(UIProgressView*) progressView forDownloadingAttachment:(ZPZoteroAttachment*)attachment;
 -(BOOL) isAttachmentDownloading:(ZPZoteroAttachment*)attachment;
-//-(BOOL) canUploadVersionForAttachment:(ZPZoteroAttachment*)attachment;
-//-(void) downloadAttachmentFromZoteroServer:(ZPZoteroAttachment*)attachment toTempFile:(NSString*)filePath withUIProgressView:(UIProgressView*) progressView;
 
+//Asynchronous uploading of files
+-(NSInteger) numberOfFilesUploading;
+-(void) uploadVersionOfAttachment:(ZPZoteroAttachment*)attachment;
+-(void) finishedUploadingAttachment:(ZPZoteroAttachment*)attachment;
+-(void) failedUploadingAttachment:(ZPZoteroAttachment*)attachment withError:(NSError*) error usingFileChannel:(ZPFileChannel*)fileChannel;
+-(void) canceledUploadingAttachment:(ZPZoteroAttachment*)attachment usingFileChannel:(ZPFileChannel*)fileChannel;
+-(void) useProgressView:(UIProgressView*) progressView forUploadingAttachment:(ZPZoteroAttachment*)attachment;
+-(BOOL) isAttachmentUploading:(ZPZoteroAttachment*)attachment;
 
 @end

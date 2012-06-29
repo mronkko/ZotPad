@@ -20,6 +20,17 @@
 
 #define CHUNK 16384
 
+NSInteger const ZPATTACHMENTICONGVIEWCONTROLLER_MODE_STATIC = 0;
+NSInteger const ZPATTACHMENTICONGVIEWCONTROLLER_MODE_UPLOAD = 1;
+NSInteger const ZPATTACHMENTICONGVIEWCONTROLLER_MODE_DOWNLOAD = 2;
+NSInteger const ZPATTACHMENTICONGVIEWCONTROLLER_MODE_FIRST_STATIC_SECOND_DOWNLOAD = 3;
+
+NSInteger const ZPATTACHMENTICONGVIEWCONTROLLER_SHOW_ORIGINAL = 10;
+NSInteger const ZPATTACHMENTICONGVIEWCONTROLLER_SHOW_MODIFIED = 11;
+NSInteger const ZPATTACHMENTICONGVIEWCONTROLLER_SHOW_ORIGINAL_OR_MODIFIED = 12;
+NSInteger const ZPATTACHMENTICONGVIEWCONTROLLER_SHOW_FIRST_MODIFIED_SECOND_ORIGINAL = 13;
+
+
 @interface ZPAttachmentIconViewController (){
     UIGestureRecognizer* _tapRecognizer;
 }
@@ -30,6 +41,7 @@
 -(void) _renderPDFPreview;
 -(void) _showPDFPreview:(UIImage*) image;
 -(void) _captureWebViewContent:(UIWebView*) webView forCacheKey:(NSString*) cacheKey;
++(void) _uncompressSVGZ:(NSString*)name;
 
 @end
 
@@ -41,21 +53,11 @@ static ZPAttachmentIconViewController* _webViewDelegate;
 
 @implementation ZPAttachmentIconViewController
 
-@synthesize titleLabel;
-@synthesize downloadLabel;
-@synthesize cancelButton;
-@synthesize progressView;
-@synthesize fileImage;
-@synthesize attachment;
-@synthesize allowDownloading;
-@synthesize usePreview;
-@synthesize showLabel;
-@synthesize labelBackground;
-@synthesize errorLabel;
-
+@synthesize titleLabel, progressLabel, cancelButton, progressView, fileImage, attachment, labelBackground, errorLabel;
+@synthesize mode, show;
 
 + (void)initialize{
-
+    
     _previewCache = [[NSCache alloc] init];
     [_previewCache setCountLimit:20];
     _fileIconCache = [[NSCache alloc] init];
@@ -78,25 +80,37 @@ static ZPAttachmentIconViewController* _webViewDelegate;
 {
     [super viewDidLoad];
     NSLog(@"Loading view for ZPAttachmentPreviewViewController %x",self);
-
+    
     [self _configurePreview];
     
-    if(self.showLabel){
-        // Do any additional setup after loading the view.
+    if(self.mode == ZPATTACHMENTICONGVIEWCONTROLLER_MODE_DOWNLOAD){
+        [self _configureDownloadLabel];
+    }
+    else if(self.mode == ZPATTACHMENTICONGVIEWCONTROLLER_MODE_UPLOAD){
+        self.progressLabel.hidden = FALSE;
         
-        if(self.allowDownloading){
-            [self _configureDownloadLabel];
+        if([[ZPServerConnection instance] isAttachmentDownloading:self.attachment]){
+            [self notifyAttachmentDownloadStarted:attachment];
         }
-        [self _configureTitleLabel];
-        
-        // Extra configuration not possible in Interface Builder
-        self.labelBackground.layer.cornerRadius = 8;
-        self.view.layer.borderWidth = 2.0f;
-        
+        else{
+            self.progressLabel.text = @"Waiting for upload";
+        }    
     }
-    else{
-        self.labelBackground.hidden = TRUE;
+    if(self.mode == ZPATTACHMENTICONGVIEWCONTROLLER_MODE_STATIC){
+        if(attachment.fileExists)
+            self.progressLabel.hidden =TRUE;
+        else
+            self.progressLabel.text = @"File not found";
     }
+    
+    [self _configureTitleLabel];
+    
+    // Extra configuration not possible in Interface Builder
+    self.labelBackground.backgroundColor = [[UIColor blackColor] colorWithAlphaComponent:.5];
+    self.labelBackground.layer.cornerRadius = 8;
+    self.view.layer.borderWidth = 2.0f;
+    
+    [[ZPDataLayer instance] registerAttachmentObserver:self];
 }
 
 - (void)viewDidUnload
@@ -109,24 +123,35 @@ static ZPAttachmentIconViewController* _webViewDelegate;
 - (BOOL)shouldAutorotateToInterfaceOrientation:(UIInterfaceOrientation)interfaceOrientation
 {
     return TRUE;
-//    return (interfaceOrientation == UIInterfaceOrientationPortrait);
+    //    return (interfaceOrientation == UIInterfaceOrientationPortrait);
 }
 
 
 -(void) _configureDownloadLabel{
     
     
-    self.downloadLabel.hidden = FALSE;
-
+    self.progressLabel.hidden = FALSE;
+    
     if([[ZPServerConnection instance] isAttachmentDownloading:self.attachment]){
         [self notifyAttachmentDownloadStarted:attachment];
     }
     else{
-
+        
         //Imported files and URLs have files that can be downloaded
-
-        if(([attachment.linkMode intValue] == LINK_MODE_IMPORTED_FILE || [attachment.linkMode intValue] == LINK_MODE_IMPORTED_URL )
-           && ! [attachment fileExists]){
+        
+        NSInteger linkMode = [attachment.linkMode intValue ];
+        BOOL exists;
+        if(show == ZPATTACHMENTICONGVIEWCONTROLLER_SHOW_ORIGINAL){
+            exists = ([[NSFileManager defaultManager] fileExistsAtPath:attachment.fileSystemPath_original]);
+        }
+        else if(show == ZPATTACHMENTICONGVIEWCONTROLLER_SHOW_MODIFIED){
+            exists = ([[NSFileManager defaultManager] fileExistsAtPath:attachment.fileSystemPath_modified]);
+        }
+        else{
+            exists = [attachment fileExists];
+        }
+        if((linkMode == LINK_MODE_IMPORTED_FILE || linkMode == LINK_MODE_IMPORTED_URL )
+           && ! exists){
             
             //Register self as observer for item downloads
             
@@ -144,35 +169,35 @@ static ZPAttachmentIconViewController* _webViewDelegate;
                 if(source != NULL){
                     if(attachment.attachmentSize != [NSNull null]){
                         NSInteger size = [attachment.attachmentSize intValue];
-                        self.downloadLabel.text =  [NSString stringWithFormat:@"Download from %@ (%i KB)",source,size/1024];
+                        self.progressLabel.text =  [NSString stringWithFormat:@"Download from %@ (%i KB)",source,size/1024];
                     }
                     else{
-                        self.downloadLabel.text = [NSString stringWithFormat:@"Download from %@ (unknown size)",source];
+                        self.progressLabel.text = [NSString stringWithFormat:@"Download from %@ (unknown size)",source];
                     }
                 }
                 else {
-                    self.downloadLabel.text = @"File cannot be found for download";
+                    self.progressLabel.text = @"File cannot be found for download";
                 }
             }
-            else  self.downloadLabel.text = @"File cannot be downloaded when offline";
+            else  self.progressLabel.text = @"File cannot be downloaded when offline";
         }
         
         // Linked URL will be shown in directly from web 
         
         else if ([attachment.linkMode intValue] == LINK_MODE_LINKED_URL &&
                  !  [[ZPPreferences instance] online]){
-            self.downloadLabel.text = @"Linked URL cannot be viewed in offline mode";
+            self.progressLabel.text = @"Linked URL cannot be viewed in offline mode";
             
         }
         
         //Linked files are available only on the computer where they were created
         
         else if ([attachment.linkMode intValue] == LINK_MODE_LINKED_FILE) {
-            self.downloadLabel.text = @"Linked files cannot be viewed from ZotPad";
+            self.progressLabel.text = @"Linked files cannot be viewed in ZotPad";
         }
         
         else{
-            self.downloadLabel.hidden = TRUE;
+            self.progressLabel.hidden = TRUE;
         }
     }    
 }
@@ -184,14 +209,19 @@ static ZPAttachmentIconViewController* _webViewDelegate;
     
     //Imported files and URLs have files that can be downloaded
     
-    if([attachment fileExists] && ![attachment.contentType isEqualToString:@"application/pdf"]){
-        extraInfo = [@"Preview not supported for " stringByAppendingString:attachment.contentType];
-    }
-    else if ([attachment.linkMode intValue] == LINK_MODE_LINKED_URL &&
-             [[ZPPreferences instance] online]){
-        extraInfo = @"Preview not supported for linked URL";
-        
-    }
+    /*
+     
+     // These are confusing for the users
+     
+     if([attachment fileExists] && ![attachment.contentType isEqualToString:@"application/pdf"]){
+     extraInfo = [@"Preview not supported for " stringByAppendingString:attachment.contentType];
+     }
+     else if ([attachment.linkMode intValue] == LINK_MODE_LINKED_URL &&
+     [[ZPPreferences instance] online]){
+     extraInfo = @"Preview not supported for linked URL";
+     
+     }
+     */
     
     //Add information over the thumbnail
     
@@ -200,10 +230,10 @@ static ZPAttachmentIconViewController* _webViewDelegate;
     if(extraInfo!=NULL) label.text = [NSString stringWithFormat:@"%@ \n\n(%@)", attachment.title, extraInfo];
     else label.text = [NSString stringWithFormat:@"%@", attachment.title];
     
-
+    
 }
 -(void) _configurePreview{
-
+    
     UIImage* image = NULL;
     
     if(attachment.fileExists && [attachment.contentType isEqualToString:@"application/pdf"]){
@@ -239,14 +269,23 @@ static ZPAttachmentIconViewController* _webViewDelegate;
     
     NSString* filename =[attachment.contentType stringByReplacingOccurrencesOfString:@"/" withString:@"-"];
     
-
     CGRect frame = fileImage.bounds;
     NSInteger width = (NSInteger)roundf(frame.size.width);
     NSInteger height = (NSInteger)roundf(frame.size.height);
     
-    NSString* cacheKey = [filename stringByAppendingFormat:@"-%ix%i",width,height];
-
-//    NSLog(@"Getting icon for %@",cacheKey);
+    NSString* emblem = @"";
+    BOOL useEmblem=FALSE;
+    if([attachment.linkMode intValue] == LINK_MODE_LINKED_URL){
+        emblem =@"emblem-symbolic-link";
+        useEmblem = TRUE;
+    }else if( [attachment.linkMode intValue] == LINK_MODE_LINKED_FILE){
+        emblem =@"emblem-locked";
+        useEmblem = TRUE;
+    }
+    
+    NSString* cacheKey = [filename stringByAppendingFormat:@"%@-%ix%i",emblem,width,height];
+    
+    //    NSLog(@"Getting icon for %@",cacheKey);
     
     UIImage* cacheImage = NULL;
     BOOL render = false;
@@ -255,11 +294,11 @@ static ZPAttachmentIconViewController* _webViewDelegate;
         if(cacheImage == NULL){
             [_fileIconCache setObject:[NSNull null] forKey:cacheKey];
             render = TRUE;
-             
+            
         }
-
+        
     }
-
+    
     //Check if we are currently rendering this and if we still need to keep rendering
     if(cacheImage == [NSNull null]){
         @synchronized(_viewsThatAreRendering){
@@ -267,14 +306,14 @@ static ZPAttachmentIconViewController* _webViewDelegate;
             //If the previous rendering view is no longer on screen
             if(renderingView != NULL && !(renderingView.superview)){
                 NSLog(@"Previously rendering view %i is no longer on screen %@ (super: %i window %i)",renderingView, cacheKey, renderingView.superview, renderingView.window);
-
+                
                 render = TRUE;   
             }
         }
     }
     
     //No image in cache, and we are not currently rendering one either
-
+    
     if(render){
         //If a file exists on disk, use that
         
@@ -309,35 +348,26 @@ static ZPAttachmentIconViewController* _webViewDelegate;
             
             if([[NSFileManager defaultManager] fileExistsAtPath:filePath]){
                 
-                //Uncompress the image
                 
-                NSString* pathString = NSTemporaryDirectory();
-                NSLog(@"Render path is %@",pathString);
-                NSString* tempFile = [pathString stringByAppendingPathComponent:[filename stringByAppendingString:@".svg"]];
+                [self _uncompressSVGZ:filename];
                 
+                NSString* content;
                 
-                gzFile file = gzopen([filePath UTF8String], "rb");
-                
-                FILE *dest = fopen([tempFile UTF8String], "w");
-                
-                unsigned char buffer[CHUNK];
-                
-                int uncompressedLength;
-                
-                while (uncompressedLength = gzread(file, buffer, CHUNK) ) {
-                    // got data out of our file
-                    if(fwrite(buffer, 1, uncompressedLength, dest) != uncompressedLength || ferror(dest)) {
-                        NSLog(@"error writing data");
-                    }
+                //Render the emblem
+                if(useEmblem){
+                    [self _uncompressSVGZ:emblem];
+                    
+                    //Render the uncompressed file using a HTML file as a wrapper
+                    
+                    content = [NSString stringWithFormat:@"<html><body onload=\"document.location='zotpad:%@'\"><div style=\"position: absolute; z-index:100\"><img src=\"%@.svg\" width=%i height=%i></div><img src=\"%@.svg\" width=%i height=%i></body></html>",cacheKey,emblem,width/4,height/4,filename,width,height];          
+                }
+                else{
+                    content = [NSString stringWithFormat:@"<html><body onload=\"document.location='zotpad:%@'\"><img src=\"%@.svg\" width=%i height=%i></body></html>",cacheKey,filename,width,height];          
                 }
                 
-                fclose(dest);
-                gzclose(file);  
+                NSLog(content);
                 
-                //Render the uncompressed file using a HTML file as a wrapper
-                
-                NSString* content = [NSString stringWithFormat:@"<html><body onload=\"document.location='zotpad:%@'\"><img src=\"%@.svg\" width=%i height=%i></body></html>",cacheKey,filename,width,height];          
-                NSURL *baseURL = [NSURL fileURLWithPath:pathString];
+                NSURL *baseURL = [NSURL fileURLWithPath:NSTemporaryDirectory()];
                 
                 webview.delegate=_webViewDelegate;
                 
@@ -367,10 +397,37 @@ static ZPAttachmentIconViewController* _webViewDelegate;
     }
     //We have a cached image
     else{
-//        NSLog(@"Using cached image %@",cacheKey);
+        //        NSLog(@"Using cached image %@",cacheKey);
         
         fileImage.image = cacheImage;
     }
+}
+
++(void) _uncompressSVGZ:(NSString *)filename{
+    
+    //Uncompress the image
+    NSString* sourceFile = [[[NSBundle mainBundle] resourcePath] 
+                            stringByAppendingPathComponent:[filename stringByAppendingString:@".svgz"]];
+    
+    NSString* tempFile = [NSTemporaryDirectory() stringByAppendingPathComponent:[filename stringByAppendingString:@".svg"]];
+    
+    gzFile file = gzopen([sourceFile UTF8String], "rb");
+    
+    FILE *dest = fopen([tempFile UTF8String], "w");
+    
+    unsigned char buffer[CHUNK];
+    
+    int uncompressedLength;
+    
+    while (uncompressedLength = gzread(file, buffer, CHUNK) ) {
+        // got data out of our file
+        if(fwrite(buffer, 1, uncompressedLength, dest) != uncompressedLength || ferror(dest)) {
+            NSLog(@"error writing data");
+        }
+    }
+    
+    fclose(dest);
+    gzclose(file);  
 }
 
 
@@ -384,15 +441,16 @@ static ZPAttachmentIconViewController* _webViewDelegate;
         @synchronized(_viewsThatAreRendering){
             [_viewsThatAreRendering removeObjectForKey:[components objectAtIndex:1]];
         }
-
+        
 		return NO;
 	}
     
 	return YES;
 }
 
--(void) _captureWebViewContent:(UIWebView *)webview forCacheKey:(NSString*) cacheKey;{
 
+-(void) _captureWebViewContent:(UIWebView *)webview forCacheKey:(NSString*) cacheKey;{
+    
     
     //If the view is still visible, capture the content
     if (webview.window && webview.superview) {
@@ -404,7 +462,7 @@ static ZPAttachmentIconViewController* _webViewDelegate;
         if ([UIScreen instancesRespondToSelector:@selector(scale)] && [[UIScreen mainScreen] scale] == 2.0f) {
             UIGraphicsBeginImageContextWithOptions(size, NO, 2.0f);
         } else {
-            UIGraphicsBeginImageContext(size);
+            UIGraphicsBeginImageContextWithOptions(size, NO, 1.0f);
         }
         
         [webview.layer renderInContext:UIGraphicsGetCurrentContext()];
@@ -471,14 +529,14 @@ static ZPAttachmentIconViewController* _webViewDelegate;
     }
     else{
         @synchronized(_fileIconCache){
-
+            
             NSLog(@"View %i no longer visible. Clearing cahce for image %@",webview, cacheKey);
-
+            
             [_fileIconCache removeObjectForKey:cacheKey];
         }
         
     }
-
+    
 }
 
 -(void) _showPDFPreview:(UIImage*) image {
@@ -488,13 +546,13 @@ static ZPAttachmentIconViewController* _webViewDelegate;
     self.fileImage.layer.borderWidth = 2.0f;
     self.fileImage.layer.borderColor = [UIColor blackColor].CGColor;
     [self.fileImage setBackgroundColor:[UIColor whiteColor]]; 
-
+    
     self.fileImage.image=image;
-
+    
     //Set the old bacground transparent
     self.view.layer.borderColor = [UIColor clearColor].CGColor;
     [self.view setBackgroundColor:[UIColor clearColor]]; 
-
+    
 }
 
 -(void) _renderPDFPreview{
@@ -533,7 +591,7 @@ static ZPAttachmentIconViewController* _webViewDelegate;
     else{
         NSLog(@"Rendering pdf failed %@. File is now deleted because it is most likely corrupted",filename);
         [[[UIAlertView alloc] initWithTitle:@"File error" message:[NSString stringWithFormat:@"A downloaded attachment file (%@) could not be opened because it seems to be corrupted. The file will be now deleted and needs to be downloaded again.",attachment.filename]
-                                  delegate:NULL cancelButtonTitle:@"OK" otherButtonTitles:nil] show];
+                                   delegate:NULL cancelButtonTitle:@"OK" otherButtonTitles:nil] show];
         [[NSFileManager defaultManager] removeItemAtPath:filename error:NULL];
     }
 }
@@ -541,10 +599,10 @@ static ZPAttachmentIconViewController* _webViewDelegate;
 
 -(void) notifyAttachmentDownloadCompleted:(ZPZoteroAttachment*) attachment{
     
-    if(attachment == self.attachment){
+    if([attachment.key isEqualToString: self.attachment.key] && mode ==ZPATTACHMENTICONGVIEWCONTROLLER_MODE_DOWNLOAD){
         if ([NSThread isMainThread]){
             NSLog(@"Success");
-            self.downloadLabel.text = @"Tap to view";
+            self.progressLabel.text = @"Tap to view";
             if([attachment.contentType isEqualToString:@"application/pdf"]) [self _renderPDFPreview];
             self.progressView.hidden = TRUE;
             self.errorLabel.hidden = TRUE;
@@ -556,12 +614,17 @@ static ZPAttachmentIconViewController* _webViewDelegate;
 }
 -(void) notifyAttachmentDownloadFailed:(ZPZoteroAttachment *)attachment withError:(NSError *)error{
     
-    if(attachment == self.attachment){
+    if([attachment.key isEqualToString: self.attachment.key] && mode ==ZPATTACHMENTICONGVIEWCONTROLLER_MODE_DOWNLOAD){
         if ([NSThread isMainThread]){
             NSLog(@"Finished downloading %@",attachment.filename);
-            self.downloadLabel.text = [NSString stringWithFormat:@"Download failed. (%@: %i)",error.domain,error.code];
+            self.progressLabel.text = [NSString stringWithFormat:@"Download failed. (%@: %i)",error.domain,error.code];
             self.progressView.hidden = TRUE;
             NSString* description = [error.userInfo objectForKey:@"error"];
+            
+            if(description == NULL){
+                description = [error localizedDescription];
+            }
+            
             if(description!=NULL){
                 self.errorLabel.text=description;
                 self.errorLabel.hidden = FALSE;
@@ -581,10 +644,10 @@ static ZPAttachmentIconViewController* _webViewDelegate;
 }
 
 -(void) notifyAttachmentDownloadStarted:(ZPZoteroAttachment*) attachment{
-    if(attachment == self.attachment){
+    if([attachment.key isEqualToString: self.attachment.key] && mode ==ZPATTACHMENTICONGVIEWCONTROLLER_MODE_DOWNLOAD){
         if ([NSThread isMainThread]){
-            [[ZPServerConnection instance] useProgressView:self.progressView forAttachment:self.attachment];
-            self.downloadLabel.text = @"Downloading";
+            [[ZPServerConnection instance] useProgressView:self.progressView forDownloadingAttachment:self.attachment];
+            self.progressLabel.text = @"Downloading";
             self.progressView.hidden = FALSE;
             self.errorLabel.hidden = TRUE;
             self.progressView.progress = 0;
@@ -592,14 +655,14 @@ static ZPAttachmentIconViewController* _webViewDelegate;
         }
         else [self performSelectorOnMainThread:@selector(notifyAttachmentDownloadStarted:) withObject:attachment waitUntilDone:NO];
     }
-
+    
 }
 
 -(void) notifyAttachmentDeleted:(ZPZoteroAttachment*) attachment fileAttributes:(NSDictionary*) fileAttributes{
-    if(attachment == self.attachment){
+    if([attachment.key isEqualToString: self.attachment.key]){
         if ([NSThread isMainThread]){
             NSLog(@"Attachment deleted %@",attachment.filename);
-            self.downloadLabel.text = @"Attachment file deleted";
+            self.progressLabel.text = @"Attachment file deleted";
             self.progressView.hidden = TRUE;
             self.errorLabel.hidden = TRUE;
             self.view.userInteractionEnabled = TRUE;
@@ -612,4 +675,78 @@ static ZPAttachmentIconViewController* _webViewDelegate;
         }
     }
 }
+
+-(void) notifyAttachmentUploadCompleted:(ZPZoteroAttachment*) attachment{
+    if([attachment.key isEqualToString: self.attachment.key] && mode ==ZPATTACHMENTICONGVIEWCONTROLLER_MODE_UPLOAD){
+        if ([NSThread isMainThread]){
+            self.progressLabel.text = @"Upload completed";
+            self.progressView.hidden = TRUE;
+            self.errorLabel.hidden = TRUE;
+            
+            
+        }
+        else{
+            dispatch_async(dispatch_get_main_queue(), ^{
+                [self notifyAttachmentUploadCompleted:attachment];
+            });
+        }
+    }
+    
+}
+-(void) notifyAttachmentUploadFailed:(ZPZoteroAttachment*) attachment withError:(NSError*) error{
+    
+    if([attachment.key isEqualToString: self.attachment.key] && mode ==ZPATTACHMENTICONGVIEWCONTROLLER_MODE_UPLOAD){
+        if ([NSThread isMainThread]){
+            self.progressLabel.text = [NSString stringWithFormat:@"Uploading failed. (%@: %i)",error.domain,error.code];
+            self.progressView.hidden = TRUE;
+            NSString* description = [error.userInfo objectForKey:@"error"];
+            if(description!=NULL){
+                self.errorLabel.text=description;
+                self.errorLabel.hidden = FALSE;
+            }
+            else{
+                self.errorLabel.hidden = TRUE;
+            }
+        }
+        else{
+            dispatch_async(dispatch_get_main_queue(), ^{
+                [self notifyAttachmentDownloadFailed:attachment withError:error];
+            });
+        }
+    }
+    
+}
+-(void) notifyAttachmentUploadStarted:(ZPZoteroAttachment*) attachment{
+    if([attachment.key isEqualToString: self.attachment.key] && mode ==ZPATTACHMENTICONGVIEWCONTROLLER_MODE_UPLOAD){
+        if ([NSThread isMainThread]){
+            [[ZPServerConnection instance] useProgressView:self.progressView forUploadingAttachment:self.attachment];
+            self.progressLabel.text = @"Uploading";
+            self.progressView.hidden = FALSE;
+            self.errorLabel.hidden = TRUE;
+            self.progressView.progress = 0;
+        }
+        else{
+            dispatch_async(dispatch_get_main_queue(), ^{
+                [self notifyAttachmentUploadStarted:attachment];
+            });
+        }
+    }
+}
+
+-(void) notifyAttachmentUploadCanceled:(ZPZoteroAttachment*) attachment{
+    if([attachment.key isEqualToString: self.attachment.key] && mode ==ZPATTACHMENTICONGVIEWCONTROLLER_MODE_UPLOAD){
+        if ([NSThread isMainThread]){
+            self.progressLabel.text = @"Upload canceled";
+            self.progressView.hidden = TRUE;
+            self.errorLabel.hidden = TRUE;
+        }
+        else{
+            dispatch_async(dispatch_get_main_queue(), ^{
+                [self notifyAttachmentUploadCanceled:attachment];
+            });
+        }
+    }
+    
+}
+
 @end

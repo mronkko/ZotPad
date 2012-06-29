@@ -8,26 +8,32 @@
 
 #import <Foundation/Foundation.h>
 #import "ZPZoteroAttachment.h"
+
+
+
+
 @interface ZPFileChannel : NSObject {
     NSMutableDictionary* _requestsByAttachment;
-    NSMutableDictionary* _attachmentsByRequest;
-    NSString* _username;
-    NSString* _password;
 }
 
 -(void) startDownloadingAttachment:(ZPZoteroAttachment*)attachment;
 -(void) cancelDownloadingAttachment:(ZPZoteroAttachment*)attachment;
--(void) useProgressView:(UIProgressView*) progressView forAttachment:(ZPZoteroAttachment*)attachment;
+-(void) useProgressView:(UIProgressView*) progressView forDownloadingAttachment:(ZPZoteroAttachment*)attachment;
 -(int) fileChannelType;
 
--(NSString*) username;
--(NSString*) password;
--(void) setUsername:(NSString*)username andPassword:(NSString*)password;
+
+-(void) startUploadingAttachment:(ZPZoteroAttachment*)attachment;
+-(void) cancelUploadingAttachment:(ZPZoteroAttachment*)attachment;
+-(void) useProgressView:(UIProgressView*) progressView forUploadingAttachment:(ZPZoteroAttachment*)attachment;
+
+//Helper methods
 
 -(void) cleanupAfterFinishingAttachment:(ZPZoteroAttachment*)attachment;
 -(void) linkAttachment:(ZPZoteroAttachment*)attachment withRequest:(NSObject*)request;
--(NSObject*) keyForRequest:(NSObject*)request;
 -(id) requestWithAttachment:(ZPZoteroAttachment*)attachment;
--(ZPZoteroAttachment*) attachmentWithRequest:(NSObject*)request;
+
+-(void) presentConflictViewForAttachment:(ZPZoteroAttachment*) attachment;
+
+
 
 @end

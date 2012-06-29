@@ -22,6 +22,7 @@
     NSMutableArray* _collectionsToCache;
     NSMutableArray* _librariesToCache;
     NSMutableArray* _filesToDownload;
+    NSMutableSet* _attachmentsToUpload;
     
     // An operation que to fetch items in the background
     NSOperationQueue* _serverRequestQueue;

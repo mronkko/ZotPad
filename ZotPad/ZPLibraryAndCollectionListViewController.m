@@ -204,7 +204,7 @@
     */
     
     
-    ZPLibraryAndCollectionListViewController* subController = [[ZPLibraryAndCollectionListViewController alloc] initWithStyle: UITableViewStylePlain];
+    ZPLibraryAndCollectionListViewController* subController = [self.storyboard instantiateViewControllerWithIdentifier:@"LibraryAndCollectionList"];
 	subController.detailViewController = self.detailViewController;
     ZPZoteroDataObject* selectedNode  = [self->_content objectAtIndex: indexPath.row];
 	subController.currentlibraryID=[selectedNode libraryID];

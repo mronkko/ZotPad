@@ -150,22 +150,10 @@
             [[[UIAlertView alloc] initWithTitle:@"Unknown file" message:[NSString stringWithFormat:@"ZotPad could not identify a Zotero item for file '%@' received from %@. The file will be ignored.",[url lastPathComponent],[[sourceApplication componentsSeparatedByString:@"."] lastObject]] delegate:NULL cancelButtonTitle:@"Cancel" otherButtonTitles: nil] show];
         }
         else{
-            //TODO: Add the new file as a local version for the attachment and notify the cache controller to start uploading.
+            [[ZPCacheController instance] addAttachmentToUploadQueue:attachment withNewFile:url];
+            [self.window.rootViewController dismissModalViewControllerAnimated:YES];
+            [self.window.rootViewController performSegueWithIdentifier:@"ReceivedFile" sender:url];
             
-            ZPAttachmentIconViewController* attachmentViewController = [self.window.rootViewController.storyboard instantiateViewControllerWithIdentifier:@"AttachmentPreview"];
-            attachmentViewController.attachment = attachment;
-            attachmentViewController.modalPresentationStyle = UIModalPresentationFormSheet;
-            attachmentViewController.allowDownloading = FALSE;
-            attachmentViewController.usePreview = TRUE;
-            attachmentViewController.showLabel = TRUE;
-            
-            [self.window.rootViewController presentModalViewController:attachmentViewController animated:NO];
-
-            attachmentViewController.downloadLabel.text = [NSString stringWithFormat:@"Version from %@ prepared for uploading.", [[sourceApplication componentsSeparatedByString:@"."] lastObject]];
-
-            //TODO: Resize the modal view or add some margins around it
-            
-            [attachmentViewController.view addGestureRecognizer:[[UITapGestureRecognizer alloc] initWithTarget:self.window.rootViewController action:@selector(dismissModalViewControllerAnimated:)]];
         }
                                                                 
         

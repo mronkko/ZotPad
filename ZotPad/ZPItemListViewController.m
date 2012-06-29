@@ -722,14 +722,13 @@
             if([item.attachments count] > 0){
                 
                 [articleThumbnail setHidden:FALSE];
-                        
+                
                 ZPZoteroAttachment* attachment = [item.attachments objectAtIndex:0];
             
                 
                 //NSLog(@"ImageView for row %i is %i",indexPath.row,articleThumbnail);
 
                 [ZPAttachmentIconViewController renderFileTypeIconForAttachment:attachment intoImageView:articleThumbnail];
-                
                 // Enable or disable depending whether file is available or not
                 
                 if(attachment.fileExists || ([attachment.linkMode intValue] == LINK_MODE_LINKED_URL && [ZPServerConnection instance])){
@@ -747,7 +746,7 @@
                 }
             }
             else{
-                [articleThumbnail setHidden:TRUE];
+                articleThumbnail.hidden=TRUE;
             }
         }
         

@@ -7,8 +7,15 @@
 //
 
 #import "ZPFileChannel.h"
+#import "ASIHTTPRequestDelegate.h"
 
-@interface ZPFileChannel_ZoteroStorage : ZPFileChannel{
+extern NSInteger const ZPFILECHANNEL_ZOTEROSTORAGE_UPLOAD_AUTHORIZATION;
+extern NSInteger const ZPFILECHANNEL_ZOTEROSTORAGE_UPLOAD_FILE;
+extern NSInteger const ZPFILECHANNEL_ZOTEROSTORAGE_UPLOAD_REGISTER;
+extern NSInteger const ZPFILECHANNEL_ZOTEROSTORAGE_DOWNLOAD;
+
+
+@interface ZPFileChannel_ZoteroStorage : ZPFileChannel <ASIHTTPRequestDelegate>{
 }
 
 @end

@@ -79,6 +79,10 @@
 -(void) _checkQueues;
 -(void) _checkMetadataQueue;
 -(void) _checkDownloadQueue;
+-(void) _checkUploadQueue;
+
+-(void) _scanFilesToUpload;
+
 -(void) _doItemRetrieval:(NSArray*) itemKeys fromLibrary:(NSNumber*)libraryID;
 
 -(void) _cacheItemsAndAttachToParentsIfNeeded:(NSArray*) items;
@@ -125,6 +129,7 @@ static ZPCacheController* _instance = nil;
     _librariesToCache = [[NSMutableArray alloc] init];
     _collectionsToCache = [[NSMutableArray alloc] init];
     _filesToDownload = [[NSMutableArray alloc] init];
+    _attachmentsToUpload = [[NSMutableSet alloc] init];
     
     //Register as observer so that we can follow the size of the cache
     [[ZPDataLayer instance] registerAttachmentObserver:self];
@@ -190,6 +195,7 @@ static ZPCacheController* _instance = nil;
 
     [self _checkDownloadQueue];
     [self _checkMetadataQueue];
+    [self _checkUploadQueue];
 }
 
 -(void) _checkDownloadQueue{
@@ -215,6 +221,24 @@ static ZPCacheController* _instance = nil;
         }
     }    
 }
+
+-(void) _checkUploadQueue{
+    @synchronized(_attachmentsToUpload){
+        
+        [_statusView setFileUploads:[_attachmentsToUpload count]];
+        
+        if([_attachmentsToUpload count]>0){
+            if([ZPServerConnection instance] && [[ZPServerConnection instance] numberOfFilesUploading] <1){
+                ZPZoteroAttachment* attachment = [_attachmentsToUpload anyObject];
+                //Remove from queue and upload
+                [_attachmentsToUpload removeObject:attachment];
+                [[ZPServerConnection instance] uploadVersionOfAttachment:attachment];
+                
+            }
+        }        
+    }    
+}
+
 
 -(void) _checkMetadataQueue{
     
@@ -858,7 +882,16 @@ static ZPCacheController* _instance = nil;
 -(void) notifyAttachmentDownloadFailed:(ZPZoteroAttachment *)attachment withError:(NSError *)error{
     [self performSelectorInBackground:@selector(_checkQueues) withObject:NULL];
 }
-//This is a mandatory method for the protocol. 
+-(void) notifyAttachmentUploadFailed:(ZPZoteroAttachment *)attachment withError:(NSError *)error{
+    [self performSelectorInBackground:@selector(_checkQueues) withObject:NULL];
+
+}
+-(void) notifyAttachmentUploadCompleted:(ZPZoteroAttachment *)attachment{
+    [self performSelectorInBackground:@selector(_checkQueues) withObject:NULL];
+}
+-(void) notifyAttachmentUploadCanceled:(ZPZoteroAttachment *)attachment{
+    [self performSelectorInBackground:@selector(_checkQueues) withObject:NULL];
+}
 
 -(void) notifyAttachmentDownloadStarted:(ZPZoteroAttachment*) attachment{
 }
@@ -993,7 +1026,8 @@ static ZPCacheController* _instance = nil;
     
     //Delete attachment files until the size of the cache is below the maximum size
     for(attachment in attachments){
-        NSString* path = attachment.fileSystemPath;
+        //Only delete originals
+        NSString* path = attachment.fileSystemPath_original;
         NSDictionary *_documentFileAttributes = [[NSFileManager defaultManager] fileAttributesAtPath:path traverseLink:YES];
 
         [[NSFileManager defaultManager] removeItemAtPath:path error: NULL];
@@ -1004,6 +1038,46 @@ static ZPCacheController* _instance = nil;
         if (_sizeOfDocumentsFolder<=[[ZPPreferences instance] maxCacheSize]) break;
     }
 
+}
+
+-(void) addAttachmentToUploadQueue:(ZPZoteroAttachment*) attachment withNewFile:(NSURL*)urlToFile{
+
+    //Move the file to right place and increment cache size
+    //TODO: Implement error handling here
+    [[NSFileManager defaultManager] removeItemAtPath:attachment.fileSystemPath_modified error:NULL];
+    [[NSFileManager defaultManager] moveItemAtURL:urlToFile toURL:[NSURL fileURLWithPath:attachment.fileSystemPath_modified] error:NULL];
+    NSDictionary *_documentFileAttributes = [[NSFileManager defaultManager] fileAttributesAtPath:attachment.fileSystemPath_modified traverseLink:YES];
+    _sizeOfDocumentsFolder -= [_documentFileAttributes fileSize]/1024;
+
+    //Set the version info and write to DB
+    [[ZPDatabase instance] writeVersionInfoForAttachment:attachment];
+    
+    //Add to upload queue
+    @synchronized(_attachmentsToUpload){
+        [_attachmentsToUpload addObject:attachment];
+    }
+    [self _checkQueues];
+}
+
+/*
+ Scans the document directory for locally modified files and builds a new set
+ */
+
+-(void) _scanFilesToUpload{
+    @synchronized(_attachmentsToUpload){
+        [_attachmentsToUpload removeAllObjects];
+    }
+    NSString* _documentsDirectory = [NSSearchPathForDirectoriesInDomains(NSDocumentDirectory, NSUserDomainMask, YES)  objectAtIndex:0];
+    NSArray *directoryContent = [[NSFileManager defaultManager] contentsOfDirectoryAtPath:_documentsDirectory error:NULL];
+    
+    for (NSString* _documentFilePath in directoryContent) {
+        ZPZoteroAttachment* attachment = [ZPZoteroAttachment dataObjectForAttachedFile:_documentFilePath];
+        if(attachment !=NULL && [attachment.fileSystemPath_modified isEqualToString:_documentFilePath]){
+            @synchronized(_attachmentsToUpload){
+                [_attachmentsToUpload addObject:attachment]; 
+            }
+        }
+    }
 }
 
 

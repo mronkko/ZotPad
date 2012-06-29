@@ -16,5 +16,6 @@
 }
 
 +(void)linkDroboxIfNeeded;
+-(NSObject*) keyForRequest:(NSObject*)request;
 
 @end

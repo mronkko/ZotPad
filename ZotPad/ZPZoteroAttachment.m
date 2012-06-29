@@ -10,6 +10,8 @@
 
 #import "ZPCore.h"
 #import "ZPDatabase.h"
+#include "FileMD5Hash.h"
+
 
 NSInteger const LINK_MODE_IMPORTED_FILE = 0;
 NSInteger const LINK_MODE_IMPORTED_URL = 1;
@@ -20,9 +22,24 @@ NSInteger const VERSION_SOURCE_ZOTERO =1;
 NSInteger const VERSION_SOURCE_WEBDAV =2;
 NSInteger const VERSION_SOURCE_DROPBOX =3;
 
+@interface ZPZoteroAttachment(){
+    NSString* _versionIdentifier_local;
+}
+- (NSString*) _fileSystemPathWithSuffix:(NSString*)suffix;
+@end
+
 @implementation ZPZoteroAttachment
 
-@synthesize lastViewed, attachmentSize, existsOnZoteroServer, filename, url, versionSource, versionIdentifier_sentOut, versionIdentifier_receivedLocally, versionIdentifier_receivedFromServer;
+@synthesize lastViewed, attachmentSize, existsOnZoteroServer, filename, url, versionSource, versionIdentifier_server, charset, md5;
+//@synthesize versionIdentifier_local;
+
+-(void) setVersionIdentifier_local:(NSString *)versionIdentifier_local{
+    NSLog(@"Set local MD5 %@ for item %@",versionIdentifier_local, self.key);
+    _versionIdentifier_local = versionIdentifier_local;
+}
+-(NSString*) versionIdentifier_local{
+    return _versionIdentifier_local;
+}
 
 +(id) dataObjectWithDictionary:(NSDictionary *)fields{
     NSMutableDictionary* dict = [NSMutableDictionary dictionaryWithDictionary:fields ];
@@ -69,6 +86,9 @@ NSInteger const VERSION_SOURCE_DROPBOX =3;
     //Get the key from the filename
     NSString* key =[[filename componentsSeparatedByString: @"_"] lastObject];
     
+    //If this is a locally modified file or a version, strip the trailing - from the key
+    key = [key substringToIndex:8];
+ 
     ZPZoteroAttachment* attachment= (ZPZoteroAttachment*) [self dataObjectWithKey:key];
     if(attachment.filename == NULL) attachment = NULL;
 
@@ -77,23 +97,37 @@ NSInteger const VERSION_SOURCE_DROPBOX =3;
 }
 
 - (NSString*) fileSystemPath{
+    NSString* modified =[self fileSystemPath_modified];
+    if([[NSFileManager defaultManager] fileExistsAtPath:modified]) return modified;
+    else return [self fileSystemPath_original];
+}
+
+- (NSString*) _fileSystemPathWithSuffix:(NSString*)suffix{
     
     NSString* path;
     //Imported URLs are stored as ZIP files
     
     if([self.linkMode intValue] == LINK_MODE_IMPORTED_URL && [self.contentType isEqualToString:@"text/html"]){
-        path = [[self filename] stringByAppendingFormat:@"_%@.zip",self.key];
+        path = [[self filename] stringByAppendingFormat:@"_%@%@.zip",self.key,suffix];
     }
     else{
         NSRange lastPeriod = [[self filename] rangeOfString:@"." options:NSBackwardsSearch];
         
         
-        if(lastPeriod.location == NSNotFound) path = [[self filename] stringByAppendingFormat:@"_%@",self.key];
+        if(lastPeriod.location == NSNotFound) path = [[self filename] stringByAppendingFormat:@"_%@%@",self.key,suffix];
         else path = [[self filename] stringByReplacingCharactersInRange:lastPeriod
-                                                             withString:[NSString stringWithFormat:@"_%@.",self.key]];
+                                                             withString:[NSString stringWithFormat:@"_%@%@.",self.key,suffix]];
     }
     return  [[NSSearchPathForDirectoriesInDomains(NSDocumentDirectory, NSUserDomainMask, YES) objectAtIndex:0] stringByAppendingPathComponent:path];
+    
+}
 
+- (NSString*) fileSystemPath_modified{
+    return [self _fileSystemPathWithSuffix:@"-"];
+}
+
+- (NSString*) fileSystemPath_original{
+    return [self _fileSystemPathWithSuffix:@""];
 }
 
 -(void) setContentType:(NSString *)contentType{
@@ -137,8 +171,11 @@ NSInteger const VERSION_SOURCE_DROPBOX =3;
 - (void) setServerTimestamp:(NSString*)timestamp{
     [super setServerTimestamp:timestamp];
     if(![self.serverTimestamp isEqual:self.cacheTimestamp] && [self fileExists]){
-        NSError* error;
-        [[NSFileManager defaultManager] removeItemAtPath: [self fileSystemPath] error:&error];   
+        //If the file MD5 does not match the server MD5, delete it.
+        NSString* fileMD5 = [self md5ForFileAtPath:self.fileSystemPath_original];
+        if(! [self.md5 isEqualToString:fileMD5]){
+            [[NSFileManager defaultManager] removeItemAtPath: [self fileSystemPath_original] error:NULL];   
+        }
     }
     
 }
@@ -171,6 +208,17 @@ NSInteger const VERSION_SOURCE_DROPBOX =3;
 
 -(NSString*) previewItemTitle{
     return self.filename;
+}
+
+
+//Helper function for MD5 sums
+
+-(NSString*) md5ForFileAtPath:(NSString*)path{
+    
+    //TODO: Make sure that this does not leak memory
+    
+    NSString* md5 = (__bridge_transfer NSString*) FileMD5HashCreateWithPath((__bridge CFStringRef) path, FileHashDefaultChunkSizeForReadingData);
+    return md5;
 }
 
 @end

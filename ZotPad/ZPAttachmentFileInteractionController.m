@@ -72,6 +72,7 @@
         NSURL* url= [NSURL fileURLWithPath:_activeAttachment.fileSystemPath];
         
         UIDocumentInteractionController* docController = [UIDocumentInteractionController interactionControllerWithURL:url];
+        docController.delegate = self;
         
         _fileCanBeOpened = [docController presentOpenInMenuFromBarButtonItem:button animated: NO];
         [docController dismissMenuAnimated:NO];
@@ -121,6 +122,11 @@
             
         [[NSFileManager defaultManager] removeItemAtPath:path error: NULL];
         [[ZPDataLayer instance] notifyAttachmentDeleted:_activeAttachment fileAttributes:_documentFileAttributes];
+        
+        //Dismiss the preview controller if it is visible
+        UIViewController* root = [UIApplication sharedApplication].delegate.window.rootViewController;
+        UIViewController* vc = [root modalViewController];
+        if(vc!=NULL && [vc isKindOfClass:[ZPPreviewController class]]) [root dismissModalViewControllerAnimated:YES];
 
     }
     else{
@@ -183,14 +189,11 @@
     
     //Store the version identifier. This is later used to upload modified files to Zotero
     
-    if(_activeAttachment.versionIdentifier_receivedLocally != NULL){
-        _activeAttachment.versionIdentifier_sentOut = _activeAttachment.versionIdentifier_receivedLocally;
-    }
-    else{
-        _activeAttachment.versionIdentifier_sentOut = _activeAttachment.versionIdentifier_receivedFromServer;
+    if(_activeAttachment.versionIdentifier_local == [NSNull null] || _activeAttachment.versionIdentifier_local == NULL){
+        _activeAttachment.versionIdentifier_local = _activeAttachment.versionIdentifier_server;
     }
     
-    [[ZPDatabase instance] writeAttachments:[NSArray arrayWithObject:_activeAttachment]];
+    [[ZPDatabase instance] writeVersionInfoForAttachment:_activeAttachment];
      
     _docControllerActionSheetShowing = FALSE;
 }

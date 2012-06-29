@@ -11,13 +11,14 @@
 #import "ZPFileChannel.h"
 #import "ZPZoteroAttachment.h"
 #import "ZPServerConnection.h"
+#import "ZPUploadVersionConflictViewControllerViewController.h"
+
 
 @implementation ZPFileChannel
 
 -(id) init{
     self = [super init];
     _requestsByAttachment = [[NSMutableDictionary alloc] init];
-    _attachmentsByRequest = [[NSMutableDictionary alloc] init];
     return self;
 }
 
@@ -30,30 +31,30 @@
 -(void) cancelDownloadingAttachment:(ZPZoteroAttachment*)attachment{
     //Does nothing by default
 }
--(void) useProgressView:(UIProgressView*) progressView forAttachment:(ZPZoteroAttachment*)attachment{
+-(void) useProgressView:(UIProgressView*) progressView forDownloadingAttachment:(ZPZoteroAttachment*)attachment{
     //Does nothing by default
 }
+
+-(void) startUploadingAttachment:(ZPZoteroAttachment*)attachment{
+    //Does nothing by default
+}
+
+-(void) cancelUploadingAttachment:(ZPZoteroAttachment*)attachment{
+    //Does nothing by default
+}
+
+-(void) useProgressView:(UIProgressView*) progressView forUploadingAttachment:(ZPZoteroAttachment*)attachment{
+    //Does nothing by default
+}
+
+ 
+ 
 -(void) linkAttachment:(ZPZoteroAttachment*)attachment withRequest:(NSObject*)request{
     @synchronized(self){
         [_requestsByAttachment setObject:request forKey:attachment.key];
-        [_attachmentsByRequest setObject:attachment forKey:[self keyForRequest:request]];
     }
 }
 
--(NSString*) username{
-    return _username;
-}
--(NSString*) password{
-    return _password;
-}
--(void) setUsername:(NSString*)username andPassword:(NSString*)password{
-    _username = username;
-    _password = password;
-}
-
--(NSObject*) keyForRequest:(NSObject*)request{
-    return [NSNumber numberWithInt: request];
-}
 -(id) requestWithAttachment:(ZPZoteroAttachment*)attachment{
     id ret;
     @synchronized(self){
@@ -61,22 +62,30 @@
     }
     return ret;
 }
--(ZPZoteroAttachment*) attachmentWithRequest:(NSObject*)request{
-    id ret;
-    @synchronized(self){
-        ret = [_attachmentsByRequest objectForKey:[self keyForRequest:request]];
-    }
-    return ret;
 
-}
 
 -(void) cleanupAfterFinishingAttachment:(ZPZoteroAttachment*)attachment{
     @synchronized(self){
-        NSObject* request = [self requestWithAttachment:attachment];
         [_requestsByAttachment removeObjectForKey:attachment.key];
-        [_attachmentsByRequest removeObjectForKey:[self keyForRequest:request]];
     }
 }
+
+-(void) presentConflictViewForAttachment:(ZPZoteroAttachment*) attachment{
+    UIViewController* root = [UIApplication sharedApplication].delegate.window.rootViewController;
+    UIStoryboard *storyboard = root.storyboard;
+    ZPUploadVersionConflictViewControllerViewController* viewController = [storyboard instantiateViewControllerWithIdentifier:@"VersionConflictView"];
+    viewController.attachment = attachment;
+    viewController.fileChannel = self;
+    if(root.presentedViewController){
+        [root.presentedViewController presentModalViewController:viewController animated:YES];
+    }
+    else{
+        [root presentModalViewController:viewController animated:YES];
+    }
+}
+
+
+
 
 
 @end

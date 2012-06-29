@@ -169,7 +169,8 @@ static ZPDataLayer* _instance = nil;
     NSObject* id;
     
     while( id= [e nextObject]) {
-        [(NSObject <ZPAttachmentObserver>*) id notifyAttachmentDownloadCompleted:attachment];
+        if([id respondsToSelector:@selector(notifyAttachmentDownloadCompleted:)])
+            [(NSObject <ZPAttachmentObserver>*) id notifyAttachmentDownloadCompleted:attachment];
     }
 }
 
@@ -178,7 +179,8 @@ static ZPDataLayer* _instance = nil;
     NSObject* id;
     
     while( id= [e nextObject]) {
-        [(NSObject <ZPAttachmentObserver>*) id notifyAttachmentDownloadStarted:attachment];
+        if([id respondsToSelector:@selector(notifyAttachmentDownloadStarted:)])
+            [(NSObject <ZPAttachmentObserver>*) id notifyAttachmentDownloadStarted:attachment];
     }
 }
 
@@ -187,7 +189,8 @@ static ZPDataLayer* _instance = nil;
     NSObject* id;
     
     while( id= [e nextObject]) {
-        [(NSObject <ZPAttachmentObserver>*) id notifyAttachmentDownloadFailed:attachment withError:error];
+        if([id respondsToSelector:@selector(notifyAttachmentDownloadFailed:withError:)])
+            [(NSObject <ZPAttachmentObserver>*) id notifyAttachmentDownloadFailed:attachment withError:error];
     }
     
 }
@@ -197,9 +200,52 @@ static ZPDataLayer* _instance = nil;
     NSObject* id;
     
     while( id= [e nextObject]) {
-        [(NSObject <ZPAttachmentObserver>*) id notifyAttachmentDeleted:attachment fileAttributes:fileAttributes];
+        if([id respondsToSelector:@selector(notifyAttachmentDeleted:fileAttributes:)])
+            [(NSObject <ZPAttachmentObserver>*) id notifyAttachmentDeleted:attachment fileAttributes:fileAttributes];
     }
 
+}
+
+-(void) notifyAttachmentUploadCompleted:(ZPZoteroAttachment*) attachment{
+    NSEnumerator* e = [_attachmentObservers objectEnumerator];
+    NSObject* id;
+    
+    while( id= [e nextObject]) {
+        if([id respondsToSelector:@selector(notifyAttachmentUploadCompleted:)])
+            [(NSObject <ZPAttachmentObserver>*) id notifyAttachmentUploadCompleted:attachment];
+    }
+}
+
+-(void) notifyAttachmentUploadStarted:(ZPZoteroAttachment*) attachment{
+    NSEnumerator* e = [_attachmentObservers objectEnumerator];
+    NSObject* id;
+    
+    while( id= [e nextObject]) {
+        if([id respondsToSelector:@selector(notifyAttachmentUploadStarted:)])
+            [(NSObject <ZPAttachmentObserver>*) id notifyAttachmentUploadStarted:attachment];
+    }
+}
+
+-(void) notifyAttachmentUploadFailed:(ZPZoteroAttachment*) attachment withError:(NSError*) error{
+    NSEnumerator* e = [_attachmentObservers objectEnumerator];
+    NSObject* id;
+    
+    while( id= [e nextObject]) {
+        if([id respondsToSelector:@selector(notifyAttachmentUploadFailed:withError:)])
+            [(NSObject <ZPAttachmentObserver>*) id notifyAttachmentUploadFailed:attachment withError:error];
+    }
+    
+}
+
+-(void) notifyAttachmentUploadCanceled:(ZPZoteroAttachment*) attachment {
+    NSEnumerator* e = [_attachmentObservers objectEnumerator];
+    NSObject* id;
+    
+    while( id= [e nextObject]) {
+        if([id respondsToSelector:@selector(notifyAttachmentUploadCanceled:)])
+            [(NSObject <ZPAttachmentObserver>*) id notifyAttachmentUploadCanceled:attachment];
+    }
+    
 }
 
 

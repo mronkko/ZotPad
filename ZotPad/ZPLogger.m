@@ -26,7 +26,7 @@ void ZPLog(NSObject* source,int line,NSString* format, ...){
         
         
         //        [debugClasses addObject:@"ZPAppDelegate"];
-        //[debugClasses addObject:@"ZPAttachmentPreviewViewController"];
+        [debugClasses addObject:@"ZPAttachmentIconViewController"];
         //        [debugClasses addObject:@"ZPAuthenticationDialog"];
         //        [debugClasses addObject:@"ZPCacheController"];
         //        [debugClasses addObject:@"ZPDatabase"];
@@ -43,9 +43,13 @@ void ZPLog(NSObject* source,int line,NSString* format, ...){
         //        [debugClasses addObject:@"ZPServerResponseXMLParser"];
         //        [debugClasses addObject:@"ZPServerResponseXMLParserItem"];
         //        [debugClasses addObject:@"ZPUncachedItemsOperation"];
+                [debugClasses addObject:@"ZPZoteroAttachment"];
         //        [debugClasses addObject:@"ZPZoteroItem"];
-  
         
+        //[debugClasses addObject:@"ZPAttachmentFileInteractionController"];
+        //[debugClasses addObject:@"ZPFileChannel_ZoteroStorage"];
+        [debugClasses addObject:@"ZPFileChannel_WebDAV"];
+        [debugClasses addObject:@"ZPFileChannel_Dropbox"];
 
         
     }

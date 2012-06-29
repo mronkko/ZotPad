@@ -93,6 +93,8 @@
 -(NSArray*) writeNotes:(NSArray*)notes;
 -(NSArray*) writeAttachments:(NSArray*)attachments;
 
+-(void) writeVersionInfoForAttachment:(ZPZoteroAttachment*)attachment;
+
 -(void) writeItems:(NSArray*)items toCollection:(NSString*)collectionKey;
 -(void) addItemKeys:(NSArray*)keys toCollection:(NSString*)collectionKey;
 

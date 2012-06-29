@@ -48,6 +48,7 @@
 
 - (NSArray*) fieldsThatCanBeUsedForSorting;
 
+//TODO: refactornorifications http://stackoverflow.com/questions/2191594/how-to-send-and-receive-message-through-nsnotificationcenter-in-objective-c
 
 //Adds and removes observers
 -(void) registerItemObserver:(NSObject<ZPItemObserver>*)observer;
@@ -69,6 +70,11 @@
 -(void) notifyAttachmentDownloadStarted:(ZPZoteroAttachment*) attachment;
 -(void) notifyAttachmentDownloadFailed:(ZPZoteroAttachment*) attachment withError:(NSError*) error;
 -(void) notifyAttachmentDeleted:(ZPZoteroAttachment*) attachment fileAttributes:(NSDictionary*) fileAttributes;
+
+-(void) notifyAttachmentUploadCompleted:(ZPZoteroAttachment*) attachment;
+-(void) notifyAttachmentUploadFailed:(ZPZoteroAttachment*) attachment withError:(NSError*) error;
+-(void) notifyAttachmentUploadStarted:(ZPZoteroAttachment*) attachment;
+-(void) notifyAttachmentUploadCanceled:(ZPZoteroAttachment*) attachment;
 
 
 

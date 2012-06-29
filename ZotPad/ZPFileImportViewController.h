@@ -8,10 +8,10 @@
 
 #import <UIKit/UIKit.h>
 
-@interface ZPFileImportViewController : UIViewController <UIAlertViewDelegate>{
-    NSInteger _status;
+@interface ZPFileImportViewController : UIViewController <iCarouselDelegate>{
 }
 
+@property (retain) IBOutlet iCarousel* carousel;
 @property (retain) NSURL* url;
 
 @end

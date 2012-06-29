@@ -342,7 +342,7 @@ static ZPDatabase* _instance = nil;
                         
                     }
                     //Update if timestamps differ
-                    else if(! [[[self dbFieldValuesForObject:object fieldsNames:[NSArray arrayWithObject: @"cacheTimestamp"]] objectAtIndex:0] isEqualToString: timestamp]){
+                    else if(! [[[self dbFieldValuesForObject:object fieldsNames:[NSArray arrayWithObject: @"cacheTimestamp"]] objectAtIndex:0] isEqual: timestamp]){
                         [updateObjects addObject:object];
                         [returnArray addObject:object];
                     }
@@ -994,6 +994,24 @@ Deletes items, notes, and attachments based in array of keys from a library
     }
 }
 
+- (void) writeVersionInfoForAttachment:(ZPZoteroAttachment*)attachment{
+    @synchronized(self){
+        
+        [_database executeUpdate:@"UPDATE attachments SET md5 = ?, versionSource = ?, versionIdentifier_server = ?, versionIdentifier_local = ? WHERE itemKey = ? ",
+         attachment.md5,
+         attachment.versionSource,
+         attachment.versionIdentifier_server,
+         attachment.versionIdentifier_local,
+         attachment.key];
+        
+        NSLog(@"Updated version info to DB with md5 = %@, versionSource = %@, versionIdentifier_server = %@, versionIdentifier_local = %@ for item %@",
+              attachment.md5,
+              attachment.versionSource,
+              attachment.versionIdentifier_server,
+              attachment.versionIdentifier_local,
+              attachment.key);
+    }
+}
 
 - (void) addNotesToItem: (ZPZoteroItem*) item  {
     

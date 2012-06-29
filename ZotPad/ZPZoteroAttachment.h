@@ -36,20 +36,29 @@ extern NSInteger const VERSION_SOURCE_WEBDAV;
 @property (retain) NSString* lastViewed;
 @property (retain) NSString* url;
 @property (retain) NSString* filename;
+@property (retain) NSString* charset;
 	
 // Needed for versioning
 
+// This is the version identifier from Zotero server. We need this as well as versionIdentifier_server because the actual file can also come from Dropbox
+@property (retain) NSString* md5;
+
 @property (retain) NSNumber* versionSource;
-@property (retain) NSString* versionIdentifier_receivedFromServer;
-@property (retain) NSString* versionIdentifier_sentOut;
-@property (retain) NSString* versionIdentifier_receivedLocally;
+@property (retain) NSString* versionIdentifier_server;
+@property (retain) NSString* versionIdentifier_local;
 
 // An alias for setParentItemKey
 - (void) setParentKey:(NSString*)key;
 - (NSString*) fileSystemPath;
+- (NSString*) fileSystemPath_modified;
+- (NSString*) fileSystemPath_original;
 - (BOOL) fileExists;
 
 // returns an object based on file system path
 +(ZPZoteroAttachment*) dataObjectForAttachedFile:(NSString*) filename;
+
+// Helper functions
+
+-(NSString*) md5ForFileAtPath:(NSString*)path;
 
 @end

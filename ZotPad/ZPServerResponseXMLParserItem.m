@@ -42,6 +42,8 @@
         //Item as JSON content
         else if(([elementName isEqualToString:@"zapi:subcontent"] || [elementName isEqualToString:@"content"]) && [@"json" isEqualToString:[attributeDict objectForKey:@"zapi:type"]]){
             _jsonContent=TRUE;
+            //Get the etag for the item
+            [super _setField:@"etag" toValue:[attributeDict objectForKey:@"zapi:etag"]];
         }
     }
     
@@ -55,6 +57,9 @@
         [super _setField:key toValue:value];
     }
     else if([key isEqualToString: @"json"]){
+        
+        //Store the json as it is to enable more robust item editing
+        [super _setField:@"jsonFromServer" toValue:value];
 
         //PARSE JSON CONTENT
         NSDictionary* data = [value JSONValue];

@@ -56,6 +56,7 @@
     
 
 -(ZPServerResponseXMLParser*) makeServerRequest:(NSInteger)type withParameters:(NSDictionary*) parameters;
+-(ZPFileChannel*) _fileChannelForAttachment:(ZPZoteroAttachment*) attachment;
 
 @end
 
@@ -87,7 +88,8 @@ const NSInteger ZPServerConnectionRequestPermissions = 10;
     // If a working samba implementation appears, this should be added [[ZPFileChannel_Samba alloc] init]
     
     _activeDownloads= [[NSMutableSet alloc] init];
-    
+    _activeUploads= [[NSMutableSet alloc] init];
+
     return self;
 }
 
@@ -569,8 +571,23 @@ const NSInteger ZPServerConnectionRequestPermissions = 10;
 
 #pragma mark - Asynchronous file downloads
 
+-(ZPFileChannel*) _fileChannelForAttachment:(ZPZoteroAttachment*) attachment{
+    if([[ZPPreferences instance] useDropbox]){
+        return _fileChannel_Dropbox;
+    }
+    else if([attachment.libraryID intValue]==1 && [[ZPPreferences instance] useWebDAV]){
+        return _fileChannel_WebDAV;
+    }
+    else if([attachment.existsOnZoteroServer intValue] == 1){
+        return _fileChannel_Zotero;
+    }
+    else return NULL;
+}
+
 -(NSInteger) numberOfFilesDownloading{
-    return [_activeDownloads count];
+    @synchronized(_activeDownloads){
+        return [_activeDownloads count];
+    }
 }
 
 //TODO: Refactor: does this need to return a boolean? 
@@ -579,18 +596,9 @@ const NSInteger ZPServerConnectionRequestPermissions = 10;
     
     //Check if the file can be downloade
     
-    ZPFileChannel* downloadChannel = NULL;
+    ZPFileChannel* downloadChannel = [self _fileChannelForAttachment:attachment];
 
-    if([[ZPPreferences instance] useDropbox]){
-        downloadChannel = _fileChannel_Dropbox;
-    }
-    else if([attachment.libraryID intValue]==1 && [[ZPPreferences instance] useWebDAV]){
-        downloadChannel = _fileChannel_WebDAV;
-    }
-    else if([attachment.existsOnZoteroServer intValue] == 1){
-        downloadChannel = _fileChannel_Zotero;
-    }
-    else return false;
+    if(downloadChannel == NULL) return FALSE;
     
     @synchronized(_activeDownloads){
         //Do not download item if it is already being downloaded
@@ -639,9 +647,9 @@ const NSInteger ZPServerConnectionRequestPermissions = 10;
             
             //Write version info to DB
             attachment.versionSource = [NSNumber numberWithInt:fileChannel.fileChannelType];
-            attachment.versionIdentifier_receivedFromServer = identifier;
+            attachment.versionIdentifier_server = identifier;
             
-            [[ZPDatabase instance] writeAttachments:[NSArray arrayWithObject:attachment]];
+            [[ZPDatabase instance] writeVersionInfoForAttachment:attachment];
             
         }
         @synchronized(_activeDownloads){
@@ -678,15 +686,13 @@ const NSInteger ZPServerConnectionRequestPermissions = 10;
 
 -(void) cancelDownloadingAttachment:(ZPZoteroAttachment*)attachment{
     //Loop over the file channels and cancel downloading of this attachment
-    [_fileChannel_WebDAV cancelDownloadingAttachment:attachment];
-    [_fileChannel_Dropbox cancelDownloadingAttachment:attachment];
-    [_fileChannel_Zotero cancelDownloadingAttachment:attachment];    
+    ZPFileChannel* downloadChannel = [self _fileChannelForAttachment:attachment];
+    [downloadChannel cancelDownloadingAttachment:attachment];
 }
 
--(void) useProgressView:(UIProgressView*) progressView forAttachment:(ZPZoteroAttachment*)attachment{
-    [_fileChannel_WebDAV  useProgressView:progressView forAttachment:attachment];
-    [_fileChannel_Dropbox  useProgressView:progressView forAttachment:attachment];
-    [_fileChannel_Zotero  useProgressView:progressView forAttachment:attachment];
+-(void) useProgressView:(UIProgressView*) progressView forDownloadingAttachment:(ZPZoteroAttachment*)attachment{
+    ZPFileChannel* downloadChannel = [self _fileChannelForAttachment:attachment];
+    [downloadChannel  useProgressView:progressView forDownloadingAttachment:attachment];
 }
 
 -(BOOL) isAttachmentDownloading:(ZPZoteroAttachment*)attachment{
@@ -694,6 +700,93 @@ const NSInteger ZPServerConnectionRequestPermissions = 10;
         return [_activeDownloads containsObject:attachment];
     }
 
+}
+
+#pragma mark - Asynchronous uploading of files
+-(NSInteger) numberOfFilesUploading{
+    @synchronized(_activeUploads){
+        return [_activeUploads count];
+    }
+}
+-(void) uploadVersionOfAttachment:(ZPZoteroAttachment*)attachment{
+
+    //If the local file does not exist, raise an exception as this should not happen.
+    if(![[NSFileManager defaultManager] fileExistsAtPath:attachment.fileSystemPath_modified]){
+        [NSException raise:@"File not found" format:@"File to be uploaded to Zotero server cannot be found"];
+    }
+    //Check if the file can be uploaded
+    
+    ZPFileChannel* uploadChannel = [self _fileChannelForAttachment:attachment];
+    
+    
+    @synchronized(_activeUploads){
+        //Do not download item if it is already being downloaded
+        if([_activeUploads containsObject:attachment]) return;
+        [_activeUploads addObject:attachment];
+    }
+    
+    _activeRequestCount++;
+    
+    //First request starts the network indicator
+    if(_activeRequestCount==1) [[UIApplication sharedApplication] setNetworkActivityIndicatorVisible:YES];
+    
+    //Use the first channel
+    [uploadChannel startUploadingAttachment:attachment];
+    
+    [[ZPDataLayer instance] notifyAttachmentUploadStarted:attachment];
+
+}
+-(void) finishedUploadingAttachment:(ZPZoteroAttachment*)attachment{
+    
+    //Update the timestamps and copy files into right place
+    
+    //TODO: This should be atomic (using synchronization) and have error handling code
+    
+    attachment.versionIdentifier_server = attachment.versionIdentifier_local;
+    [[ZPDatabase instance] writeVersionInfoForAttachment:attachment];
+    [[NSFileManager defaultManager] removeItemAtPath:attachment.fileSystemPath_original error:NULL];
+    [[NSFileManager defaultManager] moveItemAtPath:attachment.fileSystemPath_modified toPath:attachment.fileSystemPath_original error:NULL];
+    
+    @synchronized(_activeUploads){
+        [_activeUploads removeObject:attachment];
+    }
+    
+    _activeRequestCount--;
+    
+    //We need to do this in a different thread so that the current thread does not count towards the operations count
+    [[ZPDataLayer instance] notifyAttachmentUploadCompleted:attachment];
+}
+-(void) failedUploadingAttachment:(ZPZoteroAttachment*)attachment withError:(NSError*) error usingFileChannel:(ZPFileChannel*)fileChannel{
+    @synchronized(_activeUploads){
+        [_activeUploads removeObject:attachment];
+    }
+    
+    _activeRequestCount--;
+    
+    //We need to do this in a different thread so that the current thread does not count towards the operations count
+    [[ZPDataLayer instance] notifyAttachmentUploadFailed:attachment withError:error];
+}
+
+-(void) canceledUploadingAttachment:(ZPZoteroAttachment*)attachment usingFileChannel:(ZPFileChannel*)fileChannel{
+    @synchronized(_activeUploads){
+        [_activeUploads removeObject:attachment];
+    }
+    
+    _activeRequestCount--;
+    
+    //We need to do this in a different thread so that the current thread does not count towards the operations count
+    [[ZPDataLayer instance] notifyAttachmentUploadCanceled:attachment];
+}
+-(void) useProgressView:(UIProgressView*) progressView forUploadingAttachment:(ZPZoteroAttachment*)attachment{
+    ZPFileChannel* uploadChannel = [self _fileChannelForAttachment:attachment];
+    [uploadChannel useProgressView:progressView forUploadingAttachment:attachment];
+}
+
+-(BOOL) isAttachmentUploading:(ZPZoteroAttachment*)attachment{
+    @synchronized(_activeUploads){
+        return [_activeUploads containsObject:attachment];
+    }
+   
 }
 
 #pragma mark - UIAlertView delegate methods

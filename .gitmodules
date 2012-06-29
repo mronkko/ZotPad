@@ -31,3 +31,6 @@
 [submodule "RBCategories"]
 	path = RBCategories
 	url = https://github.com/rob-brown/RBCategories
+[submodule "FileMD5Hash"]
+	path = FileMD5Hash
+	url = https://github.com/JoeKun/FileMD5Hash

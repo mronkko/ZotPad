@@ -12,3 +12,12 @@
     #import <UIKit/UIKit.h>
     #import <Foundation/Foundation.h>
 #endif
+
+// TODO: Include the prefix header from the MD5 submodule instead of copying the content here
+
+// Extern
+#if defined(__cplusplus)
+#define FILEMD5HASH_EXTERN extern "C"
+#else
+#define FILEMD5HASH_EXTERN extern
+#endif
