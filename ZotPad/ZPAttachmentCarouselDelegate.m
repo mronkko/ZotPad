@@ -160,7 +160,7 @@
             
             
             if(connection!=NULL && ! [connection isAttachmentDownloading:attachment]){
-                NSLog(@"Started downloading file %@ in index %i",attachment.title,index);
+                DDLogVerbose(@"Started downloading file %@ in index %i",attachment.title,index);
                 [connection checkIfCanBeDownloadedAndStartDownloadingAttachment:attachment];   
             }
             

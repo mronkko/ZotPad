@@ -8,7 +8,7 @@
 
 #import <Foundation/Foundation.h>
 #import "ZPZoteroAttachment.h"
-
+#import "ASIHTTPRequest.h"
 
 
 
@@ -33,6 +33,11 @@
 -(id) requestWithAttachment:(ZPZoteroAttachment*)attachment;
 
 -(void) presentConflictViewForAttachment:(ZPZoteroAttachment*) attachment;
+
+/*
+ Returns the content of a request and response as string. Useful for logging.
+ */
+-(NSString*) requestDumpAsString:(ASIHTTPRequest*)request;
 
 
 

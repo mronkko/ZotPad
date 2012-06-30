@@ -16,7 +16,7 @@
 #import "ZPServerConnection.h"
 #import <zlib.h>
 
-#import "ZPLogger.h"
+
 
 #define CHUNK 16384
 
@@ -79,7 +79,7 @@ static ZPAttachmentIconViewController* _webViewDelegate;
 - (void)viewDidLoad
 {
     [super viewDidLoad];
-    NSLog(@"Loading view for ZPAttachmentPreviewViewController %x",self);
+    DDLogVerbose(@"Loading view for ZPAttachmentPreviewViewController %x",self);
     
     [self _configurePreview];
     
@@ -285,7 +285,7 @@ static ZPAttachmentIconViewController* _webViewDelegate;
     
     NSString* cacheKey = [filename stringByAppendingFormat:@"%@-%ix%i",emblem,width,height];
     
-    //    NSLog(@"Getting icon for %@",cacheKey);
+    //    DDLogVerbose(@"Getting icon for %@",cacheKey);
     
     UIImage* cacheImage = NULL;
     BOOL render = false;
@@ -305,7 +305,7 @@ static ZPAttachmentIconViewController* _webViewDelegate;
             UIView* renderingView = [_viewsThatAreRendering objectForKey:cacheKey];
             //If the previous rendering view is no longer on screen
             if(renderingView != NULL && !(renderingView.superview)){
-                NSLog(@"Previously rendering view %i is no longer on screen %@ (super: %i window %i)",renderingView, cacheKey, renderingView.superview, renderingView.window);
+                DDLogVerbose(@"Previously rendering view %i is no longer on screen %@ (super: %i window %i)",renderingView, cacheKey, renderingView.superview, renderingView.window);
                 
                 render = TRUE;   
             }
@@ -326,7 +326,7 @@ static ZPAttachmentIconViewController* _webViewDelegate;
         }
         
         if([[NSFileManager defaultManager] fileExistsAtPath:[cachePath stringByAppendingPathComponent:[cacheKey stringByAppendingString:@".png"]]]){
-            NSLog(@"Loading image from disk %@",cacheKey);
+            DDLogVerbose(@"Loading image from disk %@",cacheKey);
             UIImage* image = [UIImage imageWithContentsOfFile:[cachePath stringByAppendingPathComponent:[cacheKey stringByAppendingString:@".png"]]];
             @synchronized(_fileIconCache){
                 [_fileIconCache setObject:image forKey:cacheKey];
@@ -341,7 +341,7 @@ static ZPAttachmentIconViewController* _webViewDelegate;
             }
             UIWebView* webview = [[UIWebView alloc] initWithFrame:frame];
             
-            NSLog(@"Start rendering cached image %@ with view %i",cacheKey,webview);
+            DDLogVerbose(@"Start rendering cached image %@ with view %i",cacheKey,webview);
             
             NSString* filePath = [[[NSBundle mainBundle] resourcePath] 
                                   stringByAppendingPathComponent:[filename stringByAppendingString:@".svgz"]];
@@ -365,7 +365,7 @@ static ZPAttachmentIconViewController* _webViewDelegate;
                     content = [NSString stringWithFormat:@"<html><body onload=\"document.location='zotpad:%@'\"><img src=\"%@.svg\" width=%i height=%i></body></html>",cacheKey,filename,width,height];          
                 }
                 
-                NSLog(content);
+                DDLogVerbose(content);
                 
                 NSURL *baseURL = [NSURL fileURLWithPath:NSTemporaryDirectory()];
                 
@@ -384,7 +384,7 @@ static ZPAttachmentIconViewController* _webViewDelegate;
     //IF the cache image is NSNull, this tells us that we are rendering an image currently
     else if(cacheImage == [NSNull null]){
         
-        NSLog(@"Waiting for cached image %@",cacheKey);
+        DDLogVerbose(@"Waiting for cached image %@",cacheKey);
         
         @synchronized(_viewsWaitingForImage){
             NSMutableArray* array= [_viewsWaitingForImage objectForKey:cacheKey];
@@ -397,7 +397,7 @@ static ZPAttachmentIconViewController* _webViewDelegate;
     }
     //We have a cached image
     else{
-        //        NSLog(@"Using cached image %@",cacheKey);
+        //        DDLogVerbose(@"Using cached image %@",cacheKey);
         
         fileImage.image = cacheImage;
     }
@@ -422,7 +422,7 @@ static ZPAttachmentIconViewController* _webViewDelegate;
     while (uncompressedLength = gzread(file, buffer, CHUNK) ) {
         // got data out of our file
         if(fwrite(buffer, 1, uncompressedLength, dest) != uncompressedLength || ferror(dest)) {
-            NSLog(@"error writing data");
+            DDLogVerbose(@"error writing data");
         }
     }
     
@@ -455,7 +455,7 @@ static ZPAttachmentIconViewController* _webViewDelegate;
     //If the view is still visible, capture the content
     if (webview.window && webview.superview) {
         
-        NSLog(@"Capturing cached image %@ from view %i",cacheKey,webview);
+        DDLogVerbose(@"Capturing cached image %@ from view %i",cacheKey,webview);
         
         CGSize size = webview.bounds.size;
         
@@ -498,7 +498,7 @@ static ZPAttachmentIconViewController* _webViewDelegate;
         if([UIImagePNGRepresentation(blankImage) isEqualToData:imageData]){
             @synchronized(_fileIconCache){
                 
-                NSLog(@"View %i produced a blank image. Clearing cahce for image %@",webview, cacheKey);
+                DDLogVerbose(@"View %i produced a blank image. Clearing cahce for image %@",webview, cacheKey);
                 
                 [_fileIconCache removeObjectForKey:cacheKey];
             }
@@ -519,7 +519,7 @@ static ZPAttachmentIconViewController* _webViewDelegate;
                 if(array != NULL){
                     [_viewsWaitingForImage removeObjectForKey:cacheKey];
                     for(UIImageView* view in array){
-                        NSLog(@"Redrawing with cached image %@",cacheKey);
+                        DDLogVerbose(@"Redrawing with cached image %@",cacheKey);
                         
                         view.image = image;
                     }
@@ -530,7 +530,7 @@ static ZPAttachmentIconViewController* _webViewDelegate;
     else{
         @synchronized(_fileIconCache){
             
-            NSLog(@"View %i no longer visible. Clearing cahce for image %@",webview, cacheKey);
+            DDLogVerbose(@"View %i no longer visible. Clearing cahce for image %@",webview, cacheKey);
             
             [_fileIconCache removeObjectForKey:cacheKey];
         }
@@ -564,7 +564,7 @@ static ZPAttachmentIconViewController* _webViewDelegate;
     //
     NSString* filename = attachment.fileSystemPath;
     
-    NSLog(@"Start rendering pdf %@",filename);
+    DDLogVerbose(@"Start rendering pdf %@",filename);
     
     NSURL *pdfUrl = [NSURL fileURLWithPath:filename];
     CGPDFDocumentRef document = CGPDFDocumentCreateWithURL((__bridge_retained CFURLRef)pdfUrl);
@@ -584,12 +584,12 @@ static ZPAttachmentIconViewController* _webViewDelegate;
     UIGraphicsEndImageContext();
     
     if(image != NULL){
-        NSLog(@"Done rendering pdf %@",filename);
+        DDLogVerbose(@"Done rendering pdf %@",filename);
         [_previewCache setObject:image forKey:filename];
         [self performSelectorOnMainThread:@selector(_showPDFPreview:) withObject:image waitUntilDone:NO];
     } 
     else{
-        NSLog(@"Rendering pdf failed %@. File is now deleted because it is most likely corrupted",filename);
+        DDLogVerbose(@"Rendering pdf failed %@. File is now deleted because it is most likely corrupted",filename);
         [[[UIAlertView alloc] initWithTitle:@"File error" message:[NSString stringWithFormat:@"A downloaded attachment file (%@) could not be opened because it seems to be corrupted. The file will be now deleted and needs to be downloaded again.",attachment.filename]
                                    delegate:NULL cancelButtonTitle:@"OK" otherButtonTitles:nil] show];
         [[NSFileManager defaultManager] removeItemAtPath:filename error:NULL];
@@ -601,7 +601,7 @@ static ZPAttachmentIconViewController* _webViewDelegate;
     
     if([attachment.key isEqualToString: self.attachment.key] && mode ==ZPATTACHMENTICONGVIEWCONTROLLER_MODE_DOWNLOAD){
         if ([NSThread isMainThread]){
-            NSLog(@"Success");
+            DDLogVerbose(@"Success");
             self.progressLabel.text = @"Tap to view";
             if([attachment.contentType isEqualToString:@"application/pdf"]) [self _renderPDFPreview];
             self.progressView.hidden = TRUE;
@@ -616,7 +616,7 @@ static ZPAttachmentIconViewController* _webViewDelegate;
     
     if([attachment.key isEqualToString: self.attachment.key] && mode ==ZPATTACHMENTICONGVIEWCONTROLLER_MODE_DOWNLOAD){
         if ([NSThread isMainThread]){
-            NSLog(@"Finished downloading %@",attachment.filename);
+            DDLogVerbose(@"Finished downloading %@",attachment.filename);
             self.progressLabel.text = [NSString stringWithFormat:@"Download failed. (%@: %i)",error.domain,error.code];
             self.progressView.hidden = TRUE;
             NSString* description = [error.userInfo objectForKey:@"error"];
@@ -661,7 +661,7 @@ static ZPAttachmentIconViewController* _webViewDelegate;
 -(void) notifyAttachmentDeleted:(ZPZoteroAttachment*) attachment fileAttributes:(NSDictionary*) fileAttributes{
     if([attachment.key isEqualToString: self.attachment.key]){
         if ([NSThread isMainThread]){
-            NSLog(@"Attachment deleted %@",attachment.filename);
+            DDLogVerbose(@"Attachment deleted %@",attachment.filename);
             self.progressLabel.text = @"Attachment file deleted";
             self.progressView.hidden = TRUE;
             self.errorLabel.hidden = TRUE;

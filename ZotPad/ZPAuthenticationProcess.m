@@ -15,7 +15,7 @@
 #import "ZPLibraryAndCollectionListViewController.h"
 #import "ZPPreferences.h"
 
-#import "ZPLogger.h"
+
 
 @implementation ZPAuthenticationProcess
 
@@ -38,7 +38,7 @@ static ZPAuthenticationProcess* _instance = nil;
 -(void) startAuthentication{
     
     
-    NSLog(@"Starting authentication process");
+    DDLogVerbose(@"Starting authentication process");
     _isActive = TRUE;
 
     //If the UI is not yet visible, wait for it to become visible before proceeding.
@@ -143,7 +143,7 @@ static ZPAuthenticationProcess* _instance = nil;
         _latestToken = [[OAToken alloc] initWithHTTPResponseBody:responseBody];
         
         
-        NSLog(@"Got access token");
+        DDLogVerbose(@"Got access token");
         
         //Save the key to preferences
         [[ZPPreferences instance] setOAuthKey:[_latestToken key]];
@@ -171,12 +171,12 @@ static ZPAuthenticationProcess* _instance = nil;
 
 - (void)requestTokenTicket:(OAServiceTicket *)ticket didFailWithError:(NSError *)error {
     [[UIApplication sharedApplication] setNetworkActivityIndicatorVisible:NO];    
-    NSLog(@"Error");
+    DDLogVerbose(@"Error");
 }
 - (void)requestAccessToken:(OAServiceTicket *)ticket didFailWithError:(NSError *)error {
     
     [[UIApplication sharedApplication] setNetworkActivityIndicatorVisible:NO];
-    NSLog(@"Error");
+    DDLogVerbose(@"Error");
 }
 
 @end

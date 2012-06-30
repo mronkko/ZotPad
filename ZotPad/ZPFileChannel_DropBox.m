@@ -11,7 +11,7 @@
 #import "ZPFileChannel_Dropbox.h"
 #import <DropboxSDK/DropboxSDK.h>
 #import "ZPPreferences.h"
-#import "ZPLogger.h"
+
 #import "ZPServerConnection.h"
 
 //Zipping and base64 encoding
@@ -40,7 +40,7 @@
 +(void)linkDroboxIfNeeded{
     if([[ZPPreferences instance] useDropbox]){
         if([DBSession sharedSession]==NULL){
-            TFLog(@"Starting Dropbox");
+            DDLogInfo(@"Starting Dropbox");
             DBSession* dbSession =
             [[DBSession alloc]
              initWithAppKey:@"or7xa2bxhzit1ws"
@@ -52,7 +52,7 @@
         //Link with dropBox account if not already linked
         BOOL linked =[[DBSession sharedSession] isLinked];
         if (!linked) {
-            TFLog(@"Linking Dropbox");
+            DDLogInfo(@"Linking Dropbox");
             [[DBSession sharedSession] link];
         }
     }
@@ -139,7 +139,7 @@
     
     NSString* targetPath = [NSString stringWithFormat:@"/%@/",attachment.key];
     
-    NSLog(@"Uploading file %@ to %@%@ (rev %@)",attachment.fileSystemPath_modified,targetPath,attachment.filename,attachment.versionIdentifier_local);
+    DDLogVerbose(@"Uploading file %@ to %@%@ (rev %@)",attachment.fileSystemPath_modified,targetPath,attachment.filename,attachment.versionIdentifier_local);
     
     [restClient uploadFile:attachment.filename toPath:targetPath withParentRev:attachment.versionIdentifier_local fromPath:attachment.fileSystemPath_modified];
    // [restClient uploadFile:attachment.filename toPath:@"/" withParentRev:NULL fromPath:attachment.fileSystemPath_modified];
@@ -161,11 +161,11 @@
         
     if (metadata.isDirectory) {
         ZPZoteroAttachment* attachment = client.attachment;
-        NSLog(@"Folder '%@' contains:", metadata.path);
+        DDLogVerbose(@"Folder '%@' contains:", metadata.path);
         NSString* basePath=[NSTemporaryDirectory() stringByAppendingPathComponent:[NSString stringWithFormat:@"ZP%@%i",attachment.key,[[NSDate date] timeIntervalSince1970]*1000000]];
         [[NSFileManager defaultManager] createDirectoryAtPath:basePath withIntermediateDirectories:YES attributes:NULL error:NULL];
         for (DBMetadata *file in metadata.contents) {
-            NSLog(@"\t%@", file.filename);
+            DDLogVerbose(@"\t%@", file.filename);
             NSString* tempFile = [basePath stringByAppendingPathComponent:file.filename];
             [client loadFile:[NSString stringWithFormat:@"/%@/%@",attachment.key,file.filename] intoPath:tempFile];
         }
@@ -177,7 +177,7 @@
         //Set version of the file
         ZPZoteroAttachment* attachment = client.attachment;
         client.revision=metadata.rev;
-        NSLog(@"Start downloading file /%@/%@ (rev %@)",attachment.key,attachment.filename,client.revision);
+        DDLogVerbose(@"Start downloading file /%@/%@ (rev %@)",attachment.key,attachment.filename,client.revision);
          NSString* tempFile = [NSTemporaryDirectory() stringByAppendingPathComponent:[NSString stringWithFormat:@"ZP%@%i",attachment.key,[[NSDate date] timeIntervalSince1970]*1000000]];
         [client loadFile:[NSString stringWithFormat:@"/%@/%@",attachment.key,attachment.filename] atRev:client.revision intoPath:tempFile];
     }
@@ -185,11 +185,11 @@
 
 - (void)restClient:(ZPDBRestClient*) client loadMetadataFailedWithError:(NSError *)error {
     
-    NSLog(@"Error loading metadata: %@", error);
+    DDLogVerbose(@"Error loading metadata: %@", error);
     
     //If we are not linked, link
     if(error.code==401){
-        TFLog(@"Linking Dropbox");
+        DDLogInfo(@"Linking Dropbox");
         [[DBSession sharedSession] link];
     }
     
@@ -251,7 +251,7 @@
                 // The filenames end with %ZB64, which needs to be removed
                 NSString* encodedFilename = [[QSStrings encodeBase64WithString:[file lastPathComponent]]stringByAppendingString:@"%ZB64"];
                 
-                NSLog(@"Encoded %@ as %@",file , encodedFilename);
+                DDLogVerbose(@"Encoded %@ as %@",file , encodedFilename);
                 
                 //Add to Zip with the new name
                 [zipArchive addFileToZip:[tempPath stringByAppendingPathComponent:file] newname:encodedFilename];
@@ -281,11 +281,11 @@
 }
 
 - (void)restClient:(ZPDBRestClient*)client loadFileFailedWithError:(NSError*)error {
-    NSLog(@"There was an error downloading the file - %@", error);
+    DDLogVerbose(@"There was an error downloading the file - %@", error);
 
     //If we are not linked, link
     if(error.code==401){
-        TFLog(@"Linking Dropbox");
+        DDLogInfo(@"Linking Dropbox");
         [[DBSession sharedSession] link];
     }
 
@@ -316,11 +316,11 @@
 
 }
 - (void)restClient:(DBRestClient*)client uploadFileFailedWithError:(NSError*)error{
-    NSLog(@"There was an error uploading the file - %@", error);
+    DDLogVerbose(@"There was an error uploading the file - %@", error);
     
     //If we are not linked, link
     if(error.code==401){
-        TFLog(@"Linking Dropbox");
+        DDLogInfo(@"Linking Dropbox");
         [[DBSession sharedSession] link];
     }
     

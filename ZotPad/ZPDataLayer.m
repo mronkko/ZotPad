@@ -20,7 +20,7 @@
 
 //DB and DB library
 #import "ZPDatabase.h"
-#import "ZPLogger.h"
+
 
 
 
@@ -154,7 +154,7 @@ static ZPDataLayer* _instance = nil;
 
 -(void) notifyLibraryWithCollectionsAvailable:(ZPZoteroLibrary*) library{
     
-    NSLog(@"Library %@ is available",library.title);
+    DDLogVerbose(@"Library %@ is available",library.title);
     NSEnumerator* e = [_libraryObservers objectEnumerator];
     NSObject* id;
     

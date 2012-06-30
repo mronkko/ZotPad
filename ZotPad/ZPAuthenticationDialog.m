@@ -16,7 +16,7 @@
 #import "ZPAuthenticationProcess.h"
 #import "../DSActivityView/Sources/DSActivityView.h"
 
-#import "ZPLogger.h"
+
 
 @implementation ZPAuthenticationDialog
 
@@ -75,18 +75,18 @@ static ZPAuthenticationDialog* _instance = nil;
     
     _key = key;
 
-    NSLog(@"Starting loading Zotero website");
+    DDLogVerbose(@"Starting loading Zotero website");
     
     [self loadFirstPage:NULL];
     
-    NSLog(@"Done loading");
+    DDLogVerbose(@"Done loading");
 
 }
 - (BOOL)webView:(UIWebView *)webView shouldStartLoadWithRequest:(NSURLRequest *)request navigationType:(UIWebViewNavigationType)navigationType{
 
 
     NSString* urlString = [[request mainDocumentURL] absoluteString];
-    NSLog(@"Start loading URL %@",urlString);
+    DDLogVerbose(@"Start loading URL %@",urlString);
     
     //If we are redirected to the front page, we do not need to show the web browser any more
     

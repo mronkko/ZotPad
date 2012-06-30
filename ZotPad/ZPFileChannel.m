@@ -85,6 +85,33 @@
 }
 
 
+-(NSString*) requestDumpAsString:(ASIHTTPRequest*)request{
+
+    NSMutableString* dump = [[NSMutableString alloc] initWithFormat:@"Request: \n\n%@ %@ HTTP/1.1\n",request.requestMethod,request.url];
+    
+    for(NSString* key in request.requestHeaders){
+        [dump appendFormat:@"%@: %@\n",key,[request.requestHeaders objectForKey:key]];
+    }
+    
+    if(request.postBody){
+        [dump appendString:@"\n"];
+        [dump appendString:[[NSString alloc] initWithData:request.postBody
+                                                 encoding:NSUTF8StringEncoding]];
+    }
+
+    [dump appendFormat: @"\n\nResponse: \n\n%@\n",request.responseStatusMessage];
+
+    for(NSString* key in request.responseHeaders){
+        [dump appendFormat:@"%@: %@\n",key,[request.responseHeaders objectForKey:key]];
+    }
+
+    if(request.responseString){
+        [dump appendString:@"\n"];
+        [dump appendString:request.responseString];
+    }
+    return dump;
+}
+
 
 
 

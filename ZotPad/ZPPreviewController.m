@@ -57,12 +57,12 @@
         NSArray* files = [[NSFileManager defaultManager]contentsOfDirectoryAtPath:tempDir error:NULL];
         
         for (NSString* file in files){
-            NSLog(@"Unzipped file %@ into temp dir %@",file,tempDir);
+            DDLogVerbose(@"Unzipped file %@ into temp dir %@",file,tempDir);
             // The filenames end with %ZB64, which needs to be removed
             NSString* toBeDecoded = [file substringToIndex:[file length] - 5];
             NSData* decodedData = [QSStrings decodeBase64WithString:toBeDecoded] ;
             NSString* decodedFilename = [[NSString alloc] initWithData:decodedData encoding:NSUTF8StringEncoding];
-            NSLog(@"Decoded %@ as %@",toBeDecoded, decodedFilename);
+            DDLogVerbose(@"Decoded %@ as %@",toBeDecoded, decodedFilename);
             
             [[NSFileManager defaultManager] moveItemAtPath:[tempDir stringByAppendingPathComponent:file] toPath:[tempDir stringByAppendingPathComponent:decodedFilename] error:NULL];
             

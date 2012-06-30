@@ -10,7 +10,7 @@
 
 #import "ZPLocalization.h"
 #import "ZPDatabase.h"
-#import "ZPLogger.h"
+
 
 @implementation ZPLocalization
 

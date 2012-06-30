@@ -19,7 +19,7 @@
 
 #import "ZPPreferences.h"
 #import "ZPDataLayer.h"
-#import "ZPLogger.h"
+
 
 
 //Presenting previews
@@ -185,7 +185,7 @@
 
 #pragma mark - UIDocumentInteractionControllerDelegate
 - (void) documentInteractionController: (UIDocumentInteractionController *) controller didEndSendingToApplication: (NSString *) application{
-    NSLog(@"Handed control to application %@",application);
+    DDLogVerbose(@"Handed control to application %@",application);
     
     //Store the version identifier. This is later used to upload modified files to Zotero
     

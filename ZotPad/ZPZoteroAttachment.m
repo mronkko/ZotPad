@@ -34,7 +34,7 @@ NSInteger const VERSION_SOURCE_DROPBOX =3;
 //@synthesize versionIdentifier_local;
 
 -(void) setVersionIdentifier_local:(NSString *)versionIdentifier_local{
-    NSLog(@"Set local MD5 %@ for item %@",versionIdentifier_local, self.key);
+    DDLogVerbose(@"Set local MD5 %@ for item %@",versionIdentifier_local, self.key);
     _versionIdentifier_local = versionIdentifier_local;
 }
 -(NSString*) versionIdentifier_local{
@@ -214,6 +214,10 @@ NSInteger const VERSION_SOURCE_DROPBOX =3;
 //Helper function for MD5 sums
 
 -(NSString*) md5ForFileAtPath:(NSString*)path{
+    
+    if(! [[NSFileManager defaultManager] fileExistsAtPath:path]){
+        [NSException raise:@"File not found" format:@"Attempted to calculate MD5 sum for a non-existing file at %@",path];
+    }
     
     //TODO: Make sure that this does not leak memory
     

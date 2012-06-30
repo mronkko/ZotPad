@@ -566,6 +566,14 @@
 		A75E1866153405740046988C /* zip.c in Sources */ = {isa = PBXBuildFile; fileRef = A75E185B153405740046988C /* zip.c */; };
 		A75E1867153405740046988C /* ZipArchive.mm in Sources */ = {isa = PBXBuildFile; fileRef = A75E185E153405740046988C /* ZipArchive.mm */; };
 		A75E1868153405740046988C /* ZipArchive.mm in Sources */ = {isa = PBXBuildFile; fileRef = A75E185E153405740046988C /* ZipArchive.mm */; settings = {COMPILER_FLAGS = "-fno-objc-arc"; }; };
+		A764802B159F1BD00075CFB9 /* DDFileLogger.m in Sources */ = {isa = PBXBuildFile; fileRef = A7648024159F1BD00075CFB9 /* DDFileLogger.m */; };
+		A764802C159F1BD00075CFB9 /* DDFileLogger.m in Sources */ = {isa = PBXBuildFile; fileRef = A7648024159F1BD00075CFB9 /* DDFileLogger.m */; };
+		A764802D159F1BD00075CFB9 /* DDLog.m in Sources */ = {isa = PBXBuildFile; fileRef = A7648026159F1BD00075CFB9 /* DDLog.m */; };
+		A764802E159F1BD00075CFB9 /* DDLog.m in Sources */ = {isa = PBXBuildFile; fileRef = A7648026159F1BD00075CFB9 /* DDLog.m */; };
+		A764802F159F1BD00075CFB9 /* DDTTYLogger.m in Sources */ = {isa = PBXBuildFile; fileRef = A7648028159F1BD00075CFB9 /* DDTTYLogger.m */; };
+		A7648030159F1BD00075CFB9 /* DDTTYLogger.m in Sources */ = {isa = PBXBuildFile; fileRef = A7648028159F1BD00075CFB9 /* DDTTYLogger.m */; };
+		A7648034159F1C0C0075CFB9 /* TestFlightLogger.m in Sources */ = {isa = PBXBuildFile; fileRef = A7648033159F1C0C0075CFB9 /* TestFlightLogger.m */; };
+		A7648035159F1C0C0075CFB9 /* TestFlightLogger.m in Sources */ = {isa = PBXBuildFile; fileRef = A7648033159F1C0C0075CFB9 /* TestFlightLogger.m */; };
 		A765747B15965E1000761F6B /* ZPPreviewController.m in Sources */ = {isa = PBXBuildFile; fileRef = A765747A15965E0F00761F6B /* ZPPreviewController.m */; };
 		A765747C15965E1000761F6B /* ZPPreviewController.m in Sources */ = {isa = PBXBuildFile; fileRef = A765747A15965E0F00761F6B /* ZPPreviewController.m */; };
 		A7692D84147D112D000C1A8F /* ZPZoteroItem.m in Sources */ = {isa = PBXBuildFile; fileRef = A7692D83147D112D000C1A8F /* ZPZoteroItem.m */; };
@@ -749,7 +757,6 @@
 		A7CD074815161555007A8E1D /* ASIInputStream.m in Sources */ = {isa = PBXBuildFile; fileRef = A76D3C8C14AD9FB5000C3ED9 /* ASIInputStream.m */; settings = {COMPILER_FLAGS = "-fno-objc-arc"; }; };
 		A7CD074915161555007A8E1D /* ZPLocalization.m in Sources */ = {isa = PBXBuildFile; fileRef = A7D3C08214AEE70F00DB975D /* ZPLocalization.m */; };
 		A7CD074A15161555007A8E1D /* ZPAttachmentFileInteractionController.m in Sources */ = {isa = PBXBuildFile; fileRef = A793153D14B185E800E1ABF0 /* ZPAttachmentFileInteractionController.m */; };
-		A7CD074B15161555007A8E1D /* ZPLogger.m in Sources */ = {isa = PBXBuildFile; fileRef = A7F72BC014B984920059617D /* ZPLogger.m */; };
 		A7CD074C15161555007A8E1D /* ZPItemListViewController.m in Sources */ = {isa = PBXBuildFile; fileRef = A77B98DE14DE5CDB00132E9B /* ZPItemListViewController.m */; };
 		A7CD074D15161555007A8E1D /* ZPCacheStatusToolbarController.m in Sources */ = {isa = PBXBuildFile; fileRef = A7D5E2DB14F5690700593A39 /* ZPCacheStatusToolbarController.m */; };
 		A7CD075715161555007A8E1D /* libz.dylib in Frameworks */ = {isa = PBXBuildFile; fileRef = A7F8637F14C21D8800021662 /* libz.dylib */; };
@@ -811,7 +818,6 @@
 		A7F24A081533237D00537B54 /* barbutton_image_down_state@2x~iphone.png in Resources */ = {isa = PBXBuildFile; fileRef = A7F249F51533179700537B54 /* barbutton_image_down_state@2x~iphone.png */; };
 		A7F24A091533238000537B54 /* barbutton_image_down_state~ipad.png in Resources */ = {isa = PBXBuildFile; fileRef = A7F249F41533179700537B54 /* barbutton_image_down_state~ipad.png */; };
 		A7F24A0A1533238300537B54 /* barbutton_image_down_state@2x~ipad.png in Resources */ = {isa = PBXBuildFile; fileRef = A7F249F31533179700537B54 /* barbutton_image_down_state@2x~ipad.png */; };
-		A7F72BC114B984920059617D /* ZPLogger.m in Sources */ = {isa = PBXBuildFile; fileRef = A7F72BC014B984920059617D /* ZPLogger.m */; };
 		A7F8638014C21D8800021662 /* libz.dylib in Frameworks */ = {isa = PBXBuildFile; fileRef = A7F8637F14C21D8800021662 /* libz.dylib */; };
 /* End PBXBuildFile section */
 
@@ -1132,7 +1138,7 @@
 		A708EF42153F0FAB0083A506 /* x-office-contact.svgz */ = {isa = PBXFileReference; lastKnownFileType = file; name = "x-office-contact.svgz"; path = "Oxygen-Icons/scalable/mimetypes/x-office-contact.svgz"; sourceTree = SOURCE_ROOT; };
 		A708EF43153F0FAB0083A506 /* x-office-document.svgz */ = {isa = PBXFileReference; lastKnownFileType = file; name = "x-office-document.svgz"; path = "Oxygen-Icons/scalable/mimetypes/x-office-document.svgz"; sourceTree = SOURCE_ROOT; };
 		A708EF44153F0FAB0083A506 /* x-office-spreadsheet.svgz */ = {isa = PBXFileReference; lastKnownFileType = file; name = "x-office-spreadsheet.svgz"; path = "Oxygen-Icons/scalable/mimetypes/x-office-spreadsheet.svgz"; sourceTree = SOURCE_ROOT; };
-		A70E4161154421A900D76A62 /* ASIHTTPRequestConfig.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; name = ASIHTTPRequestConfig.h; path = "asi-http-request/Classes/ASIHTTPRequestConfig.h"; sourceTree = "<group>"; };
+		A70E4161154421A900D76A62 /* ASIHTTPRequestConfig.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; lineEnding = 0; name = ASIHTTPRequestConfig.h; path = "asi-http-request/Classes/ASIHTTPRequestConfig.h"; sourceTree = "<group>"; xcLanguageSpecificationIdentifier = xcode.lang.objcpp; };
 		A716C0351494E9DE00BD6025 /* ZPZoteroAttachment.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = ZPZoteroAttachment.h; sourceTree = "<group>"; };
 		A716C0361494E9DE00BD6025 /* ZPZoteroAttachment.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = ZPZoteroAttachment.m; sourceTree = "<group>"; };
 		A716C0381495131E00BD6025 /* NSObject+SBJson.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; name = "NSObject+SBJson.h"; path = "json-framework/Classes/NSObject+SBJson.h"; sourceTree = "<group>"; };
@@ -1198,6 +1204,14 @@
 		A75E185C153405740046988C /* zip.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = zip.h; sourceTree = "<group>"; };
 		A75E185D153405740046988C /* ZipArchive.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = ZipArchive.h; sourceTree = "<group>"; };
 		A75E185E153405740046988C /* ZipArchive.mm */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.objcpp; path = ZipArchive.mm; sourceTree = "<group>"; };
+		A7648023159F1BD00075CFB9 /* DDFileLogger.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; name = DDFileLogger.h; path = CocoaLumberjack/Lumberjack/DDFileLogger.h; sourceTree = "<group>"; };
+		A7648024159F1BD00075CFB9 /* DDFileLogger.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; lineEnding = 0; name = DDFileLogger.m; path = CocoaLumberjack/Lumberjack/DDFileLogger.m; sourceTree = "<group>"; xcLanguageSpecificationIdentifier = xcode.lang.objc; };
+		A7648025159F1BD00075CFB9 /* DDLog.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; name = DDLog.h; path = CocoaLumberjack/Lumberjack/DDLog.h; sourceTree = "<group>"; };
+		A7648026159F1BD00075CFB9 /* DDLog.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; name = DDLog.m; path = CocoaLumberjack/Lumberjack/DDLog.m; sourceTree = "<group>"; };
+		A7648027159F1BD00075CFB9 /* DDTTYLogger.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; name = DDTTYLogger.h; path = CocoaLumberjack/Lumberjack/DDTTYLogger.h; sourceTree = "<group>"; };
+		A7648028159F1BD00075CFB9 /* DDTTYLogger.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; name = DDTTYLogger.m; path = CocoaLumberjack/Lumberjack/DDTTYLogger.m; sourceTree = "<group>"; };
+		A7648032159F1C0C0075CFB9 /* TestFlightLogger.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; name = TestFlightLogger.h; path = TestFlightLogger/Classes/TestFlightLogger.h; sourceTree = "<group>"; };
+		A7648033159F1C0C0075CFB9 /* TestFlightLogger.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; name = TestFlightLogger.m; path = TestFlightLogger/Classes/TestFlightLogger.m; sourceTree = "<group>"; };
 		A765747915965E0F00761F6B /* ZPPreviewController.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = ZPPreviewController.h; sourceTree = "<group>"; };
 		A765747A15965E0F00761F6B /* ZPPreviewController.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = ZPPreviewController.m; sourceTree = "<group>"; };
 		A7692D82147D112D000C1A8F /* ZPZoteroItem.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = ZPZoteroItem.h; sourceTree = "<group>"; };
@@ -1325,7 +1339,7 @@
 		A7BD5ED1156122F6003252EA /* DTAttributedTextCell.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = DTAttributedTextCell.h; sourceTree = "<group>"; };
 		A7BD5ED2156122F6003252EA /* DTAttributedTextCell.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = DTAttributedTextCell.m; sourceTree = "<group>"; };
 		A7BD5ED3156122F6003252EA /* DTAttributedTextContentView.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = DTAttributedTextContentView.h; sourceTree = "<group>"; };
-		A7BD5ED4156122F6003252EA /* DTAttributedTextContentView.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = DTAttributedTextContentView.m; sourceTree = "<group>"; xcLanguageSpecificationIdentifier = xcode.lang.objc; };
+		A7BD5ED4156122F6003252EA /* DTAttributedTextContentView.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; lineEnding = 0; path = DTAttributedTextContentView.m; sourceTree = "<group>"; xcLanguageSpecificationIdentifier = xcode.lang.objc; };
 		A7BD5ED5156122F6003252EA /* DTAttributedTextView.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = DTAttributedTextView.h; sourceTree = "<group>"; };
 		A7BD5ED6156122F6003252EA /* DTAttributedTextView.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = DTAttributedTextView.m; sourceTree = "<group>"; xcLanguageSpecificationIdentifier = xcode.lang.objc; };
 		A7BD5ED7156122F6003252EA /* DTColor+HTML.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = "DTColor+HTML.h"; sourceTree = "<group>"; };
@@ -1335,7 +1349,7 @@
 		A7BD5EDB156122F6003252EA /* DTCoreTextConstants.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = DTCoreTextConstants.h; sourceTree = "<group>"; };
 		A7BD5EDC156122F6003252EA /* DTCoreTextConstants.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = DTCoreTextConstants.m; sourceTree = "<group>"; };
 		A7BD5EDD156122F6003252EA /* DTCoreTextFontCollection.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = DTCoreTextFontCollection.h; sourceTree = "<group>"; };
-		A7BD5EDE156122F6003252EA /* DTCoreTextFontCollection.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = DTCoreTextFontCollection.m; sourceTree = "<group>"; };
+		A7BD5EDE156122F6003252EA /* DTCoreTextFontCollection.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; lineEnding = 0; path = DTCoreTextFontCollection.m; sourceTree = "<group>"; xcLanguageSpecificationIdentifier = xcode.lang.objc; };
 		A7BD5EDF156122F6003252EA /* DTCoreTextFontDescriptor.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = DTCoreTextFontDescriptor.h; sourceTree = "<group>"; };
 		A7BD5EE0156122F6003252EA /* DTCoreTextFontDescriptor.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = DTCoreTextFontDescriptor.m; sourceTree = "<group>"; };
 		A7BD5EE1156122F6003252EA /* DTCoreTextGlyphRun.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = DTCoreTextGlyphRun.h; sourceTree = "<group>"; };
@@ -1387,7 +1401,7 @@
 		A7BD5F0F156122F6003252EA /* NSMutableString+HTML.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = "NSMutableString+HTML.h"; sourceTree = "<group>"; };
 		A7BD5F10156122F6003252EA /* NSMutableString+HTML.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = "NSMutableString+HTML.m"; sourceTree = "<group>"; };
 		A7BD5F11156122F6003252EA /* NSScanner+HTML.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = "NSScanner+HTML.h"; sourceTree = "<group>"; };
-		A7BD5F12156122F6003252EA /* NSScanner+HTML.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = "NSScanner+HTML.m"; sourceTree = "<group>"; };
+		A7BD5F12156122F6003252EA /* NSScanner+HTML.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; lineEnding = 0; path = "NSScanner+HTML.m"; sourceTree = "<group>"; xcLanguageSpecificationIdentifier = xcode.lang.objc; };
 		A7BD5F13156122F6003252EA /* NSString+CSS.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = "NSString+CSS.h"; sourceTree = "<group>"; };
 		A7BD5F14156122F6003252EA /* NSString+CSS.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = "NSString+CSS.m"; sourceTree = "<group>"; };
 		A7BD5F15156122F6003252EA /* NSString+HTML.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = "NSString+HTML.h"; sourceTree = "<group>"; };
@@ -1441,8 +1455,6 @@
 		A7F249F81533179700537B54 /* barbutton_image_up_state~ipad.png */ = {isa = PBXFileReference; lastKnownFileType = image.png; name = "barbutton_image_up_state~ipad.png"; path = "Icons/barbutton_image_up_state~ipad.png"; sourceTree = SOURCE_ROOT; };
 		A7F249F91533179700537B54 /* barbutton_image_up_state@2x~iphone.png */ = {isa = PBXFileReference; lastKnownFileType = image.png; name = "barbutton_image_up_state@2x~iphone.png"; path = "Icons/barbutton_image_up_state@2x~iphone.png"; sourceTree = SOURCE_ROOT; };
 		A7F249FA1533179700537B54 /* barbutton_image_up_state~iphone.png */ = {isa = PBXFileReference; lastKnownFileType = image.png; name = "barbutton_image_up_state~iphone.png"; path = "Icons/barbutton_image_up_state~iphone.png"; sourceTree = SOURCE_ROOT; };
-		A7F72BBF14B984920059617D /* ZPLogger.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = ZPLogger.h; sourceTree = "<group>"; };
-		A7F72BC014B984920059617D /* ZPLogger.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = ZPLogger.m; sourceTree = "<group>"; };
 		A7F8637F14C21D8800021662 /* libz.dylib */ = {isa = PBXFileReference; lastKnownFileType = "compiled.mach-o.dylib"; name = libz.dylib; path = usr/lib/libz.dylib; sourceTree = SDKROOT; };
 /* End PBXFileReference section */
 
@@ -1874,6 +1886,7 @@
 		A7200DD314718DC0004347C9 /* Frameworks */ = {
 			isa = PBXGroup;
 			children = (
+				A7648031159F1BE40075CFB9 /* Cocoa-Lumberjack */,
 				A7699E52159A6908002F09DA /* FileMD5Hash */,
 				A7BD5EC9156122F5003252EA /* Core */,
 				A7BD5EC5156121A3003252EA /* CoreText.framework */,
@@ -1926,8 +1939,6 @@
 			isa = PBXGroup;
 			children = (
 				A76ECD25159CDEB20062E95A /* Images */,
-				A7F72BBF14B984920059617D /* ZPLogger.h */,
-				A7F72BC014B984920059617D /* ZPLogger.m */,
 				A73D635014879D15007999F3 /* Settings.bundle */,
 				A7200DDC14718DC0004347C9 /* ZotPad-Info.plist */,
 				A7CD077715161556007A8E1D /* ZotPad beta-Info.plist */,
@@ -2029,6 +2040,21 @@
 				A75E185C153405740046988C /* zip.h */,
 			);
 			path = minizip;
+			sourceTree = "<group>";
+		};
+		A7648031159F1BE40075CFB9 /* Cocoa-Lumberjack */ = {
+			isa = PBXGroup;
+			children = (
+				A7648032159F1C0C0075CFB9 /* TestFlightLogger.h */,
+				A7648033159F1C0C0075CFB9 /* TestFlightLogger.m */,
+				A7648023159F1BD00075CFB9 /* DDFileLogger.h */,
+				A7648024159F1BD00075CFB9 /* DDFileLogger.m */,
+				A7648025159F1BD00075CFB9 /* DDLog.h */,
+				A7648026159F1BD00075CFB9 /* DDLog.m */,
+				A7648027159F1BD00075CFB9 /* DDTTYLogger.h */,
+				A7648028159F1BD00075CFB9 /* DDTTYLogger.m */,
+			);
+			name = "Cocoa-Lumberjack";
 			sourceTree = "<group>";
 		};
 		A7699E52159A6908002F09DA /* FileMD5Hash */ = {
@@ -3171,7 +3197,6 @@
 				A76D3C8D14AD9FB5000C3ED9 /* ASIInputStream.m in Sources */,
 				A7D3C08314AEE71000DB975D /* ZPLocalization.m in Sources */,
 				A793153E14B185E800E1ABF0 /* ZPAttachmentFileInteractionController.m in Sources */,
-				A7F72BC114B984920059617D /* ZPLogger.m in Sources */,
 				A77B98DF14DE5CDB00132E9B /* ZPItemListViewController.m in Sources */,
 				A7D5E2DC14F5690700593A39 /* ZPCacheStatusToolbarController.m in Sources */,
 				A7CD078F151652E9007A8E1D /* ZPFileChannel.m in Sources */,
@@ -3235,6 +3260,10 @@
 				A79D6018159A355100F55C54 /* ASIFormDataRequest.m in Sources */,
 				A7699E50159A68EF002F09DA /* FileMD5Hash.c in Sources */,
 				A7699E5C159B1AC7002F09DA /* ZPUploadVersionConflictViewControllerViewController.m in Sources */,
+				A764802B159F1BD00075CFB9 /* DDFileLogger.m in Sources */,
+				A764802D159F1BD00075CFB9 /* DDLog.m in Sources */,
+				A764802F159F1BD00075CFB9 /* DDTTYLogger.m in Sources */,
+				A7648034159F1C0C0075CFB9 /* TestFlightLogger.m in Sources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
@@ -3305,7 +3334,6 @@
 				A7CD074815161555007A8E1D /* ASIInputStream.m in Sources */,
 				A7CD074915161555007A8E1D /* ZPLocalization.m in Sources */,
 				A7CD074A15161555007A8E1D /* ZPAttachmentFileInteractionController.m in Sources */,
-				A7CD074B15161555007A8E1D /* ZPLogger.m in Sources */,
 				A7CD074C15161555007A8E1D /* ZPItemListViewController.m in Sources */,
 				A7CD074D15161555007A8E1D /* ZPCacheStatusToolbarController.m in Sources */,
 				A7CD0790151652E9007A8E1D /* ZPFileChannel.m in Sources */,
@@ -3331,6 +3359,10 @@
 				A79D6019159A355100F55C54 /* ASIFormDataRequest.m in Sources */,
 				A7699E54159A6B75002F09DA /* FileMD5Hash.c in Sources */,
 				A7699E5D159B1AC7002F09DA /* ZPUploadVersionConflictViewControllerViewController.m in Sources */,
+				A764802C159F1BD00075CFB9 /* DDFileLogger.m in Sources */,
+				A764802E159F1BD00075CFB9 /* DDLog.m in Sources */,
+				A7648030159F1BD00075CFB9 /* DDTTYLogger.m in Sources */,
+				A7648035159F1C0C0075CFB9 /* TestFlightLogger.m in Sources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
@@ -3354,8 +3386,8 @@
 				ALWAYS_SEARCH_USER_PATHS = NO;
 				ARCHS = "$(ARCHS_STANDARD_32_BIT)";
 				CLANG_ENABLE_OBJC_ARC = YES;
-				CODE_SIGN_IDENTITY = "iPhone Distribution: Mikko Ronkko";
-				"CODE_SIGN_IDENTITY[sdk=iphoneos*]" = "iPhone Distribution: Mikko Ronkko";
+				CODE_SIGN_IDENTITY = "iPhone Developer";
+				"CODE_SIGN_IDENTITY[sdk=iphoneos*]" = "iPhone Developer";
 				COPY_PHASE_STRIP = NO;
 				GCC_C_LANGUAGE_STANDARD = gnu99;
 				GCC_DYNAMIC_NO_PIC = NO;
@@ -3380,8 +3412,8 @@
 				);
 				IPHONEOS_DEPLOYMENT_TARGET = 5.0;
 				OTHER_LDFLAGS = "-ObjC";
-				PROVISIONING_PROFILE = "2F3316B4-FF9B-46D8-B351-831AAEA0830A";
-				"PROVISIONING_PROFILE[sdk=iphoneos*]" = "2F3316B4-FF9B-46D8-B351-831AAEA0830A";
+				PROVISIONING_PROFILE = "";
+				"PROVISIONING_PROFILE[sdk=iphoneos*]" = "";
 				SDKROOT = iphoneos;
 				TARGETED_DEVICE_FAMILY = 2;
 				VALIDATE_PRODUCT = NO;
@@ -3394,8 +3426,8 @@
 				ALWAYS_SEARCH_USER_PATHS = NO;
 				ARCHS = "$(ARCHS_STANDARD_32_BIT)";
 				CLANG_ENABLE_OBJC_ARC = YES;
-				CODE_SIGN_IDENTITY = "iPhone Distribution: Mikko Ronkko";
-				"CODE_SIGN_IDENTITY[sdk=iphoneos*]" = "iPhone Distribution: Mikko Ronkko";
+				CODE_SIGN_IDENTITY = "iPhone Developer";
+				"CODE_SIGN_IDENTITY[sdk=iphoneos*]" = "iPhone Developer";
 				COPY_PHASE_STRIP = YES;
 				GCC_C_LANGUAGE_STANDARD = gnu99;
 				GCC_VERSION = com.apple.compilers.llvm.clang.1_0;
@@ -3414,8 +3446,8 @@
 				IPHONEOS_DEPLOYMENT_TARGET = 5.0;
 				OTHER_CFLAGS = "-DNS_BLOCK_ASSERTIONS=1";
 				OTHER_LDFLAGS = "-ObjC";
-				PROVISIONING_PROFILE = "2F3316B4-FF9B-46D8-B351-831AAEA0830A";
-				"PROVISIONING_PROFILE[sdk=iphoneos*]" = "2F3316B4-FF9B-46D8-B351-831AAEA0830A";
+				PROVISIONING_PROFILE = "";
+				"PROVISIONING_PROFILE[sdk=iphoneos*]" = "";
 				SDKROOT = iphoneos;
 				TARGETED_DEVICE_FAMILY = 2;
 				VALIDATE_PRODUCT = YES;
@@ -3494,7 +3526,7 @@
 			isa = XCBuildConfiguration;
 			buildSettings = {
 				ALTERNATE_GROUP = 70000;
-				CODE_SIGN_IDENTITY = "iPhone Distribution: Mikko Ronkko";
+				CODE_SIGN_IDENTITY = "iPhone Developer";
 				"CODE_SIGN_IDENTITY[sdk=iphoneos*]" = "iPhone Developer";
 				FRAMEWORK_SEARCH_PATHS = (
 					"$(inherited)",
@@ -3517,7 +3549,7 @@
 					"\"$(SDKROOT)/usr/lib/system\"",
 				);
 				PRODUCT_NAME = "ZotPad beta";
-				PROVISIONING_PROFILE = "2F3316B4-FF9B-46D8-B351-831AAEA0830A";
+				PROVISIONING_PROFILE = "";
 				"PROVISIONING_PROFILE[sdk=iphoneos*]" = "";
 				PUBLIC_HEADERS_FOLDER_PATH = "$(CONTENTS_FOLDER_PATH)/PrivateHeaders";
 				REZ_SEARCH_PATHS = (
@@ -3536,7 +3568,7 @@
 			isa = XCBuildConfiguration;
 			buildSettings = {
 				ALTERNATE_GROUP = 70000;
-				CODE_SIGN_IDENTITY = "iPhone Distribution: Mikko Ronkko";
+				CODE_SIGN_IDENTITY = "iPhone Developer";
 				"CODE_SIGN_IDENTITY[sdk=iphoneos*]" = "iPhone Developer";
 				COPY_PHASE_STRIP = NO;
 				FRAMEWORK_SEARCH_PATHS = (
@@ -3564,7 +3596,7 @@
 					"\"$(SDKROOT)/usr/lib/system\"",
 				);
 				PRODUCT_NAME = "ZotPad beta";
-				PROVISIONING_PROFILE = "2F3316B4-FF9B-46D8-B351-831AAEA0830A";
+				PROVISIONING_PROFILE = "";
 				"PROVISIONING_PROFILE[sdk=iphoneos*]" = "";
 				PUBLIC_HEADERS_FOLDER_PATH = "$(CONTENTS_FOLDER_PATH)/PrivateHeaders";
 				REZ_SEARCH_PATHS = (

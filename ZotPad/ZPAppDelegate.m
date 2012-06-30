@@ -17,6 +17,12 @@
 #import "ZPFileChannel_Dropbox.h"
 #import "ZPAttachmentIconViewController.h"
 
+//Setting up the logger
+#import "DDTTYLogger.h"
+#import "DDFileLogger.h"
+#import "TestFlightLogger.h"
+
+
 @implementation ZPAppDelegate
 
 
@@ -30,7 +36,17 @@
     [TestFlight setDeviceIdentifier:[[UIDevice currentDevice] uniqueIdentifier]];
     [TestFlight takeOff:@"5e753f234f33fc2bddf4437600037fbf_NjcyMjEyMDEyLTA0LTA5IDE0OjUyOjU0LjE4MDQwMg"];
     
-    //Manual override for userID and Key. Useful for running the code in debugger with other people's credentials.
+    //Set up loggers
+    [DDLog addLogger:[DDTTYLogger sharedInstance]];
+    [DDLog addLogger:[[TestFlightLogger alloc] initWithTeamToken:@"5e753f234f33fc2bddf4437600037fbf_NjcyMjEyMDEyLTA0LTA5IDE0OjUyOjU0LjE4MDQwMg"]];
+     DDFileLogger* fileLogger = [[DDFileLogger alloc] init];
+     fileLogger.rollingFrequency = 60; // 24 hour rolling
+     fileLogger.logFileManager.maximumNumberOfLogFiles = 7; // one week of logs
+
+     [DDLog addLogger:fileLogger]; 
+     
+     
+     //Manual override for userID and Key. Useful for running the code in debugger with other people's credentials.
     
 
     /*
@@ -65,18 +81,18 @@
     [ZPFileChannel_Dropbox linkDroboxIfNeeded];
     [[ZPCacheController instance] performSelectorInBackground:@selector(updateLibrariesAndCollectionsFromServer) withObject:NULL];
 
-    TFLog(@"Started");
+    DDLogInfo(@"Started");
     
     return YES;
 }
 
 - (void)applicationDidReceiveMemoryWarning:(UIApplication *)application{
-    TFLog(@"Start freeing memory");
+    DDLogInfo(@"Start freeing memory");
     [ZPZoteroItem dropCache];
     [ZPZoteroCollection dropCache];
     [ZPZoteroLibrary dropCache];
     [ZPLocalization dropCache];
-    TFLog(@"Done freeing memory");
+    DDLogInfo(@"Done freeing memory");
 
 }
 
@@ -122,7 +138,7 @@
      Save data if appropriate.
      See also applicationDidEnterBackground:.
      */
-    NSLog(@"Terminating");
+    DDLogVerbose(@"Terminating");
 
     
 }
@@ -132,14 +148,14 @@
     //DropBox authentication
     if ([[DBSession sharedSession] handleOpenURL:url]) {
         if ([[DBSession sharedSession] isLinked]) {
-            TFLog(@"App linked successfully with DropBox");
+            DDLogInfo(@"App linked successfully with DropBox");
             // At this point you can start making API calls
         }
         return YES;
     }
     else{
               
-        NSLog(@"Received file %@",url);
+        DDLogVerbose(@"Received file %@",url);
         //[[[UIAlertView alloc] initWithTitle:@"Not implemented" message:@"This feature has not been fully implemented and is currently disabled. The file is ignored by ZotPad" delegate:NULL cancelButtonTitle:@"Cancel" otherButtonTitles: nil] show];
         
         //Is the file recognized?

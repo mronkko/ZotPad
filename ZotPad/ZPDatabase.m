@@ -29,7 +29,7 @@
 
 #import "ZPPreferences.h"
 
-#import "ZPLogger.h"
+
 
 @interface  ZPDatabase (){
     NSMutableDictionary* dbFieldsByTables;
@@ -101,7 +101,7 @@ static ZPDatabase* _instance = nil;
 
 -(void) resetDatabase{
     @synchronized(self){
-        NSLog(@"Reseting database");
+        DDLogVerbose(@"Reseting database");
         
         NSError* error;
         
@@ -147,7 +147,7 @@ static ZPDatabase* _instance = nil;
         }
         
         
-        NSLog(@"Database reset completed");
+        DDLogVerbose(@"Database reset completed");
 
     }
 
@@ -627,7 +627,7 @@ static ZPDatabase* _instance = nil;
             
         }
         [resultSet close];
-        NSLog(@"Retrieved %i collections for parent collection %@ in library %@",[returnArray count],collectionKey,libraryID);
+        DDLogVerbose(@"Retrieved %i collections for parent collection %@ in library %@",[returnArray count],collectionKey,libraryID);
         
 	}
 	return returnArray;
@@ -665,7 +665,7 @@ static ZPDatabase* _instance = nil;
         }
         
         [resultSet close];
-        NSLog(@"Retrieved collection fields from DB for %@ Key: %@ Library: %@ Parent: %@",collection.title,collection.key,collection.libraryID,collection.parentCollectionKey);
+        DDLogVerbose(@"Retrieved collection fields from DB for %@ Key: %@ Library: %@ Parent: %@",collection.title,collection.key,collection.libraryID,collection.parentCollectionKey);
     }
 }
 
@@ -1004,7 +1004,7 @@ Deletes items, notes, and attachments based in array of keys from a library
          attachment.versionIdentifier_local,
          attachment.key];
         
-        NSLog(@"Updated version info to DB with md5 = %@, versionSource = %@, versionIdentifier_server = %@, versionIdentifier_local = %@ for item %@",
+        DDLogVerbose(@"Updated version info to DB with md5 = %@, versionSource = %@, versionIdentifier_server = %@, versionIdentifier_local = %@ for item %@",
               attachment.md5,
               attachment.versionSource,
               attachment.versionIdentifier_server,

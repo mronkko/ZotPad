@@ -15,7 +15,7 @@
 #import "ZPLocalization.h"
 #import "ZPAttachmentFileInteractionController.h"
 #import "ZPPreviewController.h"
-#import "ZPLogger.h"
+
 #import "ZPAppDelegate.h"
 #import "ZPServerConnection.h"
 #import "ZPPreferences.h"

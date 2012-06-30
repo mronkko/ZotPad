@@ -41,7 +41,7 @@
 #import "ZPDatabase.h"
 #import "ASIHTTPRequest.h"
 
-#import "ZPLogger.h"
+
 #import "ZPPreferences.h"
 
 #import "ZPFileChannel.h"
@@ -141,7 +141,7 @@ const NSInteger ZPServerConnectionRequestPermissions = 10;
 -(NSData*) _retrieveDataFromServer:(NSString*)urlString{
     _activeRequestCount++;
     
-    NSLog(@"Request started: %@ Active queries: %i",urlString,_activeRequestCount);
+    DDLogVerbose(@"Request started: %@ Active queries: %i",urlString,_activeRequestCount);
     
     //TODO: Fix the network activity indicator. It does not always get activated because it activates and deactivates in the same method call.
     
@@ -164,7 +164,7 @@ const NSInteger ZPServerConnectionRequestPermissions = 10;
                 NSArray* librariesThatCanBeAccessed = [[self makeServerRequest:ZPServerConnectionRequestKeys withParameters:NULL] parsedElements];
                 
                 if(librariesThatCanBeAccessed == NULL || [librariesThatCanBeAccessed count]==0){ 
-                    NSLog(@"The authorization key is no longer valid.");
+                    DDLogVerbose(@"The authorization key is no longer valid.");
                     
                     //Set ZotPad offline and ask the user what to do
                     [[ZPPreferences instance] setOnline:FALSE];
@@ -316,14 +316,21 @@ const NSInteger ZPServerConnectionRequestPermissions = 10;
               
             [parser setDelegate: parserDelegate];
             [parser parse];
+            
+            //Check that we got time stamps for all objects
+            for(ZPZoteroDataObject* dataObject in parserDelegate.parsedElements){
+                if(dataObject.serverTimestamp == NULL){
+                    [NSException raise:@"Missing timestamp from Zotero server" format:@"Object with key %@ has a missing timestamp. Dump of full response %@",dataObject.key,[[NSString alloc] initWithData:responseData  encoding:NSUTF8StringEncoding]];
+                }
+            }
         }
         
         //Iy is OK to get 1/0 here because queries that return a single results do not have totalResults
-        NSLog(@"Request returned %i/%i results: %@ Active queries: %i",[[parserDelegate parsedElements] count],[parserDelegate totalResults], urlString,_activeRequestCount);            
+        DDLogVerbose(@"Request returned %i/%i results: %@ Active queries: %i",[[parserDelegate parsedElements] count],[parserDelegate totalResults], urlString,_activeRequestCount);            
         
         //If there are no results, dump the entire response so that we see what the problem was
         if([[parserDelegate parsedElements] count] == 0){
-            NSLog(@"%@",[[NSString alloc] initWithData:responseData encoding:NSUTF8StringEncoding]);
+            DDLogVerbose(@"%@",[[NSString alloc] initWithData:responseData encoding:NSUTF8StringEncoding]);
         }
 
 
@@ -603,7 +610,7 @@ const NSInteger ZPServerConnectionRequestPermissions = 10;
     @synchronized(_activeDownloads){
         //Do not download item if it is already being downloaded
         if([_activeDownloads containsObject:attachment]) return false;
-        NSLog(@"Added %@ to active downloads. Number of files downloading is %i",attachment.filename,[_activeDownloads count]);
+        DDLogVerbose(@"Added %@ to active downloads. Number of files downloading is %i",attachment.filename,[_activeDownloads count]);
         [_activeDownloads addObject:attachment];
     }
 
@@ -654,7 +661,7 @@ const NSInteger ZPServerConnectionRequestPermissions = 10;
         }
         @synchronized(_activeDownloads){
             [_activeDownloads removeObject:attachment];
-            NSLog(@"Finished downloading %@. Number of files downloading is %i",attachment.filename,[_activeDownloads count]);
+            DDLogVerbose(@"Finished downloading %@. Number of files downloading is %i",attachment.filename,[_activeDownloads count]);
         }
         
         _activeRequestCount--;
@@ -673,7 +680,7 @@ const NSInteger ZPServerConnectionRequestPermissions = 10;
 -(void) failedDownloadingAttachment:(ZPZoteroAttachment*)attachment withError:(NSError*) error usingFileChannel:(ZPFileChannel*)fileChannel{
     @synchronized(_activeDownloads){
         [_activeDownloads removeObject:attachment];
-        NSLog(@"Finished downloading %@. Number of files downloading is %i",attachment.filename,[_activeDownloads count]);
+        DDLogVerbose(@"Finished downloading %@. Number of files downloading is %i",attachment.filename,[_activeDownloads count]);
     }
     
     _activeRequestCount--;

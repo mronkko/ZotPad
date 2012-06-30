@@ -17,10 +17,7 @@
 #import "ZPDataLayer.h"
 #import "ZPPreferences.h"
 
-
-
-#import "ZPLogger.h"
-#import "ZPPreferences.h"
-
-
 #import "TestFlight.h" 
+#import "DDLog.h"
+
+static const int ddLogLevel = LOG_LEVEL_VERBOSE;

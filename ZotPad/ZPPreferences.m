@@ -9,7 +9,7 @@
 #import "ZPCore.h"
 
 #import "ZPPreferences.h"
-#import "ZPLogger.h"
+
 #import "ZPDatabase.h"
 #import "ZPCacheController.h"
 #import "ASIHTTPRequest.h"
@@ -41,7 +41,7 @@ static ZPPreferences* _instance = nil;
 
 -(void) reload {
    
-    NSLog(@"Realoding preferences");
+    DDLogVerbose(@"Realoding preferences");
     
     NSUserDefaults* defaults = [NSUserDefaults standardUserDefaults];
 
@@ -51,7 +51,7 @@ static ZPPreferences* _instance = nil;
     
     NSString *settingsBundle = [[NSBundle mainBundle] pathForResource:@"Settings" ofType:@"bundle"];
     if(!settingsBundle) {
-        NSLog(@"Could not find Settings.bundle");
+        DDLogVerbose(@"Could not find Settings.bundle");
         return;
     }
     
@@ -81,7 +81,7 @@ static ZPPreferences* _instance = nil;
     float rawmax = [defaults floatForKey:@"cachesizemax"];
     _maxCacheSize = rawmax*1024*1024;
     
-    NSLog(@"NSUserDefaults dump: %@",[defaults dictionaryRepresentation]);
+    DDLogVerbose(@"NSUserDefaults dump: %@",[defaults dictionaryRepresentation]);
     
 
 }
@@ -102,19 +102,19 @@ static ZPPreferences* _instance = nil;
     NSUserDefaults* defaults = [NSUserDefaults standardUserDefaults];
 
     if([defaults boolForKey:@"resetusername"]){
-        NSLog(@"Reseting username");
+        DDLogVerbose(@"Reseting username");
         [self resetUserCredentials];
         [defaults removeObjectForKey:@"resetusername"];
     }
     
     if([defaults boolForKey:@"resetitemdata"]){
-        NSLog(@"Reseting itemdata");
+        DDLogVerbose(@"Reseting itemdata");
         [defaults removeObjectForKey:@"resetitemdata"];
         [[ZPDatabase instance] resetDatabase];
     }
     
     if([defaults boolForKey:@"resetfiles"]){
-        NSLog(@"Reseting files");
+        DDLogVerbose(@"Reseting files");
         [defaults removeObjectForKey:@"resetfiles"];
         [[ZPCacheController instance] performSelectorInBackground:@selector(purgeAllAttachmentFilesFromCache) withObject:NULL];
     }

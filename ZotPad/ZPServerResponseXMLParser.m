@@ -9,7 +9,7 @@
 #import "ZPCore.h"
 
 #import "ZPServerResponseXMLParser.h"
-#import "ZPLogger.h"
+
 
 //TODO: parse this from collections <zapi:numItems>0</zapi:numItems>
 
@@ -32,7 +32,7 @@
 
 - (void)parser:(NSXMLParser *)parser didEndElement:(NSString *)elementName namespaceURI:(NSString *)namespaceURI qualifiedName:(NSString *)qName{
     
-    NSLog(@"Parser finished element %@ with content %@",elementName,_currentStringContent);
+    DDLogVerbose(@"Parser finished element %@ with content %@",elementName,_currentStringContent);
     
     // HTML elements ( <i> ) in the formatted citation
     if([elementName isEqualToString:@"i"]){
@@ -71,7 +71,7 @@
 
 - (void)parser:(NSXMLParser *)parser didStartElement:(NSString *)elementName namespaceURI:(NSString *)namespaceURI qualifiedName:(NSString *)qualifiedName attributes:(NSDictionary *)attributeDict{
 
-    NSLog(@"Parser starting element %@",elementName);
+    DDLogVerbose(@"Parser starting element %@",elementName);
 
     // HTML elements ( <i> ) inthe formatted citation
 

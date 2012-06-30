@@ -61,7 +61,7 @@
 #import "ZPZoteroCollection.h"
 #import "ZPZoteroAttachment.h"
 #import "ZPZoteroNote.h"
-#import "ZPLogger.h"
+
 
 #define NUMBER_OF_ITEMS_TO_RETRIEVE 50
 
@@ -203,12 +203,12 @@ static ZPCacheController* _instance = nil;
 
         [_statusView setFileDownloads:[_filesToDownload count]];
 
-//        NSLog(@"There are %i files in cache download queue",[_filesToDownload count]);
+//        DDLogVerbose(@"There are %i files in cache download queue",[_filesToDownload count]);
 
         if([_filesToDownload count]>0){
             //Only cache up to 95% full
             if(_sizeOfDocumentsFolder < 0.95*[[ZPPreferences instance] maxCacheSize]){
-//                NSLog(@"There is space on device");
+//                DDLogVerbose(@"There is space on device");
                 if([ZPServerConnection instance] && [[ZPServerConnection instance] numberOfFilesDownloading] <1){
                     ZPZoteroAttachment* attachment = [_filesToDownload objectAtIndex:0];
                     [_filesToDownload removeObjectAtIndex:0];
@@ -254,7 +254,7 @@ static ZPCacheController* _instance = nil;
                     [_librariesToCache removeLastObject];
                     
                     [_serverRequestQueue addOperation:retrieveOperation];
-                    NSLog(@"Started Library retrieval operation. Operations in queue is %i. Number of libraries in queue is %i",[_serverRequestQueue operationCount],[_librariesToCache count]);
+                    DDLogVerbose(@"Started Library retrieval operation. Operations in queue is %i. Number of libraries in queue is %i",[_serverRequestQueue operationCount],[_librariesToCache count]);
                     
                 } 
             }
@@ -307,7 +307,7 @@ static ZPCacheController* _instance = nil;
                                 //Update both the DB and the in-memory cache.
                                 [[ZPDatabase instance] setUpdatedTimestampForLibrary:libraryID toValue:timestamp];
                                 [[ZPZoteroLibrary dataObjectWithKey:libraryID] setCacheTimestamp:timestamp];
-                                NSLog(@"Library %@ is now fully cached", libraryID);
+                                DDLogVerbose(@"Library %@ is now fully cached", libraryID);
                                 [_libraryTimestamps removeObjectForKey:libraryID];
                             }
                         }
@@ -328,7 +328,7 @@ static ZPCacheController* _instance = nil;
                     //Create operation and queue it for background retrieval
                     NSOperation* retrieveOperation = [[NSInvocationOperation alloc] initWithInvocation:invocation];
                     [_serverRequestQueue addOperation:retrieveOperation];
-                    NSLog(@"Started item retrieval operation. Operations in queue is %i. Number of items in queue for library %@ is %i",[_serverRequestQueue operationCount],libraryID,[keyArray count]);
+                    DDLogVerbose(@"Started item retrieval operation. Operations in queue is %i. Number of items in queue for library %@ is %i",[_serverRequestQueue operationCount],libraryID,[keyArray count]);
                     
                 }
                 
@@ -345,7 +345,7 @@ static ZPCacheController* _instance = nil;
                     [_collectionsToCache removeLastObject];
                     
                     [_serverRequestQueue addOperation:retrieveOperation];
-                    NSLog(@"Started collection retrieval operation. Operations in queue is %i. Number of collections in queue is %i",[_serverRequestQueue operationCount],[_collectionsToCache count]);
+                    DDLogVerbose(@"Started collection retrieval operation. Operations in queue is %i. Number of collections in queue is %i",[_serverRequestQueue operationCount],[_collectionsToCache count]);
                     
                 } 
                 else break;
@@ -357,7 +357,7 @@ static ZPCacheController* _instance = nil;
 
 - (void) _doItemRetrieval:(NSArray*) itemKeys fromLibrary:(NSNumber*)libraryID{
     
-    NSLog(@"Retrieving items %@",[itemKeys componentsJoinedByString:@", "]);
+    DDLogVerbose(@"Retrieving items %@",[itemKeys componentsJoinedByString:@", "]);
     
     
     NSArray* items = [[ZPServerConnection instance] retrieveItemsFromLibrary:libraryID itemKeys:itemKeys];
@@ -365,14 +365,14 @@ static ZPCacheController* _instance = nil;
     [self _cacheItemsAndAttachToParentsIfNeeded:items];
 
     //Perform checking the queue in another thread so that the current operation can exit
-    NSLog(@"Rechecking queues");
+    DDLogVerbose(@"Rechecking queues");
     [self performSelectorInBackground:@selector(_checkQueues) withObject:NULL];
 }
 
 
 -(void) _cacheItemsAndAttachToParentsIfNeeded:(NSArray*) items{
     
-    NSLog(@"Writing %i items to cache",[items count]);
+    DDLogVerbose(@"Writing %i items to cache",[items count]);
            
     ZPZoteroItem* item;
 
@@ -479,7 +479,7 @@ static ZPCacheController* _instance = nil;
         //Check that we are not already cacheing this item.
         if([_libraryTimestamps objectForKey:libraryID]==NULL){
             [_libraryTimestamps setObject:newTimestamp forKey:libraryID];
-            NSLog(@"Checking if we need to cache library %@",libraryID);
+            DDLogVerbose(@"Checking if we need to cache library %@",libraryID);
             NSArray* serverKeys = [[ZPServerConnection instance] retrieveAllItemKeysFromLibrary:libraryID];
             
             [[ZPDatabase instance] deleteItemKeysNotInArray:serverKeys fromLibrary:libraryID]; 
@@ -518,7 +518,7 @@ static ZPCacheController* _instance = nil;
                  if(![serverKey isEqualToString:cacheKey]) break;
                  }
                  
-                 NSLog(@"Adding items to queue up to last %i",index);
+                 DDLogVerbose(@"Adding items to queue up to last %i",index);
                  
                  // Queue all the items that were different
                  NSArray* itemKeysThatNeedToBeRetrieved = [serverKeys subarrayWithRange:NSMakeRange(0, [serverKeys count]-index-1)];
@@ -531,7 +531,7 @@ static ZPCacheController* _instance = nil;
                 [nonExistingKeys removeObjectsInArray:cacheKeys];
                 if([nonExistingKeys count]>0){
                     [self addToItemQueue:nonExistingKeys libraryID:libraryID priority:FALSE];
-                    NSLog(@"Added %i non-existing keys that need data",[nonExistingKeys count]);
+                    DDLogVerbose(@"Added %i non-existing keys that need data",[nonExistingKeys count]);
                 }
                 
                 // Then add the rest of the items
@@ -539,7 +539,7 @@ static ZPCacheController* _instance = nil;
                 [existingKeys removeObjectsInArray:nonExistingKeys];
                 if([existingKeys count]>0){
                     [self addToItemQueue:existingKeys libraryID:libraryID priority:FALSE];   
-                    NSLog(@"Added %i existing keys that might need new data",[existingKeys count]);
+                    DDLogVerbose(@"Added %i existing keys that might need new data",[existingKeys count]);
                 }
                 
             }            
@@ -595,7 +595,7 @@ static ZPCacheController* _instance = nil;
         @synchronized(_filesToDownload){
             [_filesToDownload removeAllObjects];
         }
-//        NSLog(@"Clearing attachment download queue because library changed and preferences do not indicate that all libraries should be downloaded");
+//        DDLogVerbose(@"Clearing attachment download queue because library changed and preferences do not indicate that all libraries should be downloaded");
     }
     
     //Store the libraryID and collectionKEy
@@ -607,7 +607,7 @@ static ZPCacheController* _instance = nil;
 
             [_filesToDownload removeAllObjects];
         }
-//        NSLog(@"Clearing attachment download queue because collection changed and preferences do not indicate that all collections should be downloaded");
+//        DDLogVerbose(@"Clearing attachment download queue because collection changed and preferences do not indicate that all collections should be downloaded");
     }
     _activeCollectionKey = collectionKey;
     
@@ -637,8 +637,6 @@ static ZPCacheController* _instance = nil;
         
         if(! [attachments isKindOfClass:[NSArray class]]){
             //For troubleshooting crashes
-            TFLog([NSString stringWithFormat:@"In ZPCacheController A class of type %@ was used as attachment array for item (%@) with key %@ in library %@",
-                   [[attachments class] description],[[item class] description],item.key,item.libraryID]);
             item.attachments = NULL;
         }
         else{
@@ -680,7 +678,7 @@ static ZPCacheController* _instance = nil;
 
                 [_filesToDownload removeObject:attachment];
                 [_filesToDownload insertObject:attachment atIndex:0];
-                //            NSLog(@"Queuing attachment download to %@, number of files in queue %i",attachment.fileSystemPath,[_filesToDownload count]);
+                //            DDLogVerbose(@"Queuing attachment download to %@, number of files in queue %i",attachment.fileSystemPath,[_filesToDownload count]);
             }
             [self _checkQueues];
         }
@@ -807,7 +805,7 @@ static ZPCacheController* _instance = nil;
     if(! _isRefresingLibraries){
         _isRefresingLibraries = TRUE;
  
-        NSLog(@"Loading library information from server");
+        DDLogVerbose(@"Loading library information from server");
         NSArray* libraries = [[ZPServerConnection instance] retrieveLibrariesFromServer];
         
         if(libraries!=NULL){
@@ -840,7 +838,7 @@ static ZPCacheController* _instance = nil;
     }
     
     if(shouldRefresh){
-        NSLog(@"Loading collections for library %@",library.title);
+        DDLogVerbose(@"Loading collections for library %@",library.title);
 
         NSArray* collections = [[ZPServerConnection instance] retrieveCollectionsForLibraryFromServer:library.libraryID];
         if(collections!=NULL){
@@ -848,9 +846,9 @@ static ZPCacheController* _instance = nil;
             [[ZPDataLayer instance] notifyLibraryWithCollectionsAvailable:library];
         }
         @synchronized(_librariesWhoseCollectionsAreBeingRefreshed){
-//            NSLog(@"Removing lock on libray %@ number of locks %i",library.libraryID,[_librariesWhoseCollectionsAreBeingRefreshed count]);
+//            DDLogVerbose(@"Removing lock on libray %@ number of locks %i",library.libraryID,[_librariesWhoseCollectionsAreBeingRefreshed count]);
             [_librariesWhoseCollectionsAreBeingRefreshed removeObject:library.libraryID];
-//            NSLog(@"Count after removing lock %i",[_librariesWhoseCollectionsAreBeingRefreshed count]);
+//            DDLogVerbose(@"Count after removing lock %i",[_librariesWhoseCollectionsAreBeingRefreshed count]);
         }
     }
 }
@@ -962,7 +960,7 @@ static ZPCacheController* _instance = nil;
         NSDictionary *_documentFileAttributes = [[NSFileManager defaultManager] fileAttributesAtPath:[_documentsDirectory stringByAppendingPathComponent:_documentFilePath] traverseLink:YES];
         NSInteger thisSize = [_documentFileAttributes fileSize]/1024;
         _documentsFolderSize += thisSize;
-        //NSLog(@"Cache size is %i after including %@ (%i)",(NSInteger) _documentsFolderSize,_documentFilePath,thisSize);
+        //DDLogVerbose(@"Cache size is %i after including %@ (%i)",(NSInteger) _documentsFolderSize,_documentFilePath,thisSize);
     }
     
     return _documentsFolderSize;
@@ -973,10 +971,10 @@ static ZPCacheController* _instance = nil;
         
         NSDictionary *_documentFileAttributes = [[NSFileManager defaultManager] fileAttributesAtPath:attachment.fileSystemPath traverseLink:YES];
         _sizeOfDocumentsFolder += [_documentFileAttributes fileSize]/1024;
-        //NSLog(@"Cache size is %i after adding %@ (%i)",(NSInteger)_sizeOfDocumentsFolder,attachment.fileSystemPath,[_documentFileAttributes fileSize]/1024);
+        //DDLogVerbose(@"Cache size is %i after adding %@ (%i)",(NSInteger)_sizeOfDocumentsFolder,attachment.fileSystemPath,[_documentFileAttributes fileSize]/1024);
 
 
-//        NSLog(@"Cache size after adding %@ to cache is %i",attachment.fileSystemPath,_sizeOfDocumentsFolder);
+//        DDLogVerbose(@"Cache size after adding %@ to cache is %i",attachment.fileSystemPath,_sizeOfDocumentsFolder);
 
         if(_sizeOfDocumentsFolder>=[[ZPPreferences instance] maxCacheSize]) [self _cleanUpCache];
         [self _updateCacheSizePreference];
@@ -1016,7 +1014,7 @@ static ZPCacheController* _instance = nil;
             if(! found){
                 NSDictionary *_documentFileAttributes = [[NSFileManager defaultManager] fileAttributesAtPath:path traverseLink:YES];
                 _sizeOfDocumentsFolder -= [_documentFileAttributes fileSize]/1024;
-                NSLog(@"Deleting orphaned file %@ cache size now %i",path,_sizeOfDocumentsFolder);
+                DDLogVerbose(@"Deleting orphaned file %@ cache size now %i",path,_sizeOfDocumentsFolder);
                 [[NSFileManager defaultManager] removeItemAtPath:path error: NULL];
             }
         }

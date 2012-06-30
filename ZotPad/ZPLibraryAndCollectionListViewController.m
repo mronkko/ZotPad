@@ -141,7 +141,7 @@
 
 - (NSInteger)tableView:(UITableView *)aTableView numberOfRowsInSection:(NSInteger)section {
     // Return the number of rows in the section.
-    NSLog(@"Rows in library/collection table %i",[self->_content count]);
+    DDLogVerbose(@"Rows in library/collection table %i",[self->_content count]);
     return [self->_content count];
 }
 
@@ -302,9 +302,9 @@
         
         ZPZoteroDataObject* dataObj;
         
-        NSLog(@"Libraries / collections before update");
+        DDLogVerbose(@"Libraries / collections before update");
         for(dataObj in _content){
-            NSLog(@"%@",dataObj.title); 
+            DDLogVerbose(@"%@",dataObj.title); 
         }
         _content = shownContent;
         
@@ -312,26 +312,26 @@
          
         if([insertArray count]>0){
             [self.tableView insertRowsAtIndexPaths:insertArray withRowAnimation:UITableViewRowAnimationAutomatic];
-            NSLog(@"Inserting rows into indices");
+            DDLogVerbose(@"Inserting rows into indices");
             NSIndexPath* temp;
             for(temp in insertArray){
-                NSLog(@"%i",temp.row); 
+                DDLogVerbose(@"%i",temp.row); 
             }
 
         }
         if([deleteArray count]>0){
             [self.tableView deleteRowsAtIndexPaths:deleteArray withRowAnimation:UITableViewRowAnimationAutomatic];
-            NSLog(@"Deleting rows from indices");
+            DDLogVerbose(@"Deleting rows from indices");
             NSIndexPath* temp;
             for(temp in insertArray){
-                NSLog(@"%i",temp.row); 
+                DDLogVerbose(@"%i",temp.row); 
             }
         }
         
         [self.tableView endUpdates];
-        NSLog(@"Libraries / collections after update");
+        DDLogVerbose(@"Libraries / collections after update");
         for(dataObj in _content){
-            NSLog(@"%@",dataObj.title); 
+            DDLogVerbose(@"%@",dataObj.title); 
         }
         
     //TODO: Figure out a way to keep the activity view spinning until the last library is loaded.

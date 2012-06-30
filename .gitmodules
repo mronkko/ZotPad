@@ -34,3 +34,9 @@
 [submodule "FileMD5Hash"]
 	path = FileMD5Hash
 	url = https://github.com/JoeKun/FileMD5Hash
+[submodule "TestFlightLogger"]
+	path = TestFlightLogger
+	url = https://github.com/quellish/TestFlightLogger
+[submodule "CocoaLumberjack"]
+	path = CocoaLumberjack
+	url = https://github.com/robbiehanson/CocoaLumberjack
