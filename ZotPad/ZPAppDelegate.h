@@ -7,10 +7,11 @@
 //
 
 #import <UIKit/UIKit.h>
+#import "DDFileLogger.h"
 
 @interface ZPAppDelegate : UIResponder <UIApplicationDelegate>
 
-
+@property (retain) DDFileLogger* fileLogger;
 @property (strong, nonatomic) UIWindow *window;
     
 @end

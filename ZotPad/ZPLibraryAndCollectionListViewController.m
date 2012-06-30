@@ -58,7 +58,8 @@
 
     //Show Cache controller status
     ZPCacheStatusToolbarController* statusController = [[ZPCacheStatusToolbarController alloc] init];
-    NSArray* toolBarItems = [NSArray arrayWithObjects: [[UIBarButtonItem alloc] initWithCustomView:statusController.view], nil];
+    NSMutableArray* toolBarItems = [NSMutableArray arrayWithObject: [[UIBarButtonItem alloc] initWithCustomView:statusController.view]];
+    [toolBarItems addObjectsFromArray:self.toolbarItems];
     [self setToolbarItems:toolBarItems];
 
     self.clearsSelectionOnViewWillAppear = NO;

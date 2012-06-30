@@ -597,6 +597,16 @@
 		A76ECD2A159CDEDD0062E95A /* emblem-symbolic-link.svgz in Resources */ = {isa = PBXBuildFile; fileRef = A76ECD27159CDEDD0062E95A /* emblem-symbolic-link.svgz */; };
 		A76ECD2B159CDEDD0062E95A /* emblem-symbolic-link.svgz in Resources */ = {isa = PBXBuildFile; fileRef = A76ECD27159CDEDD0062E95A /* emblem-symbolic-link.svgz */; };
 		A77B98DF14DE5CDB00132E9B /* ZPItemListViewController.m in Sources */ = {isa = PBXBuildFile; fileRef = A77B98DE14DE5CDB00132E9B /* ZPItemListViewController.m */; };
+		A77FD05A159F2F6900774D50 /* User Manual.pdf in Resources */ = {isa = PBXBuildFile; fileRef = A77FD059159F2F6900774D50 /* User Manual.pdf */; };
+		A77FD05B159F2F7200774D50 /* User Manual.pdf in Resources */ = {isa = PBXBuildFile; fileRef = A77FD059159F2F6900774D50 /* User Manual.pdf */; };
+		A77FD05E159F36CC00774D50 /* CompressingLogFileManager.m in Sources */ = {isa = PBXBuildFile; fileRef = A77FD05D159F36CC00774D50 /* CompressingLogFileManager.m */; };
+		A77FD05F159F36CC00774D50 /* CompressingLogFileManager.m in Sources */ = {isa = PBXBuildFile; fileRef = A77FD05D159F36CC00774D50 /* CompressingLogFileManager.m */; };
+		A77FD062159F702E00774D50 /* gear.png in Resources */ = {isa = PBXBuildFile; fileRef = A77FD060159F702D00774D50 /* gear.png */; };
+		A77FD063159F702E00774D50 /* gear.png in Resources */ = {isa = PBXBuildFile; fileRef = A77FD060159F702D00774D50 /* gear.png */; };
+		A77FD064159F702E00774D50 /* gear@2x.png in Resources */ = {isa = PBXBuildFile; fileRef = A77FD061159F702E00774D50 /* gear@2x.png */; };
+		A77FD065159F702E00774D50 /* gear@2x.png in Resources */ = {isa = PBXBuildFile; fileRef = A77FD061159F702E00774D50 /* gear@2x.png */; };
+		A77FD068159F750A00774D50 /* ZPLogViewController.m in Sources */ = {isa = PBXBuildFile; fileRef = A77FD067159F750900774D50 /* ZPLogViewController.m */; };
+		A77FD069159F750A00774D50 /* ZPLogViewController.m in Sources */ = {isa = PBXBuildFile; fileRef = A77FD067159F750900774D50 /* ZPLogViewController.m */; };
 		A786F7781476A56200B35B92 /* MainStoryboard_iPhone.storyboard in Resources */ = {isa = PBXBuildFile; fileRef = A786F7771476A56200B35B92 /* MainStoryboard_iPhone.storyboard */; };
 		A79299C3149E0CFE000F8B42 /* ZPZoteroDataObject.m in Sources */ = {isa = PBXBuildFile; fileRef = A79299C2149E0CFE000F8B42 /* ZPZoteroDataObject.m */; };
 		A793153E14B185E800E1ABF0 /* ZPAttachmentFileInteractionController.m in Sources */ = {isa = PBXBuildFile; fileRef = A793153D14B185E800E1ABF0 /* ZPAttachmentFileInteractionController.m */; };
@@ -1245,6 +1255,13 @@
 		A76ECD27159CDEDD0062E95A /* emblem-symbolic-link.svgz */ = {isa = PBXFileReference; lastKnownFileType = file; name = "emblem-symbolic-link.svgz"; path = "Oxygen-Icons/scalable/emblems/emblem-symbolic-link.svgz"; sourceTree = SOURCE_ROOT; };
 		A77B98DD14DE5CDB00132E9B /* ZPItemListViewController.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = ZPItemListViewController.h; sourceTree = "<group>"; };
 		A77B98DE14DE5CDB00132E9B /* ZPItemListViewController.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = ZPItemListViewController.m; sourceTree = "<group>"; };
+		A77FD059159F2F6900774D50 /* User Manual.pdf */ = {isa = PBXFileReference; lastKnownFileType = image.pdf; name = "User Manual.pdf"; path = "Docs/User Manual.pdf"; sourceTree = SOURCE_ROOT; };
+		A77FD05C159F36CC00774D50 /* CompressingLogFileManager.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; name = CompressingLogFileManager.h; path = CocoaLumberjack/Xcode/LogFileCompressor/CompressingLogFileManager.h; sourceTree = "<group>"; };
+		A77FD05D159F36CC00774D50 /* CompressingLogFileManager.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; name = CompressingLogFileManager.m; path = CocoaLumberjack/Xcode/LogFileCompressor/CompressingLogFileManager.m; sourceTree = "<group>"; };
+		A77FD060159F702D00774D50 /* gear.png */ = {isa = PBXFileReference; lastKnownFileType = image.png; name = gear.png; path = Icons/gear.png; sourceTree = SOURCE_ROOT; };
+		A77FD061159F702E00774D50 /* gear@2x.png */ = {isa = PBXFileReference; lastKnownFileType = image.png; name = "gear@2x.png"; path = "Icons/gear@2x.png"; sourceTree = SOURCE_ROOT; };
+		A77FD066159F750700774D50 /* ZPLogViewController.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = ZPLogViewController.h; sourceTree = "<group>"; };
+		A77FD067159F750900774D50 /* ZPLogViewController.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = ZPLogViewController.m; sourceTree = "<group>"; };
 		A786F7771476A56200B35B92 /* MainStoryboard_iPhone.storyboard */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = file.storyboard; path = MainStoryboard_iPhone.storyboard; sourceTree = "<group>"; };
 		A79299C1149E0CFE000F8B42 /* ZPZoteroDataObject.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = ZPZoteroDataObject.h; sourceTree = "<group>"; };
 		A79299C2149E0CFE000F8B42 /* ZPZoteroDataObject.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = ZPZoteroDataObject.m; sourceTree = "<group>"; };
@@ -1938,6 +1955,7 @@
 		A7200DDB14718DC0004347C9 /* Supporting Files */ = {
 			isa = PBXGroup;
 			children = (
+				A77FD059159F2F6900774D50 /* User Manual.pdf */,
 				A76ECD25159CDEB20062E95A /* Images */,
 				A73D635014879D15007999F3 /* Settings.bundle */,
 				A7200DDC14718DC0004347C9 /* ZotPad-Info.plist */,
@@ -1956,6 +1974,8 @@
 				A72C3CA61487C9DA00F6744E /* MainStoryboard_iPad.storyboard */,
 				A79E6FE71531B00100612DD9 /* ZPSplitViewController.m */,
 				A79E6FE61531B00000612DD9 /* ZPSplitViewController.h */,
+				A77FD066159F750700774D50 /* ZPLogViewController.h */,
+				A77FD067159F750900774D50 /* ZPLogViewController.m */,
 				A7D3C08114AEE70F00DB975D /* ZPLocalization.h */,
 				A7D3C08214AEE70F00DB975D /* ZPLocalization.m */,
 				A7CD2322156B73A7001EA24A /* Library and collections list */,
@@ -2045,6 +2065,8 @@
 		A7648031159F1BE40075CFB9 /* Cocoa-Lumberjack */ = {
 			isa = PBXGroup;
 			children = (
+				A77FD05C159F36CC00774D50 /* CompressingLogFileManager.h */,
+				A77FD05D159F36CC00774D50 /* CompressingLogFileManager.m */,
 				A7648032159F1C0C0075CFB9 /* TestFlightLogger.h */,
 				A7648033159F1C0C0075CFB9 /* TestFlightLogger.m */,
 				A7648023159F1BD00075CFB9 /* DDFileLogger.h */,
@@ -2408,6 +2430,8 @@
 		A7D6DA4F14F4CA0B00420FF1 /* In-App icons */ = {
 			isa = PBXGroup;
 			children = (
+				A77FD060159F702D00774D50 /* gear.png */,
+				A77FD061159F702E00774D50 /* gear@2x.png */,
 				A7F249F31533179700537B54 /* barbutton_image_down_state@2x~ipad.png */,
 				A7F249F41533179700537B54 /* barbutton_image_down_state~ipad.png */,
 				A7F249F51533179700537B54 /* barbutton_image_down_state@2x~iphone.png */,
@@ -2836,6 +2860,9 @@
 				A7BD5F3A156122F6003252EA /* default.css in Resources */,
 				A76ECD28159CDEDD0062E95A /* emblem-locked.svgz in Resources */,
 				A76ECD2A159CDEDD0062E95A /* emblem-symbolic-link.svgz in Resources */,
+				A77FD05A159F2F6900774D50 /* User Manual.pdf in Resources */,
+				A77FD062159F702E00774D50 /* gear.png in Resources */,
+				A77FD064159F702E00774D50 /* gear@2x.png in Resources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
@@ -3124,6 +3151,9 @@
 				A73D1C021560E234002D4A2D /* release_notes.txt in Resources */,
 				A76ECD29159CDEDD0062E95A /* emblem-locked.svgz in Resources */,
 				A76ECD2B159CDEDD0062E95A /* emblem-symbolic-link.svgz in Resources */,
+				A77FD05B159F2F7200774D50 /* User Manual.pdf in Resources */,
+				A77FD063159F702E00774D50 /* gear.png in Resources */,
+				A77FD065159F702E00774D50 /* gear@2x.png in Resources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
@@ -3264,6 +3294,8 @@
 				A764802D159F1BD00075CFB9 /* DDLog.m in Sources */,
 				A764802F159F1BD00075CFB9 /* DDTTYLogger.m in Sources */,
 				A7648034159F1C0C0075CFB9 /* TestFlightLogger.m in Sources */,
+				A77FD05E159F36CC00774D50 /* CompressingLogFileManager.m in Sources */,
+				A77FD068159F750A00774D50 /* ZPLogViewController.m in Sources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
@@ -3363,6 +3395,8 @@
 				A764802E159F1BD00075CFB9 /* DDLog.m in Sources */,
 				A7648030159F1BD00075CFB9 /* DDTTYLogger.m in Sources */,
 				A7648035159F1C0C0075CFB9 /* TestFlightLogger.m in Sources */,
+				A77FD05F159F36CC00774D50 /* CompressingLogFileManager.m in Sources */,
+				A77FD069159F750A00774D50 /* ZPLogViewController.m in Sources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};

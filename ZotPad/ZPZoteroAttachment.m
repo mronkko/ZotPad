@@ -34,7 +34,6 @@ NSInteger const VERSION_SOURCE_DROPBOX =3;
 //@synthesize versionIdentifier_local;
 
 -(void) setVersionIdentifier_local:(NSString *)versionIdentifier_local{
-    DDLogVerbose(@"Set local MD5 %@ for item %@",versionIdentifier_local, self.key);
     _versionIdentifier_local = versionIdentifier_local;
 }
 -(NSString*) versionIdentifier_local{

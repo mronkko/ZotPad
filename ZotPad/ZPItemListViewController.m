@@ -571,7 +571,7 @@
                 [_itemKeysNotInCache removeObject:item.key];
                 found=TRUE;
             }
-            DDLogVerbose(@"Item keys not in cache deacreased to %i after removing key %@",[_itemKeysNotInCache count],item.key);
+            //DDLogVerbose(@"Item keys not in cache deacreased to %i after removing key %@",[_itemKeysNotInCache count],item.key);
             
             //Update the view if we have received sufficient number of new items
             update = ([_itemKeysNotInCache count] % SIZE_OF_DATABASE_UPDATE_BATCH ==0 ||

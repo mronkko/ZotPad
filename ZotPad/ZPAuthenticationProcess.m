@@ -38,7 +38,7 @@ static ZPAuthenticationProcess* _instance = nil;
 -(void) startAuthentication{
     
     
-    DDLogVerbose(@"Starting authentication process");
+    DDLogWarn(@"Starting authentication process");
     _isActive = TRUE;
 
     //If the UI is not yet visible, wait for it to become visible before proceeding.
@@ -171,12 +171,12 @@ static ZPAuthenticationProcess* _instance = nil;
 
 - (void)requestTokenTicket:(OAServiceTicket *)ticket didFailWithError:(NSError *)error {
     [[UIApplication sharedApplication] setNetworkActivityIndicatorVisible:NO];    
-    DDLogVerbose(@"Error");
+    DDLogError(@"Error in requesting token ticket: %@",error);
 }
 - (void)requestAccessToken:(OAServiceTicket *)ticket didFailWithError:(NSError *)error {
     
     [[UIApplication sharedApplication] setNetworkActivityIndicatorVisible:NO];
-    DDLogVerbose(@"Error");
+    DDLogError(@"Error in requesting access token: %@",error);
 }
 
 @end

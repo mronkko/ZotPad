@@ -21,13 +21,54 @@
 #import "DDTTYLogger.h"
 #import "DDFileLogger.h"
 #import "TestFlightLogger.h"
+#import "CompressingLogFileManager.h"
 
+@interface ZPFileLogFormatter : NSObject <DDLogFormatter>{
+    NSInteger level;
+    NSDateFormatter* dateFormatter;
+}
 
+@end
+
+@implementation ZPFileLogFormatter
+
+- (id) initWithLevel:(NSInteger) level{
+    self = [super init];
+    self->level = level;
+    
+    dateFormatter = [[NSDateFormatter alloc] init];
+    [dateFormatter setDateFormat:@"dd-MM-yyyy HH:mm::ss"];
+    
+    return self;
+}
+
+- (NSString *)formatLogMessage:(DDLogMessage *)logMessage{
+    
+    if((logMessage->logFlag & self->level) != logMessage->logFlag) return NULL;
+
+    NSString* dateString = [dateFormatter stringFromDate:[NSDate date]];
+
+    if((logMessage->logFlag & LOG_LEVEL_ERROR) == logMessage->logFlag){
+        return [NSString stringWithFormat:@"%@ ERROR: %@",dateString, logMessage->logMsg];
+    }
+    else if((logMessage->logFlag & LOG_LEVEL_WARN) == logMessage->logFlag){
+        return [NSString stringWithFormat:@"%@ WARN : %@",dateString, logMessage->logMsg];
+    }
+    else if((logMessage->logFlag & LOG_LEVEL_INFO) == logMessage->logFlag){
+        return [NSString stringWithFormat:@"%@ INFO : %@",dateString, logMessage->logMsg];
+    }
+    else if((logMessage->logFlag & LOG_LEVEL_VERBOSE) == logMessage->logFlag){
+        return [NSString stringWithFormat:@"%@ DEBUG : %@",dateString, logMessage->logMsg];
+    }
+    else return NULL;
+}
+
+@end
 @implementation ZPAppDelegate
 
 
 @synthesize window = _window;
-
+@synthesize fileLogger;
 
 
 - (BOOL)application:(UIApplication *)application didFinishLaunchingWithOptions:(NSDictionary *)launchOptions
@@ -37,15 +78,22 @@
     [TestFlight takeOff:@"5e753f234f33fc2bddf4437600037fbf_NjcyMjEyMDEyLTA0LTA5IDE0OjUyOjU0LjE4MDQwMg"];
     
     //Set up loggers
+    [DDTTYLogger sharedInstance].logFormatter = [[ZPFileLogFormatter alloc] initWithLevel:LOG_LEVEL_VERBOSE];
     [DDLog addLogger:[DDTTYLogger sharedInstance]];
-    [DDLog addLogger:[[TestFlightLogger alloc] initWithTeamToken:@"5e753f234f33fc2bddf4437600037fbf_NjcyMjEyMDEyLTA0LTA5IDE0OjUyOjU0LjE4MDQwMg"]];
-     DDFileLogger* fileLogger = [[DDFileLogger alloc] init];
-     fileLogger.rollingFrequency = 60; // 24 hour rolling
-     fileLogger.logFileManager.maximumNumberOfLogFiles = 7; // one week of logs
+    
+    TestFlightLogger* tfLogger = [[TestFlightLogger alloc] initWithTeamToken:@"5e753f234f33fc2bddf4437600037fbf_NjcyMjEyMDEyLTA0LTA5IDE0OjUyOjU0LjE4MDQwMg"];
+    tfLogger.logFormatter = [[ZPFileLogFormatter alloc] initWithLevel:LOG_LEVEL_VERBOSE];
+    [DDLog addLogger:tfLogger];
+    
+    CompressingLogFileManager* logFileManager = [[CompressingLogFileManager alloc] initWithLogsDirectory:[NSSearchPathForDirectoriesInDomains(NSDocumentDirectory, NSUserDomainMask, YES) objectAtIndex:0]];
+    self.fileLogger = [[DDFileLogger alloc] initWithLogFileManager:logFileManager];
+    self.fileLogger.rollingFrequency = 60 * 60 *24; // 24 hour rolling
+    self.fileLogger.logFileManager.maximumNumberOfLogFiles = 7; // one week of logs
+    self.fileLogger.logFormatter = [[ZPFileLogFormatter alloc] initWithLevel:LOG_LEVEL_INFO];
+    [DDLog addLogger:self.fileLogger]; 
 
-     [DDLog addLogger:fileLogger]; 
-     
-     
+    DDLogInfo(@"Starting");
+
      //Manual override for userID and Key. Useful for running the code in debugger with other people's credentials.
     
 
@@ -61,7 +109,7 @@
     */
     
     [[ZPPreferences instance] checkAndProcessApplicationResetPreferences];
-    [[ZPPreferences instance] reload];
+
      
     
     // Override point for customization after application launch.
@@ -138,7 +186,7 @@
      Save data if appropriate.
      See also applicationDidEnterBackground:.
      */
-    DDLogVerbose(@"Terminating");
+    DDLogInfo(@"Terminating");
 
     
 }
@@ -155,17 +203,16 @@
     }
     else{
               
-        DDLogVerbose(@"Received file %@",url);
-        //[[[UIAlertView alloc] initWithTitle:@"Not implemented" message:@"This feature has not been fully implemented and is currently disabled. The file is ignored by ZotPad" delegate:NULL cancelButtonTitle:@"Cancel" otherButtonTitles: nil] show];
-        
         //Is the file recognized?
         
         ZPZoteroAttachment* attachment = [ZPZoteroAttachment dataObjectForAttachedFile:url.absoluteString];
         
         if(attachment == NULL){
+            DDLogInfo(@"Received an unknown file %@ from %@",[url lastPathComponent],sourceApplication);
             [[[UIAlertView alloc] initWithTitle:@"Unknown file" message:[NSString stringWithFormat:@"ZotPad could not identify a Zotero item for file '%@' received from %@. The file will be ignored.",[url lastPathComponent],[[sourceApplication componentsSeparatedByString:@"."] lastObject]] delegate:NULL cancelButtonTitle:@"Cancel" otherButtonTitles: nil] show];
         }
         else{
+            DDLogInfo(@"A file %@ from %@",[url lastPathComponent],sourceApplication);
             [[ZPCacheController instance] addAttachmentToUploadQueue:attachment withNewFile:url];
             [self.window.rootViewController dismissModalViewControllerAnimated:YES];
             [self.window.rootViewController performSegueWithIdentifier:@"ReceivedFile" sender:url];

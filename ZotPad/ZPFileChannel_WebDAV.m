@@ -91,7 +91,7 @@ NSInteger const ZPFILECHANNEL_WEBDAV_UPLOAD_REGISTER = 4;
     NSString* urlString = [WebDAVRoot stringByAppendingFormat:@"/%@.zip",key];
     NSURL *url = [NSURL URLWithString:urlString]; 
     
-    DDLogVerbose(@"Downloading from WebDAV %@",urlString);
+    DDLogInfo(@"Downloading file %@ from WebDAV url %@",attachment.filename, urlString);
     
     ASIHTTPRequest *request = [ASIHTTPRequest requestWithURL:url]; 
     
@@ -158,14 +158,16 @@ NSInteger const ZPFILECHANNEL_WEBDAV_UPLOAD_REGISTER = 4;
     
     if(! [attachment.md5 isEqualToString:attachment.versionIdentifier_local]){
         //Conflict
-        DDLogVerbose(@"Local MD5 %@ conflicts with server MD5 %@",attachment.versionIdentifier_local,attachment.md5);
-        DDLogVerbose(@"Original file MD5: %@",[attachment md5ForFileAtPath:attachment.fileSystemPath_original]);
-        DDLogVerbose(@"Modified file MD5: %@",[attachment md5ForFileAtPath:attachment.fileSystemPath_modified]);
+        DDLogWarn(@"Local MD5 %@ conflicts with server MD5 %@",attachment.versionIdentifier_local,attachment.md5);
+        DDLogWarn(@"Original file MD5: %@",[attachment md5ForFileAtPath:attachment.fileSystemPath_original]);
+        DDLogWarn(@"Modified file MD5: %@",[attachment md5ForFileAtPath:attachment.fileSystemPath_modified]);
         
         //If the version that we have downloaded from the server is different than what exists on the server now, delete the local copy
         if(! [attachment.md5 isEqualToString:attachment.versionIdentifier_server]){
-            DDLogVerbose(@"Download MD5 %@ conflicts with server MD5 %@",attachment.versionIdentifier_server,attachment.md5);
 
+            DDLogWarn(@"Removing cached copy of file %@ because the local () and server () version identifiers differ.",attachment.filename,attachment.versionIdentifier_server,attachment.md5);
+            
+            //TODO: Refactor so that file deletions are handled in ZPZoteroAttachment
             [[NSFileManager defaultManager] removeItemAtPath:attachment.fileSystemPath_original error:NULL];
             attachment.versionIdentifier_server = attachment.md5;
             [[ZPDatabase instance] writeVersionInfoForAttachment:attachment];
@@ -212,7 +214,7 @@ NSInteger const ZPFILECHANNEL_WEBDAV_UPLOAD_REGISTER = 4;
         //this can be removed
         request.timeOutSeconds=10;
 
-        DDLogVerbose(@"Sent MD5 to server %@",md5);
+        DDLogInfo(@"Uploading metadata about new version (%@) of file %@ to Zotero ",md5,attachment.filename);
 
         [request startAsynchronous];
     }
@@ -272,7 +274,7 @@ NSInteger const ZPFILECHANNEL_WEBDAV_UPLOAD_REGISTER = 4;
             
             NSString* md5 = [attachment md5ForFileAtPath:tempFile];
             
-            DDLogVerbose(@"Received file MD5 from server %@", md5);
+            DDLogVerbose(@"The MD5 sum of the file received from server is %@", md5);
             
             [[ZPServerConnection instance] finishedDownloadingAttachment:attachment toFileAtPath:tempFile withVersionIdentifier:md5 usingFileChannel:self];
         }
@@ -294,7 +296,7 @@ NSInteger const ZPFILECHANNEL_WEBDAV_UPLOAD_REGISTER = 4;
             NSString* urlString = [WebDAVRoot stringByAppendingFormat:@"/%@.zip",key];
             NSURL *url = [NSURL URLWithString:urlString]; 
             
-            DDLogVerbose(@"Uploading to WebDAV %@",urlString);
+            DDLogVerbose(@"Uploading file %@ to WebDAV %@",urlString,attachment.filename);
             
             ASIHTTPRequest *uploadRequest = [ASIHTTPRequest requestWithURL:url]; 
             
@@ -366,10 +368,11 @@ NSInteger const ZPFILECHANNEL_WEBDAV_UPLOAD_REGISTER = 4;
 
 - (void)requestFailed:(ASIHTTPRequest *)request{
     NSError *error = [request error];
-    DDLogInfo(@"File download from Zotero server failed: %@",[error description]);
 
     ZPZoteroAttachment* attachment = [request.userInfo objectForKey:@"attachment"];
-    
+
+    DDLogError(@"Requset to %@ failed: %@", request.url, [error description]);
+
     //If there was an authentication issue, reauthenticate
     if(error.code == 3){
         UIAlertView *message = [[UIAlertView alloc] initWithTitle:@"Authentication failed"

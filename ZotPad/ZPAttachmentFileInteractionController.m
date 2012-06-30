@@ -185,7 +185,8 @@
 
 #pragma mark - UIDocumentInteractionControllerDelegate
 - (void) documentInteractionController: (UIDocumentInteractionController *) controller didEndSendingToApplication: (NSString *) application{
-    DDLogVerbose(@"Handed control to application %@",application);
+
+    DDLogInfo(@"Sent file %@ and handed control to application %@", controller.name, application);
     
     //Store the version identifier. This is later used to upload modified files to Zotero
     

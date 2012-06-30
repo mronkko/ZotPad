@@ -41,7 +41,7 @@ static ZPPreferences* _instance = nil;
 
 -(void) reload {
    
-    DDLogVerbose(@"Realoding preferences");
+    DDLogInfo(@"Reloading settings");
     
     NSUserDefaults* defaults = [NSUserDefaults standardUserDefaults];
 
@@ -51,14 +51,14 @@ static ZPPreferences* _instance = nil;
     
     NSString *settingsBundle = [[NSBundle mainBundle] pathForResource:@"Settings" ofType:@"bundle"];
     if(!settingsBundle) {
-        DDLogVerbose(@"Could not find Settings.bundle");
+        DDLogError(@"Could not find Settings.bundle");
         return;
     }
     
 
     NSMutableDictionary *defaultsToRegister = [[NSMutableDictionary alloc] init];
 
-    NSArray* preferenceFiles = [NSArray arrayWithObjects:@"Root.plist", @"samba.plist", nil];
+    NSArray* preferenceFiles = [NSArray arrayWithObjects:@"Root.plist", nil];
     
     NSString* preferenceFile;
     for(preferenceFile in preferenceFiles){
@@ -81,9 +81,6 @@ static ZPPreferences* _instance = nil;
     float rawmax = [defaults floatForKey:@"cachesizemax"];
     _maxCacheSize = rawmax*1024*1024;
     
-    DDLogVerbose(@"NSUserDefaults dump: %@",[defaults dictionaryRepresentation]);
-    
-
 }
 
 -(NSString*) defaultApplicationForContentType:(NSString*) type{
@@ -102,19 +99,19 @@ static ZPPreferences* _instance = nil;
     NSUserDefaults* defaults = [NSUserDefaults standardUserDefaults];
 
     if([defaults boolForKey:@"resetusername"]){
-        DDLogVerbose(@"Reseting username");
+        DDLogWarn(@"Reseting username");
         [self resetUserCredentials];
         [defaults removeObjectForKey:@"resetusername"];
     }
     
     if([defaults boolForKey:@"resetitemdata"]){
-        DDLogVerbose(@"Reseting itemdata");
+        DDLogWarn(@"Reseting itemdata");
         [defaults removeObjectForKey:@"resetitemdata"];
         [[ZPDatabase instance] resetDatabase];
     }
     
     if([defaults boolForKey:@"resetfiles"]){
-        DDLogVerbose(@"Reseting files");
+        DDLogWarn(@"Reseting files");
         [defaults removeObjectForKey:@"resetfiles"];
         [[ZPCacheController instance] performSelectorInBackground:@selector(purgeAllAttachmentFilesFromCache) withObject:NULL];
     }
@@ -123,9 +120,12 @@ static ZPPreferences* _instance = nil;
 -(void) resetUserCredentials{
     NSUserDefaults* defaults = [NSUserDefaults standardUserDefaults];
     [defaults removeObjectForKey:@"username"];
+    self.username = NULL;
     [defaults removeObjectForKey:@"userID"];
+    self.userID = NULL;
     [defaults removeObjectForKey:@"OAuthKey"];
-    
+    self.OAuthKey = NULL;
+
     //Empty the key chain
     
     NSURLCredentialStorage *store = [NSURLCredentialStorage sharedCredentialStorage];

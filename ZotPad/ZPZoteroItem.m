@@ -56,8 +56,6 @@ static NSCache* _objectCache = NULL;
 
         newObj.key=key;
         
-        DDLogVerbose(@"Created data object %x key %@ type %@",newObj,key,type);
-        
         [newObj configureWithDictionary:fields];
         [_objectCache setObject:newObj  forKey:key];
         

@@ -154,7 +154,7 @@ static ZPDataLayer* _instance = nil;
 
 -(void) notifyLibraryWithCollectionsAvailable:(ZPZoteroLibrary*) library{
     
-    DDLogVerbose(@"Library %@ is available",library.title);
+    DDLogVerbose(@"New metadata from library %@ is available",library.title);
     NSEnumerator* e = [_libraryObservers objectEnumerator];
     NSObject* id;
     

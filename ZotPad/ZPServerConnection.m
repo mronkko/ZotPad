@@ -141,7 +141,7 @@ const NSInteger ZPServerConnectionRequestPermissions = 10;
 -(NSData*) _retrieveDataFromServer:(NSString*)urlString{
     _activeRequestCount++;
     
-    DDLogVerbose(@"Request started: %@ Active queries: %i",urlString,_activeRequestCount);
+    DDLogVerbose(@"New connection to Zotero server starting: %@ Active queries: %i",urlString,_activeRequestCount);
     
     //TODO: Fix the network activity indicator. It does not always get activated because it activates and deactivates in the same method call.
     
@@ -164,7 +164,7 @@ const NSInteger ZPServerConnectionRequestPermissions = 10;
                 NSArray* librariesThatCanBeAccessed = [[self makeServerRequest:ZPServerConnectionRequestKeys withParameters:NULL] parsedElements];
                 
                 if(librariesThatCanBeAccessed == NULL || [librariesThatCanBeAccessed count]==0){ 
-                    DDLogVerbose(@"The authorization key is no longer valid.");
+                    DDLogError(@"The authorization key is no longer valid.");
                     
                     //Set ZotPad offline and ask the user what to do
                     [[ZPPreferences instance] setOnline:FALSE];
@@ -325,6 +325,7 @@ const NSInteger ZPServerConnectionRequestPermissions = 10;
             }
         }
         
+        /*
         //Iy is OK to get 1/0 here because queries that return a single results do not have totalResults
         DDLogVerbose(@"Request returned %i/%i results: %@ Active queries: %i",[[parserDelegate parsedElements] count],[parserDelegate totalResults], urlString,_activeRequestCount);            
         
@@ -332,7 +333,7 @@ const NSInteger ZPServerConnectionRequestPermissions = 10;
         if([[parserDelegate parsedElements] count] == 0){
             DDLogVerbose(@"%@",[[NSString alloc] initWithData:responseData encoding:NSUTF8StringEncoding]);
         }
-
+         */
 
         return parserDelegate;
     }
@@ -680,7 +681,7 @@ const NSInteger ZPServerConnectionRequestPermissions = 10;
 -(void) failedDownloadingAttachment:(ZPZoteroAttachment*)attachment withError:(NSError*) error usingFileChannel:(ZPFileChannel*)fileChannel{
     @synchronized(_activeDownloads){
         [_activeDownloads removeObject:attachment];
-        DDLogVerbose(@"Finished downloading %@. Number of files downloading is %i",attachment.filename,[_activeDownloads count]);
+        DDLogError(@"Failed downloading file %@. Number of files downloading is %i",attachment.filename,[_activeDownloads count]);
     }
     
     _activeRequestCount--;

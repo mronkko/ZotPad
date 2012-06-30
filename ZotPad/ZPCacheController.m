@@ -62,7 +62,6 @@
 #import "ZPZoteroAttachment.h"
 #import "ZPZoteroNote.h"
 
-
 #define NUMBER_OF_ITEMS_TO_RETRIEVE 50
 
 
@@ -846,9 +845,7 @@ static ZPCacheController* _instance = nil;
             [[ZPDataLayer instance] notifyLibraryWithCollectionsAvailable:library];
         }
         @synchronized(_librariesWhoseCollectionsAreBeingRefreshed){
-//            DDLogVerbose(@"Removing lock on libray %@ number of locks %i",library.libraryID,[_librariesWhoseCollectionsAreBeingRefreshed count]);
             [_librariesWhoseCollectionsAreBeingRefreshed removeObject:library.libraryID];
-//            DDLogVerbose(@"Count after removing lock %i",[_librariesWhoseCollectionsAreBeingRefreshed count]);
         }
     }
 }
@@ -909,7 +906,7 @@ static ZPCacheController* _instance = nil;
     NSArray *directoryContent = [[NSFileManager defaultManager] contentsOfDirectoryAtPath:_documentsDirectory error:NULL];
     
     for (NSString* _documentFilePath in directoryContent) {
-        if(! [@"zotpad.sqlite" isEqualToString: _documentFilePath]){
+        if(! [@"zotpad.sqlite" isEqualToString: _documentFilePath] && ! [_documentFilePath isEqualToString:@"zotpad.sqlite-journal"] && ! [_documentFilePath hasPrefix:@"log-"]){
             [[NSFileManager defaultManager] removeItemAtPath:[_documentsDirectory stringByAppendingPathComponent:_documentFilePath] error:NULL];
         }
     }
@@ -983,6 +980,8 @@ static ZPCacheController* _instance = nil;
 
 - (void) _cleanUpCache{
     
+    DDLogWarn(@"Start cleaning cached files");
+    
     NSArray* attachments = [[ZPDatabase instance] getCachedAttachmentsOrderedByRemovalPriority];
 
     //Delete orphaned files
@@ -995,7 +994,7 @@ static ZPCacheController* _instance = nil;
     for (NSString* _documentFilePath in directoryContent) {
         NSString* path = [_documentsDirectory stringByAppendingPathComponent:_documentFilePath];
 
-        if(! [path hasSuffix:@"zotpad.sqlite"] && ! [path hasSuffix:@"zotpad.sqlite-journal"]){
+        if(! [_documentFilePath isEqualToString: @"zotpad.sqlite"] && ! [_documentFilePath isEqualToString:@"zotpad.sqlite-journal"] && ! [_documentFilePath hasPrefix:@"log-"]){
             
             // The strings from DB and file system have different encodings. Because of this, we cannot scan the array using built-in functions, but need to loop over it
             NSString* pathFromDB;
@@ -1014,27 +1013,29 @@ static ZPCacheController* _instance = nil;
             if(! found){
                 NSDictionary *_documentFileAttributes = [[NSFileManager defaultManager] fileAttributesAtPath:path traverseLink:YES];
                 _sizeOfDocumentsFolder -= [_documentFileAttributes fileSize]/1024;
-                DDLogVerbose(@"Deleting orphaned file %@ cache size now %i",path,_sizeOfDocumentsFolder);
+                DDLogWarn(@"Deleting orphaned file %@. Cache use is now at %i\%",path,_sizeOfDocumentsFolder*100/[[ZPPreferences instance] maxCacheSize]);
                 [[NSFileManager defaultManager] removeItemAtPath:path error: NULL];
             }
         }
     }
     
-    //TODO: refactor file removals to a separate method
     
     //Delete attachment files until the size of the cache is below the maximum size
-    for(attachment in attachments){
-        //Only delete originals
-        NSString* path = attachment.fileSystemPath_original;
-        NSDictionary *_documentFileAttributes = [[NSFileManager defaultManager] fileAttributesAtPath:path traverseLink:YES];
+    if (_sizeOfDocumentsFolder>[[ZPPreferences instance] maxCacheSize]){
+        for(attachment in attachments){
+            //Only delete originals
+            NSString* path = attachment.fileSystemPath_original;
+            NSDictionary *_documentFileAttributes = [[NSFileManager defaultManager] fileAttributesAtPath:path traverseLink:YES];
+            
+            //This will also update the cache size
+            [[ZPDataLayer instance] notifyAttachmentDeleted:attachment fileAttributes:_documentFileAttributes];
 
-        [[NSFileManager defaultManager] removeItemAtPath:path error: NULL];
-
-        //This will also update the cache size
-        [[ZPDataLayer instance] notifyAttachmentDeleted:attachment fileAttributes:_documentFileAttributes];
-
-        if (_sizeOfDocumentsFolder<=[[ZPPreferences instance] maxCacheSize]) break;
+            DDLogWarn(@"Deleted file %@ to free cahce space. Cache use is now at %i\%",path,_sizeOfDocumentsFolder*100/[[ZPPreferences instance] maxCacheSize]);
+            
+            if (_sizeOfDocumentsFolder<=[[ZPPreferences instance] maxCacheSize]) break;
+        }
     }
+    DDLogWarn(@"Done cleaning cached files");
 
 }
 

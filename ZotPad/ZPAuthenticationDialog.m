@@ -75,11 +75,7 @@ static ZPAuthenticationDialog* _instance = nil;
     
     _key = key;
 
-    DDLogVerbose(@"Starting loading Zotero website");
-    
     [self loadFirstPage:NULL];
-    
-    DDLogVerbose(@"Done loading");
 
 }
 - (BOOL)webView:(UIWebView *)webView shouldStartLoadWithRequest:(NSURLRequest *)request navigationType:(UIWebViewNavigationType)navigationType{

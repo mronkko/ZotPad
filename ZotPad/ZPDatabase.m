@@ -101,7 +101,6 @@ static ZPDatabase* _instance = nil;
 
 -(void) resetDatabase{
     @synchronized(self){
-        DDLogVerbose(@"Reseting database");
         
         NSError* error;
         
@@ -146,9 +145,6 @@ static ZPDatabase* _instance = nil;
             }
         }
         
-        
-        DDLogVerbose(@"Database reset completed");
-
     }
 
 }
@@ -627,7 +623,6 @@ static ZPDatabase* _instance = nil;
             
         }
         [resultSet close];
-        DDLogVerbose(@"Retrieved %i collections for parent collection %@ in library %@",[returnArray count],collectionKey,libraryID);
         
 	}
 	return returnArray;
@@ -665,7 +660,6 @@ static ZPDatabase* _instance = nil;
         }
         
         [resultSet close];
-        DDLogVerbose(@"Retrieved collection fields from DB for %@ Key: %@ Library: %@ Parent: %@",collection.title,collection.key,collection.libraryID,collection.parentCollectionKey);
     }
 }
 
@@ -1004,12 +998,16 @@ Deletes items, notes, and attachments based in array of keys from a library
          attachment.versionIdentifier_local,
          attachment.key];
         
-        DDLogVerbose(@"Updated version info to DB with md5 = %@, versionSource = %@, versionIdentifier_server = %@, versionIdentifier_local = %@ for item %@",
-              attachment.md5,
-              attachment.versionSource,
-              attachment.versionIdentifier_server,
-              attachment.versionIdentifier_local,
-              attachment.key);
+        //This is important to log because it helps troubleshooting file versioning problems.
+        
+        DDLogVerbose(@"Wrote file revision info for attachment %@ (%@)into database. New values are md5 = %@, versionSource = %@, versionIdentifier_server = %@, versionIdentifier_local = %@",
+                     attachment.key,
+                     attachment.title,
+                     attachment.md5,
+                     attachment.versionSource,
+                     attachment.versionIdentifier_server,
+                     attachment.versionIdentifier_local
+                     );
     }
 }
 

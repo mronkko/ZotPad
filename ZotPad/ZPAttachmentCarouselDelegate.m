@@ -160,7 +160,6 @@
             
             
             if(connection!=NULL && ! [connection isAttachmentDownloading:attachment]){
-                DDLogVerbose(@"Started downloading file %@ in index %i",attachment.title,index);
                 [connection checkIfCanBeDownloadedAndStartDownloadingAttachment:attachment];   
             }
             
