@@ -598,11 +598,12 @@ const NSInteger ZPServerConnectionRequestPermissions = 10;
     }
 }
 
-//TODO: Refactor: does this need to return a boolean? 
 
 -(BOOL) checkIfCanBeDownloadedAndStartDownloadingAttachment:(ZPZoteroAttachment*)attachment{
     
-    //Check if the file can be downloade
+    //Check if the file can be downloaded
+    
+    if([attachment.linkMode intValue] == LINK_MODE_LINKED_URL || [attachment.linkMode intValue] == LINK_MODE_LINKED_FILE) return FALSE;
     
     ZPFileChannel* downloadChannel = [self _fileChannelForAttachment:attachment];
 
@@ -624,7 +625,6 @@ const NSInteger ZPServerConnectionRequestPermissions = 10;
     [downloadChannel startDownloadingAttachment:attachment];
     
     [[ZPDataLayer instance] notifyAttachmentDownloadStarted:attachment];
-
     return TRUE;
 }
 
@@ -644,14 +644,8 @@ const NSInteger ZPServerConnectionRequestPermissions = 10;
         if([_documentFileAttributes fileSize]>0){
             
             //Move the file to the right place
-            NSString* targetPath = [attachment fileSystemPath];
-            [[NSFileManager defaultManager] moveItemAtPath:tempFile toPath:targetPath error:NULL];
+            [attachment moveFileFromPathAsNewOriginalFile:tempFile];
             
-            //Set this file as not cached
-            const char* filePath = [[attachment fileSystemPath] fileSystemRepresentation];
-            const char* attrName = "com.apple.MobileBackup";
-            u_int8_t attrValue = 1;
-            setxattr(filePath, attrName, &attrValue, sizeof(attrValue), 0, 0);
             
             //Write version info to DB
             attachment.versionSource = [NSNumber numberWithInt:fileChannel.fileChannelType];
@@ -662,7 +656,7 @@ const NSInteger ZPServerConnectionRequestPermissions = 10;
         }
         @synchronized(_activeDownloads){
             [_activeDownloads removeObject:attachment];
-            DDLogVerbose(@"Finished downloading %@. Number of files downloading is %i",attachment.filename,[_activeDownloads count]);
+            DDLogVerbose(@"Finished downloading %@",attachment.filename);
         }
         
         _activeRequestCount--;
@@ -681,7 +675,7 @@ const NSInteger ZPServerConnectionRequestPermissions = 10;
 -(void) failedDownloadingAttachment:(ZPZoteroAttachment*)attachment withError:(NSError*) error usingFileChannel:(ZPFileChannel*)fileChannel{
     @synchronized(_activeDownloads){
         [_activeDownloads removeObject:attachment];
-        DDLogError(@"Failed downloading file %@. Number of files downloading is %i",attachment.filename,[_activeDownloads count]);
+        DDLogError(@"Failed downloading file %@",attachment.filename);
     }
     
     _activeRequestCount--;
@@ -748,12 +742,10 @@ const NSInteger ZPServerConnectionRequestPermissions = 10;
     
     //Update the timestamps and copy files into right place
     
-    //TODO: This should be atomic (using synchronization) and have error handling code
-    
     attachment.versionIdentifier_server = attachment.versionIdentifier_local;
     [[ZPDatabase instance] writeVersionInfoForAttachment:attachment];
-    [[NSFileManager defaultManager] removeItemAtPath:attachment.fileSystemPath_original error:NULL];
-    [[NSFileManager defaultManager] moveItemAtPath:attachment.fileSystemPath_modified toPath:attachment.fileSystemPath_original error:NULL];
+    
+    [attachment moveModifiedFileAsOriginalFile];
     
     @synchronized(_activeUploads){
         [_activeUploads removeObject:attachment];

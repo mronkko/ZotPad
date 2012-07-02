@@ -78,8 +78,8 @@
     [TestFlight takeOff:@"5e753f234f33fc2bddf4437600037fbf_NjcyMjEyMDEyLTA0LTA5IDE0OjUyOjU0LjE4MDQwMg"];
     
     //Set up loggers
-    [DDTTYLogger sharedInstance].logFormatter = [[ZPFileLogFormatter alloc] initWithLevel:LOG_LEVEL_VERBOSE];
-    [DDLog addLogger:[DDTTYLogger sharedInstance]];
+    //[DDTTYLogger sharedInstance].logFormatter = [[ZPFileLogFormatter alloc] initWithLevel:LOG_LEVEL_VERBOSE];
+    //[DDLog addLogger:[DDTTYLogger sharedInstance]];
     
     TestFlightLogger* tfLogger = [[TestFlightLogger alloc] initWithTeamToken:@"5e753f234f33fc2bddf4437600037fbf_NjcyMjEyMDEyLTA0LTA5IDE0OjUyOjU0LjE4MDQwMg"];
     tfLogger.logFormatter = [[ZPFileLogFormatter alloc] initWithLevel:LOG_LEVEL_VERBOSE];
@@ -213,9 +213,27 @@
         }
         else{
             DDLogInfo(@"A file %@ from %@",[url lastPathComponent],sourceApplication);
+
+            //Find the top most viewcontroller
+            UIViewController* viewController = self.window.rootViewController;
+            while(viewController.presentedViewController) viewController = viewController.presentedViewController;
+            
+            //Start dismissing modal views
+            while(viewController != self.window.rootViewController){
+                UIViewController* parent = viewController.presentingViewController;
+                [viewController dismissModalViewControllerAnimated:NO];
+                viewController = parent;
+            }
+            
+            //The view controller must load first to register an observer
+            ZPFileImportViewController* importViewController = [self.window.rootViewController.storyboard instantiateViewControllerWithIdentifier:@"FileImportDialog"];
+            importViewController.modalPresentationStyle = UIModalPresentationFormSheet;
+            importViewController.modalTransitionStyle = UIModalTransitionStyleCoverVertical;
+            importViewController.url=url;
+            
+            [self.window.rootViewController presentModalViewController:importViewController animated:NO];
             [[ZPCacheController instance] addAttachmentToUploadQueue:attachment withNewFile:url];
-            [self.window.rootViewController dismissModalViewControllerAnimated:YES];
-            [self.window.rootViewController performSegueWithIdentifier:@"ReceivedFile" sender:url];
+            
             
         }
                                                                 

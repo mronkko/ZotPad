@@ -18,13 +18,13 @@
 @interface ZPAttachmentCarouselDelegate()
 
 -(void) _toggleActionButtonState;
-
+-(BOOL) _fileExistsForAttachment:(ZPZoteroAttachment*) attachment;
 @end
 
 
 @implementation ZPAttachmentCarouselDelegate
 
-@synthesize actionButton, carousel, mode, show;
+@synthesize actionButton, attachmentCarousel, mode, show;
 
 -(void) configureWithAttachmentArray:(NSArray*) attachments{
     _item = NULL;
@@ -48,32 +48,44 @@
             self.actionButton.enabled = FALSE;
         }
         else{
-            NSInteger currentIndex = carousel.currentItemIndex;
+            NSInteger currentIndex = attachmentCarousel.currentItemIndex;
             // Initially the iCarousel can return a negative index. This is probably a bug.
             if(currentIndex <0) currentIndex = 0;
             ZPZoteroAttachment* attachment = [_attachments objectAtIndex:currentIndex];
-            self.actionButton.enabled = attachment.fileExists &! [attachment.contentType isEqualToString:@"text/html"];
+            self.actionButton.enabled = [self _fileExistsForAttachment:attachment]  &! [attachment.contentType isEqualToString:@"text/html"];
         }
     }
+}
+
+/*
+ 
+ This is needed because the different show-values that the carousel can have
+ 
+ */
+-(BOOL) _fileExistsForAttachment:(ZPZoteroAttachment*) attachment{
+    if(show == ZPATTACHMENTICONGVIEWCONTROLLER_SHOW_ORIGINAL){
+        return attachment.fileExists_original;
+    }
+    else return(attachment.fileExists);
 }
 
 #pragma mark - iCarousel delegate
 
 
 - (NSUInteger)numberOfPlaceholdersInCarousel:(iCarousel *)carousel{
-    NSAssert(carousel==self.carousel,@"ZPAttachmentCarouselDelegate can only be used with the iCarousel set in the carousel property");
+    NSAssert(carousel==self.attachmentCarousel,@"ZPAttachmentCarouselDelegate can only be used with the iCarousel set in the carousel property");
     return 0;
 }
 
 - (NSUInteger)numberOfItemsInCarousel:(iCarousel *)carousel
 {
-    NSAssert(carousel==self.carousel,@"ZPAttachmentCarouselDelegate can only be used with the iCarousel set in the carousel property");
+    NSAssert(carousel==self.attachmentCarousel,@"ZPAttachmentCarouselDelegate can only be used with the iCarousel set in the carousel property");
     return [_attachments count];
 }
 
 
 - (NSUInteger) numberOfVisibleItemsInCarousel:(iCarousel*)carousel{
-    NSAssert(carousel==self.carousel,@"ZPAttachmentCarouselDelegate can only be used with the iCarousel set in the carousel property");
+    NSAssert(carousel==self.attachmentCarousel,@"ZPAttachmentCarouselDelegate can only be used with the iCarousel set in the carousel property");
     NSInteger numItems = [self numberOfItemsInCarousel:carousel];
     NSInteger ret=  MAX(numItems,5);
     return ret;
@@ -81,7 +93,7 @@
 
 - (UIView *)carousel:(iCarousel *)carousel viewForItemAtIndex:(NSUInteger)index reusingView:(UIView*)view
 {
-    NSAssert(carousel==self.carousel,@"ZPAttachmentCarouselDelegate can only be used with the iCarousel set in the carousel property");
+    NSAssert(carousel==self.attachmentCarousel,@"ZPAttachmentCarouselDelegate can only be used with the iCarousel set in the carousel property");
     ZPAttachmentIconViewController* attachmentViewController;
     
     if(view==NULL){
@@ -134,17 +146,17 @@
 
 //This is implemented because it is a mandatory protocol method
 - (UIView *)carousel:(iCarousel *)carousel placeholderViewAtIndex:(NSUInteger)index reusingView:(UIView *)view{
-    NSAssert(carousel==self.carousel,@"ZPAttachmentCarouselDelegate can only be used with the iCarousel set in the carousel property");
+    NSAssert(carousel==self.attachmentCarousel,@"ZPAttachmentCarouselDelegate can only be used with the iCarousel set in the carousel property");
     return view;
 }
 
 - (void)carousel:(iCarousel *)carousel didSelectItemAtIndex:(NSInteger)index{
-    NSAssert(carousel==self.carousel,@"ZPAttachmentCarouselDelegate can only be used with the iCarousel set in the carousel property");
+    NSAssert(carousel==self.attachmentCarousel,@"ZPAttachmentCarouselDelegate can only be used with the iCarousel set in the carousel property");
     if([carousel currentItemIndex] == index){
         
         ZPZoteroAttachment* attachment = [_attachments objectAtIndex:index]; 
         
-        if([attachment fileExists] ||
+        if([self _fileExistsForAttachment:attachment] ||
            ([attachment.linkMode intValue] == LINK_MODE_LINKED_URL && [ZPServerConnection instance])){
             UIView* sourceView;
             for(sourceView in carousel.visibleItemViews){
@@ -169,7 +181,7 @@
 }
 
 - (void)carouselCurrentItemIndexUpdated:(iCarousel *)carousel{
-    NSAssert(carousel==self.carousel,@"ZPAttachmentCarouselDelegate can only be used with the iCarousel set in the carousel property");
+    NSAssert(carousel==self.attachmentCarousel,@"ZPAttachmentCarouselDelegate can only be used with the iCarousel set in the carousel property");
     
     if(actionButton != NULL){
         if([_attachments count]==0){
@@ -180,7 +192,7 @@
             // Initially the iCarousel can return a negative index. This is probably a bug in iCarousel.
             if(currentIndex <0) currentIndex = 0;
             ZPZoteroAttachment* attachment = [_attachments objectAtIndex:currentIndex];
-            actionButton.enabled = attachment.fileExists &! [attachment.contentType isEqualToString:@"text/html"];
+            actionButton.enabled = [self _fileExistsForAttachment:attachment] &! [attachment.contentType isEqualToString:@"text/html"];
         }
     }
 }
@@ -198,14 +210,14 @@
         _item = item;
         _attachments = item.attachments;
         
-        if([carousel numberOfItems]!= _attachments.count){
+        if([self.attachmentCarousel numberOfItems]!= _attachments.count){
             if([_attachments count]==0){
-                [carousel setHidden:TRUE];
+                [self.attachmentCarousel setHidden:TRUE];
             }
             else{
-                [carousel setHidden:FALSE];
-                [carousel setScrollEnabled:[_attachments count]>1];
-                [carousel performSelectorOnMainThread:@selector(reloadData) withObject:NULL waitUntilDone:NO];
+                [self.attachmentCarousel setHidden:FALSE];
+                [self.attachmentCarousel setScrollEnabled:[_attachments count]>1];
+                [self.attachmentCarousel performSelectorOnMainThread:@selector(reloadData) withObject:NULL waitUntilDone:NO];
             }
         }
     }
@@ -221,7 +233,7 @@
 }
 
 -(void) _reloadCarouselItemAtIndex:(NSInteger) index{
-    [carousel reloadItemAtIndex:index animated:YES];
+    [attachmentCarousel reloadItemAtIndex:index animated:YES];
 }
 
 -(void) notifyAttachmentDownloadCompleted:(ZPZoteroAttachment*) attachment{

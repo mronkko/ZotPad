@@ -10,8 +10,8 @@
 
 #import "ZPCore.h"
 #import "ZPDatabase.h"
-#include "FileMD5Hash.h"
-
+#import "FileMD5Hash.h"
+#import "QSStrings.h"
 
 NSInteger const LINK_MODE_IMPORTED_FILE = 0;
 NSInteger const LINK_MODE_IMPORTED_URL = 1;
@@ -26,6 +26,7 @@ NSInteger const VERSION_SOURCE_DROPBOX =3;
     NSString* _versionIdentifier_local;
 }
 - (NSString*) _fileSystemPathWithSuffix:(NSString*)suffix;
+
 @end
 
 @implementation ZPZoteroAttachment
@@ -169,15 +170,21 @@ NSInteger const VERSION_SOURCE_DROPBOX =3;
 //If an attachment is updated, delete the old attachment file
 - (void) setServerTimestamp:(NSString*)timestamp{
     [super setServerTimestamp:timestamp];
-    if(![self.serverTimestamp isEqual:self.cacheTimestamp] && [self fileExists]){
+    if(![self.serverTimestamp isEqual:self.cacheTimestamp] && [self fileExists_original]){
         //If the file MD5 does not match the server MD5, delete it.
-        NSString* fileMD5 = [self md5ForFileAtPath:self.fileSystemPath_original];
+        NSString* fileMD5 = [ZPZoteroAttachment md5ForFileAtPath:self.fileSystemPath_original];
         if(! [self.md5 isEqualToString:fileMD5]){
             [[NSFileManager defaultManager] removeItemAtPath: [self fileSystemPath_original] error:NULL];   
         }
     }
     
 }
+
+-(NSString*) filenameZoteroBase64Encoded{
+    return [[QSStrings encodeBase64WithString:self.filename] stringByAppendingString:@"%ZB64"];
+}
+
+#pragma mark - File operations
 
 -(BOOL) fileExists{
     //If there is no known filename for the item, then the item cannot exists in cache
@@ -190,6 +197,86 @@ NSInteger const VERSION_SOURCE_DROPBOX =3;
     else
         return ([[NSFileManager defaultManager] fileExistsAtPath:fsPath]);
 }
+
+-(BOOL) fileExists_original{
+    //If there is no known filename for the item, then the item cannot exists in cache
+    if(self.filename == nil || self.filename == (NSObject*)[NSNull null]){
+        return false;
+    }
+    NSString* fsPath = [self fileSystemPath_original];
+    if(fsPath == NULL)
+        return false; 
+    else
+        return ([[NSFileManager defaultManager] fileExistsAtPath:fsPath]);
+}
+
+-(BOOL) fileExists_modified{
+    //If there is no known filename for the item, then the item cannot exists in cache
+    if(self.filename == nil || self.filename == (NSObject*)[NSNull null]){
+        return false;
+    }
+    NSString* fsPath = [self fileSystemPath_modified];
+    if(fsPath == NULL)
+        return false; 
+    else
+        return ([[NSFileManager defaultManager] fileExistsAtPath:fsPath]);
+}
+
+//The reason for purging a file will be logged 
+
+-(void) purge:(NSString*) reason{
+    [self purge_modified:reason];
+    [self purge_original:reason];
+}
+
+-(void) purge_original:(NSString*) reason{
+    if([self fileExists_original]){
+        NSDictionary* fileAttributes = [[NSFileManager defaultManager] fileAttributesAtPath:self.fileSystemPath_original traverseLink:NO];
+        [[NSFileManager defaultManager] removeItemAtPath:self.fileSystemPath_original error:NULL];
+        [[ZPDataLayer instance] notifyAttachmentDeleted:self fileAttributes:fileAttributes];
+        DDLogWarn(@"File %@ (version from server) was deleted: %@",self.filename,reason);
+    }
+}
+-(void) purge_modified:(NSString*) reason{
+    if([self fileExists_modified]){
+        NSDictionary* fileAttributes = [[NSFileManager defaultManager] fileAttributesAtPath:self.fileSystemPath_modified traverseLink:NO];
+        [[NSFileManager defaultManager] removeItemAtPath:self.fileSystemPath_modified error:NULL];
+        [[ZPDataLayer instance] notifyAttachmentDeleted:self fileAttributes:fileAttributes];
+        DDLogWarn(@"File %@ (locally modified) was deleted: %@",self.filename,reason);
+    }
+}
+
+//TODO: These should update the cache size. This is a minor issue, implement after implementing NSNotification
+
+-(void) moveFileFromPathAsNewOriginalFile:(NSString*) path{
+    NSAssert2([[NSFileManager defaultManager] fileExistsAtPath:path],@"Attempted to associate non-existing file from %@ with attachment %@", path,self.key);
+    [[NSFileManager defaultManager] removeItemAtPath:self.fileSystemPath_original error:NULL];
+    [[NSFileManager defaultManager] moveItemAtPath:path toPath:self.fileSystemPath_original error:NULL];
+
+    //Set this file as not cached
+    const char* filePath = [self.fileSystemPath_original fileSystemRepresentation];
+    const char* attrName = "com.apple.MobileBackup";
+    u_int8_t attrValue = 1;
+    setxattr(filePath, attrName, &attrValue, sizeof(attrValue), 0, 0);
+
+}
+
+-(void) moveFileFromPathAsNewModifiedFile:(NSString*) path{
+    NSAssert2([[NSFileManager defaultManager] fileExistsAtPath:path],@"Attempted to associate non-existing file from %@ with attachment %@", path,self.key);
+    [[NSFileManager defaultManager] removeItemAtPath:self.fileSystemPath_modified error:NULL];
+    [[NSFileManager defaultManager] moveItemAtPath:path toPath:self.fileSystemPath_modified error:NULL];
+
+    //Set this file as not cached
+    const char* filePath = [self.fileSystemPath_modified fileSystemRepresentation];
+    const char* attrName = "com.apple.MobileBackup";
+    u_int8_t attrValue = 1;
+    setxattr(filePath, attrName, &attrValue, sizeof(attrValue), 0, 0);
+}
+
+-(void) moveModifiedFileAsOriginalFile{
+    [self moveFileFromPathAsNewOriginalFile:self.fileSystemPath_modified];
+}
+
 
 #pragma mark - QLPreviewItem protocol
 
@@ -212,7 +299,7 @@ NSInteger const VERSION_SOURCE_DROPBOX =3;
 
 //Helper function for MD5 sums
 
--(NSString*) md5ForFileAtPath:(NSString*)path{
++(NSString*) md5ForFileAtPath:(NSString*)path{
     
     if(! [[NSFileManager defaultManager] fileExistsAtPath:path]){
         [NSException raise:@"File not found" format:@"Attempted to calculate MD5 sum for a non-existing file at %@",path];
@@ -222,6 +309,22 @@ NSInteger const VERSION_SOURCE_DROPBOX =3;
     
     NSString* md5 = (__bridge_transfer NSString*) FileMD5HashCreateWithPath((__bridge CFStringRef) path, FileHashDefaultChunkSizeForReadingData);
     return md5;
+}
+
++(NSString*) zoteroBase64Encode:(NSString*)filename{
+    return [[QSStrings encodeBase64WithString:filename] stringByAppendingString:@"%ZB64"];
+}
+
++(NSString*) zoteroBase64Decode:(NSString*)filename{
+    NSString* toBeDecoded = [filename substringToIndex:[filename length] - 5];
+    NSData* decodedData = [QSStrings decodeBase64WithString:toBeDecoded] ;
+    NSString* decodedFilename = [[NSString alloc] initWithData:decodedData encoding:NSUTF8StringEncoding];
+    return decodedFilename;
+}
+
+
+-(void) logFileRevisions{
+    DDLogInfo(@"MD5: %@ Server: %@ Local %@: Filename %@",self.md5,self.versionIdentifier_server,self.versionIdentifier_local,self.filename);
 }
 
 @end

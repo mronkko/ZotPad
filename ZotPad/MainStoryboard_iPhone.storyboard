@@ -17,8 +17,6 @@
                     <connections>
                         <segue destination="12" kind="relationship" relationship="rootViewController" id="19"/>
                         <segue destination="mdR-2R-M4d" kind="modal" identifier="Authentication" id="hyc-84-qgP"/>
-                        <segue destination="AXS-C3-mVS" kind="modal" identifier="ReceivedFile" id="2qy-0H-ZAI"/>
-                        <segue destination="RIY-yW-qZT" kind="modal" identifier="UploadConflict" id="QHU-xt-VVP"/>
                     </connections>
                 </navigationController>
             </objects>
@@ -272,7 +270,7 @@
         <scene sceneID="6Lq-Rz-Ywp">
             <objects>
                 <placeholder placeholderIdentifier="IBFirstResponder" id="TfT-zN-bNV" userLabel="First Responder" sceneMemberID="firstResponder"/>
-                <viewController id="AXS-C3-mVS" customClass="ZPFileImportViewController" sceneMemberID="viewController">
+                <viewController storyboardIdentifier="FileImportDialog" id="AXS-C3-mVS" customClass="ZPFileImportViewController" sceneMemberID="viewController">
                     <view key="view" contentMode="scaleToFill" id="opB-Jm-dX9">
                         <rect key="frame" x="0.0" y="20" width="320" height="460"/>
                         <autoresizingMask key="autoresizingMask" flexibleMaxX="YES" flexibleMaxY="YES"/>

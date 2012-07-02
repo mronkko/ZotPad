@@ -33,7 +33,7 @@
 	_carouselDelegate = [[ZPAttachmentCarouselDelegate alloc] init];
     _carouselDelegate.mode = ZPATTACHMENTICONGVIEWCONTROLLER_MODE_UPLOAD;
     _carouselDelegate.show = ZPATTACHMENTICONGVIEWCONTROLLER_SHOW_MODIFIED;
-    _carouselDelegate.carousel = carousel;
+    _carouselDelegate.attachmentCarousel = carousel;
     ZPZoteroAttachment* attachment = [ZPZoteroAttachment dataObjectForAttachedFile:url.absoluteString];
     [_carouselDelegate configureWithAttachmentArray:[NSArray arrayWithObject:attachment]];
     carousel.dataSource = _carouselDelegate;

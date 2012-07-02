@@ -27,8 +27,7 @@ NSInteger const ZPATTACHMENTICONGVIEWCONTROLLER_MODE_FIRST_STATIC_SECOND_DOWNLOA
 
 NSInteger const ZPATTACHMENTICONGVIEWCONTROLLER_SHOW_ORIGINAL = 10;
 NSInteger const ZPATTACHMENTICONGVIEWCONTROLLER_SHOW_MODIFIED = 11;
-NSInteger const ZPATTACHMENTICONGVIEWCONTROLLER_SHOW_ORIGINAL_OR_MODIFIED = 12;
-NSInteger const ZPATTACHMENTICONGVIEWCONTROLLER_SHOW_FIRST_MODIFIED_SECOND_ORIGINAL = 13;
+NSInteger const ZPATTACHMENTICONGVIEWCONTROLLER_SHOW_FIRST_MODIFIED_SECOND_ORIGINAL = 12;
 
 
 @interface ZPAttachmentIconViewController (){
@@ -45,7 +44,9 @@ NSInteger const ZPATTACHMENTICONGVIEWCONTROLLER_SHOW_FIRST_MODIFIED_SECOND_ORIGI
 
 @end
 
-static NSCache* _previewCache; 
+//TODO: This is commented out because there is currently no mechanism to expire items form the cache when files are changed on the disk
+//static NSCache* _previewCache; 
+
 static NSCache* _fileIconCache; 
 static NSMutableDictionary* _viewsWaitingForImage; 
 static NSMutableDictionary* _viewsThatAreRendering; 
@@ -58,8 +59,8 @@ static ZPAttachmentIconViewController* _webViewDelegate;
 
 + (void)initialize{
     
-    _previewCache = [[NSCache alloc] init];
-    [_previewCache setCountLimit:20];
+//    _previewCache = [[NSCache alloc] init];
+//    [_previewCache setCountLimit:20];
     _fileIconCache = [[NSCache alloc] init];
     [_fileIconCache setCountLimit:20];
     _viewsWaitingForImage = [[NSMutableDictionary alloc] init ];
@@ -142,10 +143,7 @@ static ZPAttachmentIconViewController* _webViewDelegate;
         NSInteger linkMode = [attachment.linkMode intValue ];
         BOOL exists;
         if(show == ZPATTACHMENTICONGVIEWCONTROLLER_SHOW_ORIGINAL){
-            exists = ([[NSFileManager defaultManager] fileExistsAtPath:attachment.fileSystemPath_original]);
-        }
-        else if(show == ZPATTACHMENTICONGVIEWCONTROLLER_SHOW_MODIFIED){
-            exists = ([[NSFileManager defaultManager] fileExistsAtPath:attachment.fileSystemPath_modified]);
+            exists = [attachment fileExists_original];
         }
         else{
             exists = [attachment fileExists];
@@ -167,12 +165,12 @@ static ZPAttachmentIconViewController* _webViewDelegate;
                 else if ([attachment.existsOnZoteroServer intValue]==1) source = @"Zotero";
                 
                 if(source != NULL){
-                    if(attachment.attachmentSize != [NSNull null]){
+                    if([attachment.existsOnZoteroServer intValue]==1){
                         NSInteger size = [attachment.attachmentSize intValue];
                         self.progressLabel.text =  [NSString stringWithFormat:@"Download from %@ (%i KB)",source,size/1024];
                     }
                     else{
-                        self.progressLabel.text = [NSString stringWithFormat:@"Download from %@ (unknown size)",source];
+                        self.progressLabel.text = [NSString stringWithFormat:@"Download from %@",source];
                     }
                 }
                 else {
@@ -238,11 +236,11 @@ static ZPAttachmentIconViewController* _webViewDelegate;
     
     if(attachment.fileExists && [attachment.contentType isEqualToString:@"application/pdf"]){
         
-        image = [_previewCache objectForKey:attachment.fileSystemPath];
+//        image = [_previewCache objectForKey:attachment.fileSystemPath];
         
-        if(image == NULL){
+//        if(image == NULL){
             [self performSelectorInBackground:@selector(_renderPDFPreview) withObject:NULL];
-        }
+//        }
     }
     
     if(image == NULL){
@@ -562,7 +560,14 @@ static ZPAttachmentIconViewController* _webViewDelegate;
     //
     // Source: http://stackoverflow.com/questions/5658993/creating-pdf-thumbnail-in-iphone
     //
-    NSString* filename = attachment.fileSystemPath;
+    NSString* filename;
+    
+    if(show == ZPATTACHMENTICONGVIEWCONTROLLER_SHOW_ORIGINAL){
+        filename = attachment.fileSystemPath_original;
+    }
+    else{
+        filename = attachment.fileSystemPath;
+    }
     
     DDLogVerbose(@"Start rendering pdf %@",filename);
     
@@ -585,14 +590,19 @@ static ZPAttachmentIconViewController* _webViewDelegate;
     
     if(image != NULL){
         DDLogVerbose(@"Done rendering pdf %@",filename);
-        [_previewCache setObject:image forKey:filename];
+//        [_previewCache setObject:image forKey:filename];
         [self performSelectorOnMainThread:@selector(_showPDFPreview:) withObject:image waitUntilDone:NO];
     } 
     else{
+        /*
         DDLogVerbose(@"Rendering pdf failed %@. File is now deleted because it is most likely corrupted",filename);
         [[[UIAlertView alloc] initWithTitle:@"File error" message:[NSString stringWithFormat:@"A downloaded attachment file (%@) could not be opened because it seems to be corrupted. The file will be now deleted and needs to be downloaded again.",attachment.filename]
                                    delegate:NULL cancelButtonTitle:@"OK" otherButtonTitles:nil] show];
-        [[NSFileManager defaultManager] removeItemAtPath:filename error:NULL];
+        
+        if([filename isEqualToString:attachment.fileSystemPath_modified]){
+            [attachment purge_modified:@"Preview could not be rendered, "
+        }
+        */
     }
 }
 #pragma mark - Attachment download observer protocol methods
@@ -617,9 +627,9 @@ static ZPAttachmentIconViewController* _webViewDelegate;
     if([attachment.key isEqualToString: self.attachment.key] && mode ==ZPATTACHMENTICONGVIEWCONTROLLER_MODE_DOWNLOAD){
         if ([NSThread isMainThread]){
             DDLogVerbose(@"Finished downloading %@",attachment.filename);
-            self.progressLabel.text = [NSString stringWithFormat:@"Download failed. (%@: %i)",error.domain,error.code];
+            self.progressLabel.text = [NSString stringWithFormat:@"Download failed",error.domain,error.code];
             self.progressView.hidden = TRUE;
-            NSString* description = [error.userInfo objectForKey:@"error"];
+            NSString* description = [error localizedDescription];
             
             if(description == NULL){
                 description = [error localizedDescription];
@@ -648,6 +658,7 @@ static ZPAttachmentIconViewController* _webViewDelegate;
         if ([NSThread isMainThread]){
             [[ZPServerConnection instance] useProgressView:self.progressView forDownloadingAttachment:self.attachment];
             self.progressLabel.text = @"Downloading";
+            self.progressLabel.hidden = FALSE;
             self.progressView.hidden = FALSE;
             self.errorLabel.hidden = TRUE;
             self.progressView.progress = 0;
@@ -659,10 +670,11 @@ static ZPAttachmentIconViewController* _webViewDelegate;
 }
 
 -(void) notifyAttachmentDeleted:(ZPZoteroAttachment*) attachment fileAttributes:(NSDictionary*) fileAttributes{
-    if([attachment.key isEqualToString: self.attachment.key]){
+    if([attachment.key isEqualToString: self.attachment.key] && ! mode == ZPATTACHMENTICONGVIEWCONTROLLER_MODE_UPLOAD){
         if ([NSThread isMainThread]){
             DDLogVerbose(@"Attachment deleted %@",attachment.filename);
             self.progressLabel.text = @"Attachment file deleted";
+            self.progressLabel.hidden = FALSE;
             self.progressView.hidden = TRUE;
             self.errorLabel.hidden = TRUE;
             self.view.userInteractionEnabled = TRUE;
@@ -680,6 +692,7 @@ static ZPAttachmentIconViewController* _webViewDelegate;
     if([attachment.key isEqualToString: self.attachment.key] && mode ==ZPATTACHMENTICONGVIEWCONTROLLER_MODE_UPLOAD){
         if ([NSThread isMainThread]){
             self.progressLabel.text = @"Upload completed";
+            self.progressLabel.hidden = FALSE;
             self.progressView.hidden = TRUE;
             self.errorLabel.hidden = TRUE;
             
@@ -697,9 +710,10 @@ static ZPAttachmentIconViewController* _webViewDelegate;
     
     if([attachment.key isEqualToString: self.attachment.key] && mode ==ZPATTACHMENTICONGVIEWCONTROLLER_MODE_UPLOAD){
         if ([NSThread isMainThread]){
-            self.progressLabel.text = [NSString stringWithFormat:@"Uploading failed. (%@: %i)",error.domain,error.code];
+            self.progressLabel.text = @"Uploading failed";
+            self.progressLabel.hidden = FALSE;
             self.progressView.hidden = TRUE;
-            NSString* description = [error.userInfo objectForKey:@"error"];
+            NSString* description = [error localizedDescription];
             if(description!=NULL){
                 self.errorLabel.text=description;
                 self.errorLabel.hidden = FALSE;
@@ -721,6 +735,7 @@ static ZPAttachmentIconViewController* _webViewDelegate;
         if ([NSThread isMainThread]){
             [[ZPServerConnection instance] useProgressView:self.progressView forUploadingAttachment:self.attachment];
             self.progressLabel.text = @"Uploading";
+            self.progressLabel.hidden = FALSE;
             self.progressView.hidden = FALSE;
             self.errorLabel.hidden = TRUE;
             self.progressView.progress = 0;
@@ -737,6 +752,7 @@ static ZPAttachmentIconViewController* _webViewDelegate;
     if([attachment.key isEqualToString: self.attachment.key] && mode ==ZPATTACHMENTICONGVIEWCONTROLLER_MODE_UPLOAD){
         if ([NSThread isMainThread]){
             self.progressLabel.text = @"Upload canceled";
+            self.progressLabel.hidden = FALSE;
             self.progressView.hidden = TRUE;
             self.errorLabel.hidden = TRUE;
         }

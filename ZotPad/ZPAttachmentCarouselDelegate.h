@@ -16,7 +16,7 @@
 }
 
 @property (retain) IBOutlet UIBarButtonItem* actionButton;
-@property (retain) IBOutlet iCarousel* carousel;
+@property (retain) IBOutlet iCarousel* attachmentCarousel;
 @property (assign) NSInteger mode;
 @property (assign) NSInteger show;
 

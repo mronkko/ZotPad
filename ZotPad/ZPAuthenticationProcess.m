@@ -15,7 +15,7 @@
 #import "ZPLibraryAndCollectionListViewController.h"
 #import "ZPPreferences.h"
 
-
+//TODO: refactor and combine this file with ZPAuthenticationDialog
 
 @implementation ZPAuthenticationProcess
 

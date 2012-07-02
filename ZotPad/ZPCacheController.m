@@ -906,6 +906,7 @@ static ZPCacheController* _instance = nil;
     NSArray *directoryContent = [[NSFileManager defaultManager] contentsOfDirectoryAtPath:_documentsDirectory error:NULL];
     
     for (NSString* _documentFilePath in directoryContent) {
+        //Leave database, database journal, and log files
         if(! [@"zotpad.sqlite" isEqualToString: _documentFilePath] && ! [_documentFilePath isEqualToString:@"zotpad.sqlite-journal"] && ! [_documentFilePath hasPrefix:@"log-"]){
             [[NSFileManager defaultManager] removeItemAtPath:[_documentsDirectory stringByAppendingPathComponent:_documentFilePath] error:NULL];
         }
@@ -1021,16 +1022,12 @@ static ZPCacheController* _instance = nil;
     
     
     //Delete attachment files until the size of the cache is below the maximum size
-    if (_sizeOfDocumentsFolder>[[ZPPreferences instance] maxCacheSize]){
+    NSInteger maxCacheSize =[[ZPPreferences instance] maxCacheSize];
+    if (_sizeOfDocumentsFolder>maxCacheSize){
         for(attachment in attachments){
-            //Only delete originals
-            NSString* path = attachment.fileSystemPath_original;
-            NSDictionary *_documentFileAttributes = [[NSFileManager defaultManager] fileAttributesAtPath:path traverseLink:YES];
-            
-            //This will also update the cache size
-            [[ZPDataLayer instance] notifyAttachmentDeleted:attachment fileAttributes:_documentFileAttributes];
 
-            DDLogWarn(@"Deleted file %@ to free cahce space. Cache use is now at %i\%",path,_sizeOfDocumentsFolder*100/[[ZPPreferences instance] maxCacheSize]);
+            //Only delete originals
+            [attachment purge_original:@"Automatic cache cleaning to reclaim space"];
             
             if (_sizeOfDocumentsFolder<=[[ZPPreferences instance] maxCacheSize]) break;
         }
@@ -1042,15 +1039,12 @@ static ZPCacheController* _instance = nil;
 -(void) addAttachmentToUploadQueue:(ZPZoteroAttachment*) attachment withNewFile:(NSURL*)urlToFile{
 
     //Move the file to right place and increment cache size
-    //TODO: Implement error handling here
-    [[NSFileManager defaultManager] removeItemAtPath:attachment.fileSystemPath_modified error:NULL];
-    [[NSFileManager defaultManager] moveItemAtURL:urlToFile toURL:[NSURL fileURLWithPath:attachment.fileSystemPath_modified] error:NULL];
+    [attachment moveFileFromPathAsNewModifiedFile:[urlToFile path]];
+
+    //TODO: Refactor cache size modifications to notifications
     NSDictionary *_documentFileAttributes = [[NSFileManager defaultManager] fileAttributesAtPath:attachment.fileSystemPath_modified traverseLink:YES];
     _sizeOfDocumentsFolder -= [_documentFileAttributes fileSize]/1024;
 
-    //Set the version info and write to DB
-    [[ZPDatabase instance] writeVersionInfoForAttachment:attachment];
-    
     //Add to upload queue
     @synchronized(_attachmentsToUpload){
         [_attachmentsToUpload addObject:attachment];

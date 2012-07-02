@@ -70,18 +70,21 @@
     }
 }
 
+
 -(void) presentConflictViewForAttachment:(ZPZoteroAttachment*) attachment{
+    
+    [attachment logFileRevisions];
+
     UIViewController* root = [UIApplication sharedApplication].delegate.window.rootViewController;
     UIStoryboard *storyboard = root.storyboard;
     ZPUploadVersionConflictViewControllerViewController* viewController = [storyboard instantiateViewControllerWithIdentifier:@"VersionConflictView"];
     viewController.attachment = attachment;
     viewController.fileChannel = self;
-    if(root.presentedViewController){
-        [root.presentedViewController presentModalViewController:viewController animated:YES];
-    }
-    else{
-        [root presentModalViewController:viewController animated:YES];
-    }
+    
+    UIViewController* top = root;
+    while(top.presentedViewController) top = top.presentedViewController;
+    
+    [top presentModalViewController:viewController animated:YES];
 }
 
 

@@ -36,13 +36,8 @@ NSInteger const ZPFILECHANNEL_ZOTEROSTORAGE_UPLOAD_REGISTER = 4;
 
 - (NSString*) _versionIdentifierForAttachment:(ZPZoteroAttachment*)attachment{
     
-    NSString* versionIdentifier = attachment.versionIdentifier_local;
-    
-    // Fall back on the server version identifier 
-    if(versionIdentifier == [NSNull null]){
-        versionIdentifier = attachment.versionIdentifier_server;
-    }
-    //Further fallback
+    NSString* versionIdentifier  = attachment.versionIdentifier_server;
+    // Fall back on the metadata
     if(versionIdentifier == [NSNull null]){
         versionIdentifier = attachment.md5;
     }
@@ -146,8 +141,12 @@ NSInteger const ZPFILECHANNEL_ZOTEROSTORAGE_UPLOAD_REGISTER = 4;
     long long timeModifiedMilliseconds = (long long) trunc(timeModified * 1000.0f);
     
     
-    NSString* md5 = [attachment md5ForFileAtPath:path];
+    NSString* md5 = [ZPZoteroAttachment md5ForFileAtPath:path];
     
+    attachment.versionIdentifier_local = md5;
+
+    [attachment logFileRevisions];
+
     // Get upload authorization
      
     
@@ -158,7 +157,6 @@ NSInteger const ZPFILECHANNEL_ZOTEROSTORAGE_UPLOAD_REGISTER = 4;
                                 [documentFileAttributes fileSize],
                                 timeModifiedMilliseconds ];
 
-    DDLogVerbose(@"MD5s for file %@ are old: %@ new: %@",attachment.filename,[self _versionIdentifierForAttachment:attachment],md5);
 
     NSMutableDictionary* userInfo = [[NSMutableDictionary alloc] initWithDictionary:request.userInfo];
     [userInfo setObject:md5 forKey:@"md5"];
@@ -217,7 +215,7 @@ NSInteger const ZPFILECHANNEL_ZOTEROSTORAGE_UPLOAD_REGISTER = 4;
         [self cleanupAfterFinishingAttachment:attachment];
     }
     else{
-        
+                
         if(request.tag == ZPFILECHANNEL_ZOTEROSTORAGE_UPLOAD_AUTHORIZATION && request.responseStatusCode == 200){
             
             
@@ -247,6 +245,7 @@ NSInteger const ZPFILECHANNEL_ZOTEROSTORAGE_UPLOAD_REGISTER = 4;
                 
                 uploadRequest.delegate = self;
                 uploadRequest.tag = ZPFILECHANNEL_ZOTEROSTORAGE_UPLOAD_FILE;
+                uploadRequest.showAccurateProgress=TRUE;
                 
                 NSMutableDictionary* userInfo = [[NSMutableDictionary alloc] initWithDictionary:request.userInfo];
                 [userInfo setObject:[responseDictionary objectForKey:@"uploadKey"] forKey:@"uploadKey"];
@@ -266,7 +265,7 @@ NSInteger const ZPFILECHANNEL_ZOTEROSTORAGE_UPLOAD_REGISTER = 4;
                 
 
                 NSObject* progressDelegate = [uploadRequest.userInfo objectForKey:@"progressView"];
-                
+
                 if(progressDelegate != NULL){
                     uploadRequest.uploadProgressDelegate = progressDelegate;
                 }
@@ -302,11 +301,13 @@ NSInteger const ZPFILECHANNEL_ZOTEROSTORAGE_UPLOAD_REGISTER = 4;
             //TODO: Refactor this to call ZPCacheController instead so that the response from the server is stored in the DB. 
             
             attachment = [[[ZPServerConnection instance] retrieveItemsFromLibrary:attachment.libraryID itemKeys:[NSArray arrayWithObject:attachment.key]] objectAtIndex:0];
-
+            [attachment logFileRevisions];
+            
             //If the version that we have downloaded from the server is different than what exists on the server now, delete the local copy
             if(! [attachment.md5 isEqualToString:attachment.versionIdentifier_server]){
-                [[NSFileManager defaultManager] removeItemAtPath:attachment.fileSystemPath_original error:NULL];
-                attachment.versionIdentifier_server = attachment.md5;
+                DDLogInfo(@"New metadate MD5 (%@) and cached MD5 (%@) differ",attachment.md5,attachment.versionIdentifier_server);
+                [attachment purge_original:@"File is outdated (Zotero storage conflict)"];
+                 attachment.versionIdentifier_server = attachment.md5;
                 [[ZPDatabase instance] writeVersionInfoForAttachment:attachment];
             }
             [self presentConflictViewForAttachment:attachment];
@@ -331,9 +332,7 @@ NSInteger const ZPFILECHANNEL_ZOTEROSTORAGE_UPLOAD_REGISTER = 4;
 }
 
 - (void)requestFailed:(ASIHTTPRequest *)request{
-    
-    DDLogVerbose([self requestDumpAsString:request]);
-    
+        
     NSError *error = [request error];
     ZPZoteroAttachment* attachment = [request.userInfo objectForKey:@"attachment"];
     
@@ -345,6 +344,9 @@ NSInteger const ZPFILECHANNEL_ZOTEROSTORAGE_UPLOAD_REGISTER = 4;
         DDLogError(@"Uploading failed %@ to Zotero server failed with error: %@",attachment.filename, [error description]);
         [[ZPServerConnection instance] failedUploadingAttachment:attachment withError:error usingFileChannel:self];
     }
+    
+    //DDLogVerbose([self requestDumpAsString:request]);
+
     [self cleanupAfterFinishingAttachment:attachment];
 
 }

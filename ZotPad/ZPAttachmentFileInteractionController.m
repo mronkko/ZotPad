@@ -34,6 +34,7 @@
     UIBarButtonItem* _sourceButton;
     UIDocumentInteractionController* _docController;
     BOOL _docControllerActionSheetShowing;
+    MFMailComposeViewController* _mailController;
 }
 
 @end
@@ -115,13 +116,7 @@
 
         //Purge
 
-        //TODO: refactor file removals to a separate method
-        
-        NSString* path = _activeAttachment.fileSystemPath;
-        NSDictionary *_documentFileAttributes = [[NSFileManager defaultManager] fileAttributesAtPath:path traverseLink:YES];
-            
-        [[NSFileManager defaultManager] removeItemAtPath:path error: NULL];
-        [[ZPDataLayer instance] notifyAttachmentDeleted:_activeAttachment fileAttributes:_documentFileAttributes];
+        [_activeAttachment purge:@"Requested by user"];
         
         //Dismiss the preview controller if it is visible
         UIViewController* root = [UIApplication sharedApplication].delegate.window.rootViewController;
@@ -154,18 +149,19 @@
             }
             else if(buttonIndex==4){
                 ZPZoteroItem* parentItem = [ZPZoteroItem dataObjectWithKey:_activeAttachment.parentItemKey];
-                MFMailComposeViewController *mailController = [[MFMailComposeViewController alloc] init];
-                [mailController setSubject:parentItem.shortCitation];
-                [mailController setMessageBody:[NSString stringWithFormat:@"<body>Please find the following file attached:<br>%@<br><br></body>",parentItem.fullCitation] isHTML:YES];
+                _mailController = [[MFMailComposeViewController alloc] init];
+                [_mailController setSubject:parentItem.shortCitation];
+                [_mailController setMessageBody:[NSString stringWithFormat:@"<body>Please find the following file attached:<br>%@<br><br></body>",parentItem.fullCitation] isHTML:YES];
                 
                 //In the future, possibly include this small "advertisement"
                 //<small>Shared using <a href=\"http://www.zotpad.com\">ZotPad</a>, an iPad/iPhone client for Zotero</small>
                 
-                [mailController addAttachmentData:[NSData dataWithContentsOfFile:_activeAttachment.fileSystemPath ] mimeType:_activeAttachment.contentType fileName:_activeAttachment.filename];
-                mailController.mailComposeDelegate = self;
+                [_mailController addAttachmentData:[NSData dataWithContentsOfFile:_activeAttachment.fileSystemPath ] mimeType:_activeAttachment.contentType fileName:_activeAttachment.filename];
+                _mailController.mailComposeDelegate = self;
                 
-                UIViewController* root = [UIApplication sharedApplication].delegate.window.rootViewController;      
-                [root presentModalViewController:mailController animated:YES];                
+                UIViewController* root = [UIApplication sharedApplication].delegate.window.rootViewController;
+                while (root.presentedViewController!=NULL) root= root.presentedViewController;
+                [root presentModalViewController:_mailController animated:YES];                
             }
 /*            else if(buttonIndex==5){
                 //Copy
@@ -206,8 +202,8 @@
 #pragma mark - MFMailComposeViewControllerDelegate
 
 -(void)mailComposeController:(MFMailComposeViewController*)controller didFinishWithResult:(MFMailComposeResult)result error:(NSError*)error {
-    UIViewController* root = [UIApplication sharedApplication].delegate.window.rootViewController;      
-    [root dismissModalViewControllerAnimated:YES];
+    [_mailController dismissModalViewControllerAnimated:YES];
+    _mailController = NULL;
 }
 
 @end

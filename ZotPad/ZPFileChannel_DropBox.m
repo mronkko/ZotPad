@@ -16,7 +16,6 @@
 
 //Zipping and base64 encoding
 #import "ZipArchive.h"
-#import "QSStrings.h"
 
 
 // https://www.dropbox.com/account#applications
@@ -249,8 +248,7 @@
             
             for (NSString* file in files){
                 // The filenames end with %ZB64, which needs to be removed
-                NSString* encodedFilename = [[QSStrings encodeBase64WithString:[file lastPathComponent]]stringByAppendingString:@"%ZB64"];
-                
+                NSString* encodedFilename = [ZPZoteroAttachment zoteroBase64Encode:[file lastPathComponent]];                
                 DDLogVerbose(@"Encoded %@ as %@",file , encodedFilename);
                 
                 //Add to Zip with the new name

@@ -1000,14 +1000,14 @@ Deletes items, notes, and attachments based in array of keys from a library
         
         //This is important to log because it helps troubleshooting file versioning problems.
         
-        DDLogVerbose(@"Wrote file revision info for attachment %@ (%@)into database. New values are md5 = %@, versionSource = %@, versionIdentifier_server = %@, versionIdentifier_local = %@",
+/*        DDLogInfo(@"Wrote file revision info for attachment %@ (%@)into database. New values are md5 = %@, versionSource = %@, versionIdentifier_server = %@, versionIdentifier_local = %@",
                      attachment.key,
                      attachment.title,
                      attachment.md5,
                      attachment.versionSource,
                      attachment.versionIdentifier_server,
                      attachment.versionIdentifier_local
-                     );
+                     );*/
     }
 }
 

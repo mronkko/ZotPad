@@ -64,9 +64,9 @@
     
     _carouselDelegate = [[ZPAttachmentCarouselDelegate alloc] init];
     _carouselDelegate.actionButton=self.actionButton;
-    _carouselDelegate.carousel = _carousel;
+    _carouselDelegate.attachmentCarousel = _carousel;
     _carouselDelegate.mode = ZPATTACHMENTICONGVIEWCONTROLLER_MODE_DOWNLOAD;
-    _carouselDelegate.show = ZPATTACHMENTICONGVIEWCONTROLLER_SHOW_ORIGINAL_OR_MODIFIED;
+    _carouselDelegate.show = ZPATTACHMENTICONGVIEWCONTROLLER_SHOW_MODIFIED;
     
     [_carousel setDataSource:_carouselDelegate];
     [_carousel setDelegate:_carouselDelegate];

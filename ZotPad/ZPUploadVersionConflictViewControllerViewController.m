@@ -49,7 +49,7 @@
         _carouselDelegate.mode = ZPATTACHMENTICONGVIEWCONTROLLER_MODE_STATIC;
         _carouselDelegate.show = ZPATTACHMENTICONGVIEWCONTROLLER_SHOW_MODIFIED;
     }
-    _carouselDelegate.carousel = carousel;
+    _carouselDelegate.attachmentCarousel = carousel;
     carousel.delegate = _carouselDelegate;
     carousel.dataSource = _carouselDelegate;
 
@@ -59,7 +59,7 @@
         _secondaryCarouselDelegate.mode = ZPATTACHMENTICONGVIEWCONTROLLER_MODE_DOWNLOAD;
         _secondaryCarouselDelegate.show = ZPATTACHMENTICONGVIEWCONTROLLER_SHOW_ORIGINAL;
         [_secondaryCarouselDelegate configureWithAttachmentArray:[NSArray arrayWithObject: attachment]];
-        _secondaryCarouselDelegate.carousel = secondaryCarousel;
+        _secondaryCarouselDelegate.attachmentCarousel = secondaryCarousel;
         secondaryCarousel.delegate = _secondaryCarouselDelegate;
         secondaryCarousel.dataSource = _secondaryCarouselDelegate;
     }
@@ -82,17 +82,18 @@
 #pragma mark - Actions
 
 -(IBAction)useMyVersion:(id)sender{
-    attachment.versionIdentifier_local = attachment.versionIdentifier_server;
     [[ZPDatabase instance] writeVersionInfoForAttachment:attachment];
     [fileChannel startUploadingAttachment:attachment];
     [self dismissModalViewControllerAnimated:YES];
+    [[ZPDataLayer instance] notifyAttachmentUploadStarted:attachment];
 }
 -(IBAction)useRemoteVersion:(id)sender{
     attachment.versionIdentifier_local = [NSNull null];
-    [[NSFileManager defaultManager] removeItemAtPath:attachment.fileSystemPath_modified error:NULL];
+    [attachment purge_modified:@"User chose server file during conflict"];
     [[ZPDatabase instance] writeVersionInfoForAttachment:attachment];
     [fileChannel cancelUploadingAttachment:attachment];
     [self dismissModalViewControllerAnimated:YES];
+    [[ZPDataLayer instance] notifyAttachmentUploadCanceled:attachment];    
 }
 
 

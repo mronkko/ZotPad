@@ -53,12 +53,29 @@ extern NSInteger const VERSION_SOURCE_WEBDAV;
 - (NSString*) fileSystemPath_modified;
 - (NSString*) fileSystemPath_original;
 - (BOOL) fileExists;
+-(BOOL) fileExists_original;
+-(BOOL) fileExists_modified;
+
+-(NSString*) filenameZoteroBase64Encoded;
+
+// The reason is required to enforce logging
+
+-(void) purge:(NSString*) reason;
+-(void) purge_original:(NSString*) reason;
+-(void) purge_modified:(NSString*) reason;
+
+
+-(void) moveFileFromPathAsNewOriginalFile:(NSString*) path;
+-(void) moveFileFromPathAsNewModifiedFile:(NSString*) path;
+-(void) moveModifiedFileAsOriginalFile;
 
 // returns an object based on file system path
 +(ZPZoteroAttachment*) dataObjectForAttachedFile:(NSString*) filename;
 
 // Helper functions
-
--(NSString*) md5ForFileAtPath:(NSString*)path;
++(NSString*) md5ForFileAtPath:(NSString*)path;
++(NSString*) zoteroBase64Encode:(NSString*)filename;
++(NSString*) zoteroBase64Decode:(NSString*)filename;
+-(void) logFileRevisions;
 
 @end

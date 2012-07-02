@@ -8,7 +8,7 @@
 
 #import <UIKit/UIKit.h>
 
-@interface ZPLogViewController : UIViewController
+@interface ZPLogViewController : UIViewController  <MFMailComposeViewControllerDelegate, QLPreviewControllerDataSource>
 
 @property (retain) IBOutlet UITextView* logView;
 
