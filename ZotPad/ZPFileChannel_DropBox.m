@@ -25,6 +25,8 @@
 @property (retain) ZPZoteroAttachment* attachment;
 @property (retain) NSString* revision;
 
+-(void) _restClient:(ZPDBRestClient*)client processError:(NSError *)error;
+
 @end
 
 @implementation ZPDBRestClient
@@ -36,7 +38,7 @@
 
 @implementation ZPFileChannel_Dropbox
 
-+(void)linkDroboxIfNeeded{
++(void) linkDroboxIfNeeded{
     if([[ZPPreferences instance] useDropbox]){
         if([DBSession sharedSession]==NULL){
             DDLogInfo(@"Starting Dropbox");
@@ -52,7 +54,18 @@
         BOOL linked =[[DBSession sharedSession] isLinked];
         if (!linked) {
             DDLogInfo(@"Linking Dropbox");
-            [[DBSession sharedSession] link];
+
+            UIViewController* viewController = [UIApplication sharedApplication].delegate.window.rootViewController;
+            while(viewController.presentedViewController) viewController = viewController.presentedViewController;
+            
+            //Start dismissing modal views
+            while(viewController != [UIApplication sharedApplication].delegate.window.rootViewController){
+                UIViewController* parent = viewController.presentingViewController;
+                [viewController dismissModalViewControllerAnimated:NO];
+                viewController = parent;
+            }
+
+            [[DBSession sharedSession] linkFromController:viewController];
         }
     }
 }
@@ -62,6 +75,7 @@
     [ZPFileChannel_Dropbox linkDroboxIfNeeded];
 
     self = [super init]; 
+    [DBSession sharedSession].delegate = self;
     
     progressViewsByRequest = [[NSMutableDictionary alloc] init];
     downloadCountsByRequest = [[NSMutableDictionary alloc] init];
@@ -186,11 +200,7 @@
     
     DDLogVerbose(@"Error loading metadata: %@", error);
     
-    //If we are not linked, link
-    if(error.code==401){
-        DDLogInfo(@"Linking Dropbox");
-        [[DBSession sharedSession] link];
-    }
+    [self _restClient:client processError:error];
     
     ZPZoteroAttachment* attachment = client.attachment;
     [[ZPServerConnection instance] failedDownloadingAttachment:attachment withError:error usingFileChannel:self];    
@@ -281,12 +291,8 @@
 - (void)restClient:(ZPDBRestClient*)client loadFileFailedWithError:(NSError*)error {
     DDLogVerbose(@"There was an error downloading the file - %@", error);
 
-    //If we are not linked, link
-    if(error.code==401){
-        DDLogInfo(@"Linking Dropbox");
-        [[DBSession sharedSession] link];
-    }
-
+    [self _restClient:client processError:error];
+    
     ZPZoteroAttachment* attachment = client.attachment;
     [[ZPServerConnection instance] failedDownloadingAttachment:attachment withError:error usingFileChannel:self];
     [self cleanupAfterFinishingAttachment:attachment];
@@ -305,7 +311,7 @@
     [self cleanupAfterFinishingAttachment:attachment];
 
 }
-- (void)restClient:(DBRestClient*)client uploadProgress:(CGFloat)progress forFile:(NSString*)destPath from:(NSString*)srcPath{
+- (void)restClient:(ZPDBRestClient*)client uploadProgress:(CGFloat)progress forFile:(NSString*)destPath from:(NSString*)srcPath{
 
     @synchronized(progressViewsByRequest){
         UIProgressView* progressView = [progressViewsByRequest objectForKey:[self keyForRequest:client]];
@@ -316,18 +322,30 @@
 - (void)restClient:(DBRestClient*)client uploadFileFailedWithError:(NSError*)error{
     DDLogVerbose(@"There was an error uploading the file - %@", error);
     
-    //If we are not linked, link
-    if(error.code==401){
-        DDLogInfo(@"Linking Dropbox");
-        [[DBSession sharedSession] link];
-    }
+    [self _restClient:client processError:error];
     
     ZPZoteroAttachment* attachment = [(ZPDBRestClient* )client attachment];
     [[ZPServerConnection instance] failedUploadingAttachment:attachment withError:error usingFileChannel:self];
     [self cleanupAfterFinishingAttachment:attachment];
 }
 
+#pragma DBSession delegate
+
+- (void)sessionDidReceiveAuthorizationFailure:(DBSession *)session userId:(NSString *)userId{
+    DDLogError(@"Authorization failure with Dropbox for user ID %@. Will unlink and attemp to relink later.",userId);
+    [[DBSession sharedSession] unlinkUserId:userId];
+}
+
 #pragma mark - Utility methdods
+
+-(void) _restClient:(ZPDBRestClient*) client processError:(NSError *)error{
+    //If we are not linked, link
+    if(error.code==401){
+        DDLogInfo(@"Linking Dropbox");
+        [ZPFileChannel_Dropbox linkDroboxIfNeeded];
+    }
+
+}
 
 -(void) cleanupAfterFinishingAttachment:(ZPZoteroAttachment*)attachment{
     

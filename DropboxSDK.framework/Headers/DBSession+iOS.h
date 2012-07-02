@@ -10,8 +10,12 @@
 
 @interface DBSession (iOS)
 
-- (void)link;
-- (void)linkUserId:(NSString *)userId;
++ (NSDictionary*)parseURLParams:(NSString *)query;
+
+- (NSString *)appScheme;
+
+- (void)linkFromController:(UIViewController *)rootController;
+- (void)linkUserId:(NSString *)userId fromController:(UIViewController *)rootController;
 
 - (BOOL)handleOpenURL:(NSURL *)url;
 

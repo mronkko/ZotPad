@@ -8,7 +8,7 @@
 
 #import "DBMetadata.h"
 
-@interface DBDeltaEntry : NSObject {
+@interface DBDeltaEntry : NSObject <NSCoding> {
     NSString *lowercasePath;
     DBMetadata *metadata;
 }

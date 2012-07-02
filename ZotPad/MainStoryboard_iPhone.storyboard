@@ -277,12 +277,15 @@
             <objects>
                 <placeholder placeholderIdentifier="IBFirstResponder" id="TfT-zN-bNV" userLabel="First Responder" sceneMemberID="firstResponder"/>
                 <viewController storyboardIdentifier="FileImportDialog" id="AXS-C3-mVS" customClass="ZPFileImportViewController" sceneMemberID="viewController">
-                    <view key="view" contentMode="scaleToFill" id="opB-Jm-dX9">
+                    <view key="view" contentMode="scaleToFill" id="opB-Jm-dX9" customClass="iCarousel">
                         <rect key="frame" x="0.0" y="20" width="320" height="460"/>
                         <autoresizingMask key="autoresizingMask" flexibleMaxX="YES" flexibleMaxY="YES"/>
                         <color key="backgroundColor" white="1" alpha="1" colorSpace="custom" customColorSpace="calibratedWhite"/>
                     </view>
                     <simulatedStatusBarMetrics key="simulatedStatusBarMetrics"/>
+                    <connections>
+                        <outlet property="carousel" destination="opB-Jm-dX9" id="bql-Ye-jEw"/>
+                    </connections>
                 </viewController>
             </objects>
             <point key="canvasLocation" x="455" y="-638"/>

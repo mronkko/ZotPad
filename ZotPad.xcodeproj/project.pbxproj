@@ -607,6 +607,8 @@
 		A77FD065159F702E00774D50 /* gear@2x.png in Resources */ = {isa = PBXBuildFile; fileRef = A77FD061159F702E00774D50 /* gear@2x.png */; };
 		A77FD068159F750A00774D50 /* ZPLogViewController.m in Sources */ = {isa = PBXBuildFile; fileRef = A77FD067159F750900774D50 /* ZPLogViewController.m */; };
 		A77FD069159F750A00774D50 /* ZPLogViewController.m in Sources */ = {isa = PBXBuildFile; fileRef = A77FD067159F750900774D50 /* ZPLogViewController.m */; };
+		A78353F115A234B900C70C04 /* DropboxSDK.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = A78353F015A234B900C70C04 /* DropboxSDK.framework */; };
+		A78353F215A234B900C70C04 /* DropboxSDK.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = A78353F015A234B900C70C04 /* DropboxSDK.framework */; };
 		A786F7781476A56200B35B92 /* MainStoryboard_iPhone.storyboard in Resources */ = {isa = PBXBuildFile; fileRef = A786F7771476A56200B35B92 /* MainStoryboard_iPhone.storyboard */; };
 		A79299C3149E0CFE000F8B42 /* ZPZoteroDataObject.m in Sources */ = {isa = PBXBuildFile; fileRef = A79299C2149E0CFE000F8B42 /* ZPZoteroDataObject.m */; };
 		A793153E14B185E800E1ABF0 /* ZPAttachmentFileInteractionController.m in Sources */ = {isa = PBXBuildFile; fileRef = A793153D14B185E800E1ABF0 /* ZPAttachmentFileInteractionController.m */; };
@@ -790,8 +792,6 @@
 		A7CD077B15162EE4007A8E1D /* AppIcon72x72.png in Resources */ = {isa = PBXBuildFile; fileRef = A7CD077A15162EE4007A8E1D /* AppIcon72x72.png */; };
 		A7CD078315162FA7007A8E1D /* AppIcon144x144-beta.png in Resources */ = {isa = PBXBuildFile; fileRef = A7CD078215162FA7007A8E1D /* AppIcon144x144-beta.png */; };
 		A7CD078515162FC9007A8E1D /* AppIcon144x144.png in Resources */ = {isa = PBXBuildFile; fileRef = A7CD078415162FC9007A8E1D /* AppIcon144x144.png */; };
-		A7CD078B15165269007A8E1D /* DropboxSDK.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = A7CD078A15165269007A8E1D /* DropboxSDK.framework */; };
-		A7CD078C15165269007A8E1D /* DropboxSDK.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = A7CD078A15165269007A8E1D /* DropboxSDK.framework */; };
 		A7CD078F151652E9007A8E1D /* ZPFileChannel.m in Sources */ = {isa = PBXBuildFile; fileRef = A7CD078E151652E9007A8E1D /* ZPFileChannel.m */; };
 		A7CD0790151652E9007A8E1D /* ZPFileChannel.m in Sources */ = {isa = PBXBuildFile; fileRef = A7CD078E151652E9007A8E1D /* ZPFileChannel.m */; };
 		A7CD0793151657B9007A8E1D /* ZPFileChannel_ZoteroStorage.m in Sources */ = {isa = PBXBuildFile; fileRef = A7CD0792151657B9007A8E1D /* ZPFileChannel_ZoteroStorage.m */; };
@@ -1262,6 +1262,7 @@
 		A77FD061159F702E00774D50 /* gear@2x.png */ = {isa = PBXFileReference; lastKnownFileType = image.png; name = "gear@2x.png"; path = "Icons/gear@2x.png"; sourceTree = SOURCE_ROOT; };
 		A77FD066159F750700774D50 /* ZPLogViewController.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = ZPLogViewController.h; sourceTree = "<group>"; };
 		A77FD067159F750900774D50 /* ZPLogViewController.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = ZPLogViewController.m; sourceTree = "<group>"; };
+		A78353F015A234B900C70C04 /* DropboxSDK.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; path = DropboxSDK.framework; sourceTree = "<group>"; };
 		A786F7771476A56200B35B92 /* MainStoryboard_iPhone.storyboard */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = file.storyboard; path = MainStoryboard_iPhone.storyboard; sourceTree = "<group>"; };
 		A79299C1149E0CFE000F8B42 /* ZPZoteroDataObject.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = ZPZoteroDataObject.h; sourceTree = "<group>"; };
 		A79299C2149E0CFE000F8B42 /* ZPZoteroDataObject.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = ZPZoteroDataObject.m; sourceTree = "<group>"; };
@@ -1437,7 +1438,6 @@
 		A7CD077A15162EE4007A8E1D /* AppIcon72x72.png */ = {isa = PBXFileReference; lastKnownFileType = image.png; name = AppIcon72x72.png; path = Icons/AppIcon72x72.png; sourceTree = SOURCE_ROOT; };
 		A7CD078215162FA7007A8E1D /* AppIcon144x144-beta.png */ = {isa = PBXFileReference; lastKnownFileType = image.png; name = "AppIcon144x144-beta.png"; path = "../Icons/AppIcon144x144-beta.png"; sourceTree = "<group>"; };
 		A7CD078415162FC9007A8E1D /* AppIcon144x144.png */ = {isa = PBXFileReference; lastKnownFileType = image.png; name = AppIcon144x144.png; path = ../Icons/AppIcon144x144.png; sourceTree = "<group>"; };
-		A7CD078A15165269007A8E1D /* DropboxSDK.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; path = DropboxSDK.framework; sourceTree = "<group>"; };
 		A7CD078D151652E9007A8E1D /* ZPFileChannel.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = ZPFileChannel.h; sourceTree = "<group>"; };
 		A7CD078E151652E9007A8E1D /* ZPFileChannel.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = ZPFileChannel.m; sourceTree = "<group>"; };
 		A7CD0791151657B9007A8E1D /* ZPFileChannel_ZoteroStorage.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = ZPFileChannel_ZoteroStorage.h; sourceTree = "<group>"; };
@@ -1493,8 +1493,8 @@
 				A7200DF8147193C0004347C9 /* libsqlite3.dylib in Frameworks */,
 				A7200DD514718DC0004347C9 /* UIKit.framework in Frameworks */,
 				A7200DD714718DC0004347C9 /* Foundation.framework in Frameworks */,
-				A7CD078B15165269007A8E1D /* DropboxSDK.framework in Frameworks */,
 				A73D1BFD1560E234002D4A2D /* libTestFlight.a in Frameworks */,
+				A78353F115A234B900C70C04 /* DropboxSDK.framework in Frameworks */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
@@ -1519,8 +1519,8 @@
 				A7CD076015161555007A8E1D /* libsqlite3.dylib in Frameworks */,
 				A7CD076115161555007A8E1D /* UIKit.framework in Frameworks */,
 				A7CD076215161555007A8E1D /* Foundation.framework in Frameworks */,
-				A7CD078C15165269007A8E1D /* DropboxSDK.framework in Frameworks */,
 				A73D1BFE1560E234002D4A2D /* libTestFlight.a in Frameworks */,
+				A78353F215A234B900C70C04 /* DropboxSDK.framework in Frameworks */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
@@ -1882,9 +1882,6 @@
 		A7200DC514718DBF004347C9 = {
 			isa = PBXGroup;
 			children = (
-				A7699E58159A6C65002F09DA /* libcommonCrypto.dylib */,
-				A7699E56159A6C44002F09DA /* CoreFoundation.framework */,
-				A70399B015979EC1002F4293 /* MessageUI.framework */,
 				A7200DDA14718DC0004347C9 /* ZotPad */,
 				A7200DD314718DC0004347C9 /* Frameworks */,
 				A7200DD114718DC0004347C9 /* Products */,
@@ -1903,6 +1900,10 @@
 		A7200DD314718DC0004347C9 /* Frameworks */ = {
 			isa = PBXGroup;
 			children = (
+				A78353F015A234B900C70C04 /* DropboxSDK.framework */,
+				A7699E58159A6C65002F09DA /* libcommonCrypto.dylib */,
+				A7699E56159A6C44002F09DA /* CoreFoundation.framework */,
+				A70399B015979EC1002F4293 /* MessageUI.framework */,
 				A7648031159F1BE40075CFB9 /* Cocoa-Lumberjack */,
 				A7699E52159A6908002F09DA /* FileMD5Hash */,
 				A7BD5EC9156122F5003252EA /* Core */,
@@ -1914,7 +1915,6 @@
 				A7936ED6153B4AEA0063D77B /* KeychainItemWrapper */,
 				A7D761E81534165D00E76EA1 /* QSUtilities */,
 				A75E1852153405740046988C /* ZipArchive */,
-				A7CD078A15165269007A8E1D /* DropboxSDK.framework */,
 				A7F8637F14C21D8800021662 /* libz.dylib */,
 				A7D3C07F14AEDE7B00DB975D /* QuickLook.framework */,
 				A76D3C7714AD97D6000C3ED9 /* MobileCoreServices.framework */,

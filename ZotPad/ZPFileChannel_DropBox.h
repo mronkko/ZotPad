@@ -9,7 +9,7 @@
 #import <Foundation/Foundation.h>
 #import <DropboxSDK/DropboxSDK.h>
 #import "ZPFileChannel.h"
-@interface ZPFileChannel_Dropbox : ZPFileChannel <DBRestClientDelegate>{
+@interface ZPFileChannel_Dropbox : ZPFileChannel <DBRestClientDelegate, DBSessionDelegate>{
     NSMutableDictionary* progressViewsByRequest;
     NSMutableDictionary* downloadCountsByRequest;
     NSMutableDictionary* remoteVersions;

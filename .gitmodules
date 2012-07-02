@@ -40,3 +40,6 @@
 [submodule "CocoaLumberjack"]
 	path = CocoaLumberjack
 	url = https://github.com/robbiehanson/CocoaLumberjack
+[submodule "dropbox-sdk-ios"]
+	path = dropbox-sdk-ios
+	url = https://github.com/dropbox-sdk-mirror/dropbox-sdk-ios
