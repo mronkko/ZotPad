@@ -1,7 +1,6 @@
 <?xml version="1.0" encoding="UTF-8" standalone="no"?>
 <document type="com.apple.InterfaceBuilder3.CocoaTouch.Storyboard.XIB" version="1.1" toolsVersion="2182" systemVersion="11E53" targetRuntime="iOS.CocoaTouch.iPad" propertyAccessControl="none" initialViewController="5">
     <dependencies>
-        <deployment defaultVersion="1296" identifier="iOS"/>
         <development defaultVersion="4200" identifier="xcode"/>
         <plugIn identifier="com.apple.InterfaceBuilder.IBCocoaTouchPlugin" version="1181"/>
     </dependencies>
@@ -736,12 +735,162 @@
                     </connections>
                 </viewController>
             </objects>
-            <point key="canvasLocation" x="-438" y="-2091"/>
+            <point key="canvasLocation" x="-436" y="-2085"/>
+        </scene>
+        <!--Log View Controller - ZotPad log-->
+        <scene sceneID="P15-U1-ZQo">
+            <objects>
+                <placeholder placeholderIdentifier="IBFirstResponder" id="mlk-YR-ngw" userLabel="First Responder" sceneMemberID="firstResponder"/>
+                <viewController id="Lvo-tO-czX" customClass="ZPLogViewController" sceneMemberID="viewController">
+                    <view key="view" contentMode="scaleToFill" id="W5S-qA-6Jf">
+                        <rect key="frame" x="0.0" y="20" width="768" height="1004"/>
+                        <autoresizingMask key="autoresizingMask" flexibleMaxX="YES" flexibleMaxY="YES"/>
+                        <subviews>
+                            <textView clipsSubviews="YES" multipleTouchEnabled="YES" contentMode="scaleToFill" showsHorizontalScrollIndicator="NO" editable="NO" id="RhM-vN-EhZ">
+                                <rect key="frame" x="0.0" y="-5" width="768" height="965"/>
+                                <autoresizingMask key="autoresizingMask" widthSizable="YES" heightSizable="YES"/>
+                                <color key="backgroundColor" red="1" green="1" blue="1" alpha="1" colorSpace="calibratedRGB"/>
+                                <string key="text">Lorem ipsum dolor sit er elit lamet, consectetaur cillium adipisicing pecu, sed do eiusmod tempor incididunt ut labore et dolore magna aliqua. Ut enim ad minim veniam, quis nostrud exercitation ullamco laboris nisi ut aliquip ex ea commodo consequat. Duis aute irure dolor in reprehenderit in voluptate velit esse cillum dolore eu fugiat nulla pariatur. Excepteur sint occaecat cupidatat non proident, sunt in culpa qui officia deserunt mollit anim id est laborum. Nam liber te conscient to factor tum poen legum odioque civiuda.</string>
+                                <fontDescription key="fontDescription" type="system" pointSize="14"/>
+                                <textInputTraits key="textInputTraits" autocapitalizationType="sentences"/>
+                            </textView>
+                            <toolbar opaque="NO" clearsContextBeforeDrawing="NO" contentMode="scaleToFill" id="tHS-mm-kO8">
+                                <rect key="frame" x="0.0" y="960" width="768" height="44"/>
+                                <autoresizingMask key="autoresizingMask" widthSizable="YES" flexibleMinY="YES"/>
+                                <items>
+                                    <barButtonItem style="plain" systemItem="flexibleSpace" id="REO-bK-KAe"/>
+                                    <barButtonItem title="View manual" id="lto-Dv-Eky">
+                                        <connections>
+                                            <action selector="showManual:" destination="Lvo-tO-czX" id="RvB-27-7GN"/>
+                                        </connections>
+                                    </barButtonItem>
+                                    <barButtonItem style="plain" systemItem="flexibleSpace" id="1TM-9F-Ggq"/>
+                                    <barButtonItem title="Online support" id="wdN-yh-YAW">
+                                        <connections>
+                                            <action selector="onlineSupport:" destination="Lvo-tO-czX" id="HJ5-Yh-ji1"/>
+                                        </connections>
+                                    </barButtonItem>
+                                    <barButtonItem style="plain" systemItem="flexibleSpace" id="ZVe-A5-Rmk"/>
+                                    <barButtonItem title="Email support" id="0ef-sZ-oIn">
+                                        <connections>
+                                            <action selector="emailSupport:" destination="Lvo-tO-czX" id="dW8-Rq-UqI"/>
+                                        </connections>
+                                    </barButtonItem>
+                                    <barButtonItem style="plain" systemItem="flexibleSpace" id="EAd-A6-XFd"/>
+                                    <barButtonItem title="Manage API key" id="mJx-IG-t2P">
+                                        <connections>
+                                            <action selector="manageKey:" destination="Lvo-tO-czX" id="JRP-6s-m98"/>
+                                        </connections>
+                                    </barButtonItem>
+                                    <barButtonItem style="plain" systemItem="flexibleSpace" id="JvU-6a-Wbs"/>
+                                </items>
+                                <color key="tintColor" cocoaTouchSystemColor="viewFlipsideBackgroundColor"/>
+                            </toolbar>
+                        </subviews>
+                        <color key="backgroundColor" white="1" alpha="1" colorSpace="custom" customColorSpace="calibratedWhite"/>
+                    </view>
+                    <navigationItem key="navigationItem" title="ZotPad log" id="hBd-TN-hTK">
+                        <barButtonItem key="rightBarButtonItem" systemItem="done" id="Wlg-2u-l5E">
+                            <connections>
+                                <action selector="dismiss:" destination="Lvo-tO-czX" id="DTp-Bg-H4X"/>
+                            </connections>
+                        </barButtonItem>
+                    </navigationItem>
+                    <connections>
+                        <outlet property="logView" destination="RhM-vN-EhZ" id="HpX-f2-fST"/>
+                    </connections>
+                </viewController>
+            </objects>
+            <point key="canvasLocation" x="3269" y="-1346"/>
         </scene>
     </scenes>
     <resources>
         <image name="gear.png" width="20" height="20"/>
     </resources>
+    <classes>
+        <class className="OHAttributedLabel" superclassName="UILabel">
+            <source key="sourceIdentifier" type="project" relativePath="./Classes/OHAttributedLabel.h"/>
+            <relationships>
+                <relationship kind="outlet" name="delegate"/>
+            </relationships>
+        </class>
+        <class className="ZPAttachmentIconViewController" superclassName="UIViewController">
+            <source key="sourceIdentifier" type="project" relativePath="./Classes/ZPAttachmentIconViewController.h"/>
+            <relationships>
+                <relationship kind="outlet" name="cancelButton" candidateClass="UIButton"/>
+                <relationship kind="outlet" name="errorLabel" candidateClass="UILabel"/>
+                <relationship kind="outlet" name="fileImage" candidateClass="UIImageView"/>
+                <relationship kind="outlet" name="labelBackground" candidateClass="UIView"/>
+                <relationship kind="outlet" name="progressLabel" candidateClass="UILabel"/>
+                <relationship kind="outlet" name="progressView" candidateClass="UIProgressView"/>
+                <relationship kind="outlet" name="titleLabel" candidateClass="UILabel"/>
+            </relationships>
+        </class>
+        <class className="ZPAuthenticationDialog" superclassName="UIViewController">
+            <source key="sourceIdentifier" type="project" relativePath="./Classes/ZPAuthenticationDialog.h"/>
+            <relationships>
+                <relationship kind="action" name="loadFirstPage:"/>
+                <relationship kind="outlet" name="webView" candidateClass="UIWebView"/>
+            </relationships>
+        </class>
+        <class className="ZPFileImportViewController" superclassName="UIViewController">
+            <source key="sourceIdentifier" type="project" relativePath="./Classes/ZPFileImportViewController.h"/>
+            <relationships>
+                <relationship kind="outlet" name="carousel" candidateClass="iCarousel"/>
+            </relationships>
+        </class>
+        <class className="ZPItemDetailViewController" superclassName="UITableViewController">
+            <source key="sourceIdentifier" type="project" relativePath="./Classes/ZPItemDetailViewController.h"/>
+            <relationships>
+                <relationship kind="action" name="actionButtonPressed:"/>
+                <relationship kind="outlet" name="actionButton" candidateClass="UIBarButtonItem"/>
+            </relationships>
+        </class>
+        <class className="ZPItemListViewController" superclassName="UIViewController">
+            <source key="sourceIdentifier" type="project" relativePath="./Classes/ZPItemListViewController.h"/>
+            <relationships>
+                <relationship kind="action" name="attachmentThumbnailPressed:"/>
+                <relationship kind="action" name="sortButtonPressed:"/>
+                <relationship kind="outlet" name="searchBar" candidateClass="UISearchBar"/>
+                <relationship kind="outlet" name="tableView" candidateClass="UITableView"/>
+                <relationship kind="outlet" name="toolBar" candidateClass="UIToolbar"/>
+            </relationships>
+        </class>
+        <class className="ZPLibraryAndCollectionListViewController" superclassName="UITableViewController">
+            <source key="sourceIdentifier" type="project" relativePath="./Classes/ZPLibraryAndCollectionListViewController.h"/>
+        </class>
+        <class className="ZPLogViewController" superclassName="UIViewController">
+            <source key="sourceIdentifier" type="project" relativePath="./Classes/ZPLogViewController.h"/>
+            <relationships>
+                <relationship kind="action" name="dismiss:"/>
+                <relationship kind="action" name="emailSupport:"/>
+                <relationship kind="action" name="manageKey:"/>
+                <relationship kind="action" name="onlineSupport:"/>
+                <relationship kind="action" name="showManual:"/>
+                <relationship kind="outlet" name="logView" candidateClass="UITextView"/>
+            </relationships>
+        </class>
+        <class className="ZPSplitViewController" superclassName="UISplitViewController">
+            <source key="sourceIdentifier" type="project" relativePath="./Classes/ZPSplitViewController.h"/>
+        </class>
+        <class className="ZPUploadVersionConflictViewControllerViewController" superclassName="UIViewController">
+            <source key="sourceIdentifier" type="project" relativePath="./Classes/ZPUploadVersionConflictViewControllerViewController.h"/>
+            <relationships>
+                <relationship kind="action" name="useMyVersion:"/>
+                <relationship kind="action" name="useRemoteVersion:"/>
+                <relationship kind="outlet" name="carousel" candidateClass="iCarousel"/>
+                <relationship kind="outlet" name="label" candidateClass="UILabel"/>
+                <relationship kind="outlet" name="secondaryCarousel" candidateClass="iCarousel"/>
+            </relationships>
+        </class>
+        <class className="iCarousel" superclassName="UIView">
+            <source key="sourceIdentifier" type="project" relativePath="./Classes/iCarousel.h"/>
+            <relationships>
+                <relationship kind="outlet" name="dataSource"/>
+                <relationship kind="outlet" name="delegate"/>
+            </relationships>
+        </class>
+    </classes>
     <simulatedMetricsContainer key="defaultSimulatedMetrics">
         <simulatedStatusBarMetrics key="statusBar" statusBarStyle="blackTranslucent"/>
         <simulatedOrientationMetrics key="orientation"/>

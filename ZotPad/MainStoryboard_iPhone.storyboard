@@ -55,7 +55,13 @@
                             <outlet property="delegate" destination="12" id="15"/>
                         </connections>
                     </tableView>
-                    <navigationItem key="navigationItem" title="Libraries" id="35"/>
+                    <navigationItem key="navigationItem" title="Libraries" id="35">
+                        <barButtonItem key="rightBarButtonItem" image="gear.png" id="ATc-bK-r49">
+                            <connections>
+                                <segue destination="waz-ow-W6T" kind="modal" modalTransitionStyle="flipHorizontal" id="T7T-Ms-3dw"/>
+                            </connections>
+                        </barButtonItem>
+                    </navigationItem>
                 </tableViewController>
             </objects>
             <point key="canvasLocation" x="455" y="64"/>
@@ -294,28 +300,35 @@
                                 <rect key="frame" x="6" y="62" width="256" height="256"/>
                                 <autoresizingMask key="autoresizingMask" flexibleMaxX="YES" flexibleMaxY="YES"/>
                             </imageView>
-                            <view alpha="0.5" contentMode="scaleToFill" id="TLz-gg-am0">
+                            <view contentMode="scaleToFill" id="TLz-gg-am0">
                                 <rect key="frame" x="20" y="102" width="229" height="176"/>
                                 <autoresizingMask key="autoresizingMask" flexibleMinX="YES" flexibleMaxX="YES" flexibleMinY="YES" flexibleMaxY="YES"/>
                                 <subviews>
                                     <label hidden="YES" opaque="NO" clipsSubviews="YES" userInteractionEnabled="NO" tag="1" contentMode="left" text="Label" lineBreakMode="tailTruncation" baselineAdjustment="alignBaselines" minimumFontSize="10" id="cjU-a5-haR">
-                                        <rect key="frame" x="20" y="128" width="189" height="23"/>
+                                        <rect key="frame" x="20" y="98" width="189" height="23"/>
                                         <autoresizingMask key="autoresizingMask" flexibleMaxX="YES" flexibleMaxY="YES"/>
                                         <fontDescription key="fontDescription" type="system" pointSize="17"/>
                                         <color key="textColor" white="1" alpha="1" colorSpace="custom" customColorSpace="calibratedWhite"/>
                                         <nil key="highlightedColor"/>
                                     </label>
                                     <label opaque="NO" clipsSubviews="YES" userInteractionEnabled="NO" tag="2" contentMode="left" text="Label" lineBreakMode="tailTruncation" numberOfLines="4" baselineAdjustment="alignBaselines" minimumFontSize="10" id="odu-0V-fkg">
-                                        <rect key="frame" x="20" y="20" width="189" height="97"/>
+                                        <rect key="frame" x="20" y="20" width="189" height="70"/>
                                         <autoresizingMask key="autoresizingMask" flexibleMaxX="YES" flexibleMaxY="YES"/>
                                         <fontDescription key="fontDescription" type="system" pointSize="17"/>
                                         <color key="textColor" white="1" alpha="1" colorSpace="custom" customColorSpace="calibratedWhite"/>
                                         <nil key="highlightedColor"/>
                                     </label>
                                     <progressView hidden="YES" opaque="NO" tag="3" contentMode="scaleToFill" progress="0.5" id="iGp-hl-6h2">
-                                        <rect key="frame" x="20" y="159" width="189" height="9"/>
+                                        <rect key="frame" x="20" y="124" width="189" height="9"/>
                                         <autoresizingMask key="autoresizingMask" flexibleMaxX="YES" flexibleMaxY="YES"/>
                                     </progressView>
+                                    <label hidden="YES" opaque="NO" clipsSubviews="YES" userInteractionEnabled="NO" contentMode="left" text="Error label" lineBreakMode="tailTruncation" numberOfLines="3" baselineAdjustment="alignBaselines" minimumFontSize="8" id="eXY-rn-VMq">
+                                        <rect key="frame" x="20" y="124" width="189" height="52"/>
+                                        <autoresizingMask key="autoresizingMask" widthSizable="YES" flexibleMinY="YES"/>
+                                        <fontDescription key="fontDescription" type="system" pointSize="12"/>
+                                        <color key="textColor" white="1" alpha="1" colorSpace="calibratedWhite"/>
+                                        <nil key="highlightedColor"/>
+                                    </label>
                                 </subviews>
                                 <color key="backgroundColor" cocoaTouchSystemColor="darkTextColor"/>
                             </view>
@@ -329,6 +342,7 @@
                     <simulatedOrientationMetrics key="simulatedOrientationMetrics"/>
                     <freeformSimulatedSizeMetrics key="simulatedDestinationMetrics"/>
                     <connections>
+                        <outlet property="errorLabel" destination="eXY-rn-VMq" id="ifp-CF-W6b"/>
                         <outlet property="fileImage" destination="Wmv-1P-rbV" id="y93-AI-vmv"/>
                         <outlet property="labelBackground" destination="TLz-gg-am0" id="K7b-ol-gWJ"/>
                         <outlet property="progressLabel" destination="cjU-a5-haR" id="TuB-x8-9q5"/>
@@ -414,6 +428,86 @@
             </objects>
             <point key="canvasLocation" x="1344" y="64"/>
         </scene>
+        <!--Navigation Controller-->
+        <scene sceneID="z6H-I1-5gh">
+            <objects>
+                <placeholder placeholderIdentifier="IBFirstResponder" id="6dI-vE-ZxY" userLabel="First Responder" sceneMemberID="firstResponder"/>
+                <navigationController definesPresentationContext="YES" id="waz-ow-W6T" sceneMemberID="viewController">
+                    <simulatedStatusBarMetrics key="simulatedStatusBarMetrics" statusBarStyle="blackTranslucent"/>
+                    <simulatedNavigationBarMetrics key="simulatedTopBarMetrics" barStyle="blackOpaque" prompted="NO"/>
+                    <navigationBar key="navigationBar" clipsSubviews="YES" multipleTouchEnabled="YES" contentMode="scaleToFill" barStyle="blackOpaque" id="TUn-L1-5F6">
+                        <rect key="frame" x="0.0" y="-44" width="0.0" height="44"/>
+                        <autoresizingMask key="autoresizingMask"/>
+                    </navigationBar>
+                    <connections>
+                        <segue destination="AXa-IG-NNW" kind="relationship" relationship="rootViewController" id="dto-ak-ciR"/>
+                    </connections>
+                </navigationController>
+            </objects>
+            <point key="canvasLocation" x="1371" y="-636"/>
+        </scene>
+        <!--Log View Controller - ZotPad log-->
+        <scene sceneID="1mD-wf-ZLB">
+            <objects>
+                <placeholder placeholderIdentifier="IBFirstResponder" id="Xqk-k4-2sL" userLabel="First Responder" sceneMemberID="firstResponder"/>
+                <viewController id="AXa-IG-NNW" customClass="ZPLogViewController" sceneMemberID="viewController">
+                    <view key="view" contentMode="scaleToFill" id="uGI-F6-hxZ">
+                        <rect key="frame" x="0.0" y="64" width="320" height="416"/>
+                        <autoresizingMask key="autoresizingMask" widthSizable="YES" heightSizable="YES"/>
+                        <subviews>
+                            <textView clipsSubviews="YES" multipleTouchEnabled="YES" contentMode="scaleToFill" showsHorizontalScrollIndicator="NO" editable="NO" id="CAu-jC-S2A">
+                                <rect key="frame" x="0.0" y="-5" width="320" height="377"/>
+                                <autoresizingMask key="autoresizingMask" widthSizable="YES" heightSizable="YES"/>
+                                <color key="backgroundColor" red="1" green="1" blue="1" alpha="1" colorSpace="calibratedRGB"/>
+                                <string key="text">Lorem ipsum dolor sit er elit lamet, consectetaur cillium adipisicing pecu, sed do eiusmod tempor incididunt ut labore et dolore magna aliqua. Ut enim ad minim veniam, quis nostrud exercitation ullamco laboris nisi ut aliquip ex ea commodo consequat. Duis aute irure dolor in reprehenderit in voluptate velit esse cillum dolore eu fugiat nulla pariatur. Excepteur sint occaecat cupidatat non proident, sunt in culpa qui officia deserunt mollit anim id est laborum. Nam liber te conscient to factor tum poen legum odioque civiuda.</string>
+                                <fontDescription key="fontDescription" type="system" pointSize="14"/>
+                                <textInputTraits key="textInputTraits" autocapitalizationType="sentences"/>
+                            </textView>
+                            <toolbar opaque="NO" clearsContextBeforeDrawing="NO" contentMode="scaleToFill" id="IZx-rD-ixG">
+                                <rect key="frame" x="0.0" y="372" width="320" height="44"/>
+                                <autoresizingMask key="autoresizingMask" widthSizable="YES" flexibleMinY="YES"/>
+                                <items>
+                                    <barButtonItem style="plain" systemItem="flexibleSpace" id="8Ym-xx-cYc"/>
+                                    <barButtonItem title="User manual" id="Kfj-e3-MQP">
+                                        <connections>
+                                            <action selector="showManual:" destination="AXa-IG-NNW" id="cdX-kA-vF3"/>
+                                        </connections>
+                                    </barButtonItem>
+                                    <barButtonItem style="plain" systemItem="flexibleSpace" id="0Lf-S8-lfW"/>
+                                    <barButtonItem title="Email support" id="uNB-eo-5wS">
+                                        <connections>
+                                            <action selector="emailSupport:" destination="AXa-IG-NNW" id="Uhg-dL-ZhS"/>
+                                        </connections>
+                                    </barButtonItem>
+                                    <barButtonItem style="plain" systemItem="flexibleSpace" id="Vex-OU-zLx"/>
+                                    <barButtonItem title="API key" id="nsn-dt-M6E">
+                                        <connections>
+                                            <action selector="manageKey:" destination="AXa-IG-NNW" id="02u-3Y-9J2"/>
+                                        </connections>
+                                    </barButtonItem>
+                                    <barButtonItem style="plain" systemItem="flexibleSpace" id="01g-PM-14W"/>
+                                </items>
+                                <color key="tintColor" cocoaTouchSystemColor="viewFlipsideBackgroundColor"/>
+                            </toolbar>
+                        </subviews>
+                        <color key="backgroundColor" white="1" alpha="1" colorSpace="custom" customColorSpace="calibratedWhite"/>
+                    </view>
+                    <navigationItem key="navigationItem" title="ZotPad log" id="GHV-0X-SID">
+                        <barButtonItem key="rightBarButtonItem" systemItem="done" id="abe-JU-8kQ">
+                            <connections>
+                                <action selector="dismiss:" destination="AXa-IG-NNW" id="7pq-xt-KYz"/>
+                            </connections>
+                        </barButtonItem>
+                    </navigationItem>
+                    <simulatedStatusBarMetrics key="simulatedStatusBarMetrics" statusBarStyle="blackTranslucent"/>
+                    <simulatedNavigationBarMetrics key="simulatedTopBarMetrics" barStyle="blackOpaque" prompted="NO"/>
+                    <connections>
+                        <outlet property="logView" destination="CAu-jC-S2A" id="C61-U8-U6l"/>
+                    </connections>
+                </viewController>
+            </objects>
+            <point key="canvasLocation" x="1818" y="-637"/>
+        </scene>
         <!--Upload Version Conflict View Controller View Controller - Version conflict-->
         <scene sceneID="raI-k1-hcJ">
             <objects>
@@ -485,6 +579,9 @@
             <point key="canvasLocation" x="912" y="-644"/>
         </scene>
     </scenes>
+    <resources>
+        <image name="gear.png" width="20" height="20"/>
+    </resources>
     <classes>
         <class className="OHAttributedLabel" superclassName="UILabel">
             <source key="sourceIdentifier" type="project" relativePath="./Classes/OHAttributedLabel.h"/>
@@ -536,6 +633,17 @@
         </class>
         <class className="ZPLibraryAndCollectionListViewController" superclassName="UITableViewController">
             <source key="sourceIdentifier" type="project" relativePath="./Classes/ZPLibraryAndCollectionListViewController.h"/>
+        </class>
+        <class className="ZPLogViewController" superclassName="UIViewController">
+            <source key="sourceIdentifier" type="project" relativePath="./Classes/ZPLogViewController.h"/>
+            <relationships>
+                <relationship kind="action" name="dismiss:"/>
+                <relationship kind="action" name="emailSupport:"/>
+                <relationship kind="action" name="manageKey:"/>
+                <relationship kind="action" name="onlineSupport:"/>
+                <relationship kind="action" name="showManual:"/>
+                <relationship kind="outlet" name="logView" candidateClass="UITextView"/>
+            </relationships>
         </class>
         <class className="ZPUploadVersionConflictViewControllerViewController" superclassName="UIViewController">
             <source key="sourceIdentifier" type="project" relativePath="./Classes/ZPUploadVersionConflictViewControllerViewController.h"/>
