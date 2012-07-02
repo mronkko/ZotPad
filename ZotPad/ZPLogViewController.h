@@ -15,6 +15,7 @@
 -(IBAction)showManual:(id)sender;
 -(IBAction)onlineSupport:(id)sender;
 -(IBAction)emailSupport:(id)sender;
+-(IBAction)manageKey:(id)sender;
 -(IBAction)dismiss:(id)sender;
 
 @end

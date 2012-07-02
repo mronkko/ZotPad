@@ -3612,6 +3612,7 @@
 				);
 				GCC_PRECOMPILE_PREFIX_HEADER = YES;
 				GCC_PREFIX_HEADER = "ZotPad/ZotPad-Prefix.pch";
+				GCC_PREPROCESSOR_DEFINITIONS = "DEBUG=1";
 				HEADER_SEARCH_PATHS = (
 					three20/Build/Products/three20,
 					"$(BUILT_PRODUCTS_DIR)/../../three20",

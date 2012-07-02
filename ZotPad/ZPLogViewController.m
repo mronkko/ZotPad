@@ -61,6 +61,10 @@
 -(IBAction)onlineSupport:(id)sender{
     [[UIApplication sharedApplication] openURL:[NSURL URLWithString:@"http://www.zotpad.com/node/3"]];
 }
+-(IBAction)manageKey:(id)sender{
+    [[UIApplication sharedApplication] openURL:[NSURL URLWithString:[@"https://www.zotero.org/settings/keys/edit/" stringByAppendingFormat:[[ZPPreferences instance] OAuthKey]]]];
+}
+
 -(IBAction)emailSupport:(id)sender{
     mailController = [[MFMailComposeViewController alloc] init];
     [mailController setSubject:@"Support request"];

@@ -317,12 +317,16 @@ const NSInteger ZPServerConnectionRequestPermissions = 10;
             [parser setDelegate: parserDelegate];
             [parser parse];
             
+#ifdef DEBUG
+            NSString* responseString = [[NSString alloc] initWithData:responseData  encoding:NSUTF8StringEncoding];
             //Check that we got time stamps for all objects
             for(ZPZoteroDataObject* dataObject in parserDelegate.parsedElements){
+                dataObject.responseDataFromWhichThisItemWasCreated = responseString;
                 if(dataObject.serverTimestamp == NULL){
                     [NSException raise:@"Missing timestamp from Zotero server" format:@"Object with key %@ has a missing timestamp. Dump of full response %@",dataObject.key,[[NSString alloc] initWithData:responseData  encoding:NSUTF8StringEncoding]];
                 }
             }
+#endif
         }
         
         /*

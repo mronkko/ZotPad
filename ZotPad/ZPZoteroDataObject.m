@@ -12,6 +12,11 @@
 
 @synthesize key, title, libraryID, cacheTimestamp, serverTimestamp;
 
+// This is very useful for troubleshooting, but because of memory issues, is only used for debug builds
+#ifdef DEBUG
+@synthesize responseDataFromWhichThisItemWasCreated;
+#endif
+
 /*
  
  Sub classes need to implement this method that creates and caches data objects.

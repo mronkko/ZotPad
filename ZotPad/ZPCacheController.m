@@ -387,6 +387,25 @@ static ZPCacheController* _instance = nil;
 
             //TODO: Refactor. This is very confusing. 
             
+            
+            /*
+             
+             The following if clause is used to prevent this bug from happening. A more robust fix is needed, but this is better done after refactoring the server connection code to use asynchronous requests and NSNotification.
+             
+             4 ZotPad beta 0x00091df7 -[ZPDatabase updateObjects:intoTable:] (ZPDatabase.m:256)
+             5 ZotPad beta 0x00092635 -[ZPDatabase writeObjects:intoTable:checkTimestamp:] (ZPDatabase.m:347)
+             6 ZotPad beta 0x00094849 -[ZPDatabase writeAttachments:] (ZPDatabase.m:727)
+             7 ZotPad beta 0x00099099 -[ZPCacheController _cacheItemsAndAttachToParentsIfNeeded:] (ZPCacheController.m:433)
+             8 ZotPad beta 0x00099aab -[ZPCacheController _updateItemDetailsFromServer:] (ZPCacheController.m:587)
+             
+             */
+            if(item.serverTimestamp == NULL || item.serverTimestamp == [NSNull null]){
+#ifdef DEBUG
+                DDLogError(@"Item %@ has an empty server timestamp and will not be written to cache. The item was created from the following server response: \n\n%@",item.key,item.responseDataFromWhichThisItemWasCreated);
+#endif
+                continue;
+            }
+            
             item.cacheTimestamp = item.serverTimestamp;
             
             if([item isKindOfClass:[ZPZoteroAttachment class]]){       

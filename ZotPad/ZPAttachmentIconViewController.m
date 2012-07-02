@@ -160,27 +160,23 @@ static ZPAttachmentIconViewController* _webViewDelegate;
                 //TODO: Check if already downloading.
                 
                 NSString* source;
-                if ([[ZPPreferences instance] useDropbox]) source = @"Dropbox";
-                else if([[ZPPreferences instance] useWebDAV] && [attachment.libraryID intValue] == 1) source = @"WebDAV";
-                else if ([attachment.existsOnZoteroServer intValue]==1) source = @"Zotero";
-                
-                if(source != NULL){
-                    if([attachment.existsOnZoteroServer intValue]==1){
+                if ([[ZPPreferences instance] useDropbox]) self.progressLabel.text = @"Download from Dropbox";
+                else if([[ZPPreferences instance] useWebDAV] && [attachment.libraryID intValue] == 1) self.progressLabel.text = @"Download from WebDAV";
+                else if ([attachment.existsOnZoteroServer intValue]==1){
+                    if(attachment.attachmentSize!= NULL && attachment.attachmentSize != [NSNull null]){
                         NSInteger size = [attachment.attachmentSize intValue];
-                        self.progressLabel.text =  [NSString stringWithFormat:@"Download from %@ (%i KB)",source,size/1024];
+                        self.progressLabel.text =  [NSString stringWithFormat:@"Download from Zotero (%i KB)",source,size/1024];
                     }
                     else{
-                        self.progressLabel.text = [NSString stringWithFormat:@"Download from %@",source];
+                        self.progressLabel.text = @"Download from Zotero";
                     }
                 }
-                else {
-                    self.progressLabel.text = @"File cannot be found for download";
-                }
-            }
+                else self.progressLabel.text = @"File cannot be found for download";
+           }
             else  self.progressLabel.text = @"File cannot be downloaded when offline";
         }
         
-        // Linked URL will be shown in directly from web 
+        // Linked URL will be shown directly from web 
         
         else if ([attachment.linkMode intValue] == LINK_MODE_LINKED_URL &&
                  !  [[ZPPreferences instance] online]){

@@ -35,6 +35,9 @@
 
 - (void) addAttachmentToQuicklook:(ZPZoteroAttachment *)attachment{
     
+    //Do not add the object if it already exists
+    if([_previewItems lastObject] == attachment) return;
+    
     // Imported URLs need to be unzipped
     if([attachment.linkMode intValue] == LINK_MODE_IMPORTED_URL && [attachment.contentType isEqualToString:@"text/html"]){
         
@@ -116,7 +119,7 @@ static ZPPreviewControllerDelegate* _sharedDelegate;
 
     [_sharedDelegate addAttachmentToQuicklook:attachment];
 
-    self.delegate = _sharedDelegate;
+    self.delegate = self;
     self.dataSource = _sharedDelegate;
     [self setCurrentPreviewItemIndex:[_sharedDelegate startIndex]];
 
@@ -164,6 +167,9 @@ static ZPPreviewControllerDelegate* _sharedDelegate;
         while(root.presentedViewController){
             root = root.presentedViewController;
         }
+// For troubleshooting        
+//        QLPreviewController* realQuickLook = [[QLPreviewController alloc] init];
+//        realQuickLook.dataSource = quicklook.dataSource;
         [root presentModalViewController:quicklook animated:YES];
         
     }
@@ -172,9 +178,19 @@ static ZPPreviewControllerDelegate* _sharedDelegate;
 
 -(void) viewDidAppear:(BOOL)animated{
     [super viewDidAppear:animated];
-    UIBarButtonItem* button = [[UIBarButtonItem alloc] initWithBarButtonSystemItem:UIBarButtonSystemItemAction target:self action:@selector(actionButtonPressed:)];
+    UIBarButtonItem* actionButton = [[UIBarButtonItem alloc] initWithBarButtonSystemItem:UIBarButtonSystemItemAction target:self action:@selector(actionButtonPressed:)];
     
-    [[self navigationItem] setRightBarButtonItem:button];
+    [[self navigationItem] setRightBarButtonItem:actionButton];
+
+    //This is needed because the back and forward buttons do not render correctly
+    
+    if([self.navigationItem.leftBarButtonItems count] == 2){
+        self.navigationItem.leftBarButtonItems = [NSArray arrayWithObject:[self.navigationItem.leftBarButtonItems objectAtIndex:0]];
+        //TODO: Figure out what graphics the built in buttons use and configure the view properly
+        //UIBarButtonItem* button = [self.navigationItem.leftBarButtonItems objectAtIndex:1];
+        //UISegmentedControl* control = (UISegmentedControl*) button.customView;
+        
+    }
 }
 
 - (IBAction) actionButtonPressed:(id)sender{
@@ -198,11 +214,11 @@ return frame;
 
 
 - (UIImage *)previewController:(QLPreviewController *)controller transitionImageForPreviewItem:(id <QLPreviewItem>)item contentRect:(CGRect *)contentRect{
-if([_source isKindOfClass:[UIImageView class]]) return [(UIImageView*) _source image];
-else{
-    UIImageView* imageView = (UIImageView*) [_source viewWithTag:1];
-    return imageView.image;
-}
+    if([_source isKindOfClass:[UIImageView class]]) return [(UIImageView*) _source image];
+    else{
+        UIImageView* imageView = (UIImageView*) [_source viewWithTag:1];
+        return imageView.image;
+    }
 }
 
 

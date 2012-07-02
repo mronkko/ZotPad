@@ -23,6 +23,8 @@ static NSString* locale = NULL;
 
 + (NSString*) getLocalizationStringWithKey:(NSString*) key type:(NSString*) type{
     
+    if(key==NULL) return @"";
+    
     if(localizationCache == NULL) localizationCache = [[NSCache alloc] init ];
     
     NSString* combinedKey = [type stringByAppendingString:key];
