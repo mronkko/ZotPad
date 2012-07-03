@@ -1833,8 +1833,8 @@
 		A7200DDB14718DC0004347C9 /* Supporting Files */ = {
 			isa = PBXGroup;
 			children = (
-				A77FD059159F2F6900774D50 /* User Manual.pdf */,
 				A76ECD25159CDEB20062E95A /* Images */,
+				A77FD059159F2F6900774D50 /* User Manual.pdf */,
 				A73D635014879D15007999F3 /* Settings.bundle */,
 				A7200DDC14718DC0004347C9 /* ZotPad-Info.plist */,
 				A7CD077715161556007A8E1D /* ZotPad beta-Info.plist */,
