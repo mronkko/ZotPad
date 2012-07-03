@@ -39,6 +39,7 @@
 
 -(BOOL) useCache;
 -(BOOL) useDropbox;
+-(BOOL) reportErrors;
 
 -(NSString*) webDAVURL;
 -(NSInteger) maxCacheSize;

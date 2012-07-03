@@ -183,6 +183,11 @@ static ZPPreferences* _instance = nil;
     [defaults setObject:[NSNumber numberWithInt:_mode] forKey:@"mode"];
 }
 
+-(BOOL) reportErrors{
+    NSUserDefaults* defaults = [NSUserDefaults standardUserDefaults];
+    return [defaults boolForKey:@"errorreports"];
+}
+
 -(BOOL) useDropbox{
     NSUserDefaults* defaults = [NSUserDefaults standardUserDefaults];
     return [[defaults objectForKey:@"filechannel"] isEqualToString:@"dropbox"];

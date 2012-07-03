@@ -50,7 +50,6 @@
         else{
             NSInteger currentIndex = attachmentCarousel.currentItemIndex;
             // Initially the iCarousel can return a negative index. This is probably a bug.
-            if(currentIndex <0) currentIndex = 0;
             ZPZoteroAttachment* attachment = [_attachments objectAtIndex:currentIndex];
             self.actionButton.enabled = [self _fileExistsForAttachment:attachment]  &! [attachment.contentType isEqualToString:@"text/html"];
         }

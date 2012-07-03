@@ -212,6 +212,24 @@
 			<key>DefaultValue</key>
 			<false/>
 		</dict>
+		<dict>
+			<key>Type</key>
+			<string>PSGroupSpecifier</string>
+			<key>Title</key>
+			<string>Error reports and usage statitics</string>
+			<key>FooterText</key>
+			<string>ZotPad will automatically report errors and usage statistics in the background. The reports are anonymous and do not contain any of your data.</string>
+		</dict>
+		<dict>
+			<key>Type</key>
+			<string>PSToggleSwitchSpecifier</string>
+			<key>Title</key>
+			<string>Report errors and usage statistics to developers</string>
+			<key>Key</key>
+			<string>errorreports</string>
+			<key>DefaultValue</key>
+			<true/>
+		</dict>
 	</array>
 	<key>StringsTable</key>
 	<string>Root</string>

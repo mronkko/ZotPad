@@ -43,6 +43,7 @@
         [_carouselDelegate configureWithAttachmentArray:[NSArray arrayWithObjects:attachment, attachment, nil]];
         _carouselDelegate.mode = ZPATTACHMENTICONGVIEWCONTROLLER_MODE_FIRST_STATIC_SECOND_DOWNLOAD;
         _carouselDelegate.show = ZPATTACHMENTICONGVIEWCONTROLLER_SHOW_FIRST_MODIFIED_SECOND_ORIGINAL;
+        carousel.type = iCarouselTypeCoverFlow2;
     }
     else{
         [_carouselDelegate configureWithAttachmentArray:[NSArray arrayWithObject:attachment]];
@@ -53,6 +54,8 @@
     carousel.delegate = _carouselDelegate;
     carousel.dataSource = _carouselDelegate;
 
+    carousel.currentItemIndex = 0;
+
     
     if(secondaryCarousel!=NULL){
         _secondaryCarouselDelegate = [[ZPAttachmentCarouselDelegate alloc] init];
@@ -62,8 +65,10 @@
         _secondaryCarouselDelegate.attachmentCarousel = secondaryCarousel;
         secondaryCarousel.delegate = _secondaryCarouselDelegate;
         secondaryCarousel.dataSource = _secondaryCarouselDelegate;
+        secondaryCarousel.currentItemIndex = 0;
     }
-    
+
+
     label.text = [NSString stringWithFormat:@"File '%@' has changed on server",attachment.filename];
 
 }

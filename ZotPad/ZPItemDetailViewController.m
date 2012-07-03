@@ -61,6 +61,7 @@
                                                             self.view.frame.size.width,
                                                             ATTACHMENT_VIEW_HEIGHT)];
     _carousel.type = iCarouselTypeCoverFlow2;
+    _carousel.currentItemIndex=0;
     
     _carouselDelegate = [[ZPAttachmentCarouselDelegate alloc] init];
     _carouselDelegate.actionButton=self.actionButton;
@@ -284,31 +285,33 @@
 
 - (NSString*) _textAtIndexPath:(NSIndexPath*)indexPath isTitle:(BOOL)isTitle{
 
+
+    NSString* returnString = NULL;
     
     //Title and itemtype
 
     if([indexPath indexAtPosition:0] == 0){
         if(indexPath.row == 0){
-            if(isTitle) return @"Title";
-            else return _currentItem.title;
+            if(isTitle) returnString =  @"Title";
+            else returnString =  _currentItem.title;
         }
         if(indexPath.row == 1){
-            if(isTitle) return @"Item type";
-            else return [ZPLocalization getLocalizationStringWithKey:_currentItem.itemType  type:@"itemType" ];
+            if(isTitle) returnString =  @"Item type";
+            else returnString =  [ZPLocalization getLocalizationStringWithKey:_currentItem.itemType  type:@"itemType" ];
         }
         
     }
     //Creators
     else if([indexPath indexAtPosition:0] == 1){
         NSDictionary* creator=[_currentItem.creators objectAtIndex:indexPath.row];
-        if(isTitle) return [ZPLocalization getLocalizationStringWithKey:[creator objectForKey:@"creatorType"] type:@"creatorType" ];
+        if(isTitle) returnString =  [ZPLocalization getLocalizationStringWithKey:[creator objectForKey:@"creatorType"] type:@"creatorType" ];
         else{
             NSString* lastName = [creator objectForKey:@"lastName"];
             if(lastName==NULL || lastName==[NSNull null] || [lastName isEqualToString:@""]){
-                return [creator objectForKey:@"shortName"];
+                returnString =  [creator objectForKey:@"shortName"];
             }
             else{
-                return [NSString stringWithFormat:@"%@ %@",[creator objectForKey:@"firstName"],lastName];
+                returnString =  [NSString stringWithFormat:@"%@ %@",[creator objectForKey:@"firstName"],lastName];
             }
 
         }
@@ -329,9 +332,21 @@
             }
         }
         
-        if(isTitle) return [ZPLocalization getLocalizationStringWithKey:key  type:@"field" ];
-        else return [_currentItem.fields objectForKey:key];
+        if(isTitle) returnString =  [ZPLocalization getLocalizationStringWithKey:key  type:@"field" ];
+        else returnString =  [_currentItem.fields objectForKey:key];
     }
+    
+    //Validity checks
+    if(returnString == NULL || returnString == [NSNull null]){
+        DDLogError(@"Item %@ had an empty string (%@) as field %@ in section %i, row %i of the item details table.",_currentItem.key,
+                   returnString==NULL ? @"nil" : @"NSNull",
+                   isTitle ? @"title" : @"value",
+                   indexPath.section,indexPath.row);
+        
+        returnString = @"";
+    }
+    
+    return returnString;
 }
 
 

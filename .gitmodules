@@ -25,12 +25,6 @@
 [submodule "DTCoreText"]
 	path = DTCoreText
 	url = https://github.com/Cocoanetics/DTCoreText.git
-[submodule "RBFilePreviewer"]
-	path = RBFilePreviewer
-	url = https://github.com/rob-brown/RBFilePreviewer
-[submodule "RBCategories"]
-	path = RBCategories
-	url = https://github.com/rob-brown/RBCategories
 [submodule "FileMD5Hash"]
 	path = FileMD5Hash
 	url = https://github.com/JoeKun/FileMD5Hash
@@ -40,6 +34,3 @@
 [submodule "CocoaLumberjack"]
 	path = CocoaLumberjack
 	url = https://github.com/robbiehanson/CocoaLumberjack
-[submodule "dropbox-sdk-ios"]
-	path = dropbox-sdk-ios
-	url = https://github.com/dropbox-sdk-mirror/dropbox-sdk-ios

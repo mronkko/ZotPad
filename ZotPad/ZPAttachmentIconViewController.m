@@ -165,7 +165,7 @@ static ZPAttachmentIconViewController* _webViewDelegate;
                 else if ([attachment.existsOnZoteroServer intValue]==1){
                     if(attachment.attachmentSize!= NULL && attachment.attachmentSize != [NSNull null]){
                         NSInteger size = [attachment.attachmentSize intValue];
-                        self.progressLabel.text =  [NSString stringWithFormat:@"Download from Zotero (%i KB)",source,size/1024];
+                        self.progressLabel.text =  [NSString stringWithFormat:@"Download from Zotero (%i KB)",size/1024];
                     }
                     else{
                         self.progressLabel.text = @"Download from Zotero";

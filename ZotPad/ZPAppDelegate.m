@@ -71,19 +71,22 @@
 @synthesize fileLogger;
 
 
-- (BOOL)application:(UIApplication *)application didFinishLaunchingWithOptions:(NSDictionary *)launchOptions
+- (BOOL)application:(UIApplication *)application
+didFinishLaunchingWithOptions:(NSDictionary *)launchOptions
 {
-    
+
+#ifdef DEBUG
     [TestFlight setDeviceIdentifier:[[UIDevice currentDevice] uniqueIdentifier]];
+    
     [TestFlight takeOff:@"5e753f234f33fc2bddf4437600037fbf_NjcyMjEyMDEyLTA0LTA5IDE0OjUyOjU0LjE4MDQwMg"];
-    
-    //Set up loggers
-    //[DDTTYLogger sharedInstance].logFormatter = [[ZPFileLogFormatter alloc] initWithLevel:LOG_LEVEL_VERBOSE];
-    //[DDLog addLogger:[DDTTYLogger sharedInstance]];
-    
+
     TestFlightLogger* tfLogger = [[TestFlightLogger alloc] initWithTeamToken:@"5e753f234f33fc2bddf4437600037fbf_NjcyMjEyMDEyLTA0LTA5IDE0OjUyOjU0LjE4MDQwMg"];
     tfLogger.logFormatter = [[ZPFileLogFormatter alloc] initWithLevel:LOG_LEVEL_VERBOSE];
     [DDLog addLogger:tfLogger];
+#else
+    if([[ZPPreferences instance] reportErrors]) [TestFlight takeOff:@"5e753f234f33fc2bddf4437600037fbf_NjcyMjEyMDEyLTA0LTA5IDE0OjUyOjU0LjE4MDQwMg"];
+
+#endif
     
     CompressingLogFileManager* logFileManager = [[CompressingLogFileManager alloc] initWithLogsDirectory:[NSSearchPathForDirectoriesInDomains(NSDocumentDirectory, NSUserDomainMask, YES) objectAtIndex:0]];
     self.fileLogger = [[DDFileLogger alloc] initWithLogFileManager:logFileManager];
@@ -92,6 +95,8 @@
     self.fileLogger.logFormatter = [[ZPFileLogFormatter alloc] initWithLevel:LOG_LEVEL_INFO];
     [DDLog addLogger:self.fileLogger]; 
 
+
+    
     DDLogInfo(@"Starting");
 
      //Manual override for userID and Key. Useful for running the code in debugger with other people's credentials.

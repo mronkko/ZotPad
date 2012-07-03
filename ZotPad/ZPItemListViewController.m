@@ -10,12 +10,12 @@
 
 #import "ZPItemListViewController.h"
 #import "ZPDataLayer.h"
-#import "../DSActivityView/Sources/DSActivityView.h"
+#import "DSActivityView.h"
 #import "ZPLocalization.h"
 #import "ZPPreferences.h"
 #import "ZPAppDelegate.h"
 
-#import "../OHAttributedLabel/OHAttributedLabel.h"
+#import "OHAttributedLabel.h"
 #import "DTCoreText.h"
 #import "ZPAttachmentIconViewController.h"
 #import "ZPPreviewController.h"
