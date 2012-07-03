@@ -11,7 +11,7 @@
 #include <sys/xattr.h>
 
 //Some of these are needed to determine if network connection is available.
-//TODO: determine which and clean up
+//TODO: replace with ASI implementation 
 #import <sys/socket.h>
 #import <netinet/in.h>
 #import <netinet6/in6.h>
@@ -31,7 +31,6 @@
 #import "ZPServerResponseXMLParserItem.h"
 #import "ZPServerResponseXMLParserLibrary.h"
 #import "ZPServerResponseXMLParserCollection.h"
-#import "ZPAuthenticationProcess.h"
 #import "ZPZoteroItem.h"
 #import "ZPZoteroCollection.h"
 #import "ZPZoteroLibrary.h"
@@ -344,10 +343,9 @@ const NSInteger ZPServerConnectionRequestPermissions = 10;
     else{
         if(oauthkey==NULL){
 
-            //Initialize a new authentication process if there is currently not an ongoing one
-            if(![[ZPAuthenticationProcess instance] isActive]){
-                [[ZPAuthenticationProcess instance] startAuthentication];
-            }
+            //Locate the presented viewcontroller
+            [(ZPAppDelegate*) [UIApplication sharedApplication].delegate startAuthenticationSequence];
+            
         }
         return NULL;
     }

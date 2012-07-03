@@ -7,13 +7,22 @@
 //
 
 #import <UIKit/UIKit.h>
-#import "../DSActivityView/Sources/DSActivityView.h"
-
+#import "DSActivityView.h"
+#import "OAuthConsumer.h"
+#import "OAToken.h"
 
 @interface ZPAuthenticationDialog : UIViewController <UIApplicationDelegate, UIWebViewDelegate> {
     UIWebView* webView;
     DSActivityView* _activityView;
     NSString* _key;
+
+    //The Oauht key to use
+    NSString* _oauthkey;
+    NSString* _username;
+    NSString* _userID;
+    
+    OAToken* _latestToken;
+    BOOL _isActive;
 
 }
 
@@ -25,5 +34,10 @@
 
 - (void)setKeyAndLoadZoteroSite:(NSString*)key;
 - (IBAction)loadFirstPage:(id)sender;
+
+- (void) makeOAuthRequest: (OAToken *) token;
+- (void)requestTokenTicket:(OAServiceTicket *)ticket didFinishWithData:(NSData *)data;
+
+-(void) processVerifier:(NSString*)verifier;
 
 @end

@@ -13,22 +13,14 @@
 #import "ZPServerConnection.h"
 #import "OAToken.h"
 #import "ZPDataLayer.h"
-#import "ZPAuthenticationProcess.h"
-#import "../DSActivityView/Sources/DSActivityView.h"
-
+#import "DSActivityView.h"
+#import "ZPCacheController.h"
 
 
 @implementation ZPAuthenticationDialog
 
 
 @synthesize webView;
-
-static ZPAuthenticationDialog* _instance = nil;
-
-+(ZPAuthenticationDialog*) instance {
-    return _instance;
-}
-
 
 - (void)didReceiveMemoryWarning
 {
@@ -44,10 +36,11 @@ static ZPAuthenticationDialog* _instance = nil;
 
 - (void)viewDidLoad {
     
-    _instance = self;
     //Add a loading indicator
     _activityView = [DSBezelActivityView newActivityViewForView:webView];
     [[self webView] setUserInteractionEnabled:FALSE];
+
+    [self makeOAuthRequest: NULL];
     
 }
 
@@ -88,12 +81,12 @@ static ZPAuthenticationDialog* _instance = nil;
     
     if([urlString hasPrefix:@"https://www.zotero.org/?oauth_token="]){
         
+        _activityView = [DSBezelActivityView newActivityViewForView:webView];
+
         //Get permanent key with the temporary key
         NSString* verifier=[[urlString componentsSeparatedByString:@"="] lastObject];
 
-        [self dismissModalViewControllerAnimated:YES];
-
-        [[ZPAuthenticationProcess instance] processVerifier:verifier];
+        [self processVerifier:verifier];
             
         return FALSE;
     }
@@ -118,7 +111,6 @@ static ZPAuthenticationDialog* _instance = nil;
     // Release any retained subviews of the main view.
     // e.g. self.myOutlet = nil;
     
-    _instance = NULL;
 }
 
 - (BOOL)shouldAutorotateToInterfaceOrientation:(UIInterfaceOrientation)interfaceOrientation
@@ -129,7 +121,122 @@ static ZPAuthenticationDialog* _instance = nil;
     return YES;
 }
 
+#pragma mark - Authentication process
 
+
+-(void) processVerifier:(NSString*)verifier{
+    [_latestToken setValue:verifier forKey:@"verifier"];
+    [self makeOAuthRequest:_latestToken];
+}
+
+- (void) makeOAuthRequest:(OAToken *) token {
+    OAConsumer *consumer = [[OAConsumer alloc] initWithKey:@"4cb573ead72e5d84eab4"
+                                                    secret:@"605a2a699d22dc4cce7f"];
+    
+    NSURL *url;
+    
+    if(token==nil){
+        url= [NSURL URLWithString:@"https://www.zotero.org/oauth/request"];
+    }
+    else{
+        url= [NSURL URLWithString:@"https://www.zotero.org/oauth/access"];        
+    }
+    OAMutableURLRequest *request = [[OAMutableURLRequest alloc] initWithURL:url
+                                                                   consumer:consumer
+                                                                      token:token   // we don't have a Token yet
+                                                                      realm:nil   // our service provider doesn't specify a realm
+                                                          signatureProvider:nil]; // use the default method, HMAC-SHA1
+    
+    [request setHTTPMethod:@"POST"];
+    
+    OADataFetcher *fetcher = [[OADataFetcher alloc] init];
+    
+    [[UIApplication sharedApplication] setNetworkActivityIndicatorVisible:YES];
+    
+    if(token==nil){
+        [fetcher fetchDataWithRequest:request
+                             delegate:self
+                    didFinishSelector:@selector(requestTokenTicket:didFinishWithData:)
+         
+                      didFailSelector:@selector(requestTokenTicket:didFailWithError:)];
+    }
+    else{
+        [fetcher fetchDataWithRequest:request
+                             delegate:self
+                    didFinishSelector:@selector(requestAccessToken:didFinishWithData:)
+         
+                      didFailSelector:@selector(requestAccessToken:didFailWithError:)];
+    }
+    
+}
+
+/*
+ This is the first part of the authentication to retrieve a temporary token
+ */
+- (void)requestTokenTicket:(OAServiceTicket *)ticket didFinishWithData:(NSData *)data {
+    
+    [[UIApplication sharedApplication] setNetworkActivityIndicatorVisible:NO];
+    
+    if (ticket.didSucceed) {
+        NSString *responseBody = [[NSString alloc] initWithData:data
+                                                       encoding:NSUTF8StringEncoding];
+        
+        _latestToken = [[OAToken alloc] initWithHTTPResponseBody:responseBody];
+        
+        [self setKeyAndLoadZoteroSite:[_latestToken key]];
+    }
+    
+}
+
+/*
+ This is the second part where we get the permanent token
+ */
+
+- (void)requestAccessToken:(OAServiceTicket *)ticket didFinishWithData:(NSData *)data {
+    
+    [[UIApplication sharedApplication] setNetworkActivityIndicatorVisible:NO];
+    [self dismissModalViewControllerAnimated:YES];
+
+    if (ticket.didSucceed) {
+        NSString *responseBody = [[NSString alloc] initWithData:data
+                                                       encoding:NSUTF8StringEncoding];
+        _latestToken = [[OAToken alloc] initWithHTTPResponseBody:responseBody];
+        
+        
+        DDLogVerbose(@"Got access token");
+        
+        //Save the key to preferences
+        [[ZPPreferences instance] setOAuthKey:[_latestToken key]];
+        _oauthkey = [_latestToken key];
+        
+        //Save userID and username
+        NSArray* parts = [responseBody componentsSeparatedByString:@"&"];
+        
+        NSString* userID = [[[parts objectAtIndex:2]componentsSeparatedByString:@"="] objectAtIndex:1];
+        [[ZPPreferences instance] setUserID:userID];
+        _userID = userID;
+        
+        NSString* username = [[[parts objectAtIndex:3]componentsSeparatedByString:@"="] objectAtIndex:1];
+        [[ZPPreferences instance] setUsername:username];
+        _username = username;
+        
+        //Tell the application to start updating libraries and collections from server
+        //TODO: Refactor to use notifications
+        [[ZPCacheController instance] updateLibrariesAndCollectionsFromServer];
+        
+    }
+    
+}
+
+- (void)requestTokenTicket:(OAServiceTicket *)ticket didFailWithError:(NSError *)error {
+    [[UIApplication sharedApplication] setNetworkActivityIndicatorVisible:NO];    
+    DDLogError(@"Error in requesting token ticket: %@",error);
+}
+- (void)requestAccessToken:(OAServiceTicket *)ticket didFailWithError:(NSError *)error {
+    
+    [[UIApplication sharedApplication] setNetworkActivityIndicatorVisible:NO];
+    DDLogError(@"Error in requesting access token: %@",error);
+}
 
 
 

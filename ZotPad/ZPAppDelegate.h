@@ -11,6 +11,9 @@
 
 @interface ZPAppDelegate : UIResponder <UIApplicationDelegate>
 
+- (void) _dismissViewControllerHierarchy;
+- (void) startAuthenticationSequence;
+
 @property (retain) DDFileLogger* fileLogger;
 @property (strong, nonatomic) UIWindow *window;
     

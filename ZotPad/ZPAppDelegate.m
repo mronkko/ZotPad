@@ -16,6 +16,7 @@
 #import "ZPFileImportViewController.h"
 #import "ZPFileChannel_Dropbox.h"
 #import "ZPAttachmentIconViewController.h"
+#import "ZPAuthenticationDialog.h"
 
 //Setting up the logger
 #import "DDTTYLogger.h"
@@ -219,16 +220,7 @@ didFinishLaunchingWithOptions:(NSDictionary *)launchOptions
         else{
             DDLogInfo(@"A file %@ from %@",[url lastPathComponent],sourceApplication);
 
-            //Find the top most viewcontroller
-            UIViewController* viewController = self.window.rootViewController;
-            while(viewController.presentedViewController) viewController = viewController.presentedViewController;
-            
-            //Start dismissing modal views
-            while(viewController != self.window.rootViewController){
-                UIViewController* parent = viewController.presentingViewController;
-                [viewController dismissModalViewControllerAnimated:NO];
-                viewController = parent;
-            }
+            [self _dismissViewControllerHierarchy];
             
             //The view controller must load first to register an observer
             ZPFileImportViewController* importViewController = [self.window.rootViewController.storyboard instantiateViewControllerWithIdentifier:@"FileImportDialog"];
@@ -256,4 +248,34 @@ didFinishLaunchingWithOptions:(NSDictionary *)launchOptions
     return NO;
 }
 
+- (void) startAuthenticationSequence{
+
+    if([NSThread isMainThread]){
+        UIViewController* root = self.window.rootViewController;  
+        
+        if(root.presentedViewController == NULL || ![root.presentedViewController isKindOfClass:[ZPAuthenticationDialog class]]){
+            [self _dismissViewControllerHierarchy];
+            [root performSegueWithIdentifier:@"Authentication" sender:NULL];
+        }
+    }
+    else{
+        [self performSelectorOnMainThread:@selector(startAuthenticationSequence) withObject:NULL waitUntilDone:NO];
+    }
+
+}
+
+-(void)_dismissViewControllerHierarchy{
+   
+    //Find the top most viewcontroller
+    UIViewController* viewController = self.window.rootViewController;
+    while(viewController.presentedViewController) viewController = viewController.presentedViewController;
+    
+    //Start dismissing modal views
+    while(viewController != self.window.rootViewController){
+        UIViewController* parent = viewController.presentingViewController;
+        [viewController dismissModalViewControllerAnimated:NO];
+        viewController = parent;
+    }
+    
+}
 @end
