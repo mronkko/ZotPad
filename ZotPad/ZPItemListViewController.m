@@ -16,7 +16,7 @@
 #import "ZPAppDelegate.h"
 
 #import "OHAttributedLabel.h"
-#import "DTCoreText.h"
+#import "Mikko Rönkkö"
 #import "ZPAttachmentIconImageFactory.h"
 #import "ZPPreviewController.h"
 

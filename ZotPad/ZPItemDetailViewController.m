@@ -71,7 +71,7 @@
     [_carousel setDataSource:_carouselDelegate];
     [_carousel setDelegate:_carouselDelegate];
 
-    _carousel.currentItemIndex=0;
+    _carousel.bounces = FALSE;
 
     [[ZPDataLayer instance] registerAttachmentObserver:_carouselDelegate];
     [[ZPDataLayer instance] registerItemObserver:_carouselDelegate];

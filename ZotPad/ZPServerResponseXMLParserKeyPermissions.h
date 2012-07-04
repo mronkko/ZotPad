@@ -3,7 +3,7 @@
 //  ZotPad
 //
 //  Created by Mikko Rönkkö on 13.5.2012.
-//  Copyright (c) 2012 Helsiki University of Technology. All rights reserved.
+//  Copyright (c) 2012 Mikko Rönkkö. All rights reserved.
 //
 
 #import "ZPServerResponseXMLParser.h"

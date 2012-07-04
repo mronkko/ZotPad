@@ -3,7 +3,7 @@
 //  ZotPad
 //
 //  Created by Mikko Rönkkö on 27.6.2012.
-//  Copyright (c) 2012 Helsiki University of Technology. All rights reserved.
+//  Copyright (c) 2012 Mikko Rönkkö. All rights reserved.
 //
 
 #import "ZPUploadVersionConflictViewControllerViewController.h"
@@ -44,6 +44,8 @@
         _carouselDelegate.mode = ZPATTACHMENTICONGVIEWCONTROLLER_MODE_FIRST_STATIC_SECOND_DOWNLOAD;
         _carouselDelegate.show = ZPATTACHMENTICONGVIEWCONTROLLER_SHOW_FIRST_MODIFIED_SECOND_ORIGINAL;
         carousel.type = iCarouselTypeCoverFlow2;
+        carousel.bounces = FALSE;
+
     }
     else{
         [_carouselDelegate configureWithAttachmentArray:[NSArray arrayWithObject:attachment]];

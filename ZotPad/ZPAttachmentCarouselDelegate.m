@@ -6,7 +6,7 @@
 //
 //
 //  Created by Mikko Rönkkö on 25.6.2012.
-//  Copyright (c) 2012 Helsiki University of Technology. All rights reserved.
+//  Copyright (c) 2012 Mikko Rönkkö. All rights reserved.
 //
 
 #import "ZPAttachmentCarouselDelegate.h"
@@ -35,7 +35,7 @@ NSInteger const ZPATTACHMENTICONGVIEWCONTROLLER_SHOW_FIRST_MODIFIED_SECOND_ORIGI
 -(void) _configureProgressLabel:(UILabel*) label withAttachment:(ZPZoteroAttachment*)attachment;
 -(NSInteger) _modeForAttachment:(ZPZoteroAttachment*)attachment;
 -(NSInteger) _showForAttachment:(ZPZoteroAttachment*)attachment;
--(void) _setLabelsForAttachment:(ZPZoteroAttachment*)attachment progressText:(NSString*)progressText errorText:(NSString*)errorText mode:(NSInteger)mode;
+-(void) _setLabelsForAttachment:(ZPZoteroAttachment*)attachment progressText:(NSString*)progressText errorText:(NSString*)errorText mode:(NSInteger)mode reconfigureIcon:(BOOL)reconfigureIcon;
 
 @end
 
@@ -469,56 +469,56 @@ NSInteger const ZPATTACHMENTICONGVIEWCONTROLLER_SHOW_FIRST_MODIFIED_SECOND_ORIGI
        (ZPATTACHMENTICONGVIEWCONTROLLER_MODE_FIRST_STATIC_SECOND_DOWNLOAD && [_attachments indexOfObject:attachment]==2)){
         
         [self _toggleActionButtonState];
-        [self _setLabelsForAttachment:attachment progressText:NULL errorText:NULL mode:ZPATTACHMENTICONGVIEWCONTROLLER_MODE_STATIC];
+        [self _setLabelsForAttachment:attachment progressText:NULL errorText:NULL mode:ZPATTACHMENTICONGVIEWCONTROLLER_MODE_STATIC reconfigureIcon:TRUE];
     }
 }
 -(void) notifyAttachmentDownloadFailed:(ZPZoteroAttachment *)attachment withError:(NSError *)error{
     
     if(mode ==ZPATTACHMENTICONGVIEWCONTROLLER_MODE_DOWNLOAD || 
        (ZPATTACHMENTICONGVIEWCONTROLLER_MODE_FIRST_STATIC_SECOND_DOWNLOAD && [_attachments indexOfObject:attachment]==2)){
-        [self _setLabelsForAttachment:attachment progressText:@"Download failed" errorText:[error localizedDescription] mode:ZPATTACHMENTICONGVIEWCONTROLLER_MODE_STATIC];    
+        [self _setLabelsForAttachment:attachment progressText:@"Download failed" errorText:[error localizedDescription] mode:ZPATTACHMENTICONGVIEWCONTROLLER_MODE_STATIC reconfigureIcon:FALSE];    
     }
 }
 
 -(void) notifyAttachmentDownloadStarted:(ZPZoteroAttachment*) attachment{
     if(mode ==ZPATTACHMENTICONGVIEWCONTROLLER_MODE_DOWNLOAD || 
        (ZPATTACHMENTICONGVIEWCONTROLLER_MODE_FIRST_STATIC_SECOND_DOWNLOAD && [_attachments indexOfObject:attachment]==2)){
-        [self _setLabelsForAttachment:attachment progressText:@"Downloading" errorText:NULL mode:ZPATTACHMENTICONGVIEWCONTROLLER_MODE_DOWNLOAD];    
+        [self _setLabelsForAttachment:attachment progressText:@"Downloading" errorText:NULL mode:ZPATTACHMENTICONGVIEWCONTROLLER_MODE_DOWNLOAD reconfigureIcon:FALSE];    
     }
 }
 
 -(void) notifyAttachmentDeleted:(ZPZoteroAttachment*) attachment fileAttributes:(NSDictionary*) fileAttributes{
     
     [self _toggleActionButtonState];
-    [self _setLabelsForAttachment:attachment progressText:@"File deleted" errorText:NULL mode:ZPATTACHMENTICONGVIEWCONTROLLER_MODE_STATIC];
+    [self _setLabelsForAttachment:attachment progressText:@"File deleted" errorText:NULL mode:ZPATTACHMENTICONGVIEWCONTROLLER_MODE_STATIC reconfigureIcon:FALSE];
 
 }
 
 -(void) notifyAttachmentUploadCompleted:(ZPZoteroAttachment*) attachment{
     if(mode ==ZPATTACHMENTICONGVIEWCONTROLLER_MODE_UPLOAD){
-        [self _setLabelsForAttachment:attachment progressText:@"Upload completed" errorText:NULL mode:ZPATTACHMENTICONGVIEWCONTROLLER_MODE_STATIC];
+        [self _setLabelsForAttachment:attachment progressText:@"Upload completed" errorText:NULL mode:ZPATTACHMENTICONGVIEWCONTROLLER_MODE_STATIC reconfigureIcon:FALSE];
     }
 }
 
 -(void) notifyAttachmentUploadFailed:(ZPZoteroAttachment*) attachment withError:(NSError*) error{
     if(mode ==ZPATTACHMENTICONGVIEWCONTROLLER_MODE_UPLOAD){
-        [self _setLabelsForAttachment:attachment progressText:@"Upload failed" errorText:[error localizedDescription] mode:ZPATTACHMENTICONGVIEWCONTROLLER_MODE_STATIC];
+        [self _setLabelsForAttachment:attachment progressText:@"Upload failed" errorText:[error localizedDescription] mode:ZPATTACHMENTICONGVIEWCONTROLLER_MODE_STATIC reconfigureIcon:FALSE];
     }
 }
 
 -(void) notifyAttachmentUploadStarted:(ZPZoteroAttachment*) attachment{
     if(mode ==ZPATTACHMENTICONGVIEWCONTROLLER_MODE_UPLOAD){
-        [self _setLabelsForAttachment:attachment progressText:@"Uploading" errorText:NULL mode:ZPATTACHMENTICONGVIEWCONTROLLER_MODE_UPLOAD];
+        [self _setLabelsForAttachment:attachment progressText:@"Uploading" errorText:NULL mode:ZPATTACHMENTICONGVIEWCONTROLLER_MODE_UPLOAD reconfigureIcon:FALSE];
     }
 }
 
 -(void) notifyAttachmentUploadCanceled:(ZPZoteroAttachment*) attachment{
     if(mode ==ZPATTACHMENTICONGVIEWCONTROLLER_MODE_UPLOAD){
-        [self _setLabelsForAttachment:attachment progressText:@"Upload canceled" errorText:NULL mode:ZPATTACHMENTICONGVIEWCONTROLLER_MODE_STATIC];
+        [self _setLabelsForAttachment:attachment progressText:@"Upload canceled" errorText:NULL mode:ZPATTACHMENTICONGVIEWCONTROLLER_MODE_STATIC reconfigureIcon:FALSE];
     }
 }
 
--(void) _setLabelsForAttachment:(ZPZoteroAttachment*)attachment progressText:(NSString*)progressText errorText:(NSString*)errorText mode:(NSInteger)mode{
+-(void) _setLabelsForAttachment:(ZPZoteroAttachment*)attachment progressText:(NSString*)progressText errorText:(NSString*)errorText mode:(NSInteger)mode reconfigureIcon:(BOOL)reconfigureIcon{
     NSInteger index = [_attachments indexOfObject:attachment];    
     
     if(index!=NSNotFound){
@@ -554,11 +554,14 @@ NSInteger const ZPATTACHMENTICONGVIEWCONTROLLER_SHOW_FIRST_MODIFIED_SECOND_ORIGI
                     [[ZPServerConnection instance] useProgressView:progressView forDownloadingAttachment:attachment];
                     view.userInteractionEnabled = FALSE;
                 }
+                
+                if(reconfigureIcon) [self _configureFileImageView:(UIImageView*)[view viewWithTag:1] withAttachment:attachment];
+
 
             }
             else{
                 dispatch_async(dispatch_get_main_queue(), ^{
-                    [self _setLabelsForAttachment:attachment progressText:progressText errorText:errorText mode:mode];
+                    [self _setLabelsForAttachment:attachment progressText:progressText errorText:errorText mode:mode reconfigureIcon:reconfigureIcon];
                 });
             }
         }
