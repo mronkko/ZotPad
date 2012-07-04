@@ -659,71 +659,6 @@
             </objects>
             <point key="canvasLocation" x="3269" y="-1346"/>
         </scene>
-        <!--Attachment Icon View Controller-->
-        <scene sceneID="m4K-Ef-P1K">
-            <objects>
-                <placeholder placeholderIdentifier="IBFirstResponder" id="vjE-A3-P4F" userLabel="First Responder" sceneMemberID="firstResponder"/>
-                <viewController storyboardIdentifier="AttachmentPreview" autoresizesArchivedViewToFullSize="NO" id="tNV-Nk-F0U" customClass="ZPAttachmentIconViewController" sceneMemberID="viewController">
-                    <view key="view" contentMode="scaleToFill" id="Fhs-Fk-8x7">
-                        <rect key="frame" x="0.0" y="0.0" width="423" height="580"/>
-                        <autoresizingMask key="autoresizingMask" widthSizable="YES" heightSizable="YES"/>
-                        <subviews>
-                            <imageView userInteractionEnabled="NO" tag="1" contentMode="scaleToFill" id="8bf-HZ-Xgb">
-                                <rect key="frame" x="20" y="90" width="383" height="383"/>
-                                <autoresizingMask key="autoresizingMask" widthSizable="YES" heightSizable="YES"/>
-                            </imageView>
-                            <view contentMode="scaleToFill" id="6L9-7Q-tiU">
-                                <rect key="frame" x="40" y="176" width="343" height="217"/>
-                                <autoresizingMask key="autoresizingMask" flexibleMinX="YES" widthSizable="YES" flexibleMaxX="YES" flexibleMinY="YES" heightSizable="YES" flexibleMaxY="YES"/>
-                                <subviews>
-                                    <label opaque="NO" clipsSubviews="YES" userInteractionEnabled="NO" tag="1" contentMode="left" text="Download label" lineBreakMode="tailTruncation" numberOfLines="3" baselineAdjustment="alignBaselines" minimumFontSize="10" id="163-aG-rbL">
-                                        <rect key="frame" x="20" y="146" width="303" height="23"/>
-                                        <autoresizingMask key="autoresizingMask" widthSizable="YES" flexibleMinY="YES"/>
-                                        <fontDescription key="fontDescription" type="system" pointSize="17"/>
-                                        <color key="textColor" white="1" alpha="1" colorSpace="custom" customColorSpace="calibratedWhite"/>
-                                        <nil key="highlightedColor"/>
-                                    </label>
-                                    <label opaque="NO" clipsSubviews="YES" userInteractionEnabled="NO" tag="2" contentMode="left" text="Main label" lineBreakMode="tailTruncation" numberOfLines="4" baselineAdjustment="alignBaselines" minimumFontSize="10" id="WVc-n5-r2y">
-                                        <rect key="frame" x="20" y="0.0" width="303" height="138"/>
-                                        <autoresizingMask key="autoresizingMask" widthSizable="YES" heightSizable="YES"/>
-                                        <fontDescription key="fontDescription" type="system" pointSize="17"/>
-                                        <color key="textColor" white="1" alpha="1" colorSpace="custom" customColorSpace="calibratedWhite"/>
-                                        <nil key="highlightedColor"/>
-                                    </label>
-                                    <progressView hidden="YES" opaque="NO" tag="3" contentMode="scaleToFill" progress="0.5" id="gBo-F3-4IU">
-                                        <rect key="frame" x="20" y="171" width="303" height="9"/>
-                                        <autoresizingMask key="autoresizingMask" widthSizable="YES" flexibleMinY="YES"/>
-                                    </progressView>
-                                    <label hidden="YES" opaque="NO" clipsSubviews="YES" userInteractionEnabled="NO" contentMode="left" text="Error label" lineBreakMode="tailTruncation" numberOfLines="3" baselineAdjustment="alignBaselines" minimumFontSize="8" id="95I-iY-8Fg">
-                                        <rect key="frame" x="20" y="168" width="303" height="49"/>
-                                        <autoresizingMask key="autoresizingMask" widthSizable="YES" flexibleMinY="YES"/>
-                                        <fontDescription key="fontDescription" type="system" pointSize="12"/>
-                                        <color key="textColor" red="1" green="1" blue="1" alpha="1" colorSpace="custom" customColorSpace="calibratedRGB"/>
-                                        <nil key="highlightedColor"/>
-                                    </label>
-                                </subviews>
-                                <color key="backgroundColor" cocoaTouchSystemColor="darkTextColor"/>
-                            </view>
-                        </subviews>
-                        <color key="backgroundColor" white="1" alpha="1" colorSpace="custom" customColorSpace="calibratedWhite"/>
-                    </view>
-                    <nil key="simulatedStatusBarMetrics"/>
-                    <nil key="simulatedTopBarMetrics"/>
-                    <nil key="simulatedBottomBarMetrics"/>
-                    <simulatedOrientationMetrics key="simulatedOrientationMetrics"/>
-                    <freeformSimulatedSizeMetrics key="simulatedDestinationMetrics"/>
-                    <connections>
-                        <outlet property="errorLabel" destination="95I-iY-8Fg" id="qPh-Ao-aTy"/>
-                        <outlet property="fileImage" destination="8bf-HZ-Xgb" id="dGJ-wA-wh8"/>
-                        <outlet property="labelBackground" destination="6L9-7Q-tiU" id="PEM-um-UDX"/>
-                        <outlet property="progressLabel" destination="163-aG-rbL" id="kEJ-IE-oAk"/>
-                        <outlet property="progressView" destination="gBo-F3-4IU" id="Xzj-xz-4yy"/>
-                        <outlet property="titleLabel" destination="WVc-n5-r2y" id="SDv-9c-ait"/>
-                    </connections>
-                </viewController>
-            </objects>
-            <point key="canvasLocation" x="-436" y="-2085"/>
-        </scene>
         <!--Log View Controller - ZotPad log-->
         <scene sceneID="P15-U1-ZQo">
             <objects>
@@ -799,18 +734,6 @@
             <source key="sourceIdentifier" type="project" relativePath="./Classes/OHAttributedLabel.h"/>
             <relationships>
                 <relationship kind="outlet" name="delegate"/>
-            </relationships>
-        </class>
-        <class className="ZPAttachmentIconViewController" superclassName="UIViewController">
-            <source key="sourceIdentifier" type="project" relativePath="./Classes/ZPAttachmentIconViewController.h"/>
-            <relationships>
-                <relationship kind="outlet" name="cancelButton" candidateClass="UIButton"/>
-                <relationship kind="outlet" name="errorLabel" candidateClass="UILabel"/>
-                <relationship kind="outlet" name="fileImage" candidateClass="UIImageView"/>
-                <relationship kind="outlet" name="labelBackground" candidateClass="UIView"/>
-                <relationship kind="outlet" name="progressLabel" candidateClass="UILabel"/>
-                <relationship kind="outlet" name="progressView" candidateClass="UIProgressView"/>
-                <relationship kind="outlet" name="titleLabel" candidateClass="UILabel"/>
             </relationships>
         </class>
         <class className="ZPAuthenticationDialog" superclassName="UIViewController">

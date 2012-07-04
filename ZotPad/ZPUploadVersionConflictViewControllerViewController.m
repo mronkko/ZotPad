@@ -8,7 +8,7 @@
 
 #import "ZPUploadVersionConflictViewControllerViewController.h"
 #import "ZPDatabase.h"
-#import "ZPAttachmentIconViewController.h"
+#import "ZPAttachmentIconImageFactory.h"
 
 // A helper class for showing an original version of the attachment
 

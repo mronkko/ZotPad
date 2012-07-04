@@ -15,7 +15,6 @@
 #import "ZPDatabase.h"
 #import "ZPFileImportViewController.h"
 #import "ZPFileChannel_Dropbox.h"
-#import "ZPAttachmentIconViewController.h"
 #import "ZPAuthenticationDialog.h"
 
 //Setting up the logger

@@ -19,7 +19,7 @@
 #import "ZPAppDelegate.h"
 #import "ZPServerConnection.h"
 #import "ZPPreferences.h"
-#import "ZPAttachmentIconViewController.h"
+#import "ZPAttachmentIconImageFactory.h"
 #import "ZPAttachmentCarouselDelegate.h"
 
 //Define 
@@ -61,7 +61,6 @@
                                                             self.view.frame.size.width,
                                                             ATTACHMENT_VIEW_HEIGHT)];
     _carousel.type = iCarouselTypeCoverFlow2;
-    _carousel.currentItemIndex=0;
     
     _carouselDelegate = [[ZPAttachmentCarouselDelegate alloc] init];
     _carouselDelegate.actionButton=self.actionButton;
@@ -71,7 +70,9 @@
     
     [_carousel setDataSource:_carouselDelegate];
     [_carousel setDelegate:_carouselDelegate];
-    
+
+    _carousel.currentItemIndex=0;
+
     [[ZPDataLayer instance] registerAttachmentObserver:_carouselDelegate];
     [[ZPDataLayer instance] registerItemObserver:_carouselDelegate];
 
@@ -108,16 +109,13 @@
     return YES;
 }
 
-- (void)viewWillDisappear:(BOOL)animated
-{
-    
+-(void)viewDidUnload{
     [[ZPDataLayer instance] removeItemObserver:self];
     [[ZPDataLayer instance] removeItemObserver:_carouselDelegate];
     [[ZPDataLayer instance] removeAttachmentObserver:_carouselDelegate];
     
-	[super viewWillDisappear:animated];
+    [super viewDidUnload];
 }
-
 
 - (void)didReceiveMemoryWarning
 {

@@ -13,7 +13,6 @@
 #import "ZPDataLayer.h"
 #import "ZPServerConnection.h"
 #import "ZPCacheController.h"
-#import "ZPAttachmentIconViewController.h"
 #import "ZPAttachmentCarouselDelegate.h"
 @interface ZPFileImportViewController (){
     ZPAttachmentCarouselDelegate* _carouselDelegate;

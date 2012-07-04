@@ -17,7 +17,7 @@
 
 #import "OHAttributedLabel.h"
 #import "DTCoreText.h"
-#import "ZPAttachmentIconViewController.h"
+#import "ZPAttachmentIconImageFactory.h"
 #import "ZPPreviewController.h"
 
 //TODO: Refactor so that these would not be needed
@@ -728,7 +728,7 @@
                 
                 //DDLogVerbose(@"ImageView for row %i is %i",indexPath.row,articleThumbnail);
 
-                [ZPAttachmentIconViewController renderFileTypeIconForAttachment:attachment intoImageView:articleThumbnail];
+                [ZPAttachmentIconImageFactory renderFileTypeIconForAttachment:attachment intoImageView:articleThumbnail];
                 // Enable or disable depending whether file is available or not
                 
                 if(attachment.fileExists || ([attachment.linkMode intValue] == LINK_MODE_LINKED_URL && [ZPServerConnection instance])){

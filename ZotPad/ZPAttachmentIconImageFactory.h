@@ -10,17 +10,10 @@
 #import "ZPZoteroAttachment.h"
 #import "ZPAttachmentObserver.h"
 
-extern NSInteger const ZPATTACHMENTICONGVIEWCONTROLLER_MODE_UPLOAD;
-extern NSInteger const ZPATTACHMENTICONGVIEWCONTROLLER_MODE_DOWNLOAD;
-extern NSInteger const ZPATTACHMENTICONGVIEWCONTROLLER_MODE_STATIC;
-extern NSInteger const ZPATTACHMENTICONGVIEWCONTROLLER_MODE_FIRST_STATIC_SECOND_DOWNLOAD;
-
-extern NSInteger const ZPATTACHMENTICONGVIEWCONTROLLER_SHOW_ORIGINAL;
-extern NSInteger const ZPATTACHMENTICONGVIEWCONTROLLER_SHOW_MODIFIED;
-extern NSInteger const ZPATTACHMENTICONGVIEWCONTROLLER_SHOW_FIRST_MODIFIED_SECOND_ORIGINAL;
 
 
-@interface ZPAttachmentIconViewController : UIViewController <ZPAttachmentObserver, UIWebViewDelegate, UIGestureRecognizerDelegate>{
+
+@interface ZPAttachmentIconImageFactory : NSObject <UIWebViewDelegate>{
 }
 
 
@@ -36,6 +29,8 @@ extern NSInteger const ZPATTACHMENTICONGVIEWCONTROLLER_SHOW_FIRST_MODIFIED_SECON
 @property NSInteger show;
 
 +(void) renderFileTypeIconForAttachment:(ZPZoteroAttachment*) attachment intoImageView:(UIImageView*) fileImage;
++(void) renderPDFPreviewForFileAtPath:(NSString*) filePath intoImageView:(UIImageView*) fileImage;
++(CGRect) getDimensionsForImageView:(UIImageView*) imageView withImage:(UIImage*) image;    
 
 
 @end
