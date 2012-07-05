@@ -32,7 +32,9 @@ NSInteger const VERSION_SOURCE_DROPBOX =3;
 
 @implementation ZPZoteroAttachment
 
-@synthesize lastViewed, attachmentSize, existsOnZoteroServer, filename, url, versionSource, versionIdentifier_server, versionIdentifier_local, charset;
+@synthesize lastViewed, attachmentSize, existsOnZoteroServer, filename, url, versionSource,  charset;
+@synthesize versionIdentifier_server;
+@synthesize versionIdentifier_local;
 
 //@synthesize versionIdentifier_local;
 

@@ -745,7 +745,7 @@ const NSInteger ZPServerConnectionRequestPermissions = 10;
     //Update the timestamps and copy files into right place
     
     attachment.versionIdentifier_server = identifier;
-    attachment.versionIdentifier_local = [NSNull null];
+    attachment.versionIdentifier_local = identifier;
     [[ZPDatabase instance] writeVersionInfoForAttachment:attachment];
     [attachment moveModifiedFileAsOriginalFile];
     
