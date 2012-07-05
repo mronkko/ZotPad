@@ -18,6 +18,8 @@
 #import <zlib.h>
 
 
+
+
 NSInteger const ZPATTACHMENTICONGVIEWCONTROLLER_MODE_STATIC = 0;
 NSInteger const ZPATTACHMENTICONGVIEWCONTROLLER_MODE_UPLOAD = 1;
 NSInteger const ZPATTACHMENTICONGVIEWCONTROLLER_MODE_DOWNLOAD = 2;
@@ -26,6 +28,16 @@ NSInteger const ZPATTACHMENTICONGVIEWCONTROLLER_MODE_FIRST_STATIC_SECOND_DOWNLOA
 NSInteger const ZPATTACHMENTICONGVIEWCONTROLLER_SHOW_ORIGINAL = 10;
 NSInteger const ZPATTACHMENTICONGVIEWCONTROLLER_SHOW_MODIFIED = 11;
 NSInteger const ZPATTACHMENTICONGVIEWCONTROLLER_SHOW_FIRST_MODIFIED_SECOND_ORIGINAL = 12;
+
+
+//The tags are negative, because iCarousel adds positive tags to the root views
+
+NSInteger const ZPATTACHMENTICONGVIEWCONTROLLER_TAG_FILEIMAGE = -1;
+NSInteger const ZPATTACHMENTICONGVIEWCONTROLLER_TAG_ERRORLABEL = -2;
+NSInteger const ZPATTACHMENTICONGVIEWCONTROLLER_TAG_STATUSLABEL = -3;
+NSInteger const ZPATTACHMENTICONGVIEWCONTROLLER_TAG_PROGRESSVIEW = -4;
+NSInteger const ZPATTACHMENTICONGVIEWCONTROLLER_TAG_TITLELABEL = -5;
+
 
 @interface ZPAttachmentCarouselDelegate()
 
@@ -141,6 +153,7 @@ NSInteger const ZPATTACHMENTICONGVIEWCONTROLLER_SHOW_FIRST_MODIFIED_SECOND_ORIGI
     
     if(view==NULL){
         //Construct a blank view
+        
         NSInteger height = carousel.frame.size.height*0.95;
         NSInteger width= height/1.4142;
         
@@ -150,7 +163,7 @@ NSInteger const ZPATTACHMENTICONGVIEWCONTROLLER_SHOW_FIRST_MODIFIED_SECOND_ORIGI
         view.tag = index;
         
         fileImage = [[UIImageView alloc] initWithFrame:CGRectMake(0,(height-width)/2, width, width)];
-        fileImage.tag = 1;
+        fileImage.tag = ZPATTACHMENTICONGVIEWCONTROLLER_TAG_FILEIMAGE;
         [view addSubview:fileImage];
         
         NSInteger labelHeight = height*2/5;
@@ -159,7 +172,6 @@ NSInteger const ZPATTACHMENTICONGVIEWCONTROLLER_SHOW_FIRST_MODIFIED_SECOND_ORIGI
         UIView* labelBackground = [[UIView alloc] initWithFrame:CGRectMake((width-labelWidth)/2, (height-labelHeight)/2, labelWidth, labelHeight)];
         labelBackground.backgroundColor = [[UIColor blackColor] colorWithAlphaComponent:.5];
         labelBackground.layer.cornerRadius = 8;
-        labelBackground.tag = 2;
         [view addSubview:labelBackground];
         
         NSInteger labelSubviewOffset = 10;
@@ -168,27 +180,27 @@ NSInteger const ZPATTACHMENTICONGVIEWCONTROLLER_SHOW_FIRST_MODIFIED_SECOND_ORIGI
 
         titleLabel = [[UILabel alloc] initWithFrame:CGRectMake(labelSubviewOffset, labelSubviewOffset, labelSubviewWidth, labelSubviewHeight*.6)];
         titleLabel.numberOfLines = 4;
-        titleLabel.tag = 3;
+        titleLabel.tag = ZPATTACHMENTICONGVIEWCONTROLLER_TAG_TITLELABEL;
         titleLabel.backgroundColor = [UIColor clearColor];
         titleLabel.textColor = [UIColor whiteColor];
         
         [labelBackground addSubview:titleLabel];
         
         progressLabel = [[UILabel alloc] initWithFrame:CGRectMake(labelSubviewOffset, labelSubviewOffset + labelSubviewHeight*.6, labelSubviewWidth, labelSubviewHeight*.15)];
-        progressLabel.tag = 4;
+        progressLabel.tag = ZPATTACHMENTICONGVIEWCONTROLLER_TAG_STATUSLABEL;
         progressLabel.backgroundColor = [UIColor clearColor];
         progressLabel.textColor = [UIColor whiteColor];
 
         [labelBackground addSubview: progressLabel];
         
         progressView = [[UIProgressView alloc] initWithFrame:CGRectMake(labelSubviewOffset, labelSubviewOffset + labelSubviewHeight*.75, labelSubviewWidth, labelSubviewHeight*.15)];
-        progressView.tag = 5;
+        progressView.tag = ZPATTACHMENTICONGVIEWCONTROLLER_TAG_PROGRESSVIEW;
         progressView.backgroundColor = [UIColor clearColor];
         
         [labelBackground addSubview: progressView];
         
         errorLabel = [[UILabel alloc] initWithFrame:CGRectMake(labelSubviewOffset, labelSubviewOffset + labelSubviewHeight*.75, labelSubviewWidth, labelSubviewHeight*.25)];
-        errorLabel.tag = 6;
+        errorLabel.tag = ZPATTACHMENTICONGVIEWCONTROLLER_TAG_ERRORLABEL;
         errorLabel.backgroundColor = [UIColor clearColor];
         errorLabel.textColor = [UIColor whiteColor];
         errorLabel.font = [UIFont systemFontOfSize:12];
@@ -200,12 +212,11 @@ NSInteger const ZPATTACHMENTICONGVIEWCONTROLLER_SHOW_FIRST_MODIFIED_SECOND_ORIGI
     }
     else{
         
-        fileImage = (UIImageView*)[view viewWithTag:1];
-        UIView* labelBackground = [view viewWithTag:2];
-        titleLabel = (UILabel*)[labelBackground viewWithTag:3];
-        progressLabel = (UILabel*)[labelBackground viewWithTag:4];
-        progressView = (UIProgressView*)[labelBackground viewWithTag:5];
-        errorLabel = (UILabel*)[labelBackground viewWithTag:6];
+        fileImage = (UIImageView*)[view viewWithTag:ZPATTACHMENTICONGVIEWCONTROLLER_TAG_FILEIMAGE];
+        titleLabel = (UILabel*)[view viewWithTag:ZPATTACHMENTICONGVIEWCONTROLLER_TAG_TITLELABEL];
+        progressLabel = (UILabel*)[view viewWithTag:ZPATTACHMENTICONGVIEWCONTROLLER_TAG_STATUSLABEL];
+        progressView = (UIProgressView*)[view viewWithTag:ZPATTACHMENTICONGVIEWCONTROLLER_TAG_PROGRESSVIEW];
+        errorLabel = (UILabel*)[view viewWithTag:ZPATTACHMENTICONGVIEWCONTROLLER_TAG_ERRORLABEL];
     }
 
 
@@ -246,7 +257,9 @@ NSInteger const ZPATTACHMENTICONGVIEWCONTROLLER_SHOW_FIRST_MODIFIED_SECOND_ORIGI
     
     //TODO: Cache rendered PDF images
 
-    if([attachment.contentType isEqualToString:@"application/pdf"]){
+    if([attachment.contentType isEqualToString:@"application/pdf"] && 
+        ([attachment.linkMode intValue] == LINK_MODE_IMPORTED_FILE ||
+         [attachment.linkMode intValue] == LINK_MODE_IMPORTED_URL)){
         
         NSString* path;
         if([self _showForAttachment:attachment] == ZPATTACHMENTICONGVIEWCONTROLLER_SHOW_ORIGINAL){
@@ -374,7 +387,9 @@ NSInteger const ZPATTACHMENTICONGVIEWCONTROLLER_SHOW_FIRST_MODIFIED_SECOND_ORIGI
            ([attachment.linkMode intValue] == LINK_MODE_LINKED_URL && [ZPServerConnection instance])){
             UIView* sourceView;
             for(sourceView in carousel.visibleItemViews){
-                if([carousel indexOfItemView:sourceView] == index) break;
+                if([carousel indexOfItemView:sourceView] == index){
+                    break;   
+                }
             }
             
             [ZPPreviewController displayQuicklookWithAttachment:attachment sourceView:sourceView];
@@ -519,9 +534,7 @@ NSInteger const ZPATTACHMENTICONGVIEWCONTROLLER_SHOW_FIRST_MODIFIED_SECOND_ORIGI
             
             if ([NSThread isMainThread]){
 
-                UIView* labelBackground = [view viewWithTag:2];
-                
-                UILabel* progressLabel = (UILabel*)[labelBackground viewWithTag:4];
+                UILabel* progressLabel = (UILabel*)[view viewWithTag:ZPATTACHMENTICONGVIEWCONTROLLER_TAG_STATUSLABEL];
                 if(progressText == NULL){
                     progressLabel.hidden = TRUE;   
                 }
@@ -530,7 +543,7 @@ NSInteger const ZPATTACHMENTICONGVIEWCONTROLLER_SHOW_FIRST_MODIFIED_SECOND_ORIGI
                     progressLabel.hidden = FALSE;
                 }
                 
-                UILabel* errorLabel = (UILabel*)[labelBackground viewWithTag:6];
+                UILabel* errorLabel = (UILabel*)[view viewWithTag:ZPATTACHMENTICONGVIEWCONTROLLER_TAG_ERRORLABEL];
                 if(errorText == NULL){
                     errorLabel.hidden = TRUE;   
                 }
@@ -539,7 +552,7 @@ NSInteger const ZPATTACHMENTICONGVIEWCONTROLLER_SHOW_FIRST_MODIFIED_SECOND_ORIGI
                     errorLabel.hidden = FALSE;
                 }
                 
-                UIProgressView* progressView = (UIProgressView*)[labelBackground viewWithTag:5];
+                UIProgressView* progressView = (UIProgressView*)[view viewWithTag:ZPATTACHMENTICONGVIEWCONTROLLER_TAG_PROGRESSVIEW];
                 if(mode == ZPATTACHMENTICONGVIEWCONTROLLER_MODE_STATIC){
                     progressView.hidden = TRUE;
                     view.userInteractionEnabled = FALSE;
@@ -555,7 +568,7 @@ NSInteger const ZPATTACHMENTICONGVIEWCONTROLLER_SHOW_FIRST_MODIFIED_SECOND_ORIGI
                     view.userInteractionEnabled = FALSE;
                 }
                 
-                if(reconfigureIcon) [self _configureFileImageView:(UIImageView*)[view viewWithTag:1] withAttachment:attachment];
+                if(reconfigureIcon) [self _configureFileImageView:(UIImageView*)[view viewWithTag:ZPATTACHMENTICONGVIEWCONTROLLER_TAG_FILEIMAGE] withAttachment:attachment];
 
 
             }

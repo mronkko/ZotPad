@@ -10,6 +10,7 @@
 #import "ZPDatabase.h"
 #import "ZPPreviewController.h"
 #import "ZPAttachmentFileInteractionController.h"
+#import "ZPAttachmentCarouselDelegate.h"
 
 //Unzipping and base64 decoding
 #import "ZipArchive.h"
@@ -71,22 +72,26 @@
     }
     [_previewItems addObject:attachment];
 }
-
-- (NSInteger) startIndex{
-    return [_previewItems count]-1;
-    
-}
+ 
+// Item history is disabled because it was problematic to implement.
+ 
+ - (NSInteger) startIndex{
+     return 0;
+// return [_previewItems count]-1;
+ }
 
 #pragma mark - Quick Look data source methods
 
 - (NSInteger) numberOfPreviewItemsInPreviewController: (QLPreviewController *) controller 
 {
-    return [_previewItems count];
+    return 1;
+    //    return [_previewItems count];
 }
 
 
 - (id <QLPreviewItem>) previewController: (QLPreviewController *) controller previewItemAtIndex: (NSInteger) index{
-    return [_previewItems objectAtIndex:index];
+    return [_previewItems lastObject];
+    //return [_previewItems objectAtIndex:index];
 }
 
 
@@ -207,16 +212,16 @@ static ZPPreviewControllerDelegate* _sharedDelegate;
 //Needed to provide zoom effect
 
 - (CGRect)previewController:(QLPreviewController *)controller frameForPreviewItem:(id <QLPreviewItem>)item inSourceView:(UIView **)view{
-*view = _source;
-CGRect frame = _source.frame;
-return frame; 
+    *view = _source;
+    CGRect frame = _source.frame;
+    return frame; 
 } 
 
 
 - (UIImage *)previewController:(QLPreviewController *)controller transitionImageForPreviewItem:(id <QLPreviewItem>)item contentRect:(CGRect *)contentRect{
     if([_source isKindOfClass:[UIImageView class]]) return [(UIImageView*) _source image];
     else{
-        UIImageView* imageView = (UIImageView*) [_source viewWithTag:1];
+        UIImageView* imageView = (UIImageView*) [_source viewWithTag:ZPATTACHMENTICONGVIEWCONTROLLER_TAG_FILEIMAGE];
         return imageView.image;
     }
 }

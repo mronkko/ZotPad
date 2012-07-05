@@ -102,6 +102,8 @@ NSInteger const VERSION_SOURCE_DROPBOX =3;
 
 - (NSString*) _fileSystemPathWithSuffix:(NSString*)suffix{
     
+    if(self.filename == NULL || self.filename == [NSNull null]) return NULL;
+    
     NSString* path;
     //Imported URLs are stored as ZIP files
     
