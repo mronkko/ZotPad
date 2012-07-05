@@ -3,7 +3,7 @@
 //  ZotPad
 //
 //  Created by Rönkkö Mikko on 11/14/11.
-//  Copyright (c) 2011 __MyCompanyName__. All rights reserved.
+//  Copyright (c) 2011 Mikko Rönkkö. All rights reserved.
 //
 
 #import "ZPCore.h"
@@ -218,19 +218,10 @@ didFinishLaunchingWithOptions:(NSDictionary *)launchOptions
         }
         else{
             DDLogInfo(@"A file %@ from %@",[url lastPathComponent],sourceApplication);
-
-            [self _dismissViewControllerHierarchy];
             
-            //The view controller must load first to register an observer
-            ZPFileImportViewController* importViewController = [self.window.rootViewController.storyboard instantiateViewControllerWithIdentifier:@"FileImportDialog"];
-            importViewController.modalPresentationStyle = UIModalPresentationFormSheet;
-            importViewController.modalTransitionStyle = UIModalTransitionStyleCoverVertical;
-            importViewController.url=url;
-            
-            [self.window.rootViewController presentModalViewController:importViewController animated:NO];
+            [self dismissViewControllerHierarchy];
+            [self.window.rootViewController performSegueWithIdentifier:@"Import" sender:url];
             [[ZPCacheController instance] addAttachmentToUploadQueue:attachment withNewFile:url];
-            
-            
         }
                                                                 
         
@@ -253,7 +244,7 @@ didFinishLaunchingWithOptions:(NSDictionary *)launchOptions
         UIViewController* root = self.window.rootViewController;  
         
         if(root.presentedViewController == NULL || ![root.presentedViewController isKindOfClass:[ZPAuthenticationDialog class]]){
-            [self _dismissViewControllerHierarchy];
+            [self dismissViewControllerHierarchy];
             [root performSegueWithIdentifier:@"Authentication" sender:NULL];
         }
     }
@@ -263,7 +254,7 @@ didFinishLaunchingWithOptions:(NSDictionary *)launchOptions
 
 }
 
--(void)_dismissViewControllerHierarchy{
+-(void) dismissViewControllerHierarchy{
    
     //Find the top most viewcontroller
     UIViewController* viewController = self.window.rootViewController;

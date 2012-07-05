@@ -3,7 +3,7 @@
 //  ZotPad
 //
 //  Created by Rönkkö Mikko on 12/11/11.
-//  Copyright (c) 2011 __MyCompanyName__. All rights reserved.
+//  Copyright (c) 2011 Mikko Rönkkö. All rights reserved.
 //
 
 
@@ -12,6 +12,7 @@
 #import "ZPDatabase.h"
 #import "FileMD5Hash.h"
 #import "QSStrings.h"
+#import "ZPCacheController.h"
 
 NSInteger const LINK_MODE_IMPORTED_FILE = 0;
 NSInteger const LINK_MODE_IMPORTED_URL = 1;
@@ -23,7 +24,7 @@ NSInteger const VERSION_SOURCE_WEBDAV =2;
 NSInteger const VERSION_SOURCE_DROPBOX =3;
 
 @interface ZPZoteroAttachment(){
-    NSString* _versionIdentifier_local;
+    NSString* _md5;
 }
 - (NSString*) _fileSystemPathWithSuffix:(NSString*)suffix;
 
@@ -31,15 +32,10 @@ NSInteger const VERSION_SOURCE_DROPBOX =3;
 
 @implementation ZPZoteroAttachment
 
-@synthesize lastViewed, attachmentSize, existsOnZoteroServer, filename, url, versionSource, versionIdentifier_server, charset, md5;
+@synthesize lastViewed, attachmentSize, existsOnZoteroServer, filename, url, versionSource, versionIdentifier_server, versionIdentifier_local, charset;
+
 //@synthesize versionIdentifier_local;
 
--(void) setVersionIdentifier_local:(NSString *)versionIdentifier_local{
-    _versionIdentifier_local = versionIdentifier_local;
-}
--(NSString*) versionIdentifier_local{
-    return _versionIdentifier_local;
-}
 
 +(id) dataObjectWithDictionary:(NSDictionary *)fields{
     NSMutableDictionary* dict = [NSMutableDictionary dictionaryWithDictionary:fields ];
@@ -222,6 +218,18 @@ NSInteger const VERSION_SOURCE_DROPBOX =3;
         return ([[NSFileManager defaultManager] fileExistsAtPath:fsPath]);
 }
 
+-(void) setMd5:(NSString *)md5{
+    if(md5!= NULL && md5 != [NSNull null]){
+        if(_md5!= NULL && _md5 != [NSNull null] && ! [_md5 isEqualToString:md5]){
+            //The file has changed on the server, so we will queue a download for it
+            [[ZPCacheController instance] addAttachmentToDowloadQueue:self];
+        }
+    }
+    _md5 = md5;
+}
+-(NSString*) md5{
+    return _md5;
+}
 //The reason for purging a file will be logged 
 
 -(void) purge:(NSString*) reason{

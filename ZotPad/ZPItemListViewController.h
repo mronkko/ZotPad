@@ -3,7 +3,7 @@
 //  ZotPad
 //
 //  Created by Rönkkö Mikko on 11/14/11.
-//  Copyright (c) 2011 __MyCompanyName__. All rights reserved.
+//  Copyright (c) 2011 Mikko Rönkkö. All rights reserved.
 //
 
 #import <UIKit/UIKit.h>
@@ -39,6 +39,9 @@
 @property (nonatomic, retain) IBOutlet UISearchBar* searchBar;
 @property (nonatomic, retain) IBOutlet UIToolbar* toolBar;
 @property (nonatomic, retain) IBOutlet UITableView* tableView;
+
+//This is the tableview that the datasource targets.
+@property (nonatomic, retain) UITableView* targetTableView;
 
 @property (nonatomic, retain) ZPItemDetailViewController* itemDetailViewController;
 

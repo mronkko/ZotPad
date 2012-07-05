@@ -5,7 +5,7 @@
 //  Handles communication with Zotero server. Used as a singleton.
 //
 //  Created by Rönkkö Mikko on 11/21/11.
-//  Copyright (c) 2011 __MyCompanyName__. All rights reserved.
+//  Copyright (c) 2011 Mikko Rönkkö. All rights reserved.
 //
 
 #import <Foundation/Foundation.h>
@@ -63,7 +63,7 @@
 //Asynchronous uploading of files
 -(NSInteger) numberOfFilesUploading;
 -(void) uploadVersionOfAttachment:(ZPZoteroAttachment*)attachment;
--(void) finishedUploadingAttachment:(ZPZoteroAttachment*)attachment;
+-(void) finishedUploadingAttachment:(ZPZoteroAttachment*)attachment withVersionIdentifier:(NSString*)identifier;
 -(void) failedUploadingAttachment:(ZPZoteroAttachment*)attachment withError:(NSError*) error usingFileChannel:(ZPFileChannel*)fileChannel;
 -(void) canceledUploadingAttachment:(ZPZoteroAttachment*)attachment usingFileChannel:(ZPFileChannel*)fileChannel;
 -(void) useProgressView:(UIProgressView*) progressView forUploadingAttachment:(ZPZoteroAttachment*)attachment;

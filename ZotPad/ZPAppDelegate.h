@@ -3,7 +3,7 @@
 //  ZotPad
 //
 //  Created by Rönkkö Mikko on 11/14/11.
-//  Copyright (c) 2011 __MyCompanyName__. All rights reserved.
+//  Copyright (c) 2011 Mikko Rönkkö. All rights reserved.
 //
 
 #import <UIKit/UIKit.h>
@@ -11,7 +11,7 @@
 
 @interface ZPAppDelegate : UIResponder <UIApplicationDelegate>
 
-- (void) _dismissViewControllerHierarchy;
+- (void) dismissViewControllerHierarchy;
 - (void) startAuthenticationSequence;
 
 @property (retain) DDFileLogger* fileLogger;

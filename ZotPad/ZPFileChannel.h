@@ -22,7 +22,7 @@
 -(int) fileChannelType;
 
 
--(void) startUploadingAttachment:(ZPZoteroAttachment*)attachment;
+-(void) startUploadingAttachment:(ZPZoteroAttachment*)attachment overWriteConflictingServerVersion:(BOOL)overwriteConflicting;
 -(void) cancelUploadingAttachment:(ZPZoteroAttachment*)attachment;
 -(void) useProgressView:(UIProgressView*) progressView forUploadingAttachment:(ZPZoteroAttachment*)attachment;
 

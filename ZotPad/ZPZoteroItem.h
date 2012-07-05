@@ -3,7 +3,7 @@
 //  ZotPad
 //
 //  Created by Rönkkö Mikko on 11/23/11.
-//  Copyright (c) 2011 __MyCompanyName__. All rights reserved.
+//  Copyright (c) 2011 Mikko Rönkkö. All rights reserved.
 //
 
 

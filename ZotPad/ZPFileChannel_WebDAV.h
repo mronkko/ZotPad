@@ -11,6 +11,8 @@
 
 extern NSInteger const ZPFILECHANNEL_WEBDAV_DOWNLOAD;
 extern NSInteger const ZPFILECHANNEL_WEBDAV_UPLOAD_FILE;
+extern NSInteger const ZPFILECHANNEL_WEBDAV_UPLOAD_UPDATE_LASTSYNC;
+extern NSInteger const ZPFILECHANNEL_WEBDAV_UPLOAD_UPDATE_PROP;
 extern NSInteger const ZPFILECHANNEL_WEBDAV_UPLOAD_REGISTER;
 
 @interface ZPFileChannel_WebDAV : ZPFileChannel <UIAlertViewDelegate>{

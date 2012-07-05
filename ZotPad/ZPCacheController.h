@@ -3,7 +3,7 @@
 //  ZotPad
 //
 //  Created by Rönkkö Mikko on 12/16/11.
-//  Copyright (c) 2011 __MyCompanyName__. All rights reserved.
+//  Copyright (c) 2011 Mikko Rönkkö. All rights reserved.
 //
 
 #import <Foundation/Foundation.h>
@@ -53,5 +53,6 @@
 -(void) addToCollectionsQueue:(ZPZoteroCollection*)object priority:(BOOL)priority;
 -(void) addToItemQueue:(NSArray*)items libraryID:(NSNumber*)libraryID priority:(BOOL)priority;
 -(void) addAttachmentToUploadQueue:(ZPZoteroAttachment*) attachment withNewFile:(NSURL*)urlToFile; 
+-(void) addAttachmentToDowloadQueue:(ZPZoteroAttachment *)attachment;
 
 @end

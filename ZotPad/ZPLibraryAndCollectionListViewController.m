@@ -3,7 +3,7 @@
 //  ZotPad
 //
 //  Created by Rönkkö Mikko on 11/14/11.
-//  Copyright (c) 2011 __MyCompanyName__. All rights reserved.
+//  Copyright (c) 2011 Mikko Rönkkö. All rights reserved.
 //
 
 #import "ZPCore.h"
@@ -126,6 +126,29 @@
         [target clearSearch];
         [target configureView];
         
+    }
+    if([segue.identifier isEqualToString:@"PushItemsToNavigator"]){
+        
+        
+        ZPItemListViewController* currentItemViewController = (ZPItemListViewController*) sender;
+        UITableViewController*  target = (UITableViewController*) segue.destinationViewController;
+        
+         target.navigationItem.hidesBackButton = YES;
+         target.clearsSelectionOnViewWillAppear = NO;
+        
+        [target setToolbarItems:[[currentItemViewController.navigationController topViewController] toolbarItems]];
+         
+         // Get the selected row from the item list
+         NSIndexPath* indexPath = [currentItemViewController.tableView indexPathForSelectedRow];
+         
+         @synchronized(self){
+             [target.tableView setDelegate: currentItemViewController];
+             [target.tableView setDataSource: currentItemViewController];
+             currentItemViewController.targetTableView = target.tableView;
+         }
+        
+         [target.tableView selectRowAtIndexPath:indexPath animated:NO scrollPosition:UITableViewScrollPositionMiddle]; 
+
     }
 }
 

@@ -184,7 +184,7 @@ static ZPAttachmentIconImageFactory* _webViewDelegate;
     //We have a cached image
     else{
         //        DDLogVerbose(@"Using cached image %@",cacheKey);
-        
+         DDLogVerbose(@"Using cached image %@ for view %@",cacheKey,fileImage);
         fileImage.image = cacheImage;
     }
 }
@@ -326,6 +326,8 @@ static ZPAttachmentIconImageFactory* _webViewDelegate;
 }
 
 +(void) _showPDFPreview:(UIImage*) image inImageView:(UIImageView*) imageView{
+    
+    DDLogVerbose(@"Setting PDF preview to imageView %@",imageView);
     CGRect frame = [self getDimensionsForImageView:imageView.superview withImage:image];
     imageView.frame = frame;
     imageView.center = imageView.superview.center;
@@ -343,12 +345,11 @@ static ZPAttachmentIconImageFactory* _webViewDelegate;
 
 +(CGRect) getDimensionsForImageView:(UIImageView*) imageView withImage:(UIImage*) image{   
     
-    float scalingFactor = imageView.frame.size.height/image.size.height;
+    float scalingFactor = MIN(imageView.frame.size.height/image.size.height,imageView.frame.size.width/image.size.width);
     
-    if(imageView.frame.size.height/image.size.width<scalingFactor) scalingFactor = imageView.frame.size.width/image.size.width;
-
     float newWidth = image.size.width*scalingFactor;
     float newHeight = image.size.height*scalingFactor;
+
     DDLogVerbose(@"Dimensions (width x height) image: %f x %f view:  %f x %f, return %f x %f",image.size.width,image.size.height,imageView.frame.size.width,imageView.frame.size.height,newWidth,newHeight);
 
     return CGRectMake(0,0,newWidth,newHeight);
@@ -382,21 +383,26 @@ static ZPAttachmentIconImageFactory* _webViewDelegate;
         
         UIGraphicsBeginImageContext(pageRect.size);
         CGContextRef context = UIGraphicsGetCurrentContext();
-        CGContextTranslateCTM(context, CGRectGetMinX(pageRect),CGRectGetMaxY(pageRect));
-        CGContextScaleCTM(context, 1, -1);  
-        CGContextTranslateCTM(context, -(pageRect.origin.x), -(pageRect.origin.y));
-        CGContextDrawPDFPage(context, pageRef);
         
-        UIImage* image = UIGraphicsGetImageFromCurrentImageContext();
-        UIGraphicsEndImageContext();
-        
-        if(image != NULL){
-            DDLogVerbose(@"Done rendering pdf %@",filePath);
-            //        [_previewCache setObject:image forKey:filePath];
-            dispatch_async(dispatch_get_main_queue(), ^{
-                [self _showPDFPreview:image inImageView:fileImage];
-            });
-        } 
+        //If something goes wrong, we might get an empty context
+        if (context != NULL) {
+
+            CGContextTranslateCTM(context, CGRectGetMinX(pageRect),CGRectGetMaxY(pageRect));
+            CGContextScaleCTM(context, 1, -1);  
+            CGContextTranslateCTM(context, -(pageRect.origin.x), -(pageRect.origin.y));
+            CGContextDrawPDFPage(context, pageRef);
+            
+            UIImage* image = UIGraphicsGetImageFromCurrentImageContext();
+            UIGraphicsEndImageContext();
+            
+            if(image != NULL){
+                DDLogVerbose(@"Done rendering pdf %@",filePath);
+                //        [_previewCache setObject:image forKey:filePath];
+                dispatch_async(dispatch_get_main_queue(), ^{
+                    [self _showPDFPreview:image inImageView:fileImage];
+                });
+            } 
+        }
     }
 }
 

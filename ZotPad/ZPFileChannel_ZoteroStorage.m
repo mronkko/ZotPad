@@ -6,6 +6,7 @@
 //  Copyright (c) 2012 Mikko Rönkkö. All rights reserved.
 //
 
+
 #import "ZPCore.h"
 
 #import "ZPFileChannel_ZoteroStorage.h"
@@ -24,8 +25,8 @@ NSInteger const ZPFILECHANNEL_ZOTEROSTORAGE_UPLOAD_REGISTER = 4;
 
 
 @interface ZPFileChannel_ZoteroStorage()
-- (ASIHTTPRequest*) _baseRequestForAttachment:(ZPZoteroAttachment*)attachment type:(NSInteger)type;
-- (NSString*) _versionIdentifierForAttachment:(ZPZoteroAttachment*)attachment;
+- (ASIHTTPRequest*) _baseRequestForAttachment:(ZPZoteroAttachment*)attachment type:(NSInteger)type overWriteConflictingServerVersion:(BOOL)overwriteConflicting;
+
 @end
 
 @implementation ZPFileChannel_ZoteroStorage
@@ -34,18 +35,9 @@ NSInteger const ZPFILECHANNEL_ZOTEROSTORAGE_UPLOAD_REGISTER = 4;
     return VERSION_SOURCE_ZOTERO;
 }
 
-- (NSString*) _versionIdentifierForAttachment:(ZPZoteroAttachment*)attachment{
-    
-    NSString* versionIdentifier  = attachment.versionIdentifier_server;
-    // Fall back on the metadata
-    if(versionIdentifier == [NSNull null]){
-        versionIdentifier = attachment.md5;
-    }
-    
-    return  versionIdentifier;
-}
 
-- (ASIHTTPRequest*) _baseRequestForAttachment:(ZPZoteroAttachment*)attachment type:(NSInteger)type{
+
+- (ASIHTTPRequest*) _baseRequestForAttachment:(ZPZoteroAttachment*)attachment type:(NSInteger)type overWriteConflictingServerVersion:(BOOL)overwriteConflicting{
    
     
     if(attachment.key == [NSNull null]){
@@ -78,7 +70,15 @@ NSInteger const ZPFILECHANNEL_ZOTEROSTORAGE_UPLOAD_REGISTER = 4;
     if(type != ZPFILECHANNEL_ZOTEROSTORAGE_DOWNLOAD){
         request.requestMethod = @"POST";
         [request addRequestHeader:@"Content-Type" value:@"application/x-www-form-urlencoded"];
-        [request addRequestHeader:@"If-Match" value:[self _versionIdentifierForAttachment:attachment]];
+        
+        //If we are overwriting a conflicting file, just use the metadata md5 instead of the md5 that we have received
+        
+        if(overwriteConflicting){
+            [request addRequestHeader:@"If-Match" value:attachment.md5];
+        }
+        else {
+            [request addRequestHeader:@"If-Match" value:attachment.versionIdentifier_server];
+        }
     }
     
     [self linkAttachment:attachment withRequest:request];
@@ -87,7 +87,6 @@ NSInteger const ZPFILECHANNEL_ZOTEROSTORAGE_UPLOAD_REGISTER = 4;
     request.showAccurateProgress=TRUE;
     request.delegate = self;
     request.tag = type;
-    request.userInfo = [NSDictionary dictionaryWithObject:attachment forKey:@"attachment"];
 
     return request;
 }
@@ -98,7 +97,8 @@ NSInteger const ZPFILECHANNEL_ZOTEROSTORAGE_UPLOAD_REGISTER = 4;
 -(void) startDownloadingAttachment:(ZPZoteroAttachment*)attachment{
 
     
-    ASIHTTPRequest* request = [self _baseRequestForAttachment:attachment type:ZPFILECHANNEL_ZOTEROSTORAGE_DOWNLOAD];
+    ASIHTTPRequest* request = [self _baseRequestForAttachment:attachment type:ZPFILECHANNEL_ZOTEROSTORAGE_DOWNLOAD overWriteConflictingServerVersion:FALSE];
+    request.userInfo = [NSDictionary dictionaryWithObject:attachment forKey:@"attachment"];
     
     NSString* tempFile = [NSTemporaryDirectory() stringByAppendingPathComponent:[NSString stringWithFormat:@"ZP%@%i",attachment.key,[[NSDate date] timeIntervalSince1970]*1000000]];
     [request setDownloadDestinationPath:tempFile];
@@ -129,9 +129,9 @@ NSInteger const ZPFILECHANNEL_ZOTEROSTORAGE_UPLOAD_REGISTER = 4;
 #pragma mark - Uploading
 
 
--(void) startUploadingAttachment:(ZPZoteroAttachment*)attachment{
-
-    ASIHTTPRequest* request = [self _baseRequestForAttachment:attachment type:ZPFILECHANNEL_ZOTEROSTORAGE_UPLOAD_AUTHORIZATION];
+-(void) startUploadingAttachment:(ZPZoteroAttachment*)attachment overWriteConflictingServerVersion:(BOOL)overwriteConflicting{
+    
+    ASIHTTPRequest* request = [self _baseRequestForAttachment:attachment type:ZPFILECHANNEL_ZOTEROSTORAGE_UPLOAD_AUTHORIZATION overWriteConflictingServerVersion:YES];
 
     // Get info about the file to be uploaded
     
@@ -142,8 +142,6 @@ NSInteger const ZPFILECHANNEL_ZOTEROSTORAGE_UPLOAD_REGISTER = 4;
     
     
     NSString* md5 = [ZPZoteroAttachment md5ForFileAtPath:path];
-    
-    attachment.versionIdentifier_local = md5;
 
     [attachment logFileRevisions];
 
@@ -158,8 +156,11 @@ NSInteger const ZPFILECHANNEL_ZOTEROSTORAGE_UPLOAD_REGISTER = 4;
                                 timeModifiedMilliseconds ];
 
 
-    NSMutableDictionary* userInfo = [[NSMutableDictionary alloc] initWithDictionary:request.userInfo];
+    NSMutableDictionary* userInfo = [[NSMutableDictionary alloc] initWithCapacity:3];
+    [userInfo setObject:attachment forKey:@"attachment"];
     [userInfo setObject:md5 forKey:@"md5"];
+    [userInfo setObject:[NSNumber numberWithBool:overwriteConflicting] forKey:@"overwriteConflicting"];
+    
     request.userInfo = userInfo;
     
     if(attachment.contentType != [NSNull null]){
@@ -225,7 +226,7 @@ NSInteger const ZPFILECHANNEL_ZOTEROSTORAGE_UPLOAD_REGISTER = 4;
 
                 DDLogWarn(@"Upload of file %@ was declined by Zotero server because the file exists already on the Zotero server",attachment.filename);
                 
-                [[ZPServerConnection instance] finishedUploadingAttachment:attachment];
+                [[ZPServerConnection instance] finishedUploadingAttachment:attachment withVersionIdentifier:attachment.versionIdentifier_local];
                 //TODO: Should there be some kind of notification that the file was not uploaded because it already exists?
             }
             else{
@@ -251,8 +252,13 @@ NSInteger const ZPFILECHANNEL_ZOTEROSTORAGE_UPLOAD_REGISTER = 4;
                 [userInfo setObject:[responseDictionary objectForKey:@"uploadKey"] forKey:@"uploadKey"];
                 uploadRequest.userInfo = userInfo;
                 
-                [uploadRequest addRequestHeader:@"If-Match" value:[self _versionIdentifierForAttachment:attachment]];
-                
+                if([(NSNumber*) [request.userInfo objectForKey:@"overwriteConflicting"] boolValue]){
+                    [request addRequestHeader:@"If-Match" value:attachment.md5];
+                }
+                else {
+                    [request addRequestHeader:@"If-Match" value:attachment.versionIdentifier_server];
+                }
+
                 NSDictionary* params = [responseDictionary objectForKey:@"params"];
                 for(NSString *key in params){
                     NSString* value = [params objectForKey:key];
@@ -278,7 +284,7 @@ NSInteger const ZPFILECHANNEL_ZOTEROSTORAGE_UPLOAD_REGISTER = 4;
             DDLogInfo(@"Uploading file %@ to Zotero server finished succesfully",attachment.filename);
                 
                 //Register upload
-                ASIHTTPRequest* registerRequest = [self _baseRequestForAttachment:attachment type:ZPFILECHANNEL_ZOTEROSTORAGE_UPLOAD_REGISTER];
+                ASIHTTPRequest* registerRequest = [self _baseRequestForAttachment:attachment type:ZPFILECHANNEL_ZOTEROSTORAGE_UPLOAD_REGISTER overWriteConflictingServerVersion:[(NSNumber*)[request.userInfo objectForKey:@"overwriteConflicting"] boolValue]];
                 [registerRequest setPostBody:[[NSString stringWithFormat:@"upload=%@",[request.userInfo objectForKey:@"uploadKey"]] dataUsingEncoding:NSASCIIStringEncoding]];
                 [registerRequest startAsynchronous];
                 
@@ -288,16 +294,14 @@ NSInteger const ZPFILECHANNEL_ZOTEROSTORAGE_UPLOAD_REGISTER = 4;
             DDLogInfo(@"New version of file %@ registered succesfully with Zotero server",attachment.filename);
 
             //All done
-            [[ZPServerConnection instance] finishedUploadingAttachment:attachment];
+            [[ZPServerConnection instance] finishedUploadingAttachment:attachment withVersionIdentifier:[request.userInfo objectForKey:@"md5"]];
             [self cleanupAfterFinishingAttachment:attachment];
         }
         else if(request.responseStatusCode == 412){
 
             DDLogWarn(@"Zotero server reported a version conflict with file %@",attachment.filename);
             //Conflict. 
-            
-            //Download new attachment metadata
-            
+                        
             //TODO: Refactor this to call ZPCacheController instead so that the response from the server is stored in the DB. 
             
             attachment = [[[ZPServerConnection instance] retrieveItemsFromLibrary:attachment.libraryID itemKeys:[NSArray arrayWithObject:attachment.key]] objectAtIndex:0];
@@ -307,8 +311,6 @@ NSInteger const ZPFILECHANNEL_ZOTEROSTORAGE_UPLOAD_REGISTER = 4;
             if(! [attachment.md5 isEqualToString:attachment.versionIdentifier_server]){
                 DDLogInfo(@"New metadate MD5 (%@) and cached MD5 (%@) differ",attachment.md5,attachment.versionIdentifier_server);
                 [attachment purge_original:@"File is outdated (Zotero storage conflict)"];
-                 attachment.versionIdentifier_server = attachment.md5;
-                [[ZPDatabase instance] writeVersionInfoForAttachment:attachment];
             }
             [self presentConflictViewForAttachment:attachment];
         }

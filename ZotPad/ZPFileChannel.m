@@ -12,7 +12,8 @@
 #import "ZPZoteroAttachment.h"
 #import "ZPServerConnection.h"
 #import "ZPUploadVersionConflictViewControllerViewController.h"
-
+#import "ZPFileImportViewController.h"
+#import "ZPAppDelegate.h"
 
 @implementation ZPFileChannel
 
@@ -35,7 +36,7 @@
     //Does nothing by default
 }
 
--(void) startUploadingAttachment:(ZPZoteroAttachment*)attachment{
+-(void) startUploadingAttachment:(ZPZoteroAttachment*)attachment overWriteConflictingServerVersion:(BOOL)overwriteConflicting{
     //Does nothing by default
 }
 
@@ -76,15 +77,20 @@
     [attachment logFileRevisions];
 
     UIViewController* root = [UIApplication sharedApplication].delegate.window.rootViewController;
-    UIStoryboard *storyboard = root.storyboard;
-    ZPUploadVersionConflictViewControllerViewController* viewController = [storyboard instantiateViewControllerWithIdentifier:@"VersionConflictView"];
-    viewController.attachment = attachment;
-    viewController.fileChannel = self;
     
-    UIViewController* top = root;
-    while(top.presentedViewController) top = top.presentedViewController;
-    
-    [top presentModalViewController:viewController animated:YES];
+    //TODO: Consider refactoring this some place else
+    NSDictionary* sender = [NSDictionary dictionaryWithObjectsAndKeys:self,@"fileChannel",attachment,@"attachment", nil];
+    if(root.presentedViewController == NULL){
+        [root performSegueWithIdentifier:@"FileUploadConflict" sender:sender];
+    }
+    else if ([root.presentedViewController isKindOfClass:[ZPFileImportViewController class]]){
+        [root.presentedViewController performSegueWithIdentifier:@"FileUploadConflictFromDialog" sender:sender];
+    }
+    else{
+        [(ZPAppDelegate*)[UIApplication sharedApplication].delegate dismissViewControllerHierarchy];
+        [root performSegueWithIdentifier:@"FileUploadConflict" sender:sender];
+    }
+
 }
 
 

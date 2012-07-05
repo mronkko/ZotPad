@@ -7,7 +7,7 @@
 //  Notified when new items become available
 //
 //  Created by Rönkkö Mikko on 12/11/11.
-//  Copyright (c) 2011 __MyCompanyName__. All rights reserved.
+//  Copyright (c) 2011 Mikko Rönkkö. All rights reserved.
 //
 
 #import <Foundation/Foundation.h>

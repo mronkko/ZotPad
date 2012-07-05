@@ -3,7 +3,7 @@
 //  ZotPad
 //
 //  Created by Rönkkö Mikko on 11/21/11.
-//  Copyright (c) 2011 __MyCompanyName__. All rights reserved.
+//  Copyright (c) 2011 Mikko Rönkkö. All rights reserved.
 //
 
 
@@ -735,18 +735,18 @@ const NSInteger ZPServerConnectionRequestPermissions = 10;
     if(_activeRequestCount==1) [[UIApplication sharedApplication] setNetworkActivityIndicatorVisible:YES];
     
     //Use the first channel
-    [uploadChannel startUploadingAttachment:attachment];
+    [uploadChannel startUploadingAttachment:attachment overWriteConflictingServerVersion:FALSE];
     
     [[ZPDataLayer instance] notifyAttachmentUploadStarted:attachment];
 
 }
--(void) finishedUploadingAttachment:(ZPZoteroAttachment*)attachment{
+-(void) finishedUploadingAttachment:(ZPZoteroAttachment*)attachment withVersionIdentifier:(NSString*)identifier{
     
     //Update the timestamps and copy files into right place
     
-    attachment.versionIdentifier_server = attachment.versionIdentifier_local;
+    attachment.versionIdentifier_server = identifier;
+    attachment.versionIdentifier_local = [NSNull null];
     [[ZPDatabase instance] writeVersionInfoForAttachment:attachment];
-    
     [attachment moveModifiedFileAsOriginalFile];
     
     @synchronized(_activeUploads){

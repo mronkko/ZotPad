@@ -20,10 +20,17 @@
 
 // https://www.dropbox.com/account#applications
 
+
+const NSInteger ZPFILECHANNEL_DROPBOX_UPLOAD = 1;
+const NSInteger ZPFILECHANNEL_DROPBOX_DOWNLOAD = 2;
+
+
 @interface ZPDBRestClient : DBRestClient
 
 @property (retain) ZPZoteroAttachment* attachment;
 @property (retain) NSString* revision;
+@property BOOL overwriteConflicting;
+@property NSInteger tag;
 
 -(void) _restClient:(ZPDBRestClient*)client processError:(NSError *)error;
 
@@ -31,7 +38,7 @@
 
 @implementation ZPDBRestClient
 
-@synthesize attachment,revision;
+@synthesize attachment,revision,overwriteConflicting,tag;
 
 @end
 
@@ -102,6 +109,7 @@
     ZPDBRestClient* restClient = [[ZPDBRestClient alloc] initWithSession:[DBSession sharedSession]];
     restClient.attachment = attachment;
     restClient.delegate = self;
+    restClient.tag = ZPFILECHANNEL_DROPBOX_DOWNLOAD;
     
     [self linkAttachment:attachment withRequest:restClient];
     
@@ -137,7 +145,7 @@
 
 #pragma mark - Uploads
 
--(void) startUploadingAttachment:(ZPZoteroAttachment*)attachment{
+-(void) startUploadingAttachment:(ZPZoteroAttachment*)attachment overWriteConflictingServerVersion:(BOOL)overwriteConflicting{
 
     //Link with dropBox account if not already linked
 
@@ -147,16 +155,13 @@
     ZPDBRestClient* restClient = [[ZPDBRestClient alloc] initWithSession:[DBSession sharedSession]];
     restClient.attachment = attachment;
     restClient.delegate = self;
+    restClient.overwriteConflicting = overwriteConflicting;
+    restClient.tag = ZPFILECHANNEL_DROPBOX_UPLOAD;
     
     [self linkAttachment:attachment withRequest:restClient];
+        
+    [restClient loadMetadata:[NSString stringWithFormat:@"/%@/%@",attachment.key,attachment.filename]];
     
-    NSString* targetPath = [NSString stringWithFormat:@"/%@/",attachment.key];
-    
-    DDLogVerbose(@"Uploading file %@ to %@%@ (rev %@)",attachment.fileSystemPath_modified,targetPath,attachment.filename,attachment.versionIdentifier_local);
-    
-    [restClient uploadFile:attachment.filename toPath:targetPath withParentRev:attachment.versionIdentifier_local fromPath:attachment.fileSystemPath_modified];
-   // [restClient uploadFile:attachment.filename toPath:@"/" withParentRev:NULL fromPath:attachment.fileSystemPath_modified];
-
 }
 
 -(void) useProgressView:(UIProgressView *)progressView forUploadingAttachment:(ZPZoteroAttachment *)attachment{
@@ -171,28 +176,45 @@
 #pragma mark - Call backs
 
 - (void)restClient:(ZPDBRestClient*)client loadedMetadata:(DBMetadata *)metadata {
-        
-    if (metadata.isDirectory) {
-        ZPZoteroAttachment* attachment = client.attachment;
-        DDLogVerbose(@"Folder '%@' contains:", metadata.path);
-        NSString* basePath=[NSTemporaryDirectory() stringByAppendingPathComponent:[NSString stringWithFormat:@"ZP%@%i",attachment.key,[[NSDate date] timeIntervalSince1970]*1000000]];
-        [[NSFileManager defaultManager] createDirectoryAtPath:basePath withIntermediateDirectories:YES attributes:NULL error:NULL];
-        for (DBMetadata *file in metadata.contents) {
-            DDLogVerbose(@"\t%@", file.filename);
-            NSString* tempFile = [basePath stringByAppendingPathComponent:file.filename];
-            [client loadFile:[NSString stringWithFormat:@"/%@/%@",attachment.key,file.filename] intoPath:tempFile];
+    
+    ZPZoteroAttachment* attachment = client.attachment;
+    
+    if(client.tag == ZPFILECHANNEL_DROPBOX_DOWNLOAD){
+        if (metadata.isDirectory) {
+           
+            DDLogVerbose(@"Folder '%@' contains:", metadata.path);
+            NSString* basePath=[NSTemporaryDirectory() stringByAppendingPathComponent:[NSString stringWithFormat:@"ZP%@%i",attachment.key,[[NSDate date] timeIntervalSince1970]*1000000]];
+            [[NSFileManager defaultManager] createDirectoryAtPath:basePath withIntermediateDirectories:YES attributes:NULL error:NULL];
+            for (DBMetadata *file in metadata.contents) {
+                DDLogVerbose(@"\t%@", file.filename);
+                NSString* tempFile = [basePath stringByAppendingPathComponent:file.filename];
+                [client loadFile:[NSString stringWithFormat:@"/%@/%@",attachment.key,file.filename] intoPath:tempFile];
+            }
+            @synchronized(downloadCountsByRequest){
+                [downloadCountsByRequest setObject:[NSNumber numberWithInt:[metadata.contents count]] forKey:[self keyForRequest:client]];
+            }
         }
-        @synchronized(downloadCountsByRequest){
-            [downloadCountsByRequest setObject:[NSNumber numberWithInt:[metadata.contents count]] forKey:[self keyForRequest:client]];
+        else{
+            //Set version of the file
+            client.revision=metadata.rev;
+            DDLogVerbose(@"Start downloading file /%@/%@ (rev %@)",attachment.key,attachment.filename,client.revision);
+            NSString* tempFile = [NSTemporaryDirectory() stringByAppendingPathComponent:[NSString stringWithFormat:@"ZP%@%i",attachment.key,[[NSDate date] timeIntervalSince1970]*1000000]];
+            [client loadFile:[NSString stringWithFormat:@"/%@/%@",attachment.key,attachment.filename] atRev:client.revision intoPath:tempFile];
         }
     }
-    else{
-        //Set version of the file
-        ZPZoteroAttachment* attachment = client.attachment;
-        client.revision=metadata.rev;
-        DDLogVerbose(@"Start downloading file /%@/%@ (rev %@)",attachment.key,attachment.filename,client.revision);
-         NSString* tempFile = [NSTemporaryDirectory() stringByAppendingPathComponent:[NSString stringWithFormat:@"ZP%@%i",attachment.key,[[NSDate date] timeIntervalSince1970]*1000000]];
-        [client loadFile:[NSString stringWithFormat:@"/%@/%@",attachment.key,attachment.filename] atRev:client.revision intoPath:tempFile];
+    // Uploading
+    else if(client.tag == ZPFILECHANNEL_DROPBOX_UPLOAD){
+        NSString* targetPath = [NSString stringWithFormat:@"/%@/",attachment.key];
+        
+        if(client.overwriteConflicting){
+            [client uploadFile:attachment.filename toPath:targetPath withParentRev:metadata.rev fromPath:attachment.fileSystemPath_modified];
+        }
+        else if(! [attachment.versionIdentifier_local isEqualToString:metadata.rev]){
+            [self presentConflictViewForAttachment:attachment];
+        }
+        else{
+            [client uploadFile:attachment.filename toPath:targetPath withParentRev:attachment.versionIdentifier_local fromPath:attachment.fileSystemPath_modified];
+        }
     }
 }
 
@@ -304,10 +326,7 @@
     
     ZPZoteroAttachment* attachment = client.attachment;
     
-    //The local file now has a new version identifier
-    attachment.versionIdentifier_local = metadata.rev;
-    
-    [[ZPServerConnection instance] finishedUploadingAttachment:attachment];
+    [[ZPServerConnection instance] finishedUploadingAttachment:attachment withVersionIdentifier:metadata.rev];
     [self cleanupAfterFinishingAttachment:attachment];
 
 }

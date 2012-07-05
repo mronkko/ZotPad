@@ -17,6 +17,8 @@
                     <connections>
                         <segue destination="12" kind="relationship" relationship="rootViewController" id="19"/>
                         <segue destination="mdR-2R-M4d" kind="modal" identifier="Authentication" id="hyc-84-qgP"/>
+                        <segue destination="AXS-C3-mVS" kind="modal" identifier="Import" id="WKt-2X-hWO"/>
+                        <segue destination="RIY-yW-qZT" kind="modal" identifier="FileUploadConflict" id="8vN-1U-A0T"/>
                     </connections>
                 </navigationController>
             </objects>
@@ -276,7 +278,7 @@
         <scene sceneID="6Lq-Rz-Ywp">
             <objects>
                 <placeholder placeholderIdentifier="IBFirstResponder" id="TfT-zN-bNV" userLabel="First Responder" sceneMemberID="firstResponder"/>
-                <viewController storyboardIdentifier="FileImportDialog" id="AXS-C3-mVS" customClass="ZPFileImportViewController" sceneMemberID="viewController">
+                <viewController storyboardIdentifier="" id="AXS-C3-mVS" customClass="ZPFileImportViewController" sceneMemberID="viewController">
                     <view key="view" contentMode="scaleToFill" id="opB-Jm-dX9" customClass="iCarousel">
                         <rect key="frame" x="0.0" y="20" width="320" height="460"/>
                         <autoresizingMask key="autoresizingMask" flexibleMaxX="YES" flexibleMaxY="YES"/>
@@ -285,6 +287,7 @@
                     <simulatedStatusBarMetrics key="simulatedStatusBarMetrics"/>
                     <connections>
                         <outlet property="carousel" destination="opB-Jm-dX9" id="bql-Ye-jEw"/>
+                        <segue destination="RIY-yW-qZT" kind="modal" identifier="FileUploadConflictFromDialog" id="Dn4-w4-r0y"/>
                     </connections>
                 </viewController>
             </objects>
@@ -458,7 +461,7 @@
         <scene sceneID="raI-k1-hcJ">
             <objects>
                 <placeholder placeholderIdentifier="IBFirstResponder" id="0pJ-od-qGy" userLabel="First Responder" sceneMemberID="firstResponder"/>
-                <viewController storyboardIdentifier="VersionConflictView" title="Version conflict" modalPresentationStyle="pageSheet" id="RIY-yW-qZT" customClass="ZPUploadVersionConflictViewControllerViewController" sceneMemberID="viewController">
+                <viewController storyboardIdentifier="" title="Version conflict" modalPresentationStyle="pageSheet" id="RIY-yW-qZT" customClass="ZPUploadVersionConflictViewControllerViewController" sceneMemberID="viewController">
                     <view key="view" contentMode="scaleToFill" id="lVP-cF-OyN">
                         <rect key="frame" x="0.0" y="20" width="320" height="460"/>
                         <autoresizingMask key="autoresizingMask" flexibleMaxX="YES" flexibleMaxY="YES"/>
@@ -602,4 +605,7 @@
         <simulatedOrientationMetrics key="orientation"/>
         <simulatedScreenMetrics key="destination"/>
     </simulatedMetricsContainer>
+    <inferredMetricsTieBreakers>
+        <segue reference="Dn4-w4-r0y"/>
+    </inferredMetricsTieBreakers>
 </document>

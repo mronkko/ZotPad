@@ -35,44 +35,50 @@
     [super viewDidLoad];
 	// Do any additional setup after loading the view.
 
-    _carouselDelegate = [[ZPAttachmentCarouselDelegate alloc] init];
+}
+
+-(void)viewWillAppear:(BOOL)animated{
+
+    [super viewWillAppear:animated];
     
-    //iPhone shows the versions in carousel. On iPad they are shown in separate carousels
+    if(_carouselDelegate == NULL){
+        _carouselDelegate = [[ZPAttachmentCarouselDelegate alloc] init];
+        
+        //iPhone shows the versions in carousel. On iPad they are shown in separate carousels
+        
+        if(secondaryCarousel==NULL){
+            [_carouselDelegate configureWithAttachmentArray:[NSArray arrayWithObjects:attachment, attachment, nil]];
+            _carouselDelegate.mode = ZPATTACHMENTICONGVIEWCONTROLLER_MODE_FIRST_STATIC_SECOND_DOWNLOAD;
+            _carouselDelegate.show = ZPATTACHMENTICONGVIEWCONTROLLER_SHOW_FIRST_MODIFIED_SECOND_ORIGINAL;
+            carousel.type = iCarouselTypeCoverFlow2;
+            carousel.bounces = FALSE;
+            
+        }
+        else{
+            [_carouselDelegate configureWithAttachmentArray:[NSArray arrayWithObject:attachment]];
+            _carouselDelegate.mode = ZPATTACHMENTICONGVIEWCONTROLLER_MODE_STATIC;
+            _carouselDelegate.show = ZPATTACHMENTICONGVIEWCONTROLLER_SHOW_MODIFIED;
+        }
+        _carouselDelegate.attachmentCarousel = carousel;
+        carousel.delegate = _carouselDelegate;
+        carousel.dataSource = _carouselDelegate;
+        
+        carousel.currentItemIndex = 0;
+        
+        
+        if(secondaryCarousel!=NULL){
+            _secondaryCarouselDelegate = [[ZPAttachmentCarouselDelegate alloc] init];
+            _secondaryCarouselDelegate.mode = ZPATTACHMENTICONGVIEWCONTROLLER_MODE_DOWNLOAD;
+            _secondaryCarouselDelegate.show = ZPATTACHMENTICONGVIEWCONTROLLER_SHOW_ORIGINAL;
+            [_secondaryCarouselDelegate configureWithAttachmentArray:[NSArray arrayWithObject: attachment]];
+            _secondaryCarouselDelegate.attachmentCarousel = secondaryCarousel;
+            secondaryCarousel.delegate = _secondaryCarouselDelegate;
+            secondaryCarousel.dataSource = _secondaryCarouselDelegate;
+            secondaryCarousel.currentItemIndex = 0;
+        }
+    }    
     
-    if(secondaryCarousel==NULL){
-        [_carouselDelegate configureWithAttachmentArray:[NSArray arrayWithObjects:attachment, attachment, nil]];
-        _carouselDelegate.mode = ZPATTACHMENTICONGVIEWCONTROLLER_MODE_FIRST_STATIC_SECOND_DOWNLOAD;
-        _carouselDelegate.show = ZPATTACHMENTICONGVIEWCONTROLLER_SHOW_FIRST_MODIFIED_SECOND_ORIGINAL;
-        carousel.type = iCarouselTypeCoverFlow2;
-        carousel.bounces = FALSE;
-
-    }
-    else{
-        [_carouselDelegate configureWithAttachmentArray:[NSArray arrayWithObject:attachment]];
-        _carouselDelegate.mode = ZPATTACHMENTICONGVIEWCONTROLLER_MODE_STATIC;
-        _carouselDelegate.show = ZPATTACHMENTICONGVIEWCONTROLLER_SHOW_MODIFIED;
-    }
-    _carouselDelegate.attachmentCarousel = carousel;
-    carousel.delegate = _carouselDelegate;
-    carousel.dataSource = _carouselDelegate;
-
-    carousel.currentItemIndex = 0;
-
-    
-    if(secondaryCarousel!=NULL){
-        _secondaryCarouselDelegate = [[ZPAttachmentCarouselDelegate alloc] init];
-        _secondaryCarouselDelegate.mode = ZPATTACHMENTICONGVIEWCONTROLLER_MODE_DOWNLOAD;
-        _secondaryCarouselDelegate.show = ZPATTACHMENTICONGVIEWCONTROLLER_SHOW_ORIGINAL;
-        [_secondaryCarouselDelegate configureWithAttachmentArray:[NSArray arrayWithObject: attachment]];
-        _secondaryCarouselDelegate.attachmentCarousel = secondaryCarousel;
-        secondaryCarousel.delegate = _secondaryCarouselDelegate;
-        secondaryCarousel.dataSource = _secondaryCarouselDelegate;
-        secondaryCarousel.currentItemIndex = 0;
-    }
-
-
-    label.text = [NSString stringWithFormat:@"File '%@' has changed on server",attachment.filename];
-
+    label.text = [NSString stringWithFormat:@"File '%@' has changed on server",attachment.filename];    
 }
 
 - (void)viewDidUnload
@@ -90,7 +96,7 @@
 
 -(IBAction)useMyVersion:(id)sender{
     [[ZPDatabase instance] writeVersionInfoForAttachment:attachment];
-    [fileChannel startUploadingAttachment:attachment];
+    [fileChannel startUploadingAttachment:attachment overWriteConflictingServerVersion:YES];
     [self dismissModalViewControllerAnimated:YES];
     [[ZPDataLayer instance] notifyAttachmentUploadStarted:attachment];
 }

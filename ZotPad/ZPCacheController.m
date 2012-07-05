@@ -3,7 +3,7 @@
 //  ZotPad
 //
 //  Created by Rönkkö Mikko on 12/16/11.
-//  Copyright (c) 2011 __MyCompanyName__. All rights reserved.
+//  Copyright (c) 2011 Mikko Rönkkö. All rights reserved.
 //
 //  This file manages item metadata retrieval.
 //  
@@ -692,15 +692,20 @@ static ZPCacheController* _instance = nil;
         }
         
         if(doCache){
-            @synchronized(_filesToDownload){
-
-                [_filesToDownload removeObject:attachment];
-                [_filesToDownload insertObject:attachment atIndex:0];
-                //            DDLogVerbose(@"Queuing attachment download to %@, number of files in queue %i",attachment.fileSystemPath,[_filesToDownload count]);
-            }
+            [self addAttachmentToDowloadQueue:attachment];
             [self _checkQueues];
         }
     }
+}
+
+-(void) addAttachmentToDowloadQueue:(ZPZoteroAttachment *)attachment{
+
+    @synchronized(_filesToDownload){
+        
+        [_filesToDownload removeObject:attachment];
+        [_filesToDownload insertObject:attachment atIndex:0];
+        //            DDLogVerbose(@"Queuing attachment download to %@, number of files in queue %i",attachment.fileSystemPath,[_filesToDownload count]);
+    }    
 }
 
 -(void) addToLibrariesQueue:(ZPZoteroLibrary*)object priority:(BOOL)priority{
@@ -1068,7 +1073,7 @@ static ZPCacheController* _instance = nil;
     @synchronized(_attachmentsToUpload){
         [_attachmentsToUpload addObject:attachment];
     }
-    [self _checkQueues];
+    [self performSelectorInBackground:@selector(_checkQueues) withObject:NULL];
 }
 
 /*

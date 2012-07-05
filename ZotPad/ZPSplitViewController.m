@@ -10,7 +10,7 @@
 
 #import "ZPSplitViewController.h"
 #import "ZPFileImportViewController.h"
-
+#import "ZPUploadVersionConflictViewControllerViewController.h"
 @interface ZPSplitViewController ()
 
 @end
@@ -45,11 +45,16 @@
 
 - (void)prepareForSegue:(UIStoryboardSegue *)segue sender:(id)sender{
 
-    if([segue.identifier isEqualToString:@"ReceivedFile"]){
+    if([segue.identifier isEqualToString:@"Import"]){
         NSURL* url = (NSURL*) sender;
         
         ZPFileImportViewController* target = segue.destinationViewController;
         target.url=url;
+    }
+    else if([segue.identifier isEqualToString:@"FileUploadConflict"]){
+        ZPUploadVersionConflictViewControllerViewController* target = segue.destinationViewController;
+        target.fileChannel = [(NSDictionary*) sender objectForKey:@"fileChannel"];
+        target.attachment = [(NSDictionary*) sender objectForKey:@"attachment"];
     }
 }
 

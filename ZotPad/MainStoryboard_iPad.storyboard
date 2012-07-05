@@ -286,6 +286,8 @@
                         <segue destination="3" kind="relationship" relationship="masterViewController" id="9"/>
                         <segue destination="42" kind="relationship" relationship="detailViewController" id="53"/>
                         <segue destination="bpw-6z-DmG" kind="modal" identifier="Authentication" modalPresentationStyle="pageSheet" id="jVu-Eo-vW4"/>
+                        <segue destination="3ej-hc-vCg" kind="modal" identifier="Import" modalPresentationStyle="formSheet" id="5eY-X6-fSZ"/>
+                        <segue destination="htM-EZ-pFH" kind="modal" identifier="FileUploadConflict" id="bAm-Ev-B5H"/>
                     </connections>
                 </splitViewController>
             </objects>
@@ -482,15 +484,17 @@
         <scene sceneID="DYx-Wi-uBz">
             <objects>
                 <placeholder placeholderIdentifier="IBFirstResponder" id="24i-ur-u3x" userLabel="First Responder" sceneMemberID="firstResponder"/>
-                <viewController storyboardIdentifier="FileImportDialog" id="3ej-hc-vCg" customClass="ZPFileImportViewController" sceneMemberID="viewController">
+                <viewController storyboardIdentifier="" id="3ej-hc-vCg" customClass="ZPFileImportViewController" sceneMemberID="viewController">
                     <view key="view" contentMode="scaleToFill" id="Whn-CO-3pz" customClass="iCarousel">
-                        <rect key="frame" x="0.0" y="20" width="540" height="600"/>
+                        <rect key="frame" x="0.0" y="0.0" width="540" height="620"/>
                         <autoresizingMask key="autoresizingMask" flexibleMaxX="YES" flexibleMaxY="YES"/>
                         <color key="backgroundColor" white="1" alpha="1" colorSpace="custom" customColorSpace="calibratedWhite"/>
+                        <simulatedOrientationMetrics key="simulatedOrientationMetrics" orientation="landscapeRight"/>
                     </view>
                     <modalFormSheetSimulatedSizeMetrics key="simulatedDestinationMetrics"/>
                     <connections>
                         <outlet property="carousel" destination="Whn-CO-3pz" id="S0h-gr-moB"/>
+                        <segue destination="htM-EZ-pFH" kind="modal" identifier="FileUploadConflictFromDialog" modalPresentationStyle="pageSheet" id="GHg-CO-l1D"/>
                     </connections>
                 </viewController>
             </objects>
@@ -500,7 +504,7 @@
         <scene sceneID="TZV-il-WlM">
             <objects>
                 <placeholder placeholderIdentifier="IBFirstResponder" id="GgU-XD-ySn" userLabel="First Responder" sceneMemberID="firstResponder"/>
-                <viewController storyboardIdentifier="VersionConflictView" title="Version conflict" modalPresentationStyle="pageSheet" id="htM-EZ-pFH" customClass="ZPUploadVersionConflictViewControllerViewController" sceneMemberID="viewController">
+                <viewController storyboardIdentifier="" title="Version conflict" modalPresentationStyle="pageSheet" id="htM-EZ-pFH" customClass="ZPUploadVersionConflictViewControllerViewController" sceneMemberID="viewController">
                     <view key="view" contentMode="scaleToFill" id="tzC-ae-egO">
                         <rect key="frame" x="0.0" y="20" width="768" height="748"/>
                         <autoresizingMask key="autoresizingMask" flexibleMaxX="YES" flexibleMaxY="YES"/>
@@ -543,7 +547,7 @@
                                 </connections>
                             </button>
                             <label opaque="NO" clipsSubviews="YES" userInteractionEnabled="NO" contentMode="left" text="The following file has changed on the server" lineBreakMode="tailTruncation" numberOfLines="2" baselineAdjustment="alignBaselines" minimumFontSize="10" id="LNC-vG-Hyq">
-                                <rect key="frame" x="20" y="50" width="728" height="59"/>
+                                <rect key="frame" x="20" y="49" width="728" height="59"/>
                                 <autoresizingMask key="autoresizingMask" widthSizable="YES" flexibleMinY="YES" flexibleMaxY="YES"/>
                                 <fontDescription key="fontDescription" type="system" pointSize="17"/>
                                 <color key="textColor" cocoaTouchSystemColor="darkTextColor"/>
@@ -806,4 +810,7 @@
         <simulatedOrientationMetrics key="orientation"/>
         <simulatedScreenMetrics key="destination"/>
     </simulatedMetricsContainer>
+    <inferredMetricsTieBreakers>
+        <segue reference="bAm-Ev-B5H"/>
+    </inferredMetricsTieBreakers>
 </document>

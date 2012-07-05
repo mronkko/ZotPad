@@ -27,7 +27,8 @@
 NSInteger const ZPFILECHANNEL_WEBDAV_DOWNLOAD = 1;
 NSInteger const ZPFILECHANNEL_WEBDAV_UPLOAD_FILE = 2;
 NSInteger const ZPFILECHANNEL_WEBDAV_UPLOAD_UPDATE_LASTSYNC = 3;
-NSInteger const ZPFILECHANNEL_WEBDAV_UPLOAD_REGISTER = 4;
+NSInteger const ZPFILECHANNEL_WEBDAV_UPLOAD_UPDATE_PROP = 4;
+NSInteger const ZPFILECHANNEL_WEBDAV_UPLOAD_REGISTER = 5;
 
 // This is needed bacause WebDAV requests contain actually two request. The first request will just request the size of the file.
 
@@ -75,9 +76,8 @@ NSInteger const ZPFILECHANNEL_WEBDAV_UPLOAD_REGISTER = 4;
 
 @interface ZPFileChannel_WebDAV()
 
--(void) _performWebDAVUpload:(ZPZoteroAttachment*)attachment;
--(void) _updateLastSync:(ZPZoteroAttachment*)attachment;
--(void) _registerWebDAVUploadWithZoteroServer:(ZPZoteroAttachment*)attachment;
+-(void) _registerWebDAVUploadWithZoteroServer:(ZPZoteroAttachment*)attachment userInfo:(NSDictionary*) userInfo;
+-(void) _performWebDAVUploadForAttachment:(ZPZoteroAttachment*)attachment tag:(NSInteger)tag userInfo:(NSDictionary*) userInfo;
 
 @end
     
@@ -156,63 +156,131 @@ NSInteger const ZPFILECHANNEL_WEBDAV_UPLOAD_REGISTER = 4;
 #pragma mark - Uploading
 
 
--(void) startUploadingAttachment:(ZPZoteroAttachment*)attachment{
+-(void) startUploadingAttachment:(ZPZoteroAttachment*)attachment overWriteConflictingServerVersion:(BOOL)overwriteConflicting{
+
     
     //Download new attachment metadata
     
     //TODO: Refactor this to call ZPCacheController instead so that the response from the server is stored in the DB. 
-
+    
     attachment = [[[ZPServerConnection instance] retrieveItemsFromLibrary:attachment.libraryID itemKeys:[NSArray arrayWithObject:attachment.key]] objectAtIndex:0];
     DDLogVerbose(@"Reveived MD5 from server %@",attachment.md5);
-    
-    if(! [attachment.md5 isEqualToString:attachment.versionIdentifier_local]){
-        //Conflict
-        DDLogWarn(@"Local MD5 %@ conflicts with server MD5 %@",attachment.versionIdentifier_local,attachment.md5);
-        if(attachment.fileExists_original){
-            DDLogWarn(@"Original file MD5: %@",[ZPZoteroAttachment md5ForFileAtPath:attachment.fileSystemPath_original]);
-        }
-        else {
-            DDLogCWarn(@"Original file does not exists in cache");
-        }
-        DDLogWarn(@"Modified file MD5: %@",[ZPZoteroAttachment md5ForFileAtPath:attachment.fileSystemPath_modified]);
-        
-        //If the version that we have downloaded from the server is different than what exists on the server now, delete the local copy
-        if(! [attachment.md5 isEqualToString:attachment.versionIdentifier_server]){
 
-            DDLogWarn(@"Removing cached copy of file %@ because the local (%@) and server (%@) version identifiers differ.",attachment.filename,attachment.versionIdentifier_server,attachment.md5);
-            
-            [attachment purge_original:@"File is outdated (WebDAV pre-check)"];
-            
-            attachment.versionIdentifier_server = attachment.md5;
-            [[ZPDatabase instance] writeVersionInfoForAttachment:attachment];
-        }
-        [self presentConflictViewForAttachment:attachment];
+    //Original was not found
+    if(attachment==NULL){
+        NSError* error = [[NSError alloc] initWithDomain:@"ZotPad" code:1 userInfo:[NSDictionary dictionaryWithObject:@"Original item does not exists on Zotero server." forKey:NSLocalizedDescriptionKey]];
+        [[ZPServerConnection instance] failedUploadingAttachment:attachment withError:error usingFileChannel:self];
 
     }
     else{
-        [self _performWebDAVUpload:attachment];
+        //Store data about the file in the user info so that it is always available
+        
+        NSString* path = attachment.fileSystemPath_modified;
+        NSDictionary* documentFileAttributes = [[NSFileManager defaultManager] fileAttributesAtPath:path traverseLink:YES];
+        NSTimeInterval timeModified = [[documentFileAttributes fileModificationDate] timeIntervalSince1970];
+        long long timeModifiedMilliseconds = (long long) trunc(timeModified * 1000.0f);
+        NSString* md5 = [ZPZoteroAttachment md5ForFileAtPath:path];
+        
+        NSMutableDictionary* userInfo= [[NSMutableDictionary alloc]initWithCapacity:3];
+        [userInfo setObject:attachment forKey:@"attachment"];
+        [userInfo setObject:[NSNumber numberWithLongLong:timeModifiedMilliseconds] forKey:@"mtime"];
+        [userInfo setObject:md5 forKey:@"md5"];
+        [userInfo setObject:[NSNumber numberWithBool:overwriteConflicting] forKey:@"overwriteConflicting"];
+        
+        
+        if(! [attachment.md5 isEqualToString:attachment.versionIdentifier_local] && ! overwriteConflicting){
+            
+            //Conflict
+            
+            //If the version that we have downloaded from the server is different than what exists on the server now, delete the local copy
+            if(! [attachment.md5 isEqualToString:attachment.versionIdentifier_server]){
+                
+                DDLogWarn(@"Removing cached copy of file %@ because the local (%@) and server (%@) version identifiers differ.",attachment.filename,attachment.versionIdentifier_server,attachment.md5);
+                
+                [attachment purge_original:@"File is outdated (WebDAV pre-check)"];
+                
+            }
+            [self presentConflictViewForAttachment:attachment];
+            
+        }
+        else{
+            [self _performWebDAVUploadForAttachment:attachment tag:ZPFILECHANNEL_WEBDAV_UPLOAD_FILE userInfo:userInfo];
+        }
     }
 }
 
--(void) _registerWebDAVUploadWithZoteroServer:(ZPZoteroAttachment*)attachment{
+-(void) _performWebDAVUploadForAttachment:(ZPZoteroAttachment*)attachment tag:(NSInteger)tag userInfo:(NSDictionary*) userInfo {
+    
+    //Setup the request 
+    NSString* WebDAVRoot = [[ZPPreferences instance] webDAVURL];
+    NSString* key =  attachment.key;
+    NSString* urlString;
+    if(tag == ZPFILECHANNEL_WEBDAV_UPLOAD_FILE){
+        urlString = [WebDAVRoot stringByAppendingFormat:@"/%@.zip",key];
+    }
+    else if(tag == ZPFILECHANNEL_WEBDAV_UPLOAD_UPDATE_PROP){
+        urlString = [WebDAVRoot stringByAppendingFormat:@"/%@.prop",key];
+    }
+    else if(tag == ZPFILECHANNEL_WEBDAV_UPLOAD_UPDATE_LASTSYNC){
+        urlString = [WebDAVRoot stringByAppendingString:@"/lastsync"];
+    }
+    
+    NSURL *url = [NSURL URLWithString:urlString]; 
+    
+    DDLogVerbose(@"Uploading file %@ to WebDAV (%@)",urlString,attachment.filename);
+    
+    ASIHTTPRequest *uploadRequest = [ASIHTTPRequest requestWithURL:url]; 
+    
+    [self linkAttachment:attachment withRequest:uploadRequest];
+    
+    //For some reason authentication using digest fails if persistent connections are in use
+    [uploadRequest setShouldAttemptPersistentConnection:NO];
+    [uploadRequest setShouldPresentAuthenticationDialog:YES];
+    [uploadRequest setUseKeychainPersistence:YES];
+    [uploadRequest setDelegate:self];
+    uploadRequest.userInfo = userInfo;
+    uploadRequest.tag = tag;
+    
+    
+    if(tag == ZPFILECHANNEL_WEBDAV_UPLOAD_FILE){
+        //Zip the file before uploading
+        
+        ZipArchive* zipArchive = [[ZipArchive alloc] init];
+        
+        NSString* tempFile = [NSTemporaryDirectory() stringByAppendingPathComponent:[NSString stringWithFormat:@"ZP%@%i",attachment.key,[[NSDate date] timeIntervalSince1970]*1000000]];
+        
+        [zipArchive CreateZipFile2:tempFile];
+        [zipArchive addFileToZip:attachment.fileSystemPath_modified newname:attachment.filenameZoteroBase64Encoded];
+        [zipArchive CloseZipFile2];
+        
+        [uploadRequest appendPostDataFromFile:tempFile];
+        [[NSFileManager defaultManager] removeItemAtPath:tempFile error:NULL];
+    }
+    else if(tag == ZPFILECHANNEL_WEBDAV_UPLOAD_UPDATE_PROP){
+        [uploadRequest appendPostData:[[NSString stringWithFormat:@"<properties version=\"1\">\n  <mtime>%@</mtime>\n  <hash>%@</hash>\n</properties>",
+                                        [userInfo objectForKey:@"mtime"], [userInfo objectForKey:@"md5"]] dataUsingEncoding:NSUTF8StringEncoding]];
+    }
+    else if(tag == ZPFILECHANNEL_WEBDAV_UPLOAD_UPDATE_LASTSYNC){
+        [uploadRequest appendPostData:[@"1" dataUsingEncoding:NSUTF8StringEncoding]];
+    }
+    
+    [uploadRequest setRequestMethod:@"PUT"];
+    
+    [uploadRequest startAsynchronous];
+    
+}
+
+
+-(void) _registerWebDAVUploadWithZoteroServer:(ZPZoteroAttachment*)attachment userInfo:(NSDictionary*) userInfo{
     
     //Start uploading item metadata
     
-    NSString* path = attachment.fileSystemPath_modified;
-    NSDictionary* documentFileAttributes = [[NSFileManager defaultManager] fileAttributesAtPath:path traverseLink:YES];
-    NSTimeInterval timeModified = [[documentFileAttributes fileModificationDate] timeIntervalSince1970];
-    long long timeModifiedMilliseconds = (long long) trunc(timeModified * 1000.0f);
-    attachment.versionIdentifier_local = [ZPZoteroAttachment md5ForFileAtPath:path];    
-    
-    if(attachment.versionIdentifier_local==NULL){
-        [NSException raise:@"MD5 cannot be null" format:@""];
-    }
     NSString* oauthkey =  [[ZPPreferences instance] OAuthKey];
     NSString* urlString = [NSString stringWithFormat:@"https://api.zotero.org/users/%@/items/%@?key=%@",[[ZPPreferences instance] userID],attachment.key, oauthkey];
     
     ASIHTTPRequest* request = [[ASIHTTPRequest alloc] initWithURL:[NSURL URLWithString:urlString]];
     
-    request.userInfo = [NSDictionary dictionaryWithObject:attachment forKey:@"attachment"];
+    request.userInfo = userInfo;
     request.tag = ZPFILECHANNEL_WEBDAV_UPLOAD_REGISTER;
     request.delegate = self;
     
@@ -223,92 +291,23 @@ NSInteger const ZPFILECHANNEL_WEBDAV_UPLOAD_REGISTER = 4;
     NSDictionary* oldJsonContent = (NSDictionary*) [attachment.jsonFromServer JSONValue];
     NSMutableDictionary* jsonContent = [NSMutableDictionary dictionaryWithDictionary:oldJsonContent];
     
-    [jsonContent setObject:attachment.versionIdentifier_local forKey:@"md5"];
-    [jsonContent setObject:[NSNumber numberWithLongLong:timeModifiedMilliseconds] forKey:@"mtime"];
+    [jsonContent setObject:[userInfo objectForKey:@"md5"] forKey:@"md5"];
+    [jsonContent setObject:[userInfo objectForKey:@"mtime"] forKey:@"mtime"];
     
     
     NSString* jsonString = [jsonContent JSONRepresentation];
     [request appendPostData:[jsonString dataUsingEncoding:NSUTF8StringEncoding]];
     request.requestMethod = @"PUT";
     
-    DDLogInfo(@"Uploading metadata about new version (%@) of file %@ to Zotero ",attachment.versionIdentifier_local,attachment.filename);
+    DDLogInfo(@"Uploading metadata about new version (%@) of file %@ to Zotero ",[userInfo objectForKey:@"md5"],attachment.filename);
     
     [request startAsynchronous];
 }
 
--(void) _performWebDAVUpload:(ZPZoteroAttachment*)attachment{
-    //Setup the request 
-    NSString* WebDAVRoot = [[ZPPreferences instance] webDAVURL];
-    NSString* key =  attachment.key;
-    NSString* urlString = [WebDAVRoot stringByAppendingFormat:@"/%@.zip",key];
-    NSURL *url = [NSURL URLWithString:urlString]; 
-    
-    DDLogVerbose(@"Uploading file %@ to WebDAV %@",urlString,attachment.filename);
-    
-    ASIHTTPRequest *uploadRequest = [ASIHTTPRequest requestWithURL:url]; 
-    
-    [self linkAttachment:attachment withRequest:uploadRequest];
-    
-    //For some reason authentication using digest fails if persistent connections are in use
-    [uploadRequest setShouldAttemptPersistentConnection:NO];
-    [uploadRequest setShouldPresentAuthenticationDialog:YES];
-    [uploadRequest setUseKeychainPersistence:YES];
-    
-    //Zip the file before uploading
-    
-    ZipArchive* zipArchive = [[ZipArchive alloc] init];
-    
-    NSString* tempFile = [NSTemporaryDirectory() stringByAppendingPathComponent:[NSString stringWithFormat:@"ZP%@%i",attachment.key,[[NSDate date] timeIntervalSince1970]*1000000]];
-        
-    [zipArchive CreateZipFile2:tempFile];
-    [zipArchive addFileToZip:attachment.fileSystemPath_modified newname:attachment.filenameZoteroBase64Encoded];
-    [zipArchive CloseZipFile2];
-    
-    [uploadRequest appendPostDataFromFile:tempFile];
-    
-    [[NSFileManager defaultManager] removeItemAtPath:tempFile error:NULL];
-    [uploadRequest setRequestMethod:@"PUT"];
-    [uploadRequest setDelegate:self];
-    
-    uploadRequest.userInfo = [NSDictionary dictionaryWithObject:attachment forKey:@"attachment"];
-    uploadRequest.tag = ZPFILECHANNEL_WEBDAV_UPLOAD_FILE;
-        
-    [uploadRequest startAsynchronous];
-
-    
-}
-
--(void) _updateLastSync:(ZPZoteroAttachment *)attachment{
-
-    //Setup the request 
-    NSString* WebDAVRoot = [[ZPPreferences instance] webDAVURL];
-    NSString* urlString = [WebDAVRoot stringByAppendingString:@"/lastsync"];
-    NSURL *url = [NSURL URLWithString:urlString]; 
-    
-    ASIHTTPRequest *uploadRequest = [ASIHTTPRequest requestWithURL:url]; 
-    
-    [self linkAttachment:attachment withRequest:uploadRequest];
-    
-    //For some reason authentication using digest fails if persistent connections are in use
-    [uploadRequest setShouldAttemptPersistentConnection:NO];
-    [uploadRequest setShouldPresentAuthenticationDialog:YES];
-    [uploadRequest setUseKeychainPersistence:YES];
-        
-    [uploadRequest appendPostData:[@"1" dataUsingEncoding:NSUTF8StringEncoding]];
-    
-    [uploadRequest setRequestMethod:@"PUT"];
-    [uploadRequest setDelegate:self];
-    
-    uploadRequest.userInfo = [NSDictionary dictionaryWithObject:attachment forKey:@"attachment"];
-    uploadRequest.tag = ZPFILECHANNEL_WEBDAV_UPLOAD_UPDATE_LASTSYNC;
-    
-    [uploadRequest startAsynchronous];
-    
-    
-}
 -(void) useProgressView:(UIProgressView*) progressView forUploadingAttachment:(ZPZoteroAttachment*)attachment{
     
     ASIHTTPRequest* request = [self requestWithAttachment:attachment];
+    DDLogVerbose(@"Upload ProgressView %@ for request %@ with tag %i",progressView,request,request.tag);
     
     if(request != NULL){
         if(request.tag == ZPFILECHANNEL_WEBDAV_UPLOAD_FILE){
@@ -379,24 +378,26 @@ NSInteger const ZPFILECHANNEL_WEBDAV_UPLOAD_REGISTER = 4;
     else {
         
         
-        
         if(request.tag == ZPFILECHANNEL_WEBDAV_UPLOAD_FILE && (request.responseStatusCode == 204 || request.responseStatusCode == 201)){
-            [self _updateLastSync:attachment];   
+            [self _performWebDAVUploadForAttachment:attachment tag:ZPFILECHANNEL_WEBDAV_UPLOAD_UPDATE_PROP userInfo:request.userInfo];
+        }        
+        else if(request.tag == ZPFILECHANNEL_WEBDAV_UPLOAD_UPDATE_PROP && (request.responseStatusCode == 204 || request.responseStatusCode == 201)){
+            [self _performWebDAVUploadForAttachment:attachment tag:ZPFILECHANNEL_WEBDAV_UPLOAD_UPDATE_LASTSYNC userInfo:request.userInfo];
         }
-        
         else if(request.tag == ZPFILECHANNEL_WEBDAV_UPLOAD_UPDATE_LASTSYNC &&  (request.responseStatusCode == 204 || request.responseStatusCode == 201)){
-            [self _registerWebDAVUploadWithZoteroServer:attachment];   
+            [self _registerWebDAVUploadWithZoteroServer:attachment userInfo:request.userInfo];   
         }
         
         else if(request.tag == ZPFILECHANNEL_WEBDAV_UPLOAD_REGISTER && request.responseStatusCode == 200){
             
             //DDLogVerbose([self requestDumpAsString:request]);
             //All done
-            [[ZPServerConnection instance] finishedUploadingAttachment:attachment];
+            [[ZPServerConnection instance] finishedUploadingAttachment:attachment withVersionIdentifier:[request.userInfo objectForKey:@"md5"]];
             [self cleanupAfterFinishingAttachment:attachment];
             
         }
         else if(request.tag == ZPFILECHANNEL_WEBDAV_UPLOAD_REGISTER && request.responseStatusCode == 412){
+           
             //Conflict. 
             
             //Download new attachment metadata
@@ -408,8 +409,6 @@ NSInteger const ZPFILECHANNEL_WEBDAV_UPLOAD_REGISTER = 4;
             //If the version that we have downloaded from the server is different than what exists on the server now, delete the local copy
             if(! [attachment.md5 isEqualToString:attachment.versionIdentifier_server]){
                 [attachment purge_original:@"File is outdated (WebDAV conflict)"];
-                attachment.versionIdentifier_server = attachment.md5;
-                [[ZPDatabase instance] writeVersionInfoForAttachment:attachment];
             }
             [self presentConflictViewForAttachment:attachment];
         }

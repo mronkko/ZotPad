@@ -241,10 +241,10 @@ NSInteger const ZPATTACHMENTICONGVIEWCONTROLLER_SHOW_FIRST_MODIFIED_SECOND_ORIGI
 
 
 -(void) _configureFileImageView:(UIImageView*) imageView withAttachment:(ZPZoteroAttachment*)attachment{
-
-    UIImage* image = NULL;
     
-    if(attachment.fileExists && [attachment.contentType isEqualToString:@"application/pdf"]){
+    //TODO: Cache rendered PDF images
+
+    if([attachment.contentType isEqualToString:@"application/pdf"]){
         
         NSString* path;
         if([self _showForAttachment:attachment] == ZPATTACHMENTICONGVIEWCONTROLLER_SHOW_ORIGINAL){
@@ -254,28 +254,16 @@ NSInteger const ZPATTACHMENTICONGVIEWCONTROLLER_SHOW_FIRST_MODIFIED_SECOND_ORIGI
             path =attachment.fileSystemPath;    
         }
         
-        
-        [ZPAttachmentIconImageFactory renderPDFPreviewForFileAtPath:path intoImageView:imageView];
+        if([[NSFileManager defaultManager] fileExistsAtPath:path]){
+            dispatch_async(dispatch_get_global_queue(DISPATCH_QUEUE_PRIORITY_BACKGROUND,0), ^{
+                [ZPAttachmentIconImageFactory renderPDFPreviewForFileAtPath:path intoImageView:imageView];
+            });
+        }
         
     }
     
-    if(image == NULL){
-        [ZPAttachmentIconImageFactory renderFileTypeIconForAttachment:attachment intoImageView:imageView];
-    }
-    else{
-        CGRect frame = [ZPAttachmentIconImageFactory getDimensionsForImageView:imageView withImage:image];
-        imageView.layer.frame = frame;
-        imageView.center = imageView.superview.center;
-        imageView.layer.borderWidth = 2.0f;
-        imageView.layer.borderColor = [UIColor blackColor].CGColor;
-        [imageView setBackgroundColor:[UIColor whiteColor]]; 
-        
-        imageView.image=image;
-        
-        //Set the old bacground transparent
-        imageView.superview.layer.borderColor = [UIColor clearColor].CGColor;
-        imageView.superview.backgroundColor = [UIColor clearColor];    
-    }
+    // Assing a place holder icon while we wait for the previews to render
+    [ZPAttachmentIconImageFactory renderFileTypeIconForAttachment:attachment intoImageView:imageView];
 }
 
 
@@ -532,12 +520,22 @@ NSInteger const ZPATTACHMENTICONGVIEWCONTROLLER_SHOW_FIRST_MODIFIED_SECOND_ORIGI
                 UIView* labelBackground = [view viewWithTag:2];
                 
                 UILabel* progressLabel = (UILabel*)[labelBackground viewWithTag:4];
-                if(progressText == NULL) progressLabel.hidden = TRUE;
-                else progressLabel.text = progressText;
+                if(progressText == NULL){
+                    progressLabel.hidden = TRUE;   
+                }
+                else{
+                    progressLabel.text = progressText;   
+                    progressLabel.hidden = FALSE;
+                }
                 
                 UILabel* errorLabel = (UILabel*)[labelBackground viewWithTag:6];
-                if(errorText == NULL) errorLabel.hidden = TRUE;
-                else errorLabel.text = errorText;
+                if(errorText == NULL){
+                    errorLabel.hidden = TRUE;   
+                }
+                else{
+                    errorLabel.text = errorText;   
+                    errorLabel.hidden = FALSE;
+                }
                 
                 UIProgressView* progressView = (UIProgressView*)[labelBackground viewWithTag:5];
                 if(mode == ZPATTACHMENTICONGVIEWCONTROLLER_MODE_STATIC){

@@ -3,7 +3,7 @@
 //  ZotPad
 //
 //  Created by Rönkkö Mikko on 11/14/11.
-//  Copyright (c) 2011 __MyCompanyName__. All rights reserved.
+//  Copyright (c) 2011 Mikko Rönkkö. All rights reserved.
 //
 
 #import "ZPCore.h"
@@ -15,8 +15,8 @@
 #import "ZPPreferences.h"
 #import "ZPAppDelegate.h"
 
+#import "DTCoreText.h";
 #import "OHAttributedLabel.h"
-#import "Mikko Rönkkö"
 #import "ZPAttachmentIconImageFactory.h"
 #import "ZPPreviewController.h"
 
@@ -252,7 +252,7 @@
 
 @synthesize itemKeysShown = _itemKeysShown;
 @synthesize itemDetailViewController =  _itemDetailViewController;
-
+@synthesize targetTableView = _tableView;
 
 - (void)didReceiveMemoryWarning
 {
@@ -779,29 +779,13 @@
         // Set the navigation controller in iPad
         
         if ([[UIDevice currentDevice] userInterfaceIdiom] == UIUserInterfaceIdiomPad) {
-            
-            UITableViewController * simpleItemListViewController = [self.storyboard instantiateViewControllerWithIdentifier:@"NavigationItemListView"];
-            simpleItemListViewController.navigationItem.hidesBackButton = YES;
-            simpleItemListViewController.clearsSelectionOnViewWillAppear = NO;
-            
-            // Get the selected row from the item list
-            NSIndexPath* indexPath = [_tableView indexPathForSelectedRow];
-            
-            @synchronized(self){
-                [simpleItemListViewController.tableView setDelegate: self];
-                [simpleItemListViewController.tableView setDataSource: self];
-                _tableView = simpleItemListViewController.tableView;
-            }
-            
+             
             ZPAppDelegate* appDelegate = (ZPAppDelegate*)[[UIApplication sharedApplication] delegate];
             
             UINavigationController* navigationController = [[(UISplitViewController*)appDelegate.window.rootViewController viewControllers] objectAtIndex:0];
             
-            //Set the cache status display
-            [simpleItemListViewController setToolbarItems:[[navigationController topViewController] toolbarItems]];
-            
-            [navigationController pushViewController:simpleItemListViewController animated:YES];
-            [simpleItemListViewController.tableView selectRowAtIndexPath:indexPath animated:NO scrollPosition:UITableViewScrollPositionMiddle]; 
+            [navigationController.topViewController performSegueWithIdentifier:@"PushItemsToNavigator" sender:self];
+
         }
         
     }

@@ -5,7 +5,7 @@
 //  This class contains all database operations.
 //
 //  Created by Rönkkö Mikko on 12/16/11.
-//  Copyright (c) 2011 __MyCompanyName__. All rights reserved.
+//  Copyright (c) 2011 Mikko Rönkkö. All rights reserved.
 //
 
 
@@ -248,7 +248,7 @@ static ZPDatabase* _instance = nil;
         NSString* updateSQL = [NSString stringWithFormat:@"UPDATE %@ SET %@ = ? WHERE %@ = ?",
                                table,
                                [dataFieldNames componentsJoinedByString:@" = ?, "],
-                               [primaryKeyFieldNames componentsJoinedByString:@" = ? AND"]];
+                               [primaryKeyFieldNames componentsJoinedByString:@" = ? AND "]];
         
         NSArray* allFields = [dataFieldNames arrayByAddingObjectsFromArray:primaryKeyFieldNames];
         
@@ -258,8 +258,15 @@ static ZPDatabase* _instance = nil;
                 NSArray* args = [self dbFieldValuesForObject:object fieldsNames:allFields];
                 if(![_database executeUpdate:updateSQL withArgumentsInArray:args]){
 #ifdef DEBUG
-                    DDLogError(@"Error executing query %@ with arguments %@. Server response from which the data object was created is %@",updateSQL,args,[(ZPZoteroDataObject*)object responseDataFromWhichThisItemWasCreated]);
-                    [NSException raise:@"Database error" format:@"Error executing query %@ with arguments %@. Server response from which the data object was created is %@",updateSQL,args,[(ZPZoteroDataObject*)object responseDataFromWhichThisItemWasCreated]];   
+                    if([object isKindOfClass:[ZPZoteroDataObject class]]){
+                        DDLogError(@"Error executing query %@ with arguments %@. Server response from which the data object was created is %@",updateSQL,args,[(ZPZoteroDataObject*)object responseDataFromWhichThisItemWasCreated]);
+                        [NSException raise:@"Database error" format:@"Error executing query %@ with arguments %@. Server response from which the data object was created is %@",updateSQL,args,[(ZPZoteroDataObject*)object responseDataFromWhichThisItemWasCreated]];
+                    }
+                    else{
+                        DDLogError(@"Error executing query %@ with arguments %@",updateSQL,args);
+
+                        [NSException raise:@"Database error" format:@"Error executing query %@ with arguments %@",updateSQL,args];
+                    }
 #else
                     [NSException raise:@"Database error" format:@"Error executing query %@ with arguments %@",updateSQL,args];
 #endif
