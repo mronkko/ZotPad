@@ -136,7 +136,8 @@
          target.navigationItem.hidesBackButton = YES;
          target.clearsSelectionOnViewWillAppear = NO;
         
-        [target setToolbarItems:[[currentItemViewController.navigationController topViewController] toolbarItems]];
+        //Keep the same toolbar
+        [target setToolbarItems:self.toolbarItems];
          
          // Get the selected row from the item list
          NSIndexPath* indexPath = [currentItemViewController.tableView indexPathForSelectedRow];

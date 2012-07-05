@@ -179,7 +179,13 @@ NSInteger const VERSION_SOURCE_DROPBOX =3;
 }
 
 -(NSString*) filenameZoteroBase64Encoded{
-    return [[QSStrings encodeBase64WithString:self.filename] stringByAppendingString:@"%ZB64"];
+    //This is a workaround to fix a double encoding bug in Zotero
+    
+    NSData* UTF8Data = [self.filename dataUsingEncoding:NSUTF8StringEncoding];
+    NSString* asciiString = [[NSString alloc] initWithData:UTF8Data encoding:NSASCIIStringEncoding];
+    NSData* doubleEncodedUTF8Data = [asciiString dataUsingEncoding:NSUTF8StringEncoding];
+    
+    return [[QSStrings encodeBase64WithData:doubleEncodedUTF8Data] stringByAppendingString:@"\%ZB64"];
 }
 
 #pragma mark - File operations

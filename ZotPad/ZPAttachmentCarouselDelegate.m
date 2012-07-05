@@ -191,7 +191,9 @@ NSInteger const ZPATTACHMENTICONGVIEWCONTROLLER_SHOW_FIRST_MODIFIED_SECOND_ORIGI
         errorLabel.tag = 6;
         errorLabel.backgroundColor = [UIColor clearColor];
         errorLabel.textColor = [UIColor whiteColor];
-        
+        errorLabel.font = [UIFont systemFontOfSize:12];
+        errorLabel.numberOfLines = 4;
+
         [labelBackground addSubview:errorLabel];
         
         

@@ -342,23 +342,43 @@ NSInteger const ZPFILECHANNEL_WEBDAV_UPLOAD_REGISTER = 5;
                 
                 [zipArchive UnzipFileTo:tempFile overWrite:YES];
                 [zipArchive UnzipCloseFile];
-                
-                //Check that the file that we wanted exits
-                NSString* encodedFileName = attachment.filenameZoteroBase64Encoded;
-                tempFile = [tempFile stringByAppendingPathComponent:encodedFileName];
-                
-                if(![[NSFileManager defaultManager] fileExistsAtPath:tempFile]){
-                    NSString* errorMessage = [NSString stringWithFormat:@"Zip file downloaded from WebDAV URL %@ did not contain file %@ (%@)",[request.url absoluteString], attachment.filenameZoteroBase64Encoded,attachment.filename];
 
+                //If there was only one file in the archive, use that
+                
+                NSArray* fileArray= [[NSFileManager defaultManager]contentsOfDirectoryAtPath:tempFile error:NULL];
+                
+                if([fileArray count]==1){
+                    tempFile = [tempFile stringByAppendingPathComponent:[fileArray objectAtIndex:0]];
+                    NSString* md5 = [ZPZoteroAttachment md5ForFileAtPath:tempFile];
+                    DDLogVerbose(@"The MD5 sum of the file received from server is %@", md5);
+                    [[ZPServerConnection instance] finishedDownloadingAttachment:attachment toFileAtPath:tempFile withVersionIdentifier:md5 usingFileChannel:self];
+                }
+                else if([fileArray count]==0){
+                    NSString* errorMessage = [NSString stringWithFormat:@"Zip file downloaded from WebDAV URL %@ did not contain any files (%@)",[request.url absoluteString], attachment.filename];
+                    
                     DDLogError(errorMessage);
-
+                    
                     NSError* error = [[NSError alloc] initWithDomain:[request.url host] code:request.responseStatusCode userInfo:[NSDictionary dictionaryWithObject:errorMessage forKey:NSLocalizedDescriptionKey]];
                     [[ZPServerConnection instance] failedDownloadingAttachment:attachment withError:error usingFileChannel:self];
                 }
                 else{
-                    NSString* md5 = [ZPZoteroAttachment md5ForFileAtPath:tempFile];
-                    DDLogVerbose(@"The MD5 sum of the file received from server is %@", md5);
-                    [[ZPServerConnection instance] finishedDownloadingAttachment:attachment toFileAtPath:tempFile withVersionIdentifier:md5 usingFileChannel:self];
+                    //Check that the file that we wanted exits
+                    NSString* encodedFileName = attachment.filenameZoteroBase64Encoded;
+                    tempFile = [tempFile stringByAppendingPathComponent:encodedFileName];
+                                        
+                    if(![[NSFileManager defaultManager] fileExistsAtPath:tempFile]){
+                        NSString* errorMessage = [NSString stringWithFormat:@"Zip file downloaded from WebDAV URL %@ contained several files, but none matched %@ (%@)",[request.url absoluteString], attachment.filenameZoteroBase64Encoded,attachment.filename];
+                        
+                        DDLogError(errorMessage);
+                        
+                        NSError* error = [[NSError alloc] initWithDomain:[request.url host] code:request.responseStatusCode userInfo:[NSDictionary dictionaryWithObject:errorMessage forKey:NSLocalizedDescriptionKey]];
+                        [[ZPServerConnection instance] failedDownloadingAttachment:attachment withError:error usingFileChannel:self];
+                    }
+                    else{
+                        NSString* md5 = [ZPZoteroAttachment md5ForFileAtPath:tempFile];
+                        DDLogVerbose(@"The MD5 sum of the file received from server is %@", md5);
+                        [[ZPServerConnection instance] finishedDownloadingAttachment:attachment toFileAtPath:tempFile withVersionIdentifier:md5 usingFileChannel:self];
+                    }
                 }
             }
         }
