@@ -20,6 +20,7 @@
 @property (retain) NSString* title;
 @property (retain) NSNumber* libraryID;
 @property (retain) NSString* key;
+@property (retain) NSString* dateAdded;
 
 // Important: This field stores the number of all items including items that are attachments to parent items. 
 

@@ -47,7 +47,8 @@ CREATE TABLE IF NOT EXISTS items (
     title TEXT,
     fullCitation TEXT NOT NULL,
     itemType TEXT NOT NULL,
-    cacheTimestamp TEXT DEFAULT NULL
+    cacheTimestamp TEXT DEFAULT NULL,
+    dateAdded TEXT DEFAULT NULL
 );
 
 CREATE INDEX items_libraryID ON items (libraryID);
