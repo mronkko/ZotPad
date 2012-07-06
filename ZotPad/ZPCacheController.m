@@ -141,6 +141,7 @@ static ZPCacheController* _instance = nil;
     _isRefresingLibraries =FALSE;
     _librariesWhoseCollectionsAreBeingRefreshed = [[NSMutableSet alloc] init];
 
+    [self performSelectorInBackground:@selector(updateLibrariesAndCollectionsFromServer) withObject:NULL];
     /*
     Start building cache immediately if the user has chosen to cache all libraries
      */
@@ -159,6 +160,8 @@ static ZPCacheController* _instance = nil;
             }
         }
     }
+     
+    [self performSelectorInBackground:@selector(_scanFilesToUpload) withObject:NULL];
      
     return self;
 }
@@ -224,7 +227,10 @@ static ZPCacheController* _instance = nil;
 -(void) _checkUploadQueue{
     @synchronized(_attachmentsToUpload){
         
+        //TODO: Update the views only when the number of items in the queue actually changes.
         [_statusView setFileUploads:[_attachmentsToUpload count]];
+        
+        DDLogVerbose(@"Checked upload queue: Files to upload %i",[_attachmentsToUpload count]);
         
         if([_attachmentsToUpload count]>0){
             if([ZPServerConnection instance] && [[ZPServerConnection instance] numberOfFilesUploading] <1){
@@ -1090,12 +1096,13 @@ static ZPCacheController* _instance = nil;
     
     for (NSString* _documentFilePath in directoryContent) {
         ZPZoteroAttachment* attachment = [ZPZoteroAttachment dataObjectForAttachedFile:_documentFilePath];
-        if(attachment !=NULL && [attachment.fileSystemPath_modified isEqualToString:_documentFilePath]){
+        if(attachment !=NULL && [[attachment.fileSystemPath_modified lastPathComponent] isEqualToString:_documentFilePath]){
             @synchronized(_attachmentsToUpload){
                 [_attachmentsToUpload addObject:attachment]; 
             }
         }
     }
+    [self performSelectorInBackground:@selector(_checkQueues) withObject:NULL];
 }
 
 

@@ -187,7 +187,10 @@
     //Store the version identifier. This is later used to upload modified files to Zotero
     
     if(_activeAttachment.versionIdentifier_local == [NSNull null] || _activeAttachment.versionIdentifier_local == NULL){
-        _activeAttachment.versionIdentifier_local = _activeAttachment.versionIdentifier_server;
+        if(_activeAttachment.versionIdentifier_server == [NSNull null] || _activeAttachment.versionIdentifier_server == NULL){
+            [NSException raise:@"Attachment version identifier cannot be null" format:@"Server version identifier for attachment %@ was null",_activeAttachment.key];
+         }
+         _activeAttachment.versionIdentifier_local = _activeAttachment.versionIdentifier_server;
     }
     
     [[ZPDatabase instance] writeVersionInfoForAttachment:_activeAttachment];

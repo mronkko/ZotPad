@@ -100,6 +100,21 @@ static ZPPreferences* _instance = nil;
         
     }
     
+    // Alert if webdav is misconfigured
+    
+    if ([self useWebDAV]) {
+        NSString* webdavUrl = [self webDAVURL];
+        
+        if(![webdavUrl hasPrefix:@"http"] || ! [webdavUrl hasSuffix:@"/zotero"]){
+            [[[UIAlertView alloc] initWithTitle:@"WebDAV configuration error"
+                                       message:[NSString stringWithFormat:@"WebDAV is enabled, but the WebDAV address is not specified correctly. Please check that the WebDAV address starts with 'http://' or 'https://' and ends with '/zotero'. The current value is '%@'",webdavUrl]
+                                      delegate:NULL
+                             cancelButtonTitle:@"OK"
+                              otherButtonTitles: nil] show];
+        }
+
+    }
+
 }
 
 -(NSString*) defaultApplicationForContentType:(NSString*) type{
@@ -123,18 +138,12 @@ static ZPPreferences* _instance = nil;
         [defaults removeObjectForKey:@"resetusername"];
     }
     
-    if([defaults boolForKey:@"resetitemdata"]){
-        DDLogWarn(@"Reseting itemdata");
-        [defaults removeObjectForKey:@"resetitemdata"];
+    if([defaults boolForKey:@"resetdata"]){
+        DDLogWarn(@"Reseting itemdata and deleting cached attachments");
+        [defaults removeObjectForKey:@"resetdata"];
         [[ZPDatabase instance] resetDatabase];
-    }
-    
-    if([defaults boolForKey:@"resetfiles"]){
-        DDLogWarn(@"Reseting files");
-        [defaults removeObjectForKey:@"resetfiles"];
         [[ZPCacheController instance] performSelectorInBackground:@selector(purgeAllAttachmentFilesFromCache) withObject:NULL];
     }
-
 }
 -(void) resetUserCredentials{
     NSUserDefaults* defaults = [NSUserDefaults standardUserDefaults];
@@ -229,6 +238,7 @@ static ZPPreferences* _instance = nil;
     if([ret hasSuffix:@"/"]){
         ret = [ret substringToIndex:[ret length] - 1];
     }
+    
     return ret;
 }
 

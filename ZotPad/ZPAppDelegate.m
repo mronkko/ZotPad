@@ -130,11 +130,6 @@ didFinishLaunchingWithOptions:(NSDictionary *)launchOptions
         splitViewController.delegate = (id)navigationController.topViewController;
     }
 
-    //These will trigger authentication
-
-    [ZPFileChannel_Dropbox linkDroboxIfNeeded];
-    [[ZPCacheController instance] performSelectorInBackground:@selector(updateLibrariesAndCollectionsFromServer) withObject:NULL];
-
     DDLogInfo(@"Started");
     
     return YES;

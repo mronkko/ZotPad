@@ -697,15 +697,16 @@ Deletes items, notes, and attachments based in array of keys from a library
     if([itemKeys count] == 0) return;
     
     @synchronized(self){
-
-        [_database executeUpdate:[NSString stringWithFormat:@"DELETE FROM items WHERE libraryID = ? AND itemKey NOT IN ('%@')",
-                                  [itemKeys componentsJoinedByString:@"', '"]],libraryID];
+        NSString* keyString = [itemKeys componentsJoinedByString:@"', '"];
         
-        [_database executeUpdate:[NSString stringWithFormat:@"DELETE FROM attachments WHERE itemKey NOT IN ('%@') AND parentItemKey IN (SELECT itemKey FROM items WHERE libraryID = ?)",
-                                  [itemKeys componentsJoinedByString:@"', '"]],libraryID];
+        [_database executeUpdate:[NSString stringWithFormat:@"DELETE FROM items WHERE libraryID = ? AND itemKey NOT IN ('%@')",
+                                  keyString],libraryID];
+        
+        [_database executeUpdate:[NSString stringWithFormat:@"DELETE FROM attachments WHERE itemKey NOT IN ('%@') AND parentItemKey NOT IN ('%@') AND parentItemKey IN (SELECT itemKey FROM items WHERE libraryID = ?)",
+                                  keyString,keyString],libraryID];
 
-        [_database executeUpdate:[NSString stringWithFormat:@"DELETE FROM notes WHERE itemKey NOT IN ('%@') AND parentItemKey in (SELECT itemKey FROM items WHERE libraryID = ?)",
-                                  [itemKeys componentsJoinedByString:@"', '"]],libraryID];
+        [_database executeUpdate:[NSString stringWithFormat:@"DELETE FROM notes WHERE itemKey NOT IN ('%@') AND parentItemKey NOT IN ('%@') AND parentItemKey in (SELECT itemKey FROM items WHERE libraryID = ?)",
+                                  keyString,keyString],libraryID];
 
 
     }

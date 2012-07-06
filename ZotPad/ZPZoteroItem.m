@@ -182,7 +182,7 @@ static NSCache* _objectCache = NULL;
 - (NSArray*) creators{
     if(_creators == NULL){
         [[ZPDatabase instance] addCreatorsToItem:self];
-        if(_creators ==NULL) [NSException raise:@"Creators cannot be null" format:@"Reading an item (%@) from database resulted in null creators. "];
+        if(_creators ==NULL) [NSException raise:@"Creators cannot be null" format:@"Reading an item (%@) from database resulted in null creators. ",self.key];
     }
     return _creators;
 }

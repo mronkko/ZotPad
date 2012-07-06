@@ -646,6 +646,9 @@ const NSInteger ZPServerConnectionRequestPermissions = 10;
     if(tempFile == NULL){
         [NSException raise:@"File channel should not report success if file was not received" format:@""];
     }
+    else if(identifier == NULL){
+        [NSException raise:@"File channel must report version identifier on succesful download" format:@""];
+    }
     else{
         //If we got a file, move it to the right place
         

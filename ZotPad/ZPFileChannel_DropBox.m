@@ -128,14 +128,15 @@ const NSInteger ZPFILECHANNEL_DROPBOX_DOWNLOAD = 2;
     DDLogVerbose(@"Requesting metadata from Dropbox path %@",path);
     
     //Drobbox uses NSURLconnection internally, so it needs to be called in the main thread.
-    [restClient performSelectorOnMainThread:@selector(loadMetadata:) withObject:path waitUntilDone:NO];
+    [restClient performSelectorOnMainThread:@selector(loadMetadata:) withObject:[path precomposedStringWithCanonicalMapping] waitUntilDone:NO];
     
 }
 -(void) cancelDownloadingAttachment:(ZPZoteroAttachment*)attachment{
 
     DBRestClient* restClient = [self requestWithAttachment:attachment];
     
-    [restClient cancelFileLoad:[NSString stringWithFormat:@"/%@/%@",attachment.key,attachment.filename]];
+    NSString* path = [NSString stringWithFormat:@"/%@/%@",attachment.key,attachment.filename];
+    [restClient cancelFileLoad:[path precomposedStringWithCanonicalMapping]];
     [self cleanupAfterFinishingAttachment:attachment];
 }
 
@@ -172,7 +173,7 @@ const NSInteger ZPFILECHANNEL_DROPBOX_DOWNLOAD = 2;
     NSString* path = [NSString stringWithFormat:@"/%@/%@",attachment.key,attachment.filename];
     
     //Drobbox uses NSURLconnection internally, so it needs to be called in the main thread.
-    [restClient performSelectorOnMainThread:@selector(loadMetadata:) withObject:path waitUntilDone:NO];
+    [restClient performSelectorOnMainThread:@selector(loadMetadata:) withObject:[path precomposedStringWithCanonicalMapping] waitUntilDone:NO];
 
     
 }
@@ -203,7 +204,8 @@ const NSInteger ZPFILECHANNEL_DROPBOX_DOWNLOAD = 2;
             for (DBMetadata *file in metadata.contents) {
                 DDLogVerbose(@"\t%@", file.filename);
                 NSString* tempFile = [basePath stringByAppendingPathComponent:file.filename];
-                [client loadFile:[NSString stringWithFormat:@"/%@/%@",attachment.key,file.filename] intoPath:tempFile];
+                NSString* path = [NSString stringWithFormat:@"/%@/%@",attachment.key,file.filename] ;
+                [client loadFile:[path precomposedStringWithCanonicalMapping] intoPath:tempFile];
             }
             @synchronized(downloadCountsByRequest){
                 [downloadCountsByRequest setObject:[NSNumber numberWithInt:[metadata.contents count]] forKey:[self keyForRequest:client]];
@@ -214,7 +216,8 @@ const NSInteger ZPFILECHANNEL_DROPBOX_DOWNLOAD = 2;
             client.revision=metadata.rev;
             DDLogVerbose(@"Start downloading file /%@/%@ (rev %@)",attachment.key,attachment.filename,client.revision);
             NSString* tempFile = [NSTemporaryDirectory() stringByAppendingPathComponent:[NSString stringWithFormat:@"ZP%@%i",attachment.key,[[NSDate date] timeIntervalSince1970]*1000000]];
-            [client loadFile:[NSString stringWithFormat:@"/%@/%@",attachment.key,attachment.filename] atRev:client.revision intoPath:tempFile];
+            NSString* path = [NSString stringWithFormat:@"/%@/%@",attachment.key,attachment.filename];
+            [client loadFile:[path precomposedStringWithCanonicalMapping] atRev:client.revision intoPath:tempFile];
         }
     }
     // Uploading
@@ -222,13 +225,13 @@ const NSInteger ZPFILECHANNEL_DROPBOX_DOWNLOAD = 2;
         NSString* targetPath = [NSString stringWithFormat:@"/%@/",attachment.key];
         
         if(client.overwriteConflicting){
-            [client uploadFile:attachment.filename toPath:targetPath withParentRev:metadata.rev fromPath:attachment.fileSystemPath_modified];
+            [client uploadFile:[attachment.filename precomposedStringWithCanonicalMapping] toPath:[targetPath precomposedStringWithCanonicalMapping] withParentRev:metadata.rev fromPath:attachment.fileSystemPath_modified];
         }
         else if(! [attachment.versionIdentifier_local isEqualToString:metadata.rev]){
             [self presentConflictViewForAttachment:attachment];
         }
         else{
-            [client uploadFile:attachment.filename toPath:targetPath withParentRev:attachment.versionIdentifier_local fromPath:attachment.fileSystemPath_modified];
+            [client uploadFile:[attachment.filename precomposedStringWithCanonicalMapping] toPath:[targetPath precomposedStringWithCanonicalMapping] withParentRev:attachment.versionIdentifier_local fromPath:attachment.fileSystemPath_modified];
         }
     }
 }

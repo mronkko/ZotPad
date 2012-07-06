@@ -196,19 +196,9 @@
 			<key>Type</key>
 			<string>PSToggleSwitchSpecifier</string>
 			<key>Title</key>
-			<string>Reset item data</string>
+			<string>Reset data</string>
 			<key>Key</key>
-			<string>resetitemdata</string>
-			<key>DefaultValue</key>
-			<false/>
-		</dict>
-		<dict>
-			<key>Type</key>
-			<string>PSToggleSwitchSpecifier</string>
-			<key>Title</key>
-			<string>Delete attachment files</string>
-			<key>Key</key>
-			<string>resetfiles</string>
+			<string>resetdata</string>
 			<key>DefaultValue</key>
 			<false/>
 		</dict>
@@ -216,7 +206,7 @@
 			<key>Type</key>
 			<string>PSGroupSpecifier</string>
 			<key>Title</key>
-			<string>Error reports and usage statitics</string>
+			<string>Error reports and usage statistics</string>
 			<key>FooterText</key>
 			<string>ZotPad will automatically report errors and usage statistics in the background. The reports are anonymous and do not contain any of your data.</string>
 		</dict>

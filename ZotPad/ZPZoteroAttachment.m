@@ -25,6 +25,7 @@ NSInteger const VERSION_SOURCE_DROPBOX =3;
 
 @interface ZPZoteroAttachment(){
     NSString* _md5;
+    NSString* _versionIdentifier_server;
 }
 - (NSString*) _fileSystemPathWithSuffix:(NSString*)suffix;
 
@@ -33,11 +34,15 @@ NSInteger const VERSION_SOURCE_DROPBOX =3;
 @implementation ZPZoteroAttachment
 
 @synthesize lastViewed, attachmentSize, existsOnZoteroServer, filename, url, versionSource,  charset;
-@synthesize versionIdentifier_server;
+//@synthesize versionIdentifier_server;
 @synthesize versionIdentifier_local;
 
-//@synthesize versionIdentifier_local;
-
+-(void) setVersionIdentifier_server:(NSString *)versionIdentifier_server{
+    _versionIdentifier_server = versionIdentifier_server;
+}
+-(NSString*) versionIdentifier_server{
+    return _versionIdentifier_server;
+}
 
 +(id) dataObjectWithDictionary:(NSDictionary *)fields{
     NSMutableDictionary* dict = [NSMutableDictionary dictionaryWithDictionary:fields ];
@@ -85,8 +90,10 @@ NSInteger const VERSION_SOURCE_DROPBOX =3;
     NSString* key =[[filename componentsSeparatedByString: @"_"] lastObject];
     
     //If this is a locally modified file or a version, strip the trailing - from the key
-    key = [key substringToIndex:8];
- 
+    if(key.length>8){
+        key = [key substringToIndex:8];
+    }
+    
     ZPZoteroAttachment* attachment= (ZPZoteroAttachment*) [self dataObjectWithKey:key];
     if(attachment.filename == NULL) attachment = NULL;
 
