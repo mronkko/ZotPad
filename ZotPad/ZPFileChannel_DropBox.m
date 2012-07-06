@@ -9,7 +9,7 @@
 #import "ZPCore.h"
 
 #import "ZPFileChannel_Dropbox.h"
-#import <DropboxSDK/DropboxSDK.h>
+#import "DBRestClient.h"
 #import "ZPPreferences.h"
 
 #import "ZPServerConnection.h"
@@ -101,7 +101,9 @@ const NSInteger ZPFILECHANNEL_DROPBOX_DOWNLOAD = 2;
 #pragma mark - Downloads
 
 -(void) startDownloadingAttachment:(ZPZoteroAttachment*)attachment{
-    
+
+    DDLogInfo(@"Start downloading attachment %@ from Dropbox",attachment.filename);
+
     //Link with dropBox account if not already linked
     [ZPFileChannel_Dropbox linkDroboxIfNeeded];
     
@@ -113,15 +115,20 @@ const NSInteger ZPFILECHANNEL_DROPBOX_DOWNLOAD = 2;
     
     [self linkAttachment:attachment withRequest:restClient];
     
+    NSString* path;
     //If this is a website snapshot, we need to download all files
     if([attachment.linkMode intValue] == LINK_MODE_IMPORTED_URL && [attachment.contentType isEqualToString:@"text/html"]){
         //Get a list of files to be downloaded
-        [restClient loadMetadata:[NSString stringWithFormat:@"/%@/",attachment.key]];
+        path = [NSString stringWithFormat:@"/%@/",attachment.key];
     }
     else{
         //Otherwise, load metadata for the file
-        [restClient loadMetadata:[NSString stringWithFormat:@"/%@/%@",attachment.key,attachment.filename]];
+        path =[NSString stringWithFormat:@"/%@/%@",attachment.key,attachment.filename];
     }
+    DDLogVerbose(@"Requesting metadata from Dropbox path %@",path);
+    
+    //Drobbox uses NSURLconnection internally, so it needs to be called in the main thread.
+    [restClient performSelectorOnMainThread:@selector(loadMetadata:) withObject:path waitUntilDone:NO];
     
 }
 -(void) cancelDownloadingAttachment:(ZPZoteroAttachment*)attachment{
@@ -147,6 +154,8 @@ const NSInteger ZPFILECHANNEL_DROPBOX_DOWNLOAD = 2;
 
 -(void) startUploadingAttachment:(ZPZoteroAttachment*)attachment overWriteConflictingServerVersion:(BOOL)overwriteConflicting{
 
+    DDLogInfo(@"Start uploading attachment %@ to Dropbox, overwrite: %i",attachment.filename,overwriteConflicting);
+
     //Link with dropBox account if not already linked
 
     [ZPFileChannel_Dropbox linkDroboxIfNeeded];
@@ -160,7 +169,11 @@ const NSInteger ZPFILECHANNEL_DROPBOX_DOWNLOAD = 2;
     
     [self linkAttachment:attachment withRequest:restClient];
         
-    [restClient loadMetadata:[NSString stringWithFormat:@"/%@/%@",attachment.key,attachment.filename]];
+    NSString* path = [NSString stringWithFormat:@"/%@/%@",attachment.key,attachment.filename];
+    
+    //Drobbox uses NSURLconnection internally, so it needs to be called in the main thread.
+    [restClient performSelectorOnMainThread:@selector(loadMetadata:) withObject:path waitUntilDone:NO];
+
     
 }
 
@@ -176,6 +189,8 @@ const NSInteger ZPFILECHANNEL_DROPBOX_DOWNLOAD = 2;
 #pragma mark - Call backs
 
 - (void)restClient:(ZPDBRestClient*)client loadedMetadata:(DBMetadata *)metadata {
+    
+    DDLogVerbose(@"Dropbox returned metadata");
     
     ZPZoteroAttachment* attachment = client.attachment;
     
@@ -218,6 +233,11 @@ const NSInteger ZPFILECHANNEL_DROPBOX_DOWNLOAD = 2;
     }
 }
 
+- (void)restClient:(DBRestClient*)client metadataUnchangedAtPath:(NSString*)path{
+    DDLogVerbose(@"Metadata unchanged at path: %@", path);
+    
+}
+
 - (void)restClient:(ZPDBRestClient*) client loadMetadataFailedWithError:(NSError *)error {
     
     DDLogVerbose(@"Error loading metadata: %@", error);
@@ -242,6 +262,8 @@ const NSInteger ZPFILECHANNEL_DROPBOX_DOWNLOAD = 2;
 }
 - (void)restClient:(ZPDBRestClient*)client loadedFile:(NSString*)localPath {
     
+    DDLogVerbose(@"Dropbox returned file");
+
     ZPZoteroAttachment* attachment = client.attachment;
     
     //If this is a webpage snapshot
@@ -324,6 +346,8 @@ const NSInteger ZPFILECHANNEL_DROPBOX_DOWNLOAD = 2;
 - (void)restClient:(ZPDBRestClient*)client uploadedFile:(NSString*)destPath from:(NSString*)srcPath 
           metadata:(DBMetadata*)metadata{
     
+    DDLogVerbose(@"Dropbox uploaded file");
+
     ZPZoteroAttachment* attachment = client.attachment;
     
     [[ZPServerConnection instance] finishedUploadingAttachment:attachment withVersionIdentifier:metadata.rev];

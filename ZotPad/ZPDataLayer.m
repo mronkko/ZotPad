@@ -252,33 +252,44 @@ static ZPDataLayer* _instance = nil;
 
 //Adds and removes observers. Because of concurrency issues we are not using mutable sets here.
 -(void) registerItemObserver:(NSObject<ZPItemObserver>*)observer{
-    _itemObservers = [_itemObservers setByAddingObject:observer];
-    
+    if(observer!=NULL){
+        _itemObservers = [_itemObservers setByAddingObject:observer];
+    }
 }
 -(void) removeItemObserver:(NSObject<ZPItemObserver>*)observer{
-    NSMutableSet* tempSet =[NSMutableSet setWithSet:_itemObservers];
-    [tempSet removeObject:observer];
-    _itemObservers = tempSet;
+    if(observer!=NULL){
+        NSMutableSet* tempSet =[NSMutableSet setWithSet:_itemObservers];
+        [tempSet removeObject:observer];
+        _itemObservers = tempSet;
+    }
 }
 
 -(void) registerLibraryObserver:(NSObject<ZPLibraryObserver>*)observer{
-    _libraryObservers = [_libraryObservers setByAddingObject:observer];
+    if(observer!=NULL){
+        _libraryObservers = [_libraryObservers setByAddingObject:observer];
+    }
 }
 -(void) removeLibraryObserver:(NSObject<ZPLibraryObserver>*)observer{
-    NSMutableSet* tempSet =[NSMutableSet setWithSet:_libraryObservers];
-    [tempSet removeObject:observer];
-    _libraryObservers = tempSet;
+    if(observer!=NULL){
+        NSMutableSet* tempSet =[NSMutableSet setWithSet:_libraryObservers];
+        [tempSet removeObject:observer];
+        _libraryObservers = tempSet;
+    }
 }
 
 
 -(void) registerAttachmentObserver:(NSObject<ZPAttachmentObserver>*)observer{
-    _attachmentObservers = [_attachmentObservers setByAddingObject:observer];
+    if(observer!=NULL){
+        _attachmentObservers = [_attachmentObservers setByAddingObject:observer];
+    }
 }
 
 -(void) removeAttachmentObserver:(NSObject<ZPAttachmentObserver>*)observer{
-    NSMutableSet* tempSet =[NSMutableSet setWithSet:_attachmentObservers];
-    [tempSet removeObject:observer];
-    _attachmentObservers = tempSet;
+    if(observer!=NULL){
+        NSMutableSet* tempSet =[NSMutableSet setWithSet:_attachmentObservers];
+        [tempSet removeObject:observer];
+        _attachmentObservers = tempSet;
+    }
 }
 
 

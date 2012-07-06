@@ -603,17 +603,25 @@ const NSInteger ZPServerConnectionRequestPermissions = 10;
 
 -(BOOL) checkIfCanBeDownloadedAndStartDownloadingAttachment:(ZPZoteroAttachment*)attachment{
     
+    DDLogVerbose(@"Checking if file %@ can download",attachment);
+    
     //Check if the file can be downloaded
     
-    if([attachment.linkMode intValue] == LINK_MODE_LINKED_URL || [attachment.linkMode intValue] == LINK_MODE_LINKED_FILE) return FALSE;
+    if([attachment.linkMode intValue] == LINK_MODE_LINKED_URL || [attachment.linkMode intValue] == LINK_MODE_LINKED_FILE){
+        return FALSE;
+    }
     
     ZPFileChannel* downloadChannel = [self _fileChannelForAttachment:attachment];
 
-    if(downloadChannel == NULL) return FALSE;
+    if(downloadChannel == NULL){
+     return FALSE;   
+    }
     
     @synchronized(_activeDownloads){
         //Do not download item if it is already being downloaded
-        if([_activeDownloads containsObject:attachment]) return false;
+        if([_activeDownloads containsObject:attachment]){
+            return false;   
+        }
         DDLogVerbose(@"Added %@ to active downloads. Number of files downloading is %i",attachment.filename,[_activeDownloads count]);
         [_activeDownloads addObject:attachment];
     }
@@ -623,7 +631,7 @@ const NSInteger ZPServerConnectionRequestPermissions = 10;
     //First request starts the network indicator
     if(_activeRequestCount==1) [[UIApplication sharedApplication] setNetworkActivityIndicatorVisible:YES];
     
-    //Use the first channel
+    DDLogVerbose(@"Checking downloading %@ with filechannel %i",attachment.filename,downloadChannel.fileChannelType);    
     [downloadChannel startDownloadingAttachment:attachment];
     
     [[ZPDataLayer instance] notifyAttachmentDownloadStarted:attachment];

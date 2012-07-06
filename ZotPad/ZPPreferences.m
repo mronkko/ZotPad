@@ -13,6 +13,8 @@
 #import "ZPDatabase.h"
 #import "ZPCacheController.h"
 #import "ASIHTTPRequest.h"
+#import "../InAppSettingsKit/InAppSettingsKit/Models/IASKSettingsReader.h"
+#import "../InAppSettingsKit/InAppSettingsKit/Models/IASKSpecifier.h"
 
 @implementation ZPPreferences
 
@@ -80,6 +82,23 @@ static ZPPreferences* _instance = nil;
     _mode = [defaults integerForKey:@"mode"];
     float rawmax = [defaults floatForKey:@"cachesizemax"];
     _maxCacheSize = rawmax*1024*1024;
+    
+    //Dump the preferences into log
+    
+    IASKSettingsReader* reader = [[IASKSettingsReader alloc] init];
+    for(NSInteger section =0 ; section < [reader numberOfSections]; section++){
+        for(NSInteger row =0 ; row < [reader numberOfRowsForSection:section]; row++){
+            IASKSpecifier* prefItem = [reader specifierForIndexPath:[NSIndexPath indexPathForRow:row inSection:section]];
+
+            NSObject* valueObject = [defaults objectForKey:prefItem.key];
+            NSString* valueTitle= [prefItem titleForCurrentValue:valueObject];
+            NSString* title = [prefItem title];
+            if([@"" isEqualToString:valueTitle]) DDLogInfo(@"%@: %@",title, valueObject);
+            else DDLogInfo(@"%@: %@",title, valueTitle);
+
+        }
+        
+    }
     
 }
 

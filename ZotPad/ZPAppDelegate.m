@@ -98,7 +98,8 @@ didFinishLaunchingWithOptions:(NSDictionary *)launchOptions
 
     
     DDLogInfo(@"Starting");
-
+    DDLogVerbose(@"Verbose logging is enabled");
+    
      //Manual override for userID and Key. Useful for running the code in debugger with other people's credentials.
     
 

@@ -711,6 +711,7 @@ static ZPCacheController* _instance = nil;
 -(void) addToLibrariesQueue:(ZPZoteroLibrary*)object priority:(BOOL)priority{
     //Check this library is already baing cached
     if([_libraryTimestamps objectForKey:object.libraryID] == NULL){
+        DDLogVerbose(@"Adding library %@ to the metadata retrieval queue",object.title);
         @synchronized(_librariesToCache){
             if(priority){
                 [_librariesToCache removeObject:object];
