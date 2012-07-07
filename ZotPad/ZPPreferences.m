@@ -135,10 +135,18 @@ static ZPPreferences* _instance = nil;
     if([defaults boolForKey:@"resetusername"]){
         DDLogWarn(@"Reseting username");
         [self resetUserCredentials];
+        
+        //Also reset the data
+
+        [[ZPDatabase instance] resetDatabase];
+        [[ZPCacheController instance] performSelectorInBackground:@selector(purgeAllAttachmentFilesFromCache) withObject:NULL];
+        
         [defaults removeObjectForKey:@"resetusername"];
+        [defaults removeObjectForKey:@"resetdata"];
+
     }
     
-    if([defaults boolForKey:@"resetdata"]){
+    else if([defaults boolForKey:@"resetdata"]){
         DDLogWarn(@"Reseting itemdata and deleting cached attachments");
         [defaults removeObjectForKey:@"resetdata"];
         [[ZPDatabase instance] resetDatabase];

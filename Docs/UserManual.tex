@@ -1,0 +1,529 @@
+\documentclass[oneside, openany, 12pt]{tufte-book}
+
+
+\usepackage{ifthen}
+\usepackage{hyperref}
+\usepackage{setspace}
+\usepackage{graphicx}
+\usepackage{placeins}
+
+% set up conditional compilation
+
+\setlength\fboxsep{0pt}
+
+\ifthenelse{\equal{\detokenize{iphone}}{\jobname}}{
+	% settings for iPhone
+	\usepackage{geometry}
+	\geometry{papersize={128 mm, 196 mm}, margin=5mm}
+	\newcommand{\iphone}[1]{#1} 
+	\newcommand{\ipad}[1]{} 
+	\newcommand{\image}[2]{
+	\center
+	\fbox{\includegraphics[scale=.30]{images/iPhone/{#2}}}
+
+	\refstepcounter{figure}
+	\smallskip\noindent\small Figure \thefigure: #1
+	\label{#2}
+	}
+%remove footnotes from the iPhone version
+	\newcommand{\ipadfootnote}[1]{}
+	
+
+}{
+	% default settings for iPad
+	\newcommand{\iphone}[1]{} 
+	\newcommand{\ipad}[1]{#1} 
+	\newcommand{\image}[2]{
+	\caption{#1}
+	\label{#2}
+	\fbox{\includegraphics[scale=.15]{images/iPad/{#2}}}
+	}
+	\newcommand{\ipadfootnote}[1]{\footnote{#1}} 
+
+}
+
+\newcommand{\licensetext}{\scriptsize \setlength{\parskip}{0mm} \singlespacing} 
+
+
+\ipad{\title{ZotPad User Manual}}
+\iphone{\title{ZotPad User\\Manual}}
+
+
+\begin{document}
+
+\maketitle
+
+%Copyright \copyright 2012 Mikko R\"onkk\"o
+
+\chapter{Introduction}
+
+
+%\iphone{\begin{fullwidth}}
+
+
+ZotPad is an iPad/iPhone client for Zotero reference management software. The purpose of ZotPad is to allow accessing Zotero libraries from mobile devices. Using of Zotero software can be divided into three tasks, collecting articles and other material from the internet; reading, organizing, and making notes of the collected material; and citing the collected material in one's own writing. The purpose of ZotPad is to allow doing the reading, organizing, and note taking part on a mobile device\ipadfootnote{During the summer 2012 Zotero developers announced a Zotero bookmarklet that can be used to add items directly from mobile safari. More information about the bookmarklet can be found on the Zotero website at\url{https://www.zotero.org/bookmarklet/bookmarklet.html}}. \iphone{Users who are looking for a solution to add items will probably find the Zotero bookmarklet a nice solution: \url{https://www.zotero.org/bookmarklet/bookmarklet.html}}
+
+The version 1.1 of ZotPad is focused on attachment files. Files can be read with the built-in QuickLook viewer, sent to other apps for annotating, and shared by email. The recommended way to synchronizing files between ZotPad and Zotero is to use Zotero file storage service, but also WebDAV and Dropbox are supported. ZotPad is designed to be always connected with the Zotero server and does not need to be synchronized in the same way as Zotero. If network connection is not available, ZotPad will show data from a cache. This process is designed to be completely transparent for the user.
+
+\chapter{Getting started}
+
+ZotPad is designed to be intuitive to use if you have experience with Zotero. When you launch the app for the first time, ZotPad will open a page from the Zotero website requesting your username and password, as shown in Figure \ref{Login.png}. If you navigate away from the authentication workflow, you can go back by tapping the "Back to start" button on the top right.
+
+The username and password are transmitted securely and only the username is stored by ZotPad. 
+
+\begin{figure}
+\image{Login to Zotero}{Login.png}
+\end{figure}
+
+\clearpage
+
+After you have successfully logged in, you are directed to a page with a title "New Private Key" shown in Figure \ref{CreateKey.png}. This page will create a key that ZotPad uses to access your Zotero library. Tapping  "Accept Defaults" will give the key read and write access to your personal library and all the groups that you belong to and is the recommended option. 
+
+\begin{figure}
+\image{Create access key}{CreateKey.png}
+\end{figure}
+
+If you are using Zotero file storage, ZotPad is now fully configured and ready for use. The App might appear to work slowly initially, but this will go over after it has built a cache of your Zotero library.
+
+Using WebDAV or Dropbox to synchronize your files is described later in the user manual.
+
+\chapter{User interface}
+
+This chapter explains the ZotPad user interface and describes how different tasks are performed with ZotPad.
+
+	\section{Library and collection view}
+
+\ipad{ZotPad is designed to be used in the landscape orientation. The main screen that is shown in Figure \ref{StartView.png} consists of navigator on the left and larger content view on the right. In the portrait mode, the navigator is hidden, but can be shown by tapping a button on the top left corner of the content view. }
+
+\begin{figure}
+\image{Main user interface}{StartView.png}
+\end{figure}
+
+\ipad{The bottom of the navigator shows cache status bar. This bar shows the number of items that are are queued for retrieval from the Zotero data server, and the number of files that are queud for downloading and uploading, and the amount of cache space used. \ipadfootnote{The item downloads shows the number of toplevel items, attachments, and notes. For example, an article with an attachment and two notes is four items in the counter. The cache mechanism is discussed in more detail in Chapter \label{chapt:settings} that discusses ZotPad settings.} Tapping the gear button will show the ZotPad log and support options. The log view is discussed later in the user manual.
+
+Initially the navigator displays the list of libraries that you have access to.} \iphone{The first wiew is a list of libraries. } Tapping a library activates that library and shows the items from the library\ipad{ as a list in the content view}. Tapping on the round blue buttons reveals the collections in the library and navigates deeper in the collection hierarchy. \iphone{Tapping the gear button will show the ZotPad log and support options. The log view is discussed later in the user manual.} Figure \ref{ItemList.png} shows the user interface after the activating Group Library 1\ipad{ and tapping the round blue button to reveal the collections in the library}.
+
+\FloatBarrier
+
+\begin{figure}
+\image{Item list\ipad{ and collections}}{ItemList.png}
+\end{figure}
+
+\section{Item list view}
+
+The item list view shows the list of items in the selected library and collection. The item list shows basic citation information formatted according to the APA style. Tapping an item will open that item in item detail view. 
+
+Instead of showing icons about item types like Zotero, ZotPad shows the file type icon for the first attachment. These icons are initially disabled (grayed out) and become active once a file for the first attachment has been downloaded. Tapping on an active file type icon will open the first attachment in reading mode.
+
+\begin{figure}
+\image{Searching item list}{Search.png}
+\end{figure}
+
+The item list view has two functions: searching and sorting. Search is shown in Figure \ref{Search.png}. The search function has currently two limitations: First, although ZotPad downloads and views attachments, these are not indexed for full text search. In other words, the search uses only the item fields, not content of the attachment files. Second, the search is a phrase search. This means that if you type "nunnally 1978" (without the quotes), the search will match only items containing the exact phrase "nunnally 1978", but not items that match the word "nunnally" and "1978" only separately. Both limitations will be removed in the future.
+
+Sometimes it is possible to see a search returning items that are showing as loading from Zotero server, but then disappear. This is caused by differences in how searching is implemented in the Zotero server and in ZotPad. A more detail description of why this happens can be found later in the user guide when technical details of ZotPad are discussed. 
+
+\begin{figure}
+\image{Configuring sort buttons}{Sort.png}
+\end{figure}
+
+The item list can be sorted with the \ipad{6}\iphone{3} buttons below the item list view. The \ipad{first four} buttons are preconfigured with the most commonly used sorting criteria. Any of the buttons can be reconfigured to use a different criteria by tapping and holding the button. Configuring sort buttons is shown in Figure \ref{Sort.png}. Tapping a button will sort the list in ascending order and tapping the same button again will change between ascending and descending order. 
+
+\FloatBarrier
+
+	\section{Item detail view}
+
+Tapping an item in the item list view opens the item details view shown in Figure \ref{itemDetails.png}.\ipad{Opening the item detail view will push the item list into the navigator to allow quickly switching between items.
+
+}The item detail view contains two sections. The first section shows all attachments in a carousel and the second section below the attachments shows the item fields. Editing the item fields is not implemented in ZotPad 1.1, but will be added in a later version.
+
+The attachments in the carousel will initially show file type icons. Attachments that are PDF files will be shown as previews of the first PDF page after the file has been downloaded. All the attachments in Figure \ref{itemDetails.png}. are normal attachments. Tapping on a normal attachment\ipadfootnote{Both imported items and web site snapshots are normal items that can be downloaded and viewed on ZotPad.} that is not yet downloaded will start downloading the file. Tapping a file that has already been downloaded will open the file in QuickLook for reading as shown in Figure \ref{ReadingMode.png}. The reading view cannot currently show annotations for PDF files and has many other limitations. Because of this, ZotPad also supports sending files to other for reading.
+
+In addition to normal items, there are two other attachment types. Links are shown with a large arrow emblem on the top left corner of the attachment icon. Tapping on a link will move ZotPad to background and open the link in Safari. Linked files are marked with a lock emblem because these can be accessed only on the computer where the linked file was added.
+
+\begin{figure}
+\image{Item details view}{itemDetails.png}
+\end{figure}
+
+\begin{figure}
+\image{Reading view for attachment}{ReadingMode.png}
+\end{figure}
+
+\FloatBarrier
+
+	\section{Sending and receiving files}
+
+Both the item detail view and reading view have an action button on the top right corner. This button can be used to perform three actions shown in Figure \ref{ActionMenu.png}. If an item has multiple attachments, the action targets only the currently chosen one. Choosing "Purge" will delete the downloaded file that is related to the attachment. It is useful if you want to clean up files to save space on the device or if a file is corrupted and needs to be removed. Purging an attachment does not affect the attachment on the Zotero server, and purged attachments can be restored by downloading them again. "Open in\ldots" will open another menu that presents a list of apps capable of receiving the file. This is shown in Figure \ref{SendTo.png}. Tapping an app will move ZotPad to background and open the other app with the selected attachment file. The third option, "Email", will open an email template with the citation of the currently selected file in the APA format and the currently selected attachment as attached file. After adding the recipient, and tapping "Send", the email is moved to the outbox of Mail app, from where it will be sent.
+
+\begin{figure}
+\image{Opening the action menu}{ActionMenu.png}
+\end{figure}
+
+
+\begin{figure}
+\image{Sending a file to other appa}{SendTo.png}
+\end{figure}
+
+\FloatBarrier
+
+One of the most important use cases for ZotPad is annotating PDF files on the mobile device. Because ZotPad does not yet support annotating itself, this must be done with the help of a third party application. Figure \ref{Adobe.png} shows how this is done with Adobe Reader\ipadfootnote{Adobe Reader is a free app that can be used to view and annotate PDF files and is available for both iPad and iPhone.}. After annotating a PDF, the next step is to tap the action button in the Adobe Reader, choose the "Open in\ldots" action, and choose ZotPad from the menu. This is shown in Figure \ref{Adobe.png}.
+
+\begin{figure}
+\image{Sending a file back to ZotPad}{Adobe.png}
+\end{figure}
+
+Sending a file to ZotPad will cause the Adobe Reader to move to background and ZotPad to activate. If the file is not associated with an existing attachment\ipadfootnote{Adding new attachments using ZotPad is currently not possible, but this feature can be added if there is sufficient demand.}, ZotPad will ignore the file and display an error message. If the file is recognized, it is added to upload queue and presented as an overlay shown in Figure \ref{FileImport.png}. This view can be dismissed by tapping it and uploading the file to Zotero server will continue in the background. If the upload could not be completed, the view will show an error message explaining the reason for failure, so it might be useful to dismiss it only after the file has been completely uploaded. If network connection is not available when a file is received, the file is added to the upload queue and uploaded when network connection becomes available again.
+
+\begin{figure}
+\image{File import view}{FileImport.png}
+\end{figure}
+
+ZotPad has a conflic resolution screen shown in Figure \ref{Conflict.png}. This view shows the modified version of the file on the left and the server vesion on the right. If the server version is not available, it can be downloaded by tapping the attachment icon. Otherwise, tapping an attachment icon will open that version of the attachment in the QuickLook viewer.
+
+\begin{figure}
+\image{Conflict resolution}{Conflict.png}
+\end{figure}
+
+\clearpage
+
+\chapter{Settings and details}
+
+This chapter describes the how ZotPad settings can be adjusted and how potential problems with the software can be diagnosed.
+
+\section{Settings}
+
+ZotPad settings are adjusted using the \ipad{iPad}\iphone{iPhone} Settings app. The settings screen is shown in Figure \ref{Settings.png}. The Basic settings-section shows first the username that ZotPad is using. This is for informational purposes only and cannot be edited directly. The second setting is Mode, which can be either Online or Offline. Offline mode prevents ZotPad from using the network connection. Max cache size tells how much space ZotPad is allowed to use for downloaded attachments and the Current cache size shows an approximation of how much space is used currently. If the size of the cache exceeds the limit, ZotPad will automatically purge older files from the cache.
+
+\begin{figure}
+\image{ZotPad settings}{Settings.png}
+\end{figure}
+
+The Preemptive cache-section contains two settings for cache. ZotPad will always download the data that it needs to show a view for the user. These settings can be used to adjust how much data is downloaded preemptively in the background. The item data setting controls which libraries ZotPad will cache preemptively. The setting All libraries, will cause all libraries to be refreshed with new data from the Zotero server when ZotPad is launched. Active libraries will only cache the libraries that the user has viewed during the session. The Attachment files setting will tell Zotero when to download attachments. If this setting is Off, files are downloaded only when a user selects a file for downloading by tapping it. Active items will automatically start downloading attachments when the user opens an item in item detail view. Active collections will start downloading all attachment files when user chooses a collection and Active libraries does the same for libraries. All libraries will automatically download every existing attachment in the background.
+
+File service setting has three options. The default and recommended option is to use Zotero file storage for all libraries, and this option does not require any other configuration. The second option is to use WebDAV for my library. Using this requires that user's Zotero is also configured to use the same WebDAV server and requires that the server address is specified in the settings. The server address needs to be given in the full form including the http:// or https:// suffix and the /zotero prefix. Misspecified WebDAV address will result in an error message when ZotPad is activate. Username for the WebDAV server will be asked when ZotPad attempts to connect to the WebDAV server for the first time.
+
+The third option is Dropbox. Dropbox synchronization is different from the two other options in that it does not synchronize with the Zotero server, but synchronizes files directly between ZotPad and the users computer running Zotero. In most cases there is no user visible difference, but in some instances this can result in files not syncing correctly\ipadfootnote{For example, if a user edits a file on his/her computer, but does not sync Zotero, ZotPad does not know that a new version of a file would be available in Dropbox because Zotero server is not aware of this change.}. Using Dropbox will also require that the user's computer running Zotero is set up to synchronize the Zotero data directory with Dropbox.
+
+Configuring Zotero to use DropBox requires the following steps:
+\begin{enumerate}
+\item Enable Dropbox in ZotPad settings.
+\item Start ZotPad and try to downloading something. This will start Dropbox authentication.
+\item Enter your Dropbox username and password when asked.
+\item When authentication is finished, go to your computer and verify that a folder named Apps/ZotPad has been created in your Dropbox folder.
+\item Open Zotero and click on the Show Data Directory button in the Advanced tab in the settings window. Open the data directory and locate a directory named "storage". Quit Zotero.
+\item Move the content of the storage folder to the Apps/ZotPad folder inside the Dropbox.
+\item Delete the empty storage folder.
+\item Make a symbolic link called "storage" pointing to the Apps/ZotPad folder inside the Dropbox folder. Symbolic link is not the same as shortcut on Windows or alias on Mac. On Windows, symbolic links are created with the following command in the command prompt:
+{\small
+\begin{verbatim}
+mklink /D {zotero_data_folder}\storage {dropbox_folder}\Apps\ZotPad
+\end{verbatim}
+}
+On Mac and other unixes symbolic links are created using the terminal application and runnign the following command:
+{\small
+\begin{verbatim}
+ln -s {dropbox_folder}/Apps/ZotPad {zotero_data_folder}/storage
+\end{verbatim}
+}
+
+\end{enumerate}
+
+The reset section contains two settings. Resetting username will completely reset ZotPad and forces reauthentication with the Zotero server. Resetting data will delete all downloaded item data and attachment files. These settings take effect the next time ZotPad is started.
+
+The final setting, which is on by default, sends anonymous usage statistis and error reports to ZotPad developers. This will help to identify potential problems that can be fixed in future versions.
+
+\section{Log viewer and key settings}
+
+Figure \ref{LogView.png} shows the ZotPad log viewer. This view is activated by tapping the gear button in the main view. The purpose of the log viewer is to help in trouble shooting the application. For example, if files fail do download because a WebDAV server is not working correctly or cannot be reached, this will be recorded in the log. The log file is is reset every day and log files are stored for seven days before deleting. Old logs can be accessed with iTunes. 
+
+\begin{figure}
+\image{ZotPad log viewer}{LogView.png}
+\end{figure}
+
+The toolbar contains \ipad{four}\iphone{three }buttons. The first button will show this user manual\ipad{ and the second button will open the support pages on the ZotPad website. These pages contain the most up to date documentation and are complementary to this user manual}. The Email support button will create an template that contains information about your access key and the most recent log file ready for sending these to support@zotpad.com.
+
+\ipad{Manage }API key will open a key management page in mobile safari. After you have logged in to zotero.org, this page can be used to adjust the permissions that the access key that ZotPad uses has. For example, you can limit the key to only one particular group library, remove write access from the key, or restrict the key so that it cannot be used to access your notes.
+
+\chapter{Technical information}
+
+This chapter contains technical information about ZotPad. It might not be useful for a typical user, but can contain useful or interesting details. 
+
+	\section{Technical architecture}
+\label{sect:architecture}
+
+To understand how ZotPad works, you should consider it as an online viewer to your Zotero libraries, but with a cache. The way ZotPad works is somewhere between Zotero and the Zotero website. The desktop Zotero will synchronize its data with the server periodically and then display this data to the user. The website reloads the data that it needs for each page view. ZotPad is similar to Zotero website in that it always loads new data when a user taps a library, a collection, or an item. ZotPad is also similar to Zotero in that it uses locally stored copy of the data that it shows the user. When user does navigates to a new library, collection, or item, this will first trigger a request for the local cache. The cache is used to present data for the user quickly while a request to the Zotero server for fresh data runs in the background. When ZotPad receives data from the Zotero server, this data is always written first in the local cache, and then the cache is queried again to refresh the user interface. Always presenting data from the cache guarantees that searching and sorting will work consistently regardless of how fresh the data are. In addition to cacheing data that the user requests directly, ZotPad will also preemptively cache data that it thinks it will need in the future. The preemtive cache and the ad hoc data retrieval are optimized to avoid unnecessary requests to the Zotero server. 
+
+ZotPad stores all downloaded items in the application data directory, which can be accessed with iTunes. The attachment files are named by appending an underscore (\_) and an eight character identifier at the end of the body of the file name. Files that are edited on the device are further appended a dash (-). Locally edited files are stored until they have been succesfully uploaded to the Zotero server
+
+	\section{Development of ZotPad}
+	
+ZotPad develoment takes place at Github at \url{https://github.com/mronkko/ZotPad}. The project is open for new developers who wish to participate in making ZotPad better and earning some additional income doing so. The source code si available under the GNU General Public Licence, version 3. This means that anyone can download the code and enhance it as long as the modeified code is released under the same license. Downloading the ZotPad code and relicensing it under the App Store license is not permitted. If any developer wishes to use the ZotPad code as a part of their project, contacting the ZotPad developers first is highly recommended.
+
+All bugs and feature request are recorded in a tracker that at Github: \url{https://github.com/mronkko/ZotPad/issues}. Feature requests can also be submitted through the forums at the ZotPad website at \url{http://www.zotpad.com}. 
+
+ZotPad aims to release a new version three to four times a year and does maintenance releases if critical bugs are discovered. Each major release is beta tested by actual users using the Testflight service. The beta testing is invitation only because each test deveice needs to be registered with Apple allows only 100 new device registrations are allowed per year. However, new testers are always welcome. If you want to participate in the next beta, please email \href{mailto:developers@zotpad.com}{developers@zotpad.com} and ask for further information.
+
+Beta testing the next version (1.2) is expected to start in the early fall 2012. This release will add support for using and editing notes and tags as well as support for editing item data.
+
+\chapter{Acknowledgements}
+
+\ipad{\begin{fullwidth}}
+
+\setlength{\parindent}{0pt}
+
+\setlength{\parskip}{\baselineskip}
+
+ZotPad uses the following third party software libraries that require attribution as part of the licence conditions:
+
+iCarousel, Copyright \copyright 2011 Charcoal Design. All rights reserved. \href{https://raw.github.com/nicklockwood/iCarousel/104d499da7b107b8baa58ab85c6d0f44d504e957/LICENCE.md}{License}
+
+ASIHTTPRequest, Copyright \copyright 2007-2011 All-Seeing Interactive. All rights reserved. \href{https://raw.github.com/pokeb/asi-http-request/3cb0230e547b0d13d88843ec7fc6ed77d69cb7c6/LICENSE}{License}
+
+{\licensetext Redistribution and use in source and binary forms, with or without
+modification, are permitted provided that the following conditions are met:
+
+\begin{itemize}
+
+\item Redistributions of source code must retain the above copyright
+notice, this list of conditions and the following disclaimer.
+       
+       
+\item Redistributions in binary form must reproduce the above copyright
+notice, this list of conditions and the following disclaimer in the
+documentation and/or other materials provided with the distribution.
+
+\item Neither the name of the All-Seeing Interactive nor the
+names of its contributors may be used to endorse or promote products
+derived from this software without specific prior written permission.
+\end{itemize}
+THIS SOFTWARE IS PROVIDED BY All-Seeing Interactive ''AS IS'' AND ANY
+EXPRESS OR IMPLIED WARRANTIES, INCLUDING, BUT NOT LIMITED TO, THE IMPLIED
+WARRANTIES OF MERCHANTABILITY AND FITNESS FOR A PARTICULAR PURPOSE ARE
+DISCLAIMED. IN NO EVENT SHALL All-Seeing Interactive BE LIABLE FOR ANY
+DIRECT, INDIRECT, INCIDENTAL, SPECIAL, EXEMPLARY, OR CONSEQUENTIAL DAMAGES
+(INCLUDING, BUT NOT LIMITED TO, PROCUREMENT OF SUBSTITUTE GOODS OR SERVICES;
+LOSS OF USE, DATA, OR PROFITS; OR BUSINESS INTERRUPTION) HOWEVER CAUSED AND
+ON ANY THEORY OF LIABILITY, WHETHER IN CONTRACT, STRICT LIABILITY, OR TORT
+(INCLUDING NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE OF THIS
+SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.}
+
+json-framework, Copyright \copyright 2007-2011 Stig Brautaset. All rights reserved. \href{https://raw.github.com/stig/json-framework/master/LICENSE.md}{License}
+
+{\licensetext Redistribution and use in source and binary forms, with or without
+modification, are permitted provided that the following conditions are met:
+
+\begin{itemize}
+
+\item Redistributions of source code must retain the above copyright
+notice, this list of conditions and the following disclaimer.
+       
+       
+\item Redistributions in binary form must reproduce the above copyright
+notice, this list of conditions and the following disclaimer in the
+documentation and/or other materials provided with the distribution.
+
+\item Neither the name of the All-Seeing Interactive nor the
+names of its contributors may be used to endorse or promote products
+derived from this software without specific prior written permission.
+\end{itemize}
+
+THIS SOFTWARE IS PROVIDED BY THE COPYRIGHT HOLDERS AND CONTRIBUTORS "AS IS"
+AND ANY EXPRESS OR IMPLIED WARRANTIES, INCLUDING, BUT NOT LIMITED TO, THE
+IMPLIED WARRANTIES OF MERCHANTABILITY AND FITNESS FOR A PARTICULAR PURPOSE ARE
+DISCLAIMED. IN NO EVENT SHALL THE COPYRIGHT OWNER OR CONTRIBUTORS BE LIABLE
+FOR ANY DIRECT, INDIRECT, INCIDENTAL, SPECIAL, EXEMPLARY, OR CONSEQUENTIAL
+DAMAGES (INCLUDING, BUT NOT LIMITED TO, PROCUREMENT OF SUBSTITUTE GOODS OR
+SERVICES; LOSS OF USE, DATA, OR PROFITS; OR BUSINESS INTERRUPTION) HOWEVER
+CAUSED AND ON ANY THEORY OF LIABILITY, WHETHER IN CONTRACT, STRICT LIABILITY,
+OR TORT (INCLUDING NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE
+OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.}
+
+OAuthConsumer, Copyright \copyright 2010-2012 Jonathan R. Crosby. All rights reserved. \href{http://www.opensource.org/licenses/mit-license.php}{License}
+
+{\licensetext Permission is hereby granted, free of charge, to any person obtaining a copy of this software and associated documentation files (the "Software"), to deal in the Software without restriction, including without limitation the rights to use, copy, modify, merge, publish, distribute, sublicense, and/or sell copies of the Software, and to permit persons to whom the Software is furnished to do so, subject to the following conditions:
+
+The above copyright notice and this permission notice shall be included in all copies or substantial portions of the Software.}
+
+DSActivityView, Copyright \copyright 2009-2011 Dejal Systems, LLC. All rights reserved \href{https://dejal.svn.beanstalkapp.com/open/DSActivityView/Sources/DSActivityView.h}{License}
+
+fmdb, Copyright \copyright 2008 Flying Meat Inc. All rights reserved. \href{https://raw.github.com/ccgus/fmdb/master/LICENSE.txt}{License}
+
+{\licensetext Permission is hereby granted, free of charge, to any person obtaining a copy
+of this software and associated documentation files (the "Software"), to deal
+in the Software without restriction, including without limitation the rights
+to use, copy, modify, merge, publish, distribute, sublicense, and/or sell
+copies of the Software, and to permit persons to whom the Software is
+furnished to do so, subject to the following conditions:
+
+The above copyright notice and this permission notice shall be included in
+all copies or substantial portions of the Software.}
+
+DTCoreText, Copyright \copyright 2011, Oliver Drobnik All rights reserved. \href{https://raw.github.com/Cocoanetics/DTCoreText/master/LICENSE}{License}
+
+{\licensetext Redistribution and use in source and binary forms, with or without
+modification, are permitted provided that the following conditions are met:
+
+\begin{itemize}
+\item Redistributions of source code must retain the above copyright notice, this
+list of conditions and the following disclaimer. 
+
+\item Redistributions in binary form must reproduce the above copyright notice,
+this list of conditions and the following disclaimer in the documentation
+and/or other materials provided with the distribution.
+\end{itemize}
+
+THIS SOFTWARE IS PROVIDED BY THE COPYRIGHT HOLDERS AND CONTRIBUTORS "AS IS"
+AND ANY EXPRESS OR IMPLIED WARRANTIES, INCLUDING, BUT NOT LIMITED TO, THE
+IMPLIED WARRANTIES OF MERCHANTABILITY AND FITNESS FOR A PARTICULAR PURPOSE ARE
+DISCLAIMED. IN NO EVENT SHALL THE COPYRIGHT HOLDER OR CONTRIBUTORS BE LIABLE
+FOR ANY DIRECT, INDIRECT, INCIDENTAL, SPECIAL, EXEMPLARY, OR CONSEQUENTIAL
+DAMAGES (INCLUDING, BUT NOT LIMITED TO, PROCUREMENT OF SUBSTITUTE GOODS OR
+SERVICES; LOSS OF USE, DATA, OR PROFITS; OR BUSINESS INTERRUPTION) HOWEVER
+CAUSED AND ON ANY THEORY OF LIABILITY, WHETHER IN CONTRACT, STRICT LIABILITY,
+OR TORT (INCLUDING NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE
+OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.}
+
+OAuthConsumer, Copyright \copyright 2010-2012 Jonathan R. Crosby. All rights reserved. \href{http://www.opensource.org/licenses/mit-license.php}{License}
+
+{\licensetext Permission is hereby granted, free of charge, to any person obtaining a copy of this software and associated documentation files (the "Software"), to deal in the Software without restriction, including without limitation the rights to use, copy, modify, merge, publish, distribute, sublicense, and/or sell copies of the Software, and to permit persons to whom the Software is furnished to do so, subject to the following conditions:
+
+The above copyright notice and this permission notice shall be included in all copies or substantial portions of the Software.}
+
+Base64Transcoder Copyright \copyright 2003 Toxic Software. All rights reserved. \href{http://www.opensource.org/licenses/mit-license.php}{License}
+
+{\licensetext Permission is hereby granted, free of charge, to any person obtaining a copy
+of this software and associated documentation files (the "Software"), to deal
+in the Software without restriction, including without limitation the rights
+to use, copy, modify, merge, publish, distribute, sublicense, and/or sell
+copies of the Software, and to permit persons to whom the Software is
+furnished to do so, subject to the following conditions:
+
+The above copyright notice and this permission notice shall be included in
+all copies or substantial portions of the Software.
+
+THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR
+IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY,
+FITNESS FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT. IN NO EVENT SHALL THE
+AUTHORS OR COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER
+LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM,
+OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN
+THE SOFTWARE.}
+
+DropboxSDK, Copyright \copyright 2010-2012 Dropbox, Inc. All rights reserved. \href{http://www.opensource.org/licenses/mit-license.php}{License}
+
+{\licensetext Permission is hereby granted, free of charge, to any person obtaining a copy of this software and associated documentation files (the "Software"), to deal in the Software without restriction, including without limitation the rights to use, copy, modify, merge, publish, distribute, sublicense, and/or sell copies of the Software, and to permit persons to whom the Software is furnished to do so, subject to the following conditions:
+
+The above copyright notice and this permission notice shall be included in all copies or substantial portions of the Software.
+
+THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY, FITNESS FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT. IN NO EVENT SHALL THE AUTHORS OR COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM, OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.}
+
+CocoaLumberjack, Copyright \copyright 2010, Deusty, LLC. All rights reserved. \href{https://github.com/robbiehanson/CocoaLumberjack/blob/master/LICENSE.txt}{License}
+
+FileMD5Hash,Copyright \copyright 2010 Joel Lopes Da Silva, All rights reserved. \href{https://github.com/JoeKun/FileMD5Hash/blob/master/LICENSE}{License}
+
+{\licensetext This software has been developed by Joel Lopes Da Silva (http://www.joel.lopes-da-silva.com/).
+}
+
+
+OHAttributedLabel, Copyright \copyright 2010 Olivier Halligon. All rights reserved. \href{https://github.com/AliSoftware/OHAttributedLabel/blob/master/LICENSE}{License}
+
+{\licensetext
+Permission is hereby granted, free of charge, to any person obtaining a copy
+of this software and associated documentation files (the "Software"), to deal
+in the Software without restriction, including without limitation the rights
+to use, copy, modify, merge, publish, distribute, sublicense, and/or sell
+copies of the Software, and to permit persons to whom the Software is
+furnished to do so, subject to the following conditions:
+
+The above copyright notice and this permission notice shall be included in
+all copies or substantial portions of the Software.}
+
+QSUtilities, Copyright \copyright 2010 - 2011, Quasidea Development, LLC. All rights reserved. \href{https://github.com/mikeho/QSUtilities/blob/master/LICENSE.txt}{License}
+
+{\licensetext Permission is hereby granted, free of charge, to any person obtaining a copy
+of this software and associated documentation files (the "Software"), to deal
+in the Software without restriction, including without limitation the rights
+to use, copy, modify, merge, publish, distribute, sublicense, and/or sell
+copies of the Software, and to permit persons to whom the Software is
+furnished to do so, subject to the following conditions:
+
+The above copyright notice and this permission notice shall be included in
+all copies or substantial portions of the Software.}
+
+Google Toolbox for the Mac (GTM). Copyright 2008 Google Inc. All rights reserved. \href{http://www.apache.org/licenses/LICENSE-2.0}{License}
+
+Base64, Copyright \copyright 1997-2010 The PHP Group. All Rights reserved. \href{http://www.php.net/license/3_01.txt}{License}
+
+{\licensetext Redistribution and use in source and binary forms, with or without
+modification, is permitted provided that the following conditions
+are met:
+\begin{enumerate}
+\item Redistributions of source code must retain the above copyright
+notice, this list of conditions and the following disclaimer.
+
+\item Redistributions in binary form must reproduce the above copyright
+notice, this list of conditions and the following disclaimer in
+the documentation and/or other materials provided with the
+distribution.
+
+\item The name "PHP" must not be used to endorse or promote products
+derived from this software without prior written permission. For
+written permission, please contact group@php.net.
+
+\item Products derived from this software may not be called "PHP", nor
+may "PHP" appear in their name, without prior written permission
+from group@php.net.  You may indicate that your software works in
+conjunction with PHP by saying "Foo for PHP" instead of calling
+it "PHP Foo" or "phpfoo"
+
+\item The PHP Group may publish revised and/or new versions of the
+license from time to time. Each version will be given a
+distinguishing version number.
+Once covered code has been published under a particular version
+of the license, you may always continue to use it under the terms
+of that version. You may also choose to use such covered code
+under the terms of any subsequent version of the license
+published by the PHP Group. No one other than the PHP Group has
+the right to modify the terms applicable to covered code created
+under this License.
+
+\item Redistributions of any form whatsoever must retain the following
+acknowledgment:
+"This product includes PHP software, freely available from
+<http://www.php.net/software/>".
+\end{enumerate}
+
+THIS SOFTWARE IS PROVIDED BY THE PHP DEVELOPMENT TEAM ``AS IS'' AND 
+ANY EXPRESSED OR IMPLIED WARRANTIES, INCLUDING, BUT NOT LIMITED TO,
+THE IMPLIED WARRANTIES OF MERCHANTABILITY AND FITNESS FOR A 
+PARTICULAR PURPOSE ARE DISCLAIMED.  IN NO EVENT SHALL THE PHP
+DEVELOPMENT TEAM OR ITS CONTRIBUTORS BE LIABLE FOR ANY DIRECT, 
+INDIRECT, INCIDENTAL, SPECIAL, EXEMPLARY, OR CONSEQUENTIAL DAMAGES 
+(INCLUDING, BUT NOT LIMITED TO, PROCUREMENT OF SUBSTITUTE GOODS OR 
+SERVICES; LOSS OF USE, DATA, OR PROFITS; OR BUSINESS INTERRUPTION)
+HOWEVER CAUSED AND ON ANY THEORY OF LIABILITY, WHETHER IN CONTRACT,
+STRICT LIABILITY, OR TORT (INCLUDING NEGLIGENCE OR OTHERWISE)
+ARISING IN ANY WAY OUT OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED
+OF THE POSSIBILITY OF SUCH DAMAGE.}
+
+ZipArchive Copyright \copyright 2008 Aish. All rights reserved. \href{http://www.opensource.org/licenses/mit-license.php}{License}
+
+{\licensetext 
+Permission is hereby granted, free of charge, to any person obtaining a copy of this software and associated documentation files (the "Software"), to deal in the Software without restriction, including without limitation the rights to use, copy, modify, merge, publish, distribute, sublicense, and/or sell copies of the Software, and to permit persons to whom the Software is furnished to do so, subject to the following conditions:
+
+The above copyright notice and this permission notice shall be included in all copies or substantial portions of the Software.
+
+THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY, FITNESS FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT. IN NO EVENT SHALL THE AUTHORS OR COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM, OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.}
+
+
+InAppSettingsKit, Copyright \copyright 2009-2010 Luc Vandal, Edovia Inc., http://www.edovia.com and Ortwin Gentz, FutureTap GmbH, http://www.futuretap.com All rights reserved. \href{http://www.opensource.org/licenses/bsd-license.php}{License}
+
+{\licensetext It is appreciated but not required that you give credit to Luc Vandal and Ortwin Gentz, as the original authors of this code. You can give credit in a blog post, a tweet or on a info page of your app. Also, the original authors appreciate letting them know if you use this code.
+
+The above copyright notice and this permission notice shall be included in all copies or substantial portions of the Software.
+
+This code is licensed under the BSD license that is available at: <http://www.opensource.org/licenses/bsd-license.php>}
+
+\ipad{\end{fullwidth}}
+
+\end{document}

@@ -644,10 +644,10 @@ const NSInteger ZPServerConnectionRequestPermissions = 10;
 -(void) finishedDownloadingAttachment:(ZPZoteroAttachment*)attachment toFileAtPath:(NSString*) tempFile withVersionIdentifier:(NSString*) identifier usingFileChannel:(ZPFileChannel*)fileChannel{
 
     if(tempFile == NULL){
-        [NSException raise:@"File channel should not report success if file was not received" format:@""];
+        [NSException raise:@"Invalid file path" format:@"File channel should not report success if file was not received"];
     }
     else if(identifier == NULL){
-        [NSException raise:@"File channel must report version identifier on succesful download" format:@""];
+        [NSException raise:@"Invalid version identifier" format:@"File channel must report version identifier on succesful download"];
     }
     else{
         //If we got a file, move it to the right place

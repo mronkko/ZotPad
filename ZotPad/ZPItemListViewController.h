@@ -50,6 +50,8 @@
 @property (nonatomic, retain) NSNumber* libraryID;
 @property (nonatomic, retain) NSString* searchString;
 @property (nonatomic, retain) NSString* orderField;
+@property (strong, nonatomic) UIPopoverController *masterPopoverController;
+
 @property (assign) BOOL sortDescending;
 
 - (void)configureView;

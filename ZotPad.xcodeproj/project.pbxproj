@@ -537,6 +537,8 @@
 		A716C05A1495131F00BD6025 /* SBJsonTokeniser.m in Sources */ = {isa = PBXBuildFile; fileRef = A716C04C1495131F00BD6025 /* SBJsonTokeniser.m */; };
 		A716C05B1495131F00BD6025 /* SBJsonUTF8Stream.m in Sources */ = {isa = PBXBuildFile; fileRef = A716C04E1495131F00BD6025 /* SBJsonUTF8Stream.m */; };
 		A716C05C1495131F00BD6025 /* SBJsonWriter.m in Sources */ = {isa = PBXBuildFile; fileRef = A716C0501495131F00BD6025 /* SBJsonWriter.m */; };
+		A71A166715A783DA007BB40D /* ZPNavigationController.m in Sources */ = {isa = PBXBuildFile; fileRef = A71A166615A783DA007BB40D /* ZPNavigationController.m */; };
+		A71A166815A783DA007BB40D /* ZPNavigationController.m in Sources */ = {isa = PBXBuildFile; fileRef = A71A166615A783DA007BB40D /* ZPNavigationController.m */; };
 		A7200DD514718DC0004347C9 /* UIKit.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = A7200DD414718DC0004347C9 /* UIKit.framework */; };
 		A7200DD714718DC0004347C9 /* Foundation.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = A7200DD614718DC0004347C9 /* Foundation.framework */; };
 		A7200DD914718DC0004347C9 /* CoreGraphics.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = A7200DD814718DC0004347C9 /* CoreGraphics.framework */; };
@@ -635,6 +637,10 @@
 		A73D1C021560E234002D4A2D /* release_notes.txt in Resources */ = {isa = PBXBuildFile; fileRef = A73D1BFB1560E234002D4A2D /* release_notes.txt */; };
 		A73D635114879D15007999F3 /* Settings.bundle in Resources */ = {isa = PBXBuildFile; fileRef = A73D635014879D15007999F3 /* Settings.bundle */; };
 		A74348D7147AB37A00DA6FC3 /* ZPAuthenticationDialog.m in Sources */ = {isa = PBXBuildFile; fileRef = A74348D6147AB37A00DA6FC3 /* ZPAuthenticationDialog.m */; };
+		A74B93EB15A8B6560073D303 /* iphone.pdf in Resources */ = {isa = PBXBuildFile; fileRef = A74B93E915A8B6560073D303 /* iphone.pdf */; };
+		A74B93EC15A8B6560073D303 /* iphone.pdf in Resources */ = {isa = PBXBuildFile; fileRef = A74B93E915A8B6560073D303 /* iphone.pdf */; };
+		A74B93ED15A8B6560073D303 /* UserManual.pdf in Resources */ = {isa = PBXBuildFile; fileRef = A74B93EA15A8B6560073D303 /* UserManual.pdf */; };
+		A74B93EE15A8B6560073D303 /* UserManual.pdf in Resources */ = {isa = PBXBuildFile; fileRef = A74B93EA15A8B6560073D303 /* UserManual.pdf */; };
 		A75E185F153405740046988C /* ioapi.c in Sources */ = {isa = PBXBuildFile; fileRef = A75E1855153405740046988C /* ioapi.c */; };
 		A75E1860153405740046988C /* ioapi.c in Sources */ = {isa = PBXBuildFile; fileRef = A75E1855153405740046988C /* ioapi.c */; };
 		A75E1861153405740046988C /* mztools.c in Sources */ = {isa = PBXBuildFile; fileRef = A75E1857153405740046988C /* mztools.c */; };
@@ -676,8 +682,6 @@
 		A76ECD2A159CDEDD0062E95A /* emblem-symbolic-link.svgz in Resources */ = {isa = PBXBuildFile; fileRef = A76ECD27159CDEDD0062E95A /* emblem-symbolic-link.svgz */; };
 		A76ECD2B159CDEDD0062E95A /* emblem-symbolic-link.svgz in Resources */ = {isa = PBXBuildFile; fileRef = A76ECD27159CDEDD0062E95A /* emblem-symbolic-link.svgz */; };
 		A77B98DF14DE5CDB00132E9B /* ZPItemListViewController.m in Sources */ = {isa = PBXBuildFile; fileRef = A77B98DE14DE5CDB00132E9B /* ZPItemListViewController.m */; };
-		A77FD05A159F2F6900774D50 /* User Manual.pdf in Resources */ = {isa = PBXBuildFile; fileRef = A77FD059159F2F6900774D50 /* User Manual.pdf */; };
-		A77FD05B159F2F7200774D50 /* User Manual.pdf in Resources */ = {isa = PBXBuildFile; fileRef = A77FD059159F2F6900774D50 /* User Manual.pdf */; };
 		A77FD05E159F36CC00774D50 /* CompressingLogFileManager.m in Sources */ = {isa = PBXBuildFile; fileRef = A77FD05D159F36CC00774D50 /* CompressingLogFileManager.m */; };
 		A77FD05F159F36CC00774D50 /* CompressingLogFileManager.m in Sources */ = {isa = PBXBuildFile; fileRef = A77FD05D159F36CC00774D50 /* CompressingLogFileManager.m */; };
 		A77FD062159F702E00774D50 /* gear.png in Resources */ = {isa = PBXBuildFile; fileRef = A77FD060159F702D00774D50 /* gear.png */; };
@@ -1258,6 +1262,8 @@
 		A716C04E1495131F00BD6025 /* SBJsonUTF8Stream.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; name = SBJsonUTF8Stream.m; path = "json-framework/Classes/SBJsonUTF8Stream.m"; sourceTree = "<group>"; };
 		A716C04F1495131F00BD6025 /* SBJsonWriter.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; name = SBJsonWriter.h; path = "json-framework/Classes/SBJsonWriter.h"; sourceTree = "<group>"; };
 		A716C0501495131F00BD6025 /* SBJsonWriter.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; name = SBJsonWriter.m; path = "json-framework/Classes/SBJsonWriter.m"; sourceTree = "<group>"; };
+		A71A166515A783DA007BB40D /* ZPNavigationController.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = ZPNavigationController.h; sourceTree = "<group>"; };
+		A71A166615A783DA007BB40D /* ZPNavigationController.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = ZPNavigationController.m; sourceTree = "<group>"; };
 		A7200DD014718DC0004347C9 /* ZotPad.app */ = {isa = PBXFileReference; explicitFileType = wrapper.application; includeInIndex = 0; path = ZotPad.app; sourceTree = BUILT_PRODUCTS_DIR; };
 		A7200DD414718DC0004347C9 /* UIKit.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; name = UIKit.framework; path = System/Library/Frameworks/UIKit.framework; sourceTree = SDKROOT; };
 		A7200DD614718DC0004347C9 /* Foundation.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; name = Foundation.framework; path = System/Library/Frameworks/Foundation.framework; sourceTree = SDKROOT; };
@@ -1383,6 +1389,8 @@
 		A73D635014879D15007999F3 /* Settings.bundle */ = {isa = PBXFileReference; explicitFileType = wrapper.application; name = Settings.bundle; path = ../Settings.bundle; sourceTree = "<group>"; };
 		A74348D5147AB37A00DA6FC3 /* ZPAuthenticationDialog.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = ZPAuthenticationDialog.h; sourceTree = "<group>"; };
 		A74348D6147AB37A00DA6FC3 /* ZPAuthenticationDialog.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = ZPAuthenticationDialog.m; sourceTree = "<group>"; };
+		A74B93E915A8B6560073D303 /* iphone.pdf */ = {isa = PBXFileReference; lastKnownFileType = image.pdf; name = iphone.pdf; path = Docs/iphone.pdf; sourceTree = SOURCE_ROOT; };
+		A74B93EA15A8B6560073D303 /* UserManual.pdf */ = {isa = PBXFileReference; lastKnownFileType = image.pdf; name = UserManual.pdf; path = Docs/UserManual.pdf; sourceTree = SOURCE_ROOT; };
 		A75E1854153405740046988C /* crypt.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = crypt.h; sourceTree = "<group>"; };
 		A75E1855153405740046988C /* ioapi.c */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.c; path = ioapi.c; sourceTree = "<group>"; };
 		A75E1856153405740046988C /* ioapi.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = ioapi.h; sourceTree = "<group>"; };
@@ -1435,7 +1443,6 @@
 		A76ECD27159CDEDD0062E95A /* emblem-symbolic-link.svgz */ = {isa = PBXFileReference; lastKnownFileType = file; name = "emblem-symbolic-link.svgz"; path = "Oxygen-Icons/scalable/emblems/emblem-symbolic-link.svgz"; sourceTree = SOURCE_ROOT; };
 		A77B98DD14DE5CDB00132E9B /* ZPItemListViewController.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = ZPItemListViewController.h; sourceTree = "<group>"; };
 		A77B98DE14DE5CDB00132E9B /* ZPItemListViewController.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = ZPItemListViewController.m; sourceTree = "<group>"; };
-		A77FD059159F2F6900774D50 /* User Manual.pdf */ = {isa = PBXFileReference; lastKnownFileType = image.pdf; name = "User Manual.pdf"; path = "Docs/User Manual.pdf"; sourceTree = SOURCE_ROOT; };
 		A77FD05C159F36CC00774D50 /* CompressingLogFileManager.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; name = CompressingLogFileManager.h; path = CocoaLumberjack/Xcode/LogFileCompressor/CompressingLogFileManager.h; sourceTree = "<group>"; };
 		A77FD05D159F36CC00774D50 /* CompressingLogFileManager.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; name = CompressingLogFileManager.m; path = CocoaLumberjack/Xcode/LogFileCompressor/CompressingLogFileManager.m; sourceTree = "<group>"; };
 		A77FD060159F702D00774D50 /* gear.png */ = {isa = PBXFileReference; lastKnownFileType = image.png; name = gear.png; path = Icons/gear.png; sourceTree = SOURCE_ROOT; };
@@ -2086,8 +2093,9 @@
 		A7200DDB14718DC0004347C9 /* Supporting Files */ = {
 			isa = PBXGroup;
 			children = (
+				A74B93E915A8B6560073D303 /* iphone.pdf */,
+				A74B93EA15A8B6560073D303 /* UserManual.pdf */,
 				A76ECD25159CDEB20062E95A /* Images */,
-				A77FD059159F2F6900774D50 /* User Manual.pdf */,
 				A73D635014879D15007999F3 /* Settings.bundle */,
 				A7200DDC14718DC0004347C9 /* ZotPad-Info.plist */,
 				A7CD077715161556007A8E1D /* ZotPad beta-Info.plist */,
@@ -2105,6 +2113,8 @@
 				A72C3CA61487C9DA00F6744E /* MainStoryboard_iPad.storyboard */,
 				A79E6FE71531B00100612DD9 /* ZPSplitViewController.m */,
 				A79E6FE61531B00000612DD9 /* ZPSplitViewController.h */,
+				A71A166515A783DA007BB40D /* ZPNavigationController.h */,
+				A71A166615A783DA007BB40D /* ZPNavigationController.m */,
 				A77FD066159F750700774D50 /* ZPLogViewController.h */,
 				A77FD067159F750900774D50 /* ZPLogViewController.m */,
 				A7D3C08114AEE70F00DB975D /* ZPLocalization.h */,
@@ -3097,7 +3107,6 @@
 				A73D1C011560E234002D4A2D /* release_notes.txt in Resources */,
 				A76ECD28159CDEDD0062E95A /* emblem-locked.svgz in Resources */,
 				A76ECD2A159CDEDD0062E95A /* emblem-symbolic-link.svgz in Resources */,
-				A77FD05A159F2F6900774D50 /* User Manual.pdf in Resources */,
 				A77FD062159F702E00774D50 /* gear.png in Resources */,
 				A77FD064159F702E00774D50 /* gear@2x.png in Resources */,
 				A7ABAB6115A306A600EA8B7B /* AppIcon57x57.png in Resources */,
@@ -3116,6 +3125,8 @@
 				A7A1C79415A6B6E10012BC7A /* IASKSpecifierValuesView.xib in Resources */,
 				A7307BCC15A6E51100A90BDF /* DropboxOSX-Info.plist in Resources */,
 				A7307BCE15A6E51100A90BDF /* DropboxSDK-Info.plist in Resources */,
+				A74B93EB15A8B6560073D303 /* iphone.pdf in Resources */,
+				A74B93ED15A8B6560073D303 /* UserManual.pdf in Resources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
@@ -3402,7 +3413,6 @@
 				A73D1C021560E234002D4A2D /* release_notes.txt in Resources */,
 				A76ECD29159CDEDD0062E95A /* emblem-locked.svgz in Resources */,
 				A76ECD2B159CDEDD0062E95A /* emblem-symbolic-link.svgz in Resources */,
-				A77FD05B159F2F7200774D50 /* User Manual.pdf in Resources */,
 				A77FD063159F702E00774D50 /* gear.png in Resources */,
 				A77FD065159F702E00774D50 /* gear@2x.png in Resources */,
 				A7A1C78B15A6B6E10012BC7A /* IASKAppSettingsView.xib in Resources */,
@@ -3413,6 +3423,8 @@
 				A7A1C79515A6B6E10012BC7A /* IASKSpecifierValuesView.xib in Resources */,
 				A7307BCD15A6E51100A90BDF /* DropboxOSX-Info.plist in Resources */,
 				A7307BCF15A6E51100A90BDF /* DropboxSDK-Info.plist in Resources */,
+				A74B93EC15A8B6560073D303 /* iphone.pdf in Resources */,
+				A74B93EE15A8B6560073D303 /* UserManual.pdf in Resources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
@@ -3567,6 +3579,7 @@
 				A7307BFC15A6E51100A90BDF /* NSDictionary+Dropbox.m in Sources */,
 				A7307BFE15A6E51100A90BDF /* NSString+Dropbox.m in Sources */,
 				A7307C0015A6E51100A90BDF /* UIAlertView+Dropbox.m in Sources */,
+				A71A166715A783DA007BB40D /* ZPNavigationController.m in Sources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
@@ -3718,6 +3731,7 @@
 				A7307BFD15A6E51100A90BDF /* NSDictionary+Dropbox.m in Sources */,
 				A7307BFF15A6E51100A90BDF /* NSString+Dropbox.m in Sources */,
 				A7307C0115A6E51100A90BDF /* UIAlertView+Dropbox.m in Sources */,
+				A71A166815A783DA007BB40D /* ZPNavigationController.m in Sources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};

@@ -89,12 +89,15 @@ NSInteger const VERSION_SOURCE_DROPBOX =3;
     //Get the key from the filename
     NSString* key =[[filename componentsSeparatedByString: @"_"] lastObject];
     
+    ZPZoteroAttachment* attachment;
     //If this is a locally modified file or a version, strip the trailing - from the key
     if(key.length>8){
-        key = [key substringToIndex:8];
+        NSString* newKey = [key substringToIndex:8];
+        attachment = (ZPZoteroAttachment*) [self dataObjectWithKey:newKey];
     }
-    
-    ZPZoteroAttachment* attachment= (ZPZoteroAttachment*) [self dataObjectWithKey:key];
+    else{
+        attachment = (ZPZoteroAttachment*) [self dataObjectWithKey:key];
+    }
     if(attachment.filename == NULL) attachment = NULL;
 
     return attachment;
@@ -329,7 +332,10 @@ NSInteger const VERSION_SOURCE_DROPBOX =3;
     if(! [[NSFileManager defaultManager] fileExistsAtPath:path]){
         [NSException raise:@"File not found" format:@"Attempted to calculate MD5 sum for a non-existing file at %@",path];
     }
-    
+    else if([[NSFileManager defaultManager] fileExistsAtPath:path isDirectory:YES]){
+        [NSException raise:@"Directory not allowed" format:@"Attempted to calculate MD5 sum for a directory at %@",path];
+    }
+        
     //TODO: Make sure that this does not leak memory
     
     NSString* md5 = (__bridge_transfer NSString*) FileMD5HashCreateWithPath((__bridge CFStringRef) path, FileHashDefaultChunkSizeForReadingData);

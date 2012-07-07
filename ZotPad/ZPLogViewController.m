@@ -93,7 +93,14 @@
 }
 
 - (id <QLPreviewItem>)previewController:(QLPreviewController *)controller previewItemAtIndex:(NSInteger)index{
-    NSString *filePath = [[NSBundle mainBundle] pathForResource:@"User Manual" ofType:@"pdf"];  
+    NSString* manualType;
+    if(UI_USER_INTERFACE_IDIOM() == UIUserInterfaceIdiomPad){
+        manualType = @"UserManual"; 
+    }
+    else{
+        manualType = @"iphone"; 
+    }
+    NSString *filePath = [[NSBundle mainBundle] pathForResource:manualType ofType:@"pdf"];  
     return [NSURL fileURLWithPath: filePath];
     
 }

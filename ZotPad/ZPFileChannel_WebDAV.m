@@ -347,8 +347,18 @@ NSInteger const ZPFILECHANNEL_WEBDAV_UPLOAD_REGISTER = 5;
                 
                 NSArray* fileArray= [[NSFileManager defaultManager]contentsOfDirectoryAtPath:tempFile error:NULL];
                 
+                //Traverse a file hierarchy
+                
+                while([fileArray count] == 1 && [[NSFileManager defaultManager] fileExistsAtPath:tempFile isDirectory:YES]){
+                    tempFile = [tempFile stringByAppendingPathComponent:[fileArray objectAtIndex:0]];
+                    fileArray= [[NSFileManager defaultManager]contentsOfDirectoryAtPath:tempFile error:NULL];
+                }
+                       
                 if([fileArray count]==1){
                     tempFile = [tempFile stringByAppendingPathComponent:[fileArray objectAtIndex:0]];
+
+                    //check if this is a folder instead of a file 
+                    
                     NSString* md5 = [ZPZoteroAttachment md5ForFileAtPath:tempFile];
                     DDLogVerbose(@"The MD5 sum of the file received from server is %@", md5);
                     [[ZPServerConnection instance] finishedDownloadingAttachment:attachment toFileAtPath:tempFile withVersionIdentifier:md5 usingFileChannel:self];

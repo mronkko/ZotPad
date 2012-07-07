@@ -203,9 +203,15 @@ NSInteger const ZPATTACHMENTICONGVIEWCONTROLLER_TAG_TITLELABEL = -5;
         errorLabel.tag = ZPATTACHMENTICONGVIEWCONTROLLER_TAG_ERRORLABEL;
         errorLabel.backgroundColor = [UIColor clearColor];
         errorLabel.textColor = [UIColor whiteColor];
-        errorLabel.font = [UIFont systemFontOfSize:12];
+        
+        if(UI_USER_INTERFACE_IDIOM() == UIUserInterfaceIdiomPad){
+            errorLabel.font = [UIFont systemFontOfSize:12];
+        }
+        else {
+            errorLabel.font = [UIFont systemFontOfSize:10];
+        }
+        
         errorLabel.numberOfLines = 4;
-
         [labelBackground addSubview:errorLabel];
         
         

@@ -23,6 +23,6 @@
 @property (strong, nonatomic) ZPItemListViewController *detailViewController;
 @property (retain, nonatomic) NSNumber* currentlibraryID;
 @property (retain, nonatomic) NSString* currentCollectionKey;
-
+@property IBOutlet UIBarButtonItem* gearButton;
 
 @end

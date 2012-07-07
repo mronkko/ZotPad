@@ -23,7 +23,7 @@
 @synthesize detailViewController = _detailViewController;
 @synthesize currentlibraryID = _currentlibraryID;
 @synthesize currentCollectionKey = _currentCollectionKey;
-
+@synthesize gearButton;
 
 - (void)awakeFromNib
 {
@@ -65,7 +65,11 @@
     self.clearsSelectionOnViewWillAppear = NO;
     
 	// Do any additional setup after loading the view, typically from a nib.
-    
+    if(UI_USER_INTERFACE_IDIOM() == UIUserInterfaceIdiomPad){
+        UIViewController* root = [UIApplication sharedApplication].delegate.window.rootViewController;
+        gearButton.target = root;
+        gearButton.action = @selector(showLogView:);
+    }
  
 }
 

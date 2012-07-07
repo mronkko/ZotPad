@@ -226,7 +226,7 @@
     UIView* _overlay;
 }
 
-@property (strong, nonatomic) UIPopoverController *masterPopoverController;
+
 
 -(void) _updateRowForItem:(ZPZoteroItem*)item;
 -(void) _performRowInsertions:(NSArray*)insertIndexPaths reloads:(NSArray*)reloadIndexPaths tableLength:(NSNumber*)tableLength;

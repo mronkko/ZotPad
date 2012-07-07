@@ -61,4 +61,12 @@
     }
 }
 
+-(IBAction)showLogView:(id)sender{
+    if(self.interfaceOrientation == UIInterfaceOrientationPortrait || self.interfaceOrientation == UIInterfaceOrientationPortraitUpsideDown){
+        [[(ZPItemListViewController*)[(UINavigationController*)[self.viewControllers objectAtIndex:1] topViewController] masterPopoverController] dismissPopoverAnimated:YES];
+    }
+
+    [self performSegueWithIdentifier:@"ShowLogView" sender:NULL];
+}
+
 @end
