@@ -53,6 +53,8 @@
 
 \maketitle
 
+\tableofcontents
+
 %Copyright \copyright 2012 Mikko R\"onkk\"o
 
 \chapter{Introduction}
@@ -61,47 +63,45 @@
 %\iphone{\begin{fullwidth}}
 
 
-ZotPad is an iPad/iPhone client for Zotero reference management software. The purpose of ZotPad is to allow accessing Zotero libraries from mobile devices. Using of Zotero software can be divided into three tasks, collecting articles and other material from the internet; reading, organizing, and making notes of the collected material; and citing the collected material in one's own writing. The purpose of ZotPad is to allow doing the reading, organizing, and note taking part on a mobile device\ipadfootnote{During the summer 2012 Zotero developers announced a Zotero bookmarklet that can be used to add items directly from mobile safari. More information about the bookmarklet can be found on the Zotero website at\url{https://www.zotero.org/bookmarklet/bookmarklet.html}}. \iphone{Users who are looking for a solution to add items will probably find the Zotero bookmarklet a nice solution: \url{https://www.zotero.org/bookmarklet/bookmarklet.html}}
+ZotPad is an iPad/iPhone client for Zotero reference management software. The purpose of ZotPad is to allow accessing Zotero libraries from mobile devices. Using Zotero can be divided into three tasks, collecting articles and other material from the internet; reading, organizing, and making notes of the collected material; and citing the collected material in one's own writing. The purpose of ZotPad is to allow doing the reading, organizing, and note taking part on a mobile device\ipadfootnote{During the summer 2012 Zotero developers announced a Zotero bookmarklet that can be used to add items directly from mobile safari. More information about the bookmarklet can be found on the Zotero website at\url{https://www.zotero.org/bookmarklet/bookmarklet.html}}. \iphone{Users who are looking for a solution to add items will probably find the Zotero bookmarklet a nice solution: \url{https://www.zotero.org/bookmarklet/bookmarklet.html}}
 
-The version 1.1 of ZotPad is focused on attachment files. Files can be read with the built-in QuickLook viewer, sent to other apps for annotating, and shared by email. The recommended way to synchronizing files between ZotPad and Zotero is to use Zotero file storage service, but also WebDAV and Dropbox are supported. ZotPad is designed to be always connected with the Zotero server and does not need to be synchronized in the same way as Zotero. If network connection is not available, ZotPad will show data from a cache. This process is designed to be completely transparent for the user.
+The version 1.1 of ZotPad is focused on working with attachment files. Files can be read with the built-in QuickLook viewer, sent to other apps for annotating, and shared by email. The recommended way to synchronizing files between ZotPad and Zotero is to use Zotero file storage service, but ZotPad also supports WebDAV and Dropbox. ZotPad is designed to be always connected with the Zotero server and does not need to be synchronized in the same way as Zotero. If network connection becomes unavailable, ZotPad will automatically start using a local cache instead.
 
 \chapter{Getting started}
 
-ZotPad is designed to be intuitive to use if you have experience with Zotero. When you launch the app for the first time, ZotPad will open a page from the Zotero website requesting your username and password, as shown in Figure \ref{Login.png}. If you navigate away from the authentication workflow, you can go back by tapping the "Back to start" button on the top right.
+ZotPad is designed to be intuitive to use if you have experience with Zotero. When you launch the app for the first time, ZotPad will open a page from the Zotero website prompting for your Zotero username and password, as shown in Figure \ref{Login.png}. If you navigate away from the authentication workflow, you can go back by tapping the \textbf{Back to start} on the top right.
 
 The username and password are transmitted securely and only the username is stored by ZotPad. 
 
 \begin{figure}
-\image{Login to Zotero}{Login.png}
+\image{Log in to Zotero}{Login.png}
 \end{figure}
 
 \clearpage
 
-After you have successfully logged in, you are directed to a page with a title "New Private Key" shown in Figure \ref{CreateKey.png}. This page will create a key that ZotPad uses to access your Zotero library. Tapping  "Accept Defaults" will give the key read and write access to your personal library and all the groups that you belong to and is the recommended option. 
+After you have successfully logged in, you are directed to a page with a title "New Private Key" shown in Figure \ref{CreateKey.png}. This page will create a key that ZotPad uses to access your Zotero library. Tapping  \textbf{Accept Defaults} will give the key read and write access to your personal library and all the groups that you belong to and is the recommended option. 
 
 \begin{figure}
 \image{Create access key}{CreateKey.png}
 \end{figure}
 
-If you are using Zotero file storage, ZotPad is now fully configured and ready for use. The App might appear to work slowly initially, but this will go over after it has built a cache of your Zotero library.
-
-Using WebDAV or Dropbox to synchronize your files is described later in the user manual.
+If you are using Zotero file storage, ZotPad is now fully configured and ready for use. Using WebDAV or Dropbox to synchronize your files is described later in the user manual.
 
 \chapter{User interface}
 
-This chapter explains the ZotPad user interface and describes how different tasks are performed with ZotPad.
+This chapter explains the ZotPad user interface and describes how ZotPad is used.
 
 	\section{Library and collection view}
 
-\ipad{ZotPad is designed to be used in the landscape orientation. The main screen that is shown in Figure \ref{StartView.png} consists of navigator on the left and larger content view on the right. In the portrait mode, the navigator is hidden, but can be shown by tapping a button on the top left corner of the content view. }
+\ipad{ZotPad is designed to be used mainly in the landscape orientation. The main screen that is shown in Figure \ref{StartView.png} consists of the navigator on the left and the content view on the right. In the portrait mode, the navigator is hidden, but can be shown by tapping a button on the top left corner of the content view. }
 
 \begin{figure}
 \image{Main user interface}{StartView.png}
 \end{figure}
 
-\ipad{The bottom of the navigator shows cache status bar. This bar shows the number of items that are are queued for retrieval from the Zotero data server, and the number of files that are queud for downloading and uploading, and the amount of cache space used. \ipadfootnote{The item downloads shows the number of toplevel items, attachments, and notes. For example, an article with an attachment and two notes is four items in the counter. The cache mechanism is discussed in more detail in Chapter \label{chapt:settings} that discusses ZotPad settings.} Tapping the gear button will show the ZotPad log and support options. The log view is discussed later in the user manual.
+\ipad{The bottom of the navigator shows cache status bar. This bar shows the number of items that are are queued for retrieval from the Zotero data server, and the number of files that are queud for downloading and uploading, and the amount of cache space used\ipadfootnote{The item downloads shows the number of toplevel items, attachments, and notes. For example, an article with an attachment and two notes is four items in the counter.}. Tapping the gear button will show the ZotPad log and support options. The log view is discussed later in the user manual.
 
-Initially the navigator displays the list of libraries that you have access to.} \iphone{The first wiew is a list of libraries. } Tapping a library activates that library and shows the items from the library\ipad{ as a list in the content view}. Tapping on the round blue buttons reveals the collections in the library and navigates deeper in the collection hierarchy. \iphone{Tapping the gear button will show the ZotPad log and support options. The log view is discussed later in the user manual.} Figure \ref{ItemList.png} shows the user interface after the activating Group Library 1\ipad{ and tapping the round blue button to reveal the collections in the library}.
+Initially the navigator displays the list of libraries that you have access to.} \iphone{The first wiew is a list of libraries. } Tapping a library activates that library and shows the items from the library\ipad{ as a list in the content view}. The blue buttons can be used to navigate the collections in the libraries. \iphone{Tapping the gear button will show the ZotPad log and support options. The log view is discussed later in the user manual.} Figure \ref{ItemList.png} shows the user interface after the activating Group Library 1\ipad{ and tapping the round blue button to reveal the collections in the library}.
 
 \FloatBarrier
 
@@ -111,7 +111,7 @@ Initially the navigator displays the list of libraries that you have access to.}
 
 \section{Item list view}
 
-The item list view shows the list of items in the selected library and collection. The item list shows basic citation information formatted according to the APA style. Tapping an item will open that item in item detail view. 
+The item list view shows the list of items in the selected library or collection. The item list shows basic citation information formatted according to the APA style. Tapping an item will open that item in the item detail view. 
 
 Instead of showing icons about item types like Zotero, ZotPad shows the file type icon for the first attachment. These icons are initially disabled (grayed out) and become active once a file for the first attachment has been downloaded. Tapping on an active file type icon will open the first attachment in reading mode.
 
@@ -121,28 +121,28 @@ Instead of showing icons about item types like Zotero, ZotPad shows the file typ
 
 The item list view has two functions: searching and sorting. Search is shown in Figure \ref{Search.png}. The search function has currently two limitations: First, although ZotPad downloads and views attachments, these are not indexed for full text search. In other words, the search uses only the item fields, not content of the attachment files. Second, the search is a phrase search. This means that if you type "nunnally 1978" (without the quotes), the search will match only items containing the exact phrase "nunnally 1978", but not items that match the word "nunnally" and "1978" only separately. Both limitations will be removed in the future.
 
-Sometimes it is possible to see a search returning items that are showing as loading from Zotero server, but then disappear. This is caused by differences in how searching is implemented in the Zotero server and in ZotPad. A more detail description of why this happens can be found later in the user guide when technical details of ZotPad are discussed. 
+Sometimes it is possible to see a search returning items that are showing as loading from Zotero server, but then disappear. This is caused by differences in how search is implemented in the Zotero server and in ZotPad. A more detail description of why this happens can be found later in the user guide in the chapter "Technical information". 
 
 \begin{figure}
-\image{Configuring sort buttons}{Sort.png}
+\image{Configuring the sort buttons}{Sort.png}
 \end{figure}
 
-The item list can be sorted with the \ipad{6}\iphone{3} buttons below the item list view. The \ipad{first four} buttons are preconfigured with the most commonly used sorting criteria. Any of the buttons can be reconfigured to use a different criteria by tapping and holding the button. Configuring sort buttons is shown in Figure \ref{Sort.png}. Tapping a button will sort the list in ascending order and tapping the same button again will change between ascending and descending order. 
+The item list can be sorted with the \ipad{6}\iphone{3} buttons below the item list view. The \ipad{first four} buttons are preconfigured with the most commonly used sorting criteria. Any of the buttons can be reconfigured to use a different criterion by tapping and holding the button. Configuring sort buttons is shown in Figure \ref{Sort.png}. Tapping a button will sort the list in ascending order and tapping the same button again will switch between ascending and descending order. 
 
 \FloatBarrier
 
 	\section{Item detail view}
 
-Tapping an item in the item list view opens the item details view shown in Figure \ref{itemDetails.png}.\ipad{Opening the item detail view will push the item list into the navigator to allow quickly switching between items.
+Tapping an item in the item list view opens the item detail view shown in Figure \ref{itemDetails.png}. \ipad{Opening the item detail view will push the item list into the navigator to allow quickly switching between items.
 
 }The item detail view contains two sections. The first section shows all attachments in a carousel and the second section below the attachments shows the item fields. Editing the item fields is not implemented in ZotPad 1.1, but will be added in a later version.
 
-The attachments in the carousel will initially show file type icons. Attachments that are PDF files will be shown as previews of the first PDF page after the file has been downloaded. All the attachments in Figure \ref{itemDetails.png}. are normal attachments. Tapping on a normal attachment\ipadfootnote{Both imported items and web site snapshots are normal items that can be downloaded and viewed on ZotPad.} that is not yet downloaded will start downloading the file. Tapping a file that has already been downloaded will open the file in QuickLook for reading as shown in Figure \ref{ReadingMode.png}. The reading view cannot currently show annotations for PDF files and has many other limitations. Because of this, ZotPad also supports sending files to other for reading.
+The attachments in the carousel will initially show file type icons. These will be replaced with document previews for PDF files after the files have been downloaded on ZotPad. Tapping on an attachment\ipadfootnote{Both imported items and web site snapshots are normal items that can be downloaded and viewed on ZotPad.} that is not yet downloaded will start downloading the file. Tapping a file that has already been downloaded will open the file in QuickLook for reading as shown in Figure \ref{ReadingMode.png}. The reading view cannot currently show PDF annotations and has some other limitations as well. These limitations can be avoided by using a third party PDF reader.
 
 In addition to normal items, there are two other attachment types. Links are shown with a large arrow emblem on the top left corner of the attachment icon. Tapping on a link will move ZotPad to background and open the link in Safari. Linked files are marked with a lock emblem because these can be accessed only on the computer where the linked file was added.
 
 \begin{figure}
-\image{Item details view}{itemDetails.png}
+\image{Item detail view}{itemDetails.png}
 \end{figure}
 
 \begin{figure}
@@ -153,7 +153,7 @@ In addition to normal items, there are two other attachment types. Links are sho
 
 	\section{Sending and receiving files}
 
-Both the item detail view and reading view have an action button on the top right corner. This button can be used to perform three actions shown in Figure \ref{ActionMenu.png}. If an item has multiple attachments, the action targets only the currently chosen one. Choosing "Purge" will delete the downloaded file that is related to the attachment. It is useful if you want to clean up files to save space on the device or if a file is corrupted and needs to be removed. Purging an attachment does not affect the attachment on the Zotero server, and purged attachments can be restored by downloading them again. "Open in\ldots" will open another menu that presents a list of apps capable of receiving the file. This is shown in Figure \ref{SendTo.png}. Tapping an app will move ZotPad to background and open the other app with the selected attachment file. The third option, "Email", will open an email template with the citation of the currently selected file in the APA format and the currently selected attachment as attached file. After adding the recipient, and tapping "Send", the email is moved to the outbox of Mail app, from where it will be sent.
+Both the item detail view and reading view have an action button on the top right corner. This button can be used to perform actions on the currently chosen attachment file. The three supported actions are shown in Figure \ref{ActionMenu.png}. \textbf{Purge} will delete the downloaded file that is related to the attachment. It is useful if you want to clean up files to save space on the device or if a file is corrupted and needs to be removed. Purging an files does not affect the attachment on the Zotero server, and purged files can be restored by simply downloading them again. \textbf{Open in\ldots} will open another menu that presents a list of apps capable of receiving the file. This is shown in Figure \ref{SendTo.png}. Tapping an app will move ZotPad to background and open the other app with the selected attachment file. The third option, \textbf{Email}, will open an email template with the citation of the currently selected file in the APA format and the currently selected attachment as attached file. After adding the recipient, and tapping \textbf{Send}, the email is moved to the outbox of Mail app, from where it will be sent.
 
 \begin{figure}
 \image{Opening the action menu}{ActionMenu.png}
@@ -161,24 +161,24 @@ Both the item detail view and reading view have an action button on the top righ
 
 
 \begin{figure}
-\image{Sending a file to other appa}{SendTo.png}
+\image{Sending a file to other app}{SendTo.png}
 \end{figure}
 
 \FloatBarrier
 
-One of the most important use cases for ZotPad is annotating PDF files on the mobile device. Because ZotPad does not yet support annotating itself, this must be done with the help of a third party application. Figure \ref{Adobe.png} shows how this is done with Adobe Reader\ipadfootnote{Adobe Reader is a free app that can be used to view and annotate PDF files and is available for both iPad and iPhone.}. After annotating a PDF, the next step is to tap the action button in the Adobe Reader, choose the "Open in\ldots" action, and choose ZotPad from the menu. This is shown in Figure \ref{Adobe.png}.
+One of the most important use cases for ZotPad is annotating PDF files on the mobile device. Because ZotPad does not currently have a feature for displaying and making PDF annotations, this must be done with the help of a third party application\ipadfootnote{Support for annotating PDFs inside ZotPad is planned for version 1.3}. Figure \ref{Adobe.png} shows how this is done with Adobe Reader\ipadfootnote{Adobe Reader is a free app that can be used to view and annotate PDF files and is available for both iPad and iPhone.}. After annotating a PDF, the next step is to tap the action button in the Adobe Reader, choose the \textbf{Open in\ldots} action, and choose \textbf{ZotPad} from the menu. This is shown in Figure \ref{Adobe.png}.
 
 \begin{figure}
 \image{Sending a file back to ZotPad}{Adobe.png}
 \end{figure}
 
-Sending a file to ZotPad will cause the Adobe Reader to move to background and ZotPad to activate. If the file is not associated with an existing attachment\ipadfootnote{Adding new attachments using ZotPad is currently not possible, but this feature can be added if there is sufficient demand.}, ZotPad will ignore the file and display an error message. If the file is recognized, it is added to upload queue and presented as an overlay shown in Figure \ref{FileImport.png}. This view can be dismissed by tapping it and uploading the file to Zotero server will continue in the background. If the upload could not be completed, the view will show an error message explaining the reason for failure, so it might be useful to dismiss it only after the file has been completely uploaded. If network connection is not available when a file is received, the file is added to the upload queue and uploaded when network connection becomes available again.
-
 \begin{figure}
 \image{File import view}{FileImport.png}
 \end{figure}
 
-ZotPad has a conflic resolution screen shown in Figure \ref{Conflict.png}. This view shows the modified version of the file on the left and the server vesion on the right. If the server version is not available, it can be downloaded by tapping the attachment icon. Otherwise, tapping an attachment icon will open that version of the attachment in the QuickLook viewer.
+Sending a file to ZotPad will cause the Adobe Reader to move to background and ZotPad to activate. If the file is not associated with an existing attachment\ipadfootnote{Adding new attachments using ZotPad is currently not possible, but this feature can be added if there is sufficient demand.}, ZotPad will ignore the file and display an error message. If the file is recognized, it is added to upload queue and presented as an overlay shown in Figure \ref{FileImport.png}. This view can be dismissed by tapping it. Uploading the file to Zotero server will then continue in the background. If the upload could not be completed, the view will show an error message explaining the reason for failure, so it might be useful to dismiss it only after the file has been completely uploaded. If network connection is not available when a file is received, the file is added to the upload queue and uploaded when network connection becomes available again.
+
+Uploading a new version of an attachment file results in conflict if a file has already been changed on the server. ZotPad has a conflict resolution screen shown in Figure \ref{Conflict.png}. This view shows your version version of the file on the left and the server vesion on the right. If the server version is not available, it can be downloaded by tapping the attachment icon. Otherwise, tapping an attachment icon will open that version of the attachment in the QuickLook viewer.
 
 \begin{figure}
 \image{Conflict resolution}{Conflict.png}
@@ -186,84 +186,91 @@ ZotPad has a conflic resolution screen shown in Figure \ref{Conflict.png}. This 
 
 \clearpage
 
-\chapter{Settings and details}
+\chapter{Settings}
 
-This chapter describes the how ZotPad settings can be adjusted and how potential problems with the software can be diagnosed.
+ZotPad settings are adjusted using the \ipad{iPad}\iphone{iPhone} Settings app. The settings screen is shown in Figure \ref{Settings.png}. 
 
-\section{Settings}
+\section{Basic settings}
 
-ZotPad settings are adjusted using the \ipad{iPad}\iphone{iPhone} Settings app. The settings screen is shown in Figure \ref{Settings.png}. The Basic settings-section shows first the username that ZotPad is using. This is for informational purposes only and cannot be edited directly. The second setting is Mode, which can be either Online or Offline. Offline mode prevents ZotPad from using the network connection. Max cache size tells how much space ZotPad is allowed to use for downloaded attachments and the Current cache size shows an approximation of how much space is used currently. If the size of the cache exceeds the limit, ZotPad will automatically purge older files from the cache.
+This section starts with the \textbf{Username} that ZotPad is using. This is for informational purposes only and cannot be edited directly. The first user editable setting is \textbf{Mode}, which can be either \textbf{Online} or \textbf{Offline}. Offline mode prevents ZotPad from using the network connection. \textbf{Max cache size} tells how much space ZotPad is allowed to use for downloaded attachments and \textbf{Current cache size} shows an approximation of how much space is used currently. If the size of the cache exceeds the limit, ZotPad will automatically purge older files from the cache.
 
 \begin{figure}
 \image{ZotPad settings}{Settings.png}
 \end{figure}
 
-The Preemptive cache-section contains two settings for cache. ZotPad will always download the data that it needs to show a view for the user. These settings can be used to adjust how much data is downloaded preemptively in the background. The item data setting controls which libraries ZotPad will cache preemptively. The setting All libraries, will cause all libraries to be refreshed with new data from the Zotero server when ZotPad is launched. Active libraries will only cache the libraries that the user has viewed during the session. The Attachment files setting will tell Zotero when to download attachments. If this setting is Off, files are downloaded only when a user selects a file for downloading by tapping it. Active items will automatically start downloading attachments when the user opens an item in item detail view. Active collections will start downloading all attachment files when user chooses a collection and Active libraries does the same for libraries. All libraries will automatically download every existing attachment in the background.
+\section{Preemptive cache}
 
-File service setting has three options. The default and recommended option is to use Zotero file storage for all libraries, and this option does not require any other configuration. The second option is to use WebDAV for my library. Using this requires that user's Zotero is also configured to use the same WebDAV server and requires that the server address is specified in the settings. The server address needs to be given in the full form including the http:// or https:// suffix and the /zotero prefix. Misspecified WebDAV address will result in an error message when ZotPad is activate. Username for the WebDAV server will be asked when ZotPad attempts to connect to the WebDAV server for the first time.
+ This section contains two settings for cache. When online, ZotPad will always download the data that it needs to show a view for the user. These settings can be used to adjust how much data is downloaded preemptively in the background. The \textbf{Item data} setting controls which libraries ZotPad will cache in the background. The setting \textbf{All libraries}, will cause all libraries to be refreshed with new data from the Zotero server when ZotPad is launched. \textbf{Active libraries} will only cache the libraries that the user has viewed during the session. The \textbf{Attachment files} setting will tell Zotero when to download attachments. If this setting is \textbf{Off}, files are downloaded only when a user selects a file for downloading by tapping it. \textbf{Active items} will automatically start downloading attachments when you open an item in item detail view. \textbf{Active collections} will start downloading all attachment files when you choose a collection and \textbf{Active libraries} does the same for libraries. \textbf{All libraries} will automatically download every existing attachment in the background.
 
-The third option is Dropbox. Dropbox synchronization is different from the two other options in that it does not synchronize with the Zotero server, but synchronizes files directly between ZotPad and the users computer running Zotero. In most cases there is no user visible difference, but in some instances this can result in files not syncing correctly\ipadfootnote{For example, if a user edits a file on his/her computer, but does not sync Zotero, ZotPad does not know that a new version of a file would be available in Dropbox because Zotero server is not aware of this change.}. Using Dropbox will also require that the user's computer running Zotero is set up to synchronize the Zotero data directory with Dropbox.
+\section{File service}
 
-Configuring Zotero to use DropBox requires the following steps:
+The \textbf{File service} setting has three options. The default and recommended option is to use \textbf{Zotero file storage} for all libraries, and this option does not require any other configuration. The second option, \textbf{WebDAV (My Library) and Zotero file storage (Groups)}, uses WebDAV for My Library. Using this requires that user's Zotero is also configured to use the same WebDAV server and requires that the server address is specified in the settings. The server address needs to be given in the full form including the http:// or https:// prefix and the /zotero suffix. Misspecified WebDAV address will result in an error message when ZotPad is activated. Username for the WebDAV server will be asked when ZotPad attempts to connect to the WebDAV server for the first time.
+
+The third option is \textbf{Dropbox}. Dropbox synchronization is different from the two other options in that it does not synchronize with the Zotero server, but synchronizes files directly between ZotPad and your computer. In most cases there is no user visible difference, but in some instances this can result in files not syncing correctly\ipadfootnote{For example, if a you edit a file on your computer, but do not sync Zotero, ZotPad does not know that a new version of a file would be available in Dropbox because Zotero server is not aware of this change.}. Using Dropbox will also require that the your computer running Zotero is set up to synchronize the Zotero data directory with Dropbox.
+
+The recommended way to configuring Zotero to use DropBox consists of the following steps:
+
 \begin{enumerate}
 \item Enable Dropbox in ZotPad settings.
-\item Start ZotPad and try to downloading something. This will start Dropbox authentication.
-\item Enter your Dropbox username and password when asked.
+\item Start ZotPad and try to download something. This will start Dropbox authentication.
 \item When authentication is finished, go to your computer and verify that a folder named Apps/ZotPad has been created in your Dropbox folder.
-\item Open Zotero and click on the Show Data Directory button in the Advanced tab in the settings window. Open the data directory and locate a directory named "storage". Quit Zotero.
-\item Move the content of the storage folder to the Apps/ZotPad folder inside the Dropbox.
-\item Delete the empty storage folder.
-\item Make a symbolic link called "storage" pointing to the Apps/ZotPad folder inside the Dropbox folder. Symbolic link is not the same as shortcut on Windows or alias on Mac. On Windows, symbolic links are created with the following command in the command prompt:
-{\small
-\begin{verbatim}
-mklink /D {zotero_data_folder}\storage {dropbox_folder}\Apps\ZotPad
-\end{verbatim}
-}
-On Mac and other unixes symbolic links are created using the terminal application and runnign the following command:
-{\small
-\begin{verbatim}
-ln -s {dropbox_folder}/Apps/ZotPad {zotero_data_folder}/storage
-\end{verbatim}
-}
-
+\item Create a symbolic link from the Apps/ZotPad to your Zotero data directory using the setup scripts located in the Apps/ZotPad folder.
+\item Depending on your operating system, you may need to repeat Dropbox authentication the next time you start downloading something from Dropbox
 \end{enumerate}
 
-The reset section contains two settings. Resetting username will completely reset ZotPad and forces reauthentication with the Zotero server. Resetting data will delete all downloaded item data and attachment files. These settings take effect the next time ZotPad is started.
+If you want to store the Zotero files in some other folder than the Apps/ZotPad, you can do this by changing \textbf{Advanced Dropbox settings}. If you choose to store the files somewhere else than the Apps/ZotPad folder, it is up to you to set up synchronization between Dropbox and Zotero storage folder\ipadfootnote{Although it is possible to put the entire Zotero data directory inside Dropbox, this is not recommended. Doing so will cause your database and its journal file to be synchronized to Dropbox cloud. This will create a large amount of unnecessary network traffic. Additionally, if you use Zotero on two different computers with this setup, there is a high risk of corrupting your Zotero database.}.
+
+\section{Reset}
+
+The reset section contains two settings. \textbf{Reset username} will completely reset ZotPad and forces reauthentication with the Zotero server. \textbf{Reset data} will delete all downloaded item data and attachment files. These settings take effect the next time ZotPad is started.
+
+\section{Error reports and usage statistics}
 
 The final setting, which is on by default, sends anonymous usage statistis and error reports to ZotPad developers. This will help to identify potential problems that can be fixed in future versions.
 
+\chapter{Troubleshooting}
+
 \section{Log viewer and key settings}
 
-Figure \ref{LogView.png} shows the ZotPad log viewer. This view is activated by tapping the gear button in the main view. The purpose of the log viewer is to help in trouble shooting the application. For example, if files fail do download because a WebDAV server is not working correctly or cannot be reached, this will be recorded in the log. The log file is is reset every day and log files are stored for seven days before deleting. Old logs can be accessed with iTunes. 
+Figure \ref{LogView.png} shows the ZotPad log viewer. This view is activated by tapping the gear button in the main view. The purpose of the log viewer is to help in troubleshooting the application. For example, if files fail do download because a WebDAV server is not working correctly or cannot be reached, this will be recorded in the log.
+
+The log contains three types of messages. Information (INFO) describe the normal workign of ZotPad. Warnings (WARN) are issued when something more important, but still normal is taking place (e.g. purging old files). Errors (ERROR) are printed out when something goes wrong (e.g. a file that you wanted to download was not found).
+
+The log file is is reset every day and log files are stored for seven days before deleting. Old logs can be accessed with iTunes. 
 
 \begin{figure}
 \image{ZotPad log viewer}{LogView.png}
 \end{figure}
 
-The toolbar contains \ipad{four}\iphone{three }buttons. The first button will show this user manual\ipad{ and the second button will open the support pages on the ZotPad website. These pages contain the most up to date documentation and are complementary to this user manual}. The Email support button will create an template that contains information about your access key and the most recent log file ready for sending these to support@zotpad.com.
+The toolbar contains \ipad{four}\iphone{three }buttons. The first button will show this user manual\ipad{ and the second button will open the support pages on the ZotPad website. These pages contain the most up to date documentation and are complementary to this user manual}. The \textbf{Email support} button will open an email template that contains information about your access key and the most recent log file.
 
-\ipad{Manage }API key will open a key management page in mobile safari. After you have logged in to zotero.org, this page can be used to adjust the permissions that the access key that ZotPad uses has. For example, you can limit the key to only one particular group library, remove write access from the key, or restrict the key so that it cannot be used to access your notes.
+\textbf{\ipad{Manage }API key} will open a key management page in Safari. After you have logged in to zotero.org, this page can be used to adjust the permissions that the access key that ZotPad uses has. For example, you can limit the key to only one particular group library, remove write access from the key, or restrict the key so that it cannot be used to access your notes.
+
+\section{General troubleshooting procedure}
+
+If you are experiencing problems with ZotPad, the first thing to do is to open the log viewer to see if there are any error messages. Sometimes checking the application log is sufficient to diagnose a problem. If the log does not contain any useful, or you do not understand what the log says, the next troubleshooting step is to check the frequently asked questions section on the ZotPad website. If this does not answer the problem, you should contact support by using the email support feature.
+
 
 \chapter{Technical information}
 
-This chapter contains technical information about ZotPad. It might not be useful for a typical user, but can contain useful or interesting details. 
+This chapter contains technical information about ZotPad. It might not be useful for a typical user, but can contain useful or interesting details for more technically oriented users. 
 
 	\section{Technical architecture}
 \label{sect:architecture}
 
-To understand how ZotPad works, you should consider it as an online viewer to your Zotero libraries, but with a cache. The way ZotPad works is somewhere between Zotero and the Zotero website. The desktop Zotero will synchronize its data with the server periodically and then display this data to the user. The website reloads the data that it needs for each page view. ZotPad is similar to Zotero website in that it always loads new data when a user taps a library, a collection, or an item. ZotPad is also similar to Zotero in that it uses locally stored copy of the data that it shows the user. When user does navigates to a new library, collection, or item, this will first trigger a request for the local cache. The cache is used to present data for the user quickly while a request to the Zotero server for fresh data runs in the background. When ZotPad receives data from the Zotero server, this data is always written first in the local cache, and then the cache is queried again to refresh the user interface. Always presenting data from the cache guarantees that searching and sorting will work consistently regardless of how fresh the data are. In addition to cacheing data that the user requests directly, ZotPad will also preemptively cache data that it thinks it will need in the future. The preemtive cache and the ad hoc data retrieval are optimized to avoid unnecessary requests to the Zotero server. 
+To understand how ZotPad works, you should consider it as an online viewer to your Zotero libraries, but with a cache. The way ZotPad works is somewhere between Zotero and the Zotero website. The Zotero application will synchronize its data with the server periodically and then display this data to the user. The Zotero website loads data only when needed and does this for each page view. ZotPad is similar to Zotero website in that it always loads new data when a user taps a library, a collection, or an item. ZotPad is also similar to Zotero in that it uses locally stored copy of the data that it shows the user. When a user navigates to a new library, collection, or item, this will first trigger a request against the local cache. The cache is used to present data for the user quickly while a request to the Zotero server for fresh data runs in the background. When ZotPad receives data from the Zotero server, this data are always written first in the local cache, and then the cache is queried again to refresh the user interface. Always presenting data from the cache guarantees that searching and sorting will work consistently regardless of how the source of the data. In addition to cacheing data that the user requests directly, ZotPad will also preemptively cache data that it thinks it will need in the future. The preemptive cache and the ad hoc data retrieval are optimized to avoid unnecessary requests to the Zotero server. 
 
-ZotPad stores all downloaded items in the application data directory, which can be accessed with iTunes. The attachment files are named by appending an underscore (\_) and an eight character identifier at the end of the body of the file name. Files that are edited on the device are further appended a dash (-). Locally edited files are stored until they have been succesfully uploaded to the Zotero server
+ZotPad stores all downloaded items in the application data directory, which can be accessed with iTunes file transfer. The attachment files are named by appending an underscore (\_) and an eight character identifier at the end of the body of the file name. Files that are edited on the device are further appended with a dash (-). Locally edited files are stored until they have been succesfully uploaded to the Zotero server
 
 	\section{Development of ZotPad}
 	
-ZotPad develoment takes place at Github at \url{https://github.com/mronkko/ZotPad}. The project is open for new developers who wish to participate in making ZotPad better and earning some additional income doing so. The source code si available under the GNU General Public Licence, version 3. This means that anyone can download the code and enhance it as long as the modeified code is released under the same license. Downloading the ZotPad code and relicensing it under the App Store license is not permitted. If any developer wishes to use the ZotPad code as a part of their project, contacting the ZotPad developers first is highly recommended.
+ZotPad develoment takes place at GitHub at \url{https://github.com/mronkko/ZotPad}. The project is open for new developers who wish to participate in making ZotPad better and earning some additional income by doing so. The source code is available under the GNU General Public Licence, version 3. This means that anyone can download the code and enhance it as long as the modified code is released under the same license. Downloading the ZotPad code and relicensing it under the App Store license is not permitted. If any developer wishes to use the ZotPad code as a part of their project, contacting the ZotPad developers first is highly recommended.
 
-All bugs and feature request are recorded in a tracker that at Github: \url{https://github.com/mronkko/ZotPad/issues}. Feature requests can also be submitted through the forums at the ZotPad website at \url{http://www.zotpad.com}. 
+All bugs and feature request are recorded in a tracker that at GitHub: \url{https://github.com/mronkko/ZotPad/issues}. Feature requests can also be submitted through the forums at the ZotPad website at \url{http://www.zotpad.com}. 
 
-ZotPad aims to release a new version three to four times a year and does maintenance releases if critical bugs are discovered. Each major release is beta tested by actual users using the Testflight service. The beta testing is invitation only because each test deveice needs to be registered with Apple allows only 100 new device registrations are allowed per year. However, new testers are always welcome. If you want to participate in the next beta, please email \href{mailto:developers@zotpad.com}{developers@zotpad.com} and ask for further information.
+ZotPad aims to release a new version three to four times a year and does maintenance releases if critical bugs are discovered. Each major release is beta tested by actual users using the Testflight service. The beta testing is invitation only because each test deveice needs to be registered with Apple, who allows only 100 new device registrations per year. However, new testers are always welcome. If you want to participate in the next beta, please email \href{mailto:developers@zotpad.com}{developers@zotpad.com} and ask for further information.
 
-Beta testing the next version (1.2) is expected to start in the early fall 2012. This release will add support for using and editing notes and tags as well as support for editing item data.
+Beta testing the next version (1.2) is expected to start in the early fall 2012. This release will add support for notes and tags as well as support for editing item data. 
 
 \chapter{Acknowledgements}
 
