@@ -389,8 +389,7 @@ NSInteger const ZPATTACHMENTICONGVIEWCONTROLLER_TAG_TITLELABEL = -5;
         
         ZPZoteroAttachment* attachment = [_attachments objectAtIndex:index]; 
         
-        if([self _fileExistsForAttachment:attachment] ||
-           ([attachment.linkMode intValue] == LINK_MODE_LINKED_URL && [ZPServerConnection instance])){
+        if([self _fileExistsForAttachment:attachment]){
             UIView* sourceView;
             for(sourceView in carousel.visibleItemViews){
                 if([carousel indexOfItemView:sourceView] == index){
@@ -399,6 +398,9 @@ NSInteger const ZPATTACHMENTICONGVIEWCONTROLLER_TAG_TITLELABEL = -5;
             }
             
             [ZPPreviewController displayQuicklookWithAttachment:attachment sourceView:sourceView];
+        }
+        else if([attachment.linkMode intValue] == LINK_MODE_LINKED_URL && [ZPServerConnection instance]){
+            [[UIApplication sharedApplication] openURL:[NSURL URLWithString:attachment.url]];
         }
         else if(self.mode == ZPATTACHMENTICONGVIEWCONTROLLER_MODE_DOWNLOAD && ( [attachment.linkMode intValue] == LINK_MODE_IMPORTED_FILE || 
                 [attachment.linkMode intValue] == LINK_MODE_IMPORTED_URL)){

@@ -347,11 +347,21 @@ NSInteger const ZPFILECHANNEL_WEBDAV_UPLOAD_REGISTER = 5;
                 
                 NSArray* fileArray= [[NSFileManager defaultManager]contentsOfDirectoryAtPath:tempFile error:NULL];
                 
-                //Traverse a file hierarchy
+                //Traverse a file hierarchy if this is a folderr
                 
-                while([fileArray count] == 1 && [[NSFileManager defaultManager] fileExistsAtPath:tempFile isDirectory:YES]){
-                    tempFile = [tempFile stringByAppendingPathComponent:[fileArray objectAtIndex:0]];
-                    fileArray= [[NSFileManager defaultManager]contentsOfDirectoryAtPath:tempFile error:NULL];
+                BOOL firstFileIsDirectory = FALSE;
+                
+                while([fileArray count] == 1){
+                    
+                    BOOL firstFileExists = [[NSFileManager defaultManager] fileExistsAtPath:[tempFile stringByAppendingPathComponent:[fileArray objectAtIndex:0]]
+                                                                           isDirectory:&firstFileIsDirectory];
+                    
+                    if(firstFileExists && firstFileIsDirectory){   
+                        DDLogWarn(@"WebDAV archive contained a directory instead of a file.");
+                        tempFile = [tempFile stringByAppendingPathComponent:[fileArray objectAtIndex:0]];
+                        fileArray= [[NSFileManager defaultManager]contentsOfDirectoryAtPath:tempFile error:NULL];
+                    }
+                    else break;
                 }
                        
                 if([fileArray count]==1){

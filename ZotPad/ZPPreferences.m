@@ -84,22 +84,23 @@ static ZPPreferences* _instance = nil;
     _maxCacheSize = rawmax*1024*1024;
     
     //Dump the preferences into log
-    
-    IASKSettingsReader* reader = [[IASKSettingsReader alloc] init];
-    for(NSInteger section =0 ; section < [reader numberOfSections]; section++){
-        for(NSInteger row =0 ; row < [reader numberOfRowsForSection:section]; row++){
-            IASKSpecifier* prefItem = [reader specifierForIndexPath:[NSIndexPath indexPathForRow:row inSection:section]];
-
-            NSObject* valueObject = [defaults objectForKey:prefItem.key];
-            NSString* valueTitle= [prefItem titleForCurrentValue:valueObject];
-            NSString* title = [prefItem title];
-            if([@"" isEqualToString:valueTitle]) DDLogInfo(@"%@: %@",title, valueObject);
-            else DDLogInfo(@"%@: %@",title, valueTitle);
-
+  
+    for(NSString* file in [NSArray arrayWithObjects:@"Root", @"Dropbox", nil]){
+        IASKSettingsReader* reader = [[IASKSettingsReader alloc] initWithFile:file];
+        for(NSInteger section =0 ; section < [reader numberOfSections]; section++){
+            for(NSInteger row =0 ; row < [reader numberOfRowsForSection:section]; row++){
+                IASKSpecifier* prefItem = [reader specifierForIndexPath:[NSIndexPath indexPathForRow:row inSection:section]];
+                if(! [prefItem.type isEqualToString:@"PSChildPaneSpecifier"]){
+                    NSObject* valueObject = [defaults objectForKey:prefItem.key];
+                    NSString* valueTitle= [prefItem titleForCurrentValue:valueObject];
+                    NSString* title = [prefItem title];
+                    if([@"" isEqualToString:valueTitle]) DDLogInfo(@"%@: %@",title, valueObject);
+                    else DDLogInfo(@"%@: %@",title, valueTitle);
+                }
+            }
+            
         }
-        
     }
-    
     // Alert if webdav is misconfigured
     
     if ([self useWebDAV]) {
@@ -228,6 +229,19 @@ static ZPPreferences* _instance = nil;
     NSUserDefaults* defaults = [NSUserDefaults standardUserDefaults];
     return [[defaults objectForKey:@"filechannel"] isEqualToString:@"dropbox"];
 }
+
+-(BOOL) dropboxHasFullControl{
+    NSUserDefaults* defaults = [NSUserDefaults standardUserDefaults];
+    return [defaults boolForKey:@"dropboxfullcontrol"];
+    
+}
+-(NSString*) dropboxPath{
+    NSUserDefaults* defaults = [NSUserDefaults standardUserDefaults];
+    return [[[defaults stringForKey:@"dropboxpath"] 
+             stringByTrimmingCharactersInSet:[NSCharacterSet whitespaceCharacterSet]]
+            stringByTrimmingCharactersInSet:[NSCharacterSet characterSetWithCharactersInString:@"/\\"]];
+}
+
 -(BOOL) useWebDAV{
     NSUserDefaults* defaults = [NSUserDefaults standardUserDefaults];
     return [[defaults objectForKey:@"filechannel"] isEqualToString:@"webdavzotero"];

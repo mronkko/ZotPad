@@ -419,7 +419,7 @@
                                 <rect key="frame" x="0.0" y="0.0" width="768" height="44"/>
                                 <autoresizingMask key="autoresizingMask" widthSizable="YES" flexibleMaxY="YES"/>
                                 <items>
-                                    <navigationItem title="Login to Zotero" id="ELS-Rt-bzu">
+                                    <navigationItem title="Log in to Zotero" id="ELS-Rt-bzu">
                                         <barButtonItem key="rightBarButtonItem" title="Back to start" id="Io0-c8-MzK">
                                             <connections>
                                                 <action selector="loadFirstPage:" destination="bpw-6z-DmG" id="YKr-hn-jfp"/>
@@ -656,6 +656,7 @@
                     </navigationItem>
                     <connections>
                         <outlet property="logView" destination="WxQ-Jg-oUc" id="Brn-m5-cl7"/>
+                        <outlet property="manualButton" destination="Xcx-3g-5bb" id="dL0-YO-c7b"/>
                     </connections>
                 </viewController>
             </objects>
@@ -717,6 +718,7 @@
                 <relationship kind="action" name="onlineSupport:"/>
                 <relationship kind="action" name="showManual:"/>
                 <relationship kind="outlet" name="logView" candidateClass="UITextView"/>
+                <relationship kind="outlet" name="manualButton" candidateClass="UIBarButtonItem"/>
             </relationships>
         </class>
         <class className="ZPSplitViewController" superclassName="UISplitViewController">

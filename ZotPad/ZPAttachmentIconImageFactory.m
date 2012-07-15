@@ -283,7 +283,7 @@ static ZPAttachmentIconImageFactory* _webViewDelegate;
         
         if([UIImagePNGRepresentation(blankImage) isEqualToData:imageData]){
             @synchronized(_fileIconCache){
-                
+                //TODO: It is possible that only the emblem is rendered. Consider how this could be fixed
                 DDLogVerbose(@"View %i produced a blank image. Clearing cahce for image %@",webview, cacheKey);
                 
                 [_fileIconCache removeObjectForKey:cacheKey];

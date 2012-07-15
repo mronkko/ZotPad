@@ -11,6 +11,7 @@
 @interface ZPLogViewController : UIViewController  <MFMailComposeViewControllerDelegate, QLPreviewControllerDataSource>
 
 @property (retain) IBOutlet UITextView* logView;
+@property (retain) IBOutlet UIBarButtonItem* manualButton;
 
 -(IBAction)showManual:(id)sender;
 -(IBAction)onlineSupport:(id)sender;

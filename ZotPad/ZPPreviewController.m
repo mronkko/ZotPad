@@ -221,8 +221,13 @@ static ZPPreviewControllerDelegate* _sharedDelegate;
 - (UIImage *)previewController:(QLPreviewController *)controller transitionImageForPreviewItem:(id <QLPreviewItem>)item contentRect:(CGRect *)contentRect{
     if([_source isKindOfClass:[UIImageView class]]) return [(UIImageView*) _source image];
     else{
-        UIImageView* imageView = (UIImageView*) [_source viewWithTag:ZPATTACHMENTICONGVIEWCONTROLLER_TAG_FILEIMAGE];
-        return imageView.image;
+        UIGraphicsBeginImageContextWithOptions(_source.bounds.size, NO, 0);
+        [_source.layer renderInContext:UIGraphicsGetCurrentContext()];
+        UIImage* image = UIGraphicsGetImageFromCurrentImageContext();
+        UIGraphicsEndImageContext();
+        
+        // Return the result
+        return image;
     }
 }
 

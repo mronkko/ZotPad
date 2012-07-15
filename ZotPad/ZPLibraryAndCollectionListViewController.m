@@ -16,6 +16,7 @@
 #import "ZPCacheController.h"
 #import "ZPCacheStatusToolbarController.h"
 
+#import "ZPHelpPopover.h"
 
 
 @implementation ZPLibraryAndCollectionListViewController
@@ -104,6 +105,7 @@
     [[ZPDataLayer instance] registerLibraryObserver:self];
     self.detailViewController = (ZPItemListViewController *)[[self.splitViewController.viewControllers lastObject] topViewController];
     [super viewDidAppear:animated];
+    
 }
 
 - (void)viewWillDisappear:(BOOL)animated
@@ -251,6 +253,15 @@
 #pragma mark Notified methods
 
 -(void) notifyLibraryWithCollectionsAvailable:(ZPZoteroLibrary*) library{
+    
+    //Show popover
+    if(UI_USER_INTERFACE_IDIOM() == UIUserInterfaceIdiomPad){
+        if([[NSUserDefaults standardUserDefaults] objectForKey:@"hasPresentedMainHelpPopover"]==NULL){
+            [ZPHelpPopover displayHelpPopoverFromToolbarButton:gearButton];
+            [[NSUserDefaults standardUserDefaults] setObject:@"1" forKey:@"hasPresentedMainHelpPopover"];
+        }
+    }
+
 
     //If this is a library that we are not showing now, just return;
     

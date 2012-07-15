@@ -28,7 +28,7 @@
 #import "../FMDB/src/FMResultSet.h"
 
 #import "ZPPreferences.h"
-
+#import "ZPCacheController.h"
 
 
 @interface  ZPDatabase (){
@@ -72,6 +72,22 @@ static ZPDatabase* _instance = nil;
         [_database open];
     }
 
+    //Check the database version
+    @synchronized(self){
+        
+        FMResultSet* resultSet = [_database executeQuery:@"SELECT version FROM version"];
+        
+        if(resultSet == NULL){
+            [[[UIAlertView alloc] initWithTitle:@"Database needs upgrade" message:@"This version of ZotPad uses a different database structure than your previous version. The old database will now be replaced with a new version. This will purge existing data and attachment files. For more information, see http://www.zotpad.com. " delegate:NULL cancelButtonTitle:@"OK" otherButtonTitles:nil] show];
+            [self resetDatabase];
+            [[ZPCacheController instance] performSelectorInBackground:@selector(purgeAllAttachmentFilesFromCache) withObject:NULL];
+            
+        }
+        else{
+            [resultSet close];
+        }
+    }
+    
     [_database setTraceExecution:FALSE];
     [_database setLogsErrors:TRUE];
 
@@ -1108,14 +1124,10 @@ Deletes items, notes, and attachments based in array of keys from a library
         sql=[sql stringByAppendingString:@", collectionItems"];
 
     //These are available through the API, but are not fields
-    NSArray* specialSortColumns = [NSArray arrayWithObjects: @"dateAdded", @"dateModified", @"creator", @"title", @"addedBy", @"numItems",nil ];
+    NSArray* specialSortColumns = [NSArray arrayWithObjects: @"itemType", @"dateAdded", @"dateModified", @"creator", @"title", @"addedBy", @"numItems",@"date", nil ];
 
     //Sort
     if(orderField!=NULL){
-        //There is an inconssitency between fields and API
-        if([@"type" isEqualToString:orderField]) orderField = @"fieldType";
-        
-        
         if([specialSortColumns indexOfObject:orderField]==NSNotFound){
             sql=[sql stringByAppendingString:@" LEFT JOIN (SELECT itemkey, fieldValue FROM fields WHERE fieldName = ?) fields ON items.itemKey = fields.itemKey"];
             [parameters addObject:orderField];
@@ -1176,6 +1188,12 @@ Deletes items, notes, and attachments based in array of keys from a library
         }
         else if([orderField isEqualToString:@"title"]){
             sql=[sql stringByAppendingString:@" ORDER BY title"];
+        }
+        else if([orderField isEqualToString:@"date"]){
+            sql=[sql stringByAppendingString:@" ORDER BY year"];
+        }
+        else if([orderField isEqualToString:@"itemType"]){
+            sql=[sql stringByAppendingString:@" ORDER BY itemType"];
         }
 
         else{

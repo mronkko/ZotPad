@@ -152,6 +152,11 @@ const NSInteger ZPServerConnectionRequestPermissions = 10;
     NSError* error = nil;
     NSData* responseData= [NSURLConnection sendSynchronousRequest:urlRequest returningResponse:&response error:&error];
 
+    _activeRequestCount--;
+    
+    //Last request hides the network indicator
+    if(_activeRequestCount==0) [[UIApplication sharedApplication] setNetworkActivityIndicatorVisible:NO];
+
     //If we receive a 403 (forbidden) error, delete the authorization key because we know that it is
     //no longer valid.
     if([(NSHTTPURLResponse*)response statusCode]==403){
@@ -175,11 +180,10 @@ const NSInteger ZPServerConnectionRequestPermissions = 10;
             }
         }
     }
+    else if([(NSHTTPURLResponse*)response statusCode]!=200){
+        DDLogError(@"Server request %@ resulted in error %1. Full response: %@",urlString,[(NSHTTPURLResponse*)response statusCode],[[NSString alloc] initWithData:responseData encoding:NSUTF8StringEncoding]);
+    }
     
-    _activeRequestCount--;
-    
-    //Last request hides the network indicator
-    if(_activeRequestCount==0) [[UIApplication sharedApplication] setNetworkActivityIndicatorVisible:NO];
 
     return responseData;
 }
@@ -688,7 +692,7 @@ const NSInteger ZPServerConnectionRequestPermissions = 10;
 -(void) failedDownloadingAttachment:(ZPZoteroAttachment*)attachment withError:(NSError*) error usingFileChannel:(ZPFileChannel*)fileChannel{
     @synchronized(_activeDownloads){
         [_activeDownloads removeObject:attachment];
-        DDLogError(@"Failed downloading file %@",attachment.filename);
+        DDLogError(@"Failed downloading file %@. Error %@ Troubleshooting instructions: http://www.zotpad.com/node/38",attachment.filename,error.localizedDescription);
     }
     
     _activeRequestCount--;

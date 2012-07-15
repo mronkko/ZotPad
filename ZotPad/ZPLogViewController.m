@@ -10,6 +10,7 @@
 #import "ZPLogViewController.h"
 #import "ZPAppDelegate.h"
 #import "DDFileLogger.h"
+#import "ZPHelpPopover.h"
 
 @interface ZPLogViewController (){
     MFMailComposeViewController *mailController;
@@ -19,7 +20,7 @@
 
 @implementation ZPLogViewController
 
-@synthesize logView;
+@synthesize logView,manualButton;
 
 - (id)initWithNibName:(NSString *)nibNameOrNil bundle:(NSBundle *)nibBundleOrNil
 {
@@ -41,7 +42,16 @@
     logView.text = [[NSString alloc] initWithContentsOfFile:logPath encoding:NSUTF8StringEncoding error:NULL];
 //    [logView scrollRangeToVisible:NSMakeRange([logView.text length], 0)];
 }
+- (void)viewDidAppear:(BOOL)animated{
+    [super viewDidAppear:YES];
+    if(UI_USER_INTERFACE_IDIOM() == UIUserInterfaceIdiomPad){
+        if([[NSUserDefaults standardUserDefaults] objectForKey:@"hasPresentedSecondaryHelpPopover"]==NULL){
+            [ZPHelpPopover displayHelpPopoverFromToolbarButton:manualButton];
+            [[NSUserDefaults standardUserDefaults] setObject:@"1" forKey:@"hasPresentedSecondaryHelpPopover"];
+        }
+    }
 
+}
 - (void)viewDidUnload
 {
     [super viewDidUnload];

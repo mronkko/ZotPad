@@ -329,10 +329,11 @@ NSInteger const VERSION_SOURCE_DROPBOX =3;
 
 +(NSString*) md5ForFileAtPath:(NSString*)path{
     
-    if(! [[NSFileManager defaultManager] fileExistsAtPath:path]){
+    BOOL isDirectory;
+    if(! [[NSFileManager defaultManager] fileExistsAtPath:path isDirectory:&isDirectory]){
         [NSException raise:@"File not found" format:@"Attempted to calculate MD5 sum for a non-existing file at %@",path];
     }
-    else if([[NSFileManager defaultManager] fileExistsAtPath:path isDirectory:YES]){
+    else if(isDirectory){
         [NSException raise:@"Directory not allowed" format:@"Attempted to calculate MD5 sum for a directory at %@",path];
     }
         

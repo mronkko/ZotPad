@@ -23,6 +23,8 @@
 #import "TestFlightLogger.h"
 #import "CompressingLogFileManager.h"
 
+
+
 @interface ZPFileLogFormatter : NSObject <DDLogFormatter>{
     NSInteger level;
     NSDateFormatter* dateFormatter;
@@ -97,14 +99,16 @@ didFinishLaunchingWithOptions:(NSDictionary *)launchOptions
 
 
     
-    DDLogInfo(@"Starting");
+    DDLogInfo(@"%@ %@ (build %@)",
+              [[NSBundle mainBundle] objectForInfoDictionaryKey:@"CFBundleDisplayName"],
+              [[NSBundle mainBundle] objectForInfoDictionaryKey:@"CFBundleShortVersionString"],
+              [[NSBundle mainBundle] objectForInfoDictionaryKey:@"CFBundleVersion"]);
     DDLogVerbose(@"Verbose logging is enabled");
     
      //Manual override for userID and Key. Useful for running the code in debugger with other people's credentials.
     
 
     /*
-    
     NSUserDefaults* defaults = [NSUserDefaults standardUserDefaults];
     [defaults setObject:@"" forKey:@"userID"];
     [defaults setObject:@"" forKey:@"OAuthKey"];
@@ -168,8 +172,6 @@ didFinishLaunchingWithOptions:(NSDictionary *)launchOptions
      */
     
     [[ZPPreferences instance] reload];
-    [ZPFileChannel_Dropbox linkDroboxIfNeeded];
-
 
 }
 
@@ -198,7 +200,25 @@ didFinishLaunchingWithOptions:(NSDictionary *)launchOptions
     if ([[DBSession sharedSession] handleOpenURL:url]) {
         if ([[DBSession sharedSession] isLinked]) {
             DDLogInfo(@"App linked successfully with DropBox");
-            // At this point you can start making API calls
+            
+            // Upload the setup scripts
+            BOOL fullControl = [[ZPPreferences instance] dropboxHasFullControl];
+            NSString* path = [[ZPPreferences instance] dropboxPath];
+            if(! fullControl && (path == NULL || [path isEqualToString:@""])){
+                
+                _restClient = [[DBRestClient alloc] initWithSession:[DBSession sharedSession]];
+                _restClient.delegate = self;
+                for(NSString* file in [NSArray arrayWithObjects:@"link_zotero_windows.vbs",@"link_zotero_mac_unix.sh",@"Dropbox_instructions.txt", nil]){
+                    NSString* fromPath = [[NSBundle mainBundle] pathForResource:[file stringByDeletingPathExtension] ofType:[file pathExtension]];
+                    [_restClient uploadFile:file toPath:@"/" withParentRev:NULL fromPath:fromPath];
+                }
+
+                //Copy the mac installer bundle
+                
+                //[self _uploadFolderToDropBox:_restClient toPath:@"/" fromPath:[[NSBundle mainBundle] pathForResource:@"link_zotero_mac" ofType:@"app"]];
+
+            
+            }
         }
         return YES;
     }
@@ -232,6 +252,37 @@ didFinishLaunchingWithOptions:(NSDictionary *)launchOptions
     }
     // Add whatever other url handling code your app requires here
     return NO;
+}
+
+- (void) _uploadFolderToDropBox:(DBRestClient*) client toPath:(NSString*)toPath fromPath:(NSString*) fromPath{
+    
+    NSString* newPath = [toPath stringByAppendingPathComponent:[fromPath lastPathComponent]];
+    [_restClient createFolder:newPath];
+    
+    for(NSString* content in [[NSFileManager defaultManager] contentsOfDirectoryAtPath:fromPath error:NULL]){
+        BOOL isDirectory = FALSE;
+        NSString* thisPath =[fromPath stringByAppendingPathComponent:content];
+        
+        if([[NSFileManager defaultManager] fileExistsAtPath:thisPath isDirectory:&isDirectory]){
+            if(isDirectory){
+                [self _uploadFolderToDropBox:client toPath:newPath fromPath:thisPath];
+            }
+            else{
+                [client uploadFile:content toPath:newPath withParentRev:NULL fromPath:thisPath];
+            }
+        }
+    }
+}
+
+- (void)restClient:(DBRestClient*)client uploadedFile:(NSString*)destPath from:(NSString*)srcPath 
+          metadata:(DBMetadata*)metadata{
+    
+    DDLogVerbose(@"Dropbox uploaded file");
+    
+}
+- (void)restClient:(DBRestClient*)client uploadFileFailedWithError:(NSError*)error{
+    DDLogVerbose(@"There was an error uploading the file - %@", error);
+    
 }
 
 - (void) startAuthenticationSequence{

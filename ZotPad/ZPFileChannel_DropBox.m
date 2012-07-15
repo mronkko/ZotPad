@@ -24,8 +24,25 @@
 const NSInteger ZPFILECHANNEL_DROPBOX_UPLOAD = 1;
 const NSInteger ZPFILECHANNEL_DROPBOX_DOWNLOAD = 2;
 
+#ifdef BETA
 
-@interface ZPDBRestClient : DBRestClient
+static const NSString* DROPBOX_KEY_FULL_ACCESS = @"w1nps3e4js2va7z";
+static const NSString* DROPBOX_SECRET_FULL_ACCESS = @"vvk17pjqx0ngjs3";
+
+static const NSString* DROPBOX_KEY = @"or7xa2bxhzit1ws";
+static const NSString* DROPBOX_SECRET = @"6azju842azhs5oz";
+
+#else
+
+#import "ZPSecrets.h"
+
+static const NSString* DROPBOX_KEY_FULL_ACCESS = @"mueanvefj1wo1e2";
+static const NSString* DROPBOX_KEY = @"w2aehbumzcus6vk";
+
+#endif
+
+@interface ZPDBRestClient : DBRestClient{
+}
 
 @property (retain) ZPZoteroAttachment* attachment;
 @property (retain) NSString* revision;
@@ -33,6 +50,7 @@ const NSInteger ZPFILECHANNEL_DROPBOX_DOWNLOAD = 2;
 @property NSInteger tag;
 
 -(void) _restClient:(ZPDBRestClient*)client processError:(NSError *)error;
+-(NSString*) _pathForAttachment:(ZPZoteroAttachment*)attachment;
 
 @end
 
@@ -42,37 +60,61 @@ const NSInteger ZPFILECHANNEL_DROPBOX_DOWNLOAD = 2;
 
 @end
 
-
 @implementation ZPFileChannel_Dropbox
+
 
 +(void) linkDroboxIfNeeded{
     if([[ZPPreferences instance] useDropbox]){
         if([DBSession sharedSession]==NULL){
             DDLogInfo(@"Starting Dropbox");
-            DBSession* dbSession =
-            [[DBSession alloc]
-             initWithAppKey:@"or7xa2bxhzit1ws"
-             appSecret:@"6azju842azhs5oz"
-             root:kDBRootAppFolder];
-            [DBSession setSharedSession:dbSession];
+            
+            if([[ZPPreferences instance] dropboxHasFullControl]){
+                DBSession* dbSession =
+                [[DBSession alloc]
+                 initWithAppKey:DROPBOX_KEY_FULL_ACCESS
+                 appSecret:DROPBOX_SECRET_FULL_ACCESS
+                 root:kDBRootDropbox];
+                [DBSession setSharedSession:dbSession];
+                
+            }
+            else{
+                DBSession* dbSession =
+                [[DBSession alloc]
+                 initWithAppKey:DROPBOX_KEY
+                 appSecret:DROPBOX_SECRET
+                 root:kDBRootAppFolder];
+                [DBSession setSharedSession:dbSession];
+            }
         }
 
         //Link with dropBox account if not already linked
+
         BOOL linked =[[DBSession sharedSession] isLinked];
         if (!linked) {
-            DDLogInfo(@"Linking Dropbox");
-
-            UIViewController* viewController = [UIApplication sharedApplication].delegate.window.rootViewController;
-            while(viewController.presentedViewController) viewController = viewController.presentedViewController;
             
-            //Start dismissing modal views
-            while(viewController != [UIApplication sharedApplication].delegate.window.rootViewController){
-                UIViewController* parent = viewController.presentingViewController;
-                [viewController dismissModalViewControllerAnimated:NO];
-                viewController = parent;
-            }
+            //Run on main thread
+            
+            DDLogInfo(@"Linking Dropbox");
+            if([NSThread isMainThread]){
 
-            [[DBSession sharedSession] linkFromController:viewController];
+                //Unlink all so that we can relink
+                [[DBSession sharedSession] unlinkAll];
+                
+                UIViewController* viewController = [UIApplication sharedApplication].delegate.window.rootViewController;
+                while(viewController.presentedViewController) viewController = viewController.presentedViewController;
+                
+                //Start dismissing modal views
+                while(viewController != [UIApplication sharedApplication].delegate.window.rootViewController){
+                    UIViewController* parent = viewController.presentingViewController;
+                    [viewController dismissModalViewControllerAnimated:NO];
+                    viewController = parent;
+                }
+                
+                [[DBSession sharedSession] linkFromController:viewController];
+            }
+            else {
+                [[self class] performSelectorOnMainThread:@selector(linkDroboxIfNeeded) withObject:NULL waitUntilDone:YES];
+            }
         }
     }
 }
@@ -98,6 +140,26 @@ const NSInteger ZPFILECHANNEL_DROPBOX_DOWNLOAD = 2;
     return [NSNumber numberWithInt: request];
 }
 
+-(NSString*) _pathForAttachment:(ZPZoteroAttachment*)attachment{
+
+    NSString* basePath;
+    if([[ZPPreferences instance] dropboxPath] == NULL || [[[ZPPreferences instance] dropboxPath] isEqualToString:@""]){
+        basePath = @"/storage";
+    }
+    else{
+        basePath = [NSString stringWithFormat:@"/%@",[[ZPPreferences instance] dropboxPath]];
+    }
+    
+    if([attachment.linkMode intValue] == LINK_MODE_IMPORTED_URL && [attachment.contentType isEqualToString:@"text/html"]){
+        //Get a list of files to be downloaded. This does not respect custom file name template
+        return [NSString stringWithFormat:@"%@/%@/",basePath, attachment.key];
+    }
+    else{
+        //Otherwise, load metadata for the file usign the default patterns
+        return [NSString stringWithFormat:@"%@/%@/%@",basePath, attachment.key,attachment.filename];
+    }
+}
+
 #pragma mark - Downloads
 
 -(void) startDownloadingAttachment:(ZPZoteroAttachment*)attachment{
@@ -115,16 +177,9 @@ const NSInteger ZPFILECHANNEL_DROPBOX_DOWNLOAD = 2;
     
     [self linkAttachment:attachment withRequest:restClient];
     
-    NSString* path;
+    NSString* path = [self _pathForAttachment:attachment];
     //If this is a website snapshot, we need to download all files
-    if([attachment.linkMode intValue] == LINK_MODE_IMPORTED_URL && [attachment.contentType isEqualToString:@"text/html"]){
-        //Get a list of files to be downloaded
-        path = [NSString stringWithFormat:@"/%@/",attachment.key];
-    }
-    else{
-        //Otherwise, load metadata for the file
-        path =[NSString stringWithFormat:@"/%@/%@",attachment.key,attachment.filename];
-    }
+
     DDLogVerbose(@"Requesting metadata from Dropbox path %@",path);
     
     //Drobbox uses NSURLconnection internally, so it needs to be called in the main thread.
@@ -135,7 +190,7 @@ const NSInteger ZPFILECHANNEL_DROPBOX_DOWNLOAD = 2;
 
     DBRestClient* restClient = [self requestWithAttachment:attachment];
     
-    NSString* path = [NSString stringWithFormat:@"/%@/%@",attachment.key,attachment.filename];
+    NSString* path = [self _pathForAttachment:attachment];
     [restClient cancelFileLoad:[path precomposedStringWithCanonicalMapping]];
     [self cleanupAfterFinishingAttachment:attachment];
 }
@@ -163,6 +218,8 @@ const NSInteger ZPFILECHANNEL_DROPBOX_DOWNLOAD = 2;
     
     //TODO: consider pooling these
     ZPDBRestClient* restClient = [[ZPDBRestClient alloc] initWithSession:[DBSession sharedSession]];
+
+    
     restClient.attachment = attachment;
     restClient.delegate = self;
     restClient.overwriteConflicting = overwriteConflicting;
@@ -170,7 +227,7 @@ const NSInteger ZPFILECHANNEL_DROPBOX_DOWNLOAD = 2;
     
     [self linkAttachment:attachment withRequest:restClient];
         
-    NSString* path = [NSString stringWithFormat:@"/%@/%@",attachment.key,attachment.filename];
+    NSString* path = [self _pathForAttachment:attachment];
     
     //Drobbox uses NSURLconnection internally, so it needs to be called in the main thread.
     [restClient performSelectorOnMainThread:@selector(loadMetadata:) withObject:[path precomposedStringWithCanonicalMapping] waitUntilDone:NO];
@@ -201,11 +258,12 @@ const NSInteger ZPFILECHANNEL_DROPBOX_DOWNLOAD = 2;
             DDLogVerbose(@"Folder '%@' contains:", metadata.path);
             NSString* basePath=[NSTemporaryDirectory() stringByAppendingPathComponent:[NSString stringWithFormat:@"ZP%@%i",attachment.key,[[NSDate date] timeIntervalSince1970]*1000000]];
             [[NSFileManager defaultManager] createDirectoryAtPath:basePath withIntermediateDirectories:YES attributes:NULL error:NULL];
+
+            NSString* path = [self _pathForAttachment:attachment];
             for (DBMetadata *file in metadata.contents) {
                 DDLogVerbose(@"\t%@", file.filename);
                 NSString* tempFile = [basePath stringByAppendingPathComponent:file.filename];
-                NSString* path = [NSString stringWithFormat:@"/%@/%@",attachment.key,file.filename] ;
-                [client loadFile:[path precomposedStringWithCanonicalMapping] intoPath:tempFile];
+                [client loadFile:[[path stringByAppendingPathComponent:file.filename] precomposedStringWithCanonicalMapping] intoPath:tempFile];
             }
             @synchronized(downloadCountsByRequest){
                 [downloadCountsByRequest setObject:[NSNumber numberWithInt:[metadata.contents count]] forKey:[self keyForRequest:client]];
@@ -216,30 +274,26 @@ const NSInteger ZPFILECHANNEL_DROPBOX_DOWNLOAD = 2;
             client.revision=metadata.rev;
             DDLogVerbose(@"Start downloading file /%@/%@ (rev %@)",attachment.key,attachment.filename,client.revision);
             NSString* tempFile = [NSTemporaryDirectory() stringByAppendingPathComponent:[NSString stringWithFormat:@"ZP%@%i",attachment.key,[[NSDate date] timeIntervalSince1970]*1000000]];
-            NSString* path = [NSString stringWithFormat:@"/%@/%@",attachment.key,attachment.filename];
+            NSString* path = [self _pathForAttachment:attachment];
             [client loadFile:[path precomposedStringWithCanonicalMapping] atRev:client.revision intoPath:tempFile];
         }
     }
     // Uploading
     else if(client.tag == ZPFILECHANNEL_DROPBOX_UPLOAD){
-        NSString* targetPath = [NSString stringWithFormat:@"/%@/",attachment.key];
-        
+        NSString* path = [self _pathForAttachment:attachment];
+        NSString* targetPath = [path stringByDeletingLastPathComponent];        
         if(client.overwriteConflicting){
-            [client uploadFile:[attachment.filename precomposedStringWithCanonicalMapping] toPath:[targetPath precomposedStringWithCanonicalMapping] withParentRev:metadata.rev fromPath:attachment.fileSystemPath_modified];
+            [client uploadFile:[[path lastPathComponent] precomposedStringWithCanonicalMapping] toPath:[targetPath precomposedStringWithCanonicalMapping] withParentRev:metadata.rev fromPath:attachment.fileSystemPath_modified];
         }
         else if(! [attachment.versionIdentifier_local isEqualToString:metadata.rev]){
             [self presentConflictViewForAttachment:attachment];
         }
         else{
-            [client uploadFile:[attachment.filename precomposedStringWithCanonicalMapping] toPath:[targetPath precomposedStringWithCanonicalMapping] withParentRev:attachment.versionIdentifier_local fromPath:attachment.fileSystemPath_modified];
+            [client uploadFile:[[path lastPathComponent] precomposedStringWithCanonicalMapping] toPath:[targetPath precomposedStringWithCanonicalMapping] withParentRev:attachment.versionIdentifier_local fromPath:attachment.fileSystemPath_modified];
         }
     }
 }
 
-- (void)restClient:(DBRestClient*)client metadataUnchangedAtPath:(NSString*)path{
-    DDLogVerbose(@"Metadata unchanged at path: %@", path);
-    
-}
 
 - (void)restClient:(ZPDBRestClient*) client loadMetadataFailedWithError:(NSError *)error {
     
@@ -325,7 +379,7 @@ const NSInteger ZPFILECHANNEL_DROPBOX_DOWNLOAD = 2;
             
             //Website snapshots do not use revision info in Dropbox
             
-            [[ZPServerConnection instance] finishedDownloadingAttachment:attachment toFileAtPath:localPath withVersionIdentifier:NULL usingFileChannel:self];
+            [[ZPServerConnection instance] finishedDownloadingAttachment:attachment toFileAtPath:localPath withVersionIdentifier:@"" usingFileChannel:self];
             [self cleanupAfterFinishingAttachment:attachment];
         }
     }
@@ -379,7 +433,9 @@ const NSInteger ZPFILECHANNEL_DROPBOX_DOWNLOAD = 2;
 
 - (void)sessionDidReceiveAuthorizationFailure:(DBSession *)session userId:(NSString *)userId{
     DDLogError(@"Authorization failure with Dropbox for user ID %@. Will unlink and attemp to relink later.",userId);
-    [[DBSession sharedSession] unlinkUserId:userId];
+    if(userId != NULL){
+        [[DBSession sharedSession] unlinkAll];
+    }
 }
 
 #pragma mark - Utility methdods
@@ -398,6 +454,7 @@ const NSInteger ZPFILECHANNEL_DROPBOX_DOWNLOAD = 2;
     @synchronized(progressViewsByRequest){
         [progressViewsByRequest removeObjectForKey:[self keyForRequest:[self requestWithAttachment:attachment]]];
     }
+
     [super cleanupAfterFinishingAttachment:attachment];
 }
 

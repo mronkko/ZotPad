@@ -39,6 +39,9 @@
 
 -(BOOL) useCache;
 -(BOOL) useDropbox;
+-(BOOL) dropboxHasFullControl;
+-(NSString*) dropboxPath;
+
 -(BOOL) reportErrors;
 
 -(NSString*) webDAVURL;

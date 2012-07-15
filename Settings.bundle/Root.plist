@@ -175,6 +175,14 @@
 			<string>webdavurl</string>
 		</dict>
 		<dict>
+			<key>Type</key>
+			<string>PSChildPaneSpecifier</string>
+			<key>Title</key>
+			<string>Advanced Dropbox settings</string>
+			<key>File</key>
+			<string>Dropbox</string>
+		</dict>
+		<dict>
 			<key>FooterText</key>
 			<string>These preferences will reset ZotPad data when it is next started.</string>
 			<key>Type</key>

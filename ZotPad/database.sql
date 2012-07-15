@@ -45,6 +45,7 @@ CREATE TABLE IF NOT EXISTS items (
     itemKey TEXT PRIMARY KEY,
     libraryID INT,
     title TEXT,
+    year INT DEFAULT NULL,
     fullCitation TEXT NOT NULL,
     itemType TEXT NOT NULL,
     cacheTimestamp TEXT DEFAULT NULL,
@@ -162,6 +163,7 @@ UNION SELECT "","itemType","thesis","Thesis"
 UNION SELECT "","itemType","videoRecording","Video Recording"
 UNION SELECT "","itemType","webpage","Web Page"
 UNION SELECT "","itemType","attachment","Attachment"
+UNION SELECT "","field","itemType","Item type"
 UNION SELECT "","field","numPages","# of Pages"
 UNION SELECT "","field","numberOfVolumes","# of Volumes"
 UNION SELECT "","field","abstractNote","Abstract"

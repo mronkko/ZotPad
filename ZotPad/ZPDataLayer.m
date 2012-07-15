@@ -109,7 +109,7 @@ static ZPDataLayer* _instance = nil;
 //These are hard coded for now. 
 - (NSArray*) fieldsThatCanBeUsedForSorting{
 
-    return [NSArray arrayWithObjects: @"dateAdded", @"dateModified", @"title", @"creator", @"type", @"date", @"publisher", @"publicationTitle", @"journalAbbreviation", @"language", @"accessDate", @"libraryCatalog", @"callNumber", @"rights", nil];
+    return [NSArray arrayWithObjects: @"dateAdded", @"dateModified", @"title", @"creator", @"itemType", @"date", @"publisher", @"publicationTitle", @"journalAbbreviation", @"language", @"accessDate", @"libraryCatalog", @"callNumber", @"rights", nil];
     //These are available through the API, but not used: @"addedBy" @"numItems"
 }
 

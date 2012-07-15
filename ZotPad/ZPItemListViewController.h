@@ -33,6 +33,9 @@
     NSInteger _animations;
     BOOL _hasContent;
     BOOL _invalidated;
+    
+    UIImageView* _sortDirectionArrow;
+
 
 }
 

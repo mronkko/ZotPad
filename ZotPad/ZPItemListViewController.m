@@ -203,7 +203,7 @@
     NSUserDefaults* defaults = [NSUserDefaults standardUserDefaults];
     [defaults setObject:orderField forKey:[NSString stringWithFormat: @"itemListView_sortButton%i",self.targetButton.tag]];
 
-    UILabel* label = (UILabel*)[self.targetButton.subviews objectAtIndex:1];
+    UILabel* label = (UILabel*)[self.targetButton.subviews lastObject];
     
     [label setText:[ZPLocalization getLocalizationStringWithKey:orderField type:@"field"]];
     
@@ -677,15 +677,15 @@
         
         //Show different things depending on what data we have
         if(item.creatorSummary!=NULL){
-            if(item.year!= 0){
-                authorsLabel.text = [NSString stringWithFormat:@"%@ (%i)",item.creatorSummary,item.year];
+            if(item.year != NULL){
+                authorsLabel.text = [NSString stringWithFormat:@"%@ (%@)",item.creatorSummary,item.year];
             }
             else{
                 authorsLabel.text = [NSString stringWithFormat:@"%@",item.creatorSummary];
             }
         }    
-        else if(item.year!= 0){
-            authorsLabel.text = [NSString stringWithFormat:@"No author (%i)",item.year];
+        else if(item.year!= NULL){
+            authorsLabel.text = [NSString stringWithFormat:@"No author (%@)",item.year];
         }
         
         //Publication as a formatted label
@@ -892,6 +892,7 @@
     }
     [_toolBar setItems:toobarItems];
     
+    _tagForActiveSortButton = -1;
     
     [self configureView];
 }
@@ -966,8 +967,6 @@
 
     
     if(_sortHelper!=NULL && [_sortHelper.popover isPopoverVisible]) [_sortHelper.popover dismissPopoverAnimated:YES];
-
-    _tagForActiveSortButton = [(UIView*)sender tag];
     
     //Because this preference is not used anywhere else, it is accessed directly.
     NSUserDefaults* defaults = [NSUserDefaults standardUserDefaults];
@@ -977,14 +976,32 @@
     }
         
     else{
-        if([orderField isEqualToString: _orderField ]){
-        _sortDescending = !_sortDescending;
+        if(_tagForActiveSortButton == [(UIView*)sender tag]){
+            _sortDescending = !_sortDescending;
         }
         else{
+
+            _tagForActiveSortButton = [(UIView*)sender tag];
+
+            if(_sortDirectionArrow!=NULL){
+                [_sortDirectionArrow removeFromSuperview];
+            }
+            else {
+                _sortDirectionArrow = [[UIImageView alloc] initWithImage:[UIImage imageNamed:@"icon-up-black.png"]];
+                _sortDirectionArrow.alpha = 0.25f;
+            }
+            
+            [(UIButton*)sender insertSubview:_sortDirectionArrow atIndex:1];
+            CGRect bounds = [(UIButton*)sender bounds];
+            _sortDirectionArrow.center = CGPointMake(bounds.size.width / 2, bounds.size.height / 2);
+            
             _orderField = orderField;
             _sortDescending = FALSE;
         }
-        
+
+        //TODO: consider storing the images
+        _sortDirectionArrow.image = [UIImage imageNamed:(_sortDescending ? @"icon-down-black.png":@"icon-up-black.png")];
+
         [self configureView];
     }
 
@@ -1044,7 +1061,14 @@
     
     ZPZoteroItem* item = (ZPZoteroItem*) [ZPZoteroItem dataObjectWithKey:[_itemKeysShown objectAtIndex:row]];
     
-    [ZPPreviewController displayQuicklookWithAttachment:[item.attachments objectAtIndex:0] sourceView:imageView];
+    ZPZoteroAttachment* attachment = [item.attachments objectAtIndex:0];
+    
+    if([attachment.linkMode intValue] == LINK_MODE_LINKED_URL && [ZPServerConnection instance]){
+        [[UIApplication sharedApplication] openURL:[NSURL URLWithString:attachment.url]];
+    }
+    else{
+        [ZPPreviewController displayQuicklookWithAttachment:attachment sourceView:imageView];
+    }
 }
 
 

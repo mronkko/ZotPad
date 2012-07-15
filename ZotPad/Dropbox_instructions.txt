@@ -1,0 +1,21 @@
+Zotero and Dropbox need to be linked with a symbolic link. The scripts included
+in this folder will setup the linking.
+
+WINDOWS: 
+
+Double click on the file "link_zotero_windows.vbs"
+
+MAC and LINUX/UNIX:
+
+Give the file "link_zotero_mac_unix.sh" execute permissions and run it.
+
+On Mac, the execute permissions are set with the Terminal.app. Lauch
+Terminal.app, and type "chmod a+x " without the quotes, with the trailing space,
+and without pressing enter. Then drag the file "link_zotero_mac_unix.sh" into 
+the terminal window and press enter. After this, you can run the script by
+double clicking it or by dragging it into Terminal.pp and pressing enter.
+
+If you decide to discontinue using ZotPad with Dropbox, you can remove the link
+by deleting the Apps/ZotPad folder.
+
+

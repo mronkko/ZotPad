@@ -8,11 +8,15 @@
 
 #import <UIKit/UIKit.h>
 #import "DDFileLogger.h"
+#import "DBRestClient.h"
 
-@interface ZPAppDelegate : UIResponder <UIApplicationDelegate>
+@interface ZPAppDelegate : UIResponder <UIApplicationDelegate, DBRestClientDelegate>{
+    DBRestClient* _restClient;
+}
 
 - (void) dismissViewControllerHierarchy;
 - (void) startAuthenticationSequence;
+- (void) _uploadFolderToDropBox:(DBRestClient*) client toPath:(NSString*)toPath fromPath:(NSString*) fromPath;
 
 @property (retain) DDFileLogger* fileLogger;
 @property (strong, nonatomic) UIWindow *window;

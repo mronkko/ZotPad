@@ -161,17 +161,19 @@ static NSCache* _objectCache = NULL;
         
 }
 
--(NSInteger) year{
+-(NSNumber*) year{
     NSString* value = [[self fields] objectForKey:@"date"];
+    
+    if(value == NULL) return NULL;
     
     NSRange r;
     NSString *regEx = @"[0-9]{4}";
     r = [value rangeOfString:regEx options:NSRegularExpressionSearch];
     
     if (r.location != NSNotFound) {
-        return [[value substringWithRange:r] integerValue];
+        return [NSNumber numberWithInteger:[[value substringWithRange:r] integerValue]];
     } else {
-    }   return 0; 
+    }   return NULL; 
 }
 
 
@@ -265,7 +267,7 @@ static NSCache* _objectCache = NULL;
 
     if(self.creatorSummary!=NULL && ! [self.creatorSummary isEqualToString:@""]){
         if(self.year!=0){
-            return [NSString stringWithFormat:@"%@ (%i) %@",self.creatorSummary,self.year,self.title];
+            return [NSString stringWithFormat:@"%@ (%@) %@",self.creatorSummary,self.year,self.title];
         }
         else{
             return [NSString stringWithFormat:@"%@ (no date) %@",self.creatorSummary,self.title];;

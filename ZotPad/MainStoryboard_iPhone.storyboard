@@ -246,7 +246,7 @@
                                 <rect key="frame" x="0.0" y="0.0" width="320" height="44"/>
                                 <autoresizingMask key="autoresizingMask" widthSizable="YES" flexibleMaxY="YES"/>
                                 <items>
-                                    <navigationItem title="Login to Zotero" id="ptL-59-1VP">
+                                    <navigationItem title="Log in to Zotero" id="ptL-59-1VP">
                                         <barButtonItem key="rightBarButtonItem" title="Back to start" id="Qx1-LJ-U0z">
                                             <connections>
                                                 <action selector="loadFirstPage:" destination="mdR-2R-M4d" id="thO-Cp-GqI"/>
@@ -584,6 +584,9 @@
                 <relationship kind="action" name="showManual:"/>
                 <relationship kind="outlet" name="logView" candidateClass="UITextView"/>
             </relationships>
+        </class>
+        <class className="ZPNavigationController" superclassName="UINavigationController">
+            <source key="sourceIdentifier" type="project" relativePath="./Classes/ZPNavigationController.h"/>
         </class>
         <class className="ZPUploadVersionConflictViewControllerViewController" superclassName="UIViewController">
             <source key="sourceIdentifier" type="project" relativePath="./Classes/ZPUploadVersionConflictViewControllerViewController.h"/>
