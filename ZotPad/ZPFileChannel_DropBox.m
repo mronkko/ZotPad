@@ -36,8 +36,8 @@ static const NSString* DROPBOX_SECRET = @"6azju842azhs5oz";
 
 #import "ZPSecrets.h"
 
-static const NSString* DROPBOX_KEY_FULL_ACCESS = @"mueanvefj1wo1e2";
-static const NSString* DROPBOX_KEY = @"w2aehbumzcus6vk";
+static const NSString* DROPBOX_KEY_FULL_ACCESS = @"6tpvh0msumv6plh";
+static const NSString* DROPBOX_KEY = @"nn6res38igpo4ec";
 
 #endif
 
@@ -49,14 +49,19 @@ static const NSString* DROPBOX_KEY = @"w2aehbumzcus6vk";
 @property BOOL overwriteConflicting;
 @property NSInteger tag;
 
--(void) _restClient:(ZPDBRestClient*)client processError:(NSError *)error;
--(NSString*) _pathForAttachment:(ZPZoteroAttachment*)attachment;
-
 @end
 
 @implementation ZPDBRestClient
 
 @synthesize attachment,revision,overwriteConflicting,tag;
+
+@end
+
+@interface ZPFileChannel_Dropbox()
+
+-(void) _restClient:(ZPDBRestClient*)client processError:(NSError *)error;
+-(NSString*) _pathForAttachment:(ZPZoteroAttachment*)attachment;
+-(NSString*) _URLForAttachment:(ZPZoteroAttachment*)attachment;
 
 @end
 
@@ -90,8 +95,10 @@ static const NSString* DROPBOX_KEY = @"w2aehbumzcus6vk";
         //Link with dropBox account if not already linked
 
         BOOL linked =[[DBSession sharedSession] isLinked];
-        if (!linked) {
-            
+        BOOL linking =[[DBSession sharedSession] isLinking];
+
+        if (!linked && ! linking) {
+
             //Run on main thread
             
             DDLogInfo(@"Linking Dropbox");
@@ -109,7 +116,6 @@ static const NSString* DROPBOX_KEY = @"w2aehbumzcus6vk";
                     [viewController dismissModalViewControllerAnimated:NO];
                     viewController = parent;
                 }
-                
                 [[DBSession sharedSession] linkFromController:viewController];
             }
             else {
@@ -122,7 +128,7 @@ static const NSString* DROPBOX_KEY = @"w2aehbumzcus6vk";
 -(id) init{ 
     
     [ZPFileChannel_Dropbox linkDroboxIfNeeded];
-
+    
     self = [super init]; 
     [DBSession sharedSession].delegate = self;
     
@@ -160,6 +166,22 @@ static const NSString* DROPBOX_KEY = @"w2aehbumzcus6vk";
     }
 }
 
+-(NSString*) _URLForAttachment:(ZPZoteroAttachment*)attachment{
+    
+#ifdef BETA
+    NSString* appFolder = @"ZotPad-beta";
+#else
+    NSString* appFolder = @"ZotPad";
+#endif
+
+    if([[ZPPreferences instance] dropboxHasFullControl]){
+        return [@"https://www.dropbox.com/home" stringByAppendingString:[self _pathForAttachment:attachment]];
+    }
+    else{
+        return [NSString stringWithFormat:@"https://www.dropbox.com/home/Apps/%@%@",appFolder,[self _pathForAttachment:attachment]];
+    }
+}
+
 #pragma mark - Downloads
 
 -(void) startDownloadingAttachment:(ZPZoteroAttachment*)attachment{
@@ -171,6 +193,7 @@ static const NSString* DROPBOX_KEY = @"w2aehbumzcus6vk";
     
     //TODO: consider pooling these
     ZPDBRestClient* restClient = [[ZPDBRestClient alloc] initWithSession:[DBSession sharedSession]];
+
     restClient.attachment = attachment;
     restClient.delegate = self;
     restClient.tag = ZPFILECHANNEL_DROPBOX_DOWNLOAD;
@@ -302,7 +325,7 @@ static const NSString* DROPBOX_KEY = @"w2aehbumzcus6vk";
     [self _restClient:client processError:error];
     
     ZPZoteroAttachment* attachment = client.attachment;
-    [[ZPServerConnection instance] failedDownloadingAttachment:attachment withError:error usingFileChannel:self];    
+    [[ZPServerConnection instance] failedDownloadingAttachment:attachment withError:error usingFileChannel:self fromURL:[self _URLForAttachment:attachment]];    
     [self cleanupAfterFinishingAttachment:attachment];
 
 }
@@ -395,7 +418,7 @@ static const NSString* DROPBOX_KEY = @"w2aehbumzcus6vk";
     [self _restClient:client processError:error];
     
     ZPZoteroAttachment* attachment = client.attachment;
-    [[ZPServerConnection instance] failedDownloadingAttachment:attachment withError:error usingFileChannel:self];
+    [[ZPServerConnection instance] failedDownloadingAttachment:attachment withError:error usingFileChannel:self fromURL:[self _URLForAttachment:attachment]];
     [self cleanupAfterFinishingAttachment:attachment];
 
 }
@@ -425,8 +448,20 @@ static const NSString* DROPBOX_KEY = @"w2aehbumzcus6vk";
     [self _restClient:client processError:error];
     
     ZPZoteroAttachment* attachment = [(ZPDBRestClient* )client attachment];
-    [[ZPServerConnection instance] failedUploadingAttachment:attachment withError:error usingFileChannel:self];
+    [[ZPServerConnection instance] failedUploadingAttachment:attachment withError:error usingFileChannel:self toURL:[self _URLForAttachment:attachment]];
     [self cleanupAfterFinishingAttachment:attachment];
+}
+
+
+-(void) removeProgressView:(UIProgressView*) progressView{
+    
+    @synchronized(progressViewsByRequest){
+        for (NSObject* key in progressViewsByRequest){
+            if([progressViewsByRequest objectForKey:key] == progressView){
+                [progressViewsByRequest removeObjectForKey:key];
+            }
+        }
+    }
 }
 
 #pragma DBSession delegate

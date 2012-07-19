@@ -127,7 +127,7 @@ CREATE TABLE IF NOT EXISTS localization (
     PRIMARY KEY (language,type,key)
 );
 
-INSERT INTO localization (language,type,key,value) SELECT "" AS languare, "itemType" AS type, "artwork" AS key, "Artwork" AS value
+INSERT INTO localization (language,type,key,value) SELECT "" AS language, "itemType" AS type, "artwork" AS key, "Artwork" AS value
 UNION SELECT "","itemType","audioRecording","Audio Recording"
 UNION SELECT "","itemType","bill","Bill"
 UNION SELECT "","itemType","blogPost","Blog Post"

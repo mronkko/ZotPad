@@ -548,6 +548,8 @@
 		A7200DEB14718DC1004347C9 /* ZPLibraryAndCollectionListViewController.m in Sources */ = {isa = PBXBuildFile; fileRef = A7200DEA14718DC1004347C9 /* ZPLibraryAndCollectionListViewController.m */; };
 		A7200DF614718F44004347C9 /* ZPDataLayer.m in Sources */ = {isa = PBXBuildFile; fileRef = A7200DF514718F44004347C9 /* ZPDataLayer.m */; };
 		A7200DF8147193C0004347C9 /* libsqlite3.dylib in Frameworks */ = {isa = PBXBuildFile; fileRef = A7200DF7147193C0004347C9 /* libsqlite3.dylib */; };
+		A7225CDC15B4B0D1008C5878 /* ZotPad-Info.plist in Resources */ = {isa = PBXBuildFile; fileRef = A7200DDC14718DC0004347C9 /* ZotPad-Info.plist */; };
+		A7225CDD15B4B0D9008C5878 /* ZotPad beta-Info.plist in Resources */ = {isa = PBXBuildFile; fileRef = A7CD077715161556007A8E1D /* ZotPad beta-Info.plist */; };
 		A72853F9147E319700D3FE97 /* ZPZoteroLibrary.m in Sources */ = {isa = PBXBuildFile; fileRef = A72853F8147E319600D3FE97 /* ZPZoteroLibrary.m */; };
 		A72853FD147E31B600D3FE97 /* ZPZoteroCollection.m in Sources */ = {isa = PBXBuildFile; fileRef = A72853FC147E31B500D3FE97 /* ZPZoteroCollection.m */; };
 		A72C3CA71487C9DA00F6744E /* MainStoryboard_iPad.storyboard in Resources */ = {isa = PBXBuildFile; fileRef = A72C3CA61487C9DA00F6744E /* MainStoryboard_iPad.storyboard */; };
@@ -641,6 +643,10 @@
 		A74B93EC15A8B6560073D303 /* iphone.pdf in Resources */ = {isa = PBXBuildFile; fileRef = A74B93E915A8B6560073D303 /* iphone.pdf */; };
 		A74B93ED15A8B6560073D303 /* UserManual.pdf in Resources */ = {isa = PBXBuildFile; fileRef = A74B93EA15A8B6560073D303 /* UserManual.pdf */; };
 		A74B93EE15A8B6560073D303 /* UserManual.pdf in Resources */ = {isa = PBXBuildFile; fileRef = A74B93EA15A8B6560073D303 /* UserManual.pdf */; };
+		A74F8E6A15B83D8500C72096 /* ZPItemListViewDataSource.m in Sources */ = {isa = PBXBuildFile; fileRef = A74F8E6915B83D8500C72096 /* ZPItemListViewDataSource.m */; };
+		A74F8E6B15B83D8500C72096 /* ZPItemListViewDataSource.m in Sources */ = {isa = PBXBuildFile; fileRef = A74F8E6915B83D8500C72096 /* ZPItemListViewDataSource.m */; };
+		A74F8E6E15B83DF100C72096 /* ZPMasterItemListViewController.m in Sources */ = {isa = PBXBuildFile; fileRef = A74F8E6D15B83DF100C72096 /* ZPMasterItemListViewController.m */; };
+		A74F8E6F15B83DF100C72096 /* ZPMasterItemListViewController.m in Sources */ = {isa = PBXBuildFile; fileRef = A74F8E6D15B83DF100C72096 /* ZPMasterItemListViewController.m */; };
 		A75E185F153405740046988C /* ioapi.c in Sources */ = {isa = PBXBuildFile; fileRef = A75E1855153405740046988C /* ioapi.c */; };
 		A75E1860153405740046988C /* ioapi.c in Sources */ = {isa = PBXBuildFile; fileRef = A75E1855153405740046988C /* ioapi.c */; };
 		A75E1861153405740046988C /* mztools.c in Sources */ = {isa = PBXBuildFile; fileRef = A75E1857153405740046988C /* mztools.c */; };
@@ -794,6 +800,8 @@
 		A7B051C015B187BF0049C5A2 /* icon-up-black.png in Resources */ = {isa = PBXBuildFile; fileRef = A7B051B915B187BF0049C5A2 /* icon-up-black.png */; };
 		A7B051C115B187BF0049C5A2 /* icon-up-black@2x.png in Resources */ = {isa = PBXBuildFile; fileRef = A7B051BA15B187BF0049C5A2 /* icon-up-black@2x.png */; };
 		A7B051C215B187BF0049C5A2 /* icon-up-black@2x.png in Resources */ = {isa = PBXBuildFile; fileRef = A7B051BA15B187BF0049C5A2 /* icon-up-black@2x.png */; };
+		A7B2BCC915B3E22500381E23 /* upgrade1.0to1.1.sql in Resources */ = {isa = PBXBuildFile; fileRef = A7B2BCC815B3E22500381E23 /* upgrade1.0to1.1.sql */; };
+		A7B2BCCA15B3E22500381E23 /* upgrade1.0to1.1.sql in Resources */ = {isa = PBXBuildFile; fileRef = A7B2BCC815B3E22500381E23 /* upgrade1.0to1.1.sql */; };
 		A7BD5EA315611F28003252EA /* NSAttributedString+Attributes.m in Sources */ = {isa = PBXBuildFile; fileRef = A7BD5E9315611F28003252EA /* NSAttributedString+Attributes.m */; settings = {COMPILER_FLAGS = "-fno-objc-arc"; }; };
 		A7BD5EA415611F28003252EA /* OHAttributedLabel.m in Sources */ = {isa = PBXBuildFile; fileRef = A7BD5E9515611F28003252EA /* OHAttributedLabel.m */; settings = {COMPILER_FLAGS = "-fno-objc-arc"; }; };
 		A7BD5EA915611F41003252EA /* OHAttributedLabel.m in Sources */ = {isa = PBXBuildFile; fileRef = A7BD5E9515611F28003252EA /* OHAttributedLabel.m */; settings = {COMPILER_FLAGS = "-fno-objc-arc"; }; };
@@ -1284,7 +1292,7 @@
 		A7200DD414718DC0004347C9 /* UIKit.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; name = UIKit.framework; path = System/Library/Frameworks/UIKit.framework; sourceTree = SDKROOT; };
 		A7200DD614718DC0004347C9 /* Foundation.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; name = Foundation.framework; path = System/Library/Frameworks/Foundation.framework; sourceTree = SDKROOT; };
 		A7200DD814718DC0004347C9 /* CoreGraphics.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; name = CoreGraphics.framework; path = System/Library/Frameworks/CoreGraphics.framework; sourceTree = SDKROOT; };
-		A7200DDC14718DC0004347C9 /* ZotPad-Info.plist */ = {isa = PBXFileReference; lastKnownFileType = text.plist.xml; path = "ZotPad-Info.plist"; sourceTree = "<group>"; };
+		A7200DDC14718DC0004347C9 /* ZotPad-Info.plist */ = {isa = PBXFileReference; lastKnownFileType = text.plist.xml; name = "ZotPad-Info.plist"; path = "/Users/mronkko/Documents/Software/ZotPad/ZotPad-Info.plist"; sourceTree = "<absolute>"; };
 		A7200DDE14718DC0004347C9 /* en */ = {isa = PBXFileReference; lastKnownFileType = text.plist.strings; name = en; path = en.lproj/InfoPlist.strings; sourceTree = "<group>"; };
 		A7200DE014718DC0004347C9 /* main.m */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.objc; path = main.m; sourceTree = "<group>"; };
 		A7200DE214718DC0004347C9 /* ZotPad-Prefix.pch */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = "ZotPad-Prefix.pch"; sourceTree = "<group>"; };
@@ -1407,6 +1415,10 @@
 		A74348D6147AB37A00DA6FC3 /* ZPAuthenticationDialog.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = ZPAuthenticationDialog.m; sourceTree = "<group>"; };
 		A74B93E915A8B6560073D303 /* iphone.pdf */ = {isa = PBXFileReference; lastKnownFileType = image.pdf; name = iphone.pdf; path = Docs/iphone.pdf; sourceTree = SOURCE_ROOT; };
 		A74B93EA15A8B6560073D303 /* UserManual.pdf */ = {isa = PBXFileReference; lastKnownFileType = image.pdf; name = UserManual.pdf; path = Docs/UserManual.pdf; sourceTree = SOURCE_ROOT; };
+		A74F8E6815B83D8500C72096 /* ZPItemListViewDataSource.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = ZPItemListViewDataSource.h; sourceTree = "<group>"; };
+		A74F8E6915B83D8500C72096 /* ZPItemListViewDataSource.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = ZPItemListViewDataSource.m; sourceTree = "<group>"; };
+		A74F8E6C15B83DF100C72096 /* ZPMasterItemListViewController.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = ZPMasterItemListViewController.h; sourceTree = "<group>"; };
+		A74F8E6D15B83DF100C72096 /* ZPMasterItemListViewController.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = ZPMasterItemListViewController.m; sourceTree = "<group>"; };
 		A75E1854153405740046988C /* crypt.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = crypt.h; sourceTree = "<group>"; };
 		A75E1855153405740046988C /* ioapi.c */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.c; path = ioapi.c; sourceTree = "<group>"; };
 		A75E1856153405740046988C /* ioapi.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = ioapi.h; sourceTree = "<group>"; };
@@ -1582,6 +1594,7 @@
 		A7B051B815B187BF0049C5A2 /* icon-down-black@x2.png */ = {isa = PBXFileReference; lastKnownFileType = image.png; name = "icon-down-black@x2.png"; path = "Icons/icon-down-black@x2.png"; sourceTree = SOURCE_ROOT; };
 		A7B051B915B187BF0049C5A2 /* icon-up-black.png */ = {isa = PBXFileReference; lastKnownFileType = image.png; name = "icon-up-black.png"; path = "Icons/icon-up-black.png"; sourceTree = SOURCE_ROOT; };
 		A7B051BA15B187BF0049C5A2 /* icon-up-black@2x.png */ = {isa = PBXFileReference; lastKnownFileType = image.png; name = "icon-up-black@2x.png"; path = "Icons/icon-up-black@2x.png"; sourceTree = SOURCE_ROOT; };
+		A7B2BCC815B3E22500381E23 /* upgrade1.0to1.1.sql */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = text; path = upgrade1.0to1.1.sql; sourceTree = "<group>"; };
 		A7BD5E9215611F28003252EA /* NSAttributedString+Attributes.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = "NSAttributedString+Attributes.h"; sourceTree = "<group>"; };
 		A7BD5E9315611F28003252EA /* NSAttributedString+Attributes.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = "NSAttributedString+Attributes.m"; sourceTree = "<group>"; };
 		A7BD5E9415611F28003252EA /* OHAttributedLabel.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = OHAttributedLabel.h; sourceTree = "<group>"; };
@@ -1724,8 +1737,12 @@
 		A70399AC1597034E002F4293 /* Item list */ = {
 			isa = PBXGroup;
 			children = (
+				A74F8E6815B83D8500C72096 /* ZPItemListViewDataSource.h */,
+				A74F8E6915B83D8500C72096 /* ZPItemListViewDataSource.m */,
 				A77B98DD14DE5CDB00132E9B /* ZPItemListViewController.h */,
 				A77B98DE14DE5CDB00132E9B /* ZPItemListViewController.m */,
+				A74F8E6C15B83DF100C72096 /* ZPMasterItemListViewController.h */,
+				A74F8E6D15B83DF100C72096 /* ZPMasterItemListViewController.m */,
 			);
 			name = "Item list";
 			sourceTree = "<group>";
@@ -1742,6 +1759,10 @@
 		A70399AF159703CD002F4293 /* Dialogs */ = {
 			isa = PBXGroup;
 			children = (
+				A77FD066159F750700774D50 /* ZPLogViewController.h */,
+				A77FD067159F750900774D50 /* ZPLogViewController.m */,
+				A7DBE6D115B2BA9300DA48C1 /* ZPHelpPopover.h */,
+				A7DBE6D215B2BA9300DA48C1 /* ZPHelpPopover.m */,
 				A7699E5A159B1AC7002F09DA /* ZPUploadVersionConflictViewControllerViewController.h */,
 				A7699E5B159B1AC7002F09DA /* ZPUploadVersionConflictViewControllerViewController.m */,
 				A79E6FE21531A06C00612DD9 /* ZPFileImportViewController.h */,
@@ -2134,21 +2155,21 @@
 			name = "Supporting Files";
 			sourceTree = "<group>";
 		};
+		A723A45F15B816E800D40EB7 /* Views */ = {
+			isa = PBXGroup;
+			children = (
+			);
+			name = Views;
+			sourceTree = "<group>";
+		};
 		A72853FE147E33F400D3FE97 /* User interface */ = {
 			isa = PBXGroup;
 			children = (
-				A7DBE6D115B2BA9300DA48C1 /* ZPHelpPopover.h */,
-				A7DBE6D215B2BA9300DA48C1 /* ZPHelpPopover.m */,
 				A786F7771476A56200B35B92 /* MainStoryboard_iPhone.storyboard */,
 				A72C3CA61487C9DA00F6744E /* MainStoryboard_iPad.storyboard */,
-				A79E6FE71531B00100612DD9 /* ZPSplitViewController.m */,
-				A79E6FE61531B00000612DD9 /* ZPSplitViewController.h */,
-				A71A166515A783DA007BB40D /* ZPNavigationController.h */,
-				A71A166615A783DA007BB40D /* ZPNavigationController.m */,
-				A77FD066159F750700774D50 /* ZPLogViewController.h */,
-				A77FD067159F750900774D50 /* ZPLogViewController.m */,
 				A7D3C08114AEE70F00DB975D /* ZPLocalization.h */,
 				A7D3C08214AEE70F00DB975D /* ZPLocalization.m */,
+				A7F36B3415B6B4B600492DC3 /* RootViewControllers */,
 				A7CD2322156B73A7001EA24A /* Library and collections list */,
 				A70399AC1597034E002F4293 /* Item list */,
 				A70399AD15970371002F4293 /* Item details */,
@@ -2161,7 +2182,7 @@
 		A72853FF147E343A00D3FE97 /* Data layer */ = {
 			isa = PBXGroup;
 			children = (
-				A7A3F94F147BAB6C00CA7266 /* database.sql */,
+				A7B2BCC715B3E1D600381E23 /* SQL */,
 				A7200DF414718F44004347C9 /* ZPDataLayer.h */,
 				A7200DF514718F44004347C9 /* ZPDataLayer.m */,
 				A702501B149B33E1004F2AAB /* ZPCacheController.h */,
@@ -2473,6 +2494,7 @@
 		A79D60141599DB3000F55C54 /* Attachments */ = {
 			isa = PBXGroup;
 			children = (
+				A723A45F15B816E800D40EB7 /* Views */,
 				A7093C2A15A4241300F7B5CF /* ZPAttachmentIconImageFactory.h */,
 				A7093C2B15A4241300F7B5CF /* ZPAttachmentIconImageFactory.m */,
 				A793153C14B185E800E1ABF0 /* ZPAttachmentFileInteractionController.h */,
@@ -2659,6 +2681,15 @@
 			name = Products;
 			sourceTree = "<group>";
 		};
+		A7B2BCC715B3E1D600381E23 /* SQL */ = {
+			isa = PBXGroup;
+			children = (
+				A7A3F94F147BAB6C00CA7266 /* database.sql */,
+				A7B2BCC815B3E22500381E23 /* upgrade1.0to1.1.sql */,
+			);
+			name = SQL;
+			sourceTree = "<group>";
+		};
 		A7BD5E8215611F28003252EA /* OHAttributedLabel */ = {
 			isa = PBXGroup;
 			children = (
@@ -2748,6 +2779,17 @@
 			path = GTM;
 			sourceTree = "<group>";
 		};
+		A7F36B3415B6B4B600492DC3 /* RootViewControllers */ = {
+			isa = PBXGroup;
+			children = (
+				A79E6FE71531B00100612DD9 /* ZPSplitViewController.m */,
+				A79E6FE61531B00000612DD9 /* ZPSplitViewController.h */,
+				A71A166515A783DA007BB40D /* ZPNavigationController.h */,
+				A71A166615A783DA007BB40D /* ZPNavigationController.m */,
+			);
+			name = RootViewControllers;
+			sourceTree = "<group>";
+		};
 		A7FC2EC515AB582100CF4A5B /* Dropbox setup scripts */ = {
 			isa = PBXGroup;
 			children = (
@@ -2768,6 +2810,7 @@
 				A7200DCC14718DC0004347C9 /* Sources */,
 				A7200DCD14718DC0004347C9 /* Frameworks */,
 				A7200DCE14718DC0004347C9 /* Resources */,
+				A7225CDB15B4AC8B008C5878 /* ShellScript */,
 			);
 			buildRules = (
 			);
@@ -3179,6 +3222,8 @@
 				A7B051BD15B187BF0049C5A2 /* icon-down-black@x2.png in Resources */,
 				A7B051BF15B187BF0049C5A2 /* icon-up-black.png in Resources */,
 				A7B051C115B187BF0049C5A2 /* icon-up-black@2x.png in Resources */,
+				A7B2BCC915B3E22500381E23 /* upgrade1.0to1.1.sql in Resources */,
+				A7225CDC15B4B0D1008C5878 /* ZotPad-Info.plist in Resources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
@@ -3484,12 +3529,27 @@
 				A7B051BE15B187BF0049C5A2 /* icon-down-black@x2.png in Resources */,
 				A7B051C015B187BF0049C5A2 /* icon-up-black.png in Resources */,
 				A7B051C215B187BF0049C5A2 /* icon-up-black@2x.png in Resources */,
+				A7B2BCCA15B3E22500381E23 /* upgrade1.0to1.1.sql in Resources */,
+				A7225CDD15B4B0D9008C5878 /* ZotPad beta-Info.plist in Resources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
 /* End PBXResourcesBuildPhase section */
 
 /* Begin PBXShellScriptBuildPhase section */
+		A7225CDB15B4AC8B008C5878 /* ShellScript */ = {
+			isa = PBXShellScriptBuildPhase;
+			buildActionMask = 2147483647;
+			files = (
+			);
+			inputPaths = (
+			);
+			outputPaths = (
+			);
+			runOnlyForDeploymentPostprocessing = 0;
+			shellPath = /bin/bash;
+			shellScript = "TARGET=\"$PROJECT_DIR/${PRODUCT_NAME}-Info.plist\"\necho $TARGET\nif [ ! -f \"$TARGET\" ]; then\necho \"missing file $TARGET\"\nexit 1;\nfi\n\n# the perl regex splits out the last part of a build number (ie: 1.1.1) and increments it by one\n# if you have a build number that is more than 3 components, add a '\\.\\d+' into the first part of the regex.\n\nNEW_VERSION=`/usr/libexec/PlistBuddy -c \"Print CFBundleVersion\" \"$TARGET\" | /usr/bin/perl -pe 's/(\\d+\\.\\d+\\.)(\\d+)/$1.($2+2)/eg'`\necho $NEW_VERSION;\n/usr/libexec/PListBuddy -c \"Set CFBundleVersion $NEW_VERSION\" \"$TARGET\"";
+		};
 		A7FC2ECA15ADFE3100CF4A5B /* Run Script */ = {
 			isa = PBXShellScriptBuildPhase;
 			buildActionMask = 2147483647;
@@ -3502,7 +3562,7 @@
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 			shellPath = /bin/bash;
-			shellScript = "TARGET=\"$PROJECT_DIR/${PRODUCT_NAME}-Info.plist\"\necho $TARGET\nif [ ! -f \"$TARGET\" ]; then\necho \"missing file $TARGET\"\nexit 1;\nfi\n\n# the perl regex splits out the last part of a build number (ie: 1.1.1) and increments it by one\n# if you have a build number that is more than 3 components, add a '\\.\\d+' into the first part of the regex.\n\nNEW_VERSION=`/usr/libexec/PlistBuddy -c \"Print CFBundleVersion\" \"$TARGET\" | /usr/bin/perl -pe 's/(\\d+\\.\\d+\\.)(\\d+)/$1.($2+1)/eg'`\necho $NEW_VERSION;\n/usr/libexec/PListBuddy -c \"Set CFBundleVersion $NEW_VERSION\" \"$TARGET\"";
+			shellScript = "TARGET=\"$PROJECT_DIR/${PRODUCT_NAME}-Info.plist\"\necho $TARGET\nif [ ! -f \"$TARGET\" ]; then\necho \"missing file $TARGET\"\nexit 1;\nfi\n\n# the perl regex splits out the last part of a build number (ie: 1.1.1) and increments it by one\n# if you have a build number that is more than 3 components, add a '\\.\\d+' into the first part of the regex.\n\nNEW_VERSION=`/usr/libexec/PlistBuddy -c \"Print CFBundleVersion\" \"$TARGET\" | /usr/bin/perl -pe 's/(\\d+\\.\\d+\\.)(\\d+)/$1.($2+2)/eg'`\necho $NEW_VERSION;\n/usr/libexec/PListBuddy -c \"Set CFBundleVersion $NEW_VERSION\" \"$TARGET\"";
 		};
 /* End PBXShellScriptBuildPhase section */
 
@@ -3657,6 +3717,8 @@
 				A7307C0015A6E51100A90BDF /* UIAlertView+Dropbox.m in Sources */,
 				A71A166715A783DA007BB40D /* ZPNavigationController.m in Sources */,
 				A7DBE6D315B2BA9400DA48C1 /* ZPHelpPopover.m in Sources */,
+				A74F8E6A15B83D8500C72096 /* ZPItemListViewDataSource.m in Sources */,
+				A74F8E6E15B83DF100C72096 /* ZPMasterItemListViewController.m in Sources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
@@ -3810,6 +3872,8 @@
 				A7307C0115A6E51100A90BDF /* UIAlertView+Dropbox.m in Sources */,
 				A71A166815A783DA007BB40D /* ZPNavigationController.m in Sources */,
 				A7DBE6D415B2BA9400DA48C1 /* ZPHelpPopover.m in Sources */,
+				A74F8E6B15B83D8500C72096 /* ZPItemListViewDataSource.m in Sources */,
+				A74F8E6F15B83DF100C72096 /* ZPMasterItemListViewController.m in Sources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
@@ -3915,7 +3979,7 @@
 				GCC_PRECOMPILE_PREFIX_HEADER = YES;
 				GCC_PREFIX_HEADER = "ZotPad/ZotPad-Prefix.pch";
 				HEADER_SEARCH_PATHS = /usr/include/libxml2;
-				INFOPLIST_FILE = "ZotPad/ZotPad-Info.plist";
+				INFOPLIST_FILE = "ZotPad-Info.plist";
 				INSTALL_GROUP = 70000;
 				LIBRARY_SEARCH_PATHS = (
 					"$(inherited)",
@@ -3944,8 +4008,9 @@
 				);
 				GCC_PRECOMPILE_PREFIX_HEADER = YES;
 				GCC_PREFIX_HEADER = "ZotPad/ZotPad-Prefix.pch";
+				GCC_PREPROCESSOR_DEFINITIONS = "DEBUG=1";
 				HEADER_SEARCH_PATHS = /usr/include/libxml2;
-				INFOPLIST_FILE = "ZotPad/ZotPad-Info.plist";
+				INFOPLIST_FILE = "ZotPad-Info.plist";
 				INSTALL_GROUP = 70000;
 				LIBRARY_SEARCH_PATHS = (
 					"$(inherited)",

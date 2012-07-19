@@ -20,9 +20,9 @@ static NSCache* _objectCache = NULL;
     
     NSString* key = [fields objectForKey:@"collectionKey"];
     
-    if(key == NULL)
+    if(key == NULL){
         [NSException raise:@"Key is null" format:@"ZPZoteroCollection cannot be instantiated with NULL key"];
-    
+    }
     
     if(_objectCache == NULL) _objectCache = [[NSCache alloc] init];
     
@@ -42,9 +42,9 @@ static NSCache* _objectCache = NULL;
 
 +(ZPZoteroCollection*) dataObjectWithKey:(NSObject*) key{
     
-    if(key == NULL)
+    if(key == NULL){
         [NSException raise:@"Key is null" format:@"ZPZoteroCollection cannot be instantiated with NULL key"];
-
+    }
     
     if(_objectCache == NULL) _objectCache = [[NSCache alloc] init];
     

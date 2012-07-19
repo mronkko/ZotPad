@@ -118,17 +118,6 @@ static ZPPreferences* _instance = nil;
 
 }
 
--(NSString*) defaultApplicationForContentType:(NSString*) type{
-    NSUserDefaults* defaults = [NSUserDefaults standardUserDefaults];
-    return [defaults objectForKey:[@"defaultApp_" stringByAppendingString:type]];
-}
-
--(void) setDefaultApplication:(NSString*) application forContentType:(NSString*) type{
-    NSUserDefaults* defaults = [NSUserDefaults standardUserDefaults];
-    return [defaults setObject:application forKey:[@"defaultApp_" stringByAppendingString:type]];    
-}
-
-
 -(void) checkAndProcessApplicationResetPreferences{
     
     NSUserDefaults* defaults = [NSUserDefaults standardUserDefaults];

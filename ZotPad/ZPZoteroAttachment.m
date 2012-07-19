@@ -84,10 +84,16 @@ NSInteger const VERSION_SOURCE_DROPBOX =3;
 +(ZPZoteroAttachment*) dataObjectForAttachedFile:(NSString*) filename{
 
     //Strip the file ending
-    filename = [[filename lastPathComponent] stringByDeletingPathExtension];
+    NSString* parsedFilename = [[filename lastPathComponent] stringByDeletingPathExtension];
     
     //Get the key from the filename
-    NSString* key =[[filename componentsSeparatedByString: @"_"] lastObject];
+    NSString* key =[[parsedFilename componentsSeparatedByString: @"_"] lastObject];
+    
+    //TODO: 
+    if(key == NULL || [key isEqualToString:@""]){
+        DDLogError(@"While scanning for files to upload, parsing filename %@ resulted in empty key",filename);
+        return NULL;
+    }
     
     ZPZoteroAttachment* attachment;
     //If this is a locally modified file or a version, strip the trailing - from the key
@@ -128,7 +134,15 @@ NSInteger const VERSION_SOURCE_DROPBOX =3;
         else path = [[self filename] stringByReplacingCharactersInRange:lastPeriod
                                                              withString:[NSString stringWithFormat:@"_%@%@.",self.key,suffix]];
     }
-    return  [[NSSearchPathForDirectoriesInDomains(NSDocumentDirectory, NSUserDomainMask, YES) objectAtIndex:0] stringByAppendingPathComponent:path];
+    
+    NSString* ret = [[NSSearchPathForDirectoriesInDomains(NSDocumentDirectory, NSUserDomainMask, YES) objectAtIndex:0] stringByAppendingPathComponent:path];
+
+    if(ret==nil){
+        NSString* reason = [NSString stringWithFormat:@"Parsing filename %@ (key: %@) resulted in null path",self.filename,self.key];
+        [NSException raise:reason format:reason];
+    }
+    
+    return ret;
     
 }
 

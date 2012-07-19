@@ -24,5 +24,6 @@
 @property (retain, nonatomic) NSNumber* currentlibraryID;
 @property (retain, nonatomic) NSString* currentCollectionKey;
 @property IBOutlet UIBarButtonItem* gearButton;
+@property IBOutlet UIBarButtonItem* cacheControllerPlaceHolder;
 
 @end

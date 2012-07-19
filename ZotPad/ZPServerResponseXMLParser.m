@@ -15,6 +15,10 @@
 
 @implementation ZPServerResponseXMLParser
 
+#ifdef DEBUG
+@synthesize fullResponse;
+#endif
+
 @synthesize parsedElements = _resultArray;
 
 - (id) init{

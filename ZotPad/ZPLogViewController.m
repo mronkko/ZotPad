@@ -76,19 +76,24 @@
 }
 
 -(IBAction)emailSupport:(id)sender{
-    mailController = [[MFMailComposeViewController alloc] init];
-    [mailController setSubject:@"Support request"];
-    [mailController setToRecipients:[NSArray arrayWithObject:@"support@zotpad.com"]];
-    [mailController setMessageBody:[NSString stringWithFormat:@"<Please describe your problem here>\n\n\n\nMy userID is %@ and API key is %@. My current log file is attached.",[[ZPPreferences instance] userID], [[ZPPreferences instance] OAuthKey], nil] isHTML:NO];
-    
-    ZPAppDelegate* appDelegate = (ZPAppDelegate*) [[UIApplication sharedApplication] delegate];
-    NSString* logPath = [appDelegate.fileLogger.logFileManager.sortedLogFilePaths objectAtIndex:0];
-    NSData* data = [NSData dataWithContentsOfFile:logPath];
-    [mailController addAttachmentData:data mimeType:@"text/plain" fileName:@"log.txt"];
-    
-    mailController.mailComposeDelegate = self;
-    
-    [self presentModalViewController:mailController animated:YES];     
+    if([MFMailComposeViewController canSendMail]){
+        mailController = [[MFMailComposeViewController alloc] init];
+        [mailController setSubject:@"Support request"];
+        [mailController setToRecipients:[NSArray arrayWithObject:@"support@zotpad.com"]];
+        [mailController setMessageBody:[NSString stringWithFormat:@"<Please describe your problem here>\n\n\n\nMy userID is %@ and API key is %@. My current log file is attached.",[[ZPPreferences instance] userID], [[ZPPreferences instance] OAuthKey], nil] isHTML:NO];
+        
+        ZPAppDelegate* appDelegate = (ZPAppDelegate*) [[UIApplication sharedApplication] delegate];
+        NSString* logPath = [appDelegate.fileLogger.logFileManager.sortedLogFilePaths objectAtIndex:0];
+        NSData* data = [NSData dataWithContentsOfFile:logPath];
+        [mailController addAttachmentData:data mimeType:@"text/plain" fileName:@"log.txt"];
+        
+        mailController.mailComposeDelegate = self;
+        
+        [self presentModalViewController:mailController animated:YES];     
+    }
+    else{
+        [[[UIAlertView alloc] initWithTitle:@"Email not available" message:@"Your device is not configured for sending email." delegate:NULL cancelButtonTitle:@"Cancel" otherButtonTitles:nil] show];
+    }
 }
 -(IBAction)dismiss:(id)sender{
     [self dismissModalViewControllerAnimated:YES];

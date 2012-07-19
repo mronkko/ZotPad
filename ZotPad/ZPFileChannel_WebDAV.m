@@ -169,7 +169,7 @@ NSInteger const ZPFILECHANNEL_WEBDAV_UPLOAD_REGISTER = 5;
     //Original was not found
     if(attachment==NULL){
         NSError* error = [[NSError alloc] initWithDomain:@"ZotPad" code:1 userInfo:[NSDictionary dictionaryWithObject:@"Original item does not exists on Zotero server." forKey:NSLocalizedDescriptionKey]];
-        [[ZPServerConnection instance] failedUploadingAttachment:attachment withError:error usingFileChannel:self];
+        [[ZPServerConnection instance] failedUploadingAttachment:attachment withError:error usingFileChannel:self toURL:NULL];
 
     }
     else{
@@ -317,6 +317,22 @@ NSInteger const ZPFILECHANNEL_WEBDAV_UPLOAD_REGISTER = 5;
 }
 
 
+-(void) removeProgressView:(UIProgressView*) progressView{
+
+    for(ASIHTTPRequest* request in [self allRequests]){
+        if(request.uploadProgressDelegate==progressView){
+            request.uploadProgressDelegate = NULL;
+        }
+        else if(request.downloadProgressDelegate!= NULL){
+            ZPFileChannel_WebDAV_ProgressDelegate* delegate = (ZPFileChannel_WebDAV_ProgressDelegate*) request.downloadProgressDelegate;
+            if(delegate.progressView == progressView){
+                request.downloadProgressDelegate = NULL;
+            }
+        }
+    }
+}
+
+
 #pragma mark - Callbacks
 
 - (void)requestFinished:(ASIHTTPRequest *)request{
@@ -379,7 +395,7 @@ NSInteger const ZPFILECHANNEL_WEBDAV_UPLOAD_REGISTER = 5;
                     DDLogError(errorMessage);
                     
                     NSError* error = [[NSError alloc] initWithDomain:[request.url host] code:request.responseStatusCode userInfo:[NSDictionary dictionaryWithObject:errorMessage forKey:NSLocalizedDescriptionKey]];
-                    [[ZPServerConnection instance] failedDownloadingAttachment:attachment withError:error usingFileChannel:self];
+                    [[ZPServerConnection instance] failedDownloadingAttachment:attachment withError:error usingFileChannel:self fromURL:[request.url absoluteString]];
                 }
                 else{
                     //Check that the file that we wanted exits
@@ -392,7 +408,7 @@ NSInteger const ZPFILECHANNEL_WEBDAV_UPLOAD_REGISTER = 5;
                         DDLogError(errorMessage);
                         
                         NSError* error = [[NSError alloc] initWithDomain:[request.url host] code:request.responseStatusCode userInfo:[NSDictionary dictionaryWithObject:errorMessage forKey:NSLocalizedDescriptionKey]];
-                        [[ZPServerConnection instance] failedDownloadingAttachment:attachment withError:error usingFileChannel:self];
+                        [[ZPServerConnection instance] failedDownloadingAttachment:attachment withError:error usingFileChannel:self fromURL:[request.url absoluteString]];
                     }
                     else{
                         NSString* md5 = [ZPZoteroAttachment md5ForFileAtPath:tempFile];
@@ -405,7 +421,7 @@ NSInteger const ZPFILECHANNEL_WEBDAV_UPLOAD_REGISTER = 5;
         
         else{
             NSError* error = [[NSError alloc] initWithDomain:[request.url host] code:request.responseStatusCode userInfo:[NSDictionary dictionaryWithObject:[NSString stringWithFormat:@"WebDAV request to %@ returned %@",request.url,request.responseStatusMessage] forKey:NSLocalizedDescriptionKey]];
-            [[ZPServerConnection instance] failedDownloadingAttachment:attachment withError:error usingFileChannel:self];
+            [[ZPServerConnection instance] failedDownloadingAttachment:attachment withError:error usingFileChannel:self fromURL:[request.url absoluteString]];
         }        
         
 
@@ -455,7 +471,7 @@ NSInteger const ZPFILECHANNEL_WEBDAV_UPLOAD_REGISTER = 5;
         else{
             NSError* error =[NSError errorWithDomain:request.url.host code:request.responseStatusCode userInfo:[NSDictionary dictionaryWithObject:request.responseStatusMessage forKey:NSLocalizedDescriptionKey]];
             [self cleanupAfterFinishingAttachment:attachment];
-            [[ZPServerConnection instance] failedUploadingAttachment:attachment withError:error usingFileChannel:self];
+            [[ZPServerConnection instance] failedUploadingAttachment:attachment withError:error usingFileChannel:self toURL:[request.url absoluteString]];
         }
     }
 }
@@ -488,10 +504,10 @@ NSInteger const ZPFILECHANNEL_WEBDAV_UPLOAD_REGISTER = 5;
     }
     
     if(request.tag == ZPFILECHANNEL_WEBDAV_DOWNLOAD){
-        [[ZPServerConnection instance] failedDownloadingAttachment:attachment withError:error usingFileChannel:self];
+        [[ZPServerConnection instance] failedDownloadingAttachment:attachment withError:error usingFileChannel:self fromURL:[request.url absoluteString]];
     }
     else{
-        [[ZPServerConnection instance] failedUploadingAttachment:attachment withError:error usingFileChannel:self];
+        [[ZPServerConnection instance] failedUploadingAttachment:attachment withError:error usingFileChannel:self toURL:[request.url absoluteString]];
     }
     
     [self cleanupAfterFinishingAttachment:attachment];

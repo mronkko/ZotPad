@@ -39,7 +39,9 @@ NSInteger const ZPATTACHMENTICONGVIEWCONTROLLER_TAG_PROGRESSVIEW = -4;
 NSInteger const ZPATTACHMENTICONGVIEWCONTROLLER_TAG_TITLELABEL = -5;
 
 
-@interface ZPAttachmentCarouselDelegate()
+@interface ZPAttachmentCarouselDelegate(){
+    NSMutableSet* _progressViews;
+}
 
 -(void) _toggleActionButtonState;
 -(BOOL) _fileExistsForAttachment:(ZPZoteroAttachment*) attachment;
@@ -57,6 +59,8 @@ NSInteger const ZPATTACHMENTICONGVIEWCONTROLLER_TAG_TITLELABEL = -5;
 @synthesize actionButton, attachmentCarousel, mode, show;
 
 -(id) init{
+    _progressViews = [[NSMutableSet alloc] init];
+    
     self = [super init];
 
     //Register self as observer for item downloads
@@ -67,9 +71,17 @@ NSInteger const ZPATTACHMENTICONGVIEWCONTROLLER_TAG_TITLELABEL = -5;
 }
 
 -(void) dealloc{
+    // Removes the progress views from FileChannels
+    @synchronized(_progressViews){
+        for(UIProgressView* progressView in _progressViews){
+            
+        }
+    }
     [[ZPDataLayer instance] removeItemObserver:self];
     [[ZPDataLayer instance] removeAttachmentObserver:self];
 }
+
+
 
 -(void) configureWithAttachmentArray:(NSArray*) attachments{
     _item = NULL;
@@ -199,6 +211,10 @@ NSInteger const ZPATTACHMENTICONGVIEWCONTROLLER_TAG_TITLELABEL = -5;
         
         [labelBackground addSubview: progressView];
         
+        @synchronized(_progressViews){
+            [_progressViews addObject:progressView];
+        }
+        
         errorLabel = [[UILabel alloc] initWithFrame:CGRectMake(labelSubviewOffset, labelSubviewOffset + labelSubviewHeight*.75, labelSubviewWidth, labelSubviewHeight*.25)];
         errorLabel.tag = ZPATTACHMENTICONGVIEWCONTROLLER_TAG_ERRORLABEL;
         errorLabel.backgroundColor = [UIColor clearColor];
@@ -283,8 +299,10 @@ NSInteger const ZPATTACHMENTICONGVIEWCONTROLLER_TAG_TITLELABEL = -5;
         
     }
     
-    // Assing a place holder icon while we wait for the previews to render
-    [ZPAttachmentIconImageFactory renderFileTypeIconForAttachment:attachment intoImageView:imageView];
+    // Assing a place holder icon if the current icon is null while we wait for the previews to render
+    if(imageView.image == nil){
+        [ZPAttachmentIconImageFactory renderFileTypeIconForAttachment:attachment intoImageView:imageView];
+    }
 }
 
 
@@ -567,11 +585,13 @@ NSInteger const ZPATTACHMENTICONGVIEWCONTROLLER_TAG_TITLELABEL = -5;
                 }
                 else if (mode==ZPATTACHMENTICONGVIEWCONTROLLER_MODE_UPLOAD){
                     progressView.hidden = FALSE;
+                    progressView.progress = 0.0f;
                     [[ZPServerConnection instance] useProgressView:progressView forUploadingAttachment:attachment];
                     view.userInteractionEnabled = TRUE;
                 }
                 else if (mode==ZPATTACHMENTICONGVIEWCONTROLLER_MODE_DOWNLOAD){
                     progressView.hidden = FALSE;
+                    progressView.progress = 0.0f;
                     [[ZPServerConnection instance] useProgressView:progressView forDownloadingAttachment:attachment];
                     view.userInteractionEnabled = FALSE;
                 }

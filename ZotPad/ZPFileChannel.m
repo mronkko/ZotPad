@@ -48,6 +48,10 @@
     //Does nothing by default
 }
 
+-(void) removeProgressView:(UIProgressView*) progressView{
+    //Does nothing by default
+}
+
  
  
 -(void) linkAttachment:(ZPZoteroAttachment*)attachment withRequest:(NSObject*)request{
@@ -62,6 +66,12 @@
         ret = [_requestsByAttachment objectForKey:attachment.key];
     }
     return ret;
+}
+
+-(NSArray*) allRequests{
+    @synchronized(self){
+        return [_requestsByAttachment allValues];
+    }
 }
 
 
@@ -83,12 +93,12 @@
     if(root.presentedViewController == NULL){
         [root performSegueWithIdentifier:@"FileUploadConflict" sender:sender];
     }
-    else if ([root.presentedViewController isKindOfClass:[ZPFileImportViewController class]]){
+    else if ([root.presentedViewController isKindOfClass:[ZPFileImportViewController class]] && [(ZPFileImportViewController*) root.presentedViewController isFullyPresented]){
         [root.presentedViewController performSegueWithIdentifier:@"FileUploadConflictFromDialog" sender:sender];
     }
     else{
-        [(ZPAppDelegate*)[UIApplication sharedApplication].delegate dismissViewControllerHierarchy];
-        [root performSegueWithIdentifier:@"FileUploadConflict" sender:sender];
+        //Delay one second and check again if this can be presented
+        [self performSelector:@selector(presentConflictViewForAttachment:) withObject:attachment afterDelay:(NSTimeInterval) 1];
     }
 
 }

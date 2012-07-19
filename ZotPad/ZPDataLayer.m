@@ -140,6 +140,7 @@ static ZPDataLayer* _instance = nil;
     }
     
     for(item in itemsToBeNotifiedAbout){
+        @synchronized(_itemObservers){
             NSEnumerator* e = [_itemObservers objectEnumerator];
             NSObject* id;
             
@@ -148,6 +149,7 @@ static ZPDataLayer* _instance = nil;
                     [(NSObject <ZPItemObserver>*) id notifyItemAvailable:item];
                 }
             }
+        }
     }
 }
 
@@ -253,14 +255,16 @@ static ZPDataLayer* _instance = nil;
 //Adds and removes observers. Because of concurrency issues we are not using mutable sets here.
 -(void) registerItemObserver:(NSObject<ZPItemObserver>*)observer{
     if(observer!=NULL){
-        _itemObservers = [_itemObservers setByAddingObject:observer];
+        @synchronized(_itemObservers){
+            [_itemObservers addObject:observer];
+        }
     }
 }
 -(void) removeItemObserver:(NSObject<ZPItemObserver>*)observer{
     if(observer!=NULL){
-        NSMutableSet* tempSet =[NSMutableSet setWithSet:_itemObservers];
-        [tempSet removeObject:observer];
-        _itemObservers = tempSet;
+        @synchronized(_itemObservers){
+            [_itemObservers removeObject:observer];
+        }
     }
 }
 

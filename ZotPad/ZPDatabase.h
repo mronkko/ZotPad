@@ -84,6 +84,7 @@
 // These take an array of ZPZotero* objects instead of a single objects because batch editing or inserting results in a significant performance boost
 
 - (void) writeLibraries:(NSArray*)libraries;
+- (void) removeLibrariesNotInArray:(NSArray*)libraries;
 - (void) writeCollections:(NSArray*)collections toLibrary:(ZPZoteroLibrary*)library;
 
 // This method returns an array containing the items that were actually modified in the DB. This can be used to determine if fields and attachments

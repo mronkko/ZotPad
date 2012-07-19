@@ -39,7 +39,7 @@
     self->level = level;
     
     dateFormatter = [[NSDateFormatter alloc] init];
-    [dateFormatter setDateFormat:@"dd-MM-yyyy HH:mm::ss"];
+    [dateFormatter setDateFormat:@"dd-MM-yyyy HH:mm:ss"];
     
     return self;
 }
@@ -82,9 +82,13 @@ didFinishLaunchingWithOptions:(NSDictionary *)launchOptions
     
     [TestFlight takeOff:@"5e753f234f33fc2bddf4437600037fbf_NjcyMjEyMDEyLTA0LTA5IDE0OjUyOjU0LjE4MDQwMg"];
 
-    TestFlightLogger* tfLogger = [[TestFlightLogger alloc] initWithTeamToken:@"5e753f234f33fc2bddf4437600037fbf_NjcyMjEyMDEyLTA0LTA5IDE0OjUyOjU0LjE4MDQwMg"];
-    tfLogger.logFormatter = [[ZPFileLogFormatter alloc] initWithLevel:LOG_LEVEL_VERBOSE];
-    [DDLog addLogger:tfLogger];
+//    TestFlightLogger* tfLogger = [[TestFlightLogger alloc] initWithTeamToken:@"5e753f234f33fc2bddf4437600037fbf_NjcyMjEyMDEyLTA0LTA5IDE0OjUyOjU0LjE4MDQwMg"];
+//    tfLogger.logFormatter = [[ZPFileLogFormatter alloc] initWithLevel:LOG_LEVEL_VERBOSE];
+//    [DDLog addLogger:tfLogger];
+    
+    //Perform a memory warning every X seconds
+//    [NSTimer scheduledTimerWithTimeInterval:(NSTimeInterval)10 target:[UIApplication sharedApplication] selector:@selector(_performMemoryWarning) userInfo:NULL repeats:YES];
+    
 #else
     if([[ZPPreferences instance] reportErrors]) [TestFlight takeOff:@"5e753f234f33fc2bddf4437600037fbf_NjcyMjEyMDEyLTA0LTA5IDE0OjUyOjU0LjE4MDQwMg"];
 
@@ -97,6 +101,8 @@ didFinishLaunchingWithOptions:(NSDictionary *)launchOptions
     self.fileLogger.logFormatter = [[ZPFileLogFormatter alloc] initWithLevel:LOG_LEVEL_INFO];
     [DDLog addLogger:self.fileLogger]; 
 
+    [DDTTYLogger sharedInstance].logFormatter = [[ZPFileLogFormatter alloc] initWithLevel:LOG_LEVEL_VERBOSE];
+    [DDLog addLogger:[DDTTYLogger sharedInstance]];
 
     
     DDLogInfo(@"%@ %@ (build %@)",
@@ -106,8 +112,6 @@ didFinishLaunchingWithOptions:(NSDictionary *)launchOptions
     DDLogVerbose(@"Verbose logging is enabled");
     
      //Manual override for userID and Key. Useful for running the code in debugger with other people's credentials.
-    
-
     /*
     NSUserDefaults* defaults = [NSUserDefaults standardUserDefaults];
     [defaults setObject:@"" forKey:@"userID"];
@@ -119,7 +123,6 @@ didFinishLaunchingWithOptions:(NSDictionary *)launchOptions
     */
     
     [[ZPPreferences instance] checkAndProcessApplicationResetPreferences];
-
      
     
     // Override point for customization after application launch.
@@ -212,12 +215,6 @@ didFinishLaunchingWithOptions:(NSDictionary *)launchOptions
                     NSString* fromPath = [[NSBundle mainBundle] pathForResource:[file stringByDeletingPathExtension] ofType:[file pathExtension]];
                     [_restClient uploadFile:file toPath:@"/" withParentRev:NULL fromPath:fromPath];
                 }
-
-                //Copy the mac installer bundle
-                
-                //[self _uploadFolderToDropBox:_restClient toPath:@"/" fromPath:[[NSBundle mainBundle] pathForResource:@"link_zotero_mac" ofType:@"app"]];
-
-            
             }
         }
         return YES;

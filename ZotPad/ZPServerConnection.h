@@ -55,7 +55,7 @@
 -(NSInteger) numberOfFilesDownloading;
 -(BOOL) checkIfCanBeDownloadedAndStartDownloadingAttachment:(ZPZoteroAttachment*)attachment;
 -(void) finishedDownloadingAttachment:(ZPZoteroAttachment*)attachment toFileAtPath:(NSString*) tempFile withVersionIdentifier:(NSString*) identifier usingFileChannel:(ZPFileChannel*)fileChannel;
--(void) failedDownloadingAttachment:(ZPZoteroAttachment*)attachment withError:(NSError*) error usingFileChannel:(ZPFileChannel*)fileChannel;
+-(void) failedDownloadingAttachment:(ZPZoteroAttachment*)attachment withError:(NSError*) error usingFileChannel:(ZPFileChannel*)fileChannel fromURL:(NSString*)url;
 -(void) cancelDownloadingAttachment:(ZPZoteroAttachment*)attachment;
 -(void) useProgressView:(UIProgressView*) progressView forDownloadingAttachment:(ZPZoteroAttachment*)attachment;
 -(BOOL) isAttachmentDownloading:(ZPZoteroAttachment*)attachment;
@@ -64,9 +64,12 @@
 -(NSInteger) numberOfFilesUploading;
 -(void) uploadVersionOfAttachment:(ZPZoteroAttachment*)attachment;
 -(void) finishedUploadingAttachment:(ZPZoteroAttachment*)attachment withVersionIdentifier:(NSString*)identifier;
--(void) failedUploadingAttachment:(ZPZoteroAttachment*)attachment withError:(NSError*) error usingFileChannel:(ZPFileChannel*)fileChannel;
+-(void) failedUploadingAttachment:(ZPZoteroAttachment*)attachment withError:(NSError*) error usingFileChannel:(ZPFileChannel*)fileChannel toURL:(NSString*)url;
 -(void) canceledUploadingAttachment:(ZPZoteroAttachment*)attachment usingFileChannel:(ZPFileChannel*)fileChannel;
 -(void) useProgressView:(UIProgressView*) progressView forUploadingAttachment:(ZPZoteroAttachment*)attachment;
 -(BOOL) isAttachmentUploading:(ZPZoteroAttachment*)attachment;
+
+-(void) removeProgressView:(UIProgressView*) progressView;
+
 
 @end

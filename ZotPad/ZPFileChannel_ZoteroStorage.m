@@ -283,10 +283,11 @@ NSInteger const ZPFILECHANNEL_ZOTEROSTORAGE_UPLOAD_REGISTER = 4;
         else if(request.tag == ZPFILECHANNEL_ZOTEROSTORAGE_UPLOAD_FILE && request.responseStatusCode == 201){
             DDLogInfo(@"Uploading file %@ to Zotero server finished succesfully",attachment.filename);
                 
-                //Register upload
-                ASIHTTPRequest* registerRequest = [self _baseRequestForAttachment:attachment type:ZPFILECHANNEL_ZOTEROSTORAGE_UPLOAD_REGISTER overWriteConflictingServerVersion:[(NSNumber*)[request.userInfo objectForKey:@"overwriteConflicting"] boolValue]];
-                [registerRequest setPostBody:[[NSString stringWithFormat:@"upload=%@",[request.userInfo objectForKey:@"uploadKey"]] dataUsingEncoding:NSASCIIStringEncoding]];
-                [registerRequest startAsynchronous];
+            //Register upload
+            ASIHTTPRequest* registerRequest = [self _baseRequestForAttachment:attachment type:ZPFILECHANNEL_ZOTEROSTORAGE_UPLOAD_REGISTER overWriteConflictingServerVersion:[(NSNumber*)[request.userInfo objectForKey:@"overwriteConflicting"] boolValue]];
+            registerRequest.userInfo = request.userInfo;
+            [registerRequest setPostBody:[[NSString stringWithFormat:@"upload=%@",[request.userInfo objectForKey:@"uploadKey"]] dataUsingEncoding:NSASCIIStringEncoding]];
+            [registerRequest startAsynchronous];
                 
         }
         else if(request.tag == ZPFILECHANNEL_ZOTEROSTORAGE_UPLOAD_REGISTER && request.responseStatusCode == 204){
@@ -318,7 +319,7 @@ NSInteger const ZPFILECHANNEL_ZOTEROSTORAGE_UPLOAD_REGISTER = 4;
             NSError* error =[NSError errorWithDomain:@"zotero.org" code:request.responseStatusCode userInfo:NULL];
             DDLogError(@"Uploading file %@ to Zotero server failed with error: %@",attachment.filename,request.responseStatusMessage);
             [self cleanupAfterFinishingAttachment:attachment];
-            [[ZPServerConnection instance] failedUploadingAttachment:attachment withError:error usingFileChannel:self];
+            [[ZPServerConnection instance] failedUploadingAttachment:attachment withError:error usingFileChannel:self toURL:[request.url absoluteURL]];
         }
     }
 }
@@ -340,17 +341,40 @@ NSInteger const ZPFILECHANNEL_ZOTEROSTORAGE_UPLOAD_REGISTER = 4;
     
     if(request.tag == ZPFILECHANNEL_ZOTEROSTORAGE_DOWNLOAD){
         DDLogError(@"Downloading file %@ from Zotero server failed with error: %@",attachment.filename, [error description]);
-        [[ZPServerConnection instance] failedDownloadingAttachment:attachment withError:error usingFileChannel:self];
+        [[ZPServerConnection instance] failedDownloadingAttachment:attachment withError:error usingFileChannel:self fromURL:[request.url absoluteString]];
     }
     else{
         DDLogError(@"Uploading failed %@ to Zotero server failed with error: %@",attachment.filename, [error description]);
-        [[ZPServerConnection instance] failedUploadingAttachment:attachment withError:error usingFileChannel:self];
+        [[ZPServerConnection instance] failedUploadingAttachment:attachment withError:error usingFileChannel:self toURL:[request.url absoluteString]];
     }
     
     //DDLogVerbose([self requestDumpAsString:request]);
 
     [self cleanupAfterFinishingAttachment:attachment];
 
+}
+
+-(void) removeProgressView:(UIProgressView*) progressView{
+    
+    for(ASIHTTPRequest* request in [self allRequests]){
+        if(request.uploadProgressDelegate==progressView){
+            request.uploadProgressDelegate = NULL;
+        }
+        else if(request.downloadProgressDelegate == progressView){
+            request.downloadProgressDelegate = NULL;
+        }
+        
+        if([request.userInfo objectForKey:@"progressView"] == progressView){
+            NSMutableDictionary* newUserInfo = [[NSMutableDictionary alloc] init];
+            
+            for(NSString* key in request.userInfo){
+                if(! [key isEqualToString:@"progressView"]){
+                    [newUserInfo setObject:[request.userInfo objectForKey:key] forKey:key];
+                }
+            }
+            request.userInfo = newUserInfo;
+        }
+    }
 }
 
 

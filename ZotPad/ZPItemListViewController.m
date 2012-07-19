@@ -15,20 +15,16 @@
 #import "ZPPreferences.h"
 #import "ZPAppDelegate.h"
 
-#import "DTCoreText.h";
-#import "OHAttributedLabel.h"
-#import "ZPAttachmentIconImageFactory.h"
-#import "ZPPreviewController.h"
+#import "ZPItemListViewDataSource.h"
 
 //TODO: Refactor so that these would not be needed
 #import "ZPServerConnection.h"
 #import "ZPDatabase.h"
 #import "ZPCacheController.h"
 
-#define SIZE_OF_TABLEVIEW_UPDATE_BATCH 25
-#define SIZE_OF_DATABASE_UPDATE_BATCH 50
-
 //A small helper class for performing configuration of uncanched items list in itemlistview
+
+//TODO: Refactor this away
 
 #pragma mark - Helper class for requesting item data from the server
 
@@ -39,23 +35,25 @@
     NSNumber* _libraryID;
     NSString* _orderField;
     BOOL _sortDescending;
+    ZPItemListViewDataSource* _itemListDataSource;
     ZPItemListViewController* _itemListController;
 }
 
--(id) initWithItemListController:(ZPItemListViewController*)itemListController;
+-(id) initWithItemListController:(ZPItemListViewDataSource*)itemListController dataSource:(ZPItemListViewDataSource*) dataSource ;
 
 @end
 
 @implementation ZPUncachedItemsOperation;
 
--(id) initWithItemListController:(ZPItemListViewController*)itemListController{
+-(id) initWithItemListController:(ZPItemListViewDataSource*)itemListController dataSource:(ZPItemListViewDataSource *)dataSource{
     self = [super init];
+    _itemListDataSource = dataSource;
     _itemListController=itemListController;
-    _searchString = itemListController.searchString;
-    _collectionKey = itemListController.collectionKey;
-    _libraryID = itemListController.libraryID;
-    _orderField = itemListController.orderField;
-    _sortDescending = itemListController.sortDescending;
+    _searchString = dataSource.searchString;
+    _collectionKey = dataSource.collectionKey;
+    _libraryID = dataSource.libraryID;
+    _orderField = dataSource.orderField;
+    _sortDescending = dataSource.sortDescending;
     
     return self;
 }
@@ -65,7 +63,7 @@
     if ( self.isCancelled ) return;
     //DDLogVerbose(@"Clearing table");
     
-    [_itemListController clearTable];
+    [_itemListDataSource clearTable];
     //DDLogVerbose(@"Retrieving cached keys");
     NSArray* cacheKeys= [[ZPDataLayer instance] getItemKeysFromCacheForLibrary:_libraryID collection:_collectionKey
                                                                   searchString:_searchString orderField:_orderField sortDescending:_sortDescending];
@@ -75,11 +73,11 @@
     if([cacheKeys count]>0){
         //DDLogVerbose(@"Configuring cached keys");
         
-        [_itemListController configureCachedKeys:cacheKeys];
+        [_itemListDataSource configureCachedKeys:cacheKeys];
     }
     
     if(![[ZPPreferences instance] online]){
-        [_itemListController configureUncachedKeys:[NSArray array]];
+        [_itemListDataSource configureUncachedKeys:[NSArray array]];
     }
     else{
         if ( self.isCancelled ) return;
@@ -127,13 +125,9 @@
         if ( self.isCancelled ) return;
         //DDLogVerbose(@"Setting server keys");
         
-        [_itemListController configureUncachedKeys:uncachedItems];
+        [_itemListDataSource configureUncachedKeys:uncachedItems];
+        [_itemListController performSelectorOnMainThread:@selector(makeAvailable) withObject:NULL waitUntilDone:FALSE];        
     }
-    
-    
-    
-    
-    
     
 }
 @end
@@ -189,6 +183,7 @@
 - (UITableViewCell *)tableView:(UITableView *)tableView cellForRowAtIndexPath:(NSIndexPath *)indexPath{
     UITableViewCell* cell = [[UITableViewCell alloc] init];
     cell.textLabel.text = [_fieldTitles objectAtIndex:indexPath.row];
+
     return cell;
 }
 
@@ -224,35 +219,22 @@
     NSOperationQueue* _uiEventQueue;
     ZPItemListViewController_sortHelper* _sortHelper;
     UIView* _overlay;
+    ZPItemListViewDataSource* _dataSource;
 }
 
-
-
--(void) _updateRowForItem:(ZPZoteroItem*)item;
--(void) _performRowInsertions:(NSArray*)insertIndexPaths reloads:(NSArray*)reloadIndexPaths tableLength:(NSNumber*)tableLength;
--(void) _performTableUpdates:(BOOL)animated;
--(void) _refreshCellAtIndexPaths:(NSArray*)indexPath;
 -(void) _configureSortButton:(UIButton*)button;
 
 @end
 
 @implementation ZPItemListViewController
 
-@synthesize collectionKey = _collectionKey;
-@synthesize libraryID =  _libraryID;
-@synthesize searchString = _searchString;
-@synthesize orderField = _orderField;
-@synthesize sortDescending = _sortDescending;
+
 
 @synthesize masterPopoverController = _masterPopoverController;
 
-@synthesize tableView = _ownedTableView;
+@synthesize tableView = _tableView;
 @synthesize searchBar = _searchBar;
 @synthesize toolBar = _toolBar;
-
-@synthesize itemKeysShown = _itemKeysShown;
-@synthesize itemDetailViewController =  _itemDetailViewController;
-@synthesize targetTableView = _tableView;
 
 - (void)didReceiveMemoryWarning
 {
@@ -266,27 +248,24 @@
 {
     //Clear item keys shown so that UI knows to stop drawing the old items
 
-    if(_libraryID!=0){
+    if(_dataSource.libraryID!=0){
 
-        [[ZPDataLayer instance] removeItemObserver:self];
-        
         if([NSThread isMainThread]){
             
             //Set the navigation item
             
-            if(_collectionKey != NULL){
-                ZPZoteroCollection* currentCollection = [ZPZoteroCollection dataObjectWithKey:_collectionKey];
+            if(_dataSource.collectionKey != NULL){
+                ZPZoteroCollection* currentCollection = [ZPZoteroCollection dataObjectWithKey:_dataSource.collectionKey];
                 self.navigationItem.title = currentCollection.title;
             }
             else {
-                ZPZoteroLibrary* currentLibrary = [ZPZoteroLibrary dataObjectWithKey:_libraryID];
+                ZPZoteroLibrary* currentLibrary = [ZPZoteroLibrary dataObjectWithKey:_dataSource.libraryID];
                 self.navigationItem.title = currentLibrary.title;
             }
 
             if (self.masterPopoverController != nil) {
                 [self.masterPopoverController dismissPopoverAnimated:YES];
             }
-            
             
             [self makeAvailable];
             
@@ -298,7 +277,7 @@
             
             //This queue is only used for retrieving key lists for uncahced items, so we can just invalidate all previous requests
             [_uiEventQueue cancelAllOperations];
-            ZPUncachedItemsOperation* operation = [[ZPUncachedItemsOperation alloc] initWithItemListController:self];
+            ZPUncachedItemsOperation* operation = [[ZPUncachedItemsOperation alloc] initWithItemListController:self dataSource:_dataSource];
             [_uiEventQueue addOperation:operation];
             //DDLogVerbose(@"UI update events in queue %i",[_uiEventQueue operationCount]);
             
@@ -310,57 +289,6 @@
     }
 }
 
-/*
- Called from data layer to notify that there is data for this view and it can be shown
- */
-
-- (void)clearTable{
-    
-    _invalidated = TRUE;
-    
-    @synchronized(_tableView){
-        
-        BOOL needsReload = [self tableView:_tableView numberOfRowsInSection:0]>1;
-        
-        _itemKeysNotInCache = [NSMutableArray array];
-        _itemKeysShown = [NSArray array];
-        
-        //We do not need to observe for new item events if we do not have a list of unknown keys available
-        [[ZPDataLayer instance] removeItemObserver:self];
-        
-        //TODO: Investigate why a relaodsection call a bit below causes a crash. Then uncomment these both.
-        //[_tableView reloadSections:[NSIndexSet indexSetWithIndex:0] withRowAnimation:UITableViewRowAnimationAutomatic];
-        if(needsReload){
-            [_tableView performSelectorOnMainThread:@selector(reloadData) withObject:NULL waitUntilDone:YES];
-            //DDLogVerbose(@"Reloaded data (1). Number of rows now %i",[self tableView:_tableView  numberOfRowsInSection:0]);
-        }
-    }
-}
-
-- (void) configureCachedKeys:(NSArray*)array{
-    
-    @synchronized(_tableView){
-        
-        _itemKeysShown = array;
-        [_tableView performSelectorOnMainThread:@selector(reloadData) withObject:NULL waitUntilDone:YES];
-        //DDLogVerbose(@"Reloaded data (2). Number of rows now %i",[self tableView:_tableView  numberOfRowsInSection:0]);
-        
-    }
-}
-
-
-- (void) configureUncachedKeys:(NSArray*)uncachedItems{
-    
-    //Only update the uncached keys if we are still showing the same item key list
-    _itemKeysNotInCache = [NSMutableArray arrayWithArray:uncachedItems];
-    _invalidated = FALSE;
-    [[ZPDataLayer instance] registerItemObserver:self];
-    [self _performTableUpdates:FALSE];
-    [self performSelectorOnMainThread:@selector(makeAvailable) withObject:NULL waitUntilDone:NO];
-    //DDLogVerbose(@"Configured uncached keys");
-    
-    
-}
 
 //If we are not already displaying an activity view, do so now
 
@@ -388,393 +316,22 @@
             [self performSelectorOnMainThread:@selector(makeAvailable) withObject:nil waitUntilDone:NO];
         }   
     }
-
-}
-        
-        
-#pragma mark - Receiving data and updating the table view
-
--(void) _performTableUpdates:(BOOL)animated{
     
-    //DDLogVerbose(@"Start table updates");
-    //Only one thread at a time
-    @synchronized(self){
-        //Get a pointer to an array to know if another thread has changed this in the background
-        NSArray* thisItemKeys = _itemKeysShown;
-        
-        //Copy the array to be safe from accessing it using multiple threads
-        NSMutableArray* newItemKeysShown = [NSMutableArray arrayWithArray:_itemKeysShown];
-        
-        NSArray* newKeys = [[ZPDataLayer instance] getItemKeysFromCacheForLibrary:self.libraryID collection:self.collectionKey
-                                                                     searchString:[self.searchString stringByTrimmingCharactersInSet:[NSCharacterSet whitespaceAndNewlineCharacterSet]]orderField:self.orderField sortDescending:self.sortDescending];
-        
-        
-        //If there is a new set of items loaded, return without performing any updates. 
-        if(thisItemKeys != _itemKeysShown || _invalidated) return;
-        
-        //DDLogVerbose(@"Beging updating the table rows: Known keys befor update %i. Unknown keys %i. New keys %i",[_itemKeysShown count],[_itemKeysNotInCache count],[newKeys count]);
-        
-        @synchronized(_itemKeysNotInCache){
-            [_itemKeysNotInCache removeObjectsInArray:newKeys];
-        }
-        
-        NSInteger index=0;
-        NSMutableArray* reloadIndices = [NSMutableArray array];
-        NSMutableArray* insertIndices = [NSMutableArray array];
-        
-        for(NSString* newKey in newKeys){
-            //If there is a new set of items loaded, return without performing any updates. 
-            if(thisItemKeys != _itemKeysShown || _invalidated ) return;
-            
-            //First index contains a placeholder cell
-            
-            if([newItemKeysShown count] == index){
-                // //DDLogVerbose(@"Adding item %@ at %i",newKey,index);
-                [newItemKeysShown addObject:newKey];
-                if(index==0) [reloadIndices addObject:[NSIndexPath indexPathForRow:index inSection:0]];
-                else [insertIndices addObject:[NSIndexPath indexPathForRow:index inSection:0]];
-            }
-            else if([newItemKeysShown objectAtIndex:index] == [NSNull null]){
-                // //DDLogVerbose(@"Replacing NULL with %@ at %i",newKey,index);
-                [newItemKeysShown replaceObjectAtIndex:index withObject:newKey];
-                [reloadIndices addObject:[NSIndexPath indexPathForRow:index inSection:0]];
-            }
-            
-            //There is something in the way, so we need to either insert or move
-            else if(![newKey isEqualToString:[newItemKeysShown objectAtIndex:index]]){
-                
-                //We found that a shown key does not match the data on server
-                
-                NSInteger oldIndex = [newItemKeysShown indexOfObject:newKey];
-                
-                //If the new data cannot be found in the view, insert it
-                if(oldIndex==NSNotFound){
-                    //   //DDLogVerbose(@"Inserting %@ at %i",newKey,index);
-                    [newItemKeysShown insertObject:newKey atIndex:index];
-                    [insertIndices addObject:[NSIndexPath indexPathForRow:index inSection:0]];
-                }
-                //Else move it
-                else{
-                    // //DDLogVerbose(@"Moving %@ from %i to %i",newKey,oldIndex,index);
-                    
-                    //Instead of performing a move operation, we are just replacing the old location with null. This because of thread safety.
-                    
-                    [newItemKeysShown replaceObjectAtIndex:oldIndex withObject:[NSNull null]];
-                    [newItemKeysShown insertObject:newKey atIndex:index];
-                    [insertIndices addObject:[NSIndexPath indexPathForRow:index inSection:0]];
-                    [reloadIndices addObject:[NSIndexPath indexPathForRow:oldIndex inSection:0]];
-                }
-            }
-            index++;
-        }
-        
-        //Add empty rows to the end if there are still unknown rows
-        @synchronized(_itemKeysNotInCache){
-            while([newItemKeysShown count]<([_itemKeysNotInCache count] + [newKeys count])){
-                //            //DDLogVerbose(@"Padding with null %i (Unknown keys: %i, Known keys: %i)",[newItemKeysShown count],[_itemKeysNotInCache count],[newKeys count]);
-                if([newItemKeysShown count]==0)
-                    [reloadIndices addObject:[NSIndexPath indexPathForRow:0 inSection:0]];
-                else{
-                    [insertIndices addObject:[NSIndexPath indexPathForRow:[newItemKeysShown count] inSection:0]];
-                }
-                [newItemKeysShown addObject:[NSNull null]];
-            }
-        }
-        
-        @synchronized(_tableView){
-            
-            if(thisItemKeys != _itemKeysShown || _invalidated) return;
-            
-            _itemKeysShown = newItemKeysShown;
-            
-            NSNumber* tableLength = [NSNumber numberWithInt:[_itemKeysNotInCache count] + [newKeys count]];
-            //DDLogVerbose(@"Items found from DB %i, items that are still uncached %i",[newKeys count],[_itemKeysNotInCache count]);
-            if(animated){
-                SEL selector = @selector(_performRowInsertions:reloads:tableLength:);
-                NSMethodSignature* signature = [[self class] instanceMethodSignatureForSelector:selector];
-                NSInvocation* invocation  = [NSInvocation invocationWithMethodSignature:signature];
-                [invocation setTarget:self];
-                [invocation setSelector:selector];
-                
-                //Set arguments
-                [invocation setArgument:&insertIndices atIndex:2];
-                [invocation setArgument:&reloadIndices atIndex:3];
-                [invocation setArgument:&tableLength atIndex:4];
-                
-                
-                [invocation performSelectorOnMainThread:@selector(invoke) withObject:NULL waitUntilDone:YES];
-            }
-            else{
-                if([tableLength intValue]>[_itemKeysShown count]){
-                    _itemKeysShown = [_itemKeysShown subarrayWithRange:NSMakeRange(0,[tableLength intValue])];
-                }
-                [_tableView performSelectorOnMainThread:@selector(reloadData) withObject:NULL waitUntilDone:YES];
-            }
-            //DDLogVerbose(@"End updating the table rows");
-            
-            if([_itemKeysNotInCache count] == 0){
-                [_activityIndicator stopAnimating];   
-            }
-            
-        }
-    }
-}
-
-
--(void) _performRowInsertions:(NSArray*)insertIndexPaths reloads:(NSArray*)reloadIndexPaths tableLength:(NSNumber*)tableLength{
-    //DDLogVerbose(@"Modifying the table. Inserts %i Reloads %i, Max length %@, Item key array length %i",[insertIndexPaths count],[reloadIndexPaths count],tableLength,[_itemKeysShown count]);
-    //    [_tableView beginUpdates];
-    //DDLogVerbose(@"Insert index paths %@",insertIndexPaths);
-    if([insertIndexPaths count]>0){
-        [_tableView insertRowsAtIndexPaths:insertIndexPaths withRowAnimation:_animations];   
-    }
-    //DDLogVerbose(@"Reload index paths %@",reloadIndexPaths);
-    if([reloadIndexPaths count]>0){
-        [_tableView reloadRowsAtIndexPaths:reloadIndexPaths withRowAnimation:_animations];   
-    }
-    
-    if([tableLength intValue]<[_itemKeysShown count]){
-        NSMutableArray* deleteIndexPaths = [NSMutableArray array];
-        
-        NSInteger max = [_itemKeysShown count];
-        for(NSInteger i=[tableLength intValue];i<max;i++){
-            [deleteIndexPaths addObject:[NSIndexPath indexPathForRow:i inSection:0]];
-        }
-        
-        _itemKeysShown = [_itemKeysShown subarrayWithRange:NSMakeRange(0,[tableLength intValue])];
-        //DDLogVerbose(@"Delete index paths %@",deleteIndexPaths);
-        //DDLogVerbose(@"Deletes %i",[deleteIndexPaths count]);
-        
-        [_tableView deleteRowsAtIndexPaths:deleteIndexPaths withRowAnimation:_animations];
-    }
-    
-    //    [_tableView endUpdates];
-}
-
--(void) _updateRowForItem:(ZPZoteroItem*)item{
-    NSIndexPath* indexPath = [NSIndexPath indexPathForRow:[_itemKeysShown indexOfObject:item.key] inSection:0];
-    //Do not reload cell if it is selected
-    if(! [[_tableView indexPathForSelectedRow] isEqual:indexPath]) [_tableView reloadRowsAtIndexPaths:[NSArray arrayWithObject:indexPath] withRowAnimation:_animations];
-}
-
-
--(void) notifyItemAvailable:(ZPZoteroItem *)item{
-    
-    //DDLogVerbose(@"Received item %@",item.fullCitation);
-    
-    @synchronized(self){
-        
-        BOOL found = FALSE;
-        BOOL update = FALSE;
-        @synchronized(_itemKeysNotInCache){
-            if([_itemKeysNotInCache containsObject:item.key]){
-                [_itemKeysNotInCache removeObject:item.key];
-                found=TRUE;
-            }
-            //DDLogVerbose(@"Item keys not in cache deacreased to %i after removing key %@",[_itemKeysNotInCache count],item.key);
-            
-            //Update the view if we have received sufficient number of new items
-            update = ([_itemKeysNotInCache count] % SIZE_OF_DATABASE_UPDATE_BATCH ==0 ||
-                      [_itemKeysShown count] == 0 ||
-                      [_itemKeysShown lastObject]!=[NSNull null]);
-            
-        }
-        
-        
-        if(found){
-            
-            if(update){  
-                _animations = UITableViewRowAnimationAutomatic;
-                [self _performTableUpdates:TRUE];
-            }
-        }
-        else if([_itemKeysShown containsObject:item.key]){
-            //Update the row only if the full citation for this item has changed 
-            @synchronized(_tableView){
-                [self performSelectorOnMainThread:@selector(_updateRowForItem:) withObject:item waitUntilDone:YES];
-            }
-        }
-    }    
-}
-/*
-- (void) _refreshCellAtIndexPaths:(NSArray*)indexPaths{
-    [_tableView reloadRowsAtIndexPaths:indexPaths withRowAnimation:UITableViewRowAnimationFade];
-
-}
-*/
-#pragma mark - Table view data source and delegate methods
-
-
-- (NSInteger)tableView:(UITableView *)aTableView numberOfRowsInSection:(NSInteger)section {
-    // Return the number of rows in the section. Initially there is no library selected, so we will just return an empty view
-    NSInteger count=1;
-    if(_itemKeysShown!=nil){
-        count= MAX(1,[_itemKeysShown count]);
-    }
-    //DDLogVerbose(@"Item table has now %i rows",count);
-    return count;
-}
-
-
-- (UITableViewCell *)tableView:(UITableView *)aTableView cellForRowAtIndexPath:(NSIndexPath *)indexPath {
-    
-    //DDLogVerbose(@"Getting cell for row %i",indexPath.row);
-
-   
-    //If the data has become invalid, return a cell 
-
-    if(indexPath.row>=[_itemKeysShown count]){
-        NSString* identifier;
-        if(_libraryID==0){
-            identifier = @"ChooseLibraryCell";   
-        }
-        else if(_invalidated){
-            identifier = @"BlankCell";
-        }
-        else{
-            identifier=@"NoItemsCell";
-        }
-        //DDLogVerbose(@"Cell identifier is %@",identifier);
-        
-        return [aTableView dequeueReusableCellWithIdentifier:identifier];
-    }
-    NSObject* keyObj = [_itemKeysShown objectAtIndex: indexPath.row];
-
-
-    
-    NSString* key;
-    if(keyObj==[NSNull null] || keyObj==NULL){
-        key=@"";
-    }    
-    else{
-        key= (NSString*) keyObj;
-    }    
-    
-	UITableViewCell* cell;
-    
-        
-    ZPZoteroItem* item=NULL;
-    if(![key isEqualToString:@""]) item = (ZPZoteroItem*) [ZPZoteroItem dataObjectWithKey:key];
-    
-    if(item==NULL){
-        cell = [aTableView dequeueReusableCellWithIdentifier:@"LoadingCell"]; 
-        //DDLogVerbose(@"Cell identifier is LoadingCell");
-        
-        //Row number
-        UILabel* rowNumber = (UILabel *) [cell viewWithTag:5];
-        if(rowNumber != NULL) rowNumber.text=[NSString stringWithFormat:@"%i",indexPath.row+1];
-    }
-    else{
-        
-        cell = [aTableView dequeueReusableCellWithIdentifier:@"ZoteroItemCell"];
-        //DDLogVerbose(@"Cell identifier is ZoteroItemCell");
-        //DDLogVerbose(@"Item with key %@ has full citation %@",item.key,item.fullCitation);
-        
-        UILabel *titleLabel = (UILabel *)[cell viewWithTag:1];
-        titleLabel.text = item.title;
-        
-        UILabel *authorsLabel = (UILabel *)[cell viewWithTag:2];
-        
-        //Show different things depending on what data we have
-        if(item.creatorSummary!=NULL){
-            if(item.year != NULL){
-                authorsLabel.text = [NSString stringWithFormat:@"%@ (%@)",item.creatorSummary,item.year];
-            }
-            else{
-                authorsLabel.text = [NSString stringWithFormat:@"%@",item.creatorSummary];
-            }
-        }    
-        else if(item.year!= NULL){
-            authorsLabel.text = [NSString stringWithFormat:@"No author (%@)",item.year];
-        }
-        
-        //Publication as a formatted label
-        
-        OHAttributedLabel* publishedInLabel = (OHAttributedLabel*)[cell viewWithTag:3];
-      
-        
-        
-        if(publishedInLabel != NULL){
-
-            NSString* publishedIn = item.publicationDetails;
-            
-            if(publishedIn == NULL){
-                publishedIn=@"";   
-            }
-            
-            NSAttributedString* text = [[NSAttributedString alloc] initWithHTMLData:[publishedIn dataUsingEncoding:NSUTF8StringEncoding]  documentAttributes:NULL];
-                                        
-            //Font size of TTStyledTextLabel cannot be set in interface builder, so must be done here
-            [publishedInLabel setFont:[UIFont systemFontOfSize:[UIFont smallSystemFontSize]]];
-            [publishedInLabel setAttributedText:text];
-        }
-        
-        //Attachment icon
-        
-        UIImageView* articleThumbnail = (UIImageView *) [cell viewWithTag:4];
-        
-        //Remove subviews. These can be used when rendering.
-        for(UIView* view in articleThumbnail.subviews) [view removeFromSuperview];
-        
-        //Check if the item has attachments and render a thumbnail from the first attachment PDF
-        
-        if(articleThumbnail!= NULL){
-            if([item.attachments count] > 0){
-                
-                [articleThumbnail setHidden:FALSE];
-                
-                ZPZoteroAttachment* attachment = [item.attachments objectAtIndex:0];
-            
-                
-                //DDLogVerbose(@"ImageView for row %i is %i",indexPath.row,articleThumbnail);
-
-                [ZPAttachmentIconImageFactory renderFileTypeIconForAttachment:attachment intoImageView:articleThumbnail];
-                // Enable or disable depending whether file is available or not
-                
-                if(attachment.fileExists || ([attachment.linkMode intValue] == LINK_MODE_LINKED_URL && [ZPServerConnection instance])){
-                    articleThumbnail.alpha = 1;
-                    articleThumbnail.userInteractionEnabled = TRUE;
-                    
-                    //If there is no gesture recognizer, create and add one
-                    if(articleThumbnail.gestureRecognizers.count ==0){
-                        [articleThumbnail addGestureRecognizer: [[UITapGestureRecognizer alloc] initWithTarget:self action:@selector(attachmentThumbnailPressed:)]];
-                    }
-                }
-                else{
-                    articleThumbnail.alpha = .3;
-                    articleThumbnail.userInteractionEnabled = FALSE;
-                }
-            }
-            else{
-                articleThumbnail.hidden=TRUE;
-            }
-        }
-        
-        //Row number
-        UILabel* rowNumber = (UILabel *) [cell viewWithTag:5];
-        if(rowNumber != NULL) rowNumber.text=[NSString stringWithFormat:@"%i",indexPath.row+1];
-    }
-    return cell;
-}
-
-- (void)tableView:(UITableView *)tableView didSelectRowAtIndexPath:(NSIndexPath *)indexPath{
-    if(_itemDetailViewController != NULL){
-
-        // Get the selected row from the item list
-        NSIndexPath* indexPath = [_tableView indexPathForSelectedRow];
-        
-        // Get the key for the selected item 
-        NSString* currentItemKey = [_itemKeysShown objectAtIndex: indexPath.row]; 
-        [_itemDetailViewController setSelectedItem:(ZPZoteroItem*)[ZPZoteroItem dataObjectWithKey:currentItemKey]];
-        [_itemDetailViewController configure];
-    }
 }
 
 - (void)prepareForSegue:(UIStoryboardSegue *)segue sender:(id)sender{
     // Make sure your segue name in storyboard is the same as this line
     if ([[segue identifier] isEqualToString:@"PushItemDetailView"])
     {
-        _itemDetailViewController = (ZPItemDetailViewController*)[segue destinationViewController];
+        __unsafe_unretained ZPItemDetailViewController* itemDetailViewController = ( ZPItemDetailViewController*)[segue destinationViewController];
+        
+        // Get the selected row from the item list
+        NSIndexPath* indexPath = [_tableView indexPathForSelectedRow];
+        
+        // Get the key for the selected item 
+        NSString* currentItemKey = [_dataSource.itemKeysShown objectAtIndex: indexPath.row]; 
+        [itemDetailViewController setSelectedItem:(ZPZoteroItem*)[ZPZoteroItem dataObjectWithKey:currentItemKey]];
+        [itemDetailViewController configure];
         
         // Set the navigation controller in iPad
         
@@ -784,7 +341,7 @@
             
             UINavigationController* navigationController = [[(UISplitViewController*)appDelegate.window.rootViewController viewControllers] objectAtIndex:0];
             
-            [navigationController.topViewController performSegueWithIdentifier:@"PushItemsToNavigator" sender:self];
+            [navigationController.topViewController performSegueWithIdentifier:@"PushItemsToNavigator" sender:itemDetailViewController];
 
         }
         
@@ -810,8 +367,6 @@
     
     //Configure objects
     
-
-    _animations = UITableViewRowAnimationNone;
     _uiEventQueue =[[NSOperationQueue alloc] init];
     [_uiEventQueue setMaxConcurrentOperationCount:3];
 
@@ -894,6 +449,9 @@
     
     _tagForActiveSortButton = -1;
     
+    _dataSource = [ZPItemListViewDataSource instance];
+    _tableView.dataSource = _dataSource;
+    
     [self configureView];
 }
 
@@ -907,16 +465,16 @@
 - (void)viewWillAppear:(BOOL)animated
 {
     [super viewWillAppear:animated];
-    
-    //If the view controller was previously targeting the item navigator, change this
-    _tableView = _ownedTableView;
-    
 }
 
 - (void)viewDidAppear:(BOOL)animated
 {
     [super viewDidAppear:animated];
 
+    /*
+     
+    TODO:
+     
     @synchronized(_itemKeysNotInCache){
         //If there are more items coming, make this active
         if([_itemKeysNotInCache count] >0){
@@ -926,12 +484,12 @@
             [_activityIndicator stopAnimating];
         }
     }
+     */
 }
 
 - (void)viewWillDisappear:(BOOL)animated
 {
 	[super viewWillDisappear:animated];
-    [[ZPDataLayer instance] removeItemObserver:self];
 }
 
 - (void)viewDidDisappear:(BOOL)animated
@@ -961,6 +519,13 @@
     self.masterPopoverController = nil;
 }
 
+//Needed to keep the master right size http://stackoverflow.com/questions/9649608/uisplitview-new-slide-in-popover-becomes-fullscreen-after-memory-warning-in-ios
+
+-(void)splitViewController:(UISplitViewController *)svc popoverController:(UIPopoverController *)pc willPresentViewController:(UIViewController *)aViewController
+{
+    aViewController.view.frame = CGRectMake(0, 0, 320, self.view.frame.size.height);
+}
+
 #pragma mark - Actions
 
 -(IBAction) sortButtonPressed:(id)sender{
@@ -976,12 +541,13 @@
     }
         
     else{
-        if(_tagForActiveSortButton == [(UIView*)sender tag]){
-            _sortDescending = !_sortDescending;
+        NSInteger tag = [(UIView*)sender tag];
+        if(_tagForActiveSortButton == tag){
+            _dataSource.sortDescending  = ! _dataSource.sortDescending;
         }
         else{
 
-            _tagForActiveSortButton = [(UIView*)sender tag];
+            _tagForActiveSortButton = tag;
 
             if(_sortDirectionArrow!=NULL){
                 [_sortDirectionArrow removeFromSuperview];
@@ -995,12 +561,12 @@
             CGRect bounds = [(UIButton*)sender bounds];
             _sortDirectionArrow.center = CGPointMake(bounds.size.width / 2, bounds.size.height / 2);
             
-            _orderField = orderField;
-            _sortDescending = FALSE;
+            _dataSource.orderField = orderField;
+            _dataSource.sortDescending = FALSE;
         }
 
         //TODO: consider storing the images
-        _sortDirectionArrow.image = [UIImage imageNamed:(_sortDescending ? @"icon-down-black.png":@"icon-up-black.png")];
+        _sortDirectionArrow.image = [UIImage imageNamed:(_dataSource.sortDescending ? @"icon-down-black.png":@"icon-up-black.png")];
 
         [self configureView];
     }
@@ -1018,11 +584,9 @@
 
 -(void) _configureSortButton:(UIButton*)sender{
     
-    _tagForActiveSortButton = sender.tag;
-    
     UIBarButtonItem* button;
     for(button in _toolBar.items){
-        if(button.tag == _tagForActiveSortButton) break;
+        if(button.tag == sender.tag) break;
     }
     
     if(_sortHelper == NULL){
@@ -1049,31 +613,11 @@
     }
 }
 
--(IBAction) attachmentThumbnailPressed:(id)sender{
 
-    //Get the table cell.
-    UITapGestureRecognizer* gr = (UITapGestureRecognizer*)  sender;
-    UIView* imageView = [gr view];
-    UITableViewCell* cell = (UITableViewCell* )[[imageView superview] superview];
-    
-    //Get the row of this cell
-    NSInteger row = [_tableView indexPathForCell:cell].row;
-    
-    ZPZoteroItem* item = (ZPZoteroItem*) [ZPZoteroItem dataObjectWithKey:[_itemKeysShown objectAtIndex:row]];
-    
-    ZPZoteroAttachment* attachment = [item.attachments objectAtIndex:0];
-    
-    if([attachment.linkMode intValue] == LINK_MODE_LINKED_URL && [ZPServerConnection instance]){
-        [[UIApplication sharedApplication] openURL:[NSURL URLWithString:attachment.url]];
-    }
-    else{
-        [ZPPreviewController displayQuicklookWithAttachment:attachment sourceView:imageView];
-    }
-}
 
 
 -(void) clearSearch{
-    _searchString = NULL;
+    _dataSource.searchString = NULL;
     [_searchBar setText:@""];
 }
 
@@ -1081,8 +625,8 @@
     
     [self doneSearchingClicked:NULL];
     
-    if(![[sourceSearchBar text] isEqualToString:_searchString]){
-        _searchString = [sourceSearchBar text];
+    if(![[sourceSearchBar text] isEqualToString:_dataSource.searchString]){
+        _dataSource.searchString = [sourceSearchBar text];
         [self configureView];
     }
 }

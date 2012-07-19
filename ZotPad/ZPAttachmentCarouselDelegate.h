@@ -36,6 +36,7 @@ extern NSInteger const ZPATTACHMENTICONGVIEWCONTROLLER_TAG_TITLELABEL;
 @property (assign) NSInteger mode;
 @property (assign) NSInteger show;
 
+-(void) prepareForUnloading;
 -(void) configureWithAttachmentArray:(NSArray*) attachments;
 -(void) configureWithZoteroItem:(ZPZoteroItem*) item;
 +(void) renderFileTypeIconForAttachment:(ZPZoteroAttachment*) attachment intoImageView:(UIImageView*) fileImage;

@@ -90,15 +90,7 @@
                                  otherButtonTitles:nil];
         
         if(_fileCanBeOpened){
-            NSString* defaultApp = [[ZPPreferences instance] defaultApplicationForContentType:_activeAttachment.contentType];
-            _fileHasDefaultApp = defaultApp!=NULL;
-            if(_fileHasDefaultApp){
-                [_actionSheet addButtonWithTitle:[NSString stringWithFormat:@"Open in \"%@\"",defaultApp]];
-            }
             [_actionSheet addButtonWithTitle:@"Open in..."];
-        }
-        else{
-            _fileHasDefaultApp = FALSE;
         }
         
         if([MFMailComposeViewController canSendMail]) [_actionSheet addButtonWithTitle:@"Email"];
@@ -188,7 +180,9 @@
     
     if(_activeAttachment.versionIdentifier_local == [NSNull null] || _activeAttachment.versionIdentifier_local == NULL){
         if(_activeAttachment.versionIdentifier_server == [NSNull null] || _activeAttachment.versionIdentifier_server == NULL){
-            [NSException raise:@"Attachment version identifier cannot be null" format:@"Server version identifier for attachment %@ was null",_activeAttachment.key];
+            DDLogCError(@"Server version identifier for attachment %@ was null",_activeAttachment.key);
+            _activeAttachment.versionIdentifier_server = [ZPZoteroAttachment md5ForFileAtPath:_activeAttachment.fileSystemPath_original];
+            //[NSException raise:@"Attachment version identifier cannot be null" format:@"Server version identifier for attachment %@ was null",_activeAttachment.key];
          }
          _activeAttachment.versionIdentifier_local = _activeAttachment.versionIdentifier_server;
     }

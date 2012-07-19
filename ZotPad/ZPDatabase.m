@@ -37,7 +37,7 @@
 }
 - (NSDictionary*) fieldsForItem:(ZPZoteroItem*)item;
 - (NSArray*) creatorsForItem:(ZPZoteroItem*)item;
-
+- (void) _executeSQLFromFile:(NSString*)filename;
 - (void) insertObjects:(NSArray*) objects intoTable:(NSString*) table;
 - (void) updateObjects:(NSArray*) objects intoTable:(NSString*) table;
 - (NSArray*) writeObjects:(NSArray*) objects intoTable:(NSString*) table checkTimestamp:(BOOL) checkTimestamp;
@@ -56,6 +56,9 @@ static ZPDatabase* _instance = nil;
 {
     self = [super init];
     
+    if(_instance != nil){
+        [NSException raise:@"Database can be instantiated only once" format:@"Database can be instantiated only once"];
+    }
     _instance = self;
 
     dbFieldsByTables = [NSMutableDictionary dictionary];
@@ -78,10 +81,51 @@ static ZPDatabase* _instance = nil;
         FMResultSet* resultSet = [_database executeQuery:@"SELECT version FROM version"];
         
         if(resultSet == NULL){
-            [[[UIAlertView alloc] initWithTitle:@"Database needs upgrade" message:@"This version of ZotPad uses a different database structure than your previous version. The old database will now be replaced with a new version. This will purge existing data and attachment files. For more information, see http://www.zotpad.com. " delegate:NULL cancelButtonTitle:@"OK" otherButtonTitles:nil] show];
-            [self resetDatabase];
-            [[ZPCacheController instance] performSelectorInBackground:@selector(purgeAllAttachmentFilesFromCache) withObject:NULL];
+            DDLogWarn(@"Upgrading Database from 1.0 to 1.1");
+
+            UIAlertView* alert = [[UIAlertView alloc] initWithTitle:@"Upgrading database" message:@"Your database from ZotPad 1.0 needs to be upgraded before it can be used with ZotPad 1.1." delegate:NULL cancelButtonTitle:nil otherButtonTitles:nil] ;
+
+            // Create the progress bar and add it to the alert
+            UIProgressView *progressView = [[UIProgressView alloc] initWithFrame:CGRectMake(30.0f, 120.0f, 225.0f, 90.0f)];
+            [alert addSubview:progressView];
+            [progressView setProgressViewStyle: UIProgressViewStyleBar];
+            [alert show];
             
+            [self _executeSQLFromFile:@"upgrade1.0to1.1"];
+            
+            
+        
+            dispatch_async(dispatch_get_global_queue(DISPATCH_QUEUE_PRIORITY_BACKGROUND,0), ^{
+
+                NSArray* attachments = [self getCachedAttachmentsOrderedByRemovalPriority];
+                ZPZoteroAttachment* attachment;
+                
+                NSInteger counter=0;
+                for(attachment in attachments){
+                    
+                    DDLogWarn(@"Calculating MD5 sum for attachment file %@",attachment.filename);
+                    if(attachment.fileExists){
+                        attachment.versionIdentifier_server = [ZPZoteroAttachment md5ForFileAtPath:attachment.fileSystemPath];
+                        
+                        //This is also the best guess of the metadata MD5
+                        
+                        attachment.md5 = attachment.versionIdentifier_server;
+                        counter++;
+                        float progress = ((float) counter)/((float)[attachments count]);
+                        dispatch_async(dispatch_get_main_queue(), ^{
+                            [progressView setProgress:progress];
+                        });
+                        [self writeObjects:[NSArray arrayWithObject:attachment] intoTable:@"attachments" checkTimestamp:NO];
+                    }
+                }
+                                
+                dispatch_async(dispatch_get_main_queue(), ^{
+                    [alert dismissWithClickedButtonIndex:0 animated:YES];
+                });
+                
+                DDLogWarn(@"Database upgrade completed");
+            });
+
         }
         else{
             [resultSet close];
@@ -140,11 +184,20 @@ static ZPDatabase* _instance = nil;
         [_database setLogsErrors:TRUE];
         
         //Read the database structure from file and create the database
+        [self _executeSQLFromFile:@"database"];
         
+    }
+
+}
+
+- (void) _executeSQLFromFile:(NSString*)filename{
+
+    @synchronized(self){
         NSStringEncoding encoding;
-        
+        NSError* error;
+
         NSString *sqlFile = [NSString stringWithContentsOfFile:[[NSBundle mainBundle]
-                                                                pathForResource:@"database"
+                                                                pathForResource:filename
                                                                 ofType:@"sql"] usedEncoding:&encoding error:&error];
         
         NSArray *sqlStatements = [sqlFile componentsSeparatedByString:@";"];
@@ -162,8 +215,8 @@ static ZPDatabase* _instance = nil;
         }
         
     }
-
 }
+
 
 #pragma mark -
 #pragma mark Private methods for writing objects and relationships to DB
@@ -528,7 +581,24 @@ static ZPDatabase* _instance = nil;
 -(void) writeLibraries:(NSArray*)libraries{
     [self writeObjects:libraries intoTable:@"libraries" checkTimestamp:FALSE];
     
+    NSMutableArray* keys= [[NSMutableArray alloc] init];
+    
+    for(ZPZoteroLibrary* library in libraries){
+        [keys addObject:library.libraryID];
+    }
+    
+    @synchronized(self){
+        NSString* sql = [NSString stringWithFormat:@"DELETE FROM libraries WHERE libraryID NOT IN (%@)",[keys componentsJoinedByString:@", "] ]; 
+        [_database executeUpdate:sql];
+    }
+
+    
 }
+
+- (void) removeLibrariesNotInArray:(NSArray*)libraries{
+    
+}
+
 
 - (void) setUpdatedTimestampForLibrary:(NSNumber*)libraryID toValue:(NSString*)updatedTimestamp{
     @synchronized(self){
@@ -1118,7 +1188,7 @@ Deletes items, notes, and attachments based in array of keys from a library
     
     //Build the SQL query as a string first. 
     
-    NSString* sql = @"SELECT items.itemKey FROM items";
+    NSString* sql = @"SELECT DISTINCT items.itemKey FROM items";
     
     if(collectionKey!=NULL)
         sql=[sql stringByAppendingString:@", collectionItems"];

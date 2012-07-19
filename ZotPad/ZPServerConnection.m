@@ -47,7 +47,6 @@
 #import "ZPFileChannel_Dropbox.h"
 #import "ZPFileChannel_WebDAV.h"
 #import "ZPFileChannel_ZoteroStorage.h"
-#import "ZPFileChannel_Samba.h"
 
 //Private methods
 
@@ -177,11 +176,16 @@ const NSInteger ZPServerConnectionRequestPermissions = 10;
                                                                     message:@"ZotPad is not authorized to access any of your libraries on the Zotero server and is working now in offline mode. This can occur if your access key has been revoked or communications to Zotero server is blocked."
                                                delegate:self cancelButtonTitle:@"Stay offline" otherButtonTitles:@"Check key", @"New key",nil] show];
                 }
+                else {
+                    [[[UIAlertView alloc] initWithTitle:@"Authorization error"
+                                                message:@"ZotPad is not authorized to access the library you are attempting to load. This can occur if the privileges of your access key have been changed, but ZotPad cache has not yet been updated to reflect these changes."
+                                               delegate:nil cancelButtonTitle:@"Cancel" otherButtonTitles:nil] show];
+                }
             }
         }
     }
     else if([(NSHTTPURLResponse*)response statusCode]!=200){
-        DDLogError(@"Server request %@ resulted in error %1. Full response: %@",urlString,[(NSHTTPURLResponse*)response statusCode],[[NSString alloc] initWithData:responseData encoding:NSUTF8StringEncoding]);
+        DDLogError(@"Server request %@ resulted in error %i. Full response: %@",urlString,[(NSHTTPURLResponse*)response statusCode],[[NSString alloc] initWithData:responseData encoding:NSUTF8StringEncoding]);
     }
     
 
@@ -322,6 +326,7 @@ const NSInteger ZPServerConnectionRequestPermissions = 10;
             
 #ifdef DEBUG
             NSString* responseString = [[NSString alloc] initWithData:responseData  encoding:NSUTF8StringEncoding];
+            parserDelegate.fullResponse = responseString;
             //Check that we got time stamps for all objects
             for(ZPZoteroDataObject* dataObject in parserDelegate.parsedElements){
                 dataObject.responseDataFromWhichThisItemWasCreated = responseString;
@@ -689,10 +694,10 @@ const NSInteger ZPServerConnectionRequestPermissions = 10;
     
 }
 
--(void) failedDownloadingAttachment:(ZPZoteroAttachment*)attachment withError:(NSError*) error usingFileChannel:(ZPFileChannel*)fileChannel{
+-(void) failedDownloadingAttachment:(ZPZoteroAttachment*)attachment withError:(NSError*) error usingFileChannel:(ZPFileChannel*)fileChannel fromURL:(NSString *)url{
     @synchronized(_activeDownloads){
         [_activeDownloads removeObject:attachment];
-        DDLogError(@"Failed downloading file %@. Error %@ Troubleshooting instructions: http://www.zotpad.com/node/38",attachment.filename,error.localizedDescription);
+        DDLogError(@"Failed downloading file %@. %@ (URL: %@) Troubleshooting instructions: http://www.zotpad.com/troubleshooting",attachment.filename,error.localizedDescription,url);
     }
     
     _activeRequestCount--;
@@ -757,6 +762,13 @@ const NSInteger ZPServerConnectionRequestPermissions = 10;
 }
 -(void) finishedUploadingAttachment:(ZPZoteroAttachment*)attachment withVersionIdentifier:(NSString*)identifier{
     
+    if(attachment == nil){
+        [NSException raise:@"Attachment cannot be null" format:@"File upload returned with null attachmnet"];
+    }
+    if(identifier == nil){
+        [NSException raise:@"Identifier cannot be null" format:@"File upload returned with null identifier"];
+    }
+
     //Update the timestamps and copy files into right place
     
     attachment.versionIdentifier_server = identifier;
@@ -773,9 +785,10 @@ const NSInteger ZPServerConnectionRequestPermissions = 10;
     //We need to do this in a different thread so that the current thread does not count towards the operations count
     [[ZPDataLayer instance] notifyAttachmentUploadCompleted:attachment];
 }
--(void) failedUploadingAttachment:(ZPZoteroAttachment*)attachment withError:(NSError*) error usingFileChannel:(ZPFileChannel*)fileChannel{
+-(void) failedUploadingAttachment:(ZPZoteroAttachment*)attachment withError:(NSError*) error usingFileChannel:(ZPFileChannel*)fileChannel toURL:(NSString *)url{
     @synchronized(_activeUploads){
         [_activeUploads removeObject:attachment];
+        DDLogError(@"Failed uploading file %@. %@ (URL: %@) Troubleshooting instructions: http://www.zotpad.com/troubleshooting",attachment.filename,error.localizedDescription,url);
     }
     
     _activeRequestCount--;
@@ -804,6 +817,14 @@ const NSInteger ZPServerConnectionRequestPermissions = 10;
         return [_activeUploads containsObject:attachment];
     }
    
+}
+
+#pragma mart - Cleaning up progress views
+
+-(void) removeProgressView:(UIProgressView*) progressView{
+    [_fileChannel_Dropbox removeProgressView:progressView];
+    [_fileChannel_WebDAV removeProgressView:progressView];
+    [_fileChannel_Zotero removeProgressView:progressView];
 }
 
 #pragma mark - UIAlertView delegate methods

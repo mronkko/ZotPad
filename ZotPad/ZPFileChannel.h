@@ -26,6 +26,10 @@
 -(void) cancelUploadingAttachment:(ZPZoteroAttachment*)attachment;
 -(void) useProgressView:(UIProgressView*) progressView forUploadingAttachment:(ZPZoteroAttachment*)attachment;
 
+
+-(void) removeProgressView:(UIProgressView*) progressView;
+-(NSArray*) allRequests;
+
 //Helper methods
 
 -(void) cleanupAfterFinishingAttachment:(ZPZoteroAttachment*)attachment;

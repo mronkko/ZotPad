@@ -152,8 +152,11 @@ static ZPCacheController* _instance = nil;
         ZPZoteroLibrary* library;
         for(library in libraries){
             if([[ZPPreferences instance] cacheAttachmentsAllLibraries]){
-                NSArray* itemKeysToCheck = [[ZPDatabase instance] getItemKeysForLibrary:library.libraryID collectionKey:NULL searchString:NULL orderField:NULL sortDescending:FALSE];
-                [self performSelectorInBackground:@selector(_checkIfAttachmentsExistWithParentKeysAndQueueForDownload:) withObject:itemKeysToCheck];
+                //TODO: refactor so that this block is not needed
+                dispatch_async(dispatch_get_global_queue(DISPATCH_QUEUE_PRIORITY_BACKGROUND,0), ^{
+                    NSArray* itemKeysToCheck = [[ZPDatabase instance] getItemKeysForLibrary:library.libraryID collectionKey:NULL searchString:NULL orderField:NULL sortDescending:FALSE];
+                    [self _checkIfAttachmentsExistWithParentKeysAndQueueForDownload:itemKeysToCheck];
+                });
             }
             if([[ZPPreferences instance] cacheMetadataAllLibraries]){
                 [self performSelectorInBackground:@selector(_checkIfLibraryNeedsCacheRefreshAndQueue:) withObject:library.libraryID];   
@@ -615,11 +618,13 @@ static ZPCacheController* _instance = nil;
 
 -(void) setActiveLibrary:(NSNumber*)libraryID collection:(NSString*)collectionKey{
 
+    
+    
     if(! [libraryID isEqual:_activelibraryID] && ! [[ZPPreferences instance] cacheAttachmentsAllLibraries] ){
         @synchronized(_filesToDownload){
             [_filesToDownload removeAllObjects];
         }
-//        DDLogVerbose(@"Clearing attachment download queue because library changed and preferences do not indicate that all libraries should be downloaded");
+        //        DDLogVerbose(@"Clearing attachment download queue because library changed and preferences do not indicate that all libraries should be downloaded");
     }
     
     //Store the libraryID and collectionKEy
@@ -628,16 +633,21 @@ static ZPCacheController* _instance = nil;
     //Both keys might be null, so we need to compare equality directly as well
     if(! (collectionKey == _activeCollectionKey || [collectionKey isEqual:_activeCollectionKey]) && ! [[ZPPreferences instance] cacheAttachmentsActiveLibrary]){
         @synchronized(_filesToDownload){
-
+            
             [_filesToDownload removeAllObjects];
         }
-//        DDLogVerbose(@"Clearing attachment download queue because collection changed and preferences do not indicate that all collections should be downloaded");
+        //        DDLogVerbose(@"Clearing attachment download queue because collection changed and preferences do not indicate that all collections should be downloaded");
     }
     _activeCollectionKey = collectionKey;
     
     //Add attachments to queue
-    NSArray* itemKeysToCheck = [[ZPDatabase instance] getItemKeysForLibrary:libraryID collectionKey:collectionKey searchString:NULL orderField:NULL sortDescending:FALSE];
-    [self performSelectorInBackground:@selector(_checkIfAttachmentsExistWithParentKeysAndQueueForDownload:) withObject:itemKeysToCheck];
+
+    //TODO: Refactor so that this block is not needed
+    dispatch_async(dispatch_get_global_queue(DISPATCH_QUEUE_PRIORITY_BACKGROUND,0), ^{
+
+        NSArray* itemKeysToCheck = [[ZPDatabase instance] getItemKeysForLibrary:libraryID collectionKey:collectionKey searchString:NULL orderField:NULL sortDescending:FALSE];
+        [self _checkIfAttachmentsExistWithParentKeysAndQueueForDownload:itemKeysToCheck];
+    });
     
     //Check if the container needs a refresh
     if(collectionKey == NULL){
@@ -646,9 +656,7 @@ static ZPCacheController* _instance = nil;
     else{
         [self performSelectorInBackground:@selector(_checkIfCollectionNeedsCacheRefreshAndQueue:) withObject:collectionKey];
     }
-    
 }
-
 -(void) _checkIfAttachmentsExistWithParentKeysAndQueueForDownload:(NSArray*)parentKeys{
 
     for(NSString* key in parentKeys){
@@ -832,6 +840,8 @@ static ZPCacheController* _instance = nil;
     
 -(void) updateLibrariesAndCollectionsFromServer{
 
+    //TODO: This does not currently remove libraries from the UI if they are removed from the key
+
     if(! _isRefresingLibraries){
         _isRefresingLibraries = TRUE;
  
@@ -926,7 +936,6 @@ static ZPCacheController* _instance = nil;
     if(_sizeOfDocumentsFolder!=0){
         
         _sizeOfDocumentsFolder += [fileAttributes fileSize]/1024;
-        if(_sizeOfDocumentsFolder>=[[ZPPreferences instance] maxCacheSize]) [self _cleanUpCache];
         [self _updateCacheSizePreference];
     }
 }
@@ -1000,7 +1009,7 @@ static ZPCacheController* _instance = nil;
         
         NSDictionary *_documentFileAttributes = [[NSFileManager defaultManager] fileAttributesAtPath:attachment.fileSystemPath traverseLink:YES];
         _sizeOfDocumentsFolder += [_documentFileAttributes fileSize]/1024;
-        //DDLogVerbose(@"Cache size is %i after adding %@ (%i)",(NSInteger)_sizeOfDocumentsFolder,attachment.fileSystemPath,[_documentFileAttributes fileSize]/1024);
+        DDLogInfo(@"Cache size is %i KB after adding %@ (%i KB)",(NSInteger)_sizeOfDocumentsFolder,attachment.fileSystemPath,[_documentFileAttributes fileSize]/1024);
 
 
 //        DDLogVerbose(@"Cache size after adding %@ to cache is %i",attachment.fileSystemPath,_sizeOfDocumentsFolder);

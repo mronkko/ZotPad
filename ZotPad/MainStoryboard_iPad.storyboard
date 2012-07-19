@@ -159,7 +159,6 @@
                                     </tableViewCell>
                                 </prototypes>
                                 <connections>
-                                    <outlet property="dataSource" destination="4" id="w3g-RP-oB0"/>
                                     <outlet property="delegate" destination="4" id="RgH-0w-Nqe"/>
                                 </connections>
                             </tableView>
@@ -268,7 +267,6 @@
                     </navigationItem>
                     <connections>
                         <outlet property="actionButton" destination="ptY-bC-Aae" id="WxY-ZQ-FU3"/>
-                        <outlet property="view" destination="Qr8-AN-SJ9" id="ogI-Fb-On2"/>
                     </connections>
                 </viewController>
             </objects>
@@ -323,12 +321,14 @@
                         </connections>
                     </tableView>
                     <toolbarItems>
+                        <barButtonItem title="Item" id="1Mu-V9-VeH"/>
                         <barButtonItem style="plain" systemItem="flexibleSpace" id="uum-Bh-nv7"/>
                         <barButtonItem image="gear.png" id="1wH-FN-IJx"/>
                     </toolbarItems>
                     <navigationItem key="navigationItem" title="Libraries" id="39"/>
                     <simulatedToolbarMetrics key="simulatedBottomBarMetrics"/>
                     <connections>
+                        <outlet property="cacheControllerPlaceHolder" destination="1Mu-V9-VeH" id="fQs-vC-vi9"/>
                         <outlet property="gearButton" destination="1wH-FN-IJx" id="9Sk-W0-UJE"/>
                         <segue destination="WCH-zk-FP7" kind="push" identifier="PushItemsToNavigator" id="bc4-Il-rI2"/>
                     </connections>
@@ -336,11 +336,11 @@
             </objects>
             <point key="canvasLocation" x="897" y="-178"/>
         </scene>
-        <!--Table View Controller - Items-->
+        <!--Master Item List View Controller - Items-->
         <scene sceneID="Zza-eC-TaA">
             <objects>
                 <placeholder placeholderIdentifier="IBFirstResponder" id="uuF-id-wBA" userLabel="First Responder" sceneMemberID="firstResponder"/>
-                <viewController storyboardIdentifier="NavigationItemListView" id="WCH-zk-FP7" customClass="UITableViewController" sceneMemberID="viewController">
+                <viewController storyboardIdentifier="NavigationItemListView" id="WCH-zk-FP7" customClass="ZPMasterItemListViewController" sceneMemberID="viewController">
                     <tableView key="view" clipsSubviews="YES" contentMode="scaleToFill" alwaysBounceVertical="YES" dataMode="prototypes" style="plain" rowHeight="44" sectionHeaderHeight="22" sectionFooterHeight="22" id="7zD-LX-EJk">
                         <rect key="frame" x="0.0" y="64" width="320" height="660"/>
                         <autoresizingMask key="autoresizingMask" widthSizable="YES" heightSizable="YES"/>
@@ -706,6 +706,7 @@
         <class className="ZPLibraryAndCollectionListViewController" superclassName="UITableViewController">
             <source key="sourceIdentifier" type="project" relativePath="./Classes/ZPLibraryAndCollectionListViewController.h"/>
             <relationships>
+                <relationship kind="outlet" name="cacheControllerPlaceHolder" candidateClass="UIBarButtonItem"/>
                 <relationship kind="outlet" name="gearButton" candidateClass="UIBarButtonItem"/>
             </relationships>
         </class>
@@ -720,6 +721,9 @@
                 <relationship kind="outlet" name="logView" candidateClass="UITextView"/>
                 <relationship kind="outlet" name="manualButton" candidateClass="UIBarButtonItem"/>
             </relationships>
+        </class>
+        <class className="ZPMasterItemListViewController" superclassName="UITableViewController">
+            <source key="sourceIdentifier" type="project" relativePath="./Classes/ZPMasterItemListViewController.h"/>
         </class>
         <class className="ZPSplitViewController" superclassName="UISplitViewController">
             <source key="sourceIdentifier" type="project" relativePath="./Classes/ZPSplitViewController.h"/>

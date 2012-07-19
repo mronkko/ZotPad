@@ -10,7 +10,7 @@
 
 #import "ZPItemDetailViewController.h"
 #import "ZPLibraryAndCollectionListViewController.h"
-#import "ZPItemListViewController.h"
+#import "ZPItemListViewDataSource.h"
 #import "ZPDataLayer.h"
 #import "ZPLocalization.h"
 #import "ZPAttachmentFileInteractionController.h"
@@ -73,9 +73,6 @@
 
     _carousel.bounces = FALSE;
 
-    [[ZPDataLayer instance] registerAttachmentObserver:_carouselDelegate];
-    [[ZPDataLayer instance] registerItemObserver:_carouselDelegate];
-
     self.tableView.tableHeaderView = _carousel;
 
     //Configure activity indicator.
@@ -109,18 +106,24 @@
     return YES;
 }
 
+-(void) dealloc{
+    if(_carousel != NULL){
+        [[ZPDataLayer instance] removeItemObserver:self];    
+    }
+    DDLogError(@"Deallocating");
+}
 -(void)viewDidUnload{
-    [[ZPDataLayer instance] removeItemObserver:self];
-    [[ZPDataLayer instance] removeItemObserver:_carouselDelegate];
-    [[ZPDataLayer instance] removeAttachmentObserver:_carouselDelegate];
-    
+    _activityIndicator = NULL;
+    _carouselDelegate.attachmentCarousel = NULL;
+    _carousel = NULL;
+    [[ZPDataLayer instance] removeItemObserver:self];    
     [super viewDidUnload];
 }
 
 - (void)didReceiveMemoryWarning
 {
-    [super didReceiveMemoryWarning];
     [_previewCache removeAllObjects];
+    [super didReceiveMemoryWarning];
 }
 
 #pragma mark - Configure view and subviews
@@ -154,10 +157,21 @@
 #pragma mark - Viewing and emailing
 
 - (IBAction) actionButtonPressed:(id)sender{
-    ZPZoteroAttachment* currentAttachment = [_currentItem.attachments objectAtIndex:[_carousel currentItemIndex]];
-    if(_attachmentInteractionController == NULL)  _attachmentInteractionController = [[ZPAttachmentFileInteractionController alloc] init];
-    [_attachmentInteractionController setAttachment:currentAttachment];
-    [_attachmentInteractionController presentOptionsMenuFromBarButtonItem:sender];
+    
+    // This if is needed to protect agains a crash where the _carousel currentItemIndex is MAXINT and there are no attachments.
+    
+    if(_carousel.currentItemIndex < [_currentItem.attachments count]){
+        ZPZoteroAttachment* currentAttachment = [_currentItem.attachments objectAtIndex:[_carousel currentItemIndex]];
+        if(_attachmentInteractionController == NULL)  _attachmentInteractionController = [[ZPAttachmentFileInteractionController alloc] init];
+        [_attachmentInteractionController setAttachment:currentAttachment];
+        [_attachmentInteractionController presentOptionsMenuFromBarButtonItem:sender];
+    }
+    
+    // And this else for diagnosing the crash. Once the root cause is identified, these can be removed
+    else{
+        DDLogError(@"Attempting to open action menu for attachment in index %i for an item with %i attachments. The item key is %@ and full citation is %@",
+                   _carousel.currentItemIndex,_currentItem.attachments.count,_currentItem.key,_currentItem.fullCitation);
+    }
 }
 
 
@@ -381,6 +395,10 @@
         cell.textLabel.text = [self _textAtIndexPath:indexPath isTitle:TRUE];
         cell.detailTextLabel.text = [self _textAtIndexPath:indexPath isTitle:FALSE];
     }
+    
+    if(cell == NULL || ! [cell isKindOfClass:[UITableViewCell class]]){
+        [NSException raise:@"Invalid cell" format:@""];
+    }
 	return  cell;
 }
 
@@ -396,7 +414,7 @@
     // Navigator
     else{
         // Get the key for the selected item 
-        NSArray* itemArray =[(ZPItemListViewController*) aTableView.dataSource itemKeysShown];
+        NSArray* itemArray =[(ZPItemListViewDataSource*) aTableView.dataSource itemKeysShown];
         if(indexPath.row<[itemArray count]){                    
             NSString* currentItemKey = [itemArray objectAtIndex: indexPath.row]; 
             
@@ -408,7 +426,6 @@
         }
     }
 }
-
 
 
 

@@ -26,7 +26,7 @@
 
 @implementation ZPFileImportViewController
 
-@synthesize url, carousel;
+@synthesize url, carousel, isFullyPresented;
 
 - (void)viewDidLoad
 {
@@ -51,6 +51,7 @@
 
 - (void)viewDidAppear:(BOOL)animated{
     [super viewDidAppear:animated];
+    isFullyPresented = TRUE;
 }
 - (void)viewDidUnload
 {
@@ -65,6 +66,7 @@
 }
 
 - (void)carousel:(iCarousel *)carousel didSelectItemAtIndex:(NSInteger)index{
+    isFullyPresented = FALSE;
     [self dismissModalViewControllerAnimated:YES];
 }
 
@@ -81,6 +83,7 @@
 //TODO: Is this needed?
 
 - (void)alertView:(UIAlertView *)alertView clickedButtonAtIndex:(NSInteger)buttonIndex{
+    isFullyPresented = FALSE;
     [self dismissModalViewControllerAnimated:YES];
 }
 

@@ -34,9 +34,6 @@
 -(BOOL) cacheAttachmentsActiveCollection;
 -(BOOL) cacheAttachmentsActiveItem;
 
--(NSString*) defaultApplicationForContentType:(NSString*) type;
--(void) setDefaultApplication:(NSString*) application forContentType:(NSString*) type;
-
 -(BOOL) useCache;
 -(BOOL) useDropbox;
 -(BOOL) dropboxHasFullControl;

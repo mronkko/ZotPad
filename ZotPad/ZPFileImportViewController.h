@@ -12,6 +12,8 @@
 @interface ZPFileImportViewController : UIViewController <iCarouselDelegate>{
 }
 
+@property BOOL isFullyPresented;
+
 @property (retain) IBOutlet iCarousel* carousel;
 @property (retain) NSURL* url;
 

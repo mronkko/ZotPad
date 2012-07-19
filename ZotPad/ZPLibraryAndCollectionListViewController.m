@@ -15,7 +15,7 @@
 #import "ZPAppDelegate.h"
 #import "ZPCacheController.h"
 #import "ZPCacheStatusToolbarController.h"
-
+#import "ZPItemListViewDataSource.h"
 #import "ZPHelpPopover.h"
 
 
@@ -24,7 +24,7 @@
 @synthesize detailViewController = _detailViewController;
 @synthesize currentlibraryID = _currentlibraryID;
 @synthesize currentCollectionKey = _currentCollectionKey;
-@synthesize gearButton;
+@synthesize gearButton, cacheControllerPlaceHolder;
 
 - (void)awakeFromNib
 {
@@ -35,8 +35,15 @@
 
 - (void)didReceiveMemoryWarning
 {
+    
+    //Remove the cache status bar from the toolbar 
+    
     [super didReceiveMemoryWarning];
     // Release any cached data, images, etc that aren't in use.
+    
+    // Release the cache status controller. 
+    // TODO: Also release this in the cache controller
+
 }
 
 
@@ -56,17 +63,15 @@
     //UIBarButtonItem* barButton = [[UIBarButtonItem alloc] initWithCustomView:_activityIndicator];
     //self.navigationItem.rightBarButtonItem = barButton;
 
-
-    //Show Cache controller status
-    ZPCacheStatusToolbarController* statusController = [[ZPCacheStatusToolbarController alloc] init];
-    NSMutableArray* toolBarItems = [NSMutableArray arrayWithObject: [[UIBarButtonItem alloc] initWithCustomView:statusController.view]];
-    [toolBarItems addObjectsFromArray:self.toolbarItems];
-    [self setToolbarItems:toolBarItems];
-
     self.clearsSelectionOnViewWillAppear = NO;
     
 	// Do any additional setup after loading the view, typically from a nib.
     if(UI_USER_INTERFACE_IDIOM() == UIUserInterfaceIdiomPad){
+        
+        //Show Cache controller status, only on iPad
+        ZPCacheStatusToolbarController* statusController = [[ZPCacheStatusToolbarController alloc] init];
+        cacheControllerPlaceHolder.customView = statusController.view;
+
         UIViewController* root = [UIApplication sharedApplication].delegate.window.rootViewController;
         gearButton.target = root;
         gearButton.action = @selector(showLogView:);
@@ -125,8 +130,9 @@
     if([segue.identifier isEqualToString:@"PushItemList"]){
         ZPItemListViewController* target = (ZPItemListViewController*) segue.destinationViewController;
         ZPZoteroDataObject* node = [self->_content objectAtIndex: self.tableView.indexPathForSelectedRow.row];
-        target.libraryID = [node libraryID];
-        target.collectionKey = [node key];
+        
+        [ZPItemListViewDataSource instance].libraryID = [node libraryID];
+        [ZPItemListViewDataSource instance].collectionKey = [node key];
         
         //Clear search when changing collection. This is how Zotero behaves
         [target clearSearch];
@@ -136,26 +142,20 @@
     if([segue.identifier isEqualToString:@"PushItemsToNavigator"]){
         
         
-        ZPItemListViewController* currentItemViewController = (ZPItemListViewController*) sender;
         UITableViewController*  target = (UITableViewController*) segue.destinationViewController;
         
-         target.navigationItem.hidesBackButton = YES;
-         target.clearsSelectionOnViewWillAppear = NO;
+//        target.tableView.delegate = (ZPItemDetailViewController*)sender;
+        target.navigationItem.hidesBackButton = YES;
+        target.clearsSelectionOnViewWillAppear = NO;
         
         //Keep the same toolbar
         [target setToolbarItems:self.toolbarItems];
          
          // Get the selected row from the item list
-         NSIndexPath* indexPath = [currentItemViewController.tableView indexPathForSelectedRow];
-         
-         @synchronized(self){
-             [target.tableView setDelegate: currentItemViewController];
-             [target.tableView setDataSource: currentItemViewController];
-             currentItemViewController.targetTableView = target.tableView;
-         }
-        
-         [target.tableView selectRowAtIndexPath:indexPath animated:NO scrollPosition:UITableViewScrollPositionMiddle]; 
-
+        ZPZoteroItem* selectedItem = [(ZPItemDetailViewController*)sender selectedItem];
+        NSInteger index = [[[ZPItemListViewDataSource instance] itemKeysShown] indexOfObject:selectedItem.key];
+        NSIndexPath* indexPath = [NSIndexPath indexPathForRow:index inSection:0];
+        [target.tableView selectRowAtIndexPath:indexPath animated:NO scrollPosition:UITableViewScrollPositionMiddle]; 
     }
 }
 
@@ -203,7 +203,11 @@
 	
     cell.textLabel.text = [node title];
     
-	return ( cell );
+    if(cell == NULL || ! [cell isKindOfClass:[UITableViewCell class]]){
+        [NSException raise:@"Invalid cell" format:@""];
+    }
+
+	return cell;
 }
 
 
@@ -214,13 +218,12 @@
     /*
      When a row is selected, set the detail view controller's library and collection and refresh
      */
+    ZPZoteroDataObject* node = [self->_content objectAtIndex: indexPath.row];
+    [ZPItemListViewDataSource instance].libraryID = [node libraryID];
+    [ZPItemListViewDataSource instance].collectionKey = [node key];
     
     if (self.detailViewController != NULL) {
 
-        ZPZoteroDataObject* node = [self->_content objectAtIndex: indexPath.row];
-        self.detailViewController.libraryID = [node libraryID];
-        self.detailViewController.collectionKey = [node key];
-        
         //Clear search when changing collection. This is how Zotero behaves
         [self.detailViewController clearSearch];
         [self.detailViewController configureView];

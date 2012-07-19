@@ -25,9 +25,9 @@
     
     
     //These sets are immutable due to concurrency issues
-    NSSet* _itemObservers;
-    NSSet* _libraryObservers;
-    NSSet* _attachmentObservers;
+    NSMutableSet* _itemObservers;
+    NSMutableSet* _libraryObservers;
+    NSMutableSet* _attachmentObservers;
     
     //Queue for ad hoc retrievals
     NSOperationQueue* _serverRequestQueue;
