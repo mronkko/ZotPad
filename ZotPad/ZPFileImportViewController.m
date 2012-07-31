@@ -39,6 +39,7 @@
     
     if(_carouselDelegate == NULL){
         _carouselDelegate = [[ZPAttachmentCarouselDelegate alloc] init];
+        _carouselDelegate.owner = self;
         _carouselDelegate.mode = ZPATTACHMENTICONGVIEWCONTROLLER_MODE_UPLOAD;
         _carouselDelegate.show = ZPATTACHMENTICONGVIEWCONTROLLER_SHOW_MODIFIED;
         _carouselDelegate.attachmentCarousel = carousel;

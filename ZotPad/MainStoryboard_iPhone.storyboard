@@ -571,6 +571,7 @@
         <class className="ZPLibraryAndCollectionListViewController" superclassName="UITableViewController">
             <source key="sourceIdentifier" type="project" relativePath="./Classes/ZPLibraryAndCollectionListViewController.h"/>
             <relationships>
+                <relationship kind="outlet" name="cacheControllerPlaceHolder" candidateClass="UIBarButtonItem"/>
                 <relationship kind="outlet" name="gearButton" candidateClass="UIBarButtonItem"/>
             </relationships>
         </class>
@@ -583,6 +584,7 @@
                 <relationship kind="action" name="onlineSupport:"/>
                 <relationship kind="action" name="showManual:"/>
                 <relationship kind="outlet" name="logView" candidateClass="UITextView"/>
+                <relationship kind="outlet" name="manualButton" candidateClass="UIBarButtonItem"/>
             </relationships>
         </class>
         <class className="ZPNavigationController" superclassName="UINavigationController">

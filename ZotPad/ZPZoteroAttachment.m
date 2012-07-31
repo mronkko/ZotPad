@@ -11,8 +11,8 @@
 #import "ZPCore.h"
 #import "ZPDatabase.h"
 #import "FileMD5Hash.h"
-#import "QSStrings.h"
 #import "ZPCacheController.h"
+#import "NSString+Base64.h"
 
 NSInteger const LINK_MODE_IMPORTED_FILE = 0;
 NSInteger const LINK_MODE_IMPORTED_URL = 1;
@@ -48,6 +48,11 @@ NSInteger const VERSION_SOURCE_DROPBOX =3;
     NSMutableDictionary* dict = [NSMutableDictionary dictionaryWithDictionary:fields ];
     [dict setObject:@"attachment" forKey:@"itemType"];
     ZPZoteroAttachment* attachment = (ZPZoteroAttachment*) [super dataObjectWithDictionary:dict];
+    
+    if(! [attachment isKindOfClass:[ZPZoteroAttachment class]]){
+        DDLogError(@"Creating an attachment object for item %@ resulted in non-attachment object. Crashing.",[dict objectForKey:@"key"]);
+        [NSException raise:@"Internal consistency error" format:@"Creating an attachment object for item %@ resulted in non-attachment object. %@",[dict objectForKey:@"key"],dict];
+    }
     
     //Set some default values
     if(attachment.existsOnZoteroServer == nil){
@@ -123,7 +128,8 @@ NSInteger const VERSION_SOURCE_DROPBOX =3;
     NSString* path;
     //Imported URLs are stored as ZIP files
     
-    if([self.linkMode intValue] == LINK_MODE_IMPORTED_URL && [self.contentType isEqualToString:@"text/html"]){
+    if([self.linkMode intValue] == LINK_MODE_IMPORTED_URL && ([self.contentType isEqualToString:@"text/html"]
+                                                              || [self.contentType isEqualToString:@"application/xhtml+xml"])){
         path = [[self filename] stringByAppendingFormat:@"_%@%@.zip",self.key,suffix];
     }
     else{
@@ -134,8 +140,15 @@ NSInteger const VERSION_SOURCE_DROPBOX =3;
         else path = [[self filename] stringByReplacingCharactersInRange:lastPeriod
                                                              withString:[NSString stringWithFormat:@"_%@%@.",self.key,suffix]];
     }
+    NSString* docs = [NSSearchPathForDirectoriesInDomains(NSDocumentDirectory, NSUserDomainMask, YES) objectAtIndex:0];
+    if(! [docs isKindOfClass:[NSString class]]){
+        [NSException raise:@"Internal consistency error" format:@"Document directory path is not string"];
+    }
+    if(! [path isKindOfClass:[NSString class]]){
+        [NSException raise:@"Internal consistency error" format:@"Attachment path is not string (attachment key: %@)",self.key];
+    }
     
-    NSString* ret = [[NSSearchPathForDirectoriesInDomains(NSDocumentDirectory, NSUserDomainMask, YES) objectAtIndex:0] stringByAppendingPathComponent:path];
+    NSString* ret = [docs stringByAppendingPathComponent:path];
 
     if(ret==nil){
         NSString* reason = [NSString stringWithFormat:@"Parsing filename %@ (key: %@) resulted in null path",self.filename,self.key];
@@ -205,13 +218,18 @@ NSInteger const VERSION_SOURCE_DROPBOX =3;
 }
 
 -(NSString*) filenameZoteroBase64Encoded{
+
     //This is a workaround to fix a double encoding bug in Zotero
-    
+    /*
     NSData* UTF8Data = [self.filename dataUsingEncoding:NSUTF8StringEncoding];
     NSString* asciiString = [[NSString alloc] initWithData:UTF8Data encoding:NSASCIIStringEncoding];
     NSData* doubleEncodedUTF8Data = [asciiString dataUsingEncoding:NSUTF8StringEncoding];
     
     return [[QSStrings encodeBase64WithData:doubleEncodedUTF8Data] stringByAppendingString:@"\%ZB64"];
+     
+     */
+
+    return [ZPZoteroAttachment zoteroBase64Decode:filename];
 }
 
 #pragma mark - File operations
@@ -292,6 +310,9 @@ NSInteger const VERSION_SOURCE_DROPBOX =3;
 
 -(void) moveFileFromPathAsNewOriginalFile:(NSString*) path{
     NSAssert2([[NSFileManager defaultManager] fileExistsAtPath:path],@"Attempted to associate non-existing file from %@ with attachment %@", path,self.key);
+    
+    DDLogInfo(@"Moving file from %@ as a new server file %@ for item %@",path,self.fileSystemPath_original,self.key);
+    
     [[NSFileManager defaultManager] removeItemAtPath:self.fileSystemPath_original error:NULL];
     [[NSFileManager defaultManager] moveItemAtPath:path toPath:self.fileSystemPath_original error:NULL];
 
@@ -326,7 +347,8 @@ NSInteger const VERSION_SOURCE_DROPBOX =3;
     
     //Return path to uncompressed files.
     //TODO: Encapsulate as a method
-    if([self.linkMode intValue] == LINK_MODE_IMPORTED_URL && [self.contentType isEqualToString:@"text/html"]){
+    if([self.linkMode intValue] == LINK_MODE_IMPORTED_URL && ([self.contentType isEqualToString:@"text/html"] ||
+                                                              [self.contentType isEqualToString:@"application/xhtml+xml"])){
         NSString* tempDir = [NSTemporaryDirectory() stringByAppendingPathComponent:self.key];
         
         return [NSURL fileURLWithPath:[tempDir stringByAppendingPathComponent:self.filename]];
@@ -358,19 +380,19 @@ NSInteger const VERSION_SOURCE_DROPBOX =3;
 }
 
 +(NSString*) zoteroBase64Encode:(NSString*)filename{
-    return [[QSStrings encodeBase64WithString:filename] stringByAppendingString:@"%ZB64"];
+    return [[filename base64EncodedString] stringByAppendingString:@"%ZB64"];
 }
 
 +(NSString*) zoteroBase64Decode:(NSString*)filename{
     NSString* toBeDecoded = [filename substringToIndex:[filename length] - 5];
-    NSData* decodedData = [QSStrings decodeBase64WithString:toBeDecoded] ;
+    NSData* decodedData = [toBeDecoded base64DecodedData];
     NSString* decodedFilename = [[NSString alloc] initWithData:decodedData encoding:NSUTF8StringEncoding];
     return decodedFilename;
 }
 
 
 -(void) logFileRevisions{
-    DDLogInfo(@"MD5: %@ Server: %@ Local %@: Filename %@",self.md5,self.versionIdentifier_server,self.versionIdentifier_local,self.filename);
+//    DDLogInfo(@"MD5: %@ Server: %@ Local %@: Filename %@",self.md5,self.versionIdentifier_server,self.versionIdentifier_local,self.filename);
 }
 
 @end

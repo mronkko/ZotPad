@@ -165,6 +165,7 @@ static ZPCacheController* _instance = nil;
     }
      
     [self performSelectorInBackground:@selector(_scanFilesToUpload) withObject:NULL];
+    [self performSelectorInBackground:@selector(_cleanUpCache) withObject:NULL];
      
     return self;
 }
@@ -218,6 +219,7 @@ static ZPCacheController* _instance = nil;
                     ZPZoteroAttachment* attachment = [_filesToDownload objectAtIndex:0];
                     [_filesToDownload removeObjectAtIndex:0];
                     while ( ![[ZPServerConnection instance] checkIfCanBeDownloadedAndStartDownloadingAttachment:attachment] && [_filesToDownload count] >0){
+                        DDLogWarn(@"File %@ (key: %@) belonging to item %@ (key: %@)  could not be found for download",attachment.filename,attachment.key,[(ZPZoteroItem*)[ZPZoteroItem dataObjectWithKey:attachment.parentItemKey] fullCitation],attachment.parentItemKey);
                         attachment = [_filesToDownload objectAtIndex:0];
                         [_filesToDownload removeObjectAtIndex:0];
                     }

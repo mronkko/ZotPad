@@ -1271,9 +1271,9 @@ Deletes items, notes, and attachments based in array of keys from a library
         }
 
         if(sortDescending)
-            sql=[sql stringByAppendingString:@" DESC"];
+            sql=[sql stringByAppendingString:@" COLLATE NOCASE DESC"];
         else
-            sql=[sql stringByAppendingFormat:@" ASC"];
+            sql=[sql stringByAppendingFormat:@" COLLATE NOCASE ASC"];
     }
     else{
         sql=[sql stringByAppendingFormat:@" ORDER BY items.cacheTimestamp DESC"];

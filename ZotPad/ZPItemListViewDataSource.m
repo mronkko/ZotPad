@@ -26,7 +26,7 @@
 @synthesize orderField = _orderField;
 @synthesize sortDescending = _sortDescending;
 @synthesize itemKeysShown = _itemKeysShown;
-
+@synthesize targetTableView = _tableView;
 
 static ZPItemListViewDataSource* _instance;
 
@@ -326,6 +326,8 @@ static ZPItemListViewDataSource* _instance;
     
     //If the data has become invalid, return a cell 
     
+    UITableViewCell* cell;
+    
     if(indexPath.row>=[_itemKeysShown count]){
         NSString* identifier;
         if(_libraryID==0){
@@ -339,125 +341,125 @@ static ZPItemListViewDataSource* _instance;
         }
         //DDLogVerbose(@"Cell identifier is %@",identifier);
         
-        return [aTableView dequeueReusableCellWithIdentifier:identifier];
-    }
-    NSObject* keyObj = [_itemKeysShown objectAtIndex: indexPath.row];
-    
-    
-    
-    NSString* key;
-    if(keyObj==[NSNull null] || keyObj==NULL){
-        key=@"";
-    }    
-    else{
-        key= (NSString*) keyObj;
-    }    
-    
-	UITableViewCell* cell;
-    
-    
-    ZPZoteroItem* item=NULL;
-    if(![key isEqualToString:@""]) item = (ZPZoteroItem*) [ZPZoteroItem dataObjectWithKey:key];
-    
-    if(item==NULL){
-        cell = [aTableView dequeueReusableCellWithIdentifier:@"LoadingCell"]; 
-        //DDLogVerbose(@"Cell identifier is LoadingCell");
+        cell = [aTableView dequeueReusableCellWithIdentifier:identifier];
+        if(cell == nil) cell = [[UITableViewCell alloc] initWithStyle:UITableViewCellStyleDefault reuseIdentifier:identifier];
         
-        //Row number
-        UILabel* rowNumber = (UILabel *) [cell viewWithTag:5];
-        if(rowNumber != NULL) rowNumber.text=[NSString stringWithFormat:@"%i",indexPath.row+1];
     }
     else{
+        NSObject* keyObj = [_itemKeysShown objectAtIndex: indexPath.row];
         
-        cell = [aTableView dequeueReusableCellWithIdentifier:@"ZoteroItemCell"];
-        //DDLogVerbose(@"Cell identifier is ZoteroItemCell");
-        //DDLogVerbose(@"Item with key %@ has full citation %@",item.key,item.fullCitation);
         
-        UILabel *titleLabel = (UILabel *)[cell viewWithTag:1];
-        titleLabel.text = item.title;
         
-        UILabel *authorsLabel = (UILabel *)[cell viewWithTag:2];
-        
-        //Show different things depending on what data we have
-        if(item.creatorSummary!=NULL){
-            if(item.year != NULL){
-                authorsLabel.text = [NSString stringWithFormat:@"%@ (%@)",item.creatorSummary,item.year];
-            }
-            else{
-                authorsLabel.text = [NSString stringWithFormat:@"%@",item.creatorSummary];
-            }
+        NSString* key;
+        if(keyObj==[NSNull null] || keyObj==NULL){
+            key=@"";
         }    
-        else if(item.year!= NULL){
-            authorsLabel.text = [NSString stringWithFormat:@"No author (%@)",item.year];
+        else{
+            key= (NSString*) keyObj;
+        }    
+            
+        ZPZoteroItem* item=NULL;
+        if(![key isEqualToString:@""]) item = (ZPZoteroItem*) [ZPZoteroItem dataObjectWithKey:key];
+        
+        if(item==NULL){
+            cell = [aTableView dequeueReusableCellWithIdentifier:@"LoadingCell"]; 
+            //DDLogVerbose(@"Cell identifier is LoadingCell");
+            
+            //Row number
+            UILabel* rowNumber = (UILabel *) [cell viewWithTag:5];
+            if(rowNumber != NULL) rowNumber.text=[NSString stringWithFormat:@"%i",indexPath.row+1];
         }
-        
-        //Publication as a formatted label
-        
-        OHAttributedLabel* publishedInLabel = (OHAttributedLabel*)[cell viewWithTag:3];
-        
-        
-        
-        if(publishedInLabel != NULL){
+        else{
             
-            NSString* publishedIn = item.publicationDetails;
+            cell = [aTableView dequeueReusableCellWithIdentifier:@"ZoteroItemCell"];
+            //DDLogVerbose(@"Cell identifier is ZoteroItemCell");
+            //DDLogVerbose(@"Item with key %@ has full citation %@",item.key,item.fullCitation);
             
-            if(publishedIn == NULL){
-                publishedIn=@"";   
+            UILabel *titleLabel = (UILabel *)[cell viewWithTag:1];
+            titleLabel.text = item.title;
+            
+            UILabel *authorsLabel = (UILabel *)[cell viewWithTag:2];
+            
+            //Show different things depending on what data we have
+            if(item.creatorSummary!=NULL){
+                if(item.year != NULL){
+                    authorsLabel.text = [NSString stringWithFormat:@"%@ (%@)",item.creatorSummary,item.year];
+                }
+                else{
+                    authorsLabel.text = [NSString stringWithFormat:@"%@",item.creatorSummary];
+                }
+            }    
+            else if(item.year!= NULL){
+                authorsLabel.text = [NSString stringWithFormat:@"No author (%@)",item.year];
             }
             
-            NSAttributedString* text = [[NSAttributedString alloc] initWithHTMLData:[publishedIn dataUsingEncoding:NSUTF8StringEncoding]  documentAttributes:NULL];
+            //Publication as a formatted label
             
-            //Font size of TTStyledTextLabel cannot be set in interface builder, so must be done here
-            [publishedInLabel setFont:[UIFont systemFontOfSize:[UIFont smallSystemFontSize]]];
-            [publishedInLabel setAttributedText:text];
-        }
-        
-        //Attachment icon
-        
-        UIImageView* articleThumbnail = (UIImageView *) [cell viewWithTag:4];
-        
-        //Remove subviews. These can be used when rendering.
-        for(UIView* view in articleThumbnail.subviews) [view removeFromSuperview];
-        
-        //Check if the item has attachments and render a thumbnail from the first attachment PDF
-        
-        if(articleThumbnail!= NULL){
-            if([item.attachments count] > 0){
+            OHAttributedLabel* publishedInLabel = (OHAttributedLabel*)[cell viewWithTag:3];
+            
+            
+            
+            if(publishedInLabel != NULL){
                 
-                [articleThumbnail setHidden:FALSE];
+                NSString* publishedIn = item.publicationDetails;
                 
-                ZPZoteroAttachment* attachment = [item.attachments objectAtIndex:0];
+                if(publishedIn == NULL){
+                    publishedIn=@"";   
+                }
                 
+                NSAttributedString* text = [[NSAttributedString alloc] initWithHTMLData:[publishedIn dataUsingEncoding:NSUTF8StringEncoding]  documentAttributes:NULL];
                 
-                //DDLogVerbose(@"ImageView for row %i is %i",indexPath.row,articleThumbnail);
-                
-                [ZPAttachmentIconImageFactory renderFileTypeIconForAttachment:attachment intoImageView:articleThumbnail];
-                // Enable or disable depending whether file is available or not
-                
-                if(attachment.fileExists || ([attachment.linkMode intValue] == LINK_MODE_LINKED_URL && [ZPServerConnection instance])){
-                    articleThumbnail.alpha = 1;
-                    articleThumbnail.userInteractionEnabled = TRUE;
+                //Font size of TTStyledTextLabel cannot be set in interface builder, so must be done here
+                [publishedInLabel setFont:[UIFont systemFontOfSize:[UIFont smallSystemFontSize]]];
+                [publishedInLabel setAttributedText:text];
+            }
+            
+            //Attachment icon
+            
+            UIImageView* articleThumbnail = (UIImageView *) [cell viewWithTag:4];
+            
+            //Remove subviews. These can be used when rendering.
+            for(UIView* view in articleThumbnail.subviews) [view removeFromSuperview];
+            
+            //Check if the item has attachments and render a thumbnail from the first attachment PDF
+            
+            if(articleThumbnail!= NULL){
+                if([item.attachments count] > 0){
                     
-                    //If there is no gesture recognizer, create and add one
-                    if(articleThumbnail.gestureRecognizers.count ==0){
-                        [articleThumbnail addGestureRecognizer: [[UITapGestureRecognizer alloc] initWithTarget:self action:@selector(attachmentThumbnailPressed:)]];
+                    [articleThumbnail setHidden:FALSE];
+                    
+                    ZPZoteroAttachment* attachment = [item.attachments objectAtIndex:0];
+                    
+                    
+                    //DDLogVerbose(@"ImageView for row %i is %i",indexPath.row,articleThumbnail);
+                    
+                    [ZPAttachmentIconImageFactory renderFileTypeIconForAttachment:attachment intoImageView:articleThumbnail];
+                    // Enable or disable depending whether file is available or not
+                    
+                    if(attachment.fileExists || ([attachment.linkMode intValue] == LINK_MODE_LINKED_URL && [ZPServerConnection instance])){
+                        articleThumbnail.alpha = 1;
+                        articleThumbnail.userInteractionEnabled = TRUE;
+                        
+                        //If there is no gesture recognizer, create and add one
+                        if(articleThumbnail.gestureRecognizers.count ==0){
+                            [articleThumbnail addGestureRecognizer: [[UITapGestureRecognizer alloc] initWithTarget:self action:@selector(attachmentThumbnailPressed:)]];
+                        }
+                    }
+                    else{
+                        articleThumbnail.alpha = .3;
+                        articleThumbnail.userInteractionEnabled = FALSE;
                     }
                 }
                 else{
-                    articleThumbnail.alpha = .3;
-                    articleThumbnail.userInteractionEnabled = FALSE;
+                    articleThumbnail.hidden=TRUE;
                 }
             }
-            else{
-                articleThumbnail.hidden=TRUE;
-            }
+            
+            //Row number
+            UILabel* rowNumber = (UILabel *) [cell viewWithTag:5];
+            if(rowNumber != NULL) rowNumber.text=[NSString stringWithFormat:@"%i",indexPath.row+1];
         }
-        
-        //Row number
-        UILabel* rowNumber = (UILabel *) [cell viewWithTag:5];
-        if(rowNumber != NULL) rowNumber.text=[NSString stringWithFormat:@"%i",indexPath.row+1];
-    }
-    
+    }    
     if(cell == NULL || ! [cell isKindOfClass:[UITableViewCell class]]){
         [NSException raise:@"Invalid cell" format:@""];
     }
@@ -483,8 +485,19 @@ static ZPItemListViewDataSource* _instance;
         [[UIApplication sharedApplication] openURL:[NSURL URLWithString:attachment.url]];
     }
     else{
-        [ZPPreviewController displayQuicklookWithAttachment:attachment sourceView:imageView];
+        _attachmentInQuicklook = attachment;
+        [ZPPreviewController displayQuicklookWithAttachment:attachment source:self];
     }
 }
-
+-(UIView*) sourceViewForQuickLook{
+    
+    //If the table view is no longer displayed
+    if(_tableView.superview == NULL) return NULL;
+    
+    @synchronized(self){
+        NSInteger index = [_itemKeysShown indexOfObject:_attachmentInQuicklook.parentItemKey];
+        UITableViewCell* cell = [_tableView cellForRowAtIndexPath:[NSIndexPath indexPathForRow:index inSection:0]];
+        return [cell viewWithTag:4];
+    }
+}
 @end

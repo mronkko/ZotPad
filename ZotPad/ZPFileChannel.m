@@ -84,23 +84,27 @@
 
 -(void) presentConflictViewForAttachment:(ZPZoteroAttachment*) attachment{
     
-    [attachment logFileRevisions];
-
-    UIViewController* root = [UIApplication sharedApplication].delegate.window.rootViewController;
-    
-    //TODO: Consider refactoring this some place else
-    NSDictionary* sender = [NSDictionary dictionaryWithObjectsAndKeys:self,@"fileChannel",attachment,@"attachment", nil];
-    if(root.presentedViewController == NULL){
-        [root performSegueWithIdentifier:@"FileUploadConflict" sender:sender];
-    }
-    else if ([root.presentedViewController isKindOfClass:[ZPFileImportViewController class]] && [(ZPFileImportViewController*) root.presentedViewController isFullyPresented]){
-        [root.presentedViewController performSegueWithIdentifier:@"FileUploadConflictFromDialog" sender:sender];
+    if(![NSThread isMainThread]){
+        [self performSelectorOnMainThread:@selector(presentConflictViewForAttachment:) withObject:attachment waitUntilDone:YES];
     }
     else{
-        //Delay one second and check again if this can be presented
-        [self performSelector:@selector(presentConflictViewForAttachment:) withObject:attachment afterDelay:(NSTimeInterval) 1];
+        [attachment logFileRevisions];
+        
+        UIViewController* root = [UIApplication sharedApplication].delegate.window.rootViewController;
+        
+        //TODO: Consider refactoring this some place else
+        NSDictionary* sender = [NSDictionary dictionaryWithObjectsAndKeys:self,@"fileChannel",attachment,@"attachment", nil];
+        if(root.presentedViewController == NULL){
+            [root performSegueWithIdentifier:@"FileUploadConflict" sender:sender];
+        }
+        else if ([root.presentedViewController isKindOfClass:[ZPFileImportViewController class]] && [(ZPFileImportViewController*) root.presentedViewController isFullyPresented]){
+            [root.presentedViewController performSegueWithIdentifier:@"FileUploadConflictFromDialog" sender:sender];
+        }
+        else{
+            //Delay one second and check again if this can be presented
+            [self performSelector:@selector(presentConflictViewForAttachment:) withObject:attachment afterDelay:(NSTimeInterval) 1];
+        }
     }
-
 }
 
 

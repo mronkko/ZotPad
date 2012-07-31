@@ -14,4 +14,6 @@
     
 }
 
+@property (retain) ZPItemDetailViewController* detailViewController;
+
 @end

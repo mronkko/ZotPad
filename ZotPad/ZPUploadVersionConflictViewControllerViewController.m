@@ -43,6 +43,7 @@
     
     if(_carouselDelegate == NULL){
         _carouselDelegate = [[ZPAttachmentCarouselDelegate alloc] init];
+        _carouselDelegate.owner = self;
         
         //iPhone shows the versions in carousel. On iPad they are shown in separate carousels
         
@@ -68,6 +69,7 @@
         
         if(secondaryCarousel!=NULL){
             _secondaryCarouselDelegate = [[ZPAttachmentCarouselDelegate alloc] init];
+            _secondaryCarouselDelegate.owner = self;
             _secondaryCarouselDelegate.mode = ZPATTACHMENTICONGVIEWCONTROLLER_MODE_DOWNLOAD;
             _secondaryCarouselDelegate.show = ZPATTACHMENTICONGVIEWCONTROLLER_SHOW_ORIGINAL;
             [_secondaryCarouselDelegate configureWithAttachmentArray:[NSArray arrayWithObject: attachment]];

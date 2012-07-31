@@ -156,7 +156,9 @@ static const NSString* DROPBOX_KEY = @"nn6res38igpo4ec";
         basePath = [NSString stringWithFormat:@"/%@",[[ZPPreferences instance] dropboxPath]];
     }
     
-    if([attachment.linkMode intValue] == LINK_MODE_IMPORTED_URL && [attachment.contentType isEqualToString:@"text/html"]){
+    if([attachment.linkMode intValue] == LINK_MODE_IMPORTED_URL && (
+                                                                    [attachment.contentType isEqualToString:@"text/html"] ||
+                                                                    [attachment.contentType isEqualToString:@"application/xhtml+xml"])){
         //Get a list of files to be downloaded. This does not respect custom file name template
         return [NSString stringWithFormat:@"%@/%@/",basePath, attachment.key];
     }
@@ -333,7 +335,9 @@ static const NSString* DROPBOX_KEY = @"nn6res38igpo4ec";
 - (void)restClient:(ZPDBRestClient*)client loadProgress:(CGFloat)progress forFile:(NSString*)destPath{
 
     ZPZoteroAttachment* attachment = client.attachment;
-    if(!([attachment.linkMode intValue] == LINK_MODE_IMPORTED_URL && [attachment.contentType isEqualToString:@"text/html"])){ 
+    if(!([attachment.linkMode intValue] == LINK_MODE_IMPORTED_URL && (
+                                                                      [attachment.contentType isEqualToString:@"text/html"] ||
+                                                                      [attachment.contentType isEqualToString:@"application/xhtml+xml"]))){ 
         @synchronized(progressViewsByRequest){
             UIProgressView* progressView = [progressViewsByRequest objectForKey:[self keyForRequest:client]];
             if(progressView!=NULL) [progressView setProgress:progress];
@@ -347,7 +351,9 @@ static const NSString* DROPBOX_KEY = @"nn6res38igpo4ec";
     ZPZoteroAttachment* attachment = client.attachment;
     
     //If this is a webpage snapshot
-    if([attachment.linkMode intValue] == LINK_MODE_IMPORTED_URL && [attachment.contentType isEqualToString:@"text/html"]){
+    if([attachment.linkMode intValue] == LINK_MODE_IMPORTED_URL && (
+                                                                    [attachment.contentType isEqualToString:@"text/html"] ||
+                                                                    [attachment.contentType isEqualToString:@"application/xhtml+xml"])){
         
         //Update progress
         NSInteger total;

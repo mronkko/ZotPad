@@ -15,6 +15,8 @@
 
 @implementation ZPMasterItemListViewController
 
+@synthesize detailViewController;
+
 - (id)initWithStyle:(UITableViewStyle)style
 {
     self = [super initWithStyle:style];
@@ -26,6 +28,8 @@
 
 - (void)viewDidLoad
 {
+    DDLogInfo(@"Loading item list in the navigator");
+
     [super viewDidLoad];
 
     // Uncomment the following line to preserve selection between presentations.
@@ -34,6 +38,8 @@
     // Uncomment the following line to display an Edit button in the navigation bar for this view controller.
     // self.navigationItem.rightBarButtonItem = self.editButtonItem;
 
+    //TODO: Set the selected item
+    self.tableView.delegate = detailViewController;
     self.tableView.dataSource = [ZPItemListViewDataSource instance];
 }
 

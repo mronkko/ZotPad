@@ -13,9 +13,6 @@
 [submodule "asi-http-request"]
 	path = asi-http-request
 	url = https://github.com/pokeb/asi-http-request.git
-[submodule "QSUtilities"]
-	path = QSUtilities
-	url = https://github.com/mikeho/QSUtilities.git
 [submodule "Oxygen-Icons"]
 	path = Oxygen-Icons
 	url = https://github.com/chadnickbok/Oxygen-Icons.git
@@ -37,3 +34,6 @@
 [submodule "InAppSettingsKit"]
 	path = InAppSettingsKit
 	url = https://github.com/futuretap/InAppSettingsKit.git
+[submodule "Base64"]
+	path = Base64
+	url = https://github.com/nicklockwood/Base64.git

@@ -11,10 +11,11 @@
 #import "ZPPreviewController.h"
 #import "ZPAttachmentFileInteractionController.h"
 #import "ZPAttachmentCarouselDelegate.h"
+#import "ZPPreviewSource.h"
 
 //Unzipping and base64 decoding
 #import "ZipArchive.h"
-#import "QSStrings.h"
+#import "NSString+Base64.h"
 
 @interface ZPPreviewControllerDelegate : NSObject <QLPreviewControllerDataSource, QLPreviewControllerDelegate>{
     NSMutableArray* _previewItems;
@@ -40,7 +41,8 @@
     if([_previewItems lastObject] == attachment) return;
     
     // Imported URLs need to be unzipped
-    if([attachment.linkMode intValue] == LINK_MODE_IMPORTED_URL && [attachment.contentType isEqualToString:@"text/html"]){
+    if([attachment.linkMode intValue] == LINK_MODE_IMPORTED_URL && ([attachment.contentType isEqualToString:@"text/html"] ||
+                                                                    [attachment.contentType isEqualToString:@"application/xhtml+xml"])){
         
         //TODO: Make sure that this tempdir is cleaned at some point (Maybe refactor this into ZPZoteroAttachment)
         
@@ -63,8 +65,7 @@
         for (NSString* file in files){
             // The filenames end with %ZB64, which needs to be removed
             NSString* toBeDecoded = [file substringToIndex:[file length] - 5];
-            NSData* decodedData = [QSStrings decodeBase64WithString:toBeDecoded] ;
-            NSString* decodedFilename = [[NSString alloc] initWithData:decodedData encoding:NSUTF8StringEncoding];
+            NSString* decodedFilename = [toBeDecoded base64DecodedString];
             
             [[NSFileManager defaultManager] moveItemAtPath:[tempDir stringByAppendingPathComponent:file] toPath:[tempDir stringByAppendingPathComponent:decodedFilename] error:NULL];
             
@@ -116,12 +117,11 @@ static ZPPreviewControllerDelegate* _sharedDelegate;
     return self;
 }
 
--(id) initWithAttachment:(ZPZoteroAttachment*)attachment sourceView:(UIView*)view{
+-(id) initWithAttachment:(ZPZoteroAttachment*)attachment source:(id <ZPPreviewSource>)source{
     
     self = [super init];
     
-    _source = view;
-
+    _source = source;
     [_sharedDelegate addAttachmentToQuicklook:attachment];
 
     self.delegate = self;
@@ -140,7 +140,7 @@ static ZPPreviewControllerDelegate* _sharedDelegate;
 }
 
 
-+(void) displayQuicklookWithAttachment:(ZPZoteroAttachment*)attachment sourceView:(UIView*)view{
++(void) displayQuicklookWithAttachment:(ZPZoteroAttachment*)attachment source:(id <ZPPreviewSource>)source{
     
     if([attachment.linkMode intValue] == LINK_MODE_LINKED_URL){
         NSString* urlString = [[(ZPZoteroItem*)[ZPZoteroItem dataObjectWithKey:attachment.parentItemKey] fields] objectForKey:@"url"];
@@ -163,7 +163,7 @@ static ZPPreviewControllerDelegate* _sharedDelegate;
     }
     else {
         
-        ZPPreviewController* quicklook = [[ZPPreviewController alloc] initWithAttachment:attachment sourceView:view];
+        ZPPreviewController* quicklook = [[ZPPreviewController alloc] initWithAttachment:attachment source:(id <ZPPreviewSource>)source];
         
         UIViewController* root = [UIApplication sharedApplication].delegate.window.rootViewController;
 
@@ -212,17 +212,20 @@ static ZPPreviewControllerDelegate* _sharedDelegate;
 //Needed to provide zoom effect
 
 - (CGRect)previewController:(QLPreviewController *)controller frameForPreviewItem:(id <QLPreviewItem>)item inSourceView:(UIView **)view{
-    *view = _source;
-    CGRect frame = _source.frame;
-    return frame; 
+    UIView* sourceView = [(id <ZPPreviewSource>) _source sourceViewForQuickLook]; 
+    *view = sourceView;
+    CGRect frame = sourceView.frame;
+    return frame;
 } 
 
 
 - (UIImage *)previewController:(QLPreviewController *)controller transitionImageForPreviewItem:(id <QLPreviewItem>)item contentRect:(CGRect *)contentRect{
-    if([_source isKindOfClass:[UIImageView class]]) return [(UIImageView*) _source image];
+    UIView* sourceView = [(id <ZPPreviewSource>) _source sourceViewForQuickLook]; 
+
+    if([sourceView isKindOfClass:[UIImageView class]]) return [(UIImageView*) sourceView image];
     else{
-        UIGraphicsBeginImageContextWithOptions(_source.bounds.size, NO, 0);
-        [_source.layer renderInContext:UIGraphicsGetCurrentContext()];
+        UIGraphicsBeginImageContextWithOptions(sourceView.bounds.size, NO, 0);
+        [sourceView.layer renderInContext:UIGraphicsGetCurrentContext()];
         UIImage* image = UIGraphicsGetImageFromCurrentImageContext();
         UIGraphicsEndImageContext();
         

@@ -8,8 +8,9 @@
 
 #import <Foundation/Foundation.h>
 #import "ZPCore.h"
+#import "ZPPreviewSource.h"
 
-@interface ZPItemListViewDataSource : NSObject <UITableViewDataSource, ZPItemObserver>{
+@interface ZPItemListViewDataSource : NSObject <UITableViewDataSource, ZPItemObserver, ZPPreviewSource>{
  
     //This is an array instead of a mutable array because of thread safety
     NSArray* _itemKeysShown;
@@ -26,6 +27,8 @@
     BOOL _invalidated;
     
     UITableView* _tableView;
+    
+    ZPZoteroAttachment* _attachmentInQuicklook;
 }
 
 + (ZPItemListViewDataSource*) instance;

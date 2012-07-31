@@ -116,6 +116,12 @@ NSInteger const ZPFILECHANNEL_WEBDAV_UPLOAD_REGISTER = 5;
     [request setRequestMethod:@"GET"];
     [request setDelegate:self];
     [request setShowAccurateProgress:TRUE];
+    
+    NSUserDefaults* defaults = [NSUserDefaults standardUserDefaults];
+    NSString* hostException = [defaults objectForKey:@"webdavsecurityexception"];
+    if([[url host] isEqual:hostException]){
+        [request setValidatesSecureCertificate:NO];
+    }
 
     request.userInfo = [NSDictionary dictionaryWithObject:attachment forKey:@"attachment"];
     request.tag = ZPFILECHANNEL_WEBDAV_DOWNLOAD;
@@ -242,6 +248,13 @@ NSInteger const ZPFILECHANNEL_WEBDAV_UPLOAD_REGISTER = 5;
     uploadRequest.tag = tag;
     
     
+    NSUserDefaults* defaults = [NSUserDefaults standardUserDefaults];
+    NSString* hostException = [defaults objectForKey:@"webdavsecurityexception"];
+    if([[url host] isEqual:hostException]){
+        [uploadRequest setValidatesSecureCertificate:NO];
+    }
+
+    
     if(tag == ZPFILECHANNEL_WEBDAV_UPLOAD_FILE){
         //Zip the file before uploading
         
@@ -342,7 +355,10 @@ NSInteger const ZPFILECHANNEL_WEBDAV_UPLOAD_REGISTER = 5;
     if(request.tag == ZPFILECHANNEL_WEBDAV_DOWNLOAD){
 
         if(request.responseStatusCode == 200){
-            if([attachment.linkMode intValue] == LINK_MODE_IMPORTED_URL && [attachment.contentType isEqualToString:@"text/html"]){
+            //TODO: A more robust way to check if we need to uncompress
+            if([attachment.linkMode intValue] == LINK_MODE_IMPORTED_URL && (
+                                                                            [attachment.contentType isEqualToString:@"text/html"] ||
+                                                                            [attachment.contentType isEqualToString:@"application/xhtml+xml"])){
                 NSString* tempFile = [request downloadDestinationPath];
                 NSString* md5 = [ZPZoteroAttachment md5ForFileAtPath:tempFile];
                 DDLogVerbose(@"The MD5 sum of the file received from server is %@", md5);
@@ -483,8 +499,25 @@ NSInteger const ZPFILECHANNEL_WEBDAV_UPLOAD_REGISTER = 5;
 
     DDLogError(@"Request to %@ failed: %@", request.url, [error description]);
 
+    //Connection error
+    if(error.code ==ASIConnectionFailureErrorType){
+        //SSL error (self signed certificate)
+        // errSSLXCertChainInvalid
+        NSError* underlyingError = [error.userInfo objectForKey:NSUnderlyingErrorKey];
+        if(underlyingError.code == -9807){
+            UIAlertView *message = [[UIAlertView alloc] initWithTitle:@"SSL certificate error"
+                                                              message:[NSString stringWithFormat: @"%@ did not provide a valid SSL certificate or the signature verification failed. If you are using a self-signed certificate and understand what you are doing, you can add a security exception and choose to trust the site.",[request.url host]]
+                                                             delegate:self
+                                                    cancelButtonTitle:@"Cancel"
+                                                    otherButtonTitles:@"Disable WebDAV",@"Add security exception",nil];
+            
+            [message show];
+            
+        }
+        
+    }
     //If there was an authentication issue, reauthenticate
-    if(error.code == 3){
+    else if(error.code == ASIAuthenticationErrorType){
         UIAlertView *message = [[UIAlertView alloc] initWithTitle:@"Authentication failed"
                                                           message:@"Authenticating with WebDAV server failed."
                                                          delegate:self
@@ -493,7 +526,7 @@ NSInteger const ZPFILECHANNEL_WEBDAV_UPLOAD_REGISTER = 5;
         
         [message show];
     }
-    if(error.code == 5){
+    else if(error.code == ASIUnableToCreateRequestErrorType){
         UIAlertView *message = [[UIAlertView alloc] initWithTitle:@"Configuration error"
                                                           message:@"WebDAV addresss is not configured properly. Please check ZotPad settings."
                                                          delegate:self
@@ -524,6 +557,12 @@ NSInteger const ZPFILECHANNEL_WEBDAV_UPLOAD_REGISTER = 5;
     //Disable webdav
     if(buttonIndex == 1){
         [[ZPPreferences instance] setUseWebDAV:FALSE];
+    }
+    //Add security exception
+    else if(buttonIndex == 2){
+        NSUserDefaults* defaults = [NSUserDefaults standardUserDefaults];
+        NSString* host = [[NSURL URLWithString:[[ZPPreferences instance] webDAVURL]] host]; 
+        [defaults setObject:host forKey:@"webdavsecurityexception"];
     }
 }
 

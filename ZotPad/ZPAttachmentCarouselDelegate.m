@@ -56,7 +56,8 @@ NSInteger const ZPATTACHMENTICONGVIEWCONTROLLER_TAG_TITLELABEL = -5;
 
 @implementation ZPAttachmentCarouselDelegate
 
-@synthesize actionButton, attachmentCarousel, mode, show;
+@synthesize actionButton, attachmentCarousel, mode, show, owner;
+@synthesize selectedIndex=_selectedIndex;
 
 -(id) init{
     _progressViews = [[NSMutableSet alloc] init];
@@ -101,14 +102,15 @@ NSInteger const ZPATTACHMENTICONGVIEWCONTROLLER_TAG_TITLELABEL = -5;
 
 - (void) _toggleActionButtonState{
     if(actionButton != NULL){
-        if([_attachments count]==0){
+        NSInteger currentIndex = attachmentCarousel.currentItemIndex;
+        if(currentIndex >= [_attachments count]){
             self.actionButton.enabled = FALSE;
         }
         else{
-            NSInteger currentIndex = attachmentCarousel.currentItemIndex;
-            // Initially the iCarousel can return a negative index. This is probably a bug.
             ZPZoteroAttachment* attachment = [_attachments objectAtIndex:currentIndex];
-            self.actionButton.enabled = [self _fileExistsForAttachment:attachment]  &! [attachment.contentType isEqualToString:@"text/html"];
+            self.actionButton.enabled = [self _fileExistsForAttachment:attachment]  &! 
+            [attachment.contentType isEqualToString:@"text/html"] &!
+            [attachment.contentType isEqualToString:@"application/xhtml+xml"];
         }
     }
 }
@@ -415,7 +417,7 @@ NSInteger const ZPATTACHMENTICONGVIEWCONTROLLER_TAG_TITLELABEL = -5;
                 }
             }
             
-            [ZPPreviewController displayQuicklookWithAttachment:attachment sourceView:sourceView];
+            [ZPPreviewController displayQuicklookWithAttachment:attachment source:self];
         }
         else if([attachment.linkMode intValue] == LINK_MODE_LINKED_URL && [ZPServerConnection instance]){
             [[UIApplication sharedApplication] openURL:[NSURL URLWithString:attachment.url]];
@@ -443,15 +445,16 @@ NSInteger const ZPATTACHMENTICONGVIEWCONTROLLER_TAG_TITLELABEL = -5;
             actionButton.enabled = FALSE;
         }
         else{
-            NSInteger currentIndex = carousel.currentItemIndex;
+            _selectedIndex = carousel.currentItemIndex;
             // Initially the iCarousel can return a negative index. This is probably a bug in iCarousel.
-            if(currentIndex <0) currentIndex = 0;
-            ZPZoteroAttachment* attachment = [_attachments objectAtIndex:currentIndex];
-            actionButton.enabled = [self _fileExistsForAttachment:attachment] &! [attachment.contentType isEqualToString:@"text/html"];
+            if(_selectedIndex <0) _selectedIndex = 0;
+            ZPZoteroAttachment* attachment = [_attachments objectAtIndex:_selectedIndex];
+            actionButton.enabled = [self _fileExistsForAttachment:attachment] &!
+            [attachment.contentType isEqualToString:@"text/html"] &!
+            [attachment.contentType isEqualToString:@"application/xhtml+xml"];
         }
     }
 }
-
 
 #pragma mark - Item observer methods
 
@@ -609,5 +612,20 @@ NSInteger const ZPATTACHMENTICONGVIEWCONTROLLER_TAG_TITLELABEL = -5;
     }
 }
 
+-(UIView*) sourceViewForQuickLook{
+    if(! [owner isViewLoaded]){
+        //TODO: Force owner to loading the entire view hierarchy
+        return NULL;
+    }
+    
+    iCarousel* carousel = self.attachmentCarousel;
+    UIView* sourceView = [carousel itemViewAtIndex:_selectedIndex];
+    UIView* temp = sourceView;
+    while(temp != nil){
+        DDLogVerbose(@"Class %s , w: %f h: %f x: %f y: %f",class_getName([temp class]),temp.frame.size.width,temp.frame.size.height,temp.frame.origin.x,temp.frame.origin.y);
+        temp = temp.superview;
+    }
+    return sourceView;
+}
 
 @end

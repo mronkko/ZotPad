@@ -15,7 +15,7 @@
 #import "ZPItemObserver.h"
 
 
-@interface ZPItemDetailViewController : UITableViewController <ZPItemObserver, UINavigationControllerDelegate >{
+@interface ZPItemDetailViewController : UITableViewController <UINavigationControllerDelegate >{
     ZPZoteroItem* _currentItem;
     iCarousel* _carousel;
     UIActivityIndicatorView* _activityIndicator;

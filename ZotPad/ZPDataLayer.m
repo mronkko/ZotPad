@@ -150,6 +150,11 @@ static ZPDataLayer* _instance = nil;
                 }
             }
         }
+        
+        [[NSNotificationCenter defaultCenter]
+         postNotificationName:@"ItemDataAvailable" 
+         object:self
+         userInfo:[NSDictionary dictionaryWithObject:item forKey:@"item"]];
     }
 }
 

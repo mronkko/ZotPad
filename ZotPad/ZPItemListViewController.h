@@ -10,16 +10,19 @@
 #import "../DSActivityView/Sources/DSActivityView.h"
 #import "ZPItemListViewController.h"
 #import "ZPItemDetailViewController.h"
+#import "ZPItemListViewDataSource.h"
+
+@class ZPItemListViewDataSource;
 
 @interface ZPItemListViewController : UIViewController <UISplitViewControllerDelegate, UISearchBarDelegate, ZPItemObserver>{
 
+    ZPItemListViewDataSource* _dataSource;
     DSBezelActivityView* _activityView;
     UITableView* _tableView;
     UIToolbar* _toolBar;
     NSInteger _tagForActiveSortButton;
     UIActivityIndicatorView* _activityIndicator;
     UIImageView* _sortDirectionArrow;
-
 
 }
 

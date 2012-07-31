@@ -17,7 +17,7 @@
 #import "ZPCacheStatusToolbarController.h"
 #import "ZPItemListViewDataSource.h"
 #import "ZPHelpPopover.h"
-
+#import "ZPMasterItemListViewController.h"
 
 @implementation ZPLibraryAndCollectionListViewController
 
@@ -51,8 +51,10 @@
 
 - (void)viewDidLoad
 {
-    [super viewDidLoad];
     
+    DDLogInfo(@"Loading library and collection list in navigator");
+
+    [super viewDidLoad];
 
     //TODO: Fix this activity indicator. There should be a reliable way to know when the
     //view is receiving new data and when it has received all data. This is complicated
@@ -77,6 +79,7 @@
         gearButton.action = @selector(showLogView:);
     }
  
+
 }
 
 - (void)viewDidUnload
@@ -92,7 +95,7 @@
     [super viewWillAppear:animated];
     
     //If the current library is not defined, show a list of libraries
-    if(self->_currentlibraryID == 0){
+    if(self->_currentlibraryID == NULL){
         [[ZPCacheController instance] performSelectorInBackground:@selector(updateLibrariesAndCollectionsFromServer) withObject:NULL];
         self->_content = [[ZPDataLayer instance] libraries];
     }
@@ -142,9 +145,10 @@
     if([segue.identifier isEqualToString:@"PushItemsToNavigator"]){
         
         
-        UITableViewController*  target = (UITableViewController*) segue.destinationViewController;
+        ZPMasterItemListViewController* target = (ZPMasterItemListViewController*) segue.destinationViewController;
+        target.detailViewController = sender;
+        target.tableView.delegate = sender;
         
-//        target.tableView.delegate = (ZPItemDetailViewController*)sender;
         target.navigationItem.hidesBackButton = YES;
         target.clearsSelectionOnViewWillAppear = NO;
         

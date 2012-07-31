@@ -82,12 +82,14 @@ didFinishLaunchingWithOptions:(NSDictionary *)launchOptions
     
     [TestFlight takeOff:@"5e753f234f33fc2bddf4437600037fbf_NjcyMjEyMDEyLTA0LTA5IDE0OjUyOjU0LjE4MDQwMg"];
 
+// This causes crashes
+    
 //    TestFlightLogger* tfLogger = [[TestFlightLogger alloc] initWithTeamToken:@"5e753f234f33fc2bddf4437600037fbf_NjcyMjEyMDEyLTA0LTA5IDE0OjUyOjU0LjE4MDQwMg"];
 //    tfLogger.logFormatter = [[ZPFileLogFormatter alloc] initWithLevel:LOG_LEVEL_VERBOSE];
 //    [DDLog addLogger:tfLogger];
     
-    //Perform a memory warning every X seconds
-//    [NSTimer scheduledTimerWithTimeInterval:(NSTimeInterval)10 target:[UIApplication sharedApplication] selector:@selector(_performMemoryWarning) userInfo:NULL repeats:YES];
+    //Perform a memory warning every 2 seconds
+//    [NSTimer scheduledTimerWithTimeInterval:(NSTimeInterval)2 target:[UIApplication sharedApplication] selector:@selector(_performMemoryWarning) userInfo:NULL repeats:YES];
     
 #else
     if([[ZPPreferences instance] reportErrors]) [TestFlight takeOff:@"5e753f234f33fc2bddf4437600037fbf_NjcyMjEyMDEyLTA0LTA5IDE0OjUyOjU0LjE4MDQwMg"];

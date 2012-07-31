@@ -15,12 +15,11 @@
 #import "ZPPreferences.h"
 #import "ZPAppDelegate.h"
 
-#import "ZPItemListViewDataSource.h"
-
 //TODO: Refactor so that these would not be needed
 #import "ZPServerConnection.h"
 #import "ZPDatabase.h"
 #import "ZPCacheController.h"
+
 
 //A small helper class for performing configuration of uncanched items list in itemlistview
 
@@ -219,7 +218,6 @@
     NSOperationQueue* _uiEventQueue;
     ZPItemListViewController_sortHelper* _sortHelper;
     UIView* _overlay;
-    ZPItemListViewDataSource* _dataSource;
 }
 
 -(void) _configureSortButton:(UIButton*)button;
@@ -252,6 +250,7 @@
 
         if([NSThread isMainThread]){
             
+            _dataSource.targetTableView = self.tableView;
             //Set the navigation item
             
             if(_dataSource.collectionKey != NULL){
@@ -323,7 +322,7 @@
     // Make sure your segue name in storyboard is the same as this line
     if ([[segue identifier] isEqualToString:@"PushItemDetailView"])
     {
-        __unsafe_unretained ZPItemDetailViewController* itemDetailViewController = ( ZPItemDetailViewController*)[segue destinationViewController];
+        ZPItemDetailViewController* itemDetailViewController = ( ZPItemDetailViewController*)[segue destinationViewController];
         
         // Get the selected row from the item list
         NSIndexPath* indexPath = [_tableView indexPathForSelectedRow];
@@ -355,9 +354,13 @@
 - (void)viewDidLoad
 {
 
+    DDLogInfo(@"Loading item list in the content area");
+
     [super viewDidLoad];
     
-	
+    _dataSource = [ZPItemListViewDataSource instance];
+    _tableView.dataSource = _dataSource;
+
     
     // Do any additional setup after loading the view, typically from a nib.
     	
@@ -448,10 +451,6 @@
     [_toolBar setItems:toobarItems];
     
     _tagForActiveSortButton = -1;
-    
-    _dataSource = [ZPItemListViewDataSource instance];
-    _tableView.dataSource = _dataSource;
-    
     [self configureView];
 }
 

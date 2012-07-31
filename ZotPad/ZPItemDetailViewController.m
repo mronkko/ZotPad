@@ -21,6 +21,7 @@
 #import "ZPPreferences.h"
 #import "ZPAttachmentIconImageFactory.h"
 #import "ZPAttachmentCarouselDelegate.h"
+#import "OHAttributedLabel.h"
 
 //Define 
 
@@ -54,25 +55,37 @@
 {
     [super viewDidLoad];
     
-    [[ZPDataLayer instance] registerItemObserver:self];
+    if(_carouselDelegate == NULL){
+        _carouselDelegate = [[ZPAttachmentCarouselDelegate alloc] init];
+        _carouselDelegate.mode = ZPATTACHMENTICONGVIEWCONTROLLER_MODE_DOWNLOAD;
+        _carouselDelegate.show = ZPATTACHMENTICONGVIEWCONTROLLER_SHOW_MODIFIED;
+        _carouselDelegate.owner = self;
+        
+    }
+    
+    
 
     //configure carousel
     _carousel = [[iCarousel alloc] initWithFrame:CGRectMake(0,0, 
                                                             self.view.frame.size.width,
                                                             ATTACHMENT_VIEW_HEIGHT)];
     _carousel.type = iCarouselTypeCoverFlow2;
-    
-    _carouselDelegate = [[ZPAttachmentCarouselDelegate alloc] init];
     _carouselDelegate.actionButton=self.actionButton;
     _carouselDelegate.attachmentCarousel = _carousel;
-    _carouselDelegate.mode = ZPATTACHMENTICONGVIEWCONTROLLER_MODE_DOWNLOAD;
-    _carouselDelegate.show = ZPATTACHMENTICONGVIEWCONTROLLER_SHOW_MODIFIED;
+
+    
+    if(self.selectedItem != NULL){
+        [_carouselDelegate configureWithZoteroItem:_currentItem];
+        self.navigationItem.title=_currentItem.shortCitation;
+    }
     
     [_carousel setDataSource:_carouselDelegate];
     [_carousel setDelegate:_carouselDelegate];
 
     _carousel.bounces = FALSE;
 
+    _carousel.currentItemIndex = _carouselDelegate.selectedIndex;
+    
     self.tableView.tableHeaderView = _carousel;
 
     //Configure activity indicator.
@@ -80,6 +93,12 @@
     [_activityIndicator hidesWhenStopped];
     UIBarButtonItem* barButton = [[UIBarButtonItem alloc] initWithCustomView:_activityIndicator];
     self.navigationItem.rightBarButtonItems = [NSArray arrayWithObjects:self.actionButton, barButton, nil];
+    
+    [[NSNotificationCenter defaultCenter] addObserver:self
+                                             selector:@selector(notifyItemAvailable:) 
+                                                 name:@"ItemDataAvailable"
+                                               object:nil];
+
 
 }
 
@@ -107,16 +126,13 @@
 }
 
 -(void) dealloc{
-    if(_carousel != NULL){
-        [[ZPDataLayer instance] removeItemObserver:self];    
-    }
-    DDLogError(@"Deallocating");
+   [[NSNotificationCenter defaultCenter] removeObserver:self];
 }
 -(void)viewDidUnload{
     _activityIndicator = NULL;
     _carouselDelegate.attachmentCarousel = NULL;
     _carousel = NULL;
-    [[ZPDataLayer instance] removeItemObserver:self];    
+    [[NSNotificationCenter defaultCenter] removeObserver:self];
     [super viewDidUnload];
 }
 
@@ -379,6 +395,7 @@
 
         // Configure the cell
         UILabel* textView = (UILabel*) [cell viewWithTag:2];
+        
         textView.text = [self _textAtIndexPath:indexPath isTitle:FALSE];
     }
     else {
@@ -436,7 +453,9 @@
  These are called by data layer to notify that more information about an item has become available from the server
  */
 
--(void) notifyItemAvailable:(ZPZoteroItem*) item{
+-(void) notifyItemAvailable:(NSNotification*) notification{
+    
+    ZPZoteroItem* item = [notification.userInfo objectForKey:@"item"];
     
     if([item.key isEqualToString:_currentItem.key]){
         _currentItem = item;

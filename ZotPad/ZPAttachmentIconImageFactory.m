@@ -124,49 +124,69 @@ static ZPAttachmentIconImageFactory* _webViewDelegate;
         }
         //Else start rendering
         else{
-            if(![NSThread isMainThread]){
-                [NSException raise:@"Rendering must be done in the main thread" format:@""];
+            
+            DDLogVerbose(@"Preparing to render image %@",cacheKey);
+
+            //Only render in main thread
+            
+            if([NSThread isMainThread]){
+                
+                UIWebView* webview = nil;
+                
+                //Workaround for difficult to catch
+                @try{
+                    webview = [[UIWebView alloc] initWithFrame:frame];
+                }
+                @catch (NSException *exception) {
+                    DDLogError(@"Caught exception when rendering icon %@ %@: %@",cacheKey, [exception name], [exception reason]);
+                }
+                
+                if(webview != nil){
+                    DDLogVerbose(@"Start rendering cached image %@ with view %i",cacheKey,webview);
+                    
+                    if([[NSFileManager defaultManager] fileExistsAtPath:[[[NSBundle mainBundle] resourcePath]
+                                                                         stringByAppendingPathComponent:[mimeType stringByAppendingString:@".svgz"]]]){
+                        
+                        
+                        [self _uncompressSVGZ:mimeType];
+                        
+                        NSString* content;
+                        
+                        //Render the emblem
+                        if(useEmblem){
+                            [self _uncompressSVGZ:emblem];
+                            
+                            //Render the uncompressed file using a HTML file as a wrapper
+                            
+                            content = [NSString stringWithFormat:@"<html><body onload=\"document.location='zotpad:%@'\"><div style=\"position: absolute; z-index:100\"><img src=\"%@.svg\" width=%i height=%i></div><img src=\"%@.svg\" width=%i height=%i></body></html>",cacheKey,emblem,width/4,height/4,mimeType,width,height];
+                        }
+                        else{
+                            content = [NSString stringWithFormat:@"<html><body onload=\"document.location='zotpad:%@'\"><img src=\"%@.svg\" width=%i height=%i></body></html>",cacheKey,mimeType,width,height];
+                        }
+                        
+                        DDLogVerbose(content);
+                        
+                        NSURL *baseURL = [NSURL fileURLWithPath:NSTemporaryDirectory()];
+                        
+                        webview.delegate=_webViewDelegate;
+                        
+                        [webview loadData:[content dataUsingEncoding:NSUTF8StringEncoding] MIMEType:@"text/html" textEncodingName:NULL baseURL:baseURL];
+                        
+                        [fileImage addSubview:webview];
+                        
+                        @synchronized(_viewsThatAreRendering){
+                            [_viewsThatAreRendering setObject:webview forKey:cacheKey];
+                        }
+                    }
+         
+                }
             }
-            UIWebView* webview = [[UIWebView alloc] initWithFrame:frame];
-            
-            DDLogVerbose(@"Start rendering cached image %@ with view %i",cacheKey,webview);
-            
-                       if([[NSFileManager defaultManager] fileExistsAtPath:[[[NSBundle mainBundle] resourcePath] 
-                                                                 stringByAppendingPathComponent:[mimeType stringByAppendingString:@".svgz"]]]){
-                
-                
-                [self _uncompressSVGZ:mimeType];
-                
-                NSString* content;
-                
-                //Render the emblem
-                if(useEmblem){
-                    [self _uncompressSVGZ:emblem];
-                    
-                    //Render the uncompressed file using a HTML file as a wrapper
-                    
-                    content = [NSString stringWithFormat:@"<html><body onload=\"document.location='zotpad:%@'\"><div style=\"position: absolute; z-index:100\"><img src=\"%@.svg\" width=%i height=%i></div><img src=\"%@.svg\" width=%i height=%i></body></html>",cacheKey,emblem,width/4,height/4,mimeType,width,height];          
-                }
-                else{
-                    content = [NSString stringWithFormat:@"<html><body onload=\"document.location='zotpad:%@'\"><img src=\"%@.svg\" width=%i height=%i></body></html>",cacheKey,mimeType,width,height];          
-                }
-                
-                DDLogVerbose(content);
-                
-                NSURL *baseURL = [NSURL fileURLWithPath:NSTemporaryDirectory()];
-                
-                webview.delegate=_webViewDelegate;
-                
-                [webview loadData:[content dataUsingEncoding:NSUTF8StringEncoding] MIMEType:@"text/html" textEncodingName:NULL baseURL:baseURL];
-                
-                [fileImage addSubview:webview];
-                
-                @synchronized(_viewsThatAreRendering){
-                    [_viewsThatAreRendering setObject:webview forKey:cacheKey];
-                }
+            else{
+                DDLogVerbose(@"Attempted to render file type icon in a background thread");
             }
         }
     }
+                           
     //IF the cache image is NSNull, this tells us that we are rendering an image currently
     else if(cacheImage == [NSNull null]){
         

@@ -8,12 +8,13 @@
 
 
 #import <QuickLook/QuickLook.h>
+#import "ZPPreviewSource.h"
 
 @interface ZPPreviewController : QLPreviewController <QLPreviewControllerDelegate>{
-    UIView* _source;
+    id <ZPPreviewSource> _source;
     ZPAttachmentFileInteractionController* _attachmentInteractionController;
 }
-+(void) displayQuicklookWithAttachment:(ZPZoteroAttachment*)attachment sourceView:(UIView*)view;
++(void) displayQuicklookWithAttachment:(ZPZoteroAttachment*)attachment source:(id <ZPPreviewSource>)source;
 
 @end
 
