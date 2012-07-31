@@ -37,3 +37,6 @@
 [submodule "Base64"]
 	path = Base64
 	url = https://github.com/nicklockwood/Base64.git
+[submodule ""]
+	path = dropbox-sdk-ios
+	url = https://github.com/dropbox-sdk-mirror/dropbox-sdk-ios.git
