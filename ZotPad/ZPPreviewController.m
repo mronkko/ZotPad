@@ -212,6 +212,7 @@ static ZPPreviewControllerDelegate* _sharedDelegate;
 //Needed to provide zoom effect
 
 - (CGRect)previewController:(QLPreviewController *)controller frameForPreviewItem:(id <QLPreviewItem>)item inSourceView:(UIView **)view{
+
     UIView* sourceView = [(id <ZPPreviewSource>) _source sourceViewForQuickLook]; 
     *view = sourceView;
     CGRect frame = sourceView.frame;

@@ -221,6 +221,7 @@
 }
 
 -(void) _configureSortButton:(UIButton*)button;
+-(void) _configureSortArrow;
 
 @end
 
@@ -360,7 +361,6 @@
     
     _dataSource = [ZPItemListViewDataSource instance];
     _tableView.dataSource = _dataSource;
-
     
     // Do any additional setup after loading the view, typically from a nib.
     	
@@ -450,10 +450,13 @@
     }
     [_toolBar setItems:toobarItems];
     
-    _tagForActiveSortButton = -1;
+    [self _configureSortArrow];
     [self configureView];
 }
 
+-(void)viewWillUnload{
+    [super viewWillUnload];
+}
 - (void)viewDidUnload
 {
     [super viewDidUnload];
@@ -468,6 +471,10 @@
 
 - (void)viewDidAppear:(BOOL)animated
 {
+    _dataSource.owner = self;
+    [_tableView setContentOffset:_offset animated:NO];
+    //Is the current item visible? If not, scroll to it
+    
     [super viewDidAppear:animated];
 
     /*
@@ -488,6 +495,9 @@
 
 - (void)viewWillDisappear:(BOOL)animated
 {
+    //Store scroll position
+    _offset = _tableView.contentOffset;
+
 	[super viewWillDisappear:animated];
 }
 
@@ -545,33 +555,48 @@
             _dataSource.sortDescending  = ! _dataSource.sortDescending;
         }
         else{
-
             _tagForActiveSortButton = tag;
-
-            if(_sortDirectionArrow!=NULL){
-                [_sortDirectionArrow removeFromSuperview];
-            }
-            else {
-                _sortDirectionArrow = [[UIImageView alloc] initWithImage:[UIImage imageNamed:@"icon-up-black.png"]];
-                _sortDirectionArrow.alpha = 0.25f;
-            }
-            
-            [(UIButton*)sender insertSubview:_sortDirectionArrow atIndex:1];
-            CGRect bounds = [(UIButton*)sender bounds];
-            _sortDirectionArrow.center = CGPointMake(bounds.size.width / 2, bounds.size.height / 2);
-            
             _dataSource.orderField = orderField;
             _dataSource.sortDescending = FALSE;
         }
 
-        //TODO: consider storing the images
-        _sortDirectionArrow.image = [UIImage imageNamed:(_dataSource.sortDescending ? @"icon-down-black.png":@"icon-up-black.png")];
-
+        [self _configureSortArrow];
         [self configureView];
     }
 
 }
 
+
+-(void) _configureSortArrow{
+    
+    UIButton* selectedButton = NULL;
+    
+    for(UIBarButtonItem* view in _toolBar.items){
+        if(view.tag == _tagForActiveSortButton){
+            selectedButton = (UIButton*) view.customView;
+            break;
+        }
+    }
+    
+    if(_sortDirectionArrow==NULL){
+        _sortDirectionArrow = [[UIImageView alloc] initWithImage:[UIImage imageNamed:@"icon-up-black.png"]];
+        _sortDirectionArrow.alpha = 0.25f;
+    }
+    else if(_sortDirectionArrow.superview != selectedButton){
+        [_sortDirectionArrow removeFromSuperview];
+    }
+    
+    
+    if(selectedButton != NULL && _sortDirectionArrow.superview == NULL){
+        [selectedButton insertSubview:_sortDirectionArrow atIndex:1];
+        CGRect bounds = selectedButton.bounds;
+        _sortDirectionArrow.center = CGPointMake(bounds.size.width / 2, bounds.size.height / 2);
+        
+    }
+    //TODO: consider storing the images
+    _sortDirectionArrow.image = [UIImage imageNamed:(_dataSource.sortDescending ? @"icon-down-black.png":@"icon-up-black.png")];
+
+}
 
 -(void) sortButtonLongPressed:(UILongPressGestureRecognizer*)sender{
     
@@ -611,7 +636,6 @@
         [self presentModalViewController:controller animated:YES];
     }
 }
-
 
 
 

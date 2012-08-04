@@ -235,7 +235,7 @@ static ZPCacheController* _instance = nil;
         //TODO: Update the views only when the number of items in the queue actually changes.
         [_statusView setFileUploads:[_attachmentsToUpload count]];
         
-        DDLogVerbose(@"Checked upload queue: Files to upload %i",[_attachmentsToUpload count]);
+//        DDLogVerbose(@"Checked upload queue: Files to upload %i",[_attachmentsToUpload count]);
         
         if([_attachmentsToUpload count]>0){
             if([ZPServerConnection instance] && [[ZPServerConnection instance] numberOfFilesUploading] <1){

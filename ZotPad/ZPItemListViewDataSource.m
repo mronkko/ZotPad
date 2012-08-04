@@ -27,6 +27,7 @@
 @synthesize sortDescending = _sortDescending;
 @synthesize itemKeysShown = _itemKeysShown;
 @synthesize targetTableView = _tableView;
+@synthesize owner;
 
 static ZPItemListViewDataSource* _instance;
 
@@ -491,13 +492,35 @@ static ZPItemListViewDataSource* _instance;
 }
 -(UIView*) sourceViewForQuickLook{
     
-    //If the table view is no longer displayed
-    if(_tableView.superview == NULL) return NULL;
+    //If we have had a low memory condition, it is possible that views are not loaded
+    
+    if(! [owner isViewLoaded]){
+        [owner loadView];
+        [owner viewDidLoad];
+    }
+    
+    // Because the user interface orientation may have changed, we need to layout subviews
+    // TODO: Is it necessary to call layoutSubviews and viewWillAppear
+    if(UI_USER_INTERFACE_IDIOM() == UIUserInterfaceIdiomPad){
+        UISplitViewController* root =  (UISplitViewController*) [UIApplication sharedApplication].delegate.window.rootViewController;
+        [root viewWillAppear:NO];
+        [root.view layoutSubviews];
+        
+        UIViewController* navigationController = (UIViewController*)[root.viewControllers lastObject];
+        [navigationController viewWillAppear:NO];
+        [navigationController.view layoutSubviews];
+    }
+    else {
+        UINavigationController* root =  (UINavigationController*) [UIApplication sharedApplication].delegate.window.rootViewController;
+        [root viewWillAppear:NO];
+        [root.view layoutSubviews];
+    }
     
     @synchronized(self){
         NSInteger index = [_itemKeysShown indexOfObject:_attachmentInQuicklook.parentItemKey];
         UITableViewCell* cell = [_tableView cellForRowAtIndexPath:[NSIndexPath indexPathForRow:index inSection:0]];
-        return [cell viewWithTag:4];
+        UIView* ret = [cell viewWithTag:4];
+        return ret;
     }
 }
 @end

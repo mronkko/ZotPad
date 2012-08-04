@@ -62,9 +62,10 @@
         _carouselDelegate.owner = self;
         
     }
-    
-    
-
+    else if(self.selectedItem != NULL){
+        [_carouselDelegate configureWithZoteroItem:_currentItem];
+        self.navigationItem.title=_currentItem.shortCitation;
+    }
     //configure carousel
     _carousel = [[iCarousel alloc] initWithFrame:CGRectMake(0,0, 
                                                             self.view.frame.size.width,
@@ -73,11 +74,6 @@
     _carouselDelegate.actionButton=self.actionButton;
     _carouselDelegate.attachmentCarousel = _carousel;
 
-    
-    if(self.selectedItem != NULL){
-        [_carouselDelegate configureWithZoteroItem:_currentItem];
-        self.navigationItem.title=_currentItem.shortCitation;
-    }
     
     [_carousel setDataSource:_carouselDelegate];
     [_carousel setDelegate:_carouselDelegate];

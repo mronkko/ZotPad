@@ -23,7 +23,7 @@
     NSInteger _tagForActiveSortButton;
     UIActivityIndicatorView* _activityIndicator;
     UIImageView* _sortDirectionArrow;
-
+    CGPoint _offset;
 }
 
 @property (nonatomic, retain) IBOutlet UISearchBar* searchBar;

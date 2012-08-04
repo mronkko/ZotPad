@@ -73,6 +73,27 @@ static ZPAttachmentIconImageFactory* _webViewDelegate;
     
     NSString* cacheKey = [mimeType stringByAppendingFormat:@"%@-%ix%i",emblem,width,height];
     
+    NSArray *paths = NSSearchPathForDirectoriesInDomains(NSCachesDirectory, NSUserDomainMask, YES);
+    NSString *cachePath = [paths objectAtIndex:0];
+    BOOL isDir = NO;
+    NSError *error;
+    if (! [[NSFileManager defaultManager] fileExistsAtPath:cachePath isDirectory:&isDir] && isDir == NO) {
+        [[NSFileManager defaultManager] createDirectoryAtPath:cachePath withIntermediateDirectories:NO attributes:nil error:&error];
+    }
+
+    
+    BOOL emblemOnly = FALSE;
+    //If we are rendering a file type with emblem, check that the emblem and file type have been rendered alone first
+    if(useEmblem && ! [[NSFileManager defaultManager] fileExistsAtPath:[cachePath stringByAppendingPathComponent:[emblem stringByAppendingFormat:@"-%ix%i.png",width,height]]]){
+        cacheKey = [emblem stringByAppendingFormat:@"-%ix%i",width,height];
+        emblemOnly = TRUE;
+    }
+    else if(useEmblem && ! [[NSFileManager defaultManager] fileExistsAtPath:[cachePath stringByAppendingPathComponent:[mimeType stringByAppendingFormat:@"-%ix%i.png",width,height]]]){
+        cacheKey = [mimeType stringByAppendingFormat:@"-%ix%i",width,height];
+        useEmblem = FALSE;
+    }
+
+    
     //    DDLogVerbose(@"Getting icon for %@",cacheKey);
     
     UIImage* cacheImage = NULL;
@@ -105,14 +126,7 @@ static ZPAttachmentIconImageFactory* _webViewDelegate;
     if(render){
         //If a file exists on disk, use that
         
-        NSArray *paths = NSSearchPathForDirectoriesInDomains(NSCachesDirectory, NSUserDomainMask, YES);
-        NSString *cachePath = [paths objectAtIndex:0];
-        BOOL isDir = NO;
-        NSError *error;
-        if (! [[NSFileManager defaultManager] fileExistsAtPath:cachePath isDirectory:&isDir] && isDir == NO) {
-            [[NSFileManager defaultManager] createDirectoryAtPath:cachePath withIntermediateDirectories:NO attributes:nil error:&error];
-        }
-        
+
         if([[NSFileManager defaultManager] fileExistsAtPath:[cachePath stringByAppendingPathComponent:[cacheKey stringByAppendingString:@".png"]]]){
             DDLogVerbose(@"Loading image from disk %@",cacheKey);
             UIImage* image = [UIImage imageWithContentsOfFile:[cachePath stringByAppendingPathComponent:[cacheKey stringByAppendingString:@".png"]]];
@@ -157,8 +171,11 @@ static ZPAttachmentIconImageFactory* _webViewDelegate;
                             [self _uncompressSVGZ:emblem];
                             
                             //Render the uncompressed file using a HTML file as a wrapper
-                            
-                            content = [NSString stringWithFormat:@"<html><body onload=\"document.location='zotpad:%@'\"><div style=\"position: absolute; z-index:100\"><img src=\"%@.svg\" width=%i height=%i></div><img src=\"%@.svg\" width=%i height=%i></body></html>",cacheKey,emblem,width/4,height/4,mimeType,width,height];
+                            if(emblemOnly)
+                                content = [NSString stringWithFormat:@"<html><body onload=\"document.location='zotpad:%@'\"><div style=\"position: absolute; z-index:100\"><img src=\"%@.svg\" width=%i height=%i></div></body></html>",cacheKey,emblem,width/4,height/4];
+
+                            else                               
+                                content = [NSString stringWithFormat:@"<html><body onload=\"document.location='zotpad:%@'\"><div style=\"position: absolute; z-index:100\"><img src=\"%@.svg\" width=%i height=%i></div><img src=\"%@.svg\" width=%i height=%i></body></html>",cacheKey,emblem,width/4,height/4,mimeType,width,height];
                         }
                         else{
                             content = [NSString stringWithFormat:@"<html><body onload=\"document.location='zotpad:%@'\"><img src=\"%@.svg\" width=%i height=%i></body></html>",cacheKey,mimeType,width,height];
@@ -244,10 +261,6 @@ static ZPAttachmentIconImageFactory* _webViewDelegate;
 	if ([[components objectAtIndex:0] isEqualToString:@"zotpad"]) {
         [self _captureWebViewContent:webView forCacheKey:[components objectAtIndex:1]];
         
-        @synchronized(_viewsThatAreRendering){
-            [_viewsThatAreRendering removeObjectForKey:[components objectAtIndex:1]];
-        }
-        
 		return NO;
 	}
     
@@ -303,14 +316,45 @@ static ZPAttachmentIconImageFactory* _webViewDelegate;
         
         if([UIImagePNGRepresentation(blankImage) isEqualToData:imageData]){
             @synchronized(_fileIconCache){
-                //TODO: It is possible that only the emblem is rendered. Consider how this could be fixed
-                DDLogVerbose(@"View %i produced a blank image. Clearing cahce for image %@",webview, cacheKey);
-                
-                [_fileIconCache removeObjectForKey:cacheKey];
+                DDLogVerbose(@"View %i produced a blank image for image %@, retrying",webview, cacheKey);
+
+                dispatch_after(dispatch_time(DISPATCH_TIME_NOW, NSEC_PER_SEC*0.5),
+                               dispatch_get_current_queue(), ^{
+                    [self _captureWebViewContent:webview forCacheKey:cacheKey];
+                });
+
+                return;
             }
             
         }
         else{
+            NSRange emblemRange = [cacheKey rangeOfString:@"emblem-symbolic-link"];
+            if(emblemRange.location == NSNotFound){
+                emblemRange = [cacheKey rangeOfString:@"emblem-locked"];
+            }
+            
+            //This is an emblem and mime combination and needs to be compared against emblem and mime icons
+            
+            if(emblemRange.location != NSNotFound && emblemRange.location>0){
+                
+                NSArray *paths = NSSearchPathForDirectoriesInDomains(NSCachesDirectory, NSUserDomainMask, YES);
+                NSString *cachePath = [paths objectAtIndex:0];
+                
+                if([imageData isEqualToData:[NSData dataWithContentsOfFile:[ cachePath stringByAppendingPathComponent:[[cacheKey substringFromIndex:emblemRange.location] stringByAppendingString:@".png"]]]] ||
+                   [imageData isEqualToData:[NSData dataWithContentsOfFile:[ cachePath stringByAppendingPathComponent:[[cacheKey stringByReplacingCharactersInRange:emblemRange withString:@""] stringByAppendingString:@".png"]]]]){
+
+                    DDLogVerbose(@"View %i produced a partial image (emblem or mime type missing) image %@, retrying",webview, cacheKey);
+                    
+                    dispatch_after(dispatch_time(DISPATCH_TIME_NOW, NSEC_PER_SEC*0.5),
+                                   dispatch_get_current_queue(), ^{
+                                       [self _captureWebViewContent:webview forCacheKey:cacheKey];
+                                   });
+                    
+                    return;
+                }
+            }
+            
+            
             [imageData writeToFile:[cachePath stringByAppendingPathComponent:[cacheKey stringByAppendingString:@".png"]] atomically:YES];
             
             [(UIImageView*) webview.superview setImage:image];
@@ -342,6 +386,11 @@ static ZPAttachmentIconImageFactory* _webViewDelegate;
         }
         
     }
+    
+    @synchronized(_viewsThatAreRendering){
+        [_viewsThatAreRendering removeObjectForKey:webview];
+    }
+
     
 }
 

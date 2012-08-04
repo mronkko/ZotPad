@@ -1242,13 +1242,20 @@ Deletes items, notes, and attachments based in array of keys from a library
     
     
     if(orderField!=NULL){
+ 
+        NSString* ascOrDesc = NULL;
+ 
+        if(sortDescending)
+            ascOrDesc =@"DESC";
+        else
+            ascOrDesc =@"ASC";
         
         
         if([specialSortColumns indexOfObject:orderField]==NSNotFound){
             sql=[sql stringByAppendingString:@" ORDER BY fieldValue"];
         }
         else if([orderField isEqualToString:@"creator"]){
-            sql=[sql stringByAppendingString:@" ORDER BY fullCitation"];
+            sql=[sql stringByAppendingFormat:@" ORDER BY itemKey IN (SELECT DISTINCT itemKey FROM creators) %@, fullCitation", ascOrDesc];
         }
         else if([orderField isEqualToString:@"dateModified"]){
             sql=[sql stringByAppendingString:@" ORDER BY cacheTimestamp"];
@@ -1270,10 +1277,7 @@ Deletes items, notes, and attachments based in array of keys from a library
             [NSException raise:@"Not implemented" format:@"Sorting by @% has not been implemented",orderField];
         }
 
-        if(sortDescending)
-            sql=[sql stringByAppendingString:@" COLLATE NOCASE DESC"];
-        else
-            sql=[sql stringByAppendingFormat:@" COLLATE NOCASE ASC"];
+        sql=[sql stringByAppendingFormat:@" COLLATE NOCASE %@",ascOrDesc];
     }
     else{
         sql=[sql stringByAppendingFormat:@" ORDER BY items.cacheTimestamp DESC"];

@@ -42,6 +42,7 @@
 @property (nonatomic, retain) NSString* searchString;
 @property (nonatomic, retain) NSString* orderField;
 @property (assign) BOOL sortDescending;
+@property (nonatomic, retain) UITableViewController* owner;
 
 - (void)clearTable;
 - (void)configureCachedKeys:(NSArray*)array;

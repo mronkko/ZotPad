@@ -54,9 +54,10 @@ DEFAULTPROFILE="$PROFILEBASE$(cat "$PROFILEBASE/profiles.ini" | grep -B 1 "Defau
 # If not found, fall back to default profile
 if [ "$DEFAULTPROFILE" == "" ]
 then
-
-DEFAULTPROFILE="$PROFILEBASE$(cat "$PROFILEBASE/profiles.ini" | grep "Path=" | sed 's/Path=//')"
-
+    DEFAULTPROFILE="$PROFILEBASE$(cat "$PROFILEBASE/profiles.ini" | grep "Path=" | sed 's/Path=//')"
+    echo "Found a single profile at $DEFAULTPROFILE"
+else
+    echo "Found multipler profiles, using the default at $DEFAULTPROFILE"
 fi
 
 # Parse preferences
@@ -64,21 +65,21 @@ fi
 if [ -e "$DEFAULTPROFILE/prefs.js" ]
 then
 
-if [ "$(cat "$DEFAULTPROFILE/prefs.js" | grep 'user_pref("extensions.zotero.useDataDir", true);')" == "" ]
-then
+    if [ "$(cat "$DEFAULTPROFILE/prefs.js" | grep 'user_pref("extensions.zotero.useDataDir", true);')" == "" ]
+    then
 
-ZOTERODATADIR="$DEFAULTPROFILE/zotero"
+        ZOTERODATADIR="$DEFAULTPROFILE/zotero"
+
+    else
+
+        ZOTERODATADIR=$(cat "$DEFAULTPROFILE/prefs.js" | grep "extensions.zotero.dataDir" | sed 's/user_pref(\"extensions.zotero.dataDir\", \"\(.*\)\");/\1/')
+
+    fi
 
 else
 
-ZOTERODATADIR=$(cat "$DEFAULTPROFILE/prefs.js" | grep "extensions.zotero.dataDir" | sed 's/user_pref(\"extensions.zotero.dataDir\", \"\(.*\)\");/\1/')
-
-fi
-
-else
-
-echo "Could not read Zotero preferences"
-exit 1
+    echo "Could not read Zotero preferences"
+    exit 1
 
 fi
 

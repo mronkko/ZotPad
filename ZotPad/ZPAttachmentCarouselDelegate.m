@@ -613,18 +613,64 @@ NSInteger const ZPATTACHMENTICONGVIEWCONTROLLER_TAG_TITLELABEL = -5;
 }
 
 -(UIView*) sourceViewForQuickLook{
-    if(! [owner isViewLoaded]){
-        //TODO: Force owner to loading the entire view hierarchy
-        return NULL;
-    }
     
-    iCarousel* carousel = self.attachmentCarousel;
-    UIView* sourceView = [carousel itemViewAtIndex:_selectedIndex];
+    
+    //If we have had a low memory condition, it is possible that views are not loaded
+
+    if(! [owner isViewLoaded]){
+        [owner loadView];
+        [owner viewDidLoad];
+        [self.attachmentCarousel reloadData];
+    }
+
+    // Because the user interface orientation may have changed, we need to layout subviews
+
+    if(UI_USER_INTERFACE_IDIOM() == UIUserInterfaceIdiomPad){
+        UISplitViewController* root =  (UISplitViewController*) [UIApplication sharedApplication].delegate.window.rootViewController;
+        [root viewWillAppear:NO];
+        [root.view layoutSubviews];
+        
+        UIViewController* navigationController = (UIViewController*)[root.viewControllers lastObject];
+        [navigationController viewWillAppear:NO];
+        [navigationController.view layoutSubviews];
+    }
+    else {
+        UINavigationController* root =  (UINavigationController*) [UIApplication sharedApplication].delegate.window.rootViewController;
+        [root viewWillAppear:NO];
+        [root.view layoutSubviews];
+    }
+
+        
+
+        
+/* 
+        UIViewController* parent = owner.parentViewController;
+        while(parent != NULL && ! [parent isViewLoaded]){
+            [parent loadView];
+            [parent viewDidLoad];
+            parent = parent.parentViewController;
+        }
+ */
+    
+    
+    
+    
+    UIView* sourceView = [self.attachmentCarousel currentItemView];
     UIView* temp = sourceView;
+    
     while(temp != nil){
         DDLogVerbose(@"Class %s , w: %f h: %f x: %f y: %f",class_getName([temp class]),temp.frame.size.width,temp.frame.size.height,temp.frame.origin.x,temp.frame.origin.y);
         temp = temp.superview;
     }
+    
+    UIViewController* tempVC = owner;
+    
+    while(tempVC != nil){
+        temp = tempVC.view;
+        DDLogVerbose(@"Class %s , w: %f h: %f x: %f y: %f",class_getName([tempVC class]),temp.frame.size.width,temp.frame.size.height,temp.frame.origin.x,temp.frame.origin.y);
+        tempVC = tempVC.parentViewController;
+    }
+
     return sourceView;
 }
 
