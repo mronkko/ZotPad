@@ -62,12 +62,14 @@ NSInteger const VERSION_SOURCE_DROPBOX =3;
     return attachment;
 }
 
+/*
 - (NSNumber*) libraryID{
     //Child attachments
     if(super.libraryID==NULL) return [ZPZoteroItem dataObjectWithKey:self.parentItemKey].libraryID;
     //Standalone attachments
     else return super.libraryID;
 }
+*/
 
 // An alias for setParentCollectionKey
 - (void) setParentKey:(NSString*)key{

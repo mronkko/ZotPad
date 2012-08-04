@@ -200,22 +200,22 @@
                         <autoresizingMask key="autoresizingMask" widthSizable="YES" heightSizable="YES"/>
                         <simulatedOrientationMetrics key="simulatedOrientationMetrics" orientation="landscapeRight"/>
                         <prototypes>
-                            <tableViewCell contentMode="scaleToFill" selectionStyle="blue" hidesAccessoryWhenEditing="NO" indentationLevel="1" indentationWidth="0.0" reuseIdentifier="ItemDetailCell" textLabel="ats-qy-1Oe" detailTextLabel="Fpq-3F-eNw" style="IBUITableViewCellStyleValue1" id="plA-l3-eMm">
+                            <tableViewCell contentMode="scaleToFill" selectionStyle="blue" hidesAccessoryWhenEditing="NO" indentationLevel="1" indentationWidth="0.0" reuseIdentifier="ItemDetailCell" id="plA-l3-eMm">
                                 <rect key="frame" x="0.0" y="54" width="703" height="45"/>
                                 <autoresizingMask key="autoresizingMask"/>
                                 <view key="contentView" opaque="NO" clipsSubviews="YES" multipleTouchEnabled="YES" contentMode="center">
                                     <rect key="frame" x="43" y="1" width="617" height="43"/>
                                     <autoresizingMask key="autoresizingMask"/>
                                     <subviews>
-                                        <label opaque="NO" clipsSubviews="YES" multipleTouchEnabled="YES" contentMode="center" text="Title" lineBreakMode="tailTruncation" baselineAdjustment="alignBaselines" adjustsFontSizeToFit="NO" id="ats-qy-1Oe">
-                                            <rect key="frame" x="10" y="11" width="35" height="21"/>
+                                        <label opaque="NO" clipsSubviews="YES" multipleTouchEnabled="YES" tag="1" contentMode="left" text="Title" lineBreakMode="tailTruncation" baselineAdjustment="alignBaselines" adjustsFontSizeToFit="NO" id="ctl-ud-6zk">
+                                            <rect key="frame" x="10" y="0.0" width="597" height="43"/>
                                             <autoresizingMask key="autoresizingMask"/>
                                             <fontDescription key="fontDescription" type="boldSystem" pointSize="17"/>
                                             <color key="textColor" cocoaTouchSystemColor="darkTextColor"/>
                                             <color key="highlightedColor" red="1" green="1" blue="1" alpha="1" colorSpace="calibratedRGB"/>
                                         </label>
-                                        <label opaque="NO" clipsSubviews="YES" multipleTouchEnabled="YES" contentMode="center" text="Detail" textAlignment="right" lineBreakMode="tailTruncation" baselineAdjustment="alignBaselines" adjustsFontSizeToFit="NO" id="Fpq-3F-eNw">
-                                            <rect key="frame" x="563" y="11" width="44" height="21"/>
+                                        <label opaque="NO" clipsSubviews="YES" multipleTouchEnabled="YES" tag="2" contentMode="left" text="Detail" textAlignment="right" lineBreakMode="tailTruncation" baselineAdjustment="alignBaselines" adjustsFontSizeToFit="NO" id="bgJ-q6-dbO" customClass="OHAttributedLabel">
+                                            <rect key="frame" x="324" y="11" width="283" height="21"/>
                                             <autoresizingMask key="autoresizingMask"/>
                                             <fontDescription key="fontDescription" type="system" pointSize="17"/>
                                             <color key="textColor" red="0.21960784310000001" green="0.3294117647" blue="0.52941176469999995" alpha="1" colorSpace="calibratedRGB"/>
@@ -240,11 +240,11 @@
                                             <color key="textColor" cocoaTouchSystemColor="darkTextColor"/>
                                             <nil key="highlightedColor"/>
                                         </label>
-                                        <label opaque="NO" clipsSubviews="YES" userInteractionEnabled="NO" tag="2" contentMode="left" text="Label" lineBreakMode="tailTruncation" numberOfLines="0" baselineAdjustment="alignBaselines" minimumFontSize="10" adjustsFontSizeToFit="NO" id="JBe-Ns-rr7">
+                                        <label opaque="NO" clipsSubviews="YES" userInteractionEnabled="NO" tag="2" contentMode="left" text="Label" lineBreakMode="wordWrap" numberOfLines="0" baselineAdjustment="alignBaselines" minimumFontSize="10" adjustsFontSizeToFit="NO" id="JBe-Ns-rr7" customClass="OHAttributedLabel">
                                             <rect key="frame" x="10" y="39" width="587" height="45"/>
                                             <autoresizingMask key="autoresizingMask" widthSizable="YES" heightSizable="YES"/>
                                             <fontDescription key="fontDescription" type="system" pointSize="14"/>
-                                            <color key="textColor" cocoaTouchSystemColor="darkTextColor"/>
+                                            <color key="textColor" red="0.1960784314" green="0.30980392159999998" blue="0.52156862749999999" alpha="1" colorSpace="calibratedRGB"/>
                                             <color key="highlightedColor" white="1" alpha="1" colorSpace="calibratedWhite"/>
                                         </label>
                                     </subviews>
@@ -666,89 +666,6 @@
     <resources>
         <image name="gear.png" width="20" height="20"/>
     </resources>
-    <classes>
-        <class className="OHAttributedLabel" superclassName="UILabel">
-            <source key="sourceIdentifier" type="project" relativePath="./Classes/OHAttributedLabel.h"/>
-            <relationships>
-                <relationship kind="outlet" name="delegate"/>
-            </relationships>
-        </class>
-        <class className="ZPAuthenticationDialog" superclassName="UIViewController">
-            <source key="sourceIdentifier" type="project" relativePath="./Classes/ZPAuthenticationDialog.h"/>
-            <relationships>
-                <relationship kind="action" name="loadFirstPage:"/>
-                <relationship kind="outlet" name="webView" candidateClass="UIWebView"/>
-            </relationships>
-        </class>
-        <class className="ZPFileImportViewController" superclassName="UIViewController">
-            <source key="sourceIdentifier" type="project" relativePath="./Classes/ZPFileImportViewController.h"/>
-            <relationships>
-                <relationship kind="outlet" name="carousel" candidateClass="iCarousel"/>
-            </relationships>
-        </class>
-        <class className="ZPItemDetailViewController" superclassName="UITableViewController">
-            <source key="sourceIdentifier" type="project" relativePath="./Classes/ZPItemDetailViewController.h"/>
-            <relationships>
-                <relationship kind="action" name="actionButtonPressed:"/>
-                <relationship kind="outlet" name="actionButton" candidateClass="UIBarButtonItem"/>
-            </relationships>
-        </class>
-        <class className="ZPItemListViewController" superclassName="UIViewController">
-            <source key="sourceIdentifier" type="project" relativePath="./Classes/ZPItemListViewController.h"/>
-            <relationships>
-                <relationship kind="action" name="attachmentThumbnailPressed:"/>
-                <relationship kind="action" name="sortButtonPressed:"/>
-                <relationship kind="outlet" name="searchBar" candidateClass="UISearchBar"/>
-                <relationship kind="outlet" name="tableView" candidateClass="UITableView"/>
-                <relationship kind="outlet" name="toolBar" candidateClass="UIToolbar"/>
-            </relationships>
-        </class>
-        <class className="ZPLibraryAndCollectionListViewController" superclassName="UITableViewController">
-            <source key="sourceIdentifier" type="project" relativePath="./Classes/ZPLibraryAndCollectionListViewController.h"/>
-            <relationships>
-                <relationship kind="outlet" name="cacheControllerPlaceHolder" candidateClass="UIBarButtonItem"/>
-                <relationship kind="outlet" name="gearButton" candidateClass="UIBarButtonItem"/>
-            </relationships>
-        </class>
-        <class className="ZPLogViewController" superclassName="UIViewController">
-            <source key="sourceIdentifier" type="project" relativePath="./Classes/ZPLogViewController.h"/>
-            <relationships>
-                <relationship kind="action" name="dismiss:"/>
-                <relationship kind="action" name="emailSupport:"/>
-                <relationship kind="action" name="manageKey:"/>
-                <relationship kind="action" name="onlineSupport:"/>
-                <relationship kind="action" name="showManual:"/>
-                <relationship kind="outlet" name="logView" candidateClass="UITextView"/>
-                <relationship kind="outlet" name="manualButton" candidateClass="UIBarButtonItem"/>
-            </relationships>
-        </class>
-        <class className="ZPMasterItemListViewController" superclassName="UITableViewController">
-            <source key="sourceIdentifier" type="project" relativePath="./Classes/ZPMasterItemListViewController.h"/>
-        </class>
-        <class className="ZPSplitViewController" superclassName="UISplitViewController">
-            <source key="sourceIdentifier" type="project" relativePath="./Classes/ZPSplitViewController.h"/>
-            <relationships>
-                <relationship kind="action" name="showLogView:"/>
-            </relationships>
-        </class>
-        <class className="ZPUploadVersionConflictViewControllerViewController" superclassName="UIViewController">
-            <source key="sourceIdentifier" type="project" relativePath="./Classes/ZPUploadVersionConflictViewControllerViewController.h"/>
-            <relationships>
-                <relationship kind="action" name="useMyVersion:"/>
-                <relationship kind="action" name="useRemoteVersion:"/>
-                <relationship kind="outlet" name="carousel" candidateClass="iCarousel"/>
-                <relationship kind="outlet" name="label" candidateClass="UILabel"/>
-                <relationship kind="outlet" name="secondaryCarousel" candidateClass="iCarousel"/>
-            </relationships>
-        </class>
-        <class className="iCarousel" superclassName="UIView">
-            <source key="sourceIdentifier" type="project" relativePath="./Classes/iCarousel.h"/>
-            <relationships>
-                <relationship kind="outlet" name="dataSource"/>
-                <relationship kind="outlet" name="delegate"/>
-            </relationships>
-        </class>
-    </classes>
     <simulatedMetricsContainer key="defaultSimulatedMetrics">
         <simulatedStatusBarMetrics key="statusBar" statusBarStyle="blackTranslucent"/>
         <simulatedOrientationMetrics key="orientation"/>

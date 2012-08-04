@@ -38,6 +38,7 @@
 - (NSString*) _textAtIndexPath:(NSIndexPath*)indexPath isTitle:(BOOL)isTitle;
 - (BOOL) _useAbstractCell:(NSIndexPath*)indexPath;
 -(CGRect) _getDimensionsWithImage:(UIImage*) image; 
+-(NSInteger) _textWidth;
 
 @end
 
@@ -257,33 +258,35 @@
         
         NSString *text = [self _textAtIndexPath:indexPath isTitle:false];
 
-        NSInteger textWidth;
- 
         //Margins includes margins and title.
 
         NSInteger margins=110;
         
-        if ([[UIDevice currentDevice] userInterfaceIdiom] == UIUserInterfaceIdiomPad) {
-            if (UIDeviceOrientationIsLandscape([UIDevice currentDevice].orientation)) textWidth=663;
-            else textWidth = 678;
-        }
-        else{
-            if (UIDeviceOrientationIsLandscape([UIDevice currentDevice].orientation)){
-                textWidth = 460;
-            }
-            else{
-                textWidth = 300;   
-            }
-        }
+
 
         CGSize textSize = [text sizeWithFont:[UIFont systemFontOfSize:14]
-                           constrainedToSize:CGSizeMake(textWidth, 1000.0f)];
+                           constrainedToSize:CGSizeMake([self _textWidth], 1000.0f)];
         
         
         return textSize.height+margins;
        
     }
     return tableView.rowHeight;
+}
+
+-(NSInteger) _textWidth{
+    if ([[UIDevice currentDevice] userInterfaceIdiom] == UIUserInterfaceIdiomPad) {
+        if (UIDeviceOrientationIsLandscape([UIDevice currentDevice].orientation)) return 663;
+        else return  678;
+    }
+    else{
+        if (UIDeviceOrientationIsLandscape([UIDevice currentDevice].orientation)){
+            return  460;
+        }
+        else{
+            return  300;   
+        }
+    }    
 }
 
 - (BOOL) _useAbstractCell:(NSIndexPath*)indexPath{
@@ -378,35 +381,42 @@
 - (UITableViewCell *)tableView:(UITableView *)tableView cellForRowAtIndexPath:(NSIndexPath *)indexPath {
     
     UITableViewCell *cell;
+    NSString* CellIdentifier;
     
-    if([self _useAbstractCell:indexPath]){
-        NSString* CellIdentifier = @"ItemAbstractCell";        
-        
-        // Dequeue or create a cell of the appropriate type.
-        cell = [tableView dequeueReusableCellWithIdentifier:CellIdentifier];
-        if (cell == nil)
-        {
-            cell = [[UITableViewCell alloc] initWithStyle:UITableViewCellStyleDefault reuseIdentifier:CellIdentifier];
-        }
+    BOOL isAbstract = [self _useAbstractCell:indexPath];
 
-        // Configure the cell
-        UILabel* textView = (UILabel*) [cell viewWithTag:2];
-        
-        textView.text = [self _textAtIndexPath:indexPath isTitle:FALSE];
+    if(isAbstract){
+        CellIdentifier = @"ItemAbstractCell";        
     }
     else {
-        NSString* CellIdentifier = @"ItemDetailCell";        
+        CellIdentifier = @"ItemDetailCell";        
+    }
+
+    // Dequeue or create a cell of the appropriate type.
+    cell = [tableView dequeueReusableCellWithIdentifier:CellIdentifier];
+    if (cell == nil)
+    {
+        cell = [[UITableViewCell alloc] initWithStyle:UITableViewCellStyleDefault reuseIdentifier:CellIdentifier];
+    }
+
+    // Configure the cell
+    OHAttributedLabel* value = (OHAttributedLabel*) [cell viewWithTag:2];
+    UILabel* title = (UILabel*) [cell viewWithTag:1];
+    
+    value.text = [self _textAtIndexPath:indexPath isTitle:FALSE];
+    title.text = [self _textAtIndexPath:indexPath isTitle:TRUE];
+
+    //Configure size of the value label
+    
+    if(!isAbstract){
+        CGSize labelSize = [title.text sizeWithFont:title.font];
+        CGRect frame = value.frame;
         
-        // Dequeue or create a cell of the appropriate type.
-        cell = [tableView dequeueReusableCellWithIdentifier:CellIdentifier];
-        if (cell == nil)
-        {
-            cell = [[UITableViewCell alloc] initWithStyle:UITableViewCellStyleDefault reuseIdentifier:CellIdentifier];
-        }
-        
-        // Configure the cell
-        cell.textLabel.text = [self _textAtIndexPath:indexPath isTitle:TRUE];
-        cell.detailTextLabel.text = [self _textAtIndexPath:indexPath isTitle:FALSE];
+        NSInteger newWidth = cell.contentView.bounds.size.width - labelSize.width - 40; 
+        NSInteger widthChange = newWidth - value.frame.size.width;
+        frame.size.width = newWidth; 
+        frame.origin.x = frame.origin.x - widthChange;
+        value.frame = frame;
     }
     
     if(cell == NULL || ! [cell isKindOfClass:[UITableViewCell class]]){
