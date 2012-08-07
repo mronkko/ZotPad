@@ -76,12 +76,14 @@
 
     NSString* urlString = [[request mainDocumentURL] absoluteString];
     DDLogVerbose(@"Start loading URL %@",urlString);
-    
+
+    if(_activityView == NULL)
+        _activityView = [DSBezelActivityView newActivityViewForView:webView];
+
     //If we are redirected to the front page, we do not need to show the web browser any more
     
     if([urlString hasPrefix:@"https://www.zotero.org/?oauth_token="]){
         
-        _activityView = [DSBezelActivityView newActivityViewForView:webView];
 
         //Get permanent key with the temporary key
         NSString* verifier=[[urlString componentsSeparatedByString:@"="] lastObject];
@@ -95,8 +97,8 @@
 }
 
 - (void)webViewDidStartLoad:(UIWebView *)webView{
-    
 }
+
 - (void)webViewDidFinishLoad:(UIWebView *)webView{
     if(_activityView != NULL){
         [DSBezelActivityView removeViewAnimated:YES];
@@ -130,6 +132,7 @@
 }
 
 - (void) makeOAuthRequest:(OAToken *) token {
+    //TODO: move these to secrets
     OAConsumer *consumer = [[OAConsumer alloc] initWithKey:@"4cb573ead72e5d84eab4"
                                                     secret:@"605a2a699d22dc4cce7f"];
     

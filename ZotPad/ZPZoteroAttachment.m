@@ -147,7 +147,7 @@ NSInteger const VERSION_SOURCE_DROPBOX =3;
         [NSException raise:@"Internal consistency error" format:@"Document directory path is not string"];
     }
     if(! [path isKindOfClass:[NSString class]]){
-        [NSException raise:@"Internal consistency error" format:@"Attachment path is not string (attachment key: %@)",self.key];
+        [NSException raise:@"Internal consistency error" format:@"Attachment path is not NSString (attachment key: %@, class %s)",self.key,class_getName([path class])];
     }
     
     NSString* ret = [docs stringByAppendingPathComponent:path];
@@ -212,7 +212,7 @@ NSInteger const VERSION_SOURCE_DROPBOX =3;
     if(![self.serverTimestamp isEqual:self.cacheTimestamp] && [self fileExists_original]){
         //If the file MD5 does not match the server MD5, delete it.
         NSString* fileMD5 = [ZPZoteroAttachment md5ForFileAtPath:self.fileSystemPath_original];
-        if(! [self.md5 isEqualToString:fileMD5]){
+        if(self.md5 == [NSNull null] || ! [self.md5 isEqualToString:fileMD5]){
             [[NSFileManager defaultManager] removeItemAtPath: [self fileSystemPath_original] error:NULL];   
         }
     }

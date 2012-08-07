@@ -11,6 +11,7 @@
 #import "ZPFileChannel_Dropbox.h"
 #import "DBRestClient.h"
 #import "ZPPreferences.h"
+#import "ZPLocalization.h"
 
 #import "ZPServerConnection.h"
 
@@ -62,6 +63,7 @@ static const NSString* DROPBOX_KEY = @"nn6res38igpo4ec";
 -(void) _restClient:(ZPDBRestClient*)client processError:(NSError *)error;
 -(NSString*) _pathForAttachment:(ZPZoteroAttachment*)attachment;
 -(NSString*) _URLForAttachment:(ZPZoteroAttachment*)attachment;
+-(NSString*) _filenameOrPathForAttachment:(ZPZoteroAttachment*)attachment withPattern:(NSString*)pattern;
 
 @end
 
@@ -146,42 +148,325 @@ static const NSString* DROPBOX_KEY = @"nn6res38igpo4ec";
     return [NSNumber numberWithInt: request];
 }
 
--(NSString*) _pathForAttachment:(ZPZoteroAttachment*)attachment{
 
-    NSString* basePath;
-    if([[ZPPreferences instance] dropboxPath] == NULL || [[[ZPPreferences instance] dropboxPath] isEqualToString:@""]){
-        basePath = @"/storage";
+-(NSString*) _filenameOrPathForAttachment:(ZPZoteroAttachment*)attachment withPattern:(NSString*)pattern{
+
+    NSString* creatorString;
+    NSArray* creators;
+    NSString* suffix;
+    
+    ZPZoteroItem* parent = [ZPZoteroItem dataObjectWithKey:attachment.parentItemKey];
+
+    NSInteger numAuthors = [[ZPPreferences instance] maxNumberOfAuthorsInDropboxFilenames];
+    
+    if(numAuthors >0 &&  [parent.creators count] > numAuthors){
+        creators = [NSArray arrayWithObject:[parent.creators objectAtIndex:0]];
+        suffix = [[ZPPreferences instance] authorSuffixInDropboxFilenames];
     }
     else{
-        basePath = [NSString stringWithFormat:@"/%@",[[ZPPreferences instance] dropboxPath]];
+        creators = parent.creators;
+        suffix = @"";
+    }
+        
+    NSSet* creatorTypes;
+    
+    if([parent.itemType isEqualToString:@"book"]){
+        creatorTypes = [NSSet setWithObjects:@"author", @"editor", nil];
+    }
+    else if([parent.itemType isEqualToString:@"patent"]){
+        creatorTypes = [NSSet setWithObject:@"inventor"];
+    }
+    else if([parent.itemType isEqualToString:@"computerProgram"]){
+        creatorTypes = [NSSet setWithObject:@"programmer"];
+    }
+    else if([parent.itemType isEqualToString:@"presentation"]){
+        creatorTypes = [NSSet setWithObject:@"presenter"];
+    }
+    else{
+        creatorTypes = [NSSet setWithObject:@"author"];
     }
     
-    if([attachment.linkMode intValue] == LINK_MODE_IMPORTED_URL && (
-                                                                    [attachment.contentType isEqualToString:@"text/html"] ||
-                                                                    [attachment.contentType isEqualToString:@"application/xhtml+xml"])){
-        //Get a list of files to be downloaded. This does not respect custom file name template
-        return [NSString stringWithFormat:@"%@/%@/",basePath, attachment.key];
+    NSMutableArray* creatorNames = [[NSMutableArray alloc] initWithCapacity:[creators count]];
+    
+    for(NSDictionary* creator in creators){
+        if([creatorTypes containsObject:[creator objectForKey:@"creatorType"]]){
+            NSObject* name = [creator objectForKey:@"lastName"];
+            if(name != [NSNull null]){
+                [creatorNames addObject:name];
+            }
+        }
+    }
+    
+    creatorString = [[creatorNames componentsJoinedByString:@"_"] stringByAppendingString:suffix];
+    
+    NSString* title;
+    
+    if([[ZPPreferences instance] truncateTitlesInDropboxFilenames]){
+        title = [[parent.title componentsSeparatedByCharactersInSet:[NSCharacterSet characterSetWithCharactersInString:@":.?"]] objectAtIndex:0];
     }
     else{
-        //Otherwise, load metadata for the file usign the default patterns
-        return [NSString stringWithFormat:@"%@/%@/%@",basePath, attachment.key,attachment.filename];
+        title= parent.title;
     }
+    
+    NSInteger nameLength = [[ZPPreferences instance] maxTitleLengthInDropboxFilenames];
+    if(nameLength >0 && [title length] > nameLength){
+        title = [title substringToIndex:nameLength];
+    }
+    
+    NSString* publicationTitle = [parent.fields objectForKey:@"publicationTitle"];
+    NSString* publisher = [parent.fields objectForKey:@"publisher"];
+    NSString* journalAbbreviation = [parent.fields objectForKey:@"journalAbbreviation"]; 
+    NSString* volume = [parent.fields objectForKey:@"volume"]; 
+    NSString* issue = [parent.fields objectForKey:@"issue"]; 
+    NSString* patentNumber = [parent.fields objectForKey:@"patentNumber"];
+    NSString* assignee = [parent.fields objectForKey:@"assignee"];
+    NSString* issued = [parent.fields objectForKey:@"issueDate"];
+    
+    NSInteger year;
+    
+    if([parent.itemType isEqualToString:@"patent"]){
+        if(issued != NULL) year = [[issued substringToIndex:4] integerValue];
+    }
+    else{
+        year = [parent.year intValue];
+    }
+    
+    NSArray* nameFragments = [pattern componentsSeparatedByString:@"%"];
+    NSMutableString* customName = [NSMutableString stringWithString:[nameFragments objectAtIndex:0]];
+    
+    
+    for (NSInteger i = 1; i < [nameFragments count]; i++) {
+        
+        NSString* nameFragment = [nameFragments objectAtIndex:i];
+        
+        
+        switch ([nameFragment characterAtIndex:0]) {
+                
+                // %a - last names of authors (not editors etc) or inventors. 
+            case 'a':
+                [customName appendString:creatorString];
+                break;
+                
+                // %A - first letter of author (useful for subfolders) 
+            case 'A':
+                [customName appendString:[[creatorString substringToIndex:1] uppercaseString]];
+                break;
+                
+                // %y - year (extracted from Date field)
+            case 'y':
+                if(year != 0) [customName appendString:[[NSNumber numberWithInt:year] stringValue]];
+                break;
+                
+                // %t - title. Usually truncated after : . ? The maximal length of the remaining part of the title can be changed.
+            case 't':
+                [customName appendString:title];    
+                break;
+                
+                // %T - item type (localized) 
+            case 'T':
+                [customName appendString:[ZPLocalization getLocalizationStringWithKey:parent.itemType type:@"itemType"]];
+                break;
+                
+                // %j - name of the journal
+            case 'j':
+                if(publicationTitle != NULL) [customName appendString:publicationTitle];
+                break;
+                
+                // %p - name of the publisher
+            case 'p':
+                if(publisher != NULL) [customName appendString:publisher];
+                break;
+                
+                // %w - name of the journal or publisher
+            case 'w':
+                if(publicationTitle != NULL) [customName appendString:publicationTitle];
+                else if(publisher != NULL) [customName appendString:publisher];
+                break;
+                
+                // %s - journal abbreviation
+            case 's':
+                if(journalAbbreviation != NULL) [customName appendString:journalAbbreviation];
+                break;
+                
+                // %v - journal volume
+            case 'v':
+                if(volume != NULL) [customName appendString:volume];
+                break;
+                
+                // %e - journal issue
+            case 'e':
+                if(issue != NULL) [customName appendString:issue];
+                break;
+                
+                
+                // %n - patent number (patent items only)
+            case 'n':
+                if(patentNumber != NULL) [customName appendString:patentNumber];
+                break;
+                
+                // %i - assignee (patent items only)
+            case 'i':
+                if(assignee != NULL) [customName appendString:assignee];
+                break;
+                
+                // %u - issue date (patent items only)
+            case 'u':
+                if(issued != NULL) [customName appendString:[issued substringToIndex:4]] ;
+                break;
+                
+                //Specific to ZotPad
+                /*                    
+                 case 'k':
+                 [customName appendString:attachment.key] ;
+                 break;
+                 
+                 case 'f':
+                 [customName appendString:attachment.filename] ;
+                 break;
+                 */
+                
+            default:
+                DDLogError(@"Invalid dropbox file pattern specifier \%%c in pattern %@",[nameFragment characterAtIndex:0],pattern);
+                break;
+        }
+        
+        //Add rest of the fragment
+        if([nameFragment length]>1){
+            [customName appendString:[nameFragment substringFromIndex:1]];
+        }
+        
+    }
+    return customName;
 }
 
--(NSString*) _URLForAttachment:(ZPZoteroAttachment*)attachment{
-    
+-(NSString*) _pathForAttachment:(ZPZoteroAttachment*)attachment{
+
+
 #ifdef BETA
     NSString* appFolder = @"ZotPad-beta";
 #else
     NSString* appFolder = @"ZotPad";
 #endif
 
-    if([[ZPPreferences instance] dropboxHasFullControl]){
-        return [@"https://www.dropbox.com/home" stringByAppendingString:[self _pathForAttachment:attachment]];
+    NSString* basePath = [[ZPPreferences instance] dropboxPath];
+
+    if(![[ZPPreferences instance] dropboxHasFullControl]){
+        if([[ZPPreferences instance] dropboxPath] != NULL && ! [[[ZPPreferences instance] dropboxPath] hasPrefix:[@"Apps/" stringByAppendingString:appFolder]]){
+            
+            NSString* defaultPath = [NSString stringWithFormat:@"Apps/%@/storage",appFolder];
+            [[[UIAlertView alloc] initWithTitle:@"Dropbox configuration error"
+                                       message:[NSString stringWithFormat:@"Your Dropbox settings allow ZotPad to acces only app folder located at 'Apps/%@', but the current path to our Dropbox files pointed to '%@'. Path to Dropbox files has been reset to default value 'Apps/%@/storage'",appFolder,[[ZPPreferences instance] dropboxPath], appFolder]
+                                      delegate:NULL cancelButtonTitle:@"OK" otherButtonTitles: nil] show];
+            [[ZPPreferences instance] setDropboxPath:defaultPath];
+            basePath = defaultPath;
+        }
+        
+        basePath = [basePath stringByReplacingOccurrencesOfString:[NSString stringWithFormat:@"Apps/%@/",appFolder] withString:@""] ;
+    }
+
+
+    if(! [basePath isEqualToString:@""]){
+        basePath = [basePath stringByAppendingString:@"/"];
+    }
+       
+    if([[ZPPreferences instance] useCustomFilenamesWithDropbox]){
+        
+        ZPZoteroItem* parent = [ZPZoteroItem dataObjectWithKey:attachment.parentItemKey];
+
+        NSString* pattern;
+        
+        if([parent.itemType isEqualToString:@"patent"]){
+            pattern = [[ZPPreferences instance] customPatentFilenamePatternForDropbox];
+        }
+        else{
+            pattern = [[ZPPreferences instance] customFilenamePatternForDropbox];
+        }
+
+        NSMutableString* customName = [NSMutableString stringWithString:[self _filenameOrPathForAttachment:attachment withPattern:pattern]];
+        
+        // Remove invalid characters
+        
+        [customName replaceOccurrencesOfString:@"/" withString:@"" options:nil range:NSMakeRange(0, [customName length])];
+        [customName replaceOccurrencesOfString:@"\\" withString:@"" options:nil range:NSMakeRange(0, [customName length])];
+        [customName replaceOccurrencesOfString:@"?" withString:@"" options:nil range:NSMakeRange(0, [customName length])];
+        [customName replaceOccurrencesOfString:@"*" withString:@"" options:nil range:NSMakeRange(0, [customName length])];
+        [customName replaceOccurrencesOfString:@":" withString:@"" options:nil range:NSMakeRange(0, [customName length])];
+        [customName replaceOccurrencesOfString:@"|" withString:@"" options:nil range:NSMakeRange(0, [customName length])];
+        [customName replaceOccurrencesOfString:@"\"" withString:@"" options:nil range:NSMakeRange(0, [customName length])];
+        [customName replaceOccurrencesOfString:@"<" withString:@"" options:nil range:NSMakeRange(0, [customName length])];
+        [customName replaceOccurrencesOfString:@">" withString:@"" options:nil range:NSMakeRange(0, [customName length])];
+        [customName replaceOccurrencesOfString:@"." withString:@"" options:nil range:NSMakeRange(0, [customName length])];
+        
+        //Replace white space
+        
+        NSArray* words = [customName componentsSeparatedByCharactersInSet :[NSCharacterSet whitespaceCharacterSet]];
+        customName = [NSMutableString stringWithString:[words componentsJoinedByString:@" "]];
+
+                     
+        if([[ZPPreferences instance] replaceBlanksInDropboxFilenames]){
+            [customName replaceOccurrencesOfString:@" " withString:@"_" options:nil range:NSMakeRange(0, [customName length])];
+        }
+        if([[ZPPreferences instance] removeDiacriticsInDropboxFilenames]){
+            
+            NSData *asciiEncoded = [customName dataUsingEncoding:NSASCIIStringEncoding
+                                            allowLossyConversion:YES];
+            
+            // take the data object and recreate a string using the lossy conversion
+            customName = [[NSMutableString alloc] initWithData:asciiEncoded
+                                                      encoding:NSASCIIStringEncoding];
+        }
+        
+        NSString* fileTypeSuffix = [attachment.filename pathExtension];
+        if(![fileTypeSuffix isEqualToString:@""]){
+            [customName appendFormat:@".%@",[fileTypeSuffix lowercaseString]];
+        }
+        
+        NSString* folderPattern = [[ZPPreferences instance] customSubfolderPatternForDropbox];
+        if(![folderPattern isEqualToString:@""]){
+            folderPattern = [folderPattern stringByReplacingOccurrencesOfString:@"\\" withString:@"/"];
+            folderPattern = [folderPattern stringByTrimmingCharactersInSet:[NSCharacterSet characterSetWithCharactersInString:@" /"]];
+            folderPattern = [NSString stringWithFormat:@"/%@/", folderPattern];
+            NSString* folder = [self _filenameOrPathForAttachment:attachment withPattern:pattern];
+            folder = [folder stringByReplacingOccurrencesOfString:@"//" withString:@"/undefined/"];
+            
+            customName = (NSMutableString*) [[folderPattern stringByAppendingString:customName] stringByTrimmingCharactersInSet:[NSCharacterSet characterSetWithCharactersInString:@"/"]];
+        }
+        return [NSString stringWithFormat:@"/%@%@",basePath,customName];
+        
     }
     else{
-        return [NSString stringWithFormat:@"https://www.dropbox.com/home/Apps/%@%@",appFolder,[self _pathForAttachment:attachment]];
+        if([attachment.linkMode intValue] == LINK_MODE_IMPORTED_URL && (
+                                                                        [attachment.contentType isEqualToString:@"text/html"] ||
+                                                                        [attachment.contentType isEqualToString:@"application/xhtml+xml"])){
+            //Get a list of files to be downloaded. This does not respect custom file name template
+            return [NSString stringWithFormat:@"/%@%@/",basePath, attachment.key];
+        }
+        else{
+            //Otherwise, load metadata for the file usign the default patterns
+            return [NSString stringWithFormat:@"/%@%@/%@",basePath, attachment.key,attachment.filename];
+        }
     }
+}
+
+-(NSString*) _URLForAttachment:(ZPZoteroAttachment*)attachment{
+    NSString* baseURL;
+    
+    
+#ifdef BETA
+    NSString* appFolder = @"ZotPad-beta";
+#else
+    NSString* appFolder = @"ZotPad";
+#endif
+    
+    
+    if([[ZPPreferences instance] dropboxHasFullControl]){
+        baseURL = @"https://www.dropbox.com/home";
+    }
+    else{
+        baseURL = [@"https://www.dropbox.com/home/Apps/" stringByAppendingString:appFolder];
+    }
+    
+    return [baseURL stringByAppendingPathComponent:[self _pathForAttachment:attachment]];
 }
 
 #pragma mark - Downloads
