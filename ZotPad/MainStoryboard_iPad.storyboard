@@ -215,11 +215,14 @@
                                             <color key="highlightedColor" red="1" green="1" blue="1" alpha="1" colorSpace="calibratedRGB"/>
                                         </label>
                                         <label opaque="NO" clipsSubviews="YES" multipleTouchEnabled="YES" tag="2" contentMode="left" text="Detail" textAlignment="right" lineBreakMode="tailTruncation" baselineAdjustment="alignBaselines" adjustsFontSizeToFit="NO" id="bgJ-q6-dbO" customClass="OHAttributedLabel">
-                                            <rect key="frame" x="324" y="11" width="283" height="21"/>
-                                            <autoresizingMask key="autoresizingMask"/>
+                                            <rect key="frame" x="324" y="0.0" width="283" height="43"/>
+                                            <autoresizingMask key="autoresizingMask" widthSizable="YES" heightSizable="YES"/>
                                             <fontDescription key="fontDescription" type="system" pointSize="17"/>
                                             <color key="textColor" red="0.21960784310000001" green="0.3294117647" blue="0.52941176469999995" alpha="1" colorSpace="calibratedRGB"/>
                                             <color key="highlightedColor" red="1" green="1" blue="1" alpha="1" colorSpace="calibratedRGB"/>
+                                            <userDefinedRuntimeAttributes>
+                                                <userDefinedRuntimeAttribute type="boolean" keyPath="centerVertically" value="YES"/>
+                                            </userDefinedRuntimeAttributes>
                                         </label>
                                     </subviews>
                                     <color key="backgroundColor" white="0.0" alpha="0.0" colorSpace="calibratedWhite"/>
@@ -666,6 +669,89 @@
     <resources>
         <image name="gear.png" width="20" height="20"/>
     </resources>
+    <classes>
+        <class className="OHAttributedLabel" superclassName="UILabel">
+            <source key="sourceIdentifier" type="project" relativePath="./Classes/OHAttributedLabel.h"/>
+            <relationships>
+                <relationship kind="outlet" name="delegate"/>
+            </relationships>
+        </class>
+        <class className="ZPAuthenticationDialog" superclassName="UIViewController">
+            <source key="sourceIdentifier" type="project" relativePath="./Classes/ZPAuthenticationDialog.h"/>
+            <relationships>
+                <relationship kind="action" name="loadFirstPage:"/>
+                <relationship kind="outlet" name="webView" candidateClass="UIWebView"/>
+            </relationships>
+        </class>
+        <class className="ZPFileImportViewController" superclassName="UIViewController">
+            <source key="sourceIdentifier" type="project" relativePath="./Classes/ZPFileImportViewController.h"/>
+            <relationships>
+                <relationship kind="outlet" name="carousel" candidateClass="iCarousel"/>
+            </relationships>
+        </class>
+        <class className="ZPItemDetailViewController" superclassName="UITableViewController">
+            <source key="sourceIdentifier" type="project" relativePath="./Classes/ZPItemDetailViewController.h"/>
+            <relationships>
+                <relationship kind="action" name="actionButtonPressed:"/>
+                <relationship kind="outlet" name="actionButton" candidateClass="UIBarButtonItem"/>
+            </relationships>
+        </class>
+        <class className="ZPItemListViewController" superclassName="UIViewController">
+            <source key="sourceIdentifier" type="project" relativePath="./Classes/ZPItemListViewController.h"/>
+            <relationships>
+                <relationship kind="action" name="attachmentThumbnailPressed:"/>
+                <relationship kind="action" name="sortButtonPressed:"/>
+                <relationship kind="outlet" name="searchBar" candidateClass="UISearchBar"/>
+                <relationship kind="outlet" name="tableView" candidateClass="UITableView"/>
+                <relationship kind="outlet" name="toolBar" candidateClass="UIToolbar"/>
+            </relationships>
+        </class>
+        <class className="ZPLibraryAndCollectionListViewController" superclassName="UITableViewController">
+            <source key="sourceIdentifier" type="project" relativePath="./Classes/ZPLibraryAndCollectionListViewController.h"/>
+            <relationships>
+                <relationship kind="outlet" name="cacheControllerPlaceHolder" candidateClass="UIBarButtonItem"/>
+                <relationship kind="outlet" name="gearButton" candidateClass="UIBarButtonItem"/>
+            </relationships>
+        </class>
+        <class className="ZPLogViewController" superclassName="UIViewController">
+            <source key="sourceIdentifier" type="project" relativePath="./Classes/ZPLogViewController.h"/>
+            <relationships>
+                <relationship kind="action" name="dismiss:"/>
+                <relationship kind="action" name="emailSupport:"/>
+                <relationship kind="action" name="manageKey:"/>
+                <relationship kind="action" name="onlineSupport:"/>
+                <relationship kind="action" name="showManual:"/>
+                <relationship kind="outlet" name="logView" candidateClass="UITextView"/>
+                <relationship kind="outlet" name="manualButton" candidateClass="UIBarButtonItem"/>
+            </relationships>
+        </class>
+        <class className="ZPMasterItemListViewController" superclassName="UITableViewController">
+            <source key="sourceIdentifier" type="project" relativePath="./Classes/ZPMasterItemListViewController.h"/>
+        </class>
+        <class className="ZPSplitViewController" superclassName="UISplitViewController">
+            <source key="sourceIdentifier" type="project" relativePath="./Classes/ZPSplitViewController.h"/>
+            <relationships>
+                <relationship kind="action" name="showLogView:"/>
+            </relationships>
+        </class>
+        <class className="ZPUploadVersionConflictViewControllerViewController" superclassName="UIViewController">
+            <source key="sourceIdentifier" type="project" relativePath="./Classes/ZPUploadVersionConflictViewControllerViewController.h"/>
+            <relationships>
+                <relationship kind="action" name="useMyVersion:"/>
+                <relationship kind="action" name="useRemoteVersion:"/>
+                <relationship kind="outlet" name="carousel" candidateClass="iCarousel"/>
+                <relationship kind="outlet" name="label" candidateClass="UILabel"/>
+                <relationship kind="outlet" name="secondaryCarousel" candidateClass="iCarousel"/>
+            </relationships>
+        </class>
+        <class className="iCarousel" superclassName="UIView">
+            <source key="sourceIdentifier" type="project" relativePath="./Classes/iCarousel.h"/>
+            <relationships>
+                <relationship kind="outlet" name="dataSource"/>
+                <relationship kind="outlet" name="delegate"/>
+            </relationships>
+        </class>
+    </classes>
     <simulatedMetricsContainer key="defaultSimulatedMetrics">
         <simulatedStatusBarMetrics key="statusBar" statusBarStyle="blackTranslucent"/>
         <simulatedOrientationMetrics key="orientation"/>

@@ -23,6 +23,8 @@
 #import "ZPAttachmentCarouselDelegate.h"
 #import "OHAttributedLabel.h"
 
+#import <UIKit/UIKit.h>
+
 //Define 
 
 #define IPAD UI_USER_INTERFACE_IDIOM() == UIUserInterfaceIdiomPad
@@ -403,9 +405,15 @@
     OHAttributedLabel* value = (OHAttributedLabel*) [cell viewWithTag:2];
     UILabel* title = (UILabel*) [cell viewWithTag:1];
     
+    
     value.text = [self _textAtIndexPath:indexPath isTitle:FALSE];
     title.text = [self _textAtIndexPath:indexPath isTitle:TRUE];
 
+    if([title.text isEqualToString:@"DOI"]){
+        [value addCustomLink:[NSURL URLWithString:[@"http://dx.doi.org/" stringByAppendingString:value.text]] inRange:NSMakeRange(0,[value.text length])];
+    }
+    
+    
     //Configure size of the value label
     
     if(!isAbstract){
