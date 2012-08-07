@@ -60,7 +60,7 @@ static ZPPreferences* _instance = nil;
 
     NSMutableDictionary *defaultsToRegister = [[NSMutableDictionary alloc] init];
 
-    NSArray* preferenceFiles = [NSArray arrayWithObjects:@"Root.plist", nil];
+    NSArray* preferenceFiles = [NSArray arrayWithObjects:@"Root.plist", @"Dropbox.plist", nil];
     
     NSString* preferenceFile;
     for(preferenceFile in preferenceFiles){
@@ -229,6 +229,58 @@ static ZPPreferences* _instance = nil;
     return [[[defaults stringForKey:@"dropboxpath"] 
              stringByTrimmingCharactersInSet:[NSCharacterSet whitespaceCharacterSet]]
             stringByTrimmingCharactersInSet:[NSCharacterSet characterSetWithCharactersInString:@"/\\"]];
+}
+-(void) setDropboxPath:(NSString*)path{
+    NSUserDefaults* defaults = [NSUserDefaults standardUserDefaults];
+    [defaults setObject:path forKey:@"dropboxpath"];
+}
+
+-(BOOL) useCustomFilenamesWithDropbox{
+    NSUserDefaults* defaults = [NSUserDefaults standardUserDefaults];
+    return [defaults boolForKey:@"dropboxusecustomfilenames"];
+}
+
+-(NSString*) customFilenamePatternForDropbox{
+    NSUserDefaults* defaults = [NSUserDefaults standardUserDefaults];
+    return [defaults stringForKey:@"dropboxfilenamepattern"];
+}
+-(NSString*) customSubfolderPatternForDropbox{
+    NSUserDefaults* defaults = [NSUserDefaults standardUserDefaults];
+    return [defaults stringForKey:@"dropboxsubfolderpattern"];
+}
+
+-(NSString*) customPatentFilenamePatternForDropbox{
+    NSUserDefaults* defaults = [NSUserDefaults standardUserDefaults];
+    return [defaults stringForKey:@"dropboxfilenamepatternpatents"];
+}
+
+-(BOOL) replaceBlanksInDropboxFilenames{
+    NSUserDefaults* defaults = [NSUserDefaults standardUserDefaults];
+    return [defaults boolForKey:@"dropboxreplaceblanks"];
+}
+-(BOOL) removeDiacriticsInDropboxFilenames{
+    NSUserDefaults* defaults = [NSUserDefaults standardUserDefaults];
+    return [defaults boolForKey:@"dropboxremovediacritics"];
+}
+
+-(BOOL) truncateTitlesInDropboxFilenames{
+    NSUserDefaults* defaults = [NSUserDefaults standardUserDefaults];
+    return [defaults boolForKey:@"dropboxtruncatetitle"];
+}
+
+-(NSInteger) maxTitleLengthInDropboxFilenames{
+    NSUserDefaults* defaults = [NSUserDefaults standardUserDefaults];
+    return [defaults integerForKey:@"dropboxtitlelenght"];
+}
+
+-(NSInteger) maxNumberOfAuthorsInDropboxFilenames{
+    NSUserDefaults* defaults = [NSUserDefaults standardUserDefaults];
+    return [defaults integerForKey:@"dropboxnumberofauthor"];
+}
+
+-(NSString*) authorSuffixInDropboxFilenames{
+    NSUserDefaults* defaults = [NSUserDefaults standardUserDefaults];
+    return [defaults stringForKey:@"dropboxauthorsuffix"];
 }
 
 -(BOOL) useWebDAV{

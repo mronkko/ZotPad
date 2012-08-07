@@ -1,0 +1,148 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE plist PUBLIC "-//Apple//DTD PLIST 1.0//EN" "http://www.apple.com/DTDs/PropertyList-1.0.dtd">
+<plist version="1.0">
+<dict>
+	<key>PreferenceSpecifiers</key>
+	<array>
+		<dict>
+			<key>Type</key>
+			<string>PSGroupSpecifier</string>
+			<key>Title</key>
+			<string>Advanced Dropbox settings</string>
+			<key>FooterText</key>
+			<string>By default, ZotPad is restricted to only access a dedicated app folder inside your Dropbox account. Enabling full control of Dropbox will allow ZotPad to download files from any folder in your Dropbox. Changing the Dropbox access privileges takes effect the next time ZotPad is started.</string>
+		</dict>
+		<dict>
+			<key>Type</key>
+			<string>PSToggleSwitchSpecifier</string>
+			<key>Title</key>
+			<string>Allow ZotPad full control of Dropbox</string>
+			<key>Key</key>
+			<string>dropboxfullcontrol</string>
+			<key>DefaultValue</key>
+			<false/>
+		</dict>
+		<dict>
+			<key>Type</key>
+			<string>PSTextFieldSpecifier</string>
+			<key>Title</key>
+			<string>Location of Zotero files in Dropbox</string>
+			<key>Key</key>
+			<string>dropboxpath</string>
+			<key>DefaultValue</key>
+			<string>Apps/ZotPad/storage</string>
+		</dict>
+		<dict>
+			<key>Type</key>
+			<string>PSGroupSpecifier</string>
+			<key>Title</key>
+			<string>Custom file name settings</string>
+			<key>FooterText</key>
+			<string>ZotPad expects to find a full copy of the Zotero storage directory in Dropbox. These settings allow ZotPad to locate files have copied or moved to Dropbox with some other structure. The filename patterns are based on the ZotFile pattern specifiers. See the ZotFile website at http://www.columbia.edu/~jpl2136/zotfile.html for documentation.</string>
+		</dict>
+		<dict>
+			<key>Type</key>
+			<string>PSToggleSwitchSpecifier</string>
+			<key>Title</key>
+			<string>Use custom file names</string>
+			<key>Key</key>
+			<string>dropboxusecustomfilenames</string>
+			<key>DefaultValue</key>
+			<false/>
+		</dict>
+		<dict>
+			<key>Type</key>
+			<string>PSTextFieldSpecifier</string>
+			<key>Title</key>
+			<string>Filename pattern</string>
+			<key>Key</key>
+			<string>dropboxfilenamepattern</string>
+			<key>DefaultValue</key>
+			<string>%a_%y_%t</string>
+		</dict>
+        <dict>
+			<key>Type</key>
+			<string>PSTextFieldSpecifier</string>
+			<key>Title</key>
+			<string>Filename pattern for patents</string>
+			<key>Key</key>
+			<string>dropboxfilenamepatternpatents</string>
+			<key>DefaultValue</key>
+			<string>%a_%y_%t</string>
+		</dict>
+        <dict>
+			<key>Type</key>
+			<string>PSTextFieldSpecifier</string>
+			<key>Title</key>
+			<string>Subfolder pattern</string>
+			<key>Key</key>
+			<string>dropboxsubfolderpattern</string>
+			<key>DefaultValue</key>
+			<string></string>
+		</dict>
+		<dict>
+			<key>Type</key>
+			<string>PSToggleSwitchSpecifier</string>
+			<key>Title</key>
+			<string>Replace blanks</string>
+			<key>Key</key>
+			<string>dropboxreplaceblanks</string>
+			<key>DefaultValue</key>
+			<false/>
+		</dict>
+        <dict>
+			<key>Type</key>
+			<string>PSToggleSwitchSpecifier</string>
+			<key>Title</key>
+			<string>Remove diacritics (accents etc. on top of characters)</string>
+			<key>Key</key>
+			<string>dropboxremovediacritics</string>
+			<key>DefaultValue</key>
+			<false/>
+		</dict>
+
+		<dict>
+			<key>Type</key>
+			<string>PSToggleSwitchSpecifier</string>
+			<key>Title</key>
+			<string>Truncate title after . or : or ?</string>
+			<key>Key</key>
+			<string>dropboxtruncatetitle</string>
+			<key>DefaultValue</key>
+			<true/>
+		</dict>
+		<dict>
+			<key>Type</key>
+			<string>PSTextFieldSpecifier</string>
+			<key>Title</key>
+			<string>Maximum length of title</string>
+			<key>Key</key>
+			<string>dropboxtitlelenght</string>
+			<key>DefaultValue</key>
+			<string>80</string>
+		</dict>
+		<dict>
+			<key>Type</key>
+			<string>PSTextFieldSpecifier</string>
+			<key>Title</key>
+			<string>Maximum number of authors</string>
+			<key>Key</key>
+			<string>dropboxnumberofauthor</string>
+			<key>DefaultValue</key>
+			<string>2</string>
+		</dict>
+		<dict>
+			<key>Type</key>
+			<string>PSTextFieldSpecifier</string>
+			<key>Title</key>
+			<string>Add suffix when authors are omitted</string>
+			<key>Key</key>
+			<string>dropboxauthorsuffix</string>
+			<key>DefaultValue</key>
+			<string>et al</string>
+		</dict>
+	</array>
+	<key>StringsTable</key>
+	<string>Dropbox</string>
+</dict>
+</plist>

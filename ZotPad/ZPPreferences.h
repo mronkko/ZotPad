@@ -35,9 +35,22 @@
 -(BOOL) cacheAttachmentsActiveItem;
 
 -(BOOL) useCache;
+
+//Dropbox spesific settings
 -(BOOL) useDropbox;
 -(BOOL) dropboxHasFullControl;
+-(void) setDropboxPath:(NSString*) path;
 -(NSString*) dropboxPath;
+-(BOOL) useCustomFilenamesWithDropbox;
+-(NSString*) customFilenamePatternForDropbox;
+-(NSString*) customPatentFilenamePatternForDropbox;
+-(NSString*) customSubfolderPatternForDropbox;
+-(BOOL) replaceBlanksInDropboxFilenames;
+-(BOOL) removeDiacriticsInDropboxFilenames;
+-(BOOL) truncateTitlesInDropboxFilenames;
+-(NSInteger) maxTitleLengthInDropboxFilenames;
+-(NSInteger) maxNumberOfAuthorsInDropboxFilenames;
+-(NSString*) authorSuffixInDropboxFilenames;
 
 -(BOOL) reportErrors;
 
