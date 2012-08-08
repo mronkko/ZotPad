@@ -13,7 +13,7 @@
 @synthesize key, title, libraryID, cacheTimestamp, serverTimestamp, dateAdded;
 
 // This is very useful for troubleshooting, but because of memory issues, is only used for debug builds
-#ifdef DEBUG
+#ifdef ZPDEBUG
 @synthesize responseDataFromWhichThisItemWasCreated;
 #endif
 

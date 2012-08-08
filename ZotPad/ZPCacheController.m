@@ -411,7 +411,7 @@ static ZPCacheController* _instance = nil;
              
              */
             if(item.serverTimestamp == NULL || item.serverTimestamp == [NSNull null]){
-#ifdef DEBUG
+#ifdef ZPDEBUG
                 DDLogError(@"Item %@ has an empty server timestamp and will not be written to cache. The item was created from the following server response: \n\n%@",item.key,item.responseDataFromWhichThisItemWasCreated);
 #endif
                 continue;

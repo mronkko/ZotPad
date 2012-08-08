@@ -13,7 +13,7 @@
 }
 
 // This is very useful for troubleshooting, but because of memory issues, is only used for debug builds
-#ifdef DEBUG
+#ifdef ZPDEBUG
 @property (retain) NSString* responseDataFromWhichThisItemWasCreated;
 #endif
 

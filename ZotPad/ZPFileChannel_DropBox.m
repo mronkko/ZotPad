@@ -10,6 +10,8 @@
 
 #import "ZPFileChannel_Dropbox.h"
 #import "DBRestClient.h"
+#import "DBSession.h"
+#import "DBSession+iOS.h"
 #import "ZPPreferences.h"
 #import "ZPLocalization.h"
 
@@ -42,6 +44,30 @@ static const NSString* DROPBOX_KEY = @"nn6res38igpo4ec";
 
 #endif
 
+@interface ZPDBSession : DBSession {
+    BOOL _ZPisLinking;
+}
+@property (readonly) BOOL isLinking;
+@end
+
+@implementation ZPDBSession
+
+@synthesize isLinking = _ZPisLinking;
+
+- (void)linkFromController:(UIViewController *)rootController {
+    _ZPisLinking = TRUE;
+    [super linkFromController:rootController];
+}
+
+- (BOOL)handleOpenURL:(NSURL *)url {
+    BOOL ret = [super handleOpenURL:url];
+    _ZPisLinking = FALSE;
+    return ret;
+}
+
+
+@end
+
 @interface ZPDBRestClient : DBRestClient{
 }
 
@@ -72,32 +98,32 @@ static const NSString* DROPBOX_KEY = @"nn6res38igpo4ec";
 
 +(void) linkDroboxIfNeeded{
     if([[ZPPreferences instance] useDropbox]){
-        if([DBSession sharedSession]==NULL){
+        if([ZPDBSession sharedSession]==NULL){
             DDLogInfo(@"Starting Dropbox");
             
             if([[ZPPreferences instance] dropboxHasFullControl]){
-                DBSession* dbSession =
-                [[DBSession alloc]
+                ZPDBSession* dbSession =
+                [[ZPDBSession alloc]
                  initWithAppKey:DROPBOX_KEY_FULL_ACCESS
                  appSecret:DROPBOX_SECRET_FULL_ACCESS
                  root:kDBRootDropbox];
-                [DBSession setSharedSession:dbSession];
+                [ZPDBSession setSharedSession:dbSession];
                 
             }
             else{
-                DBSession* dbSession =
-                [[DBSession alloc]
+                ZPDBSession* dbSession =
+                [[ZPDBSession alloc]
                  initWithAppKey:DROPBOX_KEY
                  appSecret:DROPBOX_SECRET
                  root:kDBRootAppFolder];
-                [DBSession setSharedSession:dbSession];
+                [ZPDBSession setSharedSession:dbSession];
             }
         }
 
         //Link with dropBox account if not already linked
 
-        BOOL linked =[[DBSession sharedSession] isLinked];
-        BOOL linking =[[DBSession sharedSession] isLinking];
+        BOOL linked =[[ZPDBSession sharedSession] isLinked];
+        BOOL linking =[[ZPDBSession sharedSession] isLinking];
 
         if (!linked && ! linking) {
 
@@ -107,7 +133,7 @@ static const NSString* DROPBOX_KEY = @"nn6res38igpo4ec";
             if([NSThread isMainThread]){
 
                 //Unlink all so that we can relink
-                [[DBSession sharedSession] unlinkAll];
+                [[ZPDBSession sharedSession] unlinkAll];
                 
                 UIViewController* viewController = [UIApplication sharedApplication].delegate.window.rootViewController;
                 while(viewController.presentedViewController) viewController = viewController.presentedViewController;
@@ -118,7 +144,7 @@ static const NSString* DROPBOX_KEY = @"nn6res38igpo4ec";
                     [viewController dismissModalViewControllerAnimated:NO];
                     viewController = parent;
                 }
-                [[DBSession sharedSession] linkFromController:viewController];
+                [[ZPDBSession sharedSession] linkFromController:viewController];
             }
             else {
                 [[self class] performSelectorOnMainThread:@selector(linkDroboxIfNeeded) withObject:NULL waitUntilDone:YES];
@@ -132,7 +158,7 @@ static const NSString* DROPBOX_KEY = @"nn6res38igpo4ec";
     [ZPFileChannel_Dropbox linkDroboxIfNeeded];
     
     self = [super init]; 
-    [DBSession sharedSession].delegate = self;
+    [ZPDBSession sharedSession].delegate = self;
     
     progressViewsByRequest = [[NSMutableDictionary alloc] init];
     downloadCountsByRequest = [[NSMutableDictionary alloc] init];
@@ -479,7 +505,7 @@ static const NSString* DROPBOX_KEY = @"nn6res38igpo4ec";
     [ZPFileChannel_Dropbox linkDroboxIfNeeded];
     
     //TODO: consider pooling these
-    ZPDBRestClient* restClient = [[ZPDBRestClient alloc] initWithSession:[DBSession sharedSession]];
+    ZPDBRestClient* restClient = [[ZPDBRestClient alloc] initWithSession:[ZPDBSession sharedSession]];
 
     restClient.attachment = attachment;
     restClient.delegate = self;
@@ -527,7 +553,7 @@ static const NSString* DROPBOX_KEY = @"nn6res38igpo4ec";
     [ZPFileChannel_Dropbox linkDroboxIfNeeded];
     
     //TODO: consider pooling these
-    ZPDBRestClient* restClient = [[ZPDBRestClient alloc] initWithSession:[DBSession sharedSession]];
+    ZPDBRestClient* restClient = [[ZPDBRestClient alloc] initWithSession:[ZPDBSession sharedSession]];
 
     
     restClient.attachment = attachment;
@@ -757,10 +783,10 @@ static const NSString* DROPBOX_KEY = @"nn6res38igpo4ec";
 
 #pragma DBSession delegate
 
-- (void)sessionDidReceiveAuthorizationFailure:(DBSession *)session userId:(NSString *)userId{
+- (void)sessionDidReceiveAuthorizationFailure:(ZPDBSession *)session userId:(NSString *)userId{
     DDLogError(@"Authorization failure with Dropbox for user ID %@. Will unlink and attemp to relink later.",userId);
     if(userId != NULL){
-        [[DBSession sharedSession] unlinkAll];
+        [[ZPDBSession sharedSession] unlinkAll];
     }
 }
 

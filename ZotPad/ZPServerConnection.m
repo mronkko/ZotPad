@@ -324,7 +324,7 @@ const NSInteger ZPServerConnectionRequestPermissions = 10;
             [parser setDelegate: parserDelegate];
             [parser parse];
             
-#ifdef DEBUG
+#ifdef ZPDEBUG
             NSString* responseString = [[NSString alloc] initWithData:responseData  encoding:NSUTF8StringEncoding];
             parserDelegate.fullResponse = responseString;
             //Check that we got time stamps for all objects

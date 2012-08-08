@@ -15,7 +15,7 @@
 
 @implementation ZPServerResponseXMLParser
 
-#ifdef DEBUG
+#ifdef ZPDEBUG
 @synthesize fullResponse;
 #endif
 

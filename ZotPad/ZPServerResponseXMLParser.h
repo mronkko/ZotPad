@@ -20,7 +20,7 @@
     NSString* _currentID;
 }
 
-#ifdef DEBUG
+#ifdef ZPDEBUG
 @property (retain) NSString* fullResponse;
 #endif
 @property (retain) NSArray* parsedElements;

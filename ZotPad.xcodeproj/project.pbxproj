@@ -3958,6 +3958,10 @@
 				);
 				GCC_PRECOMPILE_PREFIX_HEADER = YES;
 				GCC_PREFIX_HEADER = "ZotPad/ZotPad-Prefix.pch";
+				GCC_PREPROCESSOR_DEFINITIONS = (
+					"ZPDEBUG=1",
+					"$(inherited)",
+				);
 				HEADER_SEARCH_PATHS = /usr/include/libxml2;
 				INFOPLIST_FILE = "ZotPad-Info.plist";
 				INSTALL_GROUP = 70000;
@@ -4021,7 +4025,7 @@
 				GCC_PRECOMPILE_PREFIX_HEADER = YES;
 				GCC_PREFIX_HEADER = "ZotPad/ZotPad-Prefix.pch";
 				GCC_PREPROCESSOR_DEFINITIONS = (
-					"DEBUG=1",
+					"ZPDEBUG=1",
 					"BETA=1",
 				);
 				GCC_PREPROCESSOR_DEFINITIONS_NOT_USED_IN_PRECOMPS = "";
@@ -4061,7 +4065,7 @@
 				GCC_PRECOMPILE_PREFIX_HEADER = YES;
 				GCC_PREFIX_HEADER = "ZotPad/ZotPad-Prefix.pch";
 				GCC_PREPROCESSOR_DEFINITIONS = (
-					"DEBUG=1",
+					"ZPDEBUG=1",
 					"BETA=1",
 				);
 				GCC_PREPROCESSOR_DEFINITIONS_NOT_USED_IN_PRECOMPS = "";

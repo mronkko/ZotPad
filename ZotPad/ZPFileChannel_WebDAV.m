@@ -233,7 +233,7 @@ NSInteger const ZPFILECHANNEL_WEBDAV_UPLOAD_REGISTER = 5;
     
     NSURL *url = [NSURL URLWithString:urlString]; 
     
-    DDLogVerbose(@"Uploading file %@ to WebDAV (%@)",urlString,attachment.filename);
+    DDLogInfo(@"Uploading file %@ to WebDAV address %@",attachment.filename, urlString);
     
     ASIHTTPRequest *uploadRequest = [ASIHTTPRequest requestWithURL:url]; 
     
