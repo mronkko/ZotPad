@@ -8,8 +8,9 @@
 
 
 
-# Locate profile directory. 
-
+#
+# Start by locating the Zotero Standalone or Firefox profile directory. 
+#
 
 # Mac
 
@@ -47,12 +48,21 @@ exit 1
 
 fi
 
-# Parse the default profile, multiple profiles
+#
+# After the profile directory is located, read profiles.ini to find the location of the default profile
+#
+
+#
+# If there are multiple profiles, the one that includes Default=1 will be used
+#
 
 DEFAULTPROFILE="$PROFILEBASE$(cat "$PROFILEBASE/profiles.ini" | grep -B 1 "Default=1" | head -n1 | sed 's/Path=//')"
 
-# If not found, fall back to default profile
-if [ "$DEFAULTPROFILE" == "" ]
+#
+# If there was no profile that had been marked as default, this means that there should be just one profile and we can use that
+#
+
+if [ "$DEFAULTPROFILE" = "$PROFILEBASE" ]
 then
     DEFAULTPROFILE="$PROFILEBASE$(cat "$PROFILEBASE/profiles.ini" | grep "Path=" | sed 's/Path=//')"
     echo "Found a single profile at $DEFAULTPROFILE"
