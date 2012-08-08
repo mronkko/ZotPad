@@ -403,6 +403,8 @@
 
     // Configure the cell
     OHAttributedLabel* value = (OHAttributedLabel*) [cell viewWithTag:2];
+    value.automaticallyAddLinksForType = NSTextCheckingTypeLink;
+    
     UILabel* title = (UILabel*) [cell viewWithTag:1];
     
     

@@ -668,7 +668,9 @@ static ZPCacheController* _instance = nil;
         
         //TODO: Remove this workaround
         NSArray* attachments = item.attachments;
-        
+        if(attachments == NULL){
+            [NSException raise:@"Internal consistency exception" format:@"Item with key %@ had empty attachment array",key];
+        }
         if(! [attachments isKindOfClass:[NSArray class]]){
             //For troubleshooting crashes
             item.attachments = NULL;

@@ -198,6 +198,9 @@ static NSCache* _objectCache = NULL;
     if(_attachments == NULL){
         [[ZPDatabase instance] addAttachmentsToItem:self];
     }
+    if(_attachments == NULL || ! [_attachments isKindOfClass:[NSArray class]]){
+        [NSException raise:@"Internal consistency exception" format:@"Could not load attachments for item with key %@",self.key];
+    }
     return _attachments;
 }
 

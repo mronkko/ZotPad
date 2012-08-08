@@ -147,7 +147,8 @@ NSInteger const VERSION_SOURCE_DROPBOX =3;
         [NSException raise:@"Internal consistency error" format:@"Document directory path is not string"];
     }
     if(! [path isKindOfClass:[NSString class]]){
-        [NSException raise:@"Internal consistency error" format:@"Attachment path is not NSString (attachment key: %@, class %s)",self.key,class_getName([path class])];
+        const char* className = class_getName([path class]);
+        [NSException raise:@"Internal consistency error" format:@"Attachment path is not NSString (attachment key: %@, class %s)",self.key,className];
     }
     
     NSString* ret = [docs stringByAppendingPathComponent:path];

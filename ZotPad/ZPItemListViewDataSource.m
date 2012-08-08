@@ -402,6 +402,8 @@ static ZPItemListViewDataSource* _instance;
             
             if(publishedInLabel != NULL){
                 
+                publishedInLabel.automaticallyAddLinksForType = 0;
+                
                 NSString* publishedIn = item.publicationDetails;
                 
                 if(publishedIn == NULL){
