@@ -14,6 +14,9 @@
 #import "ZPCacheController.h"
 #import "NSString+Base64.h"
 
+// Needed for troubleshooting
+#import <objc/runtime.h>
+
 NSInteger const LINK_MODE_IMPORTED_FILE = 0;
 NSInteger const LINK_MODE_IMPORTED_URL = 1;
 NSInteger const LINK_MODE_LINKED_FILE = 2;
@@ -62,14 +65,21 @@ NSInteger const VERSION_SOURCE_DROPBOX =3;
     return attachment;
 }
 
-/*
+
 - (NSNumber*) libraryID{
     //Child attachments
-    if(super.libraryID==NULL) return [ZPZoteroItem dataObjectWithKey:self.parentItemKey].libraryID;
+    if(super.libraryID==NULL){
+        if(_parentItemKey != NULL){
+            return [ZPZoteroItem dataObjectWithKey:self.parentItemKey].libraryID;
+        }
+        else {
+            [NSException raise:@"Internal consistency error" format:@"Standalone items must have library IDs. Standalone attachment with key %@ had a null library ID",self.key];
+        }
+    }
     //Standalone attachments
     else return super.libraryID;
 }
-*/
+
 
 // An alias for setParentCollectionKey
 - (void) setParentKey:(NSString*)key{
@@ -148,7 +158,7 @@ NSInteger const VERSION_SOURCE_DROPBOX =3;
     }
     if(! [path isKindOfClass:[NSString class]]){
         const char* className = class_getName([path class]);
-        [NSException raise:@"Internal consistency error" format:@"Attachment path is not NSString (attachment key: %@, class %s)",self.key,className];
+        [NSException raise:@"Internal consistency error" format:@"Attachment path is not NSString (attachment key: %@, filename: %@, class %s)",self.key,[self filename],className];
     }
     
     NSString* ret = [docs stringByAppendingPathComponent:path];
