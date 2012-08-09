@@ -89,7 +89,7 @@ didFinishLaunchingWithOptions:(NSDictionary *)launchOptions
     [DDLog addLogger:tfLogger];
     
     //Perform a memory warning every 2 seconds
-    //[NSTimer scheduledTimerWithTimeInterval:(NSTimeInterval)2 target:[UIApplication sharedApplication] selector:@selector(_performMemoryWarning) userInfo:NULL repeats:YES];
+    [NSTimer scheduledTimerWithTimeInterval:(NSTimeInterval)2 target:[UIApplication sharedApplication] selector:@selector(_performMemoryWarning) userInfo:NULL repeats:YES];
     
 #else
 //    if([[ZPPreferences instance] reportErrors]) [TestFlight takeOff:@"5e753f234f33fc2bddf4437600037fbf_NjcyMjEyMDEyLTA0LTA5IDE0OjUyOjU0LjE4MDQwMg"];
@@ -116,14 +116,16 @@ didFinishLaunchingWithOptions:(NSDictionary *)launchOptions
     
      //Manual override for userID and Key. Useful for running the code in debugger with other people's credentials.
     
+    /*
     NSUserDefaults* defaults = [NSUserDefaults standardUserDefaults];
-    [defaults setObject:@"15692" forKey:@"userID"];
-    [defaults setObject:@"BxH4FdoEiLQjXvEGI3UodvqP" forKey:@"OAuthKey"];
-/*
+    [defaults setObject:@"" forKey:@"userID"];
+    [defaults setObject:@"" forKey:@"OAuthKey"];
+
     //Uncomment these to always reset the app after launch
     [[ZPDatabase instance] resetDatabase];
     [[ZPCacheController instance] performSelectorInBackground:@selector(purgeAllAttachmentFilesFromCache) withObject:NULL];
     */
+    
     
     [[ZPPreferences instance] checkAndProcessApplicationResetPreferences];
      
