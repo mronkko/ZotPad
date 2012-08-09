@@ -1292,7 +1292,7 @@
 		A7200DD414718DC0004347C9 /* UIKit.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; name = UIKit.framework; path = System/Library/Frameworks/UIKit.framework; sourceTree = SDKROOT; };
 		A7200DD614718DC0004347C9 /* Foundation.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; name = Foundation.framework; path = System/Library/Frameworks/Foundation.framework; sourceTree = SDKROOT; };
 		A7200DD814718DC0004347C9 /* CoreGraphics.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; name = CoreGraphics.framework; path = System/Library/Frameworks/CoreGraphics.framework; sourceTree = SDKROOT; };
-		A7200DDC14718DC0004347C9 /* ZotPad-Info.plist */ = {isa = PBXFileReference; lastKnownFileType = text.plist.xml; name = "ZotPad-Info.plist"; path = "/Users/mronkko/Documents/Software/ZotPad/ZotPad-Info.plist"; sourceTree = "<absolute>"; };
+		A7200DDC14718DC0004347C9 /* ZotPad-Info.plist */ = {isa = PBXFileReference; lastKnownFileType = text.plist.xml; name = "ZotPad-Info.plist"; path = "../ZotPad-Info.plist"; sourceTree = "<group>"; };
 		A7200DDE14718DC0004347C9 /* en */ = {isa = PBXFileReference; lastKnownFileType = text.plist.strings; name = en; path = en.lproj/InfoPlist.strings; sourceTree = "<group>"; };
 		A7200DE014718DC0004347C9 /* main.m */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.objc; path = main.m; sourceTree = "<group>"; };
 		A7200DE214718DC0004347C9 /* ZotPad-Prefix.pch */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = "ZotPad-Prefix.pch"; sourceTree = "<group>"; };
@@ -1609,7 +1609,7 @@
 		A7CC252C1493E14D00FDEAF4 /* iCarousel.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = iCarousel.m; sourceTree = "<group>"; };
 		A7CD067A151612DE007A8E1D /* AppIcon72x72-beta.png */ = {isa = PBXFileReference; lastKnownFileType = image.png; name = "AppIcon72x72-beta.png"; path = "../Icons/AppIcon72x72-beta.png"; sourceTree = "<group>"; };
 		A7CD077515161555007A8E1D /* ZotPad beta.app */ = {isa = PBXFileReference; explicitFileType = wrapper.application; includeInIndex = 0; path = "ZotPad beta.app"; sourceTree = BUILT_PRODUCTS_DIR; };
-		A7CD077715161556007A8E1D /* ZotPad beta-Info.plist */ = {isa = PBXFileReference; lastKnownFileType = text.plist.xml; name = "ZotPad beta-Info.plist"; path = "/Users/mronkko/Documents/Software/ZotPad/ZotPad beta-Info.plist"; sourceTree = "<absolute>"; };
+		A7CD077715161556007A8E1D /* ZotPad beta-Info.plist */ = {isa = PBXFileReference; lastKnownFileType = text.plist.xml; name = "ZotPad beta-Info.plist"; path = "../ZotPad beta-Info.plist"; sourceTree = "<group>"; };
 		A7CD077A15162EE4007A8E1D /* AppIcon72x72.png */ = {isa = PBXFileReference; lastKnownFileType = image.png; name = AppIcon72x72.png; path = Icons/AppIcon72x72.png; sourceTree = SOURCE_ROOT; };
 		A7CD078215162FA7007A8E1D /* AppIcon144x144-beta.png */ = {isa = PBXFileReference; lastKnownFileType = image.png; name = "AppIcon144x144-beta.png"; path = "../Icons/AppIcon144x144-beta.png"; sourceTree = "<group>"; };
 		A7CD078415162FC9007A8E1D /* AppIcon144x144.png */ = {isa = PBXFileReference; lastKnownFileType = image.png; name = AppIcon144x144.png; path = ../Icons/AppIcon144x144.png; sourceTree = "<group>"; };
