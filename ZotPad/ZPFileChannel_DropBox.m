@@ -123,7 +123,7 @@ static const NSString* DROPBOX_KEY = @"nn6res38igpo4ec";
         //Link with dropBox account if not already linked
 
         BOOL linked =[[ZPDBSession sharedSession] isLinked];
-        BOOL linking =[[ZPDBSession sharedSession] isLinking];
+        BOOL linking =[(ZPDBSession*) [ZPDBSession sharedSession] isLinking];
 
         if (!linked && ! linking) {
 
