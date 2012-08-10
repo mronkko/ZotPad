@@ -26,7 +26,7 @@
 			<key>Type</key>
 			<string>PSTextFieldSpecifier</string>
 			<key>Title</key>
-			<string>Location of Zotero files in Dropbox</string>
+			<string>Location of files in Dropbox</string>
 			<key>Key</key>
 			<string>dropboxpath</string>
 			<key>DefaultValue</key>
@@ -36,7 +36,7 @@
 			<key>Type</key>
 			<string>PSGroupSpecifier</string>
 			<key>Title</key>
-			<string>Custom file name settings</string>
+			<string>Custom filename settings</string>
 			<key>FooterText</key>
 			<string>ZotPad expects to find a full copy of the Zotero storage directory in Dropbox. These settings allow ZotPad to locate files have copied or moved to Dropbox with some other structure. The filename patterns are based on the ZotFile pattern specifiers. See the ZotFile website at http://www.columbia.edu/~jpl2136/zotfile.html for documentation.</string>
 		</dict>
@@ -44,7 +44,7 @@
 			<key>Type</key>
 			<string>PSToggleSwitchSpecifier</string>
 			<key>Title</key>
-			<string>Use custom file names</string>
+			<string>Use custom filenames</string>
 			<key>Key</key>
 			<string>dropboxusecustomfilenames</string>
 			<key>DefaultValue</key>
@@ -94,7 +94,7 @@
 			<key>Type</key>
 			<string>PSToggleSwitchSpecifier</string>
 			<key>Title</key>
-			<string>Remove diacritics (accents etc. on top of characters)</string>
+			<string>Remove diacritics (accents etc. above characters)</string>
 			<key>Key</key>
 			<string>dropboxremovediacritics</string>
 			<key>DefaultValue</key>
