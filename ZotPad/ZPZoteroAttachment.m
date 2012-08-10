@@ -148,25 +148,17 @@ NSInteger const VERSION_SOURCE_DROPBOX =3;
         NSRange lastPeriod = [[self filename] rangeOfString:@"." options:NSBackwardsSearch];
         
         
-        if(lastPeriod.location == NSNotFound) path = [[self filename] stringByAppendingFormat:@"_%@%@",self.key,suffix];
-        else path = [[self filename] stringByReplacingCharactersInRange:lastPeriod
+        if(lastPeriod.location == NSNotFound){
+            path = [[self filename] stringByAppendingFormat:@"_%@%@",self.key,suffix];
+        }
+        else{
+            path = [[self filename] stringByReplacingCharactersInRange:lastPeriod
                                                              withString:[NSString stringWithFormat:@"_%@%@.",self.key,suffix]];
-    }
-    NSString* docs = [NSSearchPathForDirectoriesInDomains(NSDocumentDirectory, NSUserDomainMask, YES) objectAtIndex:0];
-    if(! [docs isKindOfClass:[NSString class]]){
-        [NSException raise:@"Internal consistency error" format:@"Document directory path is not string"];
-    }
-    if(! [path isKindOfClass:[NSString class]]){
-        const char* className = class_getName([path class]);
-        [NSException raise:@"Internal consistency error" format:@"Attachment path is not NSString (attachment key: %@, filename: %@, class %s)",self.key,[self filename],className];
+        }
     }
     
+    NSString* docs = [NSSearchPathForDirectoriesInDomains(NSDocumentDirectory, NSUserDomainMask, YES) objectAtIndex:0];
     NSString* ret = [docs stringByAppendingPathComponent:path];
-
-    if(ret==nil){
-        NSString* reason = [NSString stringWithFormat:@"Parsing filename %@ (key: %@) resulted in null path",self.filename,self.key];
-        [NSException raise:reason format:reason];
-    }
     
     return ret;
     
@@ -211,7 +203,11 @@ NSInteger const VERSION_SOURCE_DROPBOX =3;
 }
 
 - (NSArray*) attachments{
-    return [NSArray arrayWithObject:self];
+    if(_attachments == NULL){
+        super.attachments =[NSArray arrayWithObject:self];
+    }
+
+    return [super attachments];
 }
 
 - (void) setAttachments:(NSArray *)attachments{

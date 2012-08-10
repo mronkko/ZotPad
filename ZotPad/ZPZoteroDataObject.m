@@ -14,7 +14,7 @@
 
 // This is very useful for troubleshooting, but because of memory issues, is only used for debug builds
 #ifdef ZPDEBUG
-@synthesize responseDataFromWhichThisItemWasCreated;
+//@synthesize responseDataFromWhichThisItemWasCreated;
 #endif
 
 /*

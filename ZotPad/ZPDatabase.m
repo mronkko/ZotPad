@@ -280,12 +280,12 @@ static ZPDatabase* _instance = nil;
                 for (object in objectBatch){
                     NSArray* arguments = [self dbFieldValuesForObject:object fieldsNames:dbFieldNames];
                     if(![_database executeUpdate:insertSQLBase withArgumentsInArray:arguments]){
-#ifdef ZPDEBUG
-                        DDLogError(@"Error executing query %@ with arguments %@. Server response from which the data object was created is %@",insertSQLBase,arguments,[(ZPZoteroDataObject*)object responseDataFromWhichThisItemWasCreated]);
-                        [NSException raise:@"Database error" format:@"Error executing query %@ with arguments %@. Server response from which the data object was created is %@",insertSQLBase,arguments,[(ZPZoteroDataObject*)object responseDataFromWhichThisItemWasCreated]];   
-#else
+//#ifdef ZPDEBUG
+//                        DDLogError(@"Error executing query %@ with arguments %@. Server response from which the data object was created is %@",insertSQLBase,arguments,[(ZPZoteroDataObject*)object responseDataFromWhichThisItemWasCreated]);
+//                        [NSException raise:@"Database error" format:@"Error executing query %@ with arguments %@. Server response from which the data object was created is %@",insertSQLBase,arguments,[(ZPZoteroDataObject*)object responseDataFromWhichThisItemWasCreated]];//
+//#else
                         [NSException raise:@"Database error" format:@"Error executing query %@ with arguments %@",insertSQLBase,arguments];   
-#endif
+//#endif
                     }
 
                 }
@@ -326,7 +326,8 @@ static ZPDatabase* _instance = nil;
             @synchronized(self){
                 NSArray* args = [self dbFieldValuesForObject:object fieldsNames:allFields];
                 if(![_database executeUpdate:updateSQL withArgumentsInArray:args]){
-#ifdef ZPDEBUG
+/*
+ #ifdef ZPDEBUG
                     if([object isKindOfClass:[ZPZoteroDataObject class]]){
                         DDLogError(@"Error executing query %@ with arguments %@. Server response from which the data object was created is %@",updateSQL,args,[(ZPZoteroDataObject*)object responseDataFromWhichThisItemWasCreated]);
                         [NSException raise:@"Database error" format:@"Error executing query %@ with arguments %@. Server response from which the data object was created is %@",updateSQL,args,[(ZPZoteroDataObject*)object responseDataFromWhichThisItemWasCreated]];
@@ -337,8 +338,9 @@ static ZPDatabase* _instance = nil;
                         [NSException raise:@"Database error" format:@"Error executing query %@ with arguments %@",updateSQL,args];
                     }
 #else
+ */
                     [NSException raise:@"Database error" format:@"Error executing query %@ with arguments %@",updateSQL,args];
-#endif
+//#endif
                 }
             }
         }

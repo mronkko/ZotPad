@@ -16,7 +16,7 @@
 @implementation ZPServerResponseXMLParser
 
 #ifdef ZPDEBUG
-@synthesize fullResponse;
+//@synthesize fullResponse;
 #endif
 
 @synthesize parsedElements = _resultArray;

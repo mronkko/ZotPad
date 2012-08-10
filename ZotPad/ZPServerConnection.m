@@ -323,7 +323,8 @@ const NSInteger ZPServerConnectionRequestPermissions = 10;
               
             [parser setDelegate: parserDelegate];
             [parser parse];
-            
+
+            /*
 #ifdef ZPDEBUG
             NSString* responseString = [[NSString alloc] initWithData:responseData  encoding:NSUTF8StringEncoding];
             parserDelegate.fullResponse = responseString;
@@ -335,6 +336,7 @@ const NSInteger ZPServerConnectionRequestPermissions = 10;
                 }
             }
 #endif
+             */
         }
         
         /*

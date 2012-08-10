@@ -21,7 +21,7 @@
 }
 
 #ifdef ZPDEBUG
-@property (retain) NSString* fullResponse;
+//@property (retain) NSString* fullResponse;
 #endif
 @property (retain) NSArray* parsedElements;
 
