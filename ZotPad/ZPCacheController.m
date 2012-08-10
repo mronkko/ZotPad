@@ -412,7 +412,7 @@ static ZPCacheController* _instance = nil;
              */
             if(item.serverTimestamp == NULL || item.serverTimestamp == [NSNull null]){
 #ifdef ZPDEBUG
-                DDLogError(@"Item %@ has an empty server timestamp and will not be written to cache. The item was created from the following server response: \n\n%@",item.key,item.responseDataFromWhichThisItemWasCreated);
+//                DDLogError(@"Item %@ has an empty server timestamp and will not be written to cache. The item was created from the following server response: \n\n%@",item.key,item.responseDataFromWhichThisItemWasCreated);
 #endif
                 continue;
             }
@@ -1029,12 +1029,20 @@ static ZPCacheController* _instance = nil;
     
     NSArray* attachments = [[ZPDatabase instance] getCachedAttachmentsOrderedByRemovalPriority];
 
+    //Store file system paths in array so that we do not need to do a million calls on attachment.filesystemPath, but use cached results
+    
+    NSMutableArray* attachmentPaths = [[NSMutableArray alloc] initWithCapacity:[attachments count]];
+
+    ZPZoteroAttachment* attachment;
+
+    for(attachment in attachments){
+        [attachmentPaths addObject:attachment.fileSystemPath];
+    }
     //Delete orphaned files
     
     NSString* _documentsDirectory = [NSSearchPathForDirectoriesInDomains(NSDocumentDirectory, NSUserDomainMask, YES)  objectAtIndex:0];
     NSArray *directoryContent = [[NSFileManager defaultManager] contentsOfDirectoryAtPath:_documentsDirectory error:NULL];
     
-    ZPZoteroAttachment* attachment;
     
     for (NSString* _documentFilePath in directoryContent) {
         NSString* path = [_documentsDirectory stringByAppendingPathComponent:_documentFilePath];
@@ -1045,8 +1053,7 @@ static ZPCacheController* _instance = nil;
             NSString* pathFromDB;
             BOOL found = FALSE;
          
-            for(attachment in attachments){
-                pathFromDB=attachment.fileSystemPath;
+            for(pathFromDB in attachmentPaths){
                 if([pathFromDB compare:path] == NSOrderedSame){
                     found=TRUE;
                     break;
