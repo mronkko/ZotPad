@@ -11,6 +11,9 @@
 #import "ZPAppDelegate.h"
 #import "DDFileLogger.h"
 #import "ZPHelpPopover.h"
+#import "UserVoice.h"
+#import "UVSession.h"
+#import "UVClientConfig.h"
 
 @interface ZPLogViewController (){
     MFMailComposeViewController *mailController;
@@ -68,9 +71,35 @@
     ql.dataSource = self;
     [self presentModalViewController:ql animated:YES];
 }
--(IBAction)onlineSupport:(id)sender{
-    [[UIApplication sharedApplication] openURL:[NSURL URLWithString:@"http://www.zotpad.com/node/3"]];
+
+#ifdef BETA
+
+-(IBAction)knowledgeBase:(id)sender{
+    [[[UIAlertView alloc] initWithTitle:@"Not implemented"
+                                message:@"Feedback and knowledge base are not available in beta builds."
+                               delegate:nil
+                      cancelButtonTitle:@"Cancel"
+                      otherButtonTitles:nil]show];
 }
+
+#else
+
+#import "ZPSecrets.h"
+
+-(IBAction)knowledgeBase:(id)sender{
+    UVConfig *config = [UVConfig configWithSite:@"zotpad.uservoice.com"
+                                         andKey:USERVOICE_API_KEY
+                                      andSecret:USERVOICE_SECRET];
+    
+    //Allow starting tickets only by email.
+    
+    [[[UVSession currentSession] clientConfig] setTicketsEnabled:NO];
+    
+    [UserVoice presentUserVoiceInterfaceForParentViewController:self andConfig:config];
+}
+
+#endif
+
 -(IBAction)manageKey:(id)sender{
     [[UIApplication sharedApplication] openURL:[NSURL URLWithString:[@"https://www.zotero.org/settings/keys/edit/" stringByAppendingFormat:[[ZPPreferences instance] OAuthKey]]]];
 }

@@ -692,6 +692,8 @@
 		A76ECD2A159CDEDD0062E95A /* emblem-symbolic-link.svgz in Resources */ = {isa = PBXBuildFile; fileRef = A76ECD27159CDEDD0062E95A /* emblem-symbolic-link.svgz */; };
 		A76ECD2B159CDEDD0062E95A /* emblem-symbolic-link.svgz in Resources */ = {isa = PBXBuildFile; fileRef = A76ECD27159CDEDD0062E95A /* emblem-symbolic-link.svgz */; };
 		A77B98DF14DE5CDB00132E9B /* ZPItemListViewController.m in Sources */ = {isa = PBXBuildFile; fileRef = A77B98DE14DE5CDB00132E9B /* ZPItemListViewController.m */; };
+		A77E0DCD15D6603200134D35 /* libUserVoice.a in Frameworks */ = {isa = PBXBuildFile; fileRef = A77E0DCC15D65FAB00134D35 /* libUserVoice.a */; };
+		A77E0DD615D660CF00134D35 /* libUserVoice.a in Frameworks */ = {isa = PBXBuildFile; fileRef = A77E0DCC15D65FAB00134D35 /* libUserVoice.a */; };
 		A77FD05E159F36CC00774D50 /* CompressingLogFileManager.m in Sources */ = {isa = PBXBuildFile; fileRef = A77FD05D159F36CC00774D50 /* CompressingLogFileManager.m */; };
 		A77FD05F159F36CC00774D50 /* CompressingLogFileManager.m in Sources */ = {isa = PBXBuildFile; fileRef = A77FD05D159F36CC00774D50 /* CompressingLogFileManager.m */; };
 		A77FD062159F702E00774D50 /* gear.png in Resources */ = {isa = PBXBuildFile; fileRef = A77FD060159F702D00774D50 /* gear.png */; };
@@ -942,6 +944,41 @@
 /* End PBXBuildFile section */
 
 /* Begin PBXContainerItemProxy section */
+		A77E0DCB15D65FAB00134D35 /* PBXContainerItemProxy */ = {
+			isa = PBXContainerItemProxy;
+			containerPortal = A77E0DC415D65FAB00134D35 /* UserVoice.xcodeproj */;
+			proxyType = 2;
+			remoteGlobalIDString = D2AAC07E0554694100DB518D;
+			remoteInfo = UserVoice;
+		};
+		A77E0DCE15D660AF00134D35 /* PBXContainerItemProxy */ = {
+			isa = PBXContainerItemProxy;
+			containerPortal = A7ABAB3315A3046300EA8B7B /* DTCoreText.xcodeproj */;
+			proxyType = 1;
+			remoteGlobalIDString = A70F11DD148632CD009202BF;
+			remoteInfo = "Static Library";
+		};
+		A77E0DD015D660B500134D35 /* PBXContainerItemProxy */ = {
+			isa = PBXContainerItemProxy;
+			containerPortal = A77E0DC415D65FAB00134D35 /* UserVoice.xcodeproj */;
+			proxyType = 1;
+			remoteGlobalIDString = D2AAC07D0554694100DB518D;
+			remoteInfo = UserVoice;
+		};
+		A77E0DD215D660BC00134D35 /* PBXContainerItemProxy */ = {
+			isa = PBXContainerItemProxy;
+			containerPortal = A77E0DC415D65FAB00134D35 /* UserVoice.xcodeproj */;
+			proxyType = 1;
+			remoteGlobalIDString = D2AAC07D0554694100DB518D;
+			remoteInfo = UserVoice;
+		};
+		A77E0DD415D660C200134D35 /* PBXContainerItemProxy */ = {
+			isa = PBXContainerItemProxy;
+			containerPortal = A7ABAB3315A3046300EA8B7B /* DTCoreText.xcodeproj */;
+			proxyType = 1;
+			remoteGlobalIDString = A70F11DD148632CD009202BF;
+			remoteInfo = "Static Library";
+		};
 		A7ABAB4115A3046300EA8B7B /* PBXContainerItemProxy */ = {
 			isa = PBXContainerItemProxy;
 			containerPortal = A7ABAB3315A3046300EA8B7B /* DTCoreText.xcodeproj */;
@@ -1475,6 +1512,7 @@
 		A76ECD27159CDEDD0062E95A /* emblem-symbolic-link.svgz */ = {isa = PBXFileReference; lastKnownFileType = file; name = "emblem-symbolic-link.svgz"; path = "Oxygen-Icons/scalable/emblems/emblem-symbolic-link.svgz"; sourceTree = SOURCE_ROOT; };
 		A77B98DD14DE5CDB00132E9B /* ZPItemListViewController.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = ZPItemListViewController.h; sourceTree = "<group>"; };
 		A77B98DE14DE5CDB00132E9B /* ZPItemListViewController.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = ZPItemListViewController.m; sourceTree = "<group>"; };
+		A77E0DC415D65FAB00134D35 /* UserVoice.xcodeproj */ = {isa = PBXFileReference; lastKnownFileType = "wrapper.pb-project"; name = UserVoice.xcodeproj; path = "uservoice-iphone-sdk/UserVoice.xcodeproj"; sourceTree = "<group>"; };
 		A77FD05C159F36CC00774D50 /* CompressingLogFileManager.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; name = CompressingLogFileManager.h; path = CocoaLumberjack/Xcode/LogFileCompressor/CompressingLogFileManager.h; sourceTree = "<group>"; };
 		A77FD05D159F36CC00774D50 /* CompressingLogFileManager.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; name = CompressingLogFileManager.m; path = CocoaLumberjack/Xcode/LogFileCompressor/CompressingLogFileManager.m; sourceTree = "<group>"; };
 		A77FD060159F702D00774D50 /* gear.png */ = {isa = PBXFileReference; lastKnownFileType = image.png; name = gear.png; path = Icons/gear.png; sourceTree = SOURCE_ROOT; };
@@ -1655,6 +1693,7 @@
 			isa = PBXFrameworksBuildPhase;
 			buildActionMask = 2147483647;
 			files = (
+				A77E0DCD15D6603200134D35 /* libUserVoice.a in Frameworks */,
 				A7ABAB6A15A3095900EA8B7B /* libDTCoreText.a in Frameworks */,
 				A7ABAB3215A3034800EA8B7B /* ImageIO.framework in Frameworks */,
 				A7ABAB3115A2FEC500EA8B7B /* MessageUI.framework in Frameworks */,
@@ -1680,6 +1719,7 @@
 			isa = PBXFrameworksBuildPhase;
 			buildActionMask = 2147483647;
 			files = (
+				A77E0DD615D660CF00134D35 /* libUserVoice.a in Frameworks */,
 				A7093C3115A44C6B00F7B5CF /* libDTCoreText.a in Frameworks */,
 				A7699E57159A6C44002F09DA /* CoreFoundation.framework in Frameworks */,
 				A70399B115979EC1002F4293 /* MessageUI.framework in Frameworks */,
@@ -2083,6 +2123,7 @@
 		A7200DD314718DC0004347C9 /* Frameworks */ = {
 			isa = PBXGroup;
 			children = (
+				A77E0DC415D65FAB00134D35 /* UserVoice.xcodeproj */,
 				A75D4B4215BC9B56003291CB /* Base64 */,
 				A7307B4715A6E51100A90BDF /* Dropbox */,
 				A7A1C71515A6B6E00012BC7A /* InAppSettingsKit */,
@@ -2464,6 +2505,14 @@
 			name = Images;
 			sourceTree = "<group>";
 		};
+		A77E0DC515D65FAB00134D35 /* Products */ = {
+			isa = PBXGroup;
+			children = (
+				A77E0DCC15D65FAB00134D35 /* libUserVoice.a */,
+			);
+			name = Products;
+			sourceTree = "<group>";
+		};
 		A78B7F0A14908DFF008303BA /* AppIcons */ = {
 			isa = PBXGroup;
 			children = (
@@ -2795,6 +2844,8 @@
 			buildRules = (
 			);
 			dependencies = (
+				A77E0DD115D660B500134D35 /* PBXTargetDependency */,
+				A77E0DCF15D660AF00134D35 /* PBXTargetDependency */,
 			);
 			name = ZotPad;
 			productName = ZotPad;
@@ -2813,6 +2864,8 @@
 			buildRules = (
 			);
 			dependencies = (
+				A77E0DD515D660C200134D35 /* PBXTargetDependency */,
+				A77E0DD315D660BC00134D35 /* PBXTargetDependency */,
 			);
 			name = "ZotPad beta";
 			productName = ZotPad;
@@ -2845,6 +2898,10 @@
 					ProductGroup = A7ABAB3415A3046300EA8B7B /* Products */;
 					ProjectRef = A7ABAB3315A3046300EA8B7B /* DTCoreText.xcodeproj */;
 				},
+				{
+					ProductGroup = A77E0DC515D65FAB00134D35 /* Products */;
+					ProjectRef = A77E0DC415D65FAB00134D35 /* UserVoice.xcodeproj */;
+				},
 			);
 			projectRoot = "";
 			targets = (
@@ -2855,6 +2912,13 @@
 /* End PBXProject section */
 
 /* Begin PBXReferenceProxy section */
+		A77E0DCC15D65FAB00134D35 /* libUserVoice.a */ = {
+			isa = PBXReferenceProxy;
+			fileType = archive.ar;
+			path = libUserVoice.a;
+			remoteRef = A77E0DCB15D65FAB00134D35 /* PBXContainerItemProxy */;
+			sourceTree = BUILT_PRODUCTS_DIR;
+		};
 		A7ABAB4215A3046300EA8B7B /* DemoApp.app */ = {
 			isa = PBXReferenceProxy;
 			fileType = wrapper.application;
@@ -3858,6 +3922,29 @@
 			runOnlyForDeploymentPostprocessing = 0;
 		};
 /* End PBXSourcesBuildPhase section */
+
+/* Begin PBXTargetDependency section */
+		A77E0DCF15D660AF00134D35 /* PBXTargetDependency */ = {
+			isa = PBXTargetDependency;
+			name = "Static Library";
+			targetProxy = A77E0DCE15D660AF00134D35 /* PBXContainerItemProxy */;
+		};
+		A77E0DD115D660B500134D35 /* PBXTargetDependency */ = {
+			isa = PBXTargetDependency;
+			name = UserVoice;
+			targetProxy = A77E0DD015D660B500134D35 /* PBXContainerItemProxy */;
+		};
+		A77E0DD315D660BC00134D35 /* PBXTargetDependency */ = {
+			isa = PBXTargetDependency;
+			name = UserVoice;
+			targetProxy = A77E0DD215D660BC00134D35 /* PBXContainerItemProxy */;
+		};
+		A77E0DD515D660C200134D35 /* PBXTargetDependency */ = {
+			isa = PBXTargetDependency;
+			name = "Static Library";
+			targetProxy = A77E0DD415D660C200134D35 /* PBXContainerItemProxy */;
+		};
+/* End PBXTargetDependency section */
 
 /* Begin PBXVariantGroup section */
 		A7200DDD14718DC0004347C9 /* InfoPlist.strings */ = {

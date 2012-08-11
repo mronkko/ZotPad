@@ -14,9 +14,11 @@
 @property (retain) IBOutlet UIBarButtonItem* manualButton;
 
 -(IBAction)showManual:(id)sender;
--(IBAction)onlineSupport:(id)sender;
+-(IBAction)knowledgeBase:(id)sender;
 -(IBAction)emailSupport:(id)sender;
+-(IBAction)feedback:(id)sender;
 -(IBAction)manageKey:(id)sender;
+
 -(IBAction)dismiss:(id)sender;
 
 @end
