@@ -40,3 +40,6 @@
 [submodule "dropbox-sdk-ios"]
 	path = dropbox-sdk-ios
 	url = https://github.com/dropbox-sdk-mirror/dropbox-sdk-ios.git
+[submodule "uservoice-iphone-sdk"]
+	path = uservoice-iphone-sdk
+	url = https://github.com/uservoice/uservoice-iphone-sdk
