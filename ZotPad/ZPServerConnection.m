@@ -618,14 +618,20 @@ const NSInteger ZPServerConnectionRequestPermissions = 10;
     
     //Check if the file can be downloaded
     
-    if([attachment.linkMode intValue] == LINK_MODE_LINKED_URL || [attachment.linkMode intValue] == LINK_MODE_LINKED_FILE){
+    if([attachment.linkMode intValue] == LINK_MODE_LINKED_URL || [attachment.linkMode intValue] == LINK_MODE_LINKED_FILE ){
+        return FALSE;
+    }
+    
+    // This can happen if the data on the server or local Zotero are corrupted.
+    else if(attachment.fileSystemPath_original == NULL){
+        [[ZPDataLayer instance] notifyAttachmentDownloadFailed:attachment withError:[NSError errorWithDomain:@"Zotero.org" code:404 userInfo:[NSDictionary dictionaryWithObject:@"Zotero server did not provide a filename." forKey:NSLocalizedDescriptionKey]]];
         return FALSE;
     }
     
     ZPFileChannel* downloadChannel = [self _fileChannelForAttachment:attachment];
 
     if(downloadChannel == NULL){
-     return FALSE;   
+        return FALSE;
     }
     
     @synchronized(_activeDownloads){

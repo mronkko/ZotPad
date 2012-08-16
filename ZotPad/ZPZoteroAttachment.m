@@ -318,15 +318,23 @@ NSInteger const VERSION_SOURCE_DROPBOX =3;
 //TODO: These should update the cache size. This is a minor issue, implement after implementing NSNotification
 
 -(void) moveFileFromPathAsNewOriginalFile:(NSString*) path{
+    
+    NSString* originalPath = self.fileSystemPath_original;
+    
+    if(originalPath == NULL){
+        DDLogError(@"File operation was attempted on attachment with null filesystem path (key: %@)", self.key);
+        return;
+    }
+
     NSAssert2([[NSFileManager defaultManager] fileExistsAtPath:path],@"Attempted to associate non-existing file from %@ with attachment %@", path,self.key);
     
     DDLogInfo(@"Moving file from %@ as a new server file %@ for item %@",path,self.fileSystemPath_original,self.key);
     
-    [[NSFileManager defaultManager] removeItemAtPath:self.fileSystemPath_original error:NULL];
-    [[NSFileManager defaultManager] moveItemAtPath:path toPath:self.fileSystemPath_original error:NULL];
+    [[NSFileManager defaultManager] removeItemAtPath:originalPath error:NULL];
+    [[NSFileManager defaultManager] moveItemAtPath:path toPath:originalPath error:NULL];
 
     //Set this file as not cached
-    const char* filePath = [self.fileSystemPath_original fileSystemRepresentation];
+    const char* filePath = [originalPath fileSystemRepresentation];
     const char* attrName = "com.apple.MobileBackup";
     u_int8_t attrValue = 1;
     setxattr(filePath, attrName, &attrValue, sizeof(attrValue), 0, 0);
@@ -334,12 +342,20 @@ NSInteger const VERSION_SOURCE_DROPBOX =3;
 }
 
 -(void) moveFileFromPathAsNewModifiedFile:(NSString*) path{
+    
+    NSString* modifiedPath = self.fileSystemPath_modified;
+    
+    if(modifiedPath == NULL){
+        DDLogError(@"File operation was attempted on attachment with null filesystem path (key: %@)", self.key);
+        return;
+    }
+    
     NSAssert2([[NSFileManager defaultManager] fileExistsAtPath:path],@"Attempted to associate non-existing file from %@ with attachment %@", path,self.key);
-    [[NSFileManager defaultManager] removeItemAtPath:self.fileSystemPath_modified error:NULL];
-    [[NSFileManager defaultManager] moveItemAtPath:path toPath:self.fileSystemPath_modified error:NULL];
+    [[NSFileManager defaultManager] removeItemAtPath:modifiedPath error:NULL];
+    [[NSFileManager defaultManager] moveItemAtPath:path toPath:modifiedPath error:NULL];
 
     //Set this file as not cached
-    const char* filePath = [self.fileSystemPath_modified fileSystemRepresentation];
+    const char* filePath = [modifiedPath fileSystemRepresentation];
     const char* attrName = "com.apple.MobileBackup";
     u_int8_t attrValue = 1;
     setxattr(filePath, attrName, &attrValue, sizeof(attrValue), 0, 0);

@@ -168,17 +168,21 @@ NSInteger const ZPFILECHANNEL_WEBDAV_UPLOAD_REGISTER = 5;
     //Download new attachment metadata
     
     //TODO: Refactor this to call ZPCacheController instead so that the response from the server is stored in the DB. 
-    
-    attachment = [[[ZPServerConnection instance] retrieveItemsFromLibrary:attachment.libraryID itemKeys:[NSArray arrayWithObject:attachment.key]] objectAtIndex:0];
-    DDLogVerbose(@"Reveived MD5 from server %@",attachment.md5);
+    NSArray* attachments = [[ZPServerConnection instance] retrieveItemsFromLibrary:attachment.libraryID itemKeys:[NSArray arrayWithObject:attachment.key]];
 
     //Original was not found
-    if(attachment==NULL){
+    if([attachments count]==0){
+        DDLogWarn(@"Retrieving updated item %@ from library %@ resulted in empty response",attachment.key,attachment.libraryID);
+        
         NSError* error = [[NSError alloc] initWithDomain:@"ZotPad" code:1 userInfo:[NSDictionary dictionaryWithObject:@"Original item does not exists on Zotero server." forKey:NSLocalizedDescriptionKey]];
         [[ZPServerConnection instance] failedUploadingAttachment:attachment withError:error usingFileChannel:self toURL:NULL];
 
     }
     else{
+        
+        //Get new data
+        attachment = [attachments objectAtIndex:0];
+
         //Store data about the file in the user info so that it is always available
         
         NSString* path = attachment.fileSystemPath_modified;

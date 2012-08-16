@@ -6,7 +6,7 @@
 
 # iPhone application icon
 
-for size in  16 57 64 72 114 128 144 512
+for size in  16 57 64 72 114 128 144 512 1024
 do
 	
 	echo "${size}x${size}"
