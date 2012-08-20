@@ -31,20 +31,20 @@
 @private
     NSString*_searchString;
     NSString*_collectionKey;
-    NSNumber* _libraryID;
+    NSInteger _libraryID;
     NSString* _orderField;
     BOOL _sortDescending;
     ZPItemListViewDataSource* _itemListDataSource;
     ZPItemListViewController* _itemListController;
 }
 
--(id) initWithItemListController:(ZPItemListViewDataSource*)itemListController dataSource:(ZPItemListViewDataSource*) dataSource ;
+-(id) initWithItemListController:(ZPItemListViewController*)itemListController dataSource:(ZPItemListViewDataSource*) dataSource ;
 
 @end
 
 @implementation ZPUncachedItemsOperation;
 
--(id) initWithItemListController:(ZPItemListViewDataSource*)itemListController dataSource:(ZPItemListViewDataSource *)dataSource{
+-(id) initWithItemListController:(ZPItemListViewController*)itemListController dataSource:(ZPItemListViewDataSource *)dataSource{
     self = [super init];
     _itemListDataSource = dataSource;
     _itemListController=itemListController;
@@ -116,8 +116,8 @@
             [[ZPCacheController instance] addToItemQueue:uncachedItems libraryID:_libraryID priority:YES];
             
             if(![_searchString isEqualToString:@""]){
-                if(_collectionKey!=NULL && ! [_searchString isEqualToString:@""]) [[ZPCacheController instance] addToCollectionsQueue:(ZPZoteroCollection*)[ZPZoteroCollection dataObjectWithKey:_collectionKey]  priority:YES];
-                else [[ZPCacheController instance] addToLibrariesQueue:(ZPZoteroLibrary*)[ZPZoteroLibrary dataObjectWithKey: _libraryID] priority:YES];
+                if(_collectionKey!=NULL && ! [_searchString isEqualToString:@""]) [[ZPCacheController instance] addToCollectionsQueue:(ZPZoteroCollection*)[ZPZoteroCollection collectionWithKey:_collectionKey]  priority:YES];
+                else [[ZPCacheController instance] addToLibrariesQueue:(ZPZoteroLibrary*)[ZPZoteroLibrary libraryWithID: _libraryID] priority:YES];
             }
         }
         
@@ -255,11 +255,11 @@
             //Set the navigation item
             
             if(_dataSource.collectionKey != NULL){
-                ZPZoteroCollection* currentCollection = [ZPZoteroCollection dataObjectWithKey:_dataSource.collectionKey];
+                ZPZoteroCollection* currentCollection = [ZPZoteroCollection collectionWithKey:_dataSource.collectionKey];
                 self.navigationItem.title = currentCollection.title;
             }
             else {
-                ZPZoteroLibrary* currentLibrary = [ZPZoteroLibrary dataObjectWithKey:_dataSource.libraryID];
+                ZPZoteroLibrary* currentLibrary = [ZPZoteroLibrary libraryWithID:_dataSource.libraryID];
                 self.navigationItem.title = currentLibrary.title;
             }
 
@@ -330,7 +330,7 @@
         
         // Get the key for the selected item 
         NSString* currentItemKey = [_dataSource.itemKeysShown objectAtIndex: indexPath.row]; 
-        [itemDetailViewController setSelectedItem:(ZPZoteroItem*)[ZPZoteroItem dataObjectWithKey:currentItemKey]];
+        [itemDetailViewController setSelectedItem:(ZPZoteroItem*)[ZPZoteroItem itemWithKey:currentItemKey]];
         [itemDetailViewController configure];
         
         // Set the navigation controller in iPad

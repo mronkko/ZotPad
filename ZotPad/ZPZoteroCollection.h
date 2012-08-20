@@ -13,9 +13,11 @@
 }
 
 @property (retain, nonatomic) NSString* parentCollectionKey;
-@property (retain, readonly) NSString* collectionKey;
+@property (retain) NSString* collectionKey;
 
 +(void) dropCache;
++(ZPZoteroCollection*) collectionWithKey:(NSString*) key;
++(ZPZoteroCollection*) collectionWithDictionary:(NSDictionary*) fields;
 
 
 @end

@@ -16,7 +16,7 @@
 @implementation ZPServerResponseXMLParser
 
 #ifdef ZPDEBUG
-//@synthesize fullResponse;
+@synthesize fullResponse;
 #endif
 
 @synthesize parsedElements = _resultArray;
@@ -101,10 +101,10 @@
                 
                 //The value is URL and we want to get the part after last /
                 if([[parts objectAtIndex:3] isEqualToString:@"users"]){
-                    _libraryID = [NSNumber numberWithInt:1];
+                    _libraryID = LIBRARY_ID_MY_LIBRARY;
                 }
                 else{
-                    _libraryID = [NSNumber numberWithInt:[[parts objectAtIndex:4] intValue]];
+                    _libraryID = [[parts objectAtIndex:4] intValue];
                 }
 
             }
@@ -114,7 +114,7 @@
             else if([@"enclosure" isEqualToString:(NSString*)[attributeDict objectForKey:@"rel"]]){
                 
                 //For now only use enclosures that point to a file
-                NSString* type=[attributeDict objectForKey:@"type"];
+                //NSString* type=[attributeDict objectForKey:@"type"];
                 NSString* length=[attributeDict objectForKey:@"length"];
                 
                 [self _setField:@"existsOnZoteroServer" toValue:[NSNumber numberWithInt:1]];
@@ -142,22 +142,16 @@
 }
 
 
-- (void) _setField:(NSString*)field toValue:(NSString*)value{
+- (void) _setField:(NSString*)field toValue:(NSObject*)value{
     if(_currentElement==NULL){
         [_temporaryFieldStorage setObject:value forKey:field];
     }
     else{
         //Strip zapi: from the element name
-        NSString* setterString=[field stringByReplacingOccurrencesOfString:@"zapi:" withString:@""];
+        NSString* attributeName=[field stringByReplacingOccurrencesOfString:@"zapi:" withString:@""];
         
-        //capitalize the first letter
-        setterString = [setterString stringByReplacingCharactersInRange:NSMakeRange(0,1)  
-                                                             withString:[[setterString substringToIndex:1] capitalizedString]];
-        
-        //Make a setter and use it if it exists
-        setterString = [[@"set" stringByAppendingString:setterString]stringByAppendingString: @":"];
-        if([_currentElement respondsToSelector:NSSelectorFromString(setterString)]){
-            [_currentElement performSelector:NSSelectorFromString(setterString) withObject:value];
+        if([_currentElement respondsToSelector:NSSelectorFromString(attributeName)]){
+            [_currentElement setValue:value forKey:attributeName];
         }
     }
 

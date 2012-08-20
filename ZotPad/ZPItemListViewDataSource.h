@@ -18,7 +18,7 @@
     
     NSString* _searchString;
     NSString* _collectionKey;
-    NSNumber* _libraryID;
+    NSInteger _libraryID;
     NSString* _orderField;
     BOOL _sortDescending;
     
@@ -38,19 +38,19 @@
 
 @property (nonatomic, retain) NSArray* itemKeysShown;
 @property (nonatomic, retain) NSString* collectionKey;
-@property (nonatomic, retain) NSNumber* libraryID;
+@property (assign) NSInteger libraryID;
 @property (nonatomic, retain) NSString* searchString;
 @property (nonatomic, retain) NSString* orderField;
 @property (assign) BOOL sortDescending;
-@property (nonatomic, retain) UITableViewController* owner;
+@property (nonatomic, retain) UIViewController* owner;
 
 - (void)clearTable;
 - (void)configureCachedKeys:(NSArray*)array;
 - (void)configureUncachedKeys:(NSArray*)uncachedItems;
 
 -(void) _updateRowForItem:(ZPZoteroItem*)item;
--(void) _performRowInsertions:(NSArray*)insertIndexPaths reloads:(NSArray*)reloadIndexPaths tableLength:(NSNumber*)tableLength;
+-(void) _performRowInsertions:(NSArray*)insertIndexPaths reloads:(NSArray*)reloadIndexPaths tableLength:(NSInteger)tableLength;
 -(void) _performTableUpdates:(BOOL)animated;
--(void) _refreshCellAtIndexPaths:(NSArray*)indexPath;
+//-(void) _refreshCellAtIndexPaths:(NSArray*)indexPath;
 
 @end

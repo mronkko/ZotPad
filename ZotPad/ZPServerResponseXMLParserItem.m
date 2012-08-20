@@ -95,8 +95,10 @@
             else if([linkModeString isEqualToString:@"linked_file"]) linkMode = LINK_MODE_LINKED_FILE;
             
             //If we get garbage, throw exception
-            else [[NSException alloc] initWithName:@"Invalid link mode" reason:@"Server returned invalid link mode for attachment" userInfo:NULL];
-
+            else{
+                [NSException raise:@"Invalid link mode" format:@"Server returned invalid link mode for attachment"];
+            }
+            
             [super _setField:@"linkMode" toValue:[NSNumber numberWithInt:linkMode]];
             [fields removeObjectForKey:@"linkMode"];
             
@@ -120,15 +122,15 @@
     NSString* itemType = [_temporaryFieldStorage objectForKey:@"zapi:itemType"];
     
     if([itemType isEqualToString:@"attachment"]){
-        _currentElement = [ZPZoteroAttachment dataObjectWithKey:id];
+        _currentElement = [ZPZoteroAttachment itemWithKey:id];
     }
     else if([itemType isEqualToString:@"note"]){
         //Notes are really note implemented yet
-        _currentElement = [ZPZoteroNote dataObjectWithKey:id];
+        _currentElement = [ZPZoteroNote itemWithKey:id];
     }
     else{
         //IF the item does not exist in the in-memory cache, attempt to load it from the disk cache 
-        _currentElement = [ZPZoteroItem dataObjectWithKey:id];
+        _currentElement = [ZPZoteroItem itemWithKey:id];
     }
     [(ZPZoteroItem*)_currentElement setLibraryID:_libraryID];
     [super _processTemporaryFieldStorage];

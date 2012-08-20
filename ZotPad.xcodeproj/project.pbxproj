@@ -548,21 +548,19 @@
 		A7200DEB14718DC1004347C9 /* ZPLibraryAndCollectionListViewController.m in Sources */ = {isa = PBXBuildFile; fileRef = A7200DEA14718DC1004347C9 /* ZPLibraryAndCollectionListViewController.m */; };
 		A7200DF614718F44004347C9 /* ZPDataLayer.m in Sources */ = {isa = PBXBuildFile; fileRef = A7200DF514718F44004347C9 /* ZPDataLayer.m */; };
 		A7200DF8147193C0004347C9 /* libsqlite3.dylib in Frameworks */ = {isa = PBXBuildFile; fileRef = A7200DF7147193C0004347C9 /* libsqlite3.dylib */; };
-		A7225CDC15B4B0D1008C5878 /* ZotPad-Info.plist in Resources */ = {isa = PBXBuildFile; fileRef = A7200DDC14718DC0004347C9 /* ZotPad-Info.plist */; };
-		A7225CDD15B4B0D9008C5878 /* ZotPad beta-Info.plist in Resources */ = {isa = PBXBuildFile; fileRef = A7CD077715161556007A8E1D /* ZotPad beta-Info.plist */; };
 		A72853F9147E319700D3FE97 /* ZPZoteroLibrary.m in Sources */ = {isa = PBXBuildFile; fileRef = A72853F8147E319600D3FE97 /* ZPZoteroLibrary.m */; };
 		A72853FD147E31B600D3FE97 /* ZPZoteroCollection.m in Sources */ = {isa = PBXBuildFile; fileRef = A72853FC147E31B500D3FE97 /* ZPZoteroCollection.m */; };
 		A72C3CA71487C9DA00F6744E /* MainStoryboard_iPad.storyboard in Resources */ = {isa = PBXBuildFile; fileRef = A72C3CA61487C9DA00F6744E /* MainStoryboard_iPad.storyboard */; };
 		A7307BAE15A6E51100A90BDF /* DBAccountInfo.m in Sources */ = {isa = PBXBuildFile; fileRef = A7307B4815A6E51100A90BDF /* DBAccountInfo.m */; settings = {COMPILER_FLAGS = "-fno-objc-arc"; }; };
 		A7307BAF15A6E51100A90BDF /* DBAccountInfo.m in Sources */ = {isa = PBXBuildFile; fileRef = A7307B4815A6E51100A90BDF /* DBAccountInfo.m */; settings = {COMPILER_FLAGS = "-fno-objc-arc"; }; };
 		A7307BB215A6E51100A90BDF /* DBConnectController.m in Sources */ = {isa = PBXBuildFile; fileRef = A7307B4A15A6E51100A90BDF /* DBConnectController.m */; settings = {COMPILER_FLAGS = "-fno-objc-arc"; }; };
-		A7307BB315A6E51100A90BDF /* DBConnectController.m in Sources */ = {isa = PBXBuildFile; fileRef = A7307B4A15A6E51100A90BDF /* DBConnectController.m */; settings = {COMPILER_FLAGS = "-fno-objc-arc"; }; };
+		A7307BB315A6E51100A90BDF /* DBConnectController.m in Sources */ = {isa = PBXBuildFile; fileRef = A7307B4A15A6E51100A90BDF /* DBConnectController.m */; settings = {COMPILER_FLAGS = "-fno-objc-arc -w"; }; };
 		A7307BB415A6E51100A90BDF /* DBDeltaEntry.m in Sources */ = {isa = PBXBuildFile; fileRef = A7307B4C15A6E51100A90BDF /* DBDeltaEntry.m */; settings = {COMPILER_FLAGS = "-fno-objc-arc"; }; };
 		A7307BB515A6E51100A90BDF /* DBDeltaEntry.m in Sources */ = {isa = PBXBuildFile; fileRef = A7307B4C15A6E51100A90BDF /* DBDeltaEntry.m */; settings = {COMPILER_FLAGS = "-fno-objc-arc"; }; };
 		A7307BB615A6E51100A90BDF /* DBError.m in Sources */ = {isa = PBXBuildFile; fileRef = A7307B4D15A6E51100A90BDF /* DBError.m */; settings = {COMPILER_FLAGS = "-fno-objc-arc"; }; };
 		A7307BB715A6E51100A90BDF /* DBError.m in Sources */ = {isa = PBXBuildFile; fileRef = A7307B4D15A6E51100A90BDF /* DBError.m */; settings = {COMPILER_FLAGS = "-fno-objc-arc"; }; };
 		A7307BB815A6E51100A90BDF /* DBKeychain-iOS.m in Sources */ = {isa = PBXBuildFile; fileRef = A7307B4E15A6E51100A90BDF /* DBKeychain-iOS.m */; settings = {COMPILER_FLAGS = "-fno-objc-arc"; }; };
-		A7307BB915A6E51100A90BDF /* DBKeychain-iOS.m in Sources */ = {isa = PBXBuildFile; fileRef = A7307B4E15A6E51100A90BDF /* DBKeychain-iOS.m */; settings = {COMPILER_FLAGS = "-fno-objc-arc"; }; };
+		A7307BB915A6E51100A90BDF /* DBKeychain-iOS.m in Sources */ = {isa = PBXBuildFile; fileRef = A7307B4E15A6E51100A90BDF /* DBKeychain-iOS.m */; settings = {COMPILER_FLAGS = "-fno-objc-arc -w"; }; };
 		A7307BBC15A6E51100A90BDF /* DBLog.m in Sources */ = {isa = PBXBuildFile; fileRef = A7307B5015A6E51100A90BDF /* DBLog.m */; settings = {COMPILER_FLAGS = "-fno-objc-arc"; }; };
 		A7307BBD15A6E51100A90BDF /* DBLog.m in Sources */ = {isa = PBXBuildFile; fileRef = A7307B5015A6E51100A90BDF /* DBLog.m */; settings = {COMPILER_FLAGS = "-fno-objc-arc"; }; };
 		A7307BBE15A6E51100A90BDF /* DBMetadata.m in Sources */ = {isa = PBXBuildFile; fileRef = A7307B5115A6E51100A90BDF /* DBMetadata.m */; settings = {COMPILER_FLAGS = "-fno-objc-arc"; }; };
@@ -572,7 +570,7 @@
 		A7307BC215A6E51100A90BDF /* DBRequest.m in Sources */ = {isa = PBXBuildFile; fileRef = A7307B5315A6E51100A90BDF /* DBRequest.m */; settings = {COMPILER_FLAGS = "-fno-objc-arc"; }; };
 		A7307BC315A6E51100A90BDF /* DBRequest.m in Sources */ = {isa = PBXBuildFile; fileRef = A7307B5315A6E51100A90BDF /* DBRequest.m */; settings = {COMPILER_FLAGS = "-fno-objc-arc"; }; };
 		A7307BC615A6E51100A90BDF /* DBRestClient.m in Sources */ = {isa = PBXBuildFile; fileRef = A7307B5515A6E51100A90BDF /* DBRestClient.m */; settings = {COMPILER_FLAGS = "-fno-objc-arc"; }; };
-		A7307BC715A6E51100A90BDF /* DBRestClient.m in Sources */ = {isa = PBXBuildFile; fileRef = A7307B5515A6E51100A90BDF /* DBRestClient.m */; settings = {COMPILER_FLAGS = "-fno-objc-arc"; }; };
+		A7307BC715A6E51100A90BDF /* DBRestClient.m in Sources */ = {isa = PBXBuildFile; fileRef = A7307B5515A6E51100A90BDF /* DBRestClient.m */; settings = {COMPILER_FLAGS = "-fno-objc-arc -w"; }; };
 		A7307BC815A6E51100A90BDF /* DBSession+iOS.m in Sources */ = {isa = PBXBuildFile; fileRef = A7307B5615A6E51100A90BDF /* DBSession+iOS.m */; settings = {COMPILER_FLAGS = "-fno-objc-arc"; }; };
 		A7307BC915A6E51100A90BDF /* DBSession+iOS.m in Sources */ = {isa = PBXBuildFile; fileRef = A7307B5615A6E51100A90BDF /* DBSession+iOS.m */; settings = {COMPILER_FLAGS = "-fno-objc-arc"; }; };
 		A7307BCA15A6E51100A90BDF /* DBSession.m in Sources */ = {isa = PBXBuildFile; fileRef = A7307B5715A6E51100A90BDF /* DBSession.m */; settings = {COMPILER_FLAGS = "-fno-objc-arc"; }; };
@@ -654,13 +652,13 @@
 		A75E185F153405740046988C /* ioapi.c in Sources */ = {isa = PBXBuildFile; fileRef = A75E1855153405740046988C /* ioapi.c */; };
 		A75E1860153405740046988C /* ioapi.c in Sources */ = {isa = PBXBuildFile; fileRef = A75E1855153405740046988C /* ioapi.c */; };
 		A75E1861153405740046988C /* mztools.c in Sources */ = {isa = PBXBuildFile; fileRef = A75E1857153405740046988C /* mztools.c */; };
-		A75E1862153405740046988C /* mztools.c in Sources */ = {isa = PBXBuildFile; fileRef = A75E1857153405740046988C /* mztools.c */; };
+		A75E1862153405740046988C /* mztools.c in Sources */ = {isa = PBXBuildFile; fileRef = A75E1857153405740046988C /* mztools.c */; settings = {COMPILER_FLAGS = "-w"; }; };
 		A75E1863153405740046988C /* unzip.c in Sources */ = {isa = PBXBuildFile; fileRef = A75E1859153405740046988C /* unzip.c */; };
-		A75E1864153405740046988C /* unzip.c in Sources */ = {isa = PBXBuildFile; fileRef = A75E1859153405740046988C /* unzip.c */; };
+		A75E1864153405740046988C /* unzip.c in Sources */ = {isa = PBXBuildFile; fileRef = A75E1859153405740046988C /* unzip.c */; settings = {COMPILER_FLAGS = "-w"; }; };
 		A75E1865153405740046988C /* zip.c in Sources */ = {isa = PBXBuildFile; fileRef = A75E185B153405740046988C /* zip.c */; };
-		A75E1866153405740046988C /* zip.c in Sources */ = {isa = PBXBuildFile; fileRef = A75E185B153405740046988C /* zip.c */; };
+		A75E1866153405740046988C /* zip.c in Sources */ = {isa = PBXBuildFile; fileRef = A75E185B153405740046988C /* zip.c */; settings = {COMPILER_FLAGS = "-w"; }; };
 		A75E1867153405740046988C /* ZipArchive.mm in Sources */ = {isa = PBXBuildFile; fileRef = A75E185E153405740046988C /* ZipArchive.mm */; settings = {COMPILER_FLAGS = "-fno-objc-arc"; }; };
-		A75E1868153405740046988C /* ZipArchive.mm in Sources */ = {isa = PBXBuildFile; fileRef = A75E185E153405740046988C /* ZipArchive.mm */; settings = {COMPILER_FLAGS = "-fno-objc-arc"; }; };
+		A75E1868153405740046988C /* ZipArchive.mm in Sources */ = {isa = PBXBuildFile; fileRef = A75E185E153405740046988C /* ZipArchive.mm */; settings = {COMPILER_FLAGS = "-fno-objc-arc -w"; }; };
 		A764802B159F1BD00075CFB9 /* DDFileLogger.m in Sources */ = {isa = PBXBuildFile; fileRef = A7648024159F1BD00075CFB9 /* DDFileLogger.m */; };
 		A764802C159F1BD00075CFB9 /* DDFileLogger.m in Sources */ = {isa = PBXBuildFile; fileRef = A7648024159F1BD00075CFB9 /* DDFileLogger.m */; };
 		A764802D159F1BD00075CFB9 /* DDLog.m in Sources */ = {isa = PBXBuildFile; fileRef = A7648026159F1BD00075CFB9 /* DDLog.m */; };
@@ -736,26 +734,12 @@
 		A7A1C77F15A6B6E10012BC7A /* IASKPSTextFieldSpecifierViewCell.m in Sources */ = {isa = PBXBuildFile; fileRef = A7A1C72D15A6B6E00012BC7A /* IASKPSTextFieldSpecifierViewCell.m */; settings = {COMPILER_FLAGS = "-fno-objc-arc"; }; };
 		A7A1C78015A6B6E10012BC7A /* IASKPSTitleValueSpecifierViewCell.m in Sources */ = {isa = PBXBuildFile; fileRef = A7A1C72F15A6B6E00012BC7A /* IASKPSTitleValueSpecifierViewCell.m */; settings = {COMPILER_FLAGS = "-fno-objc-arc"; }; };
 		A7A1C78115A6B6E10012BC7A /* IASKPSTitleValueSpecifierViewCell.m in Sources */ = {isa = PBXBuildFile; fileRef = A7A1C72F15A6B6E00012BC7A /* IASKPSTitleValueSpecifierViewCell.m */; settings = {COMPILER_FLAGS = "-fno-objc-arc"; }; };
-		A7A1C78215A6B6E10012BC7A /* IASKPSToggleSwitchSpecifierViewCell.m in Sources */ = {isa = PBXBuildFile; fileRef = A7A1C73115A6B6E00012BC7A /* IASKPSToggleSwitchSpecifierViewCell.m */; settings = {COMPILER_FLAGS = "-fno-objc-arc"; }; };
-		A7A1C78315A6B6E10012BC7A /* IASKPSToggleSwitchSpecifierViewCell.m in Sources */ = {isa = PBXBuildFile; fileRef = A7A1C73115A6B6E00012BC7A /* IASKPSToggleSwitchSpecifierViewCell.m */; settings = {COMPILER_FLAGS = "-fno-objc-arc"; }; };
 		A7A1C78415A6B6E10012BC7A /* IASKSlider.m in Sources */ = {isa = PBXBuildFile; fileRef = A7A1C73315A6B6E00012BC7A /* IASKSlider.m */; settings = {COMPILER_FLAGS = "-fno-objc-arc"; }; };
 		A7A1C78515A6B6E10012BC7A /* IASKSlider.m in Sources */ = {isa = PBXBuildFile; fileRef = A7A1C73315A6B6E00012BC7A /* IASKSlider.m */; settings = {COMPILER_FLAGS = "-fno-objc-arc"; }; };
 		A7A1C78615A6B6E10012BC7A /* IASKSwitch.m in Sources */ = {isa = PBXBuildFile; fileRef = A7A1C73515A6B6E00012BC7A /* IASKSwitch.m */; settings = {COMPILER_FLAGS = "-fno-objc-arc"; }; };
 		A7A1C78715A6B6E10012BC7A /* IASKSwitch.m in Sources */ = {isa = PBXBuildFile; fileRef = A7A1C73515A6B6E00012BC7A /* IASKSwitch.m */; settings = {COMPILER_FLAGS = "-fno-objc-arc"; }; };
 		A7A1C78815A6B6E10012BC7A /* IASKTextField.m in Sources */ = {isa = PBXBuildFile; fileRef = A7A1C73715A6B6E00012BC7A /* IASKTextField.m */; settings = {COMPILER_FLAGS = "-fno-objc-arc"; }; };
 		A7A1C78915A6B6E10012BC7A /* IASKTextField.m in Sources */ = {isa = PBXBuildFile; fileRef = A7A1C73715A6B6E00012BC7A /* IASKTextField.m */; settings = {COMPILER_FLAGS = "-fno-objc-arc"; }; };
-		A7A1C78A15A6B6E10012BC7A /* IASKAppSettingsView.xib in Resources */ = {isa = PBXBuildFile; fileRef = A7A1C73915A6B6E00012BC7A /* IASKAppSettingsView.xib */; };
-		A7A1C78B15A6B6E10012BC7A /* IASKAppSettingsView.xib in Resources */ = {isa = PBXBuildFile; fileRef = A7A1C73915A6B6E00012BC7A /* IASKAppSettingsView.xib */; };
-		A7A1C78C15A6B6E10012BC7A /* IASKAppSettingsWebView.xib in Resources */ = {isa = PBXBuildFile; fileRef = A7A1C73A15A6B6E00012BC7A /* IASKAppSettingsWebView.xib */; };
-		A7A1C78D15A6B6E10012BC7A /* IASKAppSettingsWebView.xib in Resources */ = {isa = PBXBuildFile; fileRef = A7A1C73A15A6B6E00012BC7A /* IASKAppSettingsWebView.xib */; };
-		A7A1C78E15A6B6E10012BC7A /* IASKPSSliderSpecifierViewCell.xib in Resources */ = {isa = PBXBuildFile; fileRef = A7A1C73B15A6B6E00012BC7A /* IASKPSSliderSpecifierViewCell.xib */; };
-		A7A1C78F15A6B6E10012BC7A /* IASKPSSliderSpecifierViewCell.xib in Resources */ = {isa = PBXBuildFile; fileRef = A7A1C73B15A6B6E00012BC7A /* IASKPSSliderSpecifierViewCell.xib */; };
-		A7A1C79015A6B6E10012BC7A /* IASKPSTextFieldSpecifierViewCell.xib in Resources */ = {isa = PBXBuildFile; fileRef = A7A1C73C15A6B6E00012BC7A /* IASKPSTextFieldSpecifierViewCell.xib */; };
-		A7A1C79115A6B6E10012BC7A /* IASKPSTextFieldSpecifierViewCell.xib in Resources */ = {isa = PBXBuildFile; fileRef = A7A1C73C15A6B6E00012BC7A /* IASKPSTextFieldSpecifierViewCell.xib */; };
-		A7A1C79215A6B6E10012BC7A /* IASKPSToggleSwitchSpecifierViewCell.xib in Resources */ = {isa = PBXBuildFile; fileRef = A7A1C73D15A6B6E00012BC7A /* IASKPSToggleSwitchSpecifierViewCell.xib */; };
-		A7A1C79315A6B6E10012BC7A /* IASKPSToggleSwitchSpecifierViewCell.xib in Resources */ = {isa = PBXBuildFile; fileRef = A7A1C73D15A6B6E00012BC7A /* IASKPSToggleSwitchSpecifierViewCell.xib */; };
-		A7A1C79415A6B6E10012BC7A /* IASKSpecifierValuesView.xib in Resources */ = {isa = PBXBuildFile; fileRef = A7A1C73E15A6B6E00012BC7A /* IASKSpecifierValuesView.xib */; };
-		A7A1C79515A6B6E10012BC7A /* IASKSpecifierValuesView.xib in Resources */ = {isa = PBXBuildFile; fileRef = A7A1C73E15A6B6E00012BC7A /* IASKSpecifierValuesView.xib */; };
 		A7A3F950147BAB6C00CA7266 /* database.sql in Resources */ = {isa = PBXBuildFile; fileRef = A7A3F94F147BAB6C00CA7266 /* database.sql */; };
 		A7A3F953147BBCCB00CA7266 /* ZPServerResponseXMLParser.m in Sources */ = {isa = PBXBuildFile; fileRef = A7A3F952147BBCCA00CA7266 /* ZPServerResponseXMLParser.m */; };
 		A7A4432C155FE5ED005FF5B4 /* ZPServerResponseXMLParserKeyPermissions.m in Sources */ = {isa = PBXBuildFile; fileRef = A7A4432B155FE5ED005FF5B4 /* ZPServerResponseXMLParserKeyPermissions.m */; };
@@ -818,19 +802,19 @@
 		A7CD070B15161555007A8E1D /* main.m in Sources */ = {isa = PBXBuildFile; fileRef = A7200DE014718DC0004347C9 /* main.m */; };
 		A7CD070C15161555007A8E1D /* ZPAppDelegate.m in Sources */ = {isa = PBXBuildFile; fileRef = A7200DE414718DC0004347C9 /* ZPAppDelegate.m */; };
 		A7CD070D15161555007A8E1D /* ZPLibraryAndCollectionListViewController.m in Sources */ = {isa = PBXBuildFile; fileRef = A7200DEA14718DC1004347C9 /* ZPLibraryAndCollectionListViewController.m */; };
-		A7CD070E15161555007A8E1D /* ZPDataLayer.m in Sources */ = {isa = PBXBuildFile; fileRef = A7200DF514718F44004347C9 /* ZPDataLayer.m */; };
+		A7CD070E15161555007A8E1D /* ZPDataLayer.m in Sources */ = {isa = PBXBuildFile; fileRef = A7200DF514718F44004347C9 /* ZPDataLayer.m */; settings = {COMPILER_FLAGS = "-w"; }; };
 		A7CD070F15161555007A8E1D /* ZPServerConnection.m in Sources */ = {isa = PBXBuildFile; fileRef = A7A7C9B0147A8144004D8756 /* ZPServerConnection.m */; };
 		A7CD071015161555007A8E1D /* NSMutableURLRequest+Parameters.m in Sources */ = {isa = PBXBuildFile; fileRef = A7A7C9D0147AA2EE004D8756 /* NSMutableURLRequest+Parameters.m */; settings = {COMPILER_FLAGS = "-fno-objc-arc"; }; };
 		A7CD071115161555007A8E1D /* NSString+URLEncoding.m in Sources */ = {isa = PBXBuildFile; fileRef = A7A7C9D2147AA2EE004D8756 /* NSString+URLEncoding.m */; settings = {COMPILER_FLAGS = "-fno-objc-arc"; }; };
 		A7CD071215161555007A8E1D /* NSURL+Base.m in Sources */ = {isa = PBXBuildFile; fileRef = A7A7C9D4147AA2EE004D8756 /* NSURL+Base.m */; settings = {COMPILER_FLAGS = "-fno-objc-arc"; }; };
-		A7CD071415161555007A8E1D /* hmac.c in Sources */ = {isa = PBXBuildFile; fileRef = A7A7C9D8147AA2EE004D8756 /* hmac.c */; settings = {COMPILER_FLAGS = "-fno-objc-arc"; }; };
+		A7CD071415161555007A8E1D /* hmac.c in Sources */ = {isa = PBXBuildFile; fileRef = A7A7C9D8147AA2EE004D8756 /* hmac.c */; settings = {COMPILER_FLAGS = "-fno-objc-arc -w"; }; };
 		A7CD071515161555007A8E1D /* sha1.c in Sources */ = {isa = PBXBuildFile; fileRef = A7A7C9DA147AA2EE004D8756 /* sha1.c */; settings = {COMPILER_FLAGS = "-fno-objc-arc"; }; };
 		A7CD071615161555007A8E1D /* OAAttachment.m in Sources */ = {isa = PBXBuildFile; fileRef = A7A7C9DD147AA2EE004D8756 /* OAAttachment.m */; settings = {COMPILER_FLAGS = "-fno-objc-arc"; }; };
 		A7CD071715161555007A8E1D /* OACall.m in Sources */ = {isa = PBXBuildFile; fileRef = A7A7C9DF147AA2EE004D8756 /* OACall.m */; settings = {COMPILER_FLAGS = "-fno-objc-arc"; }; };
 		A7CD071815161555007A8E1D /* OAConsumer.m in Sources */ = {isa = PBXBuildFile; fileRef = A7A7C9E1147AA2EE004D8756 /* OAConsumer.m */; settings = {COMPILER_FLAGS = "-fno-objc-arc"; }; };
 		A7CD071915161555007A8E1D /* OADataFetcher.m in Sources */ = {isa = PBXBuildFile; fileRef = A7A7C9E3147AA2EE004D8756 /* OADataFetcher.m */; settings = {COMPILER_FLAGS = "-fno-objc-arc"; }; };
 		A7CD071A15161555007A8E1D /* OAHMAC_SHA1SignatureProvider.m in Sources */ = {isa = PBXBuildFile; fileRef = A7A7C9E5147AA2EE004D8756 /* OAHMAC_SHA1SignatureProvider.m */; settings = {COMPILER_FLAGS = "-fno-objc-arc"; }; };
-		A7CD071B15161555007A8E1D /* OAMutableURLRequest.m in Sources */ = {isa = PBXBuildFile; fileRef = A7A7C9E7147AA2EE004D8756 /* OAMutableURLRequest.m */; settings = {COMPILER_FLAGS = "-fno-objc-arc"; }; };
+		A7CD071B15161555007A8E1D /* OAMutableURLRequest.m in Sources */ = {isa = PBXBuildFile; fileRef = A7A7C9E7147AA2EE004D8756 /* OAMutableURLRequest.m */; settings = {COMPILER_FLAGS = "-fno-objc-arc -w"; }; };
 		A7CD071C15161555007A8E1D /* OAPlaintextSignatureProvider.m in Sources */ = {isa = PBXBuildFile; fileRef = A7A7C9E9147AA2EE004D8756 /* OAPlaintextSignatureProvider.m */; settings = {COMPILER_FLAGS = "-fno-objc-arc"; }; };
 		A7CD071D15161555007A8E1D /* OAProblem.m in Sources */ = {isa = PBXBuildFile; fileRef = A7A7C9EB147AA2EE004D8756 /* OAProblem.m */; settings = {COMPILER_FLAGS = "-fno-objc-arc"; }; };
 		A7CD071E15161555007A8E1D /* OARequestParameter.m in Sources */ = {isa = PBXBuildFile; fileRef = A7A7C9ED147AA2EE004D8756 /* OARequestParameter.m */; settings = {COMPILER_FLAGS = "-fno-objc-arc"; }; };
@@ -1558,20 +1542,12 @@
 		A7A1C72D15A6B6E00012BC7A /* IASKPSTextFieldSpecifierViewCell.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = IASKPSTextFieldSpecifierViewCell.m; sourceTree = "<group>"; };
 		A7A1C72E15A6B6E00012BC7A /* IASKPSTitleValueSpecifierViewCell.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = IASKPSTitleValueSpecifierViewCell.h; sourceTree = "<group>"; };
 		A7A1C72F15A6B6E00012BC7A /* IASKPSTitleValueSpecifierViewCell.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = IASKPSTitleValueSpecifierViewCell.m; sourceTree = "<group>"; };
-		A7A1C73015A6B6E00012BC7A /* IASKPSToggleSwitchSpecifierViewCell.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = IASKPSToggleSwitchSpecifierViewCell.h; sourceTree = "<group>"; };
-		A7A1C73115A6B6E00012BC7A /* IASKPSToggleSwitchSpecifierViewCell.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = IASKPSToggleSwitchSpecifierViewCell.m; sourceTree = "<group>"; };
 		A7A1C73215A6B6E00012BC7A /* IASKSlider.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = IASKSlider.h; sourceTree = "<group>"; };
 		A7A1C73315A6B6E00012BC7A /* IASKSlider.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = IASKSlider.m; sourceTree = "<group>"; };
 		A7A1C73415A6B6E00012BC7A /* IASKSwitch.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = IASKSwitch.h; sourceTree = "<group>"; };
 		A7A1C73515A6B6E00012BC7A /* IASKSwitch.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = IASKSwitch.m; sourceTree = "<group>"; };
 		A7A1C73615A6B6E00012BC7A /* IASKTextField.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = IASKTextField.h; sourceTree = "<group>"; };
 		A7A1C73715A6B6E00012BC7A /* IASKTextField.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = IASKTextField.m; sourceTree = "<group>"; };
-		A7A1C73915A6B6E00012BC7A /* IASKAppSettingsView.xib */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = file.xib; path = IASKAppSettingsView.xib; sourceTree = "<group>"; };
-		A7A1C73A15A6B6E00012BC7A /* IASKAppSettingsWebView.xib */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = file.xib; path = IASKAppSettingsWebView.xib; sourceTree = "<group>"; };
-		A7A1C73B15A6B6E00012BC7A /* IASKPSSliderSpecifierViewCell.xib */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = file.xib; path = IASKPSSliderSpecifierViewCell.xib; sourceTree = "<group>"; };
-		A7A1C73C15A6B6E00012BC7A /* IASKPSTextFieldSpecifierViewCell.xib */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = file.xib; path = IASKPSTextFieldSpecifierViewCell.xib; sourceTree = "<group>"; };
-		A7A1C73D15A6B6E00012BC7A /* IASKPSToggleSwitchSpecifierViewCell.xib */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = file.xib; path = IASKPSToggleSwitchSpecifierViewCell.xib; sourceTree = "<group>"; };
-		A7A1C73E15A6B6E00012BC7A /* IASKSpecifierValuesView.xib */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = file.xib; path = IASKSpecifierValuesView.xib; sourceTree = "<group>"; };
 		A7A3F94F147BAB6C00CA7266 /* database.sql */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = text; lineEnding = 0; path = database.sql; sourceTree = "<group>"; };
 		A7A3F951147BBCCA00CA7266 /* ZPServerResponseXMLParser.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = ZPServerResponseXMLParser.h; sourceTree = "<group>"; };
 		A7A3F952147BBCCA00CA7266 /* ZPServerResponseXMLParser.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = ZPServerResponseXMLParser.m; sourceTree = "<group>"; };
@@ -2563,7 +2539,6 @@
 				A7A1C71615A6B6E00012BC7A /* Controllers */,
 				A7A1C71E15A6B6E00012BC7A /* Models */,
 				A7A1C72915A6B6E00012BC7A /* Views */,
-				A7A1C73815A6B6E00012BC7A /* Xibs */,
 			);
 			name = InAppSettingsKit;
 			path = InAppSettingsKit/InAppSettingsKit;
@@ -2609,8 +2584,6 @@
 				A7A1C72D15A6B6E00012BC7A /* IASKPSTextFieldSpecifierViewCell.m */,
 				A7A1C72E15A6B6E00012BC7A /* IASKPSTitleValueSpecifierViewCell.h */,
 				A7A1C72F15A6B6E00012BC7A /* IASKPSTitleValueSpecifierViewCell.m */,
-				A7A1C73015A6B6E00012BC7A /* IASKPSToggleSwitchSpecifierViewCell.h */,
-				A7A1C73115A6B6E00012BC7A /* IASKPSToggleSwitchSpecifierViewCell.m */,
 				A7A1C73215A6B6E00012BC7A /* IASKSlider.h */,
 				A7A1C73315A6B6E00012BC7A /* IASKSlider.m */,
 				A7A1C73415A6B6E00012BC7A /* IASKSwitch.h */,
@@ -2619,19 +2592,6 @@
 				A7A1C73715A6B6E00012BC7A /* IASKTextField.m */,
 			);
 			path = Views;
-			sourceTree = "<group>";
-		};
-		A7A1C73815A6B6E00012BC7A /* Xibs */ = {
-			isa = PBXGroup;
-			children = (
-				A7A1C73915A6B6E00012BC7A /* IASKAppSettingsView.xib */,
-				A7A1C73A15A6B6E00012BC7A /* IASKAppSettingsWebView.xib */,
-				A7A1C73B15A6B6E00012BC7A /* IASKPSSliderSpecifierViewCell.xib */,
-				A7A1C73C15A6B6E00012BC7A /* IASKPSTextFieldSpecifierViewCell.xib */,
-				A7A1C73D15A6B6E00012BC7A /* IASKPSToggleSwitchSpecifierViewCell.xib */,
-				A7A1C73E15A6B6E00012BC7A /* IASKSpecifierValuesView.xib */,
-			);
-			path = Xibs;
 			sourceTree = "<group>";
 		};
 		A7A54B0414878E2600EBAD80 /* FMDB */ = {
@@ -2878,7 +2838,7 @@
 		A7200DC714718DBF004347C9 /* Project object */ = {
 			isa = PBXProject;
 			attributes = {
-				LastUpgradeCheck = 0430;
+				LastUpgradeCheck = 0450;
 			};
 			buildConfigurationList = A7200DCA14718DBF004347C9 /* Build configuration list for PBXProject "ZotPad" */;
 			compatibilityVersion = "Xcode 3.2";
@@ -3249,12 +3209,6 @@
 				A7ABAB6715A3071000EA8B7B /* Default-Portrait@2x~ipad.png in Resources */,
 				A7ABAB6815A3071F00EA8B7B /* Default-Landscape@2x~ipad.png in Resources */,
 				A7ABAB6915A3072300EA8B7B /* Default-Landscape~ipad.png in Resources */,
-				A7A1C78A15A6B6E10012BC7A /* IASKAppSettingsView.xib in Resources */,
-				A7A1C78C15A6B6E10012BC7A /* IASKAppSettingsWebView.xib in Resources */,
-				A7A1C78E15A6B6E10012BC7A /* IASKPSSliderSpecifierViewCell.xib in Resources */,
-				A7A1C79015A6B6E10012BC7A /* IASKPSTextFieldSpecifierViewCell.xib in Resources */,
-				A7A1C79215A6B6E10012BC7A /* IASKPSToggleSwitchSpecifierViewCell.xib in Resources */,
-				A7A1C79415A6B6E10012BC7A /* IASKSpecifierValuesView.xib in Resources */,
 				A7307BCC15A6E51100A90BDF /* DropboxOSX-Info.plist in Resources */,
 				A7307BCE15A6E51100A90BDF /* DropboxSDK-Info.plist in Resources */,
 				A74B93EB15A8B6560073D303 /* iphone.pdf in Resources */,
@@ -3267,7 +3221,6 @@
 				A7B051BF15B187BF0049C5A2 /* icon-up-black.png in Resources */,
 				A7B051C115B187BF0049C5A2 /* icon-up-black@2x.png in Resources */,
 				A7B2BCC915B3E22500381E23 /* upgrade1.0to1.1.sql in Resources */,
-				A7225CDC15B4B0D1008C5878 /* ZotPad-Info.plist in Resources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
@@ -3556,12 +3509,6 @@
 				A76ECD2B159CDEDD0062E95A /* emblem-symbolic-link.svgz in Resources */,
 				A77FD063159F702E00774D50 /* gear.png in Resources */,
 				A77FD065159F702E00774D50 /* gear@2x.png in Resources */,
-				A7A1C78B15A6B6E10012BC7A /* IASKAppSettingsView.xib in Resources */,
-				A7A1C78D15A6B6E10012BC7A /* IASKAppSettingsWebView.xib in Resources */,
-				A7A1C78F15A6B6E10012BC7A /* IASKPSSliderSpecifierViewCell.xib in Resources */,
-				A7A1C79115A6B6E10012BC7A /* IASKPSTextFieldSpecifierViewCell.xib in Resources */,
-				A7A1C79315A6B6E10012BC7A /* IASKPSToggleSwitchSpecifierViewCell.xib in Resources */,
-				A7A1C79515A6B6E10012BC7A /* IASKSpecifierValuesView.xib in Resources */,
 				A7307BCD15A6E51100A90BDF /* DropboxOSX-Info.plist in Resources */,
 				A7307BCF15A6E51100A90BDF /* DropboxSDK-Info.plist in Resources */,
 				A74B93EC15A8B6560073D303 /* iphone.pdf in Resources */,
@@ -3574,7 +3521,6 @@
 				A7B051C015B187BF0049C5A2 /* icon-up-black.png in Resources */,
 				A7B051C215B187BF0049C5A2 /* icon-up-black@2x.png in Resources */,
 				A7B2BCCA15B3E22500381E23 /* upgrade1.0to1.1.sql in Resources */,
-				A7225CDD15B4B0D9008C5878 /* ZotPad beta-Info.plist in Resources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
@@ -3716,7 +3662,6 @@
 				A7A1C77C15A6B6E10012BC7A /* IASKPSSliderSpecifierViewCell.m in Sources */,
 				A7A1C77E15A6B6E10012BC7A /* IASKPSTextFieldSpecifierViewCell.m in Sources */,
 				A7A1C78015A6B6E10012BC7A /* IASKPSTitleValueSpecifierViewCell.m in Sources */,
-				A7A1C78215A6B6E10012BC7A /* IASKPSToggleSwitchSpecifierViewCell.m in Sources */,
 				A7A1C78415A6B6E10012BC7A /* IASKSlider.m in Sources */,
 				A7A1C78615A6B6E10012BC7A /* IASKSwitch.m in Sources */,
 				A7A1C78815A6B6E10012BC7A /* IASKTextField.m in Sources */,
@@ -3871,7 +3816,6 @@
 				A7A1C77D15A6B6E10012BC7A /* IASKPSSliderSpecifierViewCell.m in Sources */,
 				A7A1C77F15A6B6E10012BC7A /* IASKPSTextFieldSpecifierViewCell.m in Sources */,
 				A7A1C78115A6B6E10012BC7A /* IASKPSTitleValueSpecifierViewCell.m in Sources */,
-				A7A1C78315A6B6E10012BC7A /* IASKPSToggleSwitchSpecifierViewCell.m in Sources */,
 				A7A1C78515A6B6E10012BC7A /* IASKSlider.m in Sources */,
 				A7A1C78715A6B6E10012BC7A /* IASKSwitch.m in Sources */,
 				A7A1C78915A6B6E10012BC7A /* IASKTextField.m in Sources */,

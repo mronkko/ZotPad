@@ -40,14 +40,14 @@ NSInteger const ZPFILECHANNEL_ZOTEROSTORAGE_UPLOAD_REGISTER = 4;
 - (ASIHTTPRequest*) _baseRequestForAttachment:(ZPZoteroAttachment*)attachment type:(NSInteger)type overWriteConflictingServerVersion:(BOOL)overwriteConflicting{
    
     
-    if(attachment.key == [NSNull null]){
+    if(attachment.key == NULL){
         [NSException raise:@"Attachment key cannot be null" format:@""];
     }
     
     //Create the download URL
     NSString* oauthkey =  [[ZPPreferences instance] OAuthKey];
     NSString* urlString;
-    NSInteger libraryID= [attachment.libraryID intValue];
+    NSInteger libraryID= attachment.libraryID;
     
     if(libraryID==1 || libraryID == 0){
         urlString = [NSString stringWithFormat:@"https://api.zotero.org/users/%@",[[ZPPreferences instance] userID]];
@@ -100,7 +100,7 @@ NSInteger const ZPFILECHANNEL_ZOTEROSTORAGE_UPLOAD_REGISTER = 4;
     ASIHTTPRequest* request = [self _baseRequestForAttachment:attachment type:ZPFILECHANNEL_ZOTEROSTORAGE_DOWNLOAD overWriteConflictingServerVersion:FALSE];
     request.userInfo = [NSDictionary dictionaryWithObject:attachment forKey:@"attachment"];
     
-    NSString* tempFile = [NSTemporaryDirectory() stringByAppendingPathComponent:[NSString stringWithFormat:@"ZP%@%i",attachment.key,[[NSDate date] timeIntervalSince1970]*1000000]];
+    NSString* tempFile = [NSTemporaryDirectory() stringByAppendingPathComponent:[NSString stringWithFormat:@"ZP%@%f",attachment.key,[[NSDate date] timeIntervalSince1970]*1000000]];
     [request setDownloadDestinationPath:tempFile];
     [request startAsynchronous];
 
@@ -136,7 +136,7 @@ NSInteger const ZPFILECHANNEL_ZOTEROSTORAGE_UPLOAD_REGISTER = 4;
     // Get info about the file to be uploaded
     
     NSString* path = attachment.fileSystemPath_modified;
-    NSDictionary* documentFileAttributes = [[NSFileManager defaultManager] fileAttributesAtPath:path traverseLink:YES];
+    NSDictionary* documentFileAttributes = [[NSFileManager defaultManager] attributesOfFileSystemForPath:path error:NULL];
     NSTimeInterval timeModified = [[documentFileAttributes fileModificationDate] timeIntervalSince1970];
     long long timeModifiedMilliseconds = (long long) trunc(timeModified * 1000.0f);
     
@@ -163,9 +163,9 @@ NSInteger const ZPFILECHANNEL_ZOTEROSTORAGE_UPLOAD_REGISTER = 4;
     
     request.userInfo = userInfo;
     
-    if(attachment.contentType != [NSNull null]){
+    if(attachment.contentType != NULL){
         postBodyString = [postBodyString stringByAppendingFormat:@"&contentType=%@",attachment.contentType];
-        if(attachment.charset != [NSNull null]){
+        if(attachment.charset != NULL){
             postBodyString = [postBodyString stringByAppendingFormat:@"&charset=%@",attachment.charset];
         }
         else {
@@ -175,7 +175,7 @@ NSInteger const ZPFILECHANNEL_ZOTEROSTORAGE_UPLOAD_REGISTER = 4;
     postBodyString = [postBodyString stringByAppendingFormat:@"&params=1"];
     
     
-    [request setPostBody:[postBodyString dataUsingEncoding:NSUTF8StringEncoding]];
+    [request setPostBody:[NSMutableData dataWithData:[postBodyString dataUsingEncoding:NSUTF8StringEncoding]]];
      
     [request startAsynchronous];
     
@@ -286,7 +286,7 @@ NSInteger const ZPFILECHANNEL_ZOTEROSTORAGE_UPLOAD_REGISTER = 4;
             //Register upload
             ASIHTTPRequest* registerRequest = [self _baseRequestForAttachment:attachment type:ZPFILECHANNEL_ZOTEROSTORAGE_UPLOAD_REGISTER overWriteConflictingServerVersion:[(NSNumber*)[request.userInfo objectForKey:@"overwriteConflicting"] boolValue]];
             registerRequest.userInfo = request.userInfo;
-            [registerRequest setPostBody:[[NSString stringWithFormat:@"upload=%@",[request.userInfo objectForKey:@"uploadKey"]] dataUsingEncoding:NSASCIIStringEncoding]];
+            [registerRequest setPostBody:[NSMutableData dataWithData:[[NSString stringWithFormat:@"upload=%@",[request.userInfo objectForKey:@"uploadKey"]] dataUsingEncoding:NSASCIIStringEncoding]]];
             [registerRequest startAsynchronous];
                 
         }
@@ -319,7 +319,7 @@ NSInteger const ZPFILECHANNEL_ZOTEROSTORAGE_UPLOAD_REGISTER = 4;
             NSError* error =[NSError errorWithDomain:@"zotero.org" code:request.responseStatusCode userInfo:NULL];
             DDLogError(@"Uploading file %@ to Zotero server failed with error: %@",attachment.filename,request.responseStatusMessage);
             [self cleanupAfterFinishingAttachment:attachment];
-            [[ZPServerConnection instance] failedUploadingAttachment:attachment withError:error usingFileChannel:self toURL:[request.url absoluteURL]];
+            [[ZPServerConnection instance] failedUploadingAttachment:attachment withError:error usingFileChannel:self toURL:[request.url absoluteString]];
         }
     }
 }

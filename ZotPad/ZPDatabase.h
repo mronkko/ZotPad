@@ -37,15 +37,15 @@
 
 // Methods for retrieving data from the data layer
 - (NSArray*) libraries;
-- (NSArray*) collectionsForLibrary : (NSNumber*)currentlibraryID withParentCollection:(NSString*)currentCollectionKey;
-- (NSArray*) collectionsForLibrary : (NSNumber*)currentlibraryID;
+- (NSArray*) collectionsForLibrary : (NSInteger)currentlibraryID withParentCollection:(NSString*)currentCollectionKey;
+- (NSArray*) collectionsForLibrary : (NSInteger)currentlibraryID;
 
 
 // Methods for retrieving item keys
-- (NSArray*) getItemKeysForLibrary:(NSNumber*)libraryID collectionKey:(NSString*)collectionKey
+- (NSArray*) getItemKeysForLibrary:(NSInteger)libraryID collectionKey:(NSString*)collectionKey
                       searchString:(NSString*)searchString orderField:(NSString*)orderField sortDescending:(BOOL)sortDescending;
 
-- (NSString*) getFirstItemKeyWithTimestamp:(NSString*)timestamp from:(NSNumber*)libraryID;
+- (NSString*) getFirstItemKeyWithTimestamp:(NSString*)timestamp from:(NSInteger)libraryID;
 
 
 // Methods for filling data into existing objects
@@ -63,13 +63,13 @@
 - (NSArray*) getCachedAttachmentsOrderedByRemovalPriority;
 
 //Return a list of all attachment paths priority for retrieval
-- (NSArray*) getAttachmentsInLibrary:(NSNumber*)libraryID collection:(NSString*)collectionKey;
+- (NSArray*) getAttachmentsInLibrary:(NSInteger)libraryID collection:(NSString*)collectionKey;
 
 - (NSString*) getLocalizationStringWithKey:(NSString*) key type:(NSString*) type locale:(NSString*) locale;
 
 // Retrieves all item keys and note and attachment keys from the library
 
-- (NSArray*) getAllItemKeysForLibrary:(NSNumber*)libraryID;
+- (NSArray*) getAllItemKeysForLibrary:(NSInteger)libraryID;
 
 
 - (NSArray*) collectionsForItem:(ZPZoteroItem*)item;
@@ -105,10 +105,10 @@
 
 // These remove items from the cache
 - (void) removeItemKeysNotInArray:(NSArray*)itemKeys fromCollection:(NSString*)collectionKey;
-- (void) deleteItemKeysNotInArray:(NSArray*)itemKeys fromLibrary:(NSNumber*)libraryID;
+- (void) deleteItemKeysNotInArray:(NSArray*)itemKeys fromLibrary:(NSInteger)libraryID;
 
 - (void) updateViewedTimestamp:(ZPZoteroAttachment*)attachment;
 - (void) setUpdatedTimestampForCollection:(NSString*)collectionKey toValue:(NSString*)updatedTimestamp;
-- (void) setUpdatedTimestampForLibrary:(NSNumber*)libraryID toValue:(NSString*)updatedTimestamp;
+- (void) setUpdatedTimestampForLibrary:(NSInteger)libraryID toValue:(NSString*)updatedTimestamp;
 
 @end

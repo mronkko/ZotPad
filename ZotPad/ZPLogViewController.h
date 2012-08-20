@@ -16,7 +16,6 @@
 -(IBAction)showManual:(id)sender;
 -(IBAction)knowledgeBase:(id)sender;
 -(IBAction)emailSupport:(id)sender;
--(IBAction)feedback:(id)sender;
 -(IBAction)manageKey:(id)sender;
 
 -(IBAction)dismiss:(id)sender;

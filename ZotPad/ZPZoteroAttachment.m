@@ -13,9 +13,8 @@
 #import "FileMD5Hash.h"
 #import "ZPCacheController.h"
 #import "NSString+Base64.h"
+#include <sys/xattr.h>
 
-// Needed for troubleshooting
-#import <objc/runtime.h>
 
 NSInteger const LINK_MODE_IMPORTED_FILE = 0;
 NSInteger const LINK_MODE_IMPORTED_URL = 1;
@@ -47,37 +46,35 @@ NSInteger const VERSION_SOURCE_DROPBOX =3;
     return _versionIdentifier_server;
 }
 
-+(id) dataObjectWithDictionary:(NSDictionary *)fields{
++(id) itemWithDictionary:(NSDictionary *)fields{
     NSMutableDictionary* dict = [NSMutableDictionary dictionaryWithDictionary:fields ];
     [dict setObject:@"attachment" forKey:@"itemType"];
-    ZPZoteroAttachment* attachment = (ZPZoteroAttachment*) [super dataObjectWithDictionary:dict];
+    ZPZoteroAttachment* attachment = (ZPZoteroAttachment*) [super itemWithDictionary:dict];
     
     if(! [attachment isKindOfClass:[ZPZoteroAttachment class]]){
         DDLogError(@"Creating an attachment object for item %@ resulted in non-attachment object. Crashing.",[dict objectForKey:@"key"]);
         [NSException raise:@"Internal consistency error" format:@"Creating an attachment object for item %@ resulted in non-attachment object. %@",[dict objectForKey:@"key"],dict];
     }
     
-    //Set some default values
-    if(attachment.existsOnZoteroServer == nil){
-        attachment.existsOnZoteroServer = [NSNumber numberWithBool:NO];   
-    }
-
     return attachment;
 }
 
 
-- (NSNumber*) libraryID{
+- (NSInteger) libraryID{
     //Child attachments
-    if(super.libraryID==NULL){
+    if(super.libraryID==LIBRARY_ID_NOT_SET){
         if(_parentItemKey != NULL){
-            return [ZPZoteroItem dataObjectWithKey:self.parentItemKey].libraryID;
+            return [ZPZoteroItem itemWithKey:self.parentItemKey].libraryID;
         }
         else {
             [NSException raise:@"Internal consistency error" format:@"Standalone items must have library IDs. Standalone attachment with key %@ had a null library ID",self.key];
+            return LIBRARY_ID_NOT_SET;
         }
     }
-    //Standalone attachments
-    else return super.libraryID;
+    else{
+        //Standalone attachments
+        return super.libraryID;
+    }
 }
 
 
@@ -116,10 +113,10 @@ NSInteger const VERSION_SOURCE_DROPBOX =3;
     //If this is a locally modified file or a version, strip the trailing - from the key
     if(key.length>8){
         NSString* newKey = [key substringToIndex:8];
-        attachment = (ZPZoteroAttachment*) [self dataObjectWithKey:newKey];
+        attachment = (ZPZoteroAttachment*) [self itemWithKey:newKey];
     }
     else{
-        attachment = (ZPZoteroAttachment*) [self dataObjectWithKey:key];
+        attachment = (ZPZoteroAttachment*) [self itemWithKey:key];
     }
     if(attachment.filename == NULL) attachment = NULL;
 
@@ -135,12 +132,12 @@ NSInteger const VERSION_SOURCE_DROPBOX =3;
 
 - (NSString*) _fileSystemPathWithSuffix:(NSString*)suffix{
     
-    if(self.filename == NULL || self.filename == [NSNull null]) return NULL;
+    if(self.filename == NULL ) return NULL;
     
     NSString* path;
     //Imported URLs are stored as ZIP files
     
-    if([self.linkMode intValue] == LINK_MODE_IMPORTED_URL && ([self.contentType isEqualToString:@"text/html"]
+    if(self.linkMode == LINK_MODE_IMPORTED_URL && ([self.contentType isEqualToString:@"text/html"]
                                                               || [self.contentType isEqualToString:@"application/xhtml+xml"])){
         path = [[self filename] stringByAppendingFormat:@"_%@%@.zip",self.key,suffix];
     }
@@ -180,14 +177,14 @@ NSInteger const VERSION_SOURCE_DROPBOX =3;
 -(NSString*) contentType{
     return  _contentType;
 }
--(void) setLinkMode:(NSNumber *)linkMode{
+-(void) setLinkMode:(NSInteger)linkMode{
     _linkMode = linkMode;
     //set text/HTML as the default type for links
-    if([_linkMode intValue]==LINK_MODE_LINKED_URL && _contentType == NULL){
+    if(_linkMode ==LINK_MODE_LINKED_URL && _contentType == NULL){
         _contentType = @"text/html";
     }
 }
--(NSNumber*)linkMode{
+-(NSInteger)linkMode{
     return _linkMode;
 }
 
@@ -219,7 +216,7 @@ NSInteger const VERSION_SOURCE_DROPBOX =3;
     if(![self.serverTimestamp isEqual:self.cacheTimestamp] && [self fileExists_original]){
         //If the file MD5 does not match the server MD5, delete it.
         NSString* fileMD5 = [ZPZoteroAttachment md5ForFileAtPath:self.fileSystemPath_original];
-        if(self.md5 == [NSNull null] || ! [self.md5 isEqualToString:fileMD5]){
+        if(self.md5 == NULL || ! [self.md5 isEqualToString:fileMD5]){
             [[NSFileManager defaultManager] removeItemAtPath: [self fileSystemPath_original] error:NULL];   
         }
     }
@@ -280,8 +277,8 @@ NSInteger const VERSION_SOURCE_DROPBOX =3;
 }
 
 -(void) setMd5:(NSString *)md5{
-    if(md5!= NULL && md5 != [NSNull null]){
-        if(_md5!= NULL && _md5 != [NSNull null] && ! [_md5 isEqualToString:md5]){
+    if(md5!= NULL){
+        if(_md5!= NULL && ! [_md5 isEqualToString:md5]){
             //The file has changed on the server, so we will queue a download for it
             [[ZPCacheController instance] addAttachmentToDowloadQueue:self];
         }
@@ -300,7 +297,7 @@ NSInteger const VERSION_SOURCE_DROPBOX =3;
 
 -(void) purge_original:(NSString*) reason{
     if([self fileExists_original]){
-        NSDictionary* fileAttributes = [[NSFileManager defaultManager] fileAttributesAtPath:self.fileSystemPath_original traverseLink:NO];
+        NSDictionary* fileAttributes = [[NSFileManager defaultManager] attributesOfItemAtPath:self.fileSystemPath_original error:NULL];
         [[NSFileManager defaultManager] removeItemAtPath:self.fileSystemPath_original error:NULL];
         [[ZPDataLayer instance] notifyAttachmentDeleted:self fileAttributes:fileAttributes];
         DDLogWarn(@"File %@ (version from server) was deleted: %@",self.filename,reason);
@@ -308,7 +305,7 @@ NSInteger const VERSION_SOURCE_DROPBOX =3;
 }
 -(void) purge_modified:(NSString*) reason{
     if([self fileExists_modified]){
-        NSDictionary* fileAttributes = [[NSFileManager defaultManager] fileAttributesAtPath:self.fileSystemPath_modified traverseLink:NO];
+        NSDictionary* fileAttributes = [[NSFileManager defaultManager] attributesOfItemAtPath:self.fileSystemPath_modified error:NULL];
         [[NSFileManager defaultManager] removeItemAtPath:self.fileSystemPath_modified error:NULL];
         [[ZPDataLayer instance] notifyAttachmentDeleted:self fileAttributes:fileAttributes];
         DDLogWarn(@"File %@ (locally modified) was deleted: %@",self.filename,reason);
@@ -372,7 +369,7 @@ NSInteger const VERSION_SOURCE_DROPBOX =3;
     
     //Return path to uncompressed files.
     //TODO: Encapsulate as a method
-    if([self.linkMode intValue] == LINK_MODE_IMPORTED_URL && ([self.contentType isEqualToString:@"text/html"] ||
+    if(self.linkMode == LINK_MODE_IMPORTED_URL && ([self.contentType isEqualToString:@"text/html"] ||
                                                               [self.contentType isEqualToString:@"application/xhtml+xml"])){
         NSString* tempDir = [NSTemporaryDirectory() stringByAppendingPathComponent:self.key];
         

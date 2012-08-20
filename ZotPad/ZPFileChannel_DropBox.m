@@ -29,11 +29,11 @@ const NSInteger ZPFILECHANNEL_DROPBOX_DOWNLOAD = 2;
 
 #ifdef BETA
 
-static const NSString* DROPBOX_KEY_FULL_ACCESS = @"w1nps3e4js2va7z";
-static const NSString* DROPBOX_SECRET_FULL_ACCESS = @"vvk17pjqx0ngjs3";
+static NSString* const  DROPBOX_KEY_FULL_ACCESS = @"w1nps3e4js2va7z";
+static NSString* const DROPBOX_SECRET_FULL_ACCESS = @"vvk17pjqx0ngjs3";
 
-static const NSString* DROPBOX_KEY = @"or7xa2bxhzit1ws";
-static const NSString* DROPBOX_SECRET = @"6azju842azhs5oz";
+static NSString* const DROPBOX_KEY = @"or7xa2bxhzit1ws";
+static NSString* const DROPBOX_SECRET = @"6azju842azhs5oz";
 
 #else
 
@@ -171,7 +171,7 @@ static const NSString* DROPBOX_KEY = @"nn6res38igpo4ec";
 }
 
 -(NSObject*) keyForRequest:(NSObject*)request{
-    return [NSNumber numberWithInt: request];
+    return [NSNumber numberWithInt: (NSInteger) request];
 }
 
 
@@ -181,7 +181,7 @@ static const NSString* DROPBOX_KEY = @"nn6res38igpo4ec";
     NSArray* creators;
     NSString* suffix;
     
-    ZPZoteroItem* parent = [ZPZoteroItem dataObjectWithKey:attachment.parentItemKey];
+    ZPZoteroItem* parent = [ZPZoteroItem itemWithKey:attachment.parentItemKey];
 
     NSInteger numAuthors = [[ZPPreferences instance] maxNumberOfAuthorsInDropboxFilenames];
     
@@ -254,7 +254,7 @@ static const NSString* DROPBOX_KEY = @"nn6res38igpo4ec";
         if(issued != NULL) year = [[issued substringToIndex:4] integerValue];
     }
     else{
-        year = [parent.year intValue];
+        year = parent.year;
     }
     
     NSArray* nameFragments = [pattern componentsSeparatedByString:@"%"];
@@ -352,7 +352,7 @@ static const NSString* DROPBOX_KEY = @"nn6res38igpo4ec";
                  */
                 
             default:
-                DDLogError(@"Invalid dropbox file pattern specifier \%%c in pattern %@",[nameFragment characterAtIndex:0],pattern);
+                DDLogError(@"Invalid dropbox file pattern specifier %c in pattern %@",[nameFragment characterAtIndex:0],pattern);
                 break;
         }
         
@@ -397,7 +397,7 @@ static const NSString* DROPBOX_KEY = @"nn6res38igpo4ec";
        
     if([[ZPPreferences instance] useCustomFilenamesWithDropbox]){
         
-        ZPZoteroItem* parent = [ZPZoteroItem dataObjectWithKey:attachment.parentItemKey];
+        ZPZoteroItem* parent = [ZPZoteroItem itemWithKey:attachment.parentItemKey];
 
         NSString* pattern;
         
@@ -412,16 +412,16 @@ static const NSString* DROPBOX_KEY = @"nn6res38igpo4ec";
         
         // Remove invalid characters
         
-        [customName replaceOccurrencesOfString:@"/" withString:@"" options:nil range:NSMakeRange(0, [customName length])];
-        [customName replaceOccurrencesOfString:@"\\" withString:@"" options:nil range:NSMakeRange(0, [customName length])];
-        [customName replaceOccurrencesOfString:@"?" withString:@"" options:nil range:NSMakeRange(0, [customName length])];
-        [customName replaceOccurrencesOfString:@"*" withString:@"" options:nil range:NSMakeRange(0, [customName length])];
-        [customName replaceOccurrencesOfString:@":" withString:@"" options:nil range:NSMakeRange(0, [customName length])];
-        [customName replaceOccurrencesOfString:@"|" withString:@"" options:nil range:NSMakeRange(0, [customName length])];
-        [customName replaceOccurrencesOfString:@"\"" withString:@"" options:nil range:NSMakeRange(0, [customName length])];
-        [customName replaceOccurrencesOfString:@"<" withString:@"" options:nil range:NSMakeRange(0, [customName length])];
-        [customName replaceOccurrencesOfString:@">" withString:@"" options:nil range:NSMakeRange(0, [customName length])];
-        [customName replaceOccurrencesOfString:@"." withString:@"" options:nil range:NSMakeRange(0, [customName length])];
+        [customName replaceOccurrencesOfString:@"/" withString:@"" options:NSCaseInsensitiveSearch range:NSMakeRange(0, [customName length])];
+        [customName replaceOccurrencesOfString:@"\\" withString:@"" options:NSCaseInsensitiveSearch range:NSMakeRange(0, [customName length])];
+        [customName replaceOccurrencesOfString:@"?" withString:@"" options:NSCaseInsensitiveSearch range:NSMakeRange(0, [customName length])];
+        [customName replaceOccurrencesOfString:@"*" withString:@"" options:NSCaseInsensitiveSearch range:NSMakeRange(0, [customName length])];
+        [customName replaceOccurrencesOfString:@":" withString:@"" options:NSCaseInsensitiveSearch range:NSMakeRange(0, [customName length])];
+        [customName replaceOccurrencesOfString:@"|" withString:@"" options:NSCaseInsensitiveSearch range:NSMakeRange(0, [customName length])];
+        [customName replaceOccurrencesOfString:@"\"" withString:@"" options:NSCaseInsensitiveSearch range:NSMakeRange(0, [customName length])];
+        [customName replaceOccurrencesOfString:@"<" withString:@"" options:NSCaseInsensitiveSearch range:NSMakeRange(0, [customName length])];
+        [customName replaceOccurrencesOfString:@">" withString:@"" options:NSCaseInsensitiveSearch range:NSMakeRange(0, [customName length])];
+        [customName replaceOccurrencesOfString:@"." withString:@"" options:NSCaseInsensitiveSearch range:NSMakeRange(0, [customName length])];
         
         //Replace white space
         
@@ -430,7 +430,7 @@ static const NSString* DROPBOX_KEY = @"nn6res38igpo4ec";
 
                      
         if([[ZPPreferences instance] replaceBlanksInDropboxFilenames]){
-            [customName replaceOccurrencesOfString:@" " withString:@"_" options:nil range:NSMakeRange(0, [customName length])];
+            [customName replaceOccurrencesOfString:@" " withString:@"_" options:NSCaseInsensitiveSearch range:NSMakeRange(0, [customName length])];
         }
         if([[ZPPreferences instance] removeDiacriticsInDropboxFilenames]){
             
@@ -461,7 +461,7 @@ static const NSString* DROPBOX_KEY = @"nn6res38igpo4ec";
         
     }
     else{
-        if([attachment.linkMode intValue] == LINK_MODE_IMPORTED_URL && (
+        if(attachment.linkMode == LINK_MODE_IMPORTED_URL && (
                                                                         [attachment.contentType isEqualToString:@"text/html"] ||
                                                                         [attachment.contentType isEqualToString:@"application/xhtml+xml"])){
             //Get a list of files to be downloaded. This does not respect custom file name template
@@ -592,7 +592,7 @@ static const NSString* DROPBOX_KEY = @"nn6res38igpo4ec";
         if (metadata.isDirectory) {
            
             DDLogVerbose(@"Folder '%@' contains:", metadata.path);
-            NSString* basePath=[NSTemporaryDirectory() stringByAppendingPathComponent:[NSString stringWithFormat:@"ZP%@%i",attachment.key,[[NSDate date] timeIntervalSince1970]*1000000]];
+            NSString* basePath=[NSTemporaryDirectory() stringByAppendingPathComponent:[NSString stringWithFormat:@"ZP%@%f",attachment.key,[[NSDate date] timeIntervalSince1970]*1000000]];
             [[NSFileManager defaultManager] createDirectoryAtPath:basePath withIntermediateDirectories:YES attributes:NULL error:NULL];
 
             NSString* path = [self _pathForAttachment:attachment];
@@ -609,7 +609,7 @@ static const NSString* DROPBOX_KEY = @"nn6res38igpo4ec";
             //Set version of the file
             client.revision=metadata.rev;
             DDLogVerbose(@"Start downloading file /%@/%@ (rev %@)",attachment.key,attachment.filename,client.revision);
-            NSString* tempFile = [NSTemporaryDirectory() stringByAppendingPathComponent:[NSString stringWithFormat:@"ZP%@%i",attachment.key,[[NSDate date] timeIntervalSince1970]*1000000]];
+            NSString* tempFile = [NSTemporaryDirectory() stringByAppendingPathComponent:[NSString stringWithFormat:@"ZP%@%f",attachment.key,[[NSDate date] timeIntervalSince1970]*1000000]];
             NSString* path = [self _pathForAttachment:attachment];
             [client loadFile:[path precomposedStringWithCanonicalMapping] atRev:client.revision intoPath:tempFile];
         }
@@ -646,7 +646,7 @@ static const NSString* DROPBOX_KEY = @"nn6res38igpo4ec";
 - (void)restClient:(ZPDBRestClient*)client loadProgress:(CGFloat)progress forFile:(NSString*)destPath{
 
     ZPZoteroAttachment* attachment = client.attachment;
-    if(!([attachment.linkMode intValue] == LINK_MODE_IMPORTED_URL && (
+    if(!(attachment.linkMode == LINK_MODE_IMPORTED_URL && (
                                                                       [attachment.contentType isEqualToString:@"text/html"] ||
                                                                       [attachment.contentType isEqualToString:@"application/xhtml+xml"]))){ 
         @synchronized(progressViewsByRequest){
@@ -662,7 +662,7 @@ static const NSString* DROPBOX_KEY = @"nn6res38igpo4ec";
     ZPZoteroAttachment* attachment = client.attachment;
     
     //If this is a webpage snapshot
-    if([attachment.linkMode intValue] == LINK_MODE_IMPORTED_URL && (
+    if(attachment.linkMode == LINK_MODE_IMPORTED_URL && (
                                                                     [attachment.contentType isEqualToString:@"text/html"] ||
                                                                     [attachment.contentType isEqualToString:@"application/xhtml+xml"])){
         
@@ -685,7 +685,7 @@ static const NSString* DROPBOX_KEY = @"nn6res38igpo4ec";
             //All done
 
 
-            NSString* zipFilePath = [NSTemporaryDirectory() stringByAppendingPathComponent:[NSString stringWithFormat:@"ZP%@%i",attachment.key,[[NSDate date] timeIntervalSince1970]*1000000]];
+            NSString* zipFilePath = [NSTemporaryDirectory() stringByAppendingPathComponent:[NSString stringWithFormat:@"ZP%@%f",attachment.key,[[NSDate date] timeIntervalSince1970]*1000000]];
             
             ZipArchive* zipArchive = [[ZipArchive alloc] init];
 
@@ -759,7 +759,7 @@ static const NSString* DROPBOX_KEY = @"nn6res38igpo4ec";
     }
 
 }
-- (void)restClient:(DBRestClient*)client uploadFileFailedWithError:(NSError*)error{
+- (void)restClient:(ZPDBRestClient*)client uploadFileFailedWithError:(NSError*)error{
     DDLogVerbose(@"There was an error uploading the file - %@", error);
     
     [self _restClient:client processError:error];

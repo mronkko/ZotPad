@@ -38,15 +38,15 @@
 
 // Methods to get data from the server
 -(NSArray*) retrieveLibrariesFromServer;
--(NSArray*) retrieveCollectionsForLibraryFromServer:(NSNumber*)libraryID;
+-(NSArray*) retrieveCollectionsForLibraryFromServer:(NSInteger)libraryID;
 
--(NSArray*) retrieveItemsFromLibrary:(NSNumber*)libraryID itemKeys:(NSArray*)keys;
+-(NSArray*) retrieveItemsFromLibrary:(NSInteger)libraryID itemKeys:(NSArray*)keys;
 
--(NSArray*) retrieveKeysInContainer:(NSNumber*)libraryID collectionKey:(NSString*)key;
--(NSArray*) retrieveKeysInContainer:(NSNumber*)libraryID collectionKey:(NSString*)collectionKey searchString:(NSString*)searchString orderField:(NSString*)orderField sortDescending:(BOOL)sortDescending;
+-(NSArray*) retrieveKeysInContainer:(NSInteger)libraryID collectionKey:(NSString*)key;
+-(NSArray*) retrieveKeysInContainer:(NSInteger)libraryID collectionKey:(NSString*)collectionKey searchString:(NSString*)searchString orderField:(NSString*)orderField sortDescending:(BOOL)sortDescending;
     
--(NSString*) retrieveTimestampForContainer:(NSNumber*)libraryID collectionKey:(NSString*)key;
--(NSArray*) retrieveAllItemKeysFromLibrary:(NSNumber*)libraryID;
+-(NSString*) retrieveTimestampForContainer:(NSInteger)libraryID collectionKey:(NSString*)key;
+-(NSArray*) retrieveAllItemKeysFromLibrary:(NSInteger)libraryID;
 
 //This retrieves single item details and notes and attachments associated with that item
 -(ZPZoteroItem*) retrieveSingleItemDetailsFromServer:(ZPZoteroItem*)item;

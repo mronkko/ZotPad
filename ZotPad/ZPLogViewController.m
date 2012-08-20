@@ -101,7 +101,7 @@
 #endif
 
 -(IBAction)manageKey:(id)sender{
-    [[UIApplication sharedApplication] openURL:[NSURL URLWithString:[@"https://www.zotero.org/settings/keys/edit/" stringByAppendingFormat:[[ZPPreferences instance] OAuthKey]]]];
+    [[UIApplication sharedApplication] openURL:[NSURL URLWithString:[@"https://www.zotero.org/settings/keys/edit/" stringByAppendingString:[[ZPPreferences instance] OAuthKey]]]];
 }
 
 -(IBAction)emailSupport:(id)sender{

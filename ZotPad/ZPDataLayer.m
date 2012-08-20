@@ -83,16 +83,16 @@ static ZPDataLayer* _instance = nil;
  
  */
 
-- (NSArray*) collectionsForLibrary : (NSNumber*)currentlibraryID withParentCollection:(NSString*)currentcollectionKey {
+- (NSArray*) collectionsForLibrary : (NSInteger)currentlibraryID withParentCollection:(NSString*)currentcollectionKey {
 
-    [[ZPCacheController instance] performSelectorInBackground:@selector(updateCollectionsForLibraryFromServer:) withObject:[ZPZoteroLibrary dataObjectWithKey:currentlibraryID]];
+    [[ZPCacheController instance] performSelectorInBackground:@selector(updateCollectionsForLibraryFromServer:) withObject:[ZPZoteroLibrary libraryWithID:currentlibraryID]];
     return [[ZPDatabase instance] collectionsForLibrary:currentlibraryID withParentCollection:currentcollectionKey];
 
 }
 
 
 
-- (NSArray*) getItemKeysFromCacheForLibrary:(NSNumber*)libraryID collection:(NSString*)collectionKey searchString:(NSString*)searchString orderField:(NSString*)orderField sortDescending:(BOOL)sortDescending{
+- (NSArray*) getItemKeysFromCacheForLibrary:(NSInteger)libraryID collection:(NSString*)collectionKey searchString:(NSString*)searchString orderField:(NSString*)orderField sortDescending:(BOOL)sortDescending{
     
     [[ZPCacheController instance] setActiveLibrary:libraryID collection:collectionKey];
     
@@ -124,7 +124,7 @@ static ZPDataLayer* _instance = nil;
         if([item respondsToSelector:@selector(parentItemKey)]){
             NSString* parentKey = (NSString*)[item performSelector:@selector(parentItemKey)];
             if(![parentKey isEqualToString:item.key]){
-                ZPZoteroItem* parentItem = (ZPZoteroItem*) [ZPZoteroItem dataObjectWithKey:parentKey];
+                ZPZoteroItem* parentItem = (ZPZoteroItem*) [ZPZoteroItem itemWithKey:parentKey];
                 
                 //For now notify about Attachments only
                 if([item isKindOfClass:[ZPZoteroAttachment class]] && ! [itemsToBeNotifiedAbout containsObject:parentItem]){

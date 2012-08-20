@@ -60,9 +60,9 @@ NSInteger const ZPATTACHMENTICONGVIEWCONTROLLER_TAG_TITLELABEL = -5;
 @synthesize selectedIndex=_selectedIndex;
 
 -(id) init{
-    _progressViews = [[NSMutableSet alloc] init];
-    
     self = [super init];
+
+    _progressViews = [[NSMutableSet alloc] init];
 
     //Register self as observer for item downloads
     [[ZPDataLayer instance] registerAttachmentObserver:self];
@@ -282,8 +282,8 @@ NSInteger const ZPATTACHMENTICONGVIEWCONTROLLER_TAG_TITLELABEL = -5;
     //TODO: Cache rendered PDF images
 
     if([attachment.contentType isEqualToString:@"application/pdf"] && 
-        ([attachment.linkMode intValue] == LINK_MODE_IMPORTED_FILE ||
-         [attachment.linkMode intValue] == LINK_MODE_IMPORTED_URL)){
+        (attachment.linkMode == LINK_MODE_IMPORTED_FILE ||
+         attachment.linkMode == LINK_MODE_IMPORTED_URL)){
         
         NSString* path;
         if([self _showForAttachment:attachment] == ZPATTACHMENTICONGVIEWCONTROLLER_SHOW_ORIGINAL){
@@ -322,7 +322,7 @@ NSInteger const ZPATTACHMENTICONGVIEWCONTROLLER_TAG_TITLELABEL = -5;
             
             //Imported files and URLs have files that can be downloaded
             
-            NSInteger linkMode = [attachment.linkMode intValue ];
+            NSInteger linkMode = attachment.linkMode;
             BOOL exists;
             if(thisShow == ZPATTACHMENTICONGVIEWCONTROLLER_SHOW_ORIGINAL){
                 exists = [attachment fileExists_original];
@@ -338,11 +338,10 @@ NSInteger const ZPATTACHMENTICONGVIEWCONTROLLER_TAG_TITLELABEL = -5;
                     //TODO: Check if already downloading.
                     
                     if ([[ZPPreferences instance] useDropbox]) label.text = @"Download from Dropbox";
-                    else if([[ZPPreferences instance] useWebDAV] && [attachment.libraryID intValue] == 1) label.text = @"Download from WebDAV";
-                    else if ([attachment.existsOnZoteroServer intValue]==1){
-                        if(attachment.attachmentSize!= NULL && attachment.attachmentSize != [NSNull null]){
-                            NSInteger size = [attachment.attachmentSize intValue];
-                            label.text =  [NSString stringWithFormat:@"Download from Zotero (%i KB)",size/1024];
+                    else if([[ZPPreferences instance] useWebDAV] && attachment.libraryID == 1) label.text = @"Download from WebDAV";
+                    else if (attachment.existsOnZoteroServer){
+                        if(attachment.attachmentSize!= 0){
+                            label.text =  [NSString stringWithFormat:@"Download from Zotero (%i KB)",attachment.attachmentSize/1024];
                         }
                         else{
                             label.text = @"Download from Zotero";
@@ -355,7 +354,7 @@ NSInteger const ZPATTACHMENTICONGVIEWCONTROLLER_TAG_TITLELABEL = -5;
             
             // Linked URL will be shown directly from web 
             
-            else if ([attachment.linkMode intValue] == LINK_MODE_LINKED_URL &&
+            else if (attachment.linkMode == LINK_MODE_LINKED_URL &&
                      !  [[ZPPreferences instance] online]){
                 label.text = @"Linked URL cannot be viewed in offline mode";
                 
@@ -363,7 +362,7 @@ NSInteger const ZPATTACHMENTICONGVIEWCONTROLLER_TAG_TITLELABEL = -5;
             
             //Linked files are available only on the computer where they were created
             
-            else if ([attachment.linkMode intValue] == LINK_MODE_LINKED_FILE) {
+            else if (attachment.linkMode == LINK_MODE_LINKED_FILE) {
                 label.text = @"Linked files cannot be viewed in ZotPad";
             }
             
@@ -419,11 +418,11 @@ NSInteger const ZPATTACHMENTICONGVIEWCONTROLLER_TAG_TITLELABEL = -5;
             
             [ZPPreviewController displayQuicklookWithAttachment:attachment source:self];
         }
-        else if([attachment.linkMode intValue] == LINK_MODE_LINKED_URL && [ZPServerConnection instance]){
+        else if(attachment.linkMode == LINK_MODE_LINKED_URL && [ZPServerConnection instance]){
             [[UIApplication sharedApplication] openURL:[NSURL URLWithString:attachment.url]];
         }
-        else if(self.mode == ZPATTACHMENTICONGVIEWCONTROLLER_MODE_DOWNLOAD && ( [attachment.linkMode intValue] == LINK_MODE_IMPORTED_FILE || 
-                [attachment.linkMode intValue] == LINK_MODE_IMPORTED_URL)){
+        else if(self.mode == ZPATTACHMENTICONGVIEWCONTROLLER_MODE_DOWNLOAD && ( attachment.linkMode == LINK_MODE_IMPORTED_FILE || 
+                attachment.linkMode == LINK_MODE_IMPORTED_URL)){
             
             ZPServerConnection* connection = [ZPServerConnection instance];
             
@@ -552,7 +551,7 @@ NSInteger const ZPATTACHMENTICONGVIEWCONTROLLER_TAG_TITLELABEL = -5;
     }
 }
 
--(void) _setLabelsForAttachment:(ZPZoteroAttachment*)attachment progressText:(NSString*)progressText errorText:(NSString*)errorText mode:(NSInteger)mode reconfigureIcon:(BOOL)reconfigureIcon{
+-(void) _setLabelsForAttachment:(ZPZoteroAttachment*)attachment progressText:(NSString*)progressText errorText:(NSString*)errorText mode:(NSInteger)aMode reconfigureIcon:(BOOL)reconfigureIcon{
     NSInteger index = [_attachments indexOfObject:attachment];    
     
     if(index!=NSNotFound){
@@ -582,17 +581,17 @@ NSInteger const ZPATTACHMENTICONGVIEWCONTROLLER_TAG_TITLELABEL = -5;
                 }
                 
                 UIProgressView* progressView = (UIProgressView*)[view viewWithTag:ZPATTACHMENTICONGVIEWCONTROLLER_TAG_PROGRESSVIEW];
-                if(mode == ZPATTACHMENTICONGVIEWCONTROLLER_MODE_STATIC){
+                if(aMode == ZPATTACHMENTICONGVIEWCONTROLLER_MODE_STATIC){
                     progressView.hidden = TRUE;
                     view.userInteractionEnabled = FALSE;
                 }
-                else if (mode==ZPATTACHMENTICONGVIEWCONTROLLER_MODE_UPLOAD){
+                else if (aMode==ZPATTACHMENTICONGVIEWCONTROLLER_MODE_UPLOAD){
                     progressView.hidden = FALSE;
                     progressView.progress = 0.0f;
                     [[ZPServerConnection instance] useProgressView:progressView forUploadingAttachment:attachment];
                     view.userInteractionEnabled = TRUE;
                 }
-                else if (mode==ZPATTACHMENTICONGVIEWCONTROLLER_MODE_DOWNLOAD){
+                else if (aMode==ZPATTACHMENTICONGVIEWCONTROLLER_MODE_DOWNLOAD){
                     progressView.hidden = FALSE;
                     progressView.progress = 0.0f;
                     [[ZPServerConnection instance] useProgressView:progressView forDownloadingAttachment:attachment];
@@ -659,7 +658,6 @@ NSInteger const ZPATTACHMENTICONGVIEWCONTROLLER_TAG_TITLELABEL = -5;
     UIView* temp = sourceView;
     
     while(temp != nil){
-        DDLogVerbose(@"Class %s , w: %f h: %f x: %f y: %f",class_getName([temp class]),temp.frame.size.width,temp.frame.size.height,temp.frame.origin.x,temp.frame.origin.y);
         temp = temp.superview;
     }
     
@@ -667,7 +665,6 @@ NSInteger const ZPATTACHMENTICONGVIEWCONTROLLER_TAG_TITLELABEL = -5;
     
     while(tempVC != nil){
         temp = tempVC.view;
-        DDLogVerbose(@"Class %s , w: %f h: %f x: %f y: %f",class_getName([tempVC class]),temp.frame.size.width,temp.frame.size.height,temp.frame.origin.x,temp.frame.origin.y);
         tempVC = tempVC.parentViewController;
     }
 

@@ -9,7 +9,6 @@
 #import <Foundation/Foundation.h>
 
 @interface ZPZoteroDataObject : NSObject{
-    NSInteger _numChildren;
 }
 
 // This is very useful for troubleshooting, but because of memory issues, is only used for debug builds
@@ -18,20 +17,17 @@
 #endif
 
 @property (retain) NSString* title;
-@property (retain) NSNumber* libraryID;
+@property (assign) NSInteger libraryID;
 @property (retain) NSString* key;
 @property (retain) NSString* dateAdded;
 
 // Important: This field stores the number of all items including items that are attachments to parent items. 
 
-@property (retain) NSNumber* numChildren;
+@property (assign) NSInteger numChildren;
 @property (assign, readonly) BOOL hasChildren;
 
 @property (retain) NSString* cacheTimestamp;
 @property (retain) NSString* serverTimestamp;
-
-+(ZPZoteroDataObject*) dataObjectWithKey:(NSObject*) key;
-+(ZPZoteroDataObject*) dataObjectWithDictionary:(NSDictionary*) fields;
 
 -(void) configureWithDictionary:(NSDictionary*) dictionary;
 -(BOOL) needsToBeWrittenToCache;

@@ -221,7 +221,7 @@ static ZPItemListViewDataSource* _instance;
 }
 
 
--(void) _performRowInsertions:(NSArray*)insertIndexPaths reloads:(NSArray*)reloadIndexPaths tableLength:(NSNumber*)tableLength{
+-(void) _performRowInsertions:(NSArray*)insertIndexPaths reloads:(NSArray*)reloadIndexPaths tableLength:(NSInteger)tableLength{
     //DDLogVerbose(@"Modifying the table. Inserts %i Reloads %i, Max length %@, Item key array length %i",[insertIndexPaths count],[reloadIndexPaths count],tableLength,[_itemKeysShown count]);
     //    [_tableView beginUpdates];
     //DDLogVerbose(@"Insert index paths %@",insertIndexPaths);
@@ -233,15 +233,15 @@ static ZPItemListViewDataSource* _instance;
         [_tableView reloadRowsAtIndexPaths:reloadIndexPaths withRowAnimation:_animations];   
     }
     
-    if([tableLength intValue]<[_itemKeysShown count]){
+    if(tableLength<[_itemKeysShown count]){
         NSMutableArray* deleteIndexPaths = [NSMutableArray array];
         
         NSInteger max = [_itemKeysShown count];
-        for(NSInteger i=[tableLength intValue];i<max;i++){
+        for(NSInteger i=tableLength;i<max;i++){
             [deleteIndexPaths addObject:[NSIndexPath indexPathForRow:i inSection:0]];
         }
         
-        _itemKeysShown = [_itemKeysShown subarrayWithRange:NSMakeRange(0,[tableLength intValue])];
+        _itemKeysShown = [_itemKeysShown subarrayWithRange:NSMakeRange(0,tableLength)];
         //DDLogVerbose(@"Delete index paths %@",deleteIndexPaths);
         //DDLogVerbose(@"Deletes %i",[deleteIndexPaths count]);
         
@@ -360,7 +360,7 @@ static ZPItemListViewDataSource* _instance;
         }    
             
         ZPZoteroItem* item=NULL;
-        if(![key isEqualToString:@""]) item = (ZPZoteroItem*) [ZPZoteroItem dataObjectWithKey:key];
+        if(![key isEqualToString:@""]) item = (ZPZoteroItem*) [ZPZoteroItem itemWithKey:key];
         
         if(item==NULL){
             cell = [aTableView dequeueReusableCellWithIdentifier:@"LoadingCell"]; 
@@ -383,15 +383,15 @@ static ZPItemListViewDataSource* _instance;
             
             //Show different things depending on what data we have
             if(item.creatorSummary!=NULL){
-                if(item.year != NULL){
-                    authorsLabel.text = [NSString stringWithFormat:@"%@ (%@)",item.creatorSummary,item.year];
+                if(item.year != 0){
+                    authorsLabel.text = [NSString stringWithFormat:@"%@ (%i)",item.creatorSummary,item.year];
                 }
                 else{
                     authorsLabel.text = [NSString stringWithFormat:@"%@",item.creatorSummary];
                 }
             }    
-            else if(item.year!= NULL){
-                authorsLabel.text = [NSString stringWithFormat:@"No author (%@)",item.year];
+            else if(item.year!= 0){
+                authorsLabel.text = [NSString stringWithFormat:@"No author (%i)",item.year];
             }
             
             //Publication as a formatted label
@@ -439,7 +439,7 @@ static ZPItemListViewDataSource* _instance;
                     [ZPAttachmentIconImageFactory renderFileTypeIconForAttachment:attachment intoImageView:articleThumbnail];
                     // Enable or disable depending whether file is available or not
                     
-                    if(attachment.fileExists || ([attachment.linkMode intValue] == LINK_MODE_LINKED_URL && [ZPServerConnection instance])){
+                    if(attachment.fileExists || (attachment.linkMode == LINK_MODE_LINKED_URL && [ZPServerConnection instance])){
                         articleThumbnail.alpha = 1;
                         articleThumbnail.userInteractionEnabled = TRUE;
                         
@@ -480,11 +480,11 @@ static ZPItemListViewDataSource* _instance;
     //Get the row of this cell
     NSInteger row = [_tableView indexPathForCell:cell].row;
     
-    ZPZoteroItem* item = (ZPZoteroItem*) [ZPZoteroItem dataObjectWithKey:[_itemKeysShown objectAtIndex:row]];
+    ZPZoteroItem* item = (ZPZoteroItem*) [ZPZoteroItem itemWithKey:[_itemKeysShown objectAtIndex:row]];
     
     ZPZoteroAttachment* attachment = [item.attachments objectAtIndex:0];
     
-    if([attachment.linkMode intValue] == LINK_MODE_LINKED_URL && [ZPServerConnection instance]){
+    if(attachment.linkMode == LINK_MODE_LINKED_URL && [ZPServerConnection instance]){
         [[UIApplication sharedApplication] openURL:[NSURL URLWithString:attachment.url]];
     }
     else{

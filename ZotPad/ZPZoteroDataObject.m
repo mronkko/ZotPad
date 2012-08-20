@@ -11,6 +11,7 @@
 @implementation ZPZoteroDataObject
 
 @synthesize key, title, libraryID, cacheTimestamp, serverTimestamp, dateAdded;
+@synthesize numChildren;
 
 // This is very useful for troubleshooting, but because of memory issues, is only used for debug builds
 #ifdef ZPDEBUG
@@ -23,13 +24,13 @@
  
  */
 
-+(ZPZoteroDataObject*) dataObjectWithKey:(NSObject*) key{
-    [NSException raise:@"Not implemented" format:@"Subclasses of ZPZoteroDataObject need to implement dataObjectWithKey method"];
++(ZPZoteroDataObject*) itemWithKey:(NSObject*) key{
+    [NSException raise:@"Not implemented" format:@"Subclasses of ZPZoteroDataObject need to implement itemWithKey method"];
     return nil;
 }
 
-+(ZPZoteroDataObject*) dataObjectWithDictionary:(NSDictionary*) fields{
-    [NSException raise:@"Not implemented" format:@"Subclasses of ZPZoteroDataObject need to implement dataObjectWithDictionary method"];
++(ZPZoteroDataObject*) itemWithDictionary:(NSDictionary*) fields{
+    [NSException raise:@"Not implemented" format:@"Subclasses of ZPZoteroDataObject need to implement itemWithDictionary method"];
     return nil;
 }
 
@@ -38,26 +39,12 @@
  */
 
 -(void) configureWithDictionary:(NSDictionary*) dictionary{
-    
-    
-    for(NSString* key in dictionary){
- 
-        //capitalize the first letter
-        NSString* setterString = [key stringByReplacingCharactersInRange:NSMakeRange(0,1)  
-                                                             withString:[[key substringToIndex:1] capitalizedString]];
-        
-        //Make a setter and use it if it exists
-        setterString = [[@"set" stringByAppendingString:setterString]stringByAppendingString: @":"];
-        if([self respondsToSelector:NSSelectorFromString(setterString)]){
-            NSObject* value=[dictionary objectForKey:key];
-            [self performSelector:NSSelectorFromString(setterString) withObject:value];
-        }
-    }
+    [self setValuesForKeysWithDictionary:dictionary];
 }
 
 - (BOOL)isEqual:(id)anObject{
     if([anObject isKindOfClass:[self class]]){
-        if(self.key == nil) return [self.libraryID isEqual:[(ZPZoteroDataObject*) anObject libraryID]];
+        if(self.key == nil) return self.libraryID == [(ZPZoteroDataObject*) anObject libraryID];
         else return [self.key isEqualToString:[(ZPZoteroDataObject*) anObject key]];
     }
     else return FALSE;
@@ -70,14 +57,17 @@
     return write;
 }
 -(BOOL) hasChildren{
-    return _numChildren>0;
+    return self.numChildren >0;
 }
 
--(NSNumber*) numChildren{
-    return [NSNumber numberWithInt: _numChildren];
-}
--(void) setNumChildren:(NSNumber*) numChildren {
-    _numChildren = [numChildren intValue];
+/*
+ 
+ Ignore undefined keys
+ 
+ */
+
+- (void)setValue:(id)value forUndefinedKey:(NSString *)key{
+    NSLog(@"Cannot set %@ to %@",key,value);
 }
 
 @end

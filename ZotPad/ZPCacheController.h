@@ -40,18 +40,18 @@
 
 // These methods tell the cache that the user is currently viewing something
 //-(void) setCurrentCollection:(NSString*) collectionKey;
-//-(void) setCurrentLibrary:(NSNumber*) libraryID;
+//-(void) setCurrentLibrary:(NSInteger) libraryID;
 //-(void) setCurrentItem:(NSString*) itemKey;
 -(void) updateLibrariesAndCollectionsFromServer;
 -(void) updateCollectionsForLibraryFromServer:(ZPZoteroLibrary*) libraryID;
 -(void) purgeAllAttachmentFilesFromCache;
 
 -(void) refreshActiveItem:(ZPZoteroItem*) item;
--(void) setActiveLibrary:(NSNumber*)libraryID collection:(NSString*)collectionKey;
+-(void) setActiveLibrary:(NSInteger)libraryID collection:(NSString*)collectionKey;
 
 -(void) addToLibrariesQueue:(ZPZoteroLibrary*)object priority:(BOOL)priority;
 -(void) addToCollectionsQueue:(ZPZoteroCollection*)object priority:(BOOL)priority;
--(void) addToItemQueue:(NSArray*)items libraryID:(NSNumber*)libraryID priority:(BOOL)priority;
+-(void) addToItemQueue:(NSArray*)items libraryID:(NSInteger)libraryID priority:(BOOL)priority;
 -(void) addAttachmentToUploadQueue:(ZPZoteroAttachment*) attachment withNewFile:(NSURL*)urlToFile; 
 -(void) addAttachmentToDowloadQueue:(ZPZoteroAttachment *)attachment;
 

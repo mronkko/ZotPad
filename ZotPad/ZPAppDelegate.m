@@ -26,8 +26,8 @@
 
 
 @interface ZPFileLogFormatter : NSObject <DDLogFormatter>{
-    NSInteger level;
-    NSDateFormatter* dateFormatter;
+    NSInteger _level;
+    NSDateFormatter* _dateFormatter;
 }
 
 @end
@@ -36,19 +36,19 @@
 
 - (id) initWithLevel:(NSInteger) level{
     self = [super init];
-    self->level = level;
+    _level = level;
     
-    dateFormatter = [[NSDateFormatter alloc] init];
-    [dateFormatter setDateFormat:@"dd-MM-yyyy HH:mm:ss"];
+    _dateFormatter = [[NSDateFormatter alloc] init];
+    [_dateFormatter setDateFormat:@"dd-MM-yyyy HH:mm:ss"];
     
     return self;
 }
 
 - (NSString *)formatLogMessage:(DDLogMessage *)logMessage{
     
-    if((logMessage->logFlag & self->level) != logMessage->logFlag) return NULL;
+    if((logMessage->logFlag & _level) != logMessage->logFlag) return NULL;
 
-    NSString* dateString = [dateFormatter stringFromDate:[NSDate date]];
+    NSString* dateString = [_dateFormatter stringFromDate:[NSDate date]];
 
     if((logMessage->logFlag & LOG_LEVEL_ERROR) == logMessage->logFlag){
         return [NSString stringWithFormat:@"%@ ERROR: %@",dateString, logMessage->logMsg];
@@ -79,8 +79,13 @@ didFinishLaunchingWithOptions:(NSDictionary *)launchOptions
 
 #ifdef ZPDEBUG
 
+    //We know that this is deprecated, so suppress warnings
+#pragma clang diagnostic push
+#pragma clang diagnostic ignored "-Wdeprecated-declarations"
     [TestFlight setDeviceIdentifier:[[UIDevice currentDevice] uniqueIdentifier]];
+#pragma clang diagnostic pop
     
+        
     [TestFlight takeOff:@"5e753f234f33fc2bddf4437600037fbf_NjcyMjEyMDEyLTA0LTA5IDE0OjUyOjU0LjE4MDQwMg"];
 
     // This causes crashes, but provides useful debug info

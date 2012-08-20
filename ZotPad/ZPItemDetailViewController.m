@@ -39,7 +39,7 @@
 - (void) _reconfigureDetailTableView:(BOOL)animated;
 - (NSString*) _textAtIndexPath:(NSIndexPath*)indexPath isTitle:(BOOL)isTitle;
 - (BOOL) _useAbstractCell:(NSIndexPath*)indexPath;
--(CGRect) _getDimensionsWithImage:(UIImage*) image; 
+//-(CGRect) _getDimensionsWithImage:(UIImage*) image;
 -(NSInteger) _textWidth;
 
 @end
@@ -336,7 +336,7 @@
         if(isTitle) returnString =  [ZPLocalization getLocalizationStringWithKey:[creator objectForKey:@"creatorType"] type:@"creatorType" ];
         else{
             NSString* lastName = [creator objectForKey:@"lastName"];
-            if(lastName==NULL || lastName==[NSNull null] || [lastName isEqualToString:@""]){
+            if(lastName==NULL || [lastName isEqualToString:@""]){
                 returnString =  [creator objectForKey:@"shortName"];
             }
             else{
@@ -366,7 +366,7 @@
     }
     
     //Validity checks
-    if(returnString == NULL || returnString == [NSNull null]){
+    if(returnString == NULL){
         DDLogError(@"Item %@ had an empty string (%@) as field %@ in section %i, row %i of the item details table.",_currentItem.key,
                    returnString==NULL ? @"nil" : @"NSNull",
                    isTitle ? @"title" : @"value",
@@ -452,7 +452,7 @@
             NSString* currentItemKey = [itemArray objectAtIndex: indexPath.row]; 
             
             if((NSObject*)currentItemKey != [NSNull null]){
-                _currentItem = (ZPZoteroItem*) [ZPZoteroItem dataObjectWithKey:currentItemKey];
+                _currentItem = (ZPZoteroItem*) [ZPZoteroItem itemWithKey:currentItemKey];
                 [self configure];
             }
             

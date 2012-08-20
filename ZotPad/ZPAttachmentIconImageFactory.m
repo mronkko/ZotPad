@@ -63,10 +63,10 @@ static ZPAttachmentIconImageFactory* _webViewDelegate;
     
     NSString* emblem = @"";
     BOOL useEmblem=FALSE;
-    if([attachment.linkMode intValue] == LINK_MODE_LINKED_URL){
+    if(attachment.linkMode == LINK_MODE_LINKED_URL){
         emblem =@"emblem-symbolic-link";
         useEmblem = TRUE;
-    }else if( [attachment.linkMode intValue] == LINK_MODE_LINKED_FILE){
+    }else if( attachment.linkMode == LINK_MODE_LINKED_FILE){
         emblem =@"emblem-locked";
         useEmblem = TRUE;
     }
@@ -96,7 +96,7 @@ static ZPAttachmentIconImageFactory* _webViewDelegate;
     
     //    DDLogVerbose(@"Getting icon for %@",cacheKey);
     
-    UIImage* cacheImage = NULL;
+    NSObject* cacheImage = NULL;
     BOOL render = false;
     @synchronized(_fileIconCache){
         cacheImage = [_fileIconCache objectForKey:cacheKey];
@@ -114,9 +114,7 @@ static ZPAttachmentIconImageFactory* _webViewDelegate;
             UIView* renderingView = [_viewsThatAreRendering objectForKey:cacheKey];
             //If the previous rendering view is no longer on screen
             if(renderingView != NULL && !(renderingView.superview)){
-                DDLogVerbose(@"Previously rendering view %i is no longer on screen %@ (super: %i window %i)",renderingView, cacheKey, renderingView.superview, renderingView.window);
-                
-                render = TRUE;   
+                render = TRUE;
             }
         }
     }
@@ -155,9 +153,7 @@ static ZPAttachmentIconImageFactory* _webViewDelegate;
                     DDLogError(@"Caught exception when rendering icon %@ %@: %@",cacheKey, [exception name], [exception reason]);
                 }
                 
-                if(webview != nil){
-                    DDLogVerbose(@"Start rendering cached image %@ with view %i",cacheKey,webview);
-                    
+                if(webview != nil){                    
                     if([[NSFileManager defaultManager] fileExistsAtPath:[[[NSBundle mainBundle] resourcePath]
                                                                          stringByAppendingPathComponent:[mimeType stringByAppendingString:@".svgz"]]]){
                         
@@ -195,6 +191,12 @@ static ZPAttachmentIconImageFactory* _webViewDelegate;
                             [_viewsThatAreRendering setObject:webview forKey:cacheKey];
                         }
                     }
+                    //We do not have a file type icon for this.
+                    else{
+                        if([[ZPPreferences instance] reportErrors]){
+                            [TestFlight passCheckpoint:[NSString stringWithFormat:@"Unknown mime type %@",mimeType]];
+                        }
+                    }
          
                 }
             }
@@ -222,7 +224,7 @@ static ZPAttachmentIconImageFactory* _webViewDelegate;
     else{
         //        DDLogVerbose(@"Using cached image %@",cacheKey);
          DDLogVerbose(@"Using cached image %@ for view %@",cacheKey,fileImage);
-        fileImage.image = cacheImage;
+        fileImage.image = (UIImage*) cacheImage;
     }
 }
 
@@ -242,7 +244,7 @@ static ZPAttachmentIconImageFactory* _webViewDelegate;
     
     int uncompressedLength;
     
-    while (uncompressedLength = gzread(file, buffer, CHUNK) ) {
+    while ((uncompressedLength = gzread(file, buffer, CHUNK)) ) {
         // got data out of our file
         if(fwrite(buffer, 1, uncompressedLength, dest) != uncompressedLength || ferror(dest)) {
             DDLogVerbose(@"error writing data");
@@ -273,8 +275,6 @@ static ZPAttachmentIconImageFactory* _webViewDelegate;
     
     //If the view is still visible, capture the content
     if (webview.window && webview.superview) {
-        
-        DDLogVerbose(@"Capturing cached image %@ from view %i",cacheKey,webview);
         
         CGSize size = webview.bounds.size;
         
@@ -316,7 +316,6 @@ static ZPAttachmentIconImageFactory* _webViewDelegate;
         
         if([UIImagePNGRepresentation(blankImage) isEqualToData:imageData]){
             @synchronized(_fileIconCache){
-                DDLogVerbose(@"View %i produced a blank image for image %@, retrying",webview, cacheKey);
 
                 dispatch_after(dispatch_time(DISPATCH_TIME_NOW, NSEC_PER_SEC*0.5),
                                dispatch_get_current_queue(), ^{
@@ -343,8 +342,6 @@ static ZPAttachmentIconImageFactory* _webViewDelegate;
                 if([imageData isEqualToData:[NSData dataWithContentsOfFile:[ cachePath stringByAppendingPathComponent:[[cacheKey substringFromIndex:emblemRange.location] stringByAppendingString:@".png"]]]] ||
                    [imageData isEqualToData:[NSData dataWithContentsOfFile:[ cachePath stringByAppendingPathComponent:[[cacheKey stringByReplacingCharactersInRange:emblemRange withString:@""] stringByAppendingString:@".png"]]]]){
 
-                    DDLogVerbose(@"View %i produced a partial image (emblem or mime type missing) image %@, retrying",webview, cacheKey);
-                    
                     dispatch_after(dispatch_time(DISPATCH_TIME_NOW, NSEC_PER_SEC*0.5),
                                    dispatch_get_current_queue(), ^{
                                        [self _captureWebViewContent:webview forCacheKey:cacheKey];
@@ -380,8 +377,6 @@ static ZPAttachmentIconImageFactory* _webViewDelegate;
     else{
         @synchronized(_fileIconCache){
             
-            DDLogVerbose(@"View %i no longer visible. Clearing cahce for image %@",webview, cacheKey);
-            
             [_fileIconCache removeObjectForKey:cacheKey];
         }
         
@@ -396,7 +391,6 @@ static ZPAttachmentIconImageFactory* _webViewDelegate;
 
 +(void) _showPDFPreview:(UIImage*) image inImageView:(UIImageView*) imageView{
     
-    DDLogVerbose(@"Setting PDF preview to imageView %@",imageView);
     CGRect frame = [self getDimensionsForImageView:imageView.superview withImage:image];
     imageView.frame = frame;
     imageView.center = imageView.superview.center;
@@ -412,7 +406,7 @@ static ZPAttachmentIconImageFactory* _webViewDelegate;
     
 }
 
-+(CGRect) getDimensionsForImageView:(UIImageView*) imageView withImage:(UIImage*) image{   
++(CGRect) getDimensionsForImageView:(UIView*) imageView withImage:(UIImage*) image{   
     
     float scalingFactor = MIN(imageView.frame.size.height/image.size.height,imageView.frame.size.width/image.size.width);
     

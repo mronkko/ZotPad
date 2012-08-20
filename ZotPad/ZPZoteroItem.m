@@ -1,4 +1,4 @@
-//
+s//
 //  ZPZoteroItem.m
 //  ZotPad
 //
@@ -12,7 +12,6 @@
 @implementation ZPZoteroItem
 
 @synthesize fullCitation, numTags,dateAdded,etag,jsonFromServer;
-@synthesize attachments = _attachments;
 
 //TODO: Consider what happens when the cache is purged. This may result in duplicate objects with the same key.
 
@@ -32,7 +31,7 @@ static NSCache* _objectCache = NULL;
     return self;
 }
 
-+(id) dataObjectWithDictionary:(NSDictionary *)fields{
++(ZPZoteroItem*) itemWithDictionary:(NSDictionary *)fields{
     
     NSString* key = [fields objectForKey:@"itemKey"];
     
@@ -70,7 +69,7 @@ static NSCache* _objectCache = NULL;
     return obj;
 }
 
-+(id) dataObjectWithKey:(NSObject*) key{
++(ZPZoteroItem*) itemWithKey:(NSObject*) key{
     
     if(key == NULL || [key isEqual:@""])
         [NSException raise:@"Key is empty" format:@"ZPZoteroItem cannot be instantiated with empty key"];
@@ -85,7 +84,7 @@ static NSCache* _objectCache = NULL;
 
         NSDictionary* attributes = [[ZPDatabase instance] attributesForItemWithKey:(NSString*)key];
         
-        obj = (ZPZoteroItem*) [self dataObjectWithDictionary:attributes];
+        obj = [self itemWithDictionary:attributes];
     }
 
 
@@ -123,8 +122,8 @@ static NSCache* _objectCache = NULL;
         NSRegularExpression* regex = [NSRegularExpression regularExpressionWithPattern:@"[^a-z0-9]"
                                                                                options:NSRegularExpressionCaseInsensitive
                                                                                  error:NULL];
-        NSString* tempFull = [regex stringByReplacingMatchesInString:self.fullCitation options:NULL range:NSMakeRange(0, [self.fullCitation length]) withTemplate:@" "];
-        NSString* tempTitle = [regex stringByReplacingMatchesInString:title options:NULL range:NSMakeRange(0, [title length]) withTemplate:@" "];
+        NSString* tempFull = [regex stringByReplacingMatchesInString:self.fullCitation options:NSRegularExpressionCaseInsensitive range:NSMakeRange(0, [self.fullCitation length]) withTemplate:@" "];
+        NSString* tempTitle = [regex stringByReplacingMatchesInString:title options:NSRegularExpressionCaseInsensitive range:NSMakeRange(0, [title length]) withTemplate:@" "];
         range = [tempFull rangeOfString:tempTitle];
     }
     
@@ -161,19 +160,19 @@ static NSCache* _objectCache = NULL;
         
 }
 
--(NSNumber*) year{
+-(NSInteger) year{
     NSString* value = [[self fields] objectForKey:@"date"];
-    
-    if(value == NULL) return NULL;
     
     NSRange r;
     NSString *regEx = @"[0-9]{4}";
     r = [value rangeOfString:regEx options:NSRegularExpressionSearch];
     
     if (r.location != NSNotFound) {
-        return [NSNumber numberWithInteger:[[value substringWithRange:r] integerValue]];
-    } else {
-    }   return NULL; 
+        return [[value substringWithRange:r] integerValue];
+    }
+    else {
+       return 0;
+    }
 }
 
 
@@ -204,6 +203,10 @@ static NSCache* _objectCache = NULL;
     return _attachments;
 }
 
+-(void) setAttachments:(NSArray *)attachments{
+    _attachments = attachments;
+}
+
 - (NSDictionary*) fields{
     if(_fields == NULL){
         [[ZPDatabase instance] addFieldsToItem:self];
@@ -223,15 +226,9 @@ static NSCache* _objectCache = NULL;
         if(![value isEqual:@""]){
             [newFields setObject:value forKey:key];
             
-            //If there is a setter for this field, set it.
             
-            NSString* setterString = [key stringByReplacingCharactersInRange:NSMakeRange(0,1)  
-                                                                 withString:[[key substringToIndex:1] capitalizedString]];
-            
-            //Make a setter and use it if it exists
-            setterString = [[@"set" stringByAppendingString:setterString]stringByAppendingString: @":"];
-            if([self respondsToSelector:NSSelectorFromString(setterString)]){
-                [self performSelector:NSSelectorFromString(setterString) withObject:value];
+            if([self respondsToSelector:NSSelectorFromString(key)]){
+                [self setValue:value forKey:key];
             }
 
         }
@@ -265,12 +262,16 @@ static NSCache* _objectCache = NULL;
     return [self key];
 }
 
+-(void) setItemKey:(NSString*)key{
+    [super setKey:key];
+}
+
 
 - (NSString*) shortCitation{
 
     if(self.creatorSummary!=NULL && ! [self.creatorSummary isEqualToString:@""]){
         if(self.year!=0){
-            return [NSString stringWithFormat:@"%@ (%@) %@",self.creatorSummary,self.year,self.title];
+            return [NSString stringWithFormat:@"%@ (%i) %@",self.creatorSummary,self.year,self.title];
         }
         else{
             return [NSString stringWithFormat:@"%@ (no date) %@",self.creatorSummary,self.title];;

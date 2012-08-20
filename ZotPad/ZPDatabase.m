@@ -72,6 +72,9 @@ static ZPDatabase* _instance = nil;
     if(! [[NSFileManager defaultManager] fileExistsAtPath:dbPath]) [self resetDatabase];
     else{
         _database = [FMDatabase databaseWithPath:dbPath];
+#ifdef BETA
+        _database.crashOnErrors = TRUE;
+#endif
         [_database open];
     }
 
@@ -171,8 +174,10 @@ static ZPDatabase* _instance = nil;
         }
         
         _database = [FMDatabase databaseWithPath:dbPath];
-        
-        [_database open];  
+#ifdef BETA
+        _database.crashOnErrors = TRUE;
+#endif
+        [_database open];
         //Prevent backing up of DB
         const char* filePath = [dbPath fileSystemRepresentation];
         const char* attrName = "com.apple.MobileBackup";
@@ -360,7 +365,7 @@ static ZPDatabase* _instance = nil;
     NSArray* primaryKeyFieldNames = [self dbPrimaryKeyNamesForTable:table];
 
     if([primaryKeyFieldNames count] > 1 && checkTimestamp){
-        [NSException raise:@"Unsupported" format:@"Checkign timestamp is not supported for writing opbjects with multicolumn primary keys"];
+        [NSException raise:@"Unsupported" format:@"Checking timestamp is not supported for writing opbjects with multicolumn primary keys"];
     }
 
     //Because it is possible that the same item is received multiple times, it is important to use synchronized for almost the entire function to avoid inserting the same object twice
@@ -561,8 +566,7 @@ static ZPDatabase* _instance = nil;
             else [returnArray addObject:[NSNull null]];
         }
         else{
-            SEL selector = NSSelectorFromString(fieldName);
-            NSObject* value = [object performSelector:selector];
+            NSObject* value = [object valueForKey:fieldName];
             if(value!=NULL) [returnArray addObject:value];
             else [returnArray addObject:[NSNull null]];
         }
@@ -586,7 +590,7 @@ static ZPDatabase* _instance = nil;
     NSMutableArray* keys= [[NSMutableArray alloc] init];
     
     for(ZPZoteroLibrary* library in libraries){
-        [keys addObject:library.libraryID];
+        [keys addObject:[NSNumber numberWithInt:library.libraryID]];
     }
     
     @synchronized(self){
@@ -602,9 +606,9 @@ static ZPDatabase* _instance = nil;
 }
 
 
-- (void) setUpdatedTimestampForLibrary:(NSNumber*)libraryID toValue:(NSString*)updatedTimestamp{
+- (void) setUpdatedTimestampForLibrary:(NSInteger)libraryID toValue:(NSString*)updatedTimestamp{
     @synchronized(self){
-        [_database executeUpdate:@"UPDATE libraries SET cacheTimestamp = ? WHERE libraryID = ?",updatedTimestamp,libraryID];
+        [_database executeUpdate:@"UPDATE libraries SET cacheTimestamp = ? WHERE libraryID = ?",updatedTimestamp,[NSNumber numberWithInt:libraryID]];
     }
 }
 
@@ -623,7 +627,7 @@ static ZPDatabase* _instance = nil;
         FMResultSet* resultSet = [_database executeQuery:@"SELECT *, (SELECT count(*) FROM collections WHERE libraryID=libraries.libraryID AND parentCollectionKey IS NULL) AS numChildren FROM libraries ORDER BY libraryID <> 1 ,LOWER(title)"];
         
         while([resultSet next]) {
-            [returnArray addObject:[ZPZoteroLibrary dataObjectWithDictionary:[resultSet resultDict]]];
+            [returnArray addObject:[ZPZoteroLibrary libraryWithDictionary:[resultSet resultDictionary]]];
         }
         [resultSet close];
     }
@@ -637,10 +641,10 @@ static ZPDatabase* _instance = nil;
 - (void) addAttributesToGroupLibrary:(ZPZoteroLibrary*) library{
     @synchronized(self){
         
-        FMResultSet* resultSet = [_database executeQuery:@"SELECT *, (SELECT count(*) FROM collections WHERE libraryID=libraryID AND parentCollectionKey IS NULL) AS numChildren FROM libraries WHERE libraryID = ?  LIMIT 1",library.libraryID];
+        FMResultSet* resultSet = [_database executeQuery:@"SELECT *, (SELECT count(*) FROM collections WHERE libraryID=libraryID AND parentCollectionKey IS NULL) AS numChildren FROM libraries WHERE libraryID = ? LIMIT 1",[NSNumber numberWithInt:library.libraryID]];
         
         if([resultSet next]){
-            [library configureWithDictionary:[resultSet resultDict]];
+            [library configureWithDictionary:[resultSet resultDictionary]];
         }
         [resultSet close];
         
@@ -675,7 +679,7 @@ static ZPDatabase* _instance = nil;
     // Delete collections that no longer exist
 
     @synchronized(self){
-        [_database executeUpdate:[NSString stringWithFormat:@"DELETE FROM collections WHERE collectionKey NOT IN ('%@') and libraryID = ?",[keys componentsJoinedByString:@"', '"]],library.libraryID];
+        [_database executeUpdate:[NSString stringWithFormat:@"DELETE FROM collections WHERE collectionKey NOT IN ('%@') and libraryID = ?",[keys componentsJoinedByString:@"', '"]],[NSNumber numberWithInt:library.libraryID]];
     }
 
     //Because parents come before children from the Zotero server, none of the collections in the in-memory cache will be flagged as having children.
@@ -710,7 +714,7 @@ static ZPDatabase* _instance = nil;
  
  */
 
-- (NSArray*) collectionsForLibrary : (NSNumber*)libraryID withParentCollection:(NSString*)collectionKey {
+- (NSArray*) collectionsForLibrary : (NSInteger)libraryID withParentCollection:(NSString*)collectionKey {
     
     NSMutableArray* returnArray = [[NSMutableArray alloc] init];
     
@@ -718,14 +722,14 @@ static ZPDatabase* _instance = nil;
         
         FMResultSet* resultSet;
         if(collectionKey == NULL)
-            resultSet= [_database executeQuery:@"SELECT *, (SELECT count(*) FROM collections WHERE parentCollectionKey = parent.collectionKey) AS numChildren FROM collections parent WHERE libraryID=? AND parentCollectionKey IS NULL ORDER BY LOWER(title)",libraryID];
+            resultSet= [_database executeQuery:@"SELECT *, (SELECT count(*) FROM collections WHERE parentCollectionKey = parent.collectionKey) AS numChildren FROM collections parent WHERE libraryID=? AND parentCollectionKey IS NULL ORDER BY LOWER(title)",[NSNumber numberWithInt:libraryID]];
         
         else
-            resultSet= [_database executeQuery:@"SELECT *, (SELECT count(*) FROM collections WHERE parentCollectionKey = parent.collectionKey) AS numChildren FROM collections parent WHERE libraryID=? AND parentCollectionKey = ? ORDER BY LOWER(title)",libraryID,collectionKey];
+            resultSet= [_database executeQuery:@"SELECT *, (SELECT count(*) FROM collections WHERE parentCollectionKey = parent.collectionKey) AS numChildren FROM collections parent WHERE libraryID=? AND parentCollectionKey = ? ORDER BY LOWER(title)",[NSNumber numberWithInt:libraryID],collectionKey];
         
         while([resultSet next]) {
-            NSDictionary* dict = [resultSet resultDict];
-            [returnArray addObject:[ZPZoteroCollection dataObjectWithDictionary:dict]];
+            NSDictionary* dict = [resultSet resultDictionary];
+            [returnArray addObject:[ZPZoteroCollection collectionWithDictionary:dict]];
             
         }
         [resultSet close];
@@ -734,16 +738,16 @@ static ZPDatabase* _instance = nil;
 	return returnArray;
 }
 
-- (NSArray*) collectionsForLibrary : (NSNumber*)libraryID{
+- (NSArray*) collectionsForLibrary : (NSInteger)libraryID{
     NSMutableArray* returnArray = [[NSMutableArray alloc] init];
     
 	@synchronized(self){
         
         FMResultSet* resultSet;
-        resultSet= [_database executeQuery:@"SELECT *, (SELECT count(*) FROM collections WHERE parentCollectionKey = parent.collectionKey) AS numChildren FROM collections parent WHERE libraryID=?",libraryID];
+        resultSet= [_database executeQuery:@"SELECT *, (SELECT count(*) FROM collections WHERE parentCollectionKey = parent.collectionKey) AS numChildren FROM collections parent WHERE libraryID=?",[NSNumber numberWithInt:libraryID]];
            
         while([resultSet next]) {
-            [returnArray addObject:[ZPZoteroCollection dataObjectWithDictionary:[resultSet resultDict]]];
+            [returnArray addObject:[ZPZoteroCollection collectionWithDictionary:[resultSet resultDictionary]]];
             
         }
         [resultSet close];
@@ -762,7 +766,7 @@ static ZPDatabase* _instance = nil;
         
         
         if([resultSet next]){
-            [collection configureWithDictionary:[resultSet resultDict]];
+            [collection configureWithDictionary:[resultSet resultDictionary]];
         }
         
         [resultSet close];
@@ -780,7 +784,7 @@ Deletes items, notes, and attachments based in array of keys from a library
  
  */
 
-- (void) deleteItemKeysNotInArray:(NSArray*)itemKeys fromLibrary:(NSNumber*)libraryID{
+- (void) deleteItemKeysNotInArray:(NSArray*)itemKeys fromLibrary:(NSInteger)libraryID{
     
     if([itemKeys count] == 0) return;
     
@@ -788,13 +792,13 @@ Deletes items, notes, and attachments based in array of keys from a library
         NSString* keyString = [itemKeys componentsJoinedByString:@"', '"];
         
         [_database executeUpdate:[NSString stringWithFormat:@"DELETE FROM items WHERE libraryID = ? AND itemKey NOT IN ('%@')",
-                                  keyString],libraryID];
+                                  keyString],[NSNumber numberWithInt:libraryID]];
         
         [_database executeUpdate:[NSString stringWithFormat:@"DELETE FROM attachments WHERE itemKey NOT IN ('%@') AND parentItemKey NOT IN ('%@') AND parentItemKey IN (SELECT itemKey FROM items WHERE libraryID = ?)",
-                                  keyString,keyString],libraryID];
+                                  keyString,keyString],[NSNumber numberWithInt:libraryID]];
 
         [_database executeUpdate:[NSString stringWithFormat:@"DELETE FROM notes WHERE itemKey NOT IN ('%@') AND parentItemKey NOT IN ('%@') AND parentItemKey in (SELECT itemKey FROM items WHERE libraryID = ?)",
-                                  keyString,keyString],libraryID];
+                                  keyString,keyString],[NSNumber numberWithInt:libraryID]];
 
 
     }
@@ -868,7 +872,7 @@ Deletes items, notes, and attachments based in array of keys from a library
         FMResultSet* resultSet = [_database executeQuery: @"SELECT * FROM items WHERE itemKey=? LIMIT 1",key];
         
         if ([resultSet next]) {
-            results = [resultSet resultDict];
+            results = [resultSet resultDictionary];
         }
         else results = [NSDictionary dictionaryWithObject:key forKey:@"itemKey"];
 
@@ -881,7 +885,7 @@ Deletes items, notes, and attachments based in array of keys from a library
 
             if ([resultSet next]) {
                 NSMutableDictionary* dict = [NSMutableDictionary dictionaryWithDictionary:results];
-                [dict addEntriesFromDictionary: [resultSet resultDict]];
+                [dict addEntriesFromDictionary: [resultSet resultDictionary]];
                 results=dict;
             }
             
@@ -982,7 +986,7 @@ Deletes items, notes, and attachments based in array of keys from a library
         FMResultSet* resultSet = [_database executeQuery: @"SELECT * FROM creators WHERE itemKey = ? ORDER BY \"order\"",item.key];
         
         while([resultSet next]) {
-            [creators addObject:[resultSet resultDict]];
+            [creators addObject:[resultSet resultDictionary]];
         }
         
         [resultSet close];
@@ -999,7 +1003,7 @@ Deletes items, notes, and attachments based in array of keys from a library
         FMResultSet* resultSet = [_database executeQuery: @"SELECT * FROM collectionItems, collections WHERE itemKey = ? AND collectionItems.collectionKey = collections.collectionKey ORDER BY LOWER(title)",item.key];
         
         while([resultSet next]) {
-            [collections addObject:[ZPZoteroCollection dataObjectWithDictionary:[resultSet resultDict]]];
+            [collections addObject:[ZPZoteroCollection collectionWithDictionary:[resultSet resultDictionary]]];
         }
         
         [resultSet close];
@@ -1025,8 +1029,8 @@ Deletes items, notes, and attachments based in array of keys from a library
         
         NSMutableArray* attachments = [[NSMutableArray alloc] init];
         while([resultSet next]) {
-            NSDictionary* dict = [resultSet resultDict];
-            ZPZoteroAttachment* attachment = [ZPZoteroAttachment dataObjectWithDictionary:dict];
+            NSDictionary* dict = [resultSet resultDictionary];
+            ZPZoteroAttachment* attachment = (ZPZoteroAttachment*) [ZPZoteroAttachment itemWithDictionary:dict];
             [attachments addObject:attachment];
         }
         
@@ -1046,7 +1050,7 @@ Deletes items, notes, and attachments based in array of keys from a library
         FMResultSet* resultSet = [_database executeQuery: @"SELECT * FROM attachments ORDER BY CASE WHEN lastViewed IS NULL THEN 0 ELSE 1 end, lastViewed ASC, cacheTimestamp ASC"];
         
         while([resultSet next]){
-            ZPZoteroAttachment* attachment = (ZPZoteroAttachment*) [ZPZoteroAttachment dataObjectWithDictionary:[resultSet resultDict]];
+            ZPZoteroAttachment* attachment = (ZPZoteroAttachment*) [ZPZoteroAttachment itemWithDictionary:[resultSet resultDictionary]];
             
             //If this attachment does have a file, add it to the list that we return;
             if(attachment.fileExists){
@@ -1061,7 +1065,7 @@ Deletes items, notes, and attachments based in array of keys from a library
 
 }
 
-- (NSArray*) getAttachmentsInLibrary:(NSNumber*)libraryID collection:(NSString*)collectionKey{
+- (NSArray*) getAttachmentsInLibrary:(NSInteger)libraryID collection:(NSString*)collectionKey{
     @synchronized(self){
 
         NSMutableArray* returnArray = [NSMutableArray array];
@@ -1069,14 +1073,14 @@ Deletes items, notes, and attachments based in array of keys from a library
         FMResultSet* resultSet;
         
         if(collectionKey==NULL){
-            resultSet= [_database executeQuery: @"SELECT * FROM attachments, items WHERE parentItemKey = items.itemKey AND items.libraryID = ? ORDER BY attachments.cacheTimestamp DESC",libraryID];
+            resultSet= [_database executeQuery: @"SELECT * FROM attachments, items WHERE parentItemKey = items.itemKey AND items.libraryID = ? ORDER BY attachments.cacheTimestamp DESC",[NSNumber numberWithInt:libraryID]];
         }
         else{
             resultSet= [_database executeQuery: @"SELECT * FROM attachments, collectionItems WHERE parentItemKey = itemsKey AND collectionKey = ? ORDER BY attachments.cacheTimestamp DESC",collectionKey];
         }
         
         while([resultSet next]){
-            ZPZoteroAttachment* attachment = (ZPZoteroAttachment*) [ZPZoteroAttachment dataObjectWithDictionary:[resultSet resultDict]];
+            ZPZoteroAttachment* attachment = (ZPZoteroAttachment*) [ZPZoteroAttachment itemWithDictionary:[resultSet resultDictionary]];
 
             [returnArray addObject:attachment];
         }
@@ -1100,7 +1104,7 @@ Deletes items, notes, and attachments based in array of keys from a library
         
         [_database executeUpdate:@"UPDATE attachments SET md5 = ?, versionSource = ?, versionIdentifier_server = ?, versionIdentifier_local = ? WHERE itemKey = ? ",
          attachment.md5,
-         attachment.versionSource,
+         [NSNumber numberWithInt:attachment.versionSource],
          attachment.versionIdentifier_server,
          attachment.versionIdentifier_local,
          attachment.key];
@@ -1125,7 +1129,7 @@ Deletes items, notes, and attachments based in array of keys from a library
         
         NSMutableArray* notes = [[NSMutableArray alloc] init];
         while([resultSet next]) {
-            [notes addObject:[ZPZoteroNote dataObjectWithDictionary:[resultSet resultDict]]];
+            [notes addObject:[ZPZoteroNote itemWithDictionary:[resultSet resultDictionary]]];
         }
         
         [resultSet close];
@@ -1139,7 +1143,7 @@ Deletes items, notes, and attachments based in array of keys from a library
  Retrieves all item keys and note and attachment keys from the library
  */
 
-- (NSArray*) getAllItemKeysForLibrary:(NSNumber*)libraryID{
+- (NSArray*) getAllItemKeysForLibrary:(NSInteger)libraryID{
     
     NSMutableArray* keys = [[NSMutableArray alloc] init];
     
@@ -1159,13 +1163,13 @@ Deletes items, notes, and attachments based in array of keys from a library
     return keys;
 }
 
-- (NSString*) getFirstItemKeyWithTimestamp:(NSString*)timestamp from:(NSNumber*)libraryID{
+- (NSString*) getFirstItemKeyWithTimestamp:(NSString*)timestamp from:(NSInteger)libraryID{
     @synchronized(self){
         FMResultSet* resultSet;
         
         NSString* sql = @"SELECT itemKey FROM items WHERE cacheTimestamp <= ? and libraryID = ? ORDER BY cacheTimestamp DESC LIMIT 1";
         
-        resultSet = [_database executeQuery: sql, timestamp, libraryID];
+        resultSet = [_database executeQuery: sql, timestamp, [NSNumber numberWithInt:libraryID]];
         
         [resultSet next];
         NSString* ret= [resultSet stringForColumnIndex:0];
@@ -1181,7 +1185,7 @@ Deletes items, notes, and attachments based in array of keys from a library
  
  */
 
-- (NSArray*) getItemKeysForLibrary:(NSNumber*)libraryID collectionKey:(NSString*)collectionKey
+- (NSArray*) getItemKeysForLibrary:(NSInteger)libraryID collectionKey:(NSString*)collectionKey
                       searchString:(NSString*)searchString orderField:(NSString*)orderField sortDescending:(BOOL)sortDescending{
 
     NSMutableArray* keys = [[NSMutableArray alloc] init];
@@ -1208,7 +1212,7 @@ Deletes items, notes, and attachments based in array of keys from a library
     //Conditions
 
     sql=[sql stringByAppendingString:@" WHERE libraryID = ?"];
-    [parameters addObject:libraryID];
+    [parameters addObject:[NSNumber numberWithInt:libraryID]];
     
     if(collectionKey!=NULL){
         sql=[sql stringByAppendingString:@" AND collectionItems.collectionKey = ? and collectionItems.itemKey = items.itemKey"];
@@ -1276,7 +1280,7 @@ Deletes items, notes, and attachments based in array of keys from a library
         }
 
         else{
-            [NSException raise:@"Not implemented" format:@"Sorting by @% has not been implemented",orderField];
+            [NSException raise:@"Not implemented" format:@"Sorting by %@ has not been implemented",orderField];
         }
 
         sql=[sql stringByAppendingFormat:@" COLLATE NOCASE %@",ascOrDesc];

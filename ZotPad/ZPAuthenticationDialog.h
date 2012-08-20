@@ -12,7 +12,6 @@
 #import "OAToken.h"
 
 @interface ZPAuthenticationDialog : UIViewController <UIApplicationDelegate, UIWebViewDelegate> {
-    UIWebView* webView;
     DSActivityView* _activityView;
     NSString* _key;
 
@@ -29,8 +28,6 @@
 @property(nonatomic,retain) IBOutlet UIWebView *webView;
 
 - (BOOL)webView:(UIWebView *)webView shouldStartLoadWithRequest:(NSURLRequest *)request navigationType:(UIWebViewNavigationType)navigationType;
-
-+(ZPAuthenticationDialog*) instance;
 
 - (void)setKeyAndLoadZoteroSite:(NSString*)key;
 - (IBAction)loadFirstPage:(id)sender;

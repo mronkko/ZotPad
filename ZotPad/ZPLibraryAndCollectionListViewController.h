@@ -15,13 +15,13 @@
 
 @interface ZPLibraryAndCollectionListViewController : UITableViewController <ZPLibraryObserver>{
     NSArray* _content;
-    NSNumber* _currentlibraryID;
+    NSInteger _currentlibraryID;
     NSString* _currentCollectionKey;
     UIActivityIndicatorView* _activityIndicator;
 }
 
 @property (strong, nonatomic) ZPItemListViewController *detailViewController;
-@property (retain, nonatomic) NSNumber* currentlibraryID;
+@property (assign) NSInteger currentlibraryID;
 @property (retain, nonatomic) NSString* currentCollectionKey;
 @property IBOutlet UIBarButtonItem* gearButton;
 @property IBOutlet UIBarButtonItem* cacheControllerPlaceHolder;

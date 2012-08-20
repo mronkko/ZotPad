@@ -40,9 +40,7 @@ extern NSInteger const ZPATTACHMENTICONGVIEWCONTROLLER_TAG_TITLELABEL;
 @property (readonly) NSInteger selectedIndex;
 @property (weak) UIViewController* owner;
 
--(void) prepareForUnloading;
 -(void) configureWithAttachmentArray:(NSArray*) attachments;
 -(void) configureWithZoteroItem:(ZPZoteroItem*) item;
-+(void) renderFileTypeIconForAttachment:(ZPZoteroAttachment*) attachment intoImageView:(UIImageView*) fileImage;
 
 @end

@@ -27,14 +27,14 @@
 @property (retain) NSString* fullCitation;
 @property (readonly) NSString* creatorSummary;
 @property (readonly) NSString* publicationDetails;
-@property (readonly) NSNumber* year;
+@property (readonly) NSInteger year;
 @property (readonly) NSString* itemType;
-@property (retain) NSNumber* numTags;
+@property (assign) NSInteger numTags;
 @property (retain) NSArray* notes;
 @property (retain) NSArray* attachments;
 @property (retain) NSArray* creators;
 @property (retain) NSDictionary* fields;
-@property (retain, readonly) NSString* itemKey;
+@property (retain) NSString* itemKey;
 
 //Used for versioning by Zotero
 
@@ -44,6 +44,9 @@
 @property (retain) NSString* jsonFromServer;
 
 +(void) dropCache;
++(ZPZoteroItem*) itemWithKey:(NSString*) key;
++(ZPZoteroItem*) itemWithDictionary:(NSDictionary*) fields;
+
 -(NSArray*) collections;
 
 - (NSString*) shortCitation;

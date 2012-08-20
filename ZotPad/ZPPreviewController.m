@@ -41,7 +41,7 @@
     if([_previewItems lastObject] == attachment) return;
     
     // Imported URLs need to be unzipped
-    if([attachment.linkMode intValue] == LINK_MODE_IMPORTED_URL && ([attachment.contentType isEqualToString:@"text/html"] ||
+    if(attachment.linkMode == LINK_MODE_IMPORTED_URL && ([attachment.contentType isEqualToString:@"text/html"] ||
                                                                     [attachment.contentType isEqualToString:@"application/xhtml+xml"])){
         
         //TODO: Make sure that this tempdir is cleaned at some point (Maybe refactor this into ZPZoteroAttachment)
@@ -142,8 +142,8 @@ static ZPPreviewControllerDelegate* _sharedDelegate;
 
 +(void) displayQuicklookWithAttachment:(ZPZoteroAttachment*)attachment source:(id <ZPPreviewSource>)source{
     
-    if([attachment.linkMode intValue] == LINK_MODE_LINKED_URL){
-        NSString* urlString = [[(ZPZoteroItem*)[ZPZoteroItem dataObjectWithKey:attachment.parentItemKey] fields] objectForKey:@"url"];
+    if(attachment.linkMode == LINK_MODE_LINKED_URL){
+        NSString* urlString = [[(ZPZoteroItem*)[ZPZoteroItem itemWithKey:attachment.parentItemKey] fields] objectForKey:@"url"];
         
         //Links will be opened with safari.
         NSURL* url = [NSURL URLWithString: urlString];

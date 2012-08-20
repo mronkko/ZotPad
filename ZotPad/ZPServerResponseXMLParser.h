@@ -16,12 +16,12 @@
     BOOL _insideEntry;
     NSObject* _currentElement;
     NSString* _updateTimestamp;
-    NSNumber* _libraryID;
+    NSInteger _libraryID;
     NSString* _currentID;
 }
 
 #ifdef ZPDEBUG
-//@property (retain) NSString* fullResponse;
+@property (retain) NSString* fullResponse;
 #endif
 @property (retain) NSArray* parsedElements;
 
@@ -33,7 +33,7 @@
 - (NSInteger) totalResults;
 - (NSString*) updateTimestamp;
 
-- (void) _setField:(NSString*)field toValue:(NSString*)value;
+- (void) _setField:(NSString*)field toValue:(NSObject*)value;
 - (void) _initNewElementWithID:(NSString*)id;
 - (void) _processTemporaryFieldStorage;
 

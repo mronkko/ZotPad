@@ -23,16 +23,16 @@ extern NSInteger const VERSION_SOURCE_WEBDAV;
 
 @interface ZPZoteroAttachment : ZPZoteroItem <QLPreviewItem>{
     __strong NSString* _parentItemKey;
-    __strong NSNumber* _linkMode;
+    NSInteger _linkMode;
     //TODO: Recycle content type strings
     __strong NSString* _contentType;    
 }
 
 @property (retain) NSString* parentItemKey;
 @property (retain) NSString* contentType;
-@property (retain) NSNumber* linkMode;
-@property (retain) NSNumber* existsOnZoteroServer;
-@property (retain) NSNumber* attachmentSize;
+@property (assign) NSInteger linkMode;
+@property (assign) BOOL existsOnZoteroServer;
+@property (assign) NSInteger attachmentSize;
 @property (retain) NSString* lastViewed;
 @property (retain) NSString* url;
 @property (retain) NSString* filename;
@@ -43,7 +43,7 @@ extern NSInteger const VERSION_SOURCE_WEBDAV;
 // This is the version identifier from Zotero server. We need this as well as versionIdentifier_server because the actual file can also come from Dropbox
 @property (retain) NSString* md5;
 
-@property (retain) NSNumber* versionSource;
+@property (assign) NSInteger versionSource;
 @property (retain) NSString* versionIdentifier_server;
 @property (retain) NSString* versionIdentifier_local;
 

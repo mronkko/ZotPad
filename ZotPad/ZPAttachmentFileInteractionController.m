@@ -140,7 +140,7 @@
                 [_docController presentOpenInMenuFromBarButtonItem:_sourceButton animated:YES];
             }
             else if(buttonIndex==4){
-                ZPZoteroItem* parentItem = [ZPZoteroItem dataObjectWithKey:_activeAttachment.parentItemKey];
+                ZPZoteroItem* parentItem = [ZPZoteroItem itemWithKey:_activeAttachment.parentItemKey];
                 _mailController = [[MFMailComposeViewController alloc] init];
                 [_mailController setSubject:parentItem.shortCitation];
                 [_mailController setMessageBody:[NSString stringWithFormat:@"<body>Please find the following file attached:<br>%@<br><br></body>",parentItem.fullCitation] isHTML:YES];
@@ -178,8 +178,8 @@
     
     //Store the version identifier. This is later used to upload modified files to Zotero
     
-    if(_activeAttachment.versionIdentifier_local == [NSNull null] || _activeAttachment.versionIdentifier_local == NULL){
-        if(_activeAttachment.versionIdentifier_server == [NSNull null] || _activeAttachment.versionIdentifier_server == NULL){
+    if( _activeAttachment.versionIdentifier_local == NULL){
+        if(_activeAttachment.versionIdentifier_server == NULL){
             DDLogCError(@"Server version identifier for attachment %@ was null",_activeAttachment.key);
             _activeAttachment.versionIdentifier_server = [ZPZoteroAttachment md5ForFileAtPath:_activeAttachment.fileSystemPath_original];
             //[NSException raise:@"Attachment version identifier cannot be null" format:@"Server version identifier for attachment %@ was null",_activeAttachment.key];

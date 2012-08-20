@@ -71,7 +71,7 @@
     [self loadFirstPage:NULL];
 
 }
-- (BOOL)webView:(UIWebView *)webView shouldStartLoadWithRequest:(NSURLRequest *)request navigationType:(UIWebViewNavigationType)navigationType{
+- (BOOL)webView:(UIWebView *)aWebView shouldStartLoadWithRequest:(NSURLRequest *)request navigationType:(UIWebViewNavigationType)navigationType{
 
 
     NSString* urlString = [[request mainDocumentURL] absoluteString];

@@ -42,5 +42,6 @@
 -(void)doneSearchingClicked:(id) source;
 -(IBAction) sortButtonPressed:(id)sender;
 -(void) sortButtonLongPressed:(id)sender;
--(IBAction) attachmentThumbnailPressed:(id)sender;
+//-(IBAction) attachmentThumbnailPressed:(id)sender;
+
 @end

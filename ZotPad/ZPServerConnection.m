@@ -202,15 +202,14 @@ const NSInteger ZPServerConnectionRequestPermissions = 10;
     NSString* oauthkey =  [[ZPPreferences instance] OAuthKey];
     if(oauthkey!=NULL){
 
-        NSInteger libraryID = [(NSNumber*)[parameters objectForKey:@"libraryID"] integerValue];
+        NSInteger libraryID = [[parameters objectForKey:@"libraryID"] integerValue];
         
-        if(libraryID==1 || libraryID == 0){
+        if(libraryID== LIBRARY_ID_MY_LIBRARY || libraryID == LIBRARY_ID_NOT_SET){
             urlString = [NSString stringWithFormat:@"https://api.zotero.org/users/%@/",[[ZPPreferences instance] userID]];
         }
         else{
             urlString = [NSString stringWithFormat:@"https://api.zotero.org/groups/%i/",libraryID];        
         }
-        
         // Groups and collections
         if(type==ZPServerConnectionRequestPermissions){
             urlString = [NSString stringWithFormat:@"%@keys/%@",urlString,oauthkey];
@@ -244,8 +243,8 @@ const NSInteger ZPServerConnectionRequestPermissions = 10;
             }
         }
         else if (type==ZPServerConnectionRequestItemsAndChildren){
-            NSString* collectionKey = [parameters objectForKey:@"collectionKey"];
-            NSAssert(collectionKey==NULL,@"Cannot request child items for collection");
+//            NSString* collectionKey = [parameters objectForKey:@"collectionKey"];
+//            NSAssert(collectionKey==NULL,@"Cannot request child items for collection");
             urlString = [NSString stringWithFormat:@"%@items?key=%@&format=atom",urlString,oauthkey];
         }
 
@@ -364,7 +363,7 @@ const NSInteger ZPServerConnectionRequestPermissions = 10;
 
 -(ZPZoteroItem*) retrieveSingleItemDetailsFromServer:(ZPZoteroItem*)item{
 
-    NSMutableDictionary* parameters = [NSMutableDictionary dictionaryWithObject:item.libraryID forKey:@"libraryID"];
+    NSMutableDictionary* parameters = [NSMutableDictionary dictionaryWithObject:[NSNumber numberWithInt:item.libraryID] forKey:@"libraryID"];
     [parameters setObject:item.key forKey:@"itemKey"];
     [parameters setObject:@"json" forKey:@"content"];
     
@@ -452,23 +451,23 @@ const NSInteger ZPServerConnectionRequestPermissions = 10;
         //enumerate through the permissions and build list of libraries
         NSString* libraryID;
         for(libraryID in librariesThatCanBeAccessed){
-            [newArray addObject:[ZPZoteroLibrary dataObjectWithKey:[NSNumber numberWithInt:[libraryID intValue]]]];
+            [newArray addObject:[ZPZoteroLibrary libraryWithID:[libraryID intValue]]];
         }
         returnArray = newArray;
     }
     
     //Is my library available
-    else if([librariesThatCanBeAccessed indexOfObject:@"1"]!=NSNotFound){
-        returnArray = [[NSArray arrayWithObject:[ZPZoteroLibrary dataObjectWithKey:[NSNumber numberWithInt:1]]] arrayByAddingObjectsFromArray:returnArray];
+    else if([librariesThatCanBeAccessed indexOfObject:[NSString stringWithFormat:@"%i",LIBRARY_ID_MY_LIBRARY]]!=NSNotFound){
+        returnArray = [[NSArray arrayWithObject:[ZPZoteroLibrary libraryWithID:LIBRARY_ID_MY_LIBRARY]] arrayByAddingObjectsFromArray:returnArray];
     }
             
     return returnArray;
     
 }
 
--(NSArray*) retrieveCollectionsForLibraryFromServer:(NSNumber*)libraryID{
+-(NSArray*) retrieveCollectionsForLibraryFromServer:(NSInteger)libraryID{
     
-    NSMutableDictionary* parameters = [NSMutableDictionary dictionaryWithObject:libraryID forKey:@"libraryID"];
+    NSMutableDictionary* parameters = [NSMutableDictionary dictionaryWithObject:[NSNumber numberWithInt:libraryID] forKey:@"libraryID"];
 
     ZPServerResponseXMLParser* parserDelegate =  [self makeServerRequest:ZPServerConnectionRequestCollections withParameters:parameters];
     if(parserDelegate == NULL) return NULL;
@@ -489,9 +488,9 @@ const NSInteger ZPServerConnectionRequestPermissions = 10;
     return returnArray;
 }
 
--(ZPZoteroCollection*) retrieveCollection:(NSString*)collectionKey fromLibrary:(NSNumber*)libraryID{
+-(ZPZoteroCollection*) retrieveCollection:(NSString*)collectionKey fromLibrary:(NSInteger)libraryID{
 
-    NSMutableDictionary* parameters = [NSMutableDictionary dictionaryWithObject:libraryID forKey:@"libraryID"];
+    NSMutableDictionary* parameters = [NSMutableDictionary dictionaryWithObject:[NSNumber numberWithInt:libraryID] forKey:@"libraryID"];
     [parameters setValue:collectionKey forKey:@"collectionKey"];
     
     ZPServerResponseXMLParser* parserDelegate =  [self makeServerRequest:ZPServerConnectionRequestSingleCollection withParameters:parameters];
@@ -505,10 +504,10 @@ const NSInteger ZPServerConnectionRequestPermissions = 10;
 }
 
 
--(NSArray*) retrieveItemsFromLibrary:(NSNumber*)libraryID itemKeys:(NSArray*)keys {
+-(NSArray*) retrieveItemsFromLibrary:(NSInteger)libraryID itemKeys:(NSArray*)keys {
     
     
-    NSMutableDictionary* parameters = [NSMutableDictionary dictionaryWithObject:libraryID  forKey:@"libraryID"];
+    NSMutableDictionary* parameters = [NSMutableDictionary dictionaryWithObject:[NSNumber numberWithInt:libraryID]  forKey:@"libraryID"];
     
     [parameters setObject:@"bib,json" forKey:@"content"];
     [parameters setObject:@"apa" forKey:@"style"];
@@ -520,9 +519,9 @@ const NSInteger ZPServerConnectionRequestPermissions = 10;
     
     
 }
--(NSArray*) retrieveAllItemKeysFromLibrary:(NSNumber*)libraryID{
+-(NSArray*) retrieveAllItemKeysFromLibrary:(NSInteger)libraryID{
     
-    NSMutableDictionary* parameters = [NSMutableDictionary dictionaryWithObject:libraryID  forKey:@"libraryID"];
+    NSMutableDictionary* parameters = [NSMutableDictionary dictionaryWithObject:[NSNumber numberWithInt:libraryID]  forKey:@"libraryID"];
     [parameters setObject:@"dateModified" forKey:@"order"];
     [parameters setObject:@"desc" forKey:@"sort"];
     ZPServerResponseXMLParser* parserDelegate =  [self makeServerRequest:ZPServerConnectionRequestKeys withParameters:parameters];
@@ -530,8 +529,8 @@ const NSInteger ZPServerConnectionRequestPermissions = 10;
     return parserDelegate.parsedElements;
     
 }
--(NSArray*) retrieveKeysInContainer:(NSNumber*)libraryID collectionKey:(NSString*)key{
-    NSMutableDictionary* parameters = [NSMutableDictionary dictionaryWithObject:libraryID  forKey:@"libraryID"];
+-(NSArray*) retrieveKeysInContainer:(NSInteger)libraryID collectionKey:(NSString*)key{
+    NSMutableDictionary* parameters = [NSMutableDictionary dictionaryWithObject:[NSNumber numberWithInt:libraryID]  forKey:@"libraryID"];
     if(key!=NULL) [parameters setValue:key forKey:@"collectionKey"];
 
     ZPServerResponseXMLParser* parserDelegate =  [self makeServerRequest:ZPServerConnectionRequestTopLevelKeys withParameters:parameters];
@@ -540,9 +539,9 @@ const NSInteger ZPServerConnectionRequestPermissions = 10;
     
 }
 
--(NSArray*) retrieveKeysInContainer:(NSNumber*)libraryID collectionKey:(NSString*)collectionKey searchString:(NSString*)searchString orderField:(NSString*)orderField sortDescending:(BOOL)sortDescending{
+-(NSArray*) retrieveKeysInContainer:(NSInteger)libraryID collectionKey:(NSString*)collectionKey searchString:(NSString*)searchString orderField:(NSString*)orderField sortDescending:(BOOL)sortDescending{
     
-    NSMutableDictionary* parameters = [NSMutableDictionary dictionaryWithObject:libraryID  forKey:@"libraryID"];
+    NSMutableDictionary* parameters = [NSMutableDictionary dictionaryWithObject:[NSNumber numberWithInt:libraryID]  forKey:@"libraryID"];
     if(collectionKey!=NULL) [parameters setValue:collectionKey forKey:@"collectionKey"];
     
     //Search
@@ -572,9 +571,9 @@ const NSInteger ZPServerConnectionRequestPermissions = 10;
     
 }
 
--(NSString*) retrieveTimestampForContainer:(NSNumber*)libraryID collectionKey:(NSString*)key{
+-(NSString*) retrieveTimestampForContainer:(NSInteger)libraryID collectionKey:(NSString*)key{
     
-    NSMutableDictionary* parameters = [NSMutableDictionary dictionaryWithObject:libraryID  forKey:@"libraryID"];
+    NSMutableDictionary* parameters = [NSMutableDictionary dictionaryWithObject:[NSNumber numberWithInt:libraryID]  forKey:@"libraryID"];
     if(key!=NULL) [parameters setValue:key forKey:@"collectionKey"];
     
     
@@ -596,10 +595,10 @@ const NSInteger ZPServerConnectionRequestPermissions = 10;
     if([[ZPPreferences instance] useDropbox]){
         return _fileChannel_Dropbox;
     }
-    else if([attachment.libraryID intValue]==1 && [[ZPPreferences instance] useWebDAV]){
+    else if(attachment.libraryID == LIBRARY_ID_MY_LIBRARY && [[ZPPreferences instance] useWebDAV]){
         return _fileChannel_WebDAV;
     }
-    else if([attachment.existsOnZoteroServer intValue] == 1){
+    else if(attachment.existsOnZoteroServer){
         return _fileChannel_Zotero;
     }
     else return NULL;
@@ -618,7 +617,7 @@ const NSInteger ZPServerConnectionRequestPermissions = 10;
     
     //Check if the file can be downloaded
     
-    if([attachment.linkMode intValue] == LINK_MODE_LINKED_URL || [attachment.linkMode intValue] == LINK_MODE_LINKED_FILE ){
+    if(attachment.linkMode  == LINK_MODE_LINKED_URL || attachment.linkMode == LINK_MODE_LINKED_FILE ){
         return FALSE;
     }
     
@@ -668,8 +667,8 @@ const NSInteger ZPServerConnectionRequestPermissions = 10;
     }
     else{
         //If we got a file, move it to the right place
-        
-        NSDictionary *_documentFileAttributes = [[NSFileManager defaultManager] fileAttributesAtPath:tempFile traverseLink:YES];
+
+        NSDictionary *_documentFileAttributes = [[NSFileManager defaultManager] attributesOfItemAtPath:tempFile error:NULL];
         
         if([_documentFileAttributes fileSize]>0){
             
@@ -678,7 +677,7 @@ const NSInteger ZPServerConnectionRequestPermissions = 10;
             
             
             //Write version info to DB
-            attachment.versionSource = [NSNumber numberWithInt:fileChannel.fileChannelType];
+            attachment.versionSource = fileChannel.fileChannelType;
             attachment.versionIdentifier_server = identifier;
             
             [[ZPDatabase instance] writeVersionInfoForAttachment:attachment];

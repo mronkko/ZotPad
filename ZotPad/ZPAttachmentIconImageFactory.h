@@ -30,7 +30,7 @@
 
 +(void) renderFileTypeIconForAttachment:(ZPZoteroAttachment*) attachment intoImageView:(UIImageView*) fileImage;
 +(void) renderPDFPreviewForFileAtPath:(NSString*) filePath intoImageView:(UIImageView*) fileImage;
-+(CGRect) getDimensionsForImageView:(UIImageView*) imageView withImage:(UIImage*) image;    
++(CGRect) getDimensionsForImageView:(UIView*) imageView withImage:(UIImage*) image;    
 
 
 @end

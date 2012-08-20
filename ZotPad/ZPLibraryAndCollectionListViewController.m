@@ -95,13 +95,13 @@
     [super viewWillAppear:animated];
     
     //If the current library is not defined, show a list of libraries
-    if(self->_currentlibraryID == NULL){
+    if(self->_currentlibraryID == LIBRARY_ID_NOT_SET){
         [[ZPCacheController instance] performSelectorInBackground:@selector(updateLibrariesAndCollectionsFromServer) withObject:NULL];
         self->_content = [[ZPDataLayer instance] libraries];
     }
     //If a library is chosen, show collections level collections for that library
     else{
-        [[ZPCacheController instance] performSelectorInBackground:@selector(updateCollectionsForLibraryFromServer:) withObject:[ZPZoteroLibrary dataObjectWithKey:_currentlibraryID]];
+        [[ZPCacheController instance] performSelectorInBackground:@selector(updateCollectionsForLibraryFromServer:) withObject:[ZPZoteroLibrary libraryWithID:_currentlibraryID]];
         self->_content = [[ZPDataLayer instance] collectionsForLibrary:self->_currentlibraryID withParentCollection:self->_currentCollectionKey];        
     }
     
@@ -272,7 +272,7 @@
 
     //If this is a library that we are not showing now, just return;
     
-    if(self->_currentlibraryID != NULL && ! [_currentlibraryID isEqualToNumber:library.libraryID]) return;
+    if(self->_currentlibraryID != library.libraryID) return;
     
     if([NSThread isMainThread]){
         
@@ -305,10 +305,10 @@
         
         NSArray* newContent;
         
-        if(_currentlibraryID == NULL){
+        if(_currentlibraryID == LIBRARY_ID_NOT_SET){
             newContent = [[ZPDataLayer instance] libraries];        
         }
-        else if([_currentlibraryID isEqualToNumber:library.libraryID]){
+        else if(_currentlibraryID == library.libraryID){
             newContent = [[ZPDataLayer instance] collectionsForLibrary:self->_currentlibraryID withParentCollection:self->_currentCollectionKey];        
         }
 

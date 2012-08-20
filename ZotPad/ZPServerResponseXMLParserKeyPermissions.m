@@ -22,7 +22,12 @@
 - (void)parser:(NSXMLParser *)parser didStartElement:(NSString *)elementName namespaceURI:(NSString *)namespaceURI qualifiedName:(NSString *)qualifiedName attributes:(NSDictionary *)attributeDict{
     if([elementName isEqualToString:@"access"]){
         NSString* libraryID =[attributeDict objectForKey:@"library"];
-        if(libraryID == NULL) libraryID =[attributeDict objectForKey:@"group"];
+        if(libraryID == NULL){
+            libraryID =[attributeDict objectForKey:@"group"];
+        }
+        else{
+            libraryID = [NSString stringWithFormat:@"%i",LIBRARY_ID_MY_LIBRARY];
+        }
         [_results addObject:libraryID];
     }
 }

@@ -15,7 +15,7 @@
 
 
 - (void) _initNewElementWithID:(NSString*)id{
-    _currentElement = [ZPZoteroCollection dataObjectWithKey:id];
+    _currentElement = [ZPZoteroCollection collectionWithKey:id];
     [(ZPZoteroCollection*)_currentElement setLibraryID:_libraryID];
     [super _processTemporaryFieldStorage];
 }

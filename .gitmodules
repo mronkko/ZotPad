@@ -1,6 +1,6 @@
 [submodule "FMDB"]
 	path = FMDB
-	url = https://github.com/mronkko/fmdb.git
+	url = https://github.com/ccgus/fmdb.git
 [submodule "OAuthConsumer"]
 	path = OAuthConsumer
 	url = https://github.com/jdg/oauthconsumer.git

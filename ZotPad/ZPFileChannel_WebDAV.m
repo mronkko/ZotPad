@@ -106,7 +106,7 @@ NSInteger const ZPFILECHANNEL_WEBDAV_UPLOAD_REGISTER = 5;
     
     [self linkAttachment:attachment withRequest:request];
         
-    NSString* tempFile = [NSTemporaryDirectory() stringByAppendingPathComponent:[NSString stringWithFormat:@"ZP%@%i",attachment.key,[[NSDate date] timeIntervalSince1970]*1000000]];
+    NSString* tempFile = [NSTemporaryDirectory() stringByAppendingPathComponent:[NSString stringWithFormat:@"ZP%@%f",attachment.key,[[NSDate date] timeIntervalSince1970]*1000000]];
     [request setDownloadDestinationPath:tempFile];
     
     //For some reason authentication using digest fails if persistent connections are in use
@@ -145,11 +145,11 @@ NSInteger const ZPFILECHANNEL_WEBDAV_UPLOAD_REGISTER = 5;
     if(request != NULL){
         ZPFileChannel_WebDAV_ProgressDelegate* progressDelegate;
         @synchronized(downloadProgressDelegates){
-            progressDelegate = [downloadProgressDelegates objectForKey:[NSNumber numberWithInt: attachment]];
+            progressDelegate = [downloadProgressDelegates objectForKey:attachment.key];
             
             if(progressDelegate == NULL){
                 progressDelegate  = [[ZPFileChannel_WebDAV_ProgressDelegate alloc] initWithUIProgressView:progressView];
-                [downloadProgressDelegates setObject:progressDelegate forKey:[NSNumber numberWithInt: attachment]];
+                [downloadProgressDelegates setObject:progressDelegate forKey:attachment.key];
             }
             else{
                 progressDelegate.progressView = progressView;
@@ -172,7 +172,7 @@ NSInteger const ZPFILECHANNEL_WEBDAV_UPLOAD_REGISTER = 5;
 
     //Original was not found
     if([attachments count]==0){
-        DDLogWarn(@"Retrieving updated item %@ from library %@ resulted in empty response",attachment.key,attachment.libraryID);
+        DDLogWarn(@"Retrieving updated item %@ from library %i resulted in empty response",attachment.key,attachment.libraryID);
         
         NSError* error = [[NSError alloc] initWithDomain:@"ZotPad" code:1 userInfo:[NSDictionary dictionaryWithObject:@"Original item does not exists on Zotero server." forKey:NSLocalizedDescriptionKey]];
         [[ZPServerConnection instance] failedUploadingAttachment:attachment withError:error usingFileChannel:self toURL:NULL];
@@ -186,7 +186,7 @@ NSInteger const ZPFILECHANNEL_WEBDAV_UPLOAD_REGISTER = 5;
         //Store data about the file in the user info so that it is always available
         
         NSString* path = attachment.fileSystemPath_modified;
-        NSDictionary* documentFileAttributes = [[NSFileManager defaultManager] fileAttributesAtPath:path traverseLink:YES];
+        NSDictionary* documentFileAttributes = [[NSFileManager defaultManager] attributesOfFileSystemForPath:path error:NULL];
         NSTimeInterval timeModified = [[documentFileAttributes fileModificationDate] timeIntervalSince1970];
         long long timeModifiedMilliseconds = (long long) trunc(timeModified * 1000.0f);
         NSString* md5 = [ZPZoteroAttachment md5ForFileAtPath:path];
@@ -264,7 +264,7 @@ NSInteger const ZPFILECHANNEL_WEBDAV_UPLOAD_REGISTER = 5;
         
         ZipArchive* zipArchive = [[ZipArchive alloc] init];
         
-        NSString* tempFile = [NSTemporaryDirectory() stringByAppendingPathComponent:[NSString stringWithFormat:@"ZP%@%i",attachment.key,[[NSDate date] timeIntervalSince1970]*1000000]];
+        NSString* tempFile = [NSTemporaryDirectory() stringByAppendingPathComponent:[NSString stringWithFormat:@"ZP%@%f",attachment.key,[[NSDate date] timeIntervalSince1970]*1000000]];
         
         [zipArchive CreateZipFile2:tempFile];
         [zipArchive addFileToZip:attachment.fileSystemPath_modified newname:attachment.filenameZoteroBase64Encoded];
@@ -360,7 +360,7 @@ NSInteger const ZPFILECHANNEL_WEBDAV_UPLOAD_REGISTER = 5;
 
         if(request.responseStatusCode == 200){
             //TODO: A more robust way to check if we need to uncompress
-            if([attachment.linkMode intValue] == LINK_MODE_IMPORTED_URL && (
+            if(attachment.linkMode == LINK_MODE_IMPORTED_URL && (
                                                                             [attachment.contentType isEqualToString:@"text/html"] ||
                                                                             [attachment.contentType isEqualToString:@"application/xhtml+xml"])){
                 NSString* tempFile = [request downloadDestinationPath];
@@ -374,7 +374,7 @@ NSInteger const ZPFILECHANNEL_WEBDAV_UPLOAD_REGISTER = 5;
                 ZipArchive* zipArchive = [[ZipArchive alloc] init];
                 [zipArchive UnzipOpenFile:[request downloadDestinationPath]];
                 
-                NSString* tempFile = [NSTemporaryDirectory() stringByAppendingPathComponent:[NSString stringWithFormat:@"ZP%@%i",attachment.key,[[NSDate date] timeIntervalSince1970]*1000000]];
+                NSString* tempFile = [NSTemporaryDirectory() stringByAppendingPathComponent:[NSString stringWithFormat:@"ZP%@%f",attachment.key,[[NSDate date] timeIntervalSince1970]*1000000]];
                 
                 [zipArchive UnzipFileTo:tempFile overWrite:YES];
                 [zipArchive UnzipCloseFile];
@@ -552,7 +552,7 @@ NSInteger const ZPFILECHANNEL_WEBDAV_UPLOAD_REGISTER = 5;
 
 -(void) cleanupAfterFinishingAttachment:(ZPZoteroAttachment *)attachment{
     @synchronized(downloadProgressDelegates){
-        [downloadProgressDelegates removeObjectForKey:[NSNumber numberWithInt: attachment]];
+        [downloadProgressDelegates removeObjectForKey:attachment.key];
     }
 
 }

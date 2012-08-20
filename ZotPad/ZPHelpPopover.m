@@ -65,7 +65,10 @@ static UIPopoverController* helpPopover;
     [helpPopover dismissPopoverAnimated:YES];
     [(UIBarButtonItem*)sender setTarget:_target];
     [(UIBarButtonItem*)sender setAction:_action];
+#pragma clang diagnostic push
+#pragma clang diagnostic ignored "-Warc-performSelector-leaks"
     [_target performSelector:_action withObject:sender];
+#pragma clang diagnostic pop
 }
 
 - (void)popoverControllerDidDismissPopover:(UIPopoverController *)popoverController{

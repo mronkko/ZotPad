@@ -103,7 +103,7 @@
     [[ZPDataLayer instance] notifyAttachmentUploadStarted:attachment];
 }
 -(IBAction)useRemoteVersion:(id)sender{
-    attachment.versionIdentifier_local = [NSNull null];
+    attachment.versionIdentifier_local = NULL;
     [attachment purge_modified:@"User chose server file during conflict"];
     [[ZPDatabase instance] writeVersionInfoForAttachment:attachment];
     [fileChannel cancelUploadingAttachment:attachment];
