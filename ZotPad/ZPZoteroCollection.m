@@ -53,7 +53,7 @@ static NSCache* _objectCache = NULL;
     if(obj==NULL){
         obj= [[ZPZoteroCollection alloc] init];
         obj.key = (NSString*) key;
-        [[ZPDatabase instance] addAttributesToCollection:obj];
+        [ZPDatabase addAttributesToCollection:obj];
         [_objectCache setObject:obj  forKey:key];
     }
     return obj;

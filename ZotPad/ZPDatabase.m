@@ -32,35 +32,29 @@
 
 
 @interface  ZPDatabase (){
-    NSMutableDictionary* dbFieldsByTables;
-    NSMutableDictionary* dbPrimaryKeysByTables;
 }
-- (NSDictionary*) fieldsForItem:(ZPZoteroItem*)item;
-- (NSArray*) creatorsForItem:(ZPZoteroItem*)item;
-- (void) _executeSQLFromFile:(NSString*)filename;
-- (void) insertObjects:(NSArray*) objects intoTable:(NSString*) table;
-- (void) updateObjects:(NSArray*) objects intoTable:(NSString*) table;
-- (NSArray*) writeObjects:(NSArray*) objects intoTable:(NSString*) table checkTimestamp:(BOOL) checkTimestamp;
++(NSDictionary*) fieldsForItem:(ZPZoteroItem*)item;
++(NSArray*) creatorsForItem:(ZPZoteroItem*)item;
++(void) _executeSQLFromFile:(NSString*)filename;
++(void) insertObjects:(NSArray*) objects intoTable:(NSString*) table;
++(void) updateObjects:(NSArray*) objects intoTable:(NSString*) table;
++(NSArray*) writeObjects:(NSArray*) objects intoTable:(NSString*) table checkTimestamp:(BOOL) checkTimestamp;
 
-- (NSArray*) dbFieldNamesForTable:(NSString*) table;
-- (NSArray*) dbPrimaryKeyNamesForTable:(NSString*) table;
-- (NSArray*) dbFieldValuesForObject:(NSObject*) object fieldsNames:(NSArray*)fieldNames;
++(NSArray*) dbFieldNamesForTable:(NSString*) table;
++(NSArray*) dbPrimaryKeyNamesForTable:(NSString*) table;
++(NSArray*) dbFieldValuesForObject:(NSObject*) object fieldsNames:(NSArray*)fieldNames;
 
 @end
 
 @implementation ZPDatabase
 
-static ZPDatabase* _instance = nil;
+static FMDatabase* _database;
+static NSMutableDictionary* dbFieldsByTables;
+static NSMutableDictionary* dbPrimaryKeysByTables;
 
--(id)init
++(void)initialize
 {
-    self = [super init];
     
-    if(_instance != nil){
-        [NSException raise:@"Database can be instantiated only once" format:@"Database can be instantiated only once"];
-    }
-    _instance = self;
-
     dbFieldsByTables = [NSMutableDictionary dictionary];
     dbPrimaryKeysByTables = [NSMutableDictionary dictionary];
 
@@ -138,22 +132,6 @@ static ZPDatabase* _instance = nil;
     [_database setTraceExecution:FALSE];
     [_database setLogsErrors:TRUE];
 
-	return self;
-}
-
-/*
- 
- Singleton accessor. 
- 
- */
-
-+(ZPDatabase*) instance {
-    @synchronized(self){
-        if(_instance == NULL){
-            _instance = [[ZPDatabase alloc] init];
-        }
-        return _instance;
-    }
 }
 
 /*
@@ -162,7 +140,7 @@ static ZPDatabase* _instance = nil;
 
  */
 
--(void) resetDatabase{
++(void) resetDatabase{
     @synchronized(self){
         
         NSError* error;
@@ -195,7 +173,7 @@ static ZPDatabase* _instance = nil;
 
 }
 
-- (void) _executeSQLFromFile:(NSString*)filename{
++(void) _executeSQLFromFile:(NSString*)filename{
 
     @synchronized(self){
         NSStringEncoding encoding;
@@ -235,7 +213,7 @@ static ZPDatabase* _instance = nil;
  
  */
 
-- (void) insertObjects:(NSArray*) objects intoTable:(NSString*) table {
++(void) insertObjects:(NSArray*) objects intoTable:(NSString*) table {
 
     NSArray* dbFieldNames = [self dbFieldNamesForTable:table];
     NSString* unionSelectSQL = [@" UNION SELECT " stringByPaddingToLength:12+[dbFieldNames count]*3 withString:@"?, " startingAtIndex:0];
@@ -311,7 +289,7 @@ static ZPDatabase* _instance = nil;
  
 */
 
-- (void) updateObjects:(NSArray*) objects intoTable:(NSString*) table {
++(void) updateObjects:(NSArray*) objects intoTable:(NSString*) table {
 
     NSMutableArray* dataFieldNames = [NSMutableArray arrayWithArray:[self dbFieldNamesForTable:table]];
     NSArray* primaryKeyFieldNames = [self dbPrimaryKeyNamesForTable:table];
@@ -358,7 +336,7 @@ static ZPDatabase* _instance = nil;
 
  */
 
-- (NSArray*) writeObjects:(NSArray*) objects intoTable:(NSString*) table checkTimestamp:(BOOL) checkTimestamp{
++(NSArray*) writeObjects:(NSArray*) objects intoTable:(NSString*) table checkTimestamp:(BOOL) checkTimestamp{
     
     if([objects count] == 0 ) return objects;
 
@@ -517,7 +495,7 @@ static ZPDatabase* _instance = nil;
 }
 
 
-- (NSArray*) dbFieldNamesForTable:(NSString*) table{
++(NSArray*) dbFieldNamesForTable:(NSString*) table{
     NSArray* returnArray = [dbFieldsByTables objectForKey:table];
     if(returnArray == NULL){
         NSMutableArray* mutableReturnArray = [NSMutableArray array];
@@ -536,7 +514,7 @@ static ZPDatabase* _instance = nil;
     return returnArray;
 }
 
-- (NSArray*) dbPrimaryKeyNamesForTable:(NSString*) table{
++(NSArray*) dbPrimaryKeyNamesForTable:(NSString*) table{
     NSArray* returnArray = [dbPrimaryKeysByTables objectForKey:table];
     if(returnArray == NULL){
         NSMutableArray* mutableReturnArray = [NSMutableArray array];
@@ -556,7 +534,7 @@ static ZPDatabase* _instance = nil;
     
 }
 
-- (NSArray*) dbFieldValuesForObject:(NSObject*) object fieldsNames:(NSArray*)fieldNames{
++(NSArray*) dbFieldValuesForObject:(NSObject*) object fieldsNames:(NSArray*)fieldNames{
     NSMutableArray* returnArray = [NSMutableArray array];
 
     for(NSString* fieldName in fieldNames){
@@ -584,7 +562,7 @@ static ZPDatabase* _instance = nil;
  
  */
 
--(void) writeLibraries:(NSArray*)libraries{
++(void) writeLibraries:(NSArray*)libraries{
     [self writeObjects:libraries intoTable:@"libraries" checkTimestamp:FALSE];
     
     NSMutableArray* keys= [[NSMutableArray alloc] init];
@@ -601,12 +579,12 @@ static ZPDatabase* _instance = nil;
     
 }
 
-- (void) removeLibrariesNotInArray:(NSArray*)libraries{
++(void) removeLibrariesNotInArray:(NSArray*)libraries{
     
 }
 
 
-- (void) setUpdatedTimestampForLibrary:(NSInteger)libraryID toValue:(NSString*)updatedTimestamp{
++(void) setUpdatedTimestampForLibrary:(NSInteger)libraryID toValue:(NSString*)updatedTimestamp{
     @synchronized(self){
         [_database executeUpdate:@"UPDATE libraries SET cacheTimestamp = ? WHERE libraryID = ?",updatedTimestamp,[NSNumber numberWithInt:libraryID]];
     }
@@ -618,7 +596,7 @@ static ZPDatabase* _instance = nil;
  
  */
 
-- (NSArray*) libraries{
++(NSArray*) libraries{
     NSMutableArray* returnArray = [[NSMutableArray alloc] init];
 
     //Group libraries
@@ -638,7 +616,7 @@ static ZPDatabase* _instance = nil;
  Reads data for for a group library and updates the library object
  
  */
-- (void) addAttributesToGroupLibrary:(ZPZoteroLibrary*) library{
++(void) addAttributesToGroupLibrary:(ZPZoteroLibrary*) library{
     @synchronized(self){
         
         FMResultSet* resultSet = [_database executeQuery:@"SELECT *, (SELECT count(*) FROM collections WHERE libraryID=libraryID AND parentCollectionKey IS NULL) AS numChildren FROM libraries WHERE libraryID = ? LIMIT 1",[NSNumber numberWithInt:library.libraryID]];
@@ -663,7 +641,7 @@ static ZPDatabase* _instance = nil;
  
  */
 
--(void) writeCollections:(NSArray*)collections toLibrary:(ZPZoteroLibrary*)library{
++(void) writeCollections:(NSArray*)collections toLibrary:(ZPZoteroLibrary*)library{
 
     
     NSEnumerator* e = [collections objectEnumerator];
@@ -689,7 +667,7 @@ static ZPDatabase* _instance = nil;
 }
 
 // These remove items from the collection
-- (void) removeItemKeysNotInArray:(NSArray*)itemKeys fromCollection:(NSString*)collectionKey{
++(void) removeItemKeysNotInArray:(NSArray*)itemKeys fromCollection:(NSString*)collectionKey{
 
     if([itemKeys count] == 0) return;
     
@@ -702,7 +680,7 @@ static ZPDatabase* _instance = nil;
     
 }
 
-- (void) setUpdatedTimestampForCollection:(NSString*)collectionKey toValue:(NSString*)updatedTimestamp{
++(void) setUpdatedTimestampForCollection:(NSString*)collectionKey toValue:(NSString*)updatedTimestamp{
     @synchronized(self){
         [_database executeUpdate:@"UPDATE collections SET cacheTimestamp = ? WHERE collectionKey = ?",updatedTimestamp,collectionKey];
     }
@@ -714,7 +692,7 @@ static ZPDatabase* _instance = nil;
  
  */
 
-- (NSArray*) collectionsForLibrary : (NSInteger)libraryID withParentCollection:(NSString*)collectionKey {
++(NSArray*) collectionsForLibrary : (NSInteger)libraryID withParentCollection:(NSString*)collectionKey {
     
     NSMutableArray* returnArray = [[NSMutableArray alloc] init];
     
@@ -738,7 +716,7 @@ static ZPDatabase* _instance = nil;
 	return returnArray;
 }
 
-- (NSArray*) collectionsForLibrary : (NSInteger)libraryID{
++(NSArray*) collectionsForLibrary : (NSInteger)libraryID{
     NSMutableArray* returnArray = [[NSMutableArray alloc] init];
     
 	@synchronized(self){
@@ -758,7 +736,7 @@ static ZPDatabase* _instance = nil;
 }
 
 
-- (void) addAttributesToCollection:(ZPZoteroCollection*) collection{
++(void) addAttributesToCollection:(ZPZoteroCollection*) collection{
     
     
 	@synchronized(self){
@@ -784,7 +762,7 @@ Deletes items, notes, and attachments based in array of keys from a library
  
  */
 
-- (void) deleteItemKeysNotInArray:(NSArray*)itemKeys fromLibrary:(NSInteger)libraryID{
++(void) deleteItemKeysNotInArray:(NSArray*)itemKeys fromLibrary:(NSInteger)libraryID{
     
     if([itemKeys count] == 0) return;
     
@@ -811,7 +789,7 @@ Deletes items, notes, and attachments based in array of keys from a library
  
  */
 
--(NSArray*) writeItems:(NSArray*)items {
++(NSArray*) writeItems:(NSArray*)items {
     /*
      Check that all items have keys and item types defined
      */
@@ -829,18 +807,18 @@ Deletes items, notes, and attachments based in array of keys from a library
         
 }
 
--(NSArray*) writeNotes:(NSArray*)notes{
++(NSArray*) writeNotes:(NSArray*)notes{
     return [self writeObjects:notes intoTable:@"notes" checkTimestamp:YES];     
 }
 
--(NSArray*) writeAttachments:(NSArray*)attachments{
++(NSArray*) writeAttachments:(NSArray*)attachments{
     return [self writeObjects:attachments intoTable:@"attachments" checkTimestamp:YES];     
 }
 
 
 // Records a new collection membership
 
--(void) writeItems:(NSArray*)items toCollection:(NSString*)collectionKey{
++(void) writeItems:(NSArray*)items toCollection:(NSString*)collectionKey{
 
     ZPZoteroItem* item;
     NSMutableArray* itemKeys = [NSMutableArray array];
@@ -851,7 +829,7 @@ Deletes items, notes, and attachments based in array of keys from a library
 }
 
 
--(void) addItemKeys:(NSArray*)keys toCollection:(NSString*)collectionKey{
++(void) addItemKeys:(NSArray*)keys toCollection:(NSString*)collectionKey{
     
     NSMutableArray* relationships= [NSMutableArray arrayWithCapacity:[keys count]];
 
@@ -865,7 +843,7 @@ Deletes items, notes, and attachments based in array of keys from a library
 
 
 
-- (NSDictionary*) attributesForItemWithKey:(NSString *)key{
++(NSDictionary*) attributesForItemWithKey:(NSString *)key{
     
     NSDictionary* results = NULL;
     @synchronized(self){
@@ -903,7 +881,7 @@ Deletes items, notes, and attachments based in array of keys from a library
  
  */
 
--(void) writeItemsCreators:(NSArray*)items{
++(void) writeItemsCreators:(NSArray*)items{
     
     if([items count]==0) return;
     
@@ -933,7 +911,7 @@ Deletes items, notes, and attachments based in array of keys from a library
 }
 
 
--(void) writeItemsFields:(NSArray*)items{
++(void) writeItemsFields:(NSArray*)items{
 
     if([items count]==0) return;
     
@@ -964,7 +942,7 @@ Deletes items, notes, and attachments based in array of keys from a library
 
 }
 
-- (NSDictionary*) fieldsForItem:(ZPZoteroItem*)item{
++(NSDictionary*) fieldsForItem:(ZPZoteroItem*)item{
     NSMutableDictionary* fields=[[NSMutableDictionary alloc] init];
     
     @synchronized(self){
@@ -978,7 +956,7 @@ Deletes items, notes, and attachments based in array of keys from a library
     return fields;
 }
 
-- (NSArray*) creatorsForItem:(ZPZoteroItem*)item{
++(NSArray*) creatorsForItem:(ZPZoteroItem*)item{
 
     NSMutableArray* creators = [[NSMutableArray alloc] init];
     
@@ -995,7 +973,7 @@ Deletes items, notes, and attachments based in array of keys from a library
 
 }
 
-- (NSArray*) collectionsForItem:(ZPZoteroItem*)item{
++(NSArray*) collectionsForItem:(ZPZoteroItem*)item{
     
     NSMutableArray* collections = [[NSMutableArray alloc] init];
     
@@ -1012,17 +990,17 @@ Deletes items, notes, and attachments based in array of keys from a library
     
 }
 
-- (void) addCreatorsToItem: (ZPZoteroItem*) item {
++(void) addCreatorsToItem: (ZPZoteroItem*) item {
     item.creators = [self creatorsForItem:item];
 }
 
 
 
-- (void) addFieldsToItem: (ZPZoteroItem*) item  {
++(void) addFieldsToItem: (ZPZoteroItem*) item  {
     item.fields = [self fieldsForItem:item];
 }
 
-- (void) addAttachmentsToItem: (ZPZoteroItem*) item  {
++(void) addAttachmentsToItem: (ZPZoteroItem*) item  {
     
     @synchronized(self){
         FMResultSet* resultSet = [_database executeQuery: @"SELECT * FROM attachments WHERE parentItemKey = ? ORDER BY title ASC",item.key];
@@ -1041,7 +1019,7 @@ Deletes items, notes, and attachments based in array of keys from a library
     }
 }
 
-- (NSArray*) getCachedAttachmentsOrderedByRemovalPriority{
++(NSArray*) getCachedAttachmentsOrderedByRemovalPriority{
     
     @synchronized(self){
         
@@ -1065,7 +1043,7 @@ Deletes items, notes, and attachments based in array of keys from a library
 
 }
 
-- (NSArray*) getAttachmentsInLibrary:(NSInteger)libraryID collection:(NSString*)collectionKey{
++(NSArray*) getAttachmentsInLibrary:(NSInteger)libraryID collection:(NSString*)collectionKey{
     @synchronized(self){
 
         NSMutableArray* returnArray = [NSMutableArray array];
@@ -1093,13 +1071,13 @@ Deletes items, notes, and attachments based in array of keys from a library
     
 }
 
-- (void) updateViewedTimestamp:(ZPZoteroAttachment*)attachment{
++(void) updateViewedTimestamp:(ZPZoteroAttachment*)attachment{
     @synchronized(self){
         [_database executeUpdate:@"UPDATE attachments SET lastViewed = datetime('now') WHERE itemKey = ? ",attachment.key];
     }
 }
 
-- (void) writeVersionInfoForAttachment:(ZPZoteroAttachment*)attachment{
++(void) writeVersionInfoForAttachment:(ZPZoteroAttachment*)attachment{
     @synchronized(self){
         
         [_database executeUpdate:@"UPDATE attachments SET md5 = ?, versionSource = ?, versionIdentifier_server = ?, versionIdentifier_local = ? WHERE itemKey = ? ",
@@ -1122,7 +1100,7 @@ Deletes items, notes, and attachments based in array of keys from a library
     }
 }
 
-- (void) addNotesToItem: (ZPZoteroItem*) item  {
++(void) addNotesToItem: (ZPZoteroItem*) item  {
     
     @synchronized(self){
         FMResultSet* resultSet = [_database executeQuery: @"SELECT * FROM notes WHERE parentItemKey = ? ",item.key];
@@ -1143,7 +1121,7 @@ Deletes items, notes, and attachments based in array of keys from a library
  Retrieves all item keys and note and attachment keys from the library
  */
 
-- (NSArray*) getAllItemKeysForLibrary:(NSInteger)libraryID{
++(NSArray*) getAllItemKeysForLibrary:(NSInteger)libraryID{
     
     NSMutableArray* keys = [[NSMutableArray alloc] init];
     
@@ -1163,7 +1141,7 @@ Deletes items, notes, and attachments based in array of keys from a library
     return keys;
 }
 
-- (NSString*) getFirstItemKeyWithTimestamp:(NSString*)timestamp from:(NSInteger)libraryID{
++(NSString*) getFirstItemKeyWithTimestamp:(NSString*)timestamp from:(NSInteger)libraryID{
     @synchronized(self){
         FMResultSet* resultSet;
         
@@ -1185,7 +1163,7 @@ Deletes items, notes, and attachments based in array of keys from a library
  
  */
 
-- (NSArray*) getItemKeysForLibrary:(NSInteger)libraryID collectionKey:(NSString*)collectionKey
++(NSArray*) getItemKeysForLibrary:(NSInteger)libraryID collectionKey:(NSString*)collectionKey
                       searchString:(NSString*)searchString orderField:(NSString*)orderField sortDescending:(BOOL)sortDescending{
 
     NSMutableArray* keys = [[NSMutableArray alloc] init];
@@ -1305,7 +1283,7 @@ Deletes items, notes, and attachments based in array of keys from a library
     return keys;
 }
 
-- (NSString*) getLocalizationStringWithKey:(NSString*) key type:(NSString*) type locale:(NSString*) locale{
++(NSString*) getLocalizationStringWithKey:(NSString*) key type:(NSString*) type locale:(NSString*) locale{
    
     @synchronized(self){
         FMResultSet* resultSet = [_database executeQuery: @"SELECT value FROM localization WHERE  type = ? AND key =? ",type,key];

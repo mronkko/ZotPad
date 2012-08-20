@@ -73,7 +73,7 @@ static ZPDataLayer* _instance = nil;
  */
 
 - (NSArray*) libraries {
-    return [[ZPDatabase instance] libraries];
+    return [ZPDatabase libraries];
 }
 
 
@@ -86,7 +86,7 @@ static ZPDataLayer* _instance = nil;
 - (NSArray*) collectionsForLibrary : (NSInteger)currentlibraryID withParentCollection:(NSString*)currentcollectionKey {
 
     [[ZPCacheController instance] performSelectorInBackground:@selector(updateCollectionsForLibraryFromServer:) withObject:[ZPZoteroLibrary libraryWithID:currentlibraryID]];
-    return [[ZPDatabase instance] collectionsForLibrary:currentlibraryID withParentCollection:currentcollectionKey];
+    return [ZPDatabase collectionsForLibrary:currentlibraryID withParentCollection:currentcollectionKey];
 
 }
 
@@ -96,7 +96,7 @@ static ZPDataLayer* _instance = nil;
     
     [[ZPCacheController instance] setActiveLibrary:libraryID collection:collectionKey];
     
-    return [[ZPDatabase instance] getItemKeysForLibrary:libraryID collectionKey:collectionKey searchString:searchString orderField:orderField sortDescending:sortDescending];
+    return [ZPDatabase getItemKeysForLibrary:libraryID collectionKey:collectionKey searchString:searchString orderField:orderField sortDescending:sortDescending];
 }
 
 

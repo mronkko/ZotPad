@@ -60,10 +60,10 @@ static NSCache* _objectCache = NULL;
 
         if(obj.libraryID == LIBRARY_ID_MY_LIBRARY){
             obj.title = @"My Library";
-            [obj setNumChildren:[[[ZPDatabase instance] collectionsForLibrary:obj.libraryID withParentCollection:NULL] count]];
+            [obj setNumChildren:[[ZPDatabase collectionsForLibrary:obj.libraryID withParentCollection:NULL] count]];
         }
         else{
-            [[ZPDatabase instance] addAttributesToGroupLibrary:obj];
+            [ZPDatabase addAttributesToGroupLibrary:obj];
         }
             
         [_objectCache setObject:obj  forKey:[NSNumber numberWithInt:libraryID]];

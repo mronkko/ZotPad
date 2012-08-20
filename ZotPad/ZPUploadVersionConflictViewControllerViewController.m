@@ -97,7 +97,7 @@
 #pragma mark - Actions
 
 -(IBAction)useMyVersion:(id)sender{
-    [[ZPDatabase instance] writeVersionInfoForAttachment:attachment];
+    [ZPDatabase writeVersionInfoForAttachment:attachment];
     [fileChannel startUploadingAttachment:attachment overWriteConflictingServerVersion:YES];
     [self dismissModalViewControllerAnimated:YES];
     [[ZPDataLayer instance] notifyAttachmentUploadStarted:attachment];
@@ -105,7 +105,7 @@
 -(IBAction)useRemoteVersion:(id)sender{
     attachment.versionIdentifier_local = NULL;
     [attachment purge_modified:@"User chose server file during conflict"];
-    [[ZPDatabase instance] writeVersionInfoForAttachment:attachment];
+    [ZPDatabase writeVersionInfoForAttachment:attachment];
     [fileChannel cancelUploadingAttachment:attachment];
     [self dismissModalViewControllerAnimated:YES];
     [[ZPDataLayer instance] notifyAttachmentUploadCanceled:attachment];    

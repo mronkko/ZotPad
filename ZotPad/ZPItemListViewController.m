@@ -95,13 +95,13 @@
         if(_searchString == NULL || [_searchString isEqualToString:@""]){
             if([serverKeys count]!=[cacheKeys count] || [uncachedItems count] > 0){
                 if(_collectionKey == NULL){
-                    [[ZPDatabase instance] deleteItemKeysNotInArray:serverKeys fromLibrary:_libraryID];
+                    [ZPDatabase deleteItemKeysNotInArray:serverKeys fromLibrary:_libraryID];
                     //DDLogVerbose(@"Deleted old items from library");
                     
                 }
                 else{
-                    [[ZPDatabase instance] removeItemKeysNotInArray:serverKeys fromCollection:_collectionKey];
-                    [[ZPDatabase instance] addItemKeys:uncachedItems toCollection:_collectionKey];
+                    [ZPDatabase removeItemKeysNotInArray:serverKeys fromCollection:_collectionKey];
+                    [ZPDatabase addItemKeys:uncachedItems toCollection:_collectionKey];
                     //DDLogVerbose(@"Refreshed collection memberships in cache");
                     
                 }

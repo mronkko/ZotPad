@@ -666,7 +666,7 @@ const NSInteger ZPServerConnectionRequestPermissions = 10;
             attachment.versionSource = fileChannel.fileChannelType;
             attachment.versionIdentifier_server = identifier;
             
-            [[ZPDatabase instance] writeVersionInfoForAttachment:attachment];
+            [ZPDatabase writeVersionInfoForAttachment:attachment];
             
         }
         @synchronized(_activeDownloads){
@@ -766,7 +766,7 @@ const NSInteger ZPServerConnectionRequestPermissions = 10;
     
     attachment.versionIdentifier_server = identifier;
     attachment.versionIdentifier_local = identifier;
-    [[ZPDatabase instance] writeVersionInfoForAttachment:attachment];
+    [ZPDatabase writeVersionInfoForAttachment:attachment];
     [attachment moveModifiedFileAsOriginalFile];
     
     @synchronized(_activeUploads){

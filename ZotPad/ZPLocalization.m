@@ -32,7 +32,7 @@ static NSString* locale = NULL;
     NSString* localizationString = [localizationCache objectForKey:combinedKey];
     
     if(localizationString == NULL){
-        localizationString = [[ZPDatabase instance] getLocalizationStringWithKey:key type:type locale:locale];
+        localizationString = [ZPDatabase getLocalizationStringWithKey:key type:type locale:locale];
 
         //If there is no localizatio string available, capitalize the first letter of the key and use that.
         

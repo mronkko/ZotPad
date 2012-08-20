@@ -52,7 +52,7 @@
     // that the file cannot be downloaded because the fact that user tapped an
     // item is still relevant information for the cache controller
  
-    [[ZPDatabase instance] updateViewedTimestamp:attachment];
+    [ZPDatabase updateViewedTimestamp:attachment];
 }
 
 
@@ -187,7 +187,7 @@
          _activeAttachment.versionIdentifier_local = _activeAttachment.versionIdentifier_server;
     }
     
-    [[ZPDatabase instance] writeVersionInfoForAttachment:_activeAttachment];
+    [ZPDatabase writeVersionInfoForAttachment:_activeAttachment];
      
     _docControllerActionSheetShowing = FALSE;
 }

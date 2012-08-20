@@ -114,7 +114,7 @@ static NSInteger _maxCacheSize;
         
         //Also reset the data
 
-        [[ZPDatabase instance] resetDatabase];
+        [ZPDatabase resetDatabase];
         [[ZPCacheController instance] performSelectorInBackground:@selector(purgeAllAttachmentFilesFromCache) withObject:NULL];
         
         [defaults removeObjectForKey:@"resetusername"];
@@ -125,7 +125,7 @@ static NSInteger _maxCacheSize;
     else if([defaults boolForKey:@"resetdata"]){
         DDLogWarn(@"Reseting itemdata and deleting cached attachments");
         [defaults removeObjectForKey:@"resetdata"];
-        [[ZPDatabase instance] resetDatabase];
+        [ZPDatabase resetDatabase];
         [[ZPCacheController instance] performSelectorInBackground:@selector(purgeAllAttachmentFilesFromCache) withObject:NULL];
     }
 }

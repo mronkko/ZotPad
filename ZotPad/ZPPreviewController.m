@@ -133,7 +133,7 @@ static ZPPreviewControllerDelegate* _sharedDelegate;
     // item is still relevant information for the cache controller
     
     
-    [[ZPDatabase instance] updateViewedTimestamp:attachment];
+    [ZPDatabase updateViewedTimestamp:attachment];
     
     
     return self;

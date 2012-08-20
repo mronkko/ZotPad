@@ -60,7 +60,7 @@ static NSCache* _objectCache = NULL;
         
         //TODO: refactor so that this "hack" is no longer needed to load the fields that are specific to attachments
         if([type isEqual:@"attachment"]){
-            [[ZPDatabase instance] addAttachmentsToItem:newObj];
+            [ZPDatabase addAttachmentsToItem:newObj];
         }
         obj=newObj;
     }
@@ -82,7 +82,7 @@ static NSCache* _objectCache = NULL;
     
     if(obj==NULL){
 
-        NSDictionary* attributes = [[ZPDatabase instance] attributesForItemWithKey:(NSString*)key];
+        NSDictionary* attributes = [ZPDatabase attributesForItemWithKey:(NSString*)key];
         
         obj = [self itemWithDictionary:attributes];
     }
@@ -182,7 +182,7 @@ static NSCache* _objectCache = NULL;
 
 - (NSArray*) creators{
     if(_creators == NULL){
-        [[ZPDatabase instance] addCreatorsToItem:self];
+        [ZPDatabase addCreatorsToItem:self];
         if(_creators ==NULL) [NSException raise:@"Creators cannot be null" format:@"Reading an item (%@) from database resulted in null creators. ",self.key];
     }
     return _creators;
@@ -195,7 +195,7 @@ static NSCache* _objectCache = NULL;
 - (NSArray*) attachments{
     
     if(_attachments == NULL){
-        [[ZPDatabase instance] addAttachmentsToItem:self];
+        [ZPDatabase addAttachmentsToItem:self];
     }
     if(_attachments == NULL || ! [_attachments isKindOfClass:[NSArray class]]){
         [NSException raise:@"Internal consistency exception" format:@"Could not load attachments for item with key %@",self.key];
@@ -209,7 +209,7 @@ static NSCache* _objectCache = NULL;
 
 - (NSDictionary*) fields{
     if(_fields == NULL){
-        [[ZPDatabase instance] addFieldsToItem:self];
+        [ZPDatabase addFieldsToItem:self];
     }
     return  _fields;
 }
@@ -241,7 +241,7 @@ static NSCache* _objectCache = NULL;
     
     if(_notes == NULL){
         //TODO: Implement notes
-        //[[ZPDatabase instance] addNotesItem:self];
+        //[ZPDatabase addNotesItem:self];
     }
     return _notes;
 }
@@ -253,7 +253,7 @@ static NSCache* _objectCache = NULL;
 
 -(NSArray*) collections{
     if(_collections == NULL){
-        _collections = [[ZPDatabase instance] collectionsForItem:self];
+        _collections = [ZPDatabase collectionsForItem:self];
     }
     return _collections;
 }

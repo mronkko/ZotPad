@@ -127,7 +127,7 @@ didFinishLaunchingWithOptions:(NSDictionary *)launchOptions
     [defaults setObject:@"" forKey:@"OAuthKey"];
 
     //Uncomment these to always reset the app after launch
-    [[ZPDatabase instance] resetDatabase];
+    [ZPDatabase resetDatabase];
     [[ZPCacheController instance] performSelectorInBackground:@selector(purgeAllAttachmentFilesFromCache) withObject:NULL];
     */
     
