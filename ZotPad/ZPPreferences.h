@@ -9,57 +9,60 @@
 #import <Foundation/Foundation.h>
 
 @interface ZPPreferences : NSObject{
-    NSInteger _metadataCacheLevel;
-    NSInteger _attachmentsCacheLevel;
-    NSInteger _mode;
-    NSInteger _maxCacheSize;
 }
 
-@property (retain) NSString* OAuthKey;
-@property (retain) NSString* userID;
-@property (retain) NSString* username;
-@property (retain) NSString* currentCacheSize;
++(NSString*) OAuthKey;
++(void) setOAuthKey:(NSString*)key;
 
-@property BOOL online;
++(NSString*) userID;
++(void) setUserID:(NSString*)userID;
 
-@property BOOL useWebDAV;
++(void) setUsername:(NSString*)userName;
 
-+(ZPPreferences*) instance;
--(BOOL) cacheMetadataAllLibraries;
--(BOOL) cacheMetadataActiveLibrary;
--(BOOL) cacheMetadataActiveCollection;
++(void) setCurrentCacheSize:(NSString*)cacheSize;
 
--(BOOL) cacheAttachmentsAllLibraries;
--(BOOL) cacheAttachmentsActiveLibrary;
--(BOOL) cacheAttachmentsActiveCollection;
--(BOOL) cacheAttachmentsActiveItem;
++(BOOL) online;
++(void) setOnline:(BOOL)online;
 
--(BOOL) useCache;
+
++(BOOL) useWebDAV;
++(void) setUseWebDAV:(BOOL)useWebDAV;
+
++(BOOL) cacheMetadataAllLibraries;
++(BOOL) cacheMetadataActiveLibrary;
++(BOOL) cacheMetadataActiveCollection;
+
++(BOOL) cacheAttachmentsAllLibraries;
++(BOOL) cacheAttachmentsActiveLibrary;
++(BOOL) cacheAttachmentsActiveCollection;
++(BOOL) cacheAttachmentsActiveItem;
+
++(BOOL) useCache;
 
 //Dropbox spesific settings
--(BOOL) useDropbox;
--(BOOL) dropboxHasFullControl;
--(void) setDropboxPath:(NSString*) path;
--(NSString*) dropboxPath;
--(BOOL) useCustomFilenamesWithDropbox;
--(NSString*) customFilenamePatternForDropbox;
--(NSString*) customPatentFilenamePatternForDropbox;
--(NSString*) customSubfolderPatternForDropbox;
--(BOOL) replaceBlanksInDropboxFilenames;
--(BOOL) removeDiacriticsInDropboxFilenames;
--(BOOL) truncateTitlesInDropboxFilenames;
--(NSInteger) maxTitleLengthInDropboxFilenames;
--(NSInteger) maxNumberOfAuthorsInDropboxFilenames;
--(NSString*) authorSuffixInDropboxFilenames;
++(BOOL) useDropbox;
++(BOOL) dropboxHasFullControl;
++(void) setDropboxPath:(NSString*) path;
++(NSString*) dropboxPath;
++(BOOL) useCustomFilenamesWithDropbox;
++(NSString*) customFilenamePatternForDropbox;
++(NSString*) customPatentFilenamePatternForDropbox;
++(NSString*) customSubfolderPatternForDropbox;
++(BOOL) replaceBlanksInDropboxFilenames;
++(BOOL) removeDiacriticsInDropboxFilenames;
++(BOOL) truncateTitlesInDropboxFilenames;
++(NSInteger) maxTitleLengthInDropboxFilenames;
++(NSInteger) maxNumberOfAuthorsInDropboxFilenames;
++(NSString*) authorSuffixInDropboxFilenames;
 
--(BOOL) reportErrors;
++(BOOL) reportErrors;
 
--(NSString*) webDAVURL;
--(NSInteger) maxCacheSize;
++(NSString*) webDAVURL;
++(NSInteger) maxCacheSize;
 
--(void) resetUserCredentials;
++(void) resetUserCredentials;
 
--(void) reload;
--(void) checkAndProcessApplicationResetPreferences;
++(void) reload;
++(void) checkAndProcessApplicationResetPreferences;
 
 @end

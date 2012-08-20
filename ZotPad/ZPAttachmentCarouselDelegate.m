@@ -333,12 +333,12 @@ NSInteger const ZPATTACHMENTICONGVIEWCONTROLLER_TAG_TITLELABEL = -5;
             if((linkMode == LINK_MODE_IMPORTED_FILE || linkMode == LINK_MODE_IMPORTED_URL )
                && ! exists){
                                 
-                if([[ZPPreferences instance] online]){
+                if([ZPPreferences online]){
                     
                     //TODO: Check if already downloading.
                     
-                    if ([[ZPPreferences instance] useDropbox]) label.text = @"Download from Dropbox";
-                    else if([[ZPPreferences instance] useWebDAV] && attachment.libraryID == 1) label.text = @"Download from WebDAV";
+                    if ([ZPPreferences useDropbox]) label.text = @"Download from Dropbox";
+                    else if([ZPPreferences useWebDAV] && attachment.libraryID == 1) label.text = @"Download from WebDAV";
                     else if (attachment.existsOnZoteroServer){
                         if(attachment.attachmentSize!= 0){
                             label.text =  [NSString stringWithFormat:@"Download from Zotero (%i KB)",attachment.attachmentSize/1024];
@@ -355,7 +355,7 @@ NSInteger const ZPATTACHMENTICONGVIEWCONTROLLER_TAG_TITLELABEL = -5;
             // Linked URL will be shown directly from web 
             
             else if (attachment.linkMode == LINK_MODE_LINKED_URL &&
-                     !  [[ZPPreferences instance] online]){
+                     !  [ZPPreferences online]){
                 label.text = @"Linked URL cannot be viewed in offline mode";
                 
             }

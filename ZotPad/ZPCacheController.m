@@ -146,19 +146,19 @@ static ZPCacheController* _instance = nil;
     Start building cache immediately if the user has chosen to cache all libraries
      */
      
-    if([[ZPPreferences instance] cacheAttachmentsAllLibraries] || [[ZPPreferences instance] cacheMetadataAllLibraries]){
+    if([ZPPreferences cacheAttachmentsAllLibraries] || [ZPPreferences cacheMetadataAllLibraries]){
         NSArray* libraries = [[ZPDatabase instance] libraries];
         
         ZPZoteroLibrary* library;
         for(library in libraries){
-            if([[ZPPreferences instance] cacheAttachmentsAllLibraries]){
+            if([ZPPreferences cacheAttachmentsAllLibraries]){
                 //TODO: refactor so that this block is not needed
                 dispatch_async(dispatch_get_global_queue(DISPATCH_QUEUE_PRIORITY_BACKGROUND,0), ^{
                     NSArray* itemKeysToCheck = [[ZPDatabase instance] getItemKeysForLibrary:library.libraryID collectionKey:NULL searchString:NULL orderField:NULL sortDescending:FALSE];
                     [self _checkIfAttachmentsExistWithParentKeysAndQueueForDownload:itemKeysToCheck];
                 });
             }
-            if([[ZPPreferences instance] cacheMetadataAllLibraries]){
+            if([ZPPreferences cacheMetadataAllLibraries]){
                 dispatch_async(dispatch_get_global_queue(DISPATCH_QUEUE_PRIORITY_BACKGROUND,0), ^{
                     [self _checkIfLibraryNeedsCacheRefreshAndQueue:library.libraryID];
                 });
@@ -188,7 +188,7 @@ static ZPCacheController* _instance = nil;
 -(void) setStatusView:(ZPCacheStatusToolbarController*) statusView{
     _statusView = statusView;
     
-    NSInteger maxCacheSize = [[ZPPreferences instance] maxCacheSize];
+    NSInteger maxCacheSize = [ZPPreferences maxCacheSize];
     NSInteger cacheSizePercent = _sizeOfDocumentsFolder*100/ maxCacheSize;
     [_statusView setCacheUsed:cacheSizePercent];
 
@@ -216,7 +216,7 @@ static ZPCacheController* _instance = nil;
 
         if([_filesToDownload count]>0){
             //Only cache up to 95% full
-            if(_sizeOfDocumentsFolder < 0.95*[[ZPPreferences instance] maxCacheSize]){
+            if(_sizeOfDocumentsFolder < 0.95*[ZPPreferences maxCacheSize]){
 //                DDLogVerbose(@"There is space on device");
                 if([ZPServerConnection instance] && [[ZPServerConnection instance] numberOfFilesDownloading] <1){
                     ZPZoteroAttachment* attachment = [_filesToDownload objectAtIndex:0];
@@ -627,7 +627,7 @@ static ZPCacheController* _instance = nil;
 
     
     
-    if(libraryID !=_activelibraryID && ! [[ZPPreferences instance] cacheAttachmentsAllLibraries] ){
+    if(libraryID !=_activelibraryID && ! [ZPPreferences cacheAttachmentsAllLibraries] ){
         @synchronized(_filesToDownload){
             [_filesToDownload removeAllObjects];
         }
@@ -638,7 +638,7 @@ static ZPCacheController* _instance = nil;
     _activelibraryID = libraryID;
     
     //Both keys might be null, so we need to compare equality directly as well
-    if(! (collectionKey == _activeCollectionKey || [collectionKey isEqual:_activeCollectionKey]) && ! [[ZPPreferences instance] cacheAttachmentsActiveLibrary]){
+    if(! (collectionKey == _activeCollectionKey || [collectionKey isEqual:_activeCollectionKey]) && ! [ZPPreferences cacheAttachmentsActiveLibrary]){
         @synchronized(_filesToDownload){
             
             [_filesToDownload removeAllObjects];
@@ -695,15 +695,15 @@ static ZPCacheController* _instance = nil;
     if(! attachment.fileExists){
         BOOL doCache=false;
         //Cache based on preferences
-        if([[ZPPreferences instance] cacheAttachmentsAllLibraries]){
+        if([ZPPreferences cacheAttachmentsAllLibraries]){
             doCache = true;
         }
-        else if([[ZPPreferences instance] cacheAttachmentsActiveLibrary]){
+        else if([ZPPreferences cacheAttachmentsActiveLibrary]){
             doCache = (attachment.libraryID == _activelibraryID);
             
         }
         //Check if the parent belongs to active the collection
-        else if([[ZPPreferences instance] cacheAttachmentsActiveCollection]){
+        else if([ZPPreferences cacheAttachmentsActiveCollection]){
             ZPZoteroItem* parent = (ZPZoteroItem*)[ZPZoteroItem itemWithKey:attachment.parentItemKey];
             if(parent.libraryID == _activelibraryID && _activeCollectionKey == NULL){
                 doCache=true;
@@ -712,7 +712,7 @@ static ZPCacheController* _instance = nil;
                 doCache = true;
             }
         }
-        else if([[ZPPreferences instance] cacheAttachmentsActiveItem]){
+        else if([ZPPreferences cacheAttachmentsActiveItem]){
             doCache =( attachment.parentItemKey == _activeItemKey);
         }
         
@@ -799,7 +799,7 @@ static ZPCacheController* _instance = nil;
             [self addToLibrariesQueue:container priority:FALSE];
             [self _checkQueues];
 
-            if([[ZPPreferences instance] cacheMetadataActiveLibrary]){
+            if([ZPPreferences cacheMetadataActiveLibrary]){
                 
                 //Retrieve all collections for this library and add them to cache
                 for(ZPZoteroCollection* collection in [[ZPDatabase instance] collectionsForLibrary:container.libraryID]){
@@ -908,7 +908,7 @@ static ZPCacheController* _instance = nil;
 
 
 -(void) notifyLibraryWithCollectionsAvailable:(ZPZoteroLibrary*) library{
-    if([[ZPPreferences instance] cacheMetadataAllLibraries]){
+    if([ZPPreferences cacheMetadataAllLibraries]){
         [self _checkIfLibraryNeedsCacheRefreshAndQueue:library.libraryID];
         [self _checkQueues];
     }
@@ -983,16 +983,16 @@ static ZPCacheController* _instance = nil;
     //Smaller than one gigabyte
     if(_sizeOfDocumentsFolder < 1048576){
         NSInteger temp = _sizeOfDocumentsFolder/1024;
-        [[ZPPreferences instance] setCurrentCacheSize:[NSString stringWithFormat:@"%i MB",temp]];
+        [ZPPreferences setCurrentCacheSize:[NSString stringWithFormat:@"%i MB",temp]];
         
     }
     else{
         float temp = ((float)_sizeOfDocumentsFolder)/1048576;
-        [[ZPPreferences instance] setCurrentCacheSize:[NSString stringWithFormat:@"%.1f GB",temp]];
+        [ZPPreferences setCurrentCacheSize:[NSString stringWithFormat:@"%.1f GB",temp]];
     }
     //Also update the view if it has been defined
     if(_statusView !=NULL){
-        NSInteger maxCacheSize = [[ZPPreferences instance] maxCacheSize];
+        NSInteger maxCacheSize = [ZPPreferences maxCacheSize];
         NSInteger cacheSizePercent = _sizeOfDocumentsFolder*100/ maxCacheSize;
         [_statusView setCacheUsed:cacheSizePercent];
     }
@@ -1031,7 +1031,7 @@ static ZPCacheController* _instance = nil;
 
 //        DDLogVerbose(@"Cache size after adding %@ to cache is %i",attachment.fileSystemPath,_sizeOfDocumentsFolder);
 
-        if(_sizeOfDocumentsFolder>=[[ZPPreferences instance] maxCacheSize]) [self _cleanUpCache];
+        if(_sizeOfDocumentsFolder>=[ZPPreferences maxCacheSize]) [self _cleanUpCache];
         [self _updateCacheSizePreference];
     }
 }
@@ -1078,7 +1078,7 @@ static ZPCacheController* _instance = nil;
             if(! found){
                 NSDictionary *_documentFileAttributes = [[NSFileManager defaultManager] attributesOfFileSystemForPath:path error:NULL];
                 _sizeOfDocumentsFolder -= [_documentFileAttributes fileSize]/1024;
-//                DDLogWarn(@"Deleting orphaned file %@. Cache use is now at %i\%",path,_sizeOfDocumentsFolder*100/[[ZPPreferences instance] maxCacheSize]);
+//                DDLogWarn(@"Deleting orphaned file %@. Cache use is now at %i\%",path,_sizeOfDocumentsFolder*100/[ZPPreferences maxCacheSize]);
                 [[NSFileManager defaultManager] removeItemAtPath:path error: NULL];
             }
         }
@@ -1086,14 +1086,14 @@ static ZPCacheController* _instance = nil;
     
     
     //Delete attachment files until the size of the cache is below the maximum size
-    NSInteger maxCacheSize =[[ZPPreferences instance] maxCacheSize];
+    NSInteger maxCacheSize =[ZPPreferences maxCacheSize];
     if (_sizeOfDocumentsFolder>maxCacheSize){
         for(attachment in attachments){
 
             //Only delete originals
             [attachment purge_original:@"Automatic cache cleaning to reclaim space"];
             
-            if (_sizeOfDocumentsFolder<=[[ZPPreferences instance] maxCacheSize]) break;
+            if (_sizeOfDocumentsFolder<=[ZPPreferences maxCacheSize]) break;
         }
     }
     DDLogWarn(@"Done cleaning cached files");

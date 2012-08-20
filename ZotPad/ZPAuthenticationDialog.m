@@ -209,18 +209,18 @@
         DDLogVerbose(@"Got access token");
         
         //Save the key to preferences
-        [[ZPPreferences instance] setOAuthKey:[_latestToken key]];
+        [ZPPreferences setOAuthKey:[_latestToken key]];
         _oauthkey = [_latestToken key];
         
         //Save userID and username
         NSArray* parts = [responseBody componentsSeparatedByString:@"&"];
         
         NSString* userID = [[[parts objectAtIndex:2]componentsSeparatedByString:@"="] objectAtIndex:1];
-        [[ZPPreferences instance] setUserID:userID];
+        [ZPPreferences setUserID:userID];
         _userID = userID;
         
         NSString* username = [[[parts objectAtIndex:3]componentsSeparatedByString:@"="] objectAtIndex:1];
-        [[ZPPreferences instance] setUsername:username];
+        [ZPPreferences setUsername:username];
         _username = username;
         
         //Tell the application to start updating libraries and collections from server

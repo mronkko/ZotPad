@@ -95,7 +95,7 @@ NSInteger const ZPFILECHANNEL_WEBDAV_UPLOAD_REGISTER = 5;
 -(void) startDownloadingAttachment:(ZPZoteroAttachment*)attachment{
     
     //Setup the request 
-    NSString* WebDAVRoot = [[ZPPreferences instance] webDAVURL];
+    NSString* WebDAVRoot = [ZPPreferences webDAVURL];
     NSString* key =  attachment.key;
     NSString* urlString = [WebDAVRoot stringByAppendingFormat:@"/%@.zip",key];
     NSURL *url = [NSURL URLWithString:urlString]; 
@@ -222,7 +222,7 @@ NSInteger const ZPFILECHANNEL_WEBDAV_UPLOAD_REGISTER = 5;
 -(void) _performWebDAVUploadForAttachment:(ZPZoteroAttachment*)attachment tag:(NSInteger)tag userInfo:(NSDictionary*) userInfo {
     
     //Setup the request 
-    NSString* WebDAVRoot = [[ZPPreferences instance] webDAVURL];
+    NSString* WebDAVRoot = [ZPPreferences webDAVURL];
     NSString* key =  attachment.key;
     NSString* urlString;
     if(tag == ZPFILECHANNEL_WEBDAV_UPLOAD_FILE){
@@ -292,8 +292,8 @@ NSInteger const ZPFILECHANNEL_WEBDAV_UPLOAD_REGISTER = 5;
     
     //Start uploading item metadata
     
-    NSString* oauthkey =  [[ZPPreferences instance] OAuthKey];
-    NSString* urlString = [NSString stringWithFormat:@"https://api.zotero.org/users/%@/items/%@?key=%@",[[ZPPreferences instance] userID],attachment.key, oauthkey];
+    NSString* oauthkey =  [ZPPreferences OAuthKey];
+    NSString* urlString = [NSString stringWithFormat:@"https://api.zotero.org/users/%@/items/%@?key=%@",[ZPPreferences userID],attachment.key, oauthkey];
     
     ASIHTTPRequest* request = [[ASIHTTPRequest alloc] initWithURL:[NSURL URLWithString:urlString]];
     
@@ -560,12 +560,12 @@ NSInteger const ZPFILECHANNEL_WEBDAV_UPLOAD_REGISTER = 5;
 {
     //Disable webdav
     if(buttonIndex == 1){
-        [[ZPPreferences instance] setUseWebDAV:FALSE];
+        [ZPPreferences setUseWebDAV:FALSE];
     }
     //Add security exception
     else if(buttonIndex == 2){
         NSUserDefaults* defaults = [NSUserDefaults standardUserDefaults];
-        NSString* host = [[NSURL URLWithString:[[ZPPreferences instance] webDAVURL]] host]; 
+        NSString* host = [[NSURL URLWithString:[ZPPreferences webDAVURL]] host]; 
         [defaults setObject:host forKey:@"webdavsecurityexception"];
     }
 }

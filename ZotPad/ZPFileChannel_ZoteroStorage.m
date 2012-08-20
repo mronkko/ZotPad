@@ -45,12 +45,12 @@ NSInteger const ZPFILECHANNEL_ZOTEROSTORAGE_UPLOAD_REGISTER = 4;
     }
     
     //Create the download URL
-    NSString* oauthkey =  [[ZPPreferences instance] OAuthKey];
+    NSString* oauthkey =  [ZPPreferences OAuthKey];
     NSString* urlString;
     NSInteger libraryID= attachment.libraryID;
     
     if(libraryID==1 || libraryID == 0){
-        urlString = [NSString stringWithFormat:@"https://api.zotero.org/users/%@",[[ZPPreferences instance] userID]];
+        urlString = [NSString stringWithFormat:@"https://api.zotero.org/users/%@",[ZPPreferences userID]];
     }
     else{
         urlString = [NSString stringWithFormat:@"https://api.zotero.org/groups/%i",libraryID];        

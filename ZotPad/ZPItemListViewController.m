@@ -75,7 +75,7 @@
         [_itemListDataSource configureCachedKeys:cacheKeys];
     }
     
-    if(![[ZPPreferences instance] online]){
+    if(![ZPPreferences online]){
         [_itemListDataSource configureUncachedKeys:[NSArray array]];
     }
     else{
@@ -272,7 +272,7 @@
             // Retrieve the item IDs if a library is selected. 
             
             
-            if([[ZPPreferences instance] online]) [_activityIndicator startAnimating];
+            if([ZPPreferences online]) [_activityIndicator startAnimating];
             
             
             //This queue is only used for retrieving key lists for uncahced items, so we can just invalidate all previous requests

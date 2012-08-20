@@ -66,8 +66,8 @@
  
  */
 
-- (void)setValue:(id)value forUndefinedKey:(NSString *)key{
-    NSLog(@"Cannot set %@ to %@",key,value);
+- (void)setValue:(id)value forUndefinedKey:(NSString *)aKey{
+    NSLog(@"Cannot set %@ to %@",aKey,value);
 }
 
 @end

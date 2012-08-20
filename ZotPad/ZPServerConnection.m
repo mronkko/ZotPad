@@ -98,7 +98,7 @@ const NSInteger ZPServerConnectionRequestPermissions = 10;
  */
 
 +(ZPServerConnection*) instance {
-    if([[ZPPreferences instance] online]){
+    if([ZPPreferences online]){
         if(_instance == NULL){
             _instance = [[ZPServerConnection alloc] init];
         }
@@ -132,7 +132,7 @@ const NSInteger ZPServerConnectionRequestPermissions = 10;
 
 - (BOOL) authenticated{
     
-    return([[ZPPreferences instance] OAuthKey] != nil);
+    return([ZPPreferences OAuthKey] != nil);
     
 }
 
@@ -161,7 +161,7 @@ const NSInteger ZPServerConnectionRequestPermissions = 10;
     if([(NSHTTPURLResponse*)response statusCode]==403){
         @synchronized(self){
             
-            if([[ZPPreferences instance] online] && [self authenticated]){
+            if([ZPPreferences online] && [self authenticated]){
                 //Check if the key is valid at all. If not, reauthenticate only then. 
                 
                 NSArray* librariesThatCanBeAccessed = [[self makeServerRequest:ZPServerConnectionRequestKeys withParameters:NULL] parsedElements];
@@ -170,7 +170,7 @@ const NSInteger ZPServerConnectionRequestPermissions = 10;
                     DDLogError(@"The authorization key is no longer valid.");
                     
                     //Set ZotPad offline and ask the user what to do
-                    [[ZPPreferences instance] setOnline:FALSE];
+                    [ZPPreferences setOnline:FALSE];
                     
                     [[[UIAlertView alloc] initWithTitle:@"Authentication error"
                                                                     message:@"ZotPad is not authorized to access any of your libraries on the Zotero server and is working now in offline mode. This can occur if your access key has been revoked or communications to Zotero server is blocked."
@@ -199,13 +199,13 @@ const NSInteger ZPServerConnectionRequestPermissions = 10;
     NSData* responseData = NULL;
     NSString* urlString;
    
-    NSString* oauthkey =  [[ZPPreferences instance] OAuthKey];
+    NSString* oauthkey =  [ZPPreferences OAuthKey];
     if(oauthkey!=NULL){
 
         NSInteger libraryID = [[parameters objectForKey:@"libraryID"] integerValue];
         
         if(libraryID== LIBRARY_ID_MY_LIBRARY || libraryID == LIBRARY_ID_NOT_SET){
-            urlString = [NSString stringWithFormat:@"https://api.zotero.org/users/%@/",[[ZPPreferences instance] userID]];
+            urlString = [NSString stringWithFormat:@"https://api.zotero.org/users/%@/",[ZPPreferences userID]];
         }
         else{
             urlString = [NSString stringWithFormat:@"https://api.zotero.org/groups/%i/",libraryID];        
@@ -592,10 +592,10 @@ const NSInteger ZPServerConnectionRequestPermissions = 10;
 #pragma mark - Asynchronous file downloads
 
 -(ZPFileChannel*) _fileChannelForAttachment:(ZPZoteroAttachment*) attachment{
-    if([[ZPPreferences instance] useDropbox]){
+    if([ZPPreferences useDropbox]){
         return _fileChannel_Dropbox;
     }
-    else if(attachment.libraryID == LIBRARY_ID_MY_LIBRARY && [[ZPPreferences instance] useWebDAV]){
+    else if(attachment.libraryID == LIBRARY_ID_MY_LIBRARY && [ZPPreferences useWebDAV]){
         return _fileChannel_WebDAV;
     }
     else if(attachment.existsOnZoteroServer){
@@ -842,12 +842,12 @@ const NSInteger ZPServerConnectionRequestPermissions = 10;
         //Stay offline button, do nothing
     }
     else if(buttonIndex == 1){
-        [[UIApplication sharedApplication] openURL:[NSString stringWithFormat:@"https://www.zotero.org/settings/keys/edit/%@",[[ZPPreferences instance] OAuthKey]]];
+        [[UIApplication sharedApplication] openURL:[NSString stringWithFormat:@"https://www.zotero.org/settings/keys/edit/%@",[ZPPreferences OAuthKey]]];
     }
     else if(buttonIndex == 2 ){
         //New key button
-        [[ZPPreferences instance] resetUserCredentials];
-        [[ZPPreferences instance] setOnline:TRUE];
+        [ZPPreferences resetUserCredentials];
+        [ZPPreferences setOnline:TRUE];
     }
 }
 

@@ -193,7 +193,7 @@ static ZPAttachmentIconImageFactory* _webViewDelegate;
                     }
                     //We do not have a file type icon for this.
                     else{
-                        if([[ZPPreferences instance] reportErrors]){
+                        if([ZPPreferences reportErrors]){
                             [TestFlight passCheckpoint:[NSString stringWithFormat:@"Unknown mime type %@",mimeType]];
                         }
                     }

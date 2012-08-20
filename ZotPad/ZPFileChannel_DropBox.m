@@ -97,11 +97,11 @@ static const NSString* DROPBOX_KEY = @"nn6res38igpo4ec";
 
 
 +(void) linkDroboxIfNeeded{
-    if([[ZPPreferences instance] useDropbox]){
+    if([ZPPreferences useDropbox]){
         if([ZPDBSession sharedSession]==NULL){
             DDLogInfo(@"Starting Dropbox");
             
-            if([[ZPPreferences instance] dropboxHasFullControl]){
+            if([ZPPreferences dropboxHasFullControl]){
                 ZPDBSession* dbSession =
                 [[ZPDBSession alloc]
                  initWithAppKey:DROPBOX_KEY_FULL_ACCESS
@@ -183,11 +183,11 @@ static const NSString* DROPBOX_KEY = @"nn6res38igpo4ec";
     
     ZPZoteroItem* parent = [ZPZoteroItem itemWithKey:attachment.parentItemKey];
 
-    NSInteger numAuthors = [[ZPPreferences instance] maxNumberOfAuthorsInDropboxFilenames];
+    NSInteger numAuthors = [ZPPreferences maxNumberOfAuthorsInDropboxFilenames];
     
     if(numAuthors >0 &&  [parent.creators count] > numAuthors){
         creators = [NSArray arrayWithObject:[parent.creators objectAtIndex:0]];
-        suffix = [[ZPPreferences instance] authorSuffixInDropboxFilenames];
+        suffix = [ZPPreferences authorSuffixInDropboxFilenames];
     }
     else{
         creators = parent.creators;
@@ -227,14 +227,14 @@ static const NSString* DROPBOX_KEY = @"nn6res38igpo4ec";
     
     NSString* title;
     
-    if([[ZPPreferences instance] truncateTitlesInDropboxFilenames]){
+    if([ZPPreferences truncateTitlesInDropboxFilenames]){
         title = [[parent.title componentsSeparatedByCharactersInSet:[NSCharacterSet characterSetWithCharactersInString:@":.?"]] objectAtIndex:0];
     }
     else{
         title= parent.title;
     }
     
-    NSInteger nameLength = [[ZPPreferences instance] maxTitleLengthInDropboxFilenames];
+    NSInteger nameLength = [ZPPreferences maxTitleLengthInDropboxFilenames];
     if(nameLength >0 && [title length] > nameLength){
         title = [title substringToIndex:nameLength];
     }
@@ -374,16 +374,16 @@ static const NSString* DROPBOX_KEY = @"nn6res38igpo4ec";
     NSString* appFolder = @"ZotPad";
 #endif
 
-    NSString* basePath = [[ZPPreferences instance] dropboxPath];
+    NSString* basePath = [ZPPreferences dropboxPath];
 
-    if(![[ZPPreferences instance] dropboxHasFullControl]){
-        if([[ZPPreferences instance] dropboxPath] != NULL && ! [[[ZPPreferences instance] dropboxPath] hasPrefix:[@"Apps/" stringByAppendingString:appFolder]]){
+    if(![ZPPreferences dropboxHasFullControl]){
+        if([ZPPreferences dropboxPath] != NULL && ! [[ZPPreferences dropboxPath] hasPrefix:[@"Apps/" stringByAppendingString:appFolder]]){
             
             NSString* defaultPath = [NSString stringWithFormat:@"Apps/%@/storage",appFolder];
             [[[UIAlertView alloc] initWithTitle:@"Dropbox configuration error"
-                                       message:[NSString stringWithFormat:@"Your Dropbox settings allow ZotPad to acces only app folder located at 'Apps/%@', but the current path to our Dropbox files pointed to '%@'. Path to Dropbox files has been reset to default value 'Apps/%@/storage'",appFolder,[[ZPPreferences instance] dropboxPath], appFolder]
+                                       message:[NSString stringWithFormat:@"Your Dropbox settings allow ZotPad to acces only app folder located at 'Apps/%@', but the current path to our Dropbox files pointed to '%@'. Path to Dropbox files has been reset to default value 'Apps/%@/storage'",appFolder,[ZPPreferences dropboxPath], appFolder]
                                       delegate:NULL cancelButtonTitle:@"OK" otherButtonTitles: nil] show];
-            [[ZPPreferences instance] setDropboxPath:defaultPath];
+            [ZPPreferences setDropboxPath:defaultPath];
             basePath = defaultPath;
         }
         
@@ -395,17 +395,17 @@ static const NSString* DROPBOX_KEY = @"nn6res38igpo4ec";
         basePath = [basePath stringByAppendingString:@"/"];
     }
        
-    if([[ZPPreferences instance] useCustomFilenamesWithDropbox]){
+    if([ZPPreferences useCustomFilenamesWithDropbox]){
         
         ZPZoteroItem* parent = [ZPZoteroItem itemWithKey:attachment.parentItemKey];
 
         NSString* pattern;
         
         if([parent.itemType isEqualToString:@"patent"]){
-            pattern = [[ZPPreferences instance] customPatentFilenamePatternForDropbox];
+            pattern = [ZPPreferences customPatentFilenamePatternForDropbox];
         }
         else{
-            pattern = [[ZPPreferences instance] customFilenamePatternForDropbox];
+            pattern = [ZPPreferences customFilenamePatternForDropbox];
         }
 
         NSMutableString* customName = [NSMutableString stringWithString:[self _filenameOrPathForAttachment:attachment withPattern:pattern]];
@@ -429,10 +429,10 @@ static const NSString* DROPBOX_KEY = @"nn6res38igpo4ec";
         customName = [NSMutableString stringWithString:[words componentsJoinedByString:@" "]];
 
                      
-        if([[ZPPreferences instance] replaceBlanksInDropboxFilenames]){
+        if([ZPPreferences replaceBlanksInDropboxFilenames]){
             [customName replaceOccurrencesOfString:@" " withString:@"_" options:NSCaseInsensitiveSearch range:NSMakeRange(0, [customName length])];
         }
-        if([[ZPPreferences instance] removeDiacriticsInDropboxFilenames]){
+        if([ZPPreferences removeDiacriticsInDropboxFilenames]){
             
             NSData *asciiEncoded = [customName dataUsingEncoding:NSASCIIStringEncoding
                                             allowLossyConversion:YES];
@@ -447,7 +447,7 @@ static const NSString* DROPBOX_KEY = @"nn6res38igpo4ec";
             [customName appendFormat:@".%@",[fileTypeSuffix lowercaseString]];
         }
         
-        NSString* folderPattern = [[ZPPreferences instance] customSubfolderPatternForDropbox];
+        NSString* folderPattern = [ZPPreferences customSubfolderPatternForDropbox];
         if(![folderPattern isEqualToString:@""]){
             folderPattern = [folderPattern stringByReplacingOccurrencesOfString:@"\\" withString:@"/"];
             folderPattern = [folderPattern stringByTrimmingCharactersInSet:[NSCharacterSet characterSetWithCharactersInString:@" /"]];
@@ -485,7 +485,7 @@ static const NSString* DROPBOX_KEY = @"nn6res38igpo4ec";
 #endif
     
     
-    if([[ZPPreferences instance] dropboxHasFullControl]){
+    if([ZPPreferences dropboxHasFullControl]){
         baseURL = @"https://www.dropbox.com/home";
     }
     else{

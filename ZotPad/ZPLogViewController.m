@@ -101,7 +101,7 @@
 #endif
 
 -(IBAction)manageKey:(id)sender{
-    [[UIApplication sharedApplication] openURL:[NSURL URLWithString:[@"https://www.zotero.org/settings/keys/edit/" stringByAppendingString:[[ZPPreferences instance] OAuthKey]]]];
+    [[UIApplication sharedApplication] openURL:[NSURL URLWithString:[@"https://www.zotero.org/settings/keys/edit/" stringByAppendingString:[ZPPreferences OAuthKey]]]];
 }
 
 -(IBAction)emailSupport:(id)sender{
@@ -109,7 +109,7 @@
         mailController = [[MFMailComposeViewController alloc] init];
         [mailController setSubject:@"Support request"];
         [mailController setToRecipients:[NSArray arrayWithObject:@"support@zotpad.com"]];
-        [mailController setMessageBody:[NSString stringWithFormat:@"<Please describe your problem here>\n\n\n\nMy userID is %@ and API key is %@. My current log file is attached.",[[ZPPreferences instance] userID], [[ZPPreferences instance] OAuthKey], nil] isHTML:NO];
+        [mailController setMessageBody:[NSString stringWithFormat:@"<Please describe your problem here>\n\n\n\nMy userID is %@ and API key is %@. My current log file is attached.",[ZPPreferences userID], [ZPPreferences OAuthKey], nil] isHTML:NO];
         
         ZPAppDelegate* appDelegate = (ZPAppDelegate*) [[UIApplication sharedApplication] delegate];
         NSString* logPath = [appDelegate.fileLogger.logFileManager.sortedLogFilePaths objectAtIndex:0];

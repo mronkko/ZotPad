@@ -18,30 +18,16 @@
 
 @implementation ZPPreferences
 
-static ZPPreferences* _instance = nil;
+static NSInteger _metadataCacheLevel;
+static NSInteger _attachmentsCacheLevel;
+static NSInteger _mode;
+static NSInteger _maxCacheSize;
 
--(id) init{
-    self = [super init];
-    
-    [self reload];
-
-    return self;
++(void) initialize{
+    [ZPPreferences reload];
 }
 
-/*
- Singleton accessor
- */
-
-+(ZPPreferences*) instance {
-    if(_instance == NULL){
-        _instance = [[ZPPreferences alloc] init];
-    }
-    return _instance;
-}
-
-
-
--(void) reload {
++(void) reload {
    
     DDLogInfo(@"Reloading settings");
     
@@ -118,7 +104,7 @@ static ZPPreferences* _instance = nil;
 
 }
 
--(void) checkAndProcessApplicationResetPreferences{
++(void) checkAndProcessApplicationResetPreferences{
     
     NSUserDefaults* defaults = [NSUserDefaults standardUserDefaults];
 
@@ -143,7 +129,7 @@ static ZPPreferences* _instance = nil;
         [[ZPCacheController instance] performSelectorInBackground:@selector(purgeAllAttachmentFilesFromCache) withObject:NULL];
     }
 }
--(void) resetUserCredentials{
++(void) resetUserCredentials{
     NSUserDefaults* defaults = [NSUserDefaults standardUserDefaults];
     [defaults removeObjectForKey:@"username"];
     self.username = NULL;
@@ -165,135 +151,135 @@ static ZPPreferences* _instance = nil;
     
 }
 // Max cache size in kilo bytes
--(NSInteger) maxCacheSize{
++(NSInteger) maxCacheSize{
     return _maxCacheSize;
 }
 
--(BOOL) cacheMetadataAllLibraries{
++(BOOL) cacheMetadataAllLibraries{
     return _metadataCacheLevel >=3;
 }
 
--(BOOL) cacheMetadataActiveLibrary{
++(BOOL) cacheMetadataActiveLibrary{
     return _metadataCacheLevel >=2;
 }
--(BOOL) cacheMetadataActiveCollection{
++(BOOL) cacheMetadataActiveCollection{
     return _metadataCacheLevel >=1;
 }
 
--(BOOL) cacheAttachmentsAllLibraries{
++(BOOL) cacheAttachmentsAllLibraries{
     return _attachmentsCacheLevel >=4;
 }
 
--(BOOL) cacheAttachmentsActiveLibrary{
++(BOOL) cacheAttachmentsActiveLibrary{
     return _attachmentsCacheLevel >=3;
 }
--(BOOL) cacheAttachmentsActiveCollection{
++(BOOL) cacheAttachmentsActiveCollection{
     return _attachmentsCacheLevel >=2;
 }
--(BOOL) cacheAttachmentsActiveItem{
++(BOOL) cacheAttachmentsActiveItem{
     return _attachmentsCacheLevel >=1;
 }
 
--(BOOL) useCache{
++(BOOL) useCache{
     return (_mode != 0);
 }
 
--(BOOL) online{
++(BOOL) online{
     return (_mode != 2);
 }
 
--(void) setOnline:(BOOL)online{
++(void) setOnline:(BOOL)online{
     if(online) _mode = 1;
     else _mode = 2;
     NSUserDefaults* defaults = [NSUserDefaults standardUserDefaults];
     [defaults setObject:[NSNumber numberWithInt:_mode] forKey:@"mode"];
 }
 
--(BOOL) reportErrors{
++(BOOL) reportErrors{
     NSUserDefaults* defaults = [NSUserDefaults standardUserDefaults];
     return [defaults boolForKey:@"errorreports"];
 }
 
--(BOOL) useDropbox{
++(BOOL) useDropbox{
     NSUserDefaults* defaults = [NSUserDefaults standardUserDefaults];
     return [[defaults objectForKey:@"filechannel"] isEqualToString:@"dropbox"];
 }
 
--(BOOL) dropboxHasFullControl{
++(BOOL) dropboxHasFullControl{
     NSUserDefaults* defaults = [NSUserDefaults standardUserDefaults];
     return [defaults boolForKey:@"dropboxfullcontrol"];
     
 }
--(NSString*) dropboxPath{
++(NSString*) dropboxPath{
     NSUserDefaults* defaults = [NSUserDefaults standardUserDefaults];
     return [[[defaults stringForKey:@"dropboxpath"] 
              stringByTrimmingCharactersInSet:[NSCharacterSet whitespaceCharacterSet]]
             stringByTrimmingCharactersInSet:[NSCharacterSet characterSetWithCharactersInString:@"/\\"]];
 }
--(void) setDropboxPath:(NSString*)path{
++(void) setDropboxPath:(NSString*)path{
     NSUserDefaults* defaults = [NSUserDefaults standardUserDefaults];
     [defaults setObject:path forKey:@"dropboxpath"];
 }
 
--(BOOL) useCustomFilenamesWithDropbox{
++(BOOL) useCustomFilenamesWithDropbox{
     NSUserDefaults* defaults = [NSUserDefaults standardUserDefaults];
     return [defaults boolForKey:@"dropboxusecustomfilenames"];
 }
 
--(NSString*) customFilenamePatternForDropbox{
++(NSString*) customFilenamePatternForDropbox{
     NSUserDefaults* defaults = [NSUserDefaults standardUserDefaults];
     return [defaults stringForKey:@"dropboxfilenamepattern"];
 }
--(NSString*) customSubfolderPatternForDropbox{
++(NSString*) customSubfolderPatternForDropbox{
     NSUserDefaults* defaults = [NSUserDefaults standardUserDefaults];
     return [defaults stringForKey:@"dropboxsubfolderpattern"];
 }
 
--(NSString*) customPatentFilenamePatternForDropbox{
++(NSString*) customPatentFilenamePatternForDropbox{
     NSUserDefaults* defaults = [NSUserDefaults standardUserDefaults];
     return [defaults stringForKey:@"dropboxfilenamepatternpatents"];
 }
 
--(BOOL) replaceBlanksInDropboxFilenames{
++(BOOL) replaceBlanksInDropboxFilenames{
     NSUserDefaults* defaults = [NSUserDefaults standardUserDefaults];
     return [defaults boolForKey:@"dropboxreplaceblanks"];
 }
--(BOOL) removeDiacriticsInDropboxFilenames{
++(BOOL) removeDiacriticsInDropboxFilenames{
     NSUserDefaults* defaults = [NSUserDefaults standardUserDefaults];
     return [defaults boolForKey:@"dropboxremovediacritics"];
 }
 
--(BOOL) truncateTitlesInDropboxFilenames{
++(BOOL) truncateTitlesInDropboxFilenames{
     NSUserDefaults* defaults = [NSUserDefaults standardUserDefaults];
     return [defaults boolForKey:@"dropboxtruncatetitle"];
 }
 
--(NSInteger) maxTitleLengthInDropboxFilenames{
++(NSInteger) maxTitleLengthInDropboxFilenames{
     NSUserDefaults* defaults = [NSUserDefaults standardUserDefaults];
     return [defaults integerForKey:@"dropboxtitlelenght"];
 }
 
--(NSInteger) maxNumberOfAuthorsInDropboxFilenames{
++(NSInteger) maxNumberOfAuthorsInDropboxFilenames{
     NSUserDefaults* defaults = [NSUserDefaults standardUserDefaults];
     return [defaults integerForKey:@"dropboxnumberofauthor"];
 }
 
--(NSString*) authorSuffixInDropboxFilenames{
++(NSString*) authorSuffixInDropboxFilenames{
     NSUserDefaults* defaults = [NSUserDefaults standardUserDefaults];
     return [defaults stringForKey:@"dropboxauthorsuffix"];
 }
 
--(BOOL) useWebDAV{
++(BOOL) useWebDAV{
     NSUserDefaults* defaults = [NSUserDefaults standardUserDefaults];
     return [[defaults objectForKey:@"filechannel"] isEqualToString:@"webdavzotero"];
 }
--(void) setUseWebDAV:(BOOL) value{
++(void) setUseWebDAV:(BOOL) value{
     NSUserDefaults* defaults = [NSUserDefaults standardUserDefaults];
     if(value) [defaults setObject:@"webdavzotero" forKey:@"filechannel"];
     else [defaults setObject:@"zotero" forKey:@"filechannel"];
 }
 
--(NSString*) webDAVURL{
++(NSString*) webDAVURL{
     NSUserDefaults* defaults = [NSUserDefaults standardUserDefaults];
     NSString* ret = [[defaults objectForKey:@"webdavurl"] stringByTrimmingCharactersInSet:[NSCharacterSet whitespaceAndNewlineCharacterSet]];
     
@@ -305,38 +291,38 @@ static ZPPreferences* _instance = nil;
     return ret;
 }
 
--(NSString*) username{
++(NSString*) username{
     NSUserDefaults* defaults = [NSUserDefaults standardUserDefaults];
     return [defaults objectForKey:@"username"];
 }
--(void) setUsername: (NSString*) value {
++(void) setUsername: (NSString*) value {
     NSUserDefaults* defaults = [NSUserDefaults standardUserDefaults];
     [defaults setValue:value forKey:@"username"];
 }
 
--(NSString*) userID{
++(NSString*) userID{
     NSUserDefaults* defaults = [NSUserDefaults standardUserDefaults];
     return [defaults objectForKey:@"userID"];
 }
--(void) setUserID: (NSString*) value {
++(void) setUserID: (NSString*) value {
     NSUserDefaults* defaults = [NSUserDefaults standardUserDefaults];
     [defaults setValue:value forKey:@"userID"];
 }
 
--(NSString*) OAuthKey{
++(NSString*) OAuthKey{
     NSUserDefaults* defaults = [NSUserDefaults standardUserDefaults];
     return [defaults objectForKey:@"OAuthKey"];
 }
--(void) setOAuthKey:(NSString*) value {
++(void) setOAuthKey:(NSString*) value {
     NSUserDefaults* defaults = [NSUserDefaults standardUserDefaults];
     [defaults setValue:value forKey:@"OAuthKey"];
 }
 
--(NSString*) currentCacheSize{
++(NSString*) currentCacheSize{
     NSUserDefaults* defaults = [NSUserDefaults standardUserDefaults];
     return [defaults objectForKey:@"cachesizecurrent"];
 }
--(void) setCurrentCacheSize:(NSString*) value {
++(void) setCurrentCacheSize:(NSString*) value {
     NSUserDefaults* defaults = [NSUserDefaults standardUserDefaults];
     [defaults setValue:value forKey:@"cachesizecurrent"];
 }

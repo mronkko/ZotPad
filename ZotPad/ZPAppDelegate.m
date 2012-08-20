@@ -97,7 +97,7 @@ didFinishLaunchingWithOptions:(NSDictionary *)launchOptions
     //[NSTimer scheduledTimerWithTimeInterval:(NSTimeInterval)2 target:[UIApplication sharedApplication] selector:@selector(_performMemoryWarning) userInfo:NULL repeats:YES];
     
 #else
-    if([[ZPPreferences instance] reportErrors]) [TestFlight takeOff:@"5e753f234f33fc2bddf4437600037fbf_NjcyMjEyMDEyLTA0LTA5IDE0OjUyOjU0LjE4MDQwMg"];
+    if([ZPPreferences reportErrors]) [TestFlight takeOff:@"5e753f234f33fc2bddf4437600037fbf_NjcyMjEyMDEyLTA0LTA5IDE0OjUyOjU0LjE4MDQwMg"];
 
 #endif
     
@@ -132,7 +132,7 @@ didFinishLaunchingWithOptions:(NSDictionary *)launchOptions
     */
     
     
-    [[ZPPreferences instance] checkAndProcessApplicationResetPreferences];
+    [ZPPreferences checkAndProcessApplicationResetPreferences];
      
     
     // Override point for customization after application launch.
@@ -183,7 +183,7 @@ didFinishLaunchingWithOptions:(NSDictionary *)launchOptions
      Called as part of the transition from the background to the inactive state; here you can undo many of the changes made on entering the background.
      */
     
-    [[ZPPreferences instance] reload];
+    [ZPPreferences reload];
 
 }
 
@@ -214,8 +214,8 @@ didFinishLaunchingWithOptions:(NSDictionary *)launchOptions
             DDLogInfo(@"App linked successfully with DropBox");
             
             // Upload the setup scripts
-            BOOL fullControl = [[ZPPreferences instance] dropboxHasFullControl];
-            NSString* path = [[ZPPreferences instance] dropboxPath];
+            BOOL fullControl = [ZPPreferences dropboxHasFullControl];
+            NSString* path = [ZPPreferences dropboxPath];
             if(! fullControl && (path == NULL || [path isEqualToString:@""])){
                 
                 _restClient = [[DBRestClient alloc] initWithSession:[DBSession sharedSession]];
