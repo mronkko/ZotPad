@@ -86,7 +86,7 @@
             //DDLogVerbose(@"Making view busy");
             [_itemListController performSelectorOnMainThread:@selector(makeBusy) withObject:NULL waitUntilDone:FALSE];        
         }
-        NSArray* serverKeys =[[ZPServerConnection instance] retrieveKeysInContainer:_libraryID collectionKey:_collectionKey searchString:_searchString orderField:_orderField sortDescending:_sortDescending];
+        NSArray* serverKeys =[ZPServerConnection retrieveKeysInContainer:_libraryID collectionKey:_collectionKey searchString:_searchString orderField:_orderField sortDescending:_sortDescending];
         
         NSMutableArray* uncachedItems = [NSMutableArray arrayWithArray:serverKeys];
         [uncachedItems removeObjectsInArray:cacheKeys];

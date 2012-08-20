@@ -638,7 +638,7 @@ static const NSString* DROPBOX_KEY = @"nn6res38igpo4ec";
     [self _restClient:client processError:error];
     
     ZPZoteroAttachment* attachment = client.attachment;
-    [[ZPServerConnection instance] failedDownloadingAttachment:attachment withError:error usingFileChannel:self fromURL:[self _URLForAttachment:attachment]];    
+    [ZPServerConnection failedDownloadingAttachment:attachment withError:error usingFileChannel:self fromURL:[self _URLForAttachment:attachment]];    
     [self cleanupAfterFinishingAttachment:attachment];
 
 }
@@ -719,12 +719,12 @@ static const NSString* DROPBOX_KEY = @"nn6res38igpo4ec";
             
             //Website snapshots do not use revision info in Dropbox
             
-            [[ZPServerConnection instance] finishedDownloadingAttachment:attachment toFileAtPath:localPath withVersionIdentifier:@"" usingFileChannel:self];
+            [ZPServerConnection finishedDownloadingAttachment:attachment toFileAtPath:localPath withVersionIdentifier:@"" usingFileChannel:self];
             [self cleanupAfterFinishingAttachment:attachment];
         }
     }
     else{
-        [[ZPServerConnection instance] finishedDownloadingAttachment:attachment toFileAtPath:localPath withVersionIdentifier:client.revision usingFileChannel:self];
+        [ZPServerConnection finishedDownloadingAttachment:attachment toFileAtPath:localPath withVersionIdentifier:client.revision usingFileChannel:self];
         [self cleanupAfterFinishingAttachment:attachment];
     }
 }
@@ -735,7 +735,7 @@ static const NSString* DROPBOX_KEY = @"nn6res38igpo4ec";
     [self _restClient:client processError:error];
     
     ZPZoteroAttachment* attachment = client.attachment;
-    [[ZPServerConnection instance] failedDownloadingAttachment:attachment withError:error usingFileChannel:self fromURL:[self _URLForAttachment:attachment]];
+    [ZPServerConnection failedDownloadingAttachment:attachment withError:error usingFileChannel:self fromURL:[self _URLForAttachment:attachment]];
     [self cleanupAfterFinishingAttachment:attachment];
 
 }
@@ -747,7 +747,7 @@ static const NSString* DROPBOX_KEY = @"nn6res38igpo4ec";
 
     ZPZoteroAttachment* attachment = client.attachment;
     
-    [[ZPServerConnection instance] finishedUploadingAttachment:attachment withVersionIdentifier:metadata.rev];
+    [ZPServerConnection finishedUploadingAttachment:attachment withVersionIdentifier:metadata.rev];
     [self cleanupAfterFinishingAttachment:attachment];
 
 }
@@ -765,7 +765,7 @@ static const NSString* DROPBOX_KEY = @"nn6res38igpo4ec";
     [self _restClient:client processError:error];
     
     ZPZoteroAttachment* attachment = [(ZPDBRestClient* )client attachment];
-    [[ZPServerConnection instance] failedUploadingAttachment:attachment withError:error usingFileChannel:self toURL:[self _URLForAttachment:attachment]];
+    [ZPServerConnection failedUploadingAttachment:attachment withError:error usingFileChannel:self toURL:[self _URLForAttachment:attachment]];
     [self cleanupAfterFinishingAttachment:attachment];
 }
 

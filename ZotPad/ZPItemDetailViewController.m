@@ -145,7 +145,7 @@
 
 -(void) configure{
     
-    if([ZPServerConnection instance]!=NULL){
+    if([ZPServerConnection hasInternetConnection]){
         [_activityIndicator startAnimating];
         [[ZPDataLayer instance] updateItemDetailsFromServer:_currentItem];
     }

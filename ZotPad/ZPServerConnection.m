@@ -53,15 +53,21 @@
 @interface ZPServerConnection();
     
 
--(ZPServerResponseXMLParser*) makeServerRequest:(NSInteger)type withParameters:(NSDictionary*) parameters;
--(ZPFileChannel*) _fileChannelForAttachment:(ZPZoteroAttachment*) attachment;
++(ZPServerResponseXMLParser*) makeServerRequest:(NSInteger)type withParameters:(NSDictionary*) parameters;
++(ZPFileChannel*) _fileChannelForAttachment:(ZPZoteroAttachment*) attachment;
 
 @end
 
 
 @implementation ZPServerConnection
 
-static ZPServerConnection* _instance = nil;
+static NSInteger _activeRequestCount;
+static NSMutableSet* _activeDownloads;
+static NSMutableSet* _activeUploads;
+
+static ZPFileChannel* _fileChannel_WebDAV;
+static ZPFileChannel* _fileChannel_Dropbox;
+static ZPFileChannel* _fileChannel_Zotero;
 
 const NSInteger ZPServerConnectionRequestGroups = 1;
 const NSInteger ZPServerConnectionRequestCollections = 2;
@@ -74,10 +80,8 @@ const NSInteger ZPServerConnectionRequestKeys = 8;
 const NSInteger ZPServerConnectionRequestTopLevelKeys = 9;
 const NSInteger ZPServerConnectionRequestPermissions = 10;
 
--(id)init
++(void) initialize
 {
-    self = [super init];
-        
     _activeRequestCount = 0;
     _fileChannel_WebDAV= [[ZPFileChannel_WebDAV alloc] init];
     _fileChannel_Zotero = [[ZPFileChannel_ZoteroStorage alloc] init];
@@ -88,30 +92,12 @@ const NSInteger ZPServerConnectionRequestPermissions = 10;
     _activeDownloads= [[NSMutableSet alloc] init];
     _activeUploads= [[NSMutableSet alloc] init];
 
-    return self;
 }
 
-/*
-
- Singleton accessor. If ZotPad is offline or there is no internet connection, return null to prevent accessing the server.
- 
- */
-
-+(ZPServerConnection*) instance {
-    if([ZPPreferences online]){
-        if(_instance == NULL){
-            _instance = [[ZPServerConnection alloc] init];
-        }
-        if([_instance hasInternetConnection]) return _instance;
-           
-    }
-    
-    return NULL;
-}
 
 //Adapted from the Reachability example project
 
--(BOOL) hasInternetConnection{
++(BOOL) hasInternetConnection{
     
     struct sockaddr_in zeroAddress;
     bzero(&zeroAddress, sizeof(zeroAddress));
@@ -130,13 +116,13 @@ const NSInteger ZPServerConnectionRequestPermissions = 10;
  We assume that the client is authenticated if a oauth key exists. The key will be cleared if we notice that it is not valid while using it.
  */
 
-- (BOOL) authenticated{
++(BOOL) authenticated{
     
     return([ZPPreferences OAuthKey] != nil);
     
 }
 
--(NSData*) _retrieveDataFromServer:(NSString*)urlString{
++(NSData*) _retrieveDataFromServer:(NSString*)urlString{
     _activeRequestCount++;
     
     DDLogVerbose(@"New connection to Zotero server starting: %@ Active queries: %i",urlString,_activeRequestCount);
@@ -193,7 +179,7 @@ const NSInteger ZPServerConnectionRequestPermissions = 10;
 }
 
 
--(ZPServerResponseXMLParser*) makeServerRequest:(NSInteger)type withParameters:(NSDictionary*) parameters{
++(ZPServerResponseXMLParser*) makeServerRequest:(NSInteger)type withParameters:(NSDictionary*) parameters{
     
     
     NSData* responseData = NULL;
@@ -361,7 +347,7 @@ const NSInteger ZPServerConnectionRequestPermissions = 10;
     }
 }
 
--(ZPZoteroItem*) retrieveSingleItemDetailsFromServer:(ZPZoteroItem*)item{
++(ZPZoteroItem*) retrieveSingleItemDetailsFromServer:(ZPZoteroItem*)item{
 
     NSMutableDictionary* parameters = [NSMutableDictionary dictionaryWithObject:[NSNumber numberWithInt:item.libraryID] forKey:@"libraryID"];
     [parameters setObject:item.key forKey:@"itemKey"];
@@ -411,7 +397,7 @@ const NSInteger ZPServerConnectionRequestPermissions = 10;
     return item;
 }
 
--(NSArray*) retrieveLibrariesFromServer{
++(NSArray*) retrieveLibrariesFromServer{
 
     
     //Retrieve access rights of this key
@@ -465,7 +451,7 @@ const NSInteger ZPServerConnectionRequestPermissions = 10;
     
 }
 
--(NSArray*) retrieveCollectionsForLibraryFromServer:(NSInteger)libraryID{
++(NSArray*) retrieveCollectionsForLibraryFromServer:(NSInteger)libraryID{
     
     NSMutableDictionary* parameters = [NSMutableDictionary dictionaryWithObject:[NSNumber numberWithInt:libraryID] forKey:@"libraryID"];
 
@@ -488,7 +474,7 @@ const NSInteger ZPServerConnectionRequestPermissions = 10;
     return returnArray;
 }
 
--(ZPZoteroCollection*) retrieveCollection:(NSString*)collectionKey fromLibrary:(NSInteger)libraryID{
++(ZPZoteroCollection*) retrieveCollection:(NSString*)collectionKey fromLibrary:(NSInteger)libraryID{
 
     NSMutableDictionary* parameters = [NSMutableDictionary dictionaryWithObject:[NSNumber numberWithInt:libraryID] forKey:@"libraryID"];
     [parameters setValue:collectionKey forKey:@"collectionKey"];
@@ -504,7 +490,7 @@ const NSInteger ZPServerConnectionRequestPermissions = 10;
 }
 
 
--(NSArray*) retrieveItemsFromLibrary:(NSInteger)libraryID itemKeys:(NSArray*)keys {
++(NSArray*) retrieveItemsFromLibrary:(NSInteger)libraryID itemKeys:(NSArray*)keys {
     
     
     NSMutableDictionary* parameters = [NSMutableDictionary dictionaryWithObject:[NSNumber numberWithInt:libraryID]  forKey:@"libraryID"];
@@ -519,7 +505,7 @@ const NSInteger ZPServerConnectionRequestPermissions = 10;
     
     
 }
--(NSArray*) retrieveAllItemKeysFromLibrary:(NSInteger)libraryID{
++(NSArray*) retrieveAllItemKeysFromLibrary:(NSInteger)libraryID{
     
     NSMutableDictionary* parameters = [NSMutableDictionary dictionaryWithObject:[NSNumber numberWithInt:libraryID]  forKey:@"libraryID"];
     [parameters setObject:@"dateModified" forKey:@"order"];
@@ -529,7 +515,7 @@ const NSInteger ZPServerConnectionRequestPermissions = 10;
     return parserDelegate.parsedElements;
     
 }
--(NSArray*) retrieveKeysInContainer:(NSInteger)libraryID collectionKey:(NSString*)key{
++(NSArray*) retrieveKeysInContainer:(NSInteger)libraryID collectionKey:(NSString*)key{
     NSMutableDictionary* parameters = [NSMutableDictionary dictionaryWithObject:[NSNumber numberWithInt:libraryID]  forKey:@"libraryID"];
     if(key!=NULL) [parameters setValue:key forKey:@"collectionKey"];
 
@@ -539,7 +525,7 @@ const NSInteger ZPServerConnectionRequestPermissions = 10;
     
 }
 
--(NSArray*) retrieveKeysInContainer:(NSInteger)libraryID collectionKey:(NSString*)collectionKey searchString:(NSString*)searchString orderField:(NSString*)orderField sortDescending:(BOOL)sortDescending{
++(NSArray*) retrieveKeysInContainer:(NSInteger)libraryID collectionKey:(NSString*)collectionKey searchString:(NSString*)searchString orderField:(NSString*)orderField sortDescending:(BOOL)sortDescending{
     
     NSMutableDictionary* parameters = [NSMutableDictionary dictionaryWithObject:[NSNumber numberWithInt:libraryID]  forKey:@"libraryID"];
     if(collectionKey!=NULL) [parameters setValue:collectionKey forKey:@"collectionKey"];
@@ -571,7 +557,7 @@ const NSInteger ZPServerConnectionRequestPermissions = 10;
     
 }
 
--(NSString*) retrieveTimestampForContainer:(NSInteger)libraryID collectionKey:(NSString*)key{
++(NSString*) retrieveTimestampForContainer:(NSInteger)libraryID collectionKey:(NSString*)key{
     
     NSMutableDictionary* parameters = [NSMutableDictionary dictionaryWithObject:[NSNumber numberWithInt:libraryID]  forKey:@"libraryID"];
     if(key!=NULL) [parameters setValue:key forKey:@"collectionKey"];
@@ -591,7 +577,7 @@ const NSInteger ZPServerConnectionRequestPermissions = 10;
 
 #pragma mark - Asynchronous file downloads
 
--(ZPFileChannel*) _fileChannelForAttachment:(ZPZoteroAttachment*) attachment{
++(ZPFileChannel*) _fileChannelForAttachment:(ZPZoteroAttachment*) attachment{
     if([ZPPreferences useDropbox]){
         return _fileChannel_Dropbox;
     }
@@ -604,14 +590,14 @@ const NSInteger ZPServerConnectionRequestPermissions = 10;
     else return NULL;
 }
 
--(NSInteger) numberOfFilesDownloading{
++(NSInteger) numberOfFilesDownloading{
     @synchronized(_activeDownloads){
         return [_activeDownloads count];
     }
 }
 
 
--(BOOL) checkIfCanBeDownloadedAndStartDownloadingAttachment:(ZPZoteroAttachment*)attachment{
++(BOOL) checkIfCanBeDownloadedAndStartDownloadingAttachment:(ZPZoteroAttachment*)attachment{
     
     DDLogVerbose(@"Checking if file %@ can download",attachment);
     
@@ -657,7 +643,7 @@ const NSInteger ZPServerConnectionRequestPermissions = 10;
 /*
  This is called always when an item finishes downloading regardless of whether it was succcesful or not.
  */
--(void) finishedDownloadingAttachment:(ZPZoteroAttachment*)attachment toFileAtPath:(NSString*) tempFile withVersionIdentifier:(NSString*) identifier usingFileChannel:(ZPFileChannel*)fileChannel{
++(void) finishedDownloadingAttachment:(ZPZoteroAttachment*)attachment toFileAtPath:(NSString*) tempFile withVersionIdentifier:(NSString*) identifier usingFileChannel:(ZPFileChannel*)fileChannel{
 
     if(tempFile == NULL){
         [NSException raise:@"Invalid file path" format:@"File channel should not report success if file was not received"];
@@ -701,7 +687,7 @@ const NSInteger ZPServerConnectionRequestPermissions = 10;
     
 }
 
--(void) failedDownloadingAttachment:(ZPZoteroAttachment*)attachment withError:(NSError*) error usingFileChannel:(ZPFileChannel*)fileChannel fromURL:(NSString *)url{
++(void) failedDownloadingAttachment:(ZPZoteroAttachment*)attachment withError:(NSError*) error usingFileChannel:(ZPFileChannel*)fileChannel fromURL:(NSString *)url{
     @synchronized(_activeDownloads){
         [_activeDownloads removeObject:attachment];
         DDLogError(@"Failed downloading file %@. %@ (URL: %@) Troubleshooting instructions: http://www.zotpad.com/troubleshooting",attachment.filename,error.localizedDescription,url);
@@ -715,18 +701,18 @@ const NSInteger ZPServerConnectionRequestPermissions = 10;
 }
 
 
--(void) cancelDownloadingAttachment:(ZPZoteroAttachment*)attachment{
++(void) cancelDownloadingAttachment:(ZPZoteroAttachment*)attachment{
     //Loop over the file channels and cancel downloading of this attachment
     ZPFileChannel* downloadChannel = [self _fileChannelForAttachment:attachment];
     [downloadChannel cancelDownloadingAttachment:attachment];
 }
 
--(void) useProgressView:(UIProgressView*) progressView forDownloadingAttachment:(ZPZoteroAttachment*)attachment{
++(void) useProgressView:(UIProgressView*) progressView forDownloadingAttachment:(ZPZoteroAttachment*)attachment{
     ZPFileChannel* downloadChannel = [self _fileChannelForAttachment:attachment];
     [downloadChannel  useProgressView:progressView forDownloadingAttachment:attachment];
 }
 
--(BOOL) isAttachmentDownloading:(ZPZoteroAttachment*)attachment{
++(BOOL) isAttachmentDownloading:(ZPZoteroAttachment*)attachment{
     @synchronized(_activeDownloads){
         return [_activeDownloads containsObject:attachment];
     }
@@ -734,12 +720,12 @@ const NSInteger ZPServerConnectionRequestPermissions = 10;
 }
 
 #pragma mark - Asynchronous uploading of files
--(NSInteger) numberOfFilesUploading{
++(NSInteger) numberOfFilesUploading{
     @synchronized(_activeUploads){
         return [_activeUploads count];
     }
 }
--(void) uploadVersionOfAttachment:(ZPZoteroAttachment*)attachment{
++(void) uploadVersionOfAttachment:(ZPZoteroAttachment*)attachment{
 
     //If the local file does not exist, raise an exception as this should not happen.
     if(![[NSFileManager defaultManager] fileExistsAtPath:attachment.fileSystemPath_modified]){
@@ -767,7 +753,7 @@ const NSInteger ZPServerConnectionRequestPermissions = 10;
     [[ZPDataLayer instance] notifyAttachmentUploadStarted:attachment];
 
 }
--(void) finishedUploadingAttachment:(ZPZoteroAttachment*)attachment withVersionIdentifier:(NSString*)identifier{
++(void) finishedUploadingAttachment:(ZPZoteroAttachment*)attachment withVersionIdentifier:(NSString*)identifier{
     
     if(attachment == nil){
         [NSException raise:@"Attachment cannot be null" format:@"File upload returned with null attachmnet"];
@@ -792,7 +778,7 @@ const NSInteger ZPServerConnectionRequestPermissions = 10;
     //We need to do this in a different thread so that the current thread does not count towards the operations count
     [[ZPDataLayer instance] notifyAttachmentUploadCompleted:attachment];
 }
--(void) failedUploadingAttachment:(ZPZoteroAttachment*)attachment withError:(NSError*) error usingFileChannel:(ZPFileChannel*)fileChannel toURL:(NSString *)url{
++(void) failedUploadingAttachment:(ZPZoteroAttachment*)attachment withError:(NSError*) error usingFileChannel:(ZPFileChannel*)fileChannel toURL:(NSString *)url{
     @synchronized(_activeUploads){
         [_activeUploads removeObject:attachment];
         DDLogError(@"Failed uploading file %@. %@ (URL: %@) Troubleshooting instructions: http://www.zotpad.com/troubleshooting",attachment.filename,error.localizedDescription,url);
@@ -804,7 +790,7 @@ const NSInteger ZPServerConnectionRequestPermissions = 10;
     [[ZPDataLayer instance] notifyAttachmentUploadFailed:attachment withError:error];
 }
 
--(void) canceledUploadingAttachment:(ZPZoteroAttachment*)attachment usingFileChannel:(ZPFileChannel*)fileChannel{
++(void) canceledUploadingAttachment:(ZPZoteroAttachment*)attachment usingFileChannel:(ZPFileChannel*)fileChannel{
     @synchronized(_activeUploads){
         [_activeUploads removeObject:attachment];
     }
@@ -814,12 +800,12 @@ const NSInteger ZPServerConnectionRequestPermissions = 10;
     //We need to do this in a different thread so that the current thread does not count towards the operations count
     [[ZPDataLayer instance] notifyAttachmentUploadCanceled:attachment];
 }
--(void) useProgressView:(UIProgressView*) progressView forUploadingAttachment:(ZPZoteroAttachment*)attachment{
++(void) useProgressView:(UIProgressView*) progressView forUploadingAttachment:(ZPZoteroAttachment*)attachment{
     ZPFileChannel* uploadChannel = [self _fileChannelForAttachment:attachment];
     [uploadChannel useProgressView:progressView forUploadingAttachment:attachment];
 }
 
--(BOOL) isAttachmentUploading:(ZPZoteroAttachment*)attachment{
++(BOOL) isAttachmentUploading:(ZPZoteroAttachment*)attachment{
     @synchronized(_activeUploads){
         return [_activeUploads containsObject:attachment];
     }
@@ -828,7 +814,7 @@ const NSInteger ZPServerConnectionRequestPermissions = 10;
 
 #pragma mart - Cleaning up progress views
 
--(void) removeProgressView:(UIProgressView*) progressView{
++(void) removeProgressView:(UIProgressView*) progressView{
     [_fileChannel_Dropbox removeProgressView:progressView];
     [_fileChannel_WebDAV removeProgressView:progressView];
     [_fileChannel_Zotero removeProgressView:progressView];
@@ -836,7 +822,7 @@ const NSInteger ZPServerConnectionRequestPermissions = 10;
 
 #pragma mark - UIAlertView delegate methods
 
-- (void)alertView:(UIAlertView *)alertView clickedButtonAtIndex:(NSInteger)buttonIndex{
++(void)alertView:(UIAlertView *)alertView clickedButtonAtIndex:(NSInteger)buttonIndex{
     
     if(buttonIndex == 0){
         //Stay offline button, do nothing

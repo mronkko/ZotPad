@@ -315,7 +315,7 @@ NSInteger const ZPATTACHMENTICONGVIEWCONTROLLER_TAG_TITLELABEL = -5;
                           
     if(thisMode == ZPATTACHMENTICONGVIEWCONTROLLER_MODE_DOWNLOAD){
 
-        if([[ZPServerConnection instance] isAttachmentDownloading:attachment]){
+        if([ZPServerConnection isAttachmentDownloading:attachment]){
             [self notifyAttachmentDownloadStarted:attachment];
         }
         else{
@@ -379,7 +379,7 @@ NSInteger const ZPATTACHMENTICONGVIEWCONTROLLER_TAG_TITLELABEL = -5;
     else if(self.mode == ZPATTACHMENTICONGVIEWCONTROLLER_MODE_UPLOAD){
         label.hidden = FALSE;
         
-        if([[ZPServerConnection instance] isAttachmentDownloading:attachment]){
+        if([ZPServerConnection isAttachmentDownloading:attachment]){
             [self notifyAttachmentDownloadStarted:attachment];
         }
         else{
@@ -418,17 +418,17 @@ NSInteger const ZPATTACHMENTICONGVIEWCONTROLLER_TAG_TITLELABEL = -5;
             
             [ZPPreviewController displayQuicklookWithAttachment:attachment source:self];
         }
-        else if(attachment.linkMode == LINK_MODE_LINKED_URL && [ZPServerConnection instance]){
+        else if(attachment.linkMode == LINK_MODE_LINKED_URL && [ZPServerConnection hasInternetConnection]){
             [[UIApplication sharedApplication] openURL:[NSURL URLWithString:attachment.url]];
         }
         else if(self.mode == ZPATTACHMENTICONGVIEWCONTROLLER_MODE_DOWNLOAD && ( attachment.linkMode == LINK_MODE_IMPORTED_FILE || 
                 attachment.linkMode == LINK_MODE_IMPORTED_URL)){
             
-            ZPServerConnection* connection = [ZPServerConnection instance];
+
             
             
-            if(connection!=NULL && ! [connection isAttachmentDownloading:attachment]){
-                [connection checkIfCanBeDownloadedAndStartDownloadingAttachment:attachment];   
+            if([ZPServerConnection hasInternetConnection] && ! [ZPServerConnection isAttachmentDownloading:attachment]){
+                [ZPServerConnection checkIfCanBeDownloadedAndStartDownloadingAttachment:attachment];   
             }
             
         }
@@ -588,13 +588,13 @@ NSInteger const ZPATTACHMENTICONGVIEWCONTROLLER_TAG_TITLELABEL = -5;
                 else if (aMode==ZPATTACHMENTICONGVIEWCONTROLLER_MODE_UPLOAD){
                     progressView.hidden = FALSE;
                     progressView.progress = 0.0f;
-                    [[ZPServerConnection instance] useProgressView:progressView forUploadingAttachment:attachment];
+                    [ZPServerConnection useProgressView:progressView forUploadingAttachment:attachment];
                     view.userInteractionEnabled = TRUE;
                 }
                 else if (aMode==ZPATTACHMENTICONGVIEWCONTROLLER_MODE_DOWNLOAD){
                     progressView.hidden = FALSE;
                     progressView.progress = 0.0f;
-                    [[ZPServerConnection instance] useProgressView:progressView forDownloadingAttachment:attachment];
+                    [ZPServerConnection useProgressView:progressView forDownloadingAttachment:attachment];
                     view.userInteractionEnabled = FALSE;
                 }
                 

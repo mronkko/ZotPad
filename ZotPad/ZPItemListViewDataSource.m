@@ -439,7 +439,7 @@ static ZPItemListViewDataSource* _instance;
                     [ZPAttachmentIconImageFactory renderFileTypeIconForAttachment:attachment intoImageView:articleThumbnail];
                     // Enable or disable depending whether file is available or not
                     
-                    if(attachment.fileExists || (attachment.linkMode == LINK_MODE_LINKED_URL && [ZPServerConnection instance])){
+                    if(attachment.fileExists || (attachment.linkMode == LINK_MODE_LINKED_URL && [ZPServerConnection hasInternetConnection])){
                         articleThumbnail.alpha = 1;
                         articleThumbnail.userInteractionEnabled = TRUE;
                         
@@ -484,7 +484,7 @@ static ZPItemListViewDataSource* _instance;
     
     ZPZoteroAttachment* attachment = [item.attachments objectAtIndex:0];
     
-    if(attachment.linkMode == LINK_MODE_LINKED_URL && [ZPServerConnection instance]){
+    if(attachment.linkMode == LINK_MODE_LINKED_URL && [ZPServerConnection hasInternetConnection]){
         [[UIApplication sharedApplication] openURL:[NSURL URLWithString:attachment.url]];
     }
     else{
