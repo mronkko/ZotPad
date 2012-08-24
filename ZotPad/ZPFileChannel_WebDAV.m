@@ -420,10 +420,15 @@ NSInteger const ZPFILECHANNEL_WEBDAV_UPLOAD_REGISTER = 5;
                 else{
                     //Check that the file that we wanted exits
                     NSString* encodedFileName = attachment.filenameZoteroBase64Encoded;
+                    NSString* tempDir= tempFile;
                     tempFile = [tempFile stringByAppendingPathComponent:encodedFileName];
                                         
                     if(![[NSFileManager defaultManager] fileExistsAtPath:tempFile]){
-                        NSString* errorMessage = [NSString stringWithFormat:@"Zip file downloaded from WebDAV URL %@ contained several files, but none matched %@ (%@)",[request.url absoluteString], attachment.filenameZoteroBase64Encoded,attachment.filename];
+                        NSString* errorMessage = [NSString stringWithFormat:@"Zip file downloaded from WebDAV URL %@ contained several files, but none matched %@ (%@). Zip content was",[request.url absoluteString], attachment.filenameZoteroBase64Encoded,attachment.filename];
+                        
+                        for(NSString* file in [[NSFileManager defaultManager]contentsOfDirectoryAtPath:tempDir error:NULL]){
+                            errorMessage = [errorMessage stringByAppendingFormat:@" %@ (%@)",file,[ZPZoteroAttachment zoteroBase64Decode:file]];
+                        }
                         
                         DDLogError(errorMessage);
                         
