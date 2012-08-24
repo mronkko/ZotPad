@@ -17,6 +17,7 @@
 #import "ZPZoteroAttachment.h"
 #import "ZPFileChannel.h"
 
+
 @interface ZPServerConnection : NSObject <UIAlertViewDelegate>{
 }
 
