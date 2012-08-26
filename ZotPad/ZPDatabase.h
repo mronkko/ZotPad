@@ -73,7 +73,7 @@
 
 
 - (NSArray*) collectionsForItem:(ZPZoteroItem*)item;
-    
+
 /*
  
  Methods for writing to DB

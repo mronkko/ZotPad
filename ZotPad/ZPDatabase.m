@@ -1038,26 +1038,33 @@ Deletes items, notes, and attachments based in array of keys from a library
 }
 
 - (NSArray*) getCachedAttachmentsOrderedByRemovalPriority{
-    
+
+    NSMutableArray* returnArray = [NSMutableArray array];
+    NSMutableArray* keyArray = [[NSMutableArray alloc] init];
+
     @synchronized(self){
         
-        NSMutableArray* returnArray = [NSMutableArray array];
         
-        FMResultSet* resultSet = [_database executeQuery: @"SELECT * FROM attachments ORDER BY CASE WHEN lastViewed IS NULL THEN 0 ELSE 1 end, lastViewed ASC, cacheTimestamp ASC"];
+        FMResultSet* resultSet = [_database executeQuery: @"SELECT itemKey FROM attachments ORDER BY CASE WHEN lastViewed IS NULL THEN 0 ELSE 1 end, lastViewed ASC, cacheTimestamp ASC"];
         
         while([resultSet next]){
-            ZPZoteroAttachment* attachment = (ZPZoteroAttachment*) [ZPZoteroAttachment dataObjectWithDictionary:[resultSet resultDict]];
-            
-            //If this attachment does have a file, add it to the list that we return;
-            if(attachment.fileExists){
-                [returnArray addObject:attachment];
-            }
+            [keyArray addObject:[resultSet objectForColumnIndex:0]];
         }
 
         [resultSet close];
-        
-        return returnArray;
     }
+    
+    for(NSString* key in keyArray){
+        ZPZoteroAttachment* attachment = (ZPZoteroAttachment*) [ZPZoteroAttachment dataObjectWithKey:key];
+        
+        //If this attachment does have a file, add it to the list that we return;
+        if(attachment.fileExists){
+            [returnArray addObject:attachment];
+        }
+    }
+
+    
+    return returnArray;
 
 }
 

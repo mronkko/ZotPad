@@ -51,7 +51,6 @@
 
 #import "ZPCore.h"
 
-
 #import "ZPCacheController.h"
 #import "ZPPreferences.h"
 #import "ZPDataLayer.h"
@@ -109,8 +108,14 @@
 @implementation ZPCacheController
 
 static ZPCacheController* _instance = nil;
+static NSRegularExpression* _regexForMacthingFilesToUpload = nil;
 
-
++(void) initialize{
+    _regexForMacthingFilesToUpload = [NSRegularExpression
+                                        regularExpressionWithPattern:@"_[A-Z0-9]{8}-"
+                                        options:0
+                                        error:NULL];
+}
 -(id)init
 {
     self = [super init];
@@ -697,7 +702,16 @@ static ZPCacheController* _instance = nil;
         }
         //Check if the parent belongs to active the collection
         else if([[ZPPreferences instance] cacheAttachmentsActiveCollection]){
-            ZPZoteroItem* parent = (ZPZoteroItem*)[ZPZoteroItem dataObjectWithKey:attachment.parentItemKey];
+            
+            ZPZoteroItem* parent;
+            
+            if([attachment.parentItemKey isEqualToString:attachment.key]){
+                parent = attachment;
+            }
+            else{
+                parent = (ZPZoteroItem*)[ZPZoteroItem dataObjectWithKey:attachment.parentItemKey];
+            }
+            
             if([parent.libraryID isEqualToNumber:_activelibraryID] && _activeCollectionKey == NULL){
                 doCache=true;
             }
@@ -1115,10 +1129,20 @@ static ZPCacheController* _instance = nil;
     NSArray *directoryContent = [[NSFileManager defaultManager] contentsOfDirectoryAtPath:_documentsDirectory error:NULL];
     
     for (NSString* _documentFilePath in directoryContent) {
-        ZPZoteroAttachment* attachment = [ZPZoteroAttachment dataObjectForAttachedFile:_documentFilePath];
-        if(attachment !=NULL && [[attachment.fileSystemPath_modified lastPathComponent] isEqualToString:_documentFilePath]){
-            @synchronized(_attachmentsToUpload){
-                [_attachmentsToUpload addObject:attachment]; 
+        
+
+        
+        NSRange range   = [_regexForMacthingFilesToUpload rangeOfFirstMatchInString:_documentFilePath
+                                                   options:0
+                                                     range:NSMakeRange(0, [_documentFilePath length])];
+
+        if(range.location != NSNotFound){
+        
+            ZPZoteroAttachment* attachment = [ZPZoteroAttachment dataObjectForAttachedFile:_documentFilePath];
+            if(attachment !=NULL && [[attachment.fileSystemPath_modified lastPathComponent] isEqualToString:_documentFilePath]){
+                @synchronized(_attachmentsToUpload){
+                    [_attachmentsToUpload addObject:attachment];
+                }
             }
         }
     }

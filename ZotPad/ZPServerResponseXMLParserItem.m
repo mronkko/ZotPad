@@ -132,6 +132,10 @@
     }
     [(ZPZoteroItem*)_currentElement setLibraryID:_libraryID];
     [super _processTemporaryFieldStorage];
+    
+    if([(ZPZoteroItem*)_currentElement libraryID] == NULL){
+        [NSException raise:@"Internal consistency error" format:@"Items must have library IDs. Item with key %@ had a null library ID",[(ZPZoteroItem*) _currentElement key]];
+    }
 }
 
 @end

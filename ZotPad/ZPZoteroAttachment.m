@@ -62,6 +62,9 @@ NSInteger const VERSION_SOURCE_DROPBOX =3;
         attachment.existsOnZoteroServer = [NSNumber numberWithBool:NO];   
     }
 
+    if(attachment.parentItemKey == NULL && attachment.libraryID == NULL){
+        [NSException raise:@"Internal consistency error" format:@"Items must have library IDs. Item with key %@ had a null library ID",attachment.key];
+    }
     return attachment;
 }
 
@@ -69,11 +72,14 @@ NSInteger const VERSION_SOURCE_DROPBOX =3;
 - (NSNumber*) libraryID{
     //Child attachments
     if(super.libraryID==NULL){
-        if(_parentItemKey != NULL){
+        if(_parentItemKey != NULL && ! [_parentItemKey isEqualToString:self.key]){
             return [ZPZoteroItem dataObjectWithKey:self.parentItemKey].libraryID;
         }
         else {
-            [NSException raise:@"Internal consistency error" format:@"Standalone items must have library IDs. Standalone attachment with key %@ had a null library ID",self.key];
+            //Load libraryID
+            [[ZPDatabase instance] addCreatorsToItem:self];
+            if(self.libraryID == NULL)
+                [NSException raise:@"Internal consistency error" format:@"Standalone items must have library IDs. Standalone attachment with key %@ had a null library ID",self.key];
         }
     }
     //Standalone attachments
@@ -106,7 +112,6 @@ NSInteger const VERSION_SOURCE_DROPBOX =3;
     //Get the key from the filename
     NSString* key =[[parsedFilename componentsSeparatedByString: @"_"] lastObject];
     
-    //TODO: 
     if(key == NULL || [key isEqualToString:@""]){
         DDLogError(@"While scanning for files to upload, parsing filename %@ resulted in empty key",filename);
         return NULL;
@@ -115,12 +120,11 @@ NSInteger const VERSION_SOURCE_DROPBOX =3;
     ZPZoteroAttachment* attachment;
     //If this is a locally modified file or a version, strip the trailing - from the key
     if(key.length>8){
-        NSString* newKey = [key substringToIndex:8];
-        attachment = (ZPZoteroAttachment*) [self dataObjectWithKey:newKey];
+        key = [key substringToIndex:8];
     }
-    else{
-        attachment = (ZPZoteroAttachment*) [self dataObjectWithKey:key];
-    }
+    
+    attachment = (ZPZoteroAttachment*) [self dataObjectWithKey:key];
+    
     if(attachment.filename == NULL) attachment = NULL;
 
     return attachment;

@@ -87,8 +87,7 @@ static NSCache* _objectCache = NULL;
         
         obj = (ZPZoteroItem*) [self dataObjectWithDictionary:attributes];
     }
-
-
+    
     return obj;
 }
 
