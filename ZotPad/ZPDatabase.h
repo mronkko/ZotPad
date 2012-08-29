@@ -49,6 +49,8 @@
 +(void) addAttributesToGroupLibrary:(ZPZoteroLibrary*) library;
 +(void) addAttributesToCollection:(ZPZoteroCollection*) collection;
 +(NSDictionary*) attributesForItemWithKey:(NSString *)key;
++(NSDictionary*) attributesForAttachmentWithKey:(NSString *)key;
++(NSDictionary*) attributesForNoteWithKey:(NSString *)key;
 
 
 +(void) addCreatorsToItem: (ZPZoteroItem*) item;

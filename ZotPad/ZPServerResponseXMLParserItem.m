@@ -104,7 +104,9 @@
             
         }
 
-        [(ZPZoteroItem*) _currentElement setFields:fields];
+        if([_currentElement isKindOfClass:[ZPZoteroItem class]]){
+            [(ZPZoteroItem*) _currentElement setFields:fields];
+        }
         
     }
     else if([key isEqualToString:@"published"]){
@@ -122,11 +124,11 @@
     NSString* itemType = [_temporaryFieldStorage objectForKey:@"zapi:itemType"];
     
     if([itemType isEqualToString:@"attachment"]){
-        _currentElement = [ZPZoteroAttachment itemWithKey:id];
+        _currentElement = [ZPZoteroAttachment attachmentWithKey:id];
     }
     else if([itemType isEqualToString:@"note"]){
         //Notes are really note implemented yet
-        _currentElement = [ZPZoteroNote itemWithKey:id];
+        _currentElement = [ZPZoteroNote noteWithKey:id];
     }
     else{
         //IF the item does not exist in the in-memory cache, attempt to load it from the disk cache 

@@ -14,7 +14,7 @@
     NSInteger _totalResults;
     NSString* _currentStringContent;
     BOOL _insideEntry;
-    NSObject* _currentElement;
+    ZPZoteroDataObject* _currentElement;
     NSString* _updateTimestamp;
     NSInteger _libraryID;
     NSString* _currentID;

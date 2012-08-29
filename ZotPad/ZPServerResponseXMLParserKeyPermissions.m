@@ -21,14 +21,14 @@
 
 - (void)parser:(NSXMLParser *)parser didStartElement:(NSString *)elementName namespaceURI:(NSString *)namespaceURI qualifiedName:(NSString *)qualifiedName attributes:(NSDictionary *)attributeDict{
     if([elementName isEqualToString:@"access"]){
-        NSString* libraryID =[attributeDict objectForKey:@"library"];
-        if(libraryID == NULL){
-            libraryID =[attributeDict objectForKey:@"group"];
+        NSString* library =[attributeDict objectForKey:@"library"];
+        NSString* group = [attributeDict objectForKey:@"group"];
+        if(library!= NULL){
+            [_results addObject:[NSString stringWithFormat:@"%i",LIBRARY_ID_MY_LIBRARY]];
         }
-        else{
-            libraryID = [NSString stringWithFormat:@"%i",LIBRARY_ID_MY_LIBRARY];
+        else if(group!=NULL){
+            [_results addObject:group];
         }
-        [_results addObject:libraryID];
     }
 }
 

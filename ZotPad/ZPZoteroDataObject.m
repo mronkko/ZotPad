@@ -10,7 +10,7 @@
 
 @implementation ZPZoteroDataObject
 
-@synthesize key, title, libraryID, cacheTimestamp, serverTimestamp, dateAdded;
+@synthesize key, title, libraryID, cacheTimestamp, serverTimestamp, dateAdded, etag,jsonFromServer;
 @synthesize numChildren;
 
 // This is very useful for troubleshooting, but because of memory issues, is only used for debug builds
@@ -67,7 +67,7 @@
  */
 
 - (void)setValue:(id)value forUndefinedKey:(NSString *)aKey{
-    NSLog(@"Cannot set %@ to %@",aKey,value);
+   // NSLog(@"Cannot set %@ to %@",aKey,value);
 }
 
 @end

@@ -43,26 +43,14 @@ static NSCache* _objectCache = NULL;
     ZPZoteroItem* obj= [_objectCache objectForKey:key];
     
     if(obj==NULL){
-        NSString* type = [fields objectForKey:@"itemType"];
-        ZPZoteroItem* newObj;
         
-        if([type isEqualToString:@"note"])
-            newObj = [[ZPZoteroNote alloc] init];
-        else if([type isEqualToString:@"attachment"])
-            newObj = [[ZPZoteroAttachment alloc] init];
-        else 
-            newObj = [[ZPZoteroItem alloc] init];
+        obj = [[ZPZoteroItem alloc] init];
 
-        newObj.key=key;
+        obj.key=key;
         
-        [newObj configureWithDictionary:fields];
-        [_objectCache setObject:newObj  forKey:key];
+        [obj configureWithDictionary:fields];
+        [_objectCache setObject:obj  forKey:key];
         
-        //TODO: refactor so that this "hack" is no longer needed to load the fields that are specific to attachments
-        if([type isEqual:@"attachment"]){
-            [ZPDatabase addAttachmentsToItem:newObj];
-        }
-        obj=newObj;
     }
     else [obj configureWithDictionary:fields];
 

@@ -59,7 +59,28 @@
             [self _processTemporaryFieldStorage];
             //Current element MUST have a libraryID
             if([_currentElement performSelector:@selector(libraryID)] == NULL) [NSException raise:@"Data object is missing library ID" format:@"All data objects must have library ID. Object with missing Library ID: %@",_currentElement];
-                
+            
+            //If this is a standalone note, add itself as a parent
+            if([_currentElement isKindOfClass:[ZPZoteroAttachment class]] && [(ZPZoteroAttachment*) _currentElement parentItemKey] == NULL){
+                ZPZoteroItem* standAloneParent = [ZPZoteroItem itemWithKey:_currentElement.key];
+                standAloneParent.title = _currentElement.title;
+                standAloneParent.fullCitation = @"Standalone attachment";
+                standAloneParent.fields = [NSDictionary dictionaryWithObject:@"attachment" forKey:@"itemType"];
+                standAloneParent.attachments = [NSArray arrayWithObject:_currentElement];
+                [(ZPZoteroAttachment*) _currentElement setParentItemKey:_currentElement.key];
+                [_resultArray addObject:standAloneParent];
+            }
+            //If this is a standalone attachment, add itself as a parent
+            else if([_currentElement isKindOfClass:[ZPZoteroNote class]] && [(ZPZoteroNote*) _currentElement parentItemKey] == NULL){
+                ZPZoteroItem* standAloneParent = [ZPZoteroItem itemWithKey:_currentElement.key];
+                standAloneParent.title = _currentElement.title;
+                standAloneParent.fullCitation = @"Standalone note";
+                standAloneParent.notes = [NSArray arrayWithObject:_currentElement];
+                standAloneParent.fields = [NSDictionary dictionaryWithObject:@"note" forKey:@"itemType"];
+                [(ZPZoteroNote*) _currentElement setParentItemKey:_currentElement.key];
+                [_resultArray addObject:standAloneParent];
+            }
+            
             [_resultArray addObject:_currentElement];
             
             _currentElement = NULL;

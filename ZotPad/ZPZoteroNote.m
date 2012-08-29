@@ -7,32 +7,54 @@
 //
 
 #import "ZPCore.h"
+#import "ZPDatabase.h"
 
 @implementation ZPZoteroNote
 
-+(id) itemWithDictionary:(NSDictionary *)fields{
-    NSMutableDictionary* dict = [NSMutableDictionary dictionaryWithDictionary:fields ];
-    [dict setObject:@"note" forKey:@"itemType"];
-    return [super itemWithDictionary:dict];
+@synthesize itemKey, parentItemKey;
+
++(void)initialize{
+    _objectCache =  [[NSCache alloc] init];
 }
 
+static NSCache* _objectCache = NULL;
+
++(ZPZoteroNote*) noteWithDictionary:(NSDictionary *)fields{
+    
+    NSString* key = [fields objectForKey:@"itemKey"];
+    
+    if(key == NULL || [key isEqual:@""])
+        [NSException raise:@"Key is empty" format:@"ZPZoteroNote cannot be instantiated with empty key"];
+    
+    ZPZoteroNote* note = (ZPZoteroNote*) [_objectCache objectForKey:key];
+    
+    if(note == NULL){
+        note = [[ZPZoteroNote alloc] init];
+    }
+    
+    [note configureWithDictionary:fields];
+    
+    return note;
+}
+
++(ZPZoteroNote*) noteWithKey:(NSString *)key{
+    
+    if(key == NULL || [key isEqual:@""])
+        [NSException raise:@"Key is empty" format:@"ZPZoteroNote cannot be instantiated with empty key"];
+    
+    ZPZoteroNote* note = (ZPZoteroNote*) [_objectCache objectForKey:key];
+    
+    if(note == NULL){
+        note = [ZPZoteroNote noteWithDictionary:[ZPDatabase attributesForNoteWithKey:key]];
+    }
+    
+    return note;
+    
+}
 // An alias for setParentCollectionKey
 - (void) setParentKey:(NSString*)key{
     [self setParentItemKey:key];    
 }
-
-- (void) setParentItemKey:(NSString*)key{
-    _parentItemKey = key; 
-}
-- (NSString*) parentItemKey{
-    if(_parentItemKey == NULL){
-        return self.key;
-    }
-    else{
-        return _parentItemKey;
-    }
-}
-
 - (NSArray*) creators{
     return [NSArray array];
 }

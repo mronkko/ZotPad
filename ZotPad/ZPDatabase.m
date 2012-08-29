@@ -602,7 +602,7 @@ static NSMutableDictionary* dbPrimaryKeysByTables;
     //Group libraries
     @synchronized(self){
         
-        FMResultSet* resultSet = [_database executeQuery:@"SELECT *, (SELECT count(*) FROM collections WHERE libraryID=libraries.libraryID AND parentCollectionKey IS NULL) AS numChildren FROM libraries ORDER BY libraryID <> 1 ,LOWER(title)"];
+        FMResultSet* resultSet = [_database executeQuery:@"SELECT *, (SELECT count(*) FROM collections WHERE libraryID=libraries.libraryID AND parentCollectionKey IS NULL) AS numChildren FROM libraries ORDER BY libraryID <> ? ,LOWER(title)",[NSNumber numberWithInt:LIBRARY_ID_MY_LIBRARY]];
         
         while([resultSet next]) {
             [returnArray addObject:[ZPZoteroLibrary libraryWithDictionary:[resultSet resultDictionary]]];
@@ -856,23 +856,43 @@ Deletes items, notes, and attachments based in array of keys from a library
 
         [resultSet close];
         
-        //TODO: Refactor
-        NSString* itemType = [results objectForKey:@"itemType"];
-        if(itemType == NULL || [itemType isEqualToString:@"attachment"]){                                       
-            resultSet = [_database executeQuery: @"SELECT * FROM attachments WHERE itemKey=? LIMIT 1",key];
-
-            if ([resultSet next]) {
-                NSMutableDictionary* dict = [NSMutableDictionary dictionaryWithDictionary:results];
-                [dict addEntriesFromDictionary: [resultSet resultDictionary]];
-                results=dict;
-            }
-            
-            [resultSet close];
-        }
     }
     return results;
 }
 
++(NSDictionary*) attributesForAttachmentWithKey:(NSString *)key{
+    
+    NSDictionary* results = NULL;
+    @synchronized(self){
+        FMResultSet* resultSet = [_database executeQuery: @"SELECT * FROM attachments WHERE itemKey=? LIMIT 1",key];
+        
+        if ([resultSet next]) {
+            results = [resultSet resultDictionary];
+        }
+        else results = [NSDictionary dictionaryWithObject:key forKey:@"itemKey"];
+        
+        [resultSet close];
+        
+    }
+    return results;
+}
+
++(NSDictionary*) attributesForNoteWithKey:(NSString *)key{
+    
+    NSDictionary* results = NULL;
+    @synchronized(self){
+        FMResultSet* resultSet = [_database executeQuery: @"SELECT * FROM notes WHERE itemKey=? LIMIT 1",key];
+        
+        if ([resultSet next]) {
+            results = [resultSet resultDictionary];
+        }
+        else results = [NSDictionary dictionaryWithObject:key forKey:@"itemKey"];
+        
+        [resultSet close];
+        
+    }
+    return results;
+}
 
 /*
  
@@ -1008,7 +1028,7 @@ Deletes items, notes, and attachments based in array of keys from a library
         NSMutableArray* attachments = [[NSMutableArray alloc] init];
         while([resultSet next]) {
             NSDictionary* dict = [resultSet resultDictionary];
-            ZPZoteroAttachment* attachment = (ZPZoteroAttachment*) [ZPZoteroAttachment itemWithDictionary:dict];
+            ZPZoteroAttachment* attachment = (ZPZoteroAttachment*) [ZPZoteroAttachment attachmentWithDictionary:dict];
             [attachments addObject:attachment];
         }
         
@@ -1028,7 +1048,7 @@ Deletes items, notes, and attachments based in array of keys from a library
         FMResultSet* resultSet = [_database executeQuery: @"SELECT * FROM attachments ORDER BY CASE WHEN lastViewed IS NULL THEN 0 ELSE 1 end, lastViewed ASC, cacheTimestamp ASC"];
         
         while([resultSet next]){
-            ZPZoteroAttachment* attachment = (ZPZoteroAttachment*) [ZPZoteroAttachment itemWithDictionary:[resultSet resultDictionary]];
+            ZPZoteroAttachment* attachment = (ZPZoteroAttachment*) [ZPZoteroAttachment attachmentWithDictionary:[resultSet resultDictionary]];
             
             //If this attachment does have a file, add it to the list that we return;
             if(attachment.fileExists){
@@ -1058,7 +1078,7 @@ Deletes items, notes, and attachments based in array of keys from a library
         }
         
         while([resultSet next]){
-            ZPZoteroAttachment* attachment = (ZPZoteroAttachment*) [ZPZoteroAttachment itemWithDictionary:[resultSet resultDictionary]];
+            ZPZoteroAttachment* attachment = (ZPZoteroAttachment*) [ZPZoteroAttachment attachmentWithDictionary:[resultSet resultDictionary]];
 
             [returnArray addObject:attachment];
         }
@@ -1107,7 +1127,7 @@ Deletes items, notes, and attachments based in array of keys from a library
         
         NSMutableArray* notes = [[NSMutableArray alloc] init];
         while([resultSet next]) {
-            [notes addObject:[ZPZoteroNote itemWithDictionary:[resultSet resultDictionary]]];
+            [notes addObject:[ZPZoteroNote noteWithDictionary:[resultSet resultDictionary]]];
         }
         
         [resultSet close];

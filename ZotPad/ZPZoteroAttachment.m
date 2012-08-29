@@ -27,43 +27,64 @@ NSInteger const VERSION_SOURCE_DROPBOX =3;
 
 @interface ZPZoteroAttachment(){
     NSString* _md5;
-    NSString* _versionIdentifier_server;
 }
+
 - (NSString*) _fileSystemPathWithSuffix:(NSString*)suffix;
 
 @end
 
+
 @implementation ZPZoteroAttachment
 
-@synthesize lastViewed, attachmentSize, existsOnZoteroServer, filename, url, versionSource,  charset;
-//@synthesize versionIdentifier_server;
+static NSCache* _objectCache = NULL;
+
+@synthesize lastViewed, attachmentSize, existsOnZoteroServer, filename, url, versionSource,  charset, itemKey;
+@synthesize versionIdentifier_server;
 @synthesize versionIdentifier_local;
+@synthesize contentType,parentItemKey;
 
--(void) setVersionIdentifier_server:(NSString *)versionIdentifier_server{
-    _versionIdentifier_server = versionIdentifier_server;
-}
--(NSString*) versionIdentifier_server{
-    return _versionIdentifier_server;
++(void)initialize{
+    _objectCache =  [[NSCache alloc] init];
 }
 
-+(id) itemWithDictionary:(NSDictionary *)fields{
-    NSMutableDictionary* dict = [NSMutableDictionary dictionaryWithDictionary:fields ];
-    [dict setObject:@"attachment" forKey:@"itemType"];
-    ZPZoteroAttachment* attachment = (ZPZoteroAttachment*) [super itemWithDictionary:dict];
+
++(ZPZoteroAttachment*) attachmentWithDictionary:(NSDictionary *)fields{
     
-    if(! [attachment isKindOfClass:[ZPZoteroAttachment class]]){
-        DDLogError(@"Creating an attachment object for item %@ resulted in non-attachment object. Crashing.",[dict objectForKey:@"key"]);
-        [NSException raise:@"Internal consistency error" format:@"Creating an attachment object for item %@ resulted in non-attachment object. %@",[dict objectForKey:@"key"],dict];
+    NSString* key = [fields objectForKey:@"itemKey"];
+
+    if(key == NULL || [key isEqual:@""])
+        [NSException raise:@"Key is empty" format:@"ZPZoteroAttachment cannot be instantiated with empty key"];
+
+    ZPZoteroAttachment* attachment = (ZPZoteroAttachment*) [_objectCache objectForKey:key];
+                                                            
+    if(attachment == NULL){
+        attachment = [[ZPZoteroAttachment alloc] init];
     }
+    
+    [attachment configureWithDictionary:fields];
     
     return attachment;
 }
 
++(ZPZoteroAttachment*) attachmentWithKey:(NSString *)key{
+
+    if(key == NULL || [key isEqual:@""])
+        [NSException raise:@"Key is empty" format:@"ZPZoteroAttachment cannot be instantiated with empty key"];
+    
+    ZPZoteroAttachment* attachment = (ZPZoteroAttachment*) [_objectCache objectForKey:key];
+    
+    if(attachment == NULL){
+        attachment = [ZPZoteroAttachment attachmentWithDictionary:[ZPDatabase attributesForAttachmentWithKey:key]];
+    }
+    
+    return attachment;
+    
+}
 
 - (NSInteger) libraryID{
     //Child attachments
     if(super.libraryID==LIBRARY_ID_NOT_SET){
-        if(_parentItemKey != NULL){
+        if(self.parentItemKey != NULL){
             return [ZPZoteroItem itemWithKey:self.parentItemKey].libraryID;
         }
         else {
@@ -83,17 +104,6 @@ NSInteger const VERSION_SOURCE_DROPBOX =3;
     [self setParentItemKey:key];    
 }
 
-- (void) setParentItemKey:(NSString*)key{
-    _parentItemKey = key; 
-}
-- (NSString*) parentItemKey{
-    if(_parentItemKey == NULL){
-        return self.key;
-    }
-    else{
-        return _parentItemKey;
-    }
-}
 
 +(ZPZoteroAttachment*) dataObjectForAttachedFile:(NSString*) filename{
 
@@ -113,10 +123,10 @@ NSInteger const VERSION_SOURCE_DROPBOX =3;
     //If this is a locally modified file or a version, strip the trailing - from the key
     if(key.length>8){
         NSString* newKey = [key substringToIndex:8];
-        attachment = (ZPZoteroAttachment*) [self itemWithKey:newKey];
+        attachment = [self attachmentWithKey:newKey];
     }
     else{
-        attachment = (ZPZoteroAttachment*) [self itemWithKey:key];
+        attachment = [self attachmentWithKey:key];
     }
     if(attachment.filename == NULL) attachment = NULL;
 
@@ -137,7 +147,7 @@ NSInteger const VERSION_SOURCE_DROPBOX =3;
     NSString* path;
     //Imported URLs are stored as ZIP files
     
-    if(self.linkMode == LINK_MODE_IMPORTED_URL && ([self.contentType isEqualToString:@"text/html"]
+    if(_linkMode == LINK_MODE_IMPORTED_URL && ([self.contentType isEqualToString:@"text/html"]
                                                               || [self.contentType isEqualToString:@"application/xhtml+xml"])){
         path = [[self filename] stringByAppendingFormat:@"_%@%@.zip",self.key,suffix];
     }
@@ -169,45 +179,15 @@ NSInteger const VERSION_SOURCE_DROPBOX =3;
     return [self _fileSystemPathWithSuffix:@""];
 }
 
--(void) setContentType:(NSString *)contentType{
-    if(contentType != (NSObject*) [NSNull null]){
-        _contentType = contentType;
-    }
-}
--(NSString*) contentType{
-    return  _contentType;
-}
 -(void) setLinkMode:(NSInteger)linkMode{
     _linkMode = linkMode;
     //set text/HTML as the default type for links
-    if(_linkMode ==LINK_MODE_LINKED_URL && _contentType == NULL){
-        _contentType = @"text/html";
+    if(_linkMode ==LINK_MODE_LINKED_URL && self.contentType == NULL){
+        self.contentType = @"text/html";
     }
 }
 -(NSInteger)linkMode{
     return _linkMode;
-}
-
-- (NSArray*) creators{
-    return [NSArray array];
-}
-- (NSDictionary*) fields{
-    return [NSDictionary dictionary];
-}
-
--(NSString*) itemType{
-    return @"attachment";
-}
-
-- (NSArray*) attachments{
-    if(_attachments == NULL){
-        super.attachments =[NSArray arrayWithObject:self];
-    }
-
-    return [super attachments];
-}
-
-- (void) setAttachments:(NSArray *)attachments{
 }
 
 //If an attachment is updated, delete the old attachment file
@@ -369,7 +349,7 @@ NSInteger const VERSION_SOURCE_DROPBOX =3;
     
     //Return path to uncompressed files.
     //TODO: Encapsulate as a method
-    if(self.linkMode == LINK_MODE_IMPORTED_URL && ([self.contentType isEqualToString:@"text/html"] ||
+    if(_linkMode == LINK_MODE_IMPORTED_URL && ([self.contentType isEqualToString:@"text/html"] ||
                                                               [self.contentType isEqualToString:@"application/xhtml+xml"])){
         NSString* tempDir = [NSTemporaryDirectory() stringByAppendingPathComponent:self.key];
         

@@ -21,6 +21,11 @@
 @property (retain) NSString* key;
 @property (retain) NSString* dateAdded;
 
+@property (retain) NSString* etag;
+
+// This is not stored in DB, but only used to temporarily store what the server returns us so that we can construct more robust updates.
+@property (retain) NSString* jsonFromServer;
+
 // Important: This field stores the number of all items including items that are attachments to parent items. 
 
 @property (assign) NSInteger numChildren;

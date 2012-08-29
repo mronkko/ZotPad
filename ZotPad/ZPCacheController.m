@@ -390,7 +390,6 @@ static ZPCacheController* _instance = nil;
     ZPZoteroItem* item;
 
     NSMutableArray* normalItems = [NSMutableArray array];
-    NSMutableArray* standaloneNotesAndAttachments = [NSMutableArray array];
     NSMutableArray* attachments = [NSMutableArray array];
     NSMutableArray* notes = [NSMutableArray array];
     NSMutableArray* parentItemsForAttachments = [NSMutableArray array];
@@ -400,7 +399,7 @@ static ZPCacheController* _instance = nil;
         if( [item needsToBeWrittenToCache]){
 
             //TODO: Refactor. This is very confusing. 
-            
+            //TODO: Make sure that this logic still works after breaking inheritance between attachment and item
             
             /*
              
@@ -428,15 +427,16 @@ static ZPCacheController* _instance = nil;
                 [attachments addObject:attachment];
                 [self _checkIfAttachmentExistsAndQueueForDownload:attachment];
                 
+                ZPZoteroItem* parent;
                 //Standalone attachments
+                
                 if(attachment.parentItemKey==attachment.key){
-                    [standaloneNotesAndAttachments addObject:attachment];
+                    parent =  [ZPZoteroItem itemWithKey:attachment.key];
                 }
                 else{
-                    ZPZoteroItem* parent = (ZPZoteroItem*) [ZPZoteroItem itemWithKey:attachment.parentItemKey];
-                    if(![parentItemsForAttachments containsObject:parent]) [parentItemsForAttachments addObject:parent];
+                    parent =  [ZPZoteroItem itemWithKey:attachment.parentItemKey];
                 }
-                
+                if(![parentItemsForAttachments containsObject:parent]) [parentItemsForAttachments addObject:parent];
             }
             //If this is a note item, store the note information
             else if([item isKindOfClass:[ZPZoteroNote class]]){
@@ -444,11 +444,15 @@ static ZPCacheController* _instance = nil;
                 [notes addObject:note];
                 
                 //Standalone notes
+                
+                ZPZoteroItem* parent;
+
                 if(note.parentItemKey==note.key){
-                    [standaloneNotesAndAttachments addObject:note];
+                    parent =  [ZPZoteroItem itemWithKey:note.key];
+                    [normalItems addObject:parent];
                 }
                 else{
-                    ZPZoteroItem* parent = (ZPZoteroItem*) [ZPZoteroItem itemWithKey:note.parentItemKey];
+                    parent = (ZPZoteroItem*) [ZPZoteroItem itemWithKey:note.parentItemKey];
                     if(![parentItemsForNotes containsObject:parent]) [parentItemsForNotes addObject:parent];
                 }
 
@@ -460,14 +464,12 @@ static ZPCacheController* _instance = nil;
             }
         }
     }
-    
-    NSArray* topLevelItemsThatWereWrittenToCache = [ZPDatabase writeItems:[normalItems arrayByAddingObjectsFromArray:standaloneNotesAndAttachments]];
 
     [ZPDatabase writeAttachments:attachments];
     [ZPDatabase writeNotes:notes];
-    
+
+    NSArray* topLevelItemsThatWereWrittenToCache = [ZPDatabase writeItems:normalItems];
     NSMutableArray* itemsThatNeedCreatorsAndFields = [NSMutableArray arrayWithArray:topLevelItemsThatWereWrittenToCache];
-    [itemsThatNeedCreatorsAndFields removeObjectsInArray:standaloneNotesAndAttachments];
                             
     [ZPDatabase writeItemsFields:itemsThatNeedCreatorsAndFields];
     [ZPDatabase writeItemsCreators:itemsThatNeedCreatorsAndFields];

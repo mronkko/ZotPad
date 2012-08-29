@@ -700,6 +700,465 @@
 		A77FD065159F702E00774D50 /* gear@2x.png in Resources */ = {isa = PBXBuildFile; fileRef = A77FD061159F702E00774D50 /* gear@2x.png */; };
 		A77FD068159F750A00774D50 /* ZPLogViewController.m in Sources */ = {isa = PBXBuildFile; fileRef = A77FD067159F750900774D50 /* ZPLogViewController.m */; };
 		A77FD069159F750A00774D50 /* ZPLogViewController.m in Sources */ = {isa = PBXBuildFile; fileRef = A77FD067159F750900774D50 /* ZPLogViewController.m */; };
+		A78322D815EE3173004BB4F7 /* main.m in Sources */ = {isa = PBXBuildFile; fileRef = A7200DE014718DC0004347C9 /* main.m */; };
+		A78322D915EE3173004BB4F7 /* ZPAppDelegate.m in Sources */ = {isa = PBXBuildFile; fileRef = A7200DE414718DC0004347C9 /* ZPAppDelegate.m */; };
+		A78322DA15EE3173004BB4F7 /* ZPLibraryAndCollectionListViewController.m in Sources */ = {isa = PBXBuildFile; fileRef = A7200DEA14718DC1004347C9 /* ZPLibraryAndCollectionListViewController.m */; };
+		A78322DB15EE3173004BB4F7 /* ZPDataLayer.m in Sources */ = {isa = PBXBuildFile; fileRef = A7200DF514718F44004347C9 /* ZPDataLayer.m */; settings = {COMPILER_FLAGS = "-w"; }; };
+		A78322DC15EE3173004BB4F7 /* ZPServerConnection.m in Sources */ = {isa = PBXBuildFile; fileRef = A7A7C9B0147A8144004D8756 /* ZPServerConnection.m */; };
+		A78322DD15EE3173004BB4F7 /* NSMutableURLRequest+Parameters.m in Sources */ = {isa = PBXBuildFile; fileRef = A7A7C9D0147AA2EE004D8756 /* NSMutableURLRequest+Parameters.m */; settings = {COMPILER_FLAGS = "-fno-objc-arc"; }; };
+		A78322DE15EE3173004BB4F7 /* NSString+URLEncoding.m in Sources */ = {isa = PBXBuildFile; fileRef = A7A7C9D2147AA2EE004D8756 /* NSString+URLEncoding.m */; settings = {COMPILER_FLAGS = "-fno-objc-arc"; }; };
+		A78322DF15EE3173004BB4F7 /* NSURL+Base.m in Sources */ = {isa = PBXBuildFile; fileRef = A7A7C9D4147AA2EE004D8756 /* NSURL+Base.m */; settings = {COMPILER_FLAGS = "-fno-objc-arc"; }; };
+		A78322E015EE3173004BB4F7 /* hmac.c in Sources */ = {isa = PBXBuildFile; fileRef = A7A7C9D8147AA2EE004D8756 /* hmac.c */; settings = {COMPILER_FLAGS = "-fno-objc-arc -w"; }; };
+		A78322E115EE3173004BB4F7 /* sha1.c in Sources */ = {isa = PBXBuildFile; fileRef = A7A7C9DA147AA2EE004D8756 /* sha1.c */; settings = {COMPILER_FLAGS = "-fno-objc-arc"; }; };
+		A78322E215EE3173004BB4F7 /* OAAttachment.m in Sources */ = {isa = PBXBuildFile; fileRef = A7A7C9DD147AA2EE004D8756 /* OAAttachment.m */; settings = {COMPILER_FLAGS = "-fno-objc-arc"; }; };
+		A78322E315EE3173004BB4F7 /* OACall.m in Sources */ = {isa = PBXBuildFile; fileRef = A7A7C9DF147AA2EE004D8756 /* OACall.m */; settings = {COMPILER_FLAGS = "-fno-objc-arc"; }; };
+		A78322E415EE3173004BB4F7 /* OAConsumer.m in Sources */ = {isa = PBXBuildFile; fileRef = A7A7C9E1147AA2EE004D8756 /* OAConsumer.m */; settings = {COMPILER_FLAGS = "-fno-objc-arc"; }; };
+		A78322E515EE3173004BB4F7 /* OADataFetcher.m in Sources */ = {isa = PBXBuildFile; fileRef = A7A7C9E3147AA2EE004D8756 /* OADataFetcher.m */; settings = {COMPILER_FLAGS = "-fno-objc-arc"; }; };
+		A78322E615EE3173004BB4F7 /* OAHMAC_SHA1SignatureProvider.m in Sources */ = {isa = PBXBuildFile; fileRef = A7A7C9E5147AA2EE004D8756 /* OAHMAC_SHA1SignatureProvider.m */; settings = {COMPILER_FLAGS = "-fno-objc-arc"; }; };
+		A78322E715EE3173004BB4F7 /* OAMutableURLRequest.m in Sources */ = {isa = PBXBuildFile; fileRef = A7A7C9E7147AA2EE004D8756 /* OAMutableURLRequest.m */; settings = {COMPILER_FLAGS = "-fno-objc-arc -w"; }; };
+		A78322E815EE3173004BB4F7 /* OAPlaintextSignatureProvider.m in Sources */ = {isa = PBXBuildFile; fileRef = A7A7C9E9147AA2EE004D8756 /* OAPlaintextSignatureProvider.m */; settings = {COMPILER_FLAGS = "-fno-objc-arc"; }; };
+		A78322E915EE3173004BB4F7 /* OAProblem.m in Sources */ = {isa = PBXBuildFile; fileRef = A7A7C9EB147AA2EE004D8756 /* OAProblem.m */; settings = {COMPILER_FLAGS = "-fno-objc-arc"; }; };
+		A78322EA15EE3173004BB4F7 /* OARequestParameter.m in Sources */ = {isa = PBXBuildFile; fileRef = A7A7C9ED147AA2EE004D8756 /* OARequestParameter.m */; settings = {COMPILER_FLAGS = "-fno-objc-arc"; }; };
+		A78322EB15EE3173004BB4F7 /* OAServiceTicket.m in Sources */ = {isa = PBXBuildFile; fileRef = A7A7C9EF147AA2EE004D8756 /* OAServiceTicket.m */; settings = {COMPILER_FLAGS = "-fno-objc-arc"; }; };
+		A78322EC15EE3173004BB4F7 /* OAToken.m in Sources */ = {isa = PBXBuildFile; fileRef = A7A7C9F3147AA2EE004D8756 /* OAToken.m */; settings = {COMPILER_FLAGS = "-fno-objc-arc"; }; };
+		A78322ED15EE3173004BB4F7 /* OATokenManager.m in Sources */ = {isa = PBXBuildFile; fileRef = A7A7C9F5147AA2EE004D8756 /* OATokenManager.m */; settings = {COMPILER_FLAGS = "-fno-objc-arc"; }; };
+		A78322EE15EE3173004BB4F7 /* ZPAuthenticationDialog.m in Sources */ = {isa = PBXBuildFile; fileRef = A74348D6147AB37A00DA6FC3 /* ZPAuthenticationDialog.m */; };
+		A78322EF15EE3173004BB4F7 /* ZPServerResponseXMLParser.m in Sources */ = {isa = PBXBuildFile; fileRef = A7A3F952147BBCCA00CA7266 /* ZPServerResponseXMLParser.m */; };
+		A78322F015EE3173004BB4F7 /* ZPZoteroItem.m in Sources */ = {isa = PBXBuildFile; fileRef = A7692D83147D112D000C1A8F /* ZPZoteroItem.m */; };
+		A78322F115EE3173004BB4F7 /* ZPZoteroLibrary.m in Sources */ = {isa = PBXBuildFile; fileRef = A72853F8147E319600D3FE97 /* ZPZoteroLibrary.m */; };
+		A78322F215EE3173004BB4F7 /* ZPZoteroCollection.m in Sources */ = {isa = PBXBuildFile; fileRef = A72853FC147E31B500D3FE97 /* ZPZoteroCollection.m */; };
+		A78322F315EE3173004BB4F7 /* FMDatabase.m in Sources */ = {isa = PBXBuildFile; fileRef = A7A54B0614878E4F00EBAD80 /* FMDatabase.m */; settings = {COMPILER_FLAGS = "-fno-objc-arc"; }; };
+		A78322F415EE3173004BB4F7 /* FMDatabaseAdditions.m in Sources */ = {isa = PBXBuildFile; fileRef = A7A54B0814878E4F00EBAD80 /* FMDatabaseAdditions.m */; settings = {COMPILER_FLAGS = "-fno-objc-arc"; }; };
+		A78322F515EE3173004BB4F7 /* FMResultSet.m in Sources */ = {isa = PBXBuildFile; fileRef = A7A54B0A14878E4F00EBAD80 /* FMResultSet.m */; settings = {COMPILER_FLAGS = "-fno-objc-arc"; }; };
+		A78322F615EE3173004BB4F7 /* DSActivityView.m in Sources */ = {isa = PBXBuildFile; fileRef = A7A54B1014878EE000EBAD80 /* DSActivityView.m */; };
+		A78322F715EE3173004BB4F7 /* ZPItemDetailViewController.m in Sources */ = {isa = PBXBuildFile; fileRef = A79ED822148B2683003EE77C /* ZPItemDetailViewController.m */; };
+		A78322F815EE3173004BB4F7 /* iCarousel.m in Sources */ = {isa = PBXBuildFile; fileRef = A7CC252C1493E14D00FDEAF4 /* iCarousel.m */; };
+		A78322F915EE3173004BB4F7 /* ZPZoteroAttachment.m in Sources */ = {isa = PBXBuildFile; fileRef = A716C0361494E9DE00BD6025 /* ZPZoteroAttachment.m */; };
+		A78322FA15EE3173004BB4F7 /* NSObject+SBJson.m in Sources */ = {isa = PBXBuildFile; fileRef = A716C0391495131E00BD6025 /* NSObject+SBJson.m */; };
+		A78322FB15EE3173004BB4F7 /* SBJsonParser.m in Sources */ = {isa = PBXBuildFile; fileRef = A716C03C1495131E00BD6025 /* SBJsonParser.m */; };
+		A78322FC15EE3173004BB4F7 /* SBJsonStreamParser.m in Sources */ = {isa = PBXBuildFile; fileRef = A716C03E1495131E00BD6025 /* SBJsonStreamParser.m */; };
+		A78322FD15EE3173004BB4F7 /* SBJsonStreamParserAccumulator.m in Sources */ = {isa = PBXBuildFile; fileRef = A716C0401495131E00BD6025 /* SBJsonStreamParserAccumulator.m */; };
+		A78322FE15EE3173004BB4F7 /* SBJsonStreamParserAdapter.m in Sources */ = {isa = PBXBuildFile; fileRef = A716C0421495131E00BD6025 /* SBJsonStreamParserAdapter.m */; };
+		A78322FF15EE3173004BB4F7 /* SBJsonStreamParserState.m in Sources */ = {isa = PBXBuildFile; fileRef = A716C0441495131E00BD6025 /* SBJsonStreamParserState.m */; };
+		A783230015EE3173004BB4F7 /* SBJsonStreamWriter.m in Sources */ = {isa = PBXBuildFile; fileRef = A716C0461495131E00BD6025 /* SBJsonStreamWriter.m */; };
+		A783230115EE3173004BB4F7 /* SBJsonStreamWriterAccumulator.m in Sources */ = {isa = PBXBuildFile; fileRef = A716C0481495131F00BD6025 /* SBJsonStreamWriterAccumulator.m */; };
+		A783230215EE3173004BB4F7 /* SBJsonStreamWriterState.m in Sources */ = {isa = PBXBuildFile; fileRef = A716C04A1495131F00BD6025 /* SBJsonStreamWriterState.m */; };
+		A783230315EE3173004BB4F7 /* SBJsonTokeniser.m in Sources */ = {isa = PBXBuildFile; fileRef = A716C04C1495131F00BD6025 /* SBJsonTokeniser.m */; };
+		A783230415EE3173004BB4F7 /* SBJsonUTF8Stream.m in Sources */ = {isa = PBXBuildFile; fileRef = A716C04E1495131F00BD6025 /* SBJsonUTF8Stream.m */; };
+		A783230515EE3173004BB4F7 /* SBJsonWriter.m in Sources */ = {isa = PBXBuildFile; fileRef = A716C0501495131F00BD6025 /* SBJsonWriter.m */; };
+		A783230615EE3173004BB4F7 /* ZPDatabase.m in Sources */ = {isa = PBXBuildFile; fileRef = A7025018149B0BB1004F2AAB /* ZPDatabase.m */; };
+		A783230715EE3173004BB4F7 /* ZPCacheController.m in Sources */ = {isa = PBXBuildFile; fileRef = A702501C149B33E1004F2AAB /* ZPCacheController.m */; };
+		A783230815EE3173004BB4F7 /* ZPPreferences.m in Sources */ = {isa = PBXBuildFile; fileRef = A702501F149C6C3D004F2AAB /* ZPPreferences.m */; };
+		A783230915EE3173004BB4F7 /* ZPServerResponseXMLParserLibrary.m in Sources */ = {isa = PBXBuildFile; fileRef = A7025071149C8D8F004F2AAB /* ZPServerResponseXMLParserLibrary.m */; };
+		A783230A15EE3173004BB4F7 /* ZPServerResponseXMLParserCollection.m in Sources */ = {isa = PBXBuildFile; fileRef = A7025074149C8F9A004F2AAB /* ZPServerResponseXMLParserCollection.m */; };
+		A783230B15EE3173004BB4F7 /* ZPServerResponseXMLParserItem.m in Sources */ = {isa = PBXBuildFile; fileRef = A7025077149C91A1004F2AAB /* ZPServerResponseXMLParserItem.m */; };
+		A783230C15EE3173004BB4F7 /* ZPZoteroDataObject.m in Sources */ = {isa = PBXBuildFile; fileRef = A79299C2149E0CFE000F8B42 /* ZPZoteroDataObject.m */; };
+		A783230D15EE3173004BB4F7 /* ZPZoteroNote.m in Sources */ = {isa = PBXBuildFile; fileRef = A76D3C6614A9F3F3000C3ED9 /* ZPZoteroNote.m */; };
+		A783230E15EE3173004BB4F7 /* ASIHTTPRequest.m in Sources */ = {isa = PBXBuildFile; fileRef = A76D3C7D14AD9D12000C3ED9 /* ASIHTTPRequest.m */; settings = {COMPILER_FLAGS = "-fno-objc-arc"; }; };
+		A783230F15EE3173004BB4F7 /* Reachability.m in Sources */ = {isa = PBXBuildFile; fileRef = A76D3C8014AD9F2E000C3ED9 /* Reachability.m */; settings = {COMPILER_FLAGS = "-fno-objc-arc"; }; };
+		A783231015EE3173004BB4F7 /* ASIAuthenticationDialog.m in Sources */ = {isa = PBXBuildFile; fileRef = A76D3C8314AD9FA6000C3ED9 /* ASIAuthenticationDialog.m */; settings = {COMPILER_FLAGS = "-fno-objc-arc"; }; };
+		A783231115EE3173004BB4F7 /* ASIDataCompressor.m in Sources */ = {isa = PBXBuildFile; fileRef = A76D3C8514AD9FA7000C3ED9 /* ASIDataCompressor.m */; settings = {COMPILER_FLAGS = "-fno-objc-arc"; }; };
+		A783231215EE3173004BB4F7 /* ASIDataDecompressor.m in Sources */ = {isa = PBXBuildFile; fileRef = A76D3C8714AD9FA7000C3ED9 /* ASIDataDecompressor.m */; settings = {COMPILER_FLAGS = "-fno-objc-arc"; }; };
+		A783231315EE3173004BB4F7 /* ASIInputStream.m in Sources */ = {isa = PBXBuildFile; fileRef = A76D3C8C14AD9FB5000C3ED9 /* ASIInputStream.m */; settings = {COMPILER_FLAGS = "-fno-objc-arc"; }; };
+		A783231415EE3173004BB4F7 /* ZPLocalization.m in Sources */ = {isa = PBXBuildFile; fileRef = A7D3C08214AEE70F00DB975D /* ZPLocalization.m */; };
+		A783231515EE3173004BB4F7 /* ZPAttachmentFileInteractionController.m in Sources */ = {isa = PBXBuildFile; fileRef = A793153D14B185E800E1ABF0 /* ZPAttachmentFileInteractionController.m */; };
+		A783231615EE3173004BB4F7 /* ZPItemListViewController.m in Sources */ = {isa = PBXBuildFile; fileRef = A77B98DE14DE5CDB00132E9B /* ZPItemListViewController.m */; };
+		A783231715EE3173004BB4F7 /* ZPCacheStatusToolbarController.m in Sources */ = {isa = PBXBuildFile; fileRef = A7D5E2DB14F5690700593A39 /* ZPCacheStatusToolbarController.m */; };
+		A783231815EE3173004BB4F7 /* ZPFileChannel.m in Sources */ = {isa = PBXBuildFile; fileRef = A7CD078E151652E9007A8E1D /* ZPFileChannel.m */; };
+		A783231915EE3173004BB4F7 /* ZPFileChannel_ZoteroStorage.m in Sources */ = {isa = PBXBuildFile; fileRef = A7CD0792151657B9007A8E1D /* ZPFileChannel_ZoteroStorage.m */; };
+		A783231A15EE3173004BB4F7 /* ZPFileChannel_WebDAV.m in Sources */ = {isa = PBXBuildFile; fileRef = A7CD0796151657C5007A8E1D /* ZPFileChannel_WebDAV.m */; };
+		A783231B15EE3173004BB4F7 /* ZPFileChannel_Dropbox.m in Sources */ = {isa = PBXBuildFile; fileRef = A7CFD5C0151F22BB00B0AD0A /* ZPFileChannel_Dropbox.m */; };
+		A783231C15EE3173004BB4F7 /* ZPFileImportViewController.m in Sources */ = {isa = PBXBuildFile; fileRef = A79E6FE31531A06C00612DD9 /* ZPFileImportViewController.m */; };
+		A783231D15EE3173004BB4F7 /* ZPSplitViewController.m in Sources */ = {isa = PBXBuildFile; fileRef = A79E6FE71531B00100612DD9 /* ZPSplitViewController.m */; };
+		A783231E15EE3173004BB4F7 /* ioapi.c in Sources */ = {isa = PBXBuildFile; fileRef = A75E1855153405740046988C /* ioapi.c */; };
+		A783231F15EE3173004BB4F7 /* mztools.c in Sources */ = {isa = PBXBuildFile; fileRef = A75E1857153405740046988C /* mztools.c */; settings = {COMPILER_FLAGS = "-w"; }; };
+		A783232015EE3173004BB4F7 /* unzip.c in Sources */ = {isa = PBXBuildFile; fileRef = A75E1859153405740046988C /* unzip.c */; settings = {COMPILER_FLAGS = "-w"; }; };
+		A783232115EE3173004BB4F7 /* zip.c in Sources */ = {isa = PBXBuildFile; fileRef = A75E185B153405740046988C /* zip.c */; settings = {COMPILER_FLAGS = "-w"; }; };
+		A783232215EE3173004BB4F7 /* ZipArchive.mm in Sources */ = {isa = PBXBuildFile; fileRef = A75E185E153405740046988C /* ZipArchive.mm */; settings = {COMPILER_FLAGS = "-fno-objc-arc -w"; }; };
+		A783232315EE3173004BB4F7 /* ZPServerResponseXMLParserKeyPermissions.m in Sources */ = {isa = PBXBuildFile; fileRef = A7A4432B155FE5ED005FF5B4 /* ZPServerResponseXMLParserKeyPermissions.m */; };
+		A783232415EE3173004BB4F7 /* OHAttributedLabel.m in Sources */ = {isa = PBXBuildFile; fileRef = A7BD5E9515611F28003252EA /* OHAttributedLabel.m */; settings = {COMPILER_FLAGS = "-fno-objc-arc"; }; };
+		A783232515EE3173004BB4F7 /* NSAttributedString+Attributes.m in Sources */ = {isa = PBXBuildFile; fileRef = A7BD5E9315611F28003252EA /* NSAttributedString+Attributes.m */; settings = {COMPILER_FLAGS = "-fno-objc-arc"; }; };
+		A783232615EE3173004BB4F7 /* ZPPreviewController.m in Sources */ = {isa = PBXBuildFile; fileRef = A765747A15965E0F00761F6B /* ZPPreviewController.m */; };
+		A783232715EE3173004BB4F7 /* ZPAttachmentCarouselDelegate.m in Sources */ = {isa = PBXBuildFile; fileRef = A70399B31598A40D002F4293 /* ZPAttachmentCarouselDelegate.m */; };
+		A783232815EE3173004BB4F7 /* ASIFormDataRequest.m in Sources */ = {isa = PBXBuildFile; fileRef = A79D6017159A355100F55C54 /* ASIFormDataRequest.m */; settings = {COMPILER_FLAGS = "-fno-objc-arc"; }; };
+		A783232915EE3173004BB4F7 /* FileMD5Hash.c in Sources */ = {isa = PBXBuildFile; fileRef = A7699E4E159A68EF002F09DA /* FileMD5Hash.c */; };
+		A783232A15EE3173004BB4F7 /* ZPUploadVersionConflictViewControllerViewController.m in Sources */ = {isa = PBXBuildFile; fileRef = A7699E5B159B1AC7002F09DA /* ZPUploadVersionConflictViewControllerViewController.m */; };
+		A783232B15EE3173004BB4F7 /* DDFileLogger.m in Sources */ = {isa = PBXBuildFile; fileRef = A7648024159F1BD00075CFB9 /* DDFileLogger.m */; };
+		A783232C15EE3173004BB4F7 /* DDLog.m in Sources */ = {isa = PBXBuildFile; fileRef = A7648026159F1BD00075CFB9 /* DDLog.m */; };
+		A783232D15EE3173004BB4F7 /* DDTTYLogger.m in Sources */ = {isa = PBXBuildFile; fileRef = A7648028159F1BD00075CFB9 /* DDTTYLogger.m */; };
+		A783232E15EE3173004BB4F7 /* TestFlightLogger.m in Sources */ = {isa = PBXBuildFile; fileRef = A7648033159F1C0C0075CFB9 /* TestFlightLogger.m */; };
+		A783232F15EE3173004BB4F7 /* CompressingLogFileManager.m in Sources */ = {isa = PBXBuildFile; fileRef = A77FD05D159F36CC00774D50 /* CompressingLogFileManager.m */; };
+		A783233015EE3173004BB4F7 /* ZPLogViewController.m in Sources */ = {isa = PBXBuildFile; fileRef = A77FD067159F750900774D50 /* ZPLogViewController.m */; };
+		A783233115EE3173004BB4F7 /* ZPAttachmentIconImageFactory.m in Sources */ = {isa = PBXBuildFile; fileRef = A7093C2B15A4241300F7B5CF /* ZPAttachmentIconImageFactory.m */; };
+		A783233215EE3173004BB4F7 /* IASKAppSettingsViewController.m in Sources */ = {isa = PBXBuildFile; fileRef = A7A1C71815A6B6E00012BC7A /* IASKAppSettingsViewController.m */; settings = {COMPILER_FLAGS = "-fno-objc-arc"; }; };
+		A783233315EE3173004BB4F7 /* IASKAppSettingsWebViewController.m in Sources */ = {isa = PBXBuildFile; fileRef = A7A1C71A15A6B6E00012BC7A /* IASKAppSettingsWebViewController.m */; settings = {COMPILER_FLAGS = "-fno-objc-arc"; }; };
+		A783233415EE3173004BB4F7 /* IASKSpecifierValuesViewController.m in Sources */ = {isa = PBXBuildFile; fileRef = A7A1C71C15A6B6E00012BC7A /* IASKSpecifierValuesViewController.m */; settings = {COMPILER_FLAGS = "-fno-objc-arc"; }; };
+		A783233515EE3173004BB4F7 /* IASKSettingsReader.m in Sources */ = {isa = PBXBuildFile; fileRef = A7A1C72015A6B6E00012BC7A /* IASKSettingsReader.m */; settings = {COMPILER_FLAGS = "-fno-objc-arc"; }; };
+		A783233615EE3173004BB4F7 /* IASKSettingsStore.m in Sources */ = {isa = PBXBuildFile; fileRef = A7A1C72215A6B6E00012BC7A /* IASKSettingsStore.m */; settings = {COMPILER_FLAGS = "-fno-objc-arc"; }; };
+		A783233715EE3173004BB4F7 /* IASKSettingsStoreFile.m in Sources */ = {isa = PBXBuildFile; fileRef = A7A1C72415A6B6E00012BC7A /* IASKSettingsStoreFile.m */; settings = {COMPILER_FLAGS = "-fno-objc-arc"; }; };
+		A783233815EE3173004BB4F7 /* IASKSettingsStoreUserDefaults.m in Sources */ = {isa = PBXBuildFile; fileRef = A7A1C72615A6B6E00012BC7A /* IASKSettingsStoreUserDefaults.m */; settings = {COMPILER_FLAGS = "-fno-objc-arc"; }; };
+		A783233915EE3173004BB4F7 /* IASKSpecifier.m in Sources */ = {isa = PBXBuildFile; fileRef = A7A1C72815A6B6E00012BC7A /* IASKSpecifier.m */; settings = {COMPILER_FLAGS = "-fno-objc-arc"; }; };
+		A783233A15EE3173004BB4F7 /* IASKPSSliderSpecifierViewCell.m in Sources */ = {isa = PBXBuildFile; fileRef = A7A1C72B15A6B6E00012BC7A /* IASKPSSliderSpecifierViewCell.m */; settings = {COMPILER_FLAGS = "-fno-objc-arc"; }; };
+		A783233B15EE3173004BB4F7 /* IASKPSTextFieldSpecifierViewCell.m in Sources */ = {isa = PBXBuildFile; fileRef = A7A1C72D15A6B6E00012BC7A /* IASKPSTextFieldSpecifierViewCell.m */; settings = {COMPILER_FLAGS = "-fno-objc-arc"; }; };
+		A783233C15EE3173004BB4F7 /* IASKPSTitleValueSpecifierViewCell.m in Sources */ = {isa = PBXBuildFile; fileRef = A7A1C72F15A6B6E00012BC7A /* IASKPSTitleValueSpecifierViewCell.m */; settings = {COMPILER_FLAGS = "-fno-objc-arc"; }; };
+		A783233D15EE3173004BB4F7 /* IASKSlider.m in Sources */ = {isa = PBXBuildFile; fileRef = A7A1C73315A6B6E00012BC7A /* IASKSlider.m */; settings = {COMPILER_FLAGS = "-fno-objc-arc"; }; };
+		A783233E15EE3173004BB4F7 /* IASKSwitch.m in Sources */ = {isa = PBXBuildFile; fileRef = A7A1C73515A6B6E00012BC7A /* IASKSwitch.m */; settings = {COMPILER_FLAGS = "-fno-objc-arc"; }; };
+		A783233F15EE3173004BB4F7 /* IASKTextField.m in Sources */ = {isa = PBXBuildFile; fileRef = A7A1C73715A6B6E00012BC7A /* IASKTextField.m */; settings = {COMPILER_FLAGS = "-fno-objc-arc"; }; };
+		A783234015EE3173004BB4F7 /* DBAccountInfo.m in Sources */ = {isa = PBXBuildFile; fileRef = A7307B4815A6E51100A90BDF /* DBAccountInfo.m */; settings = {COMPILER_FLAGS = "-fno-objc-arc"; }; };
+		A783234115EE3173004BB4F7 /* DBConnectController.m in Sources */ = {isa = PBXBuildFile; fileRef = A7307B4A15A6E51100A90BDF /* DBConnectController.m */; settings = {COMPILER_FLAGS = "-fno-objc-arc -w"; }; };
+		A783234215EE3173004BB4F7 /* DBDeltaEntry.m in Sources */ = {isa = PBXBuildFile; fileRef = A7307B4C15A6E51100A90BDF /* DBDeltaEntry.m */; settings = {COMPILER_FLAGS = "-fno-objc-arc"; }; };
+		A783234315EE3173004BB4F7 /* DBError.m in Sources */ = {isa = PBXBuildFile; fileRef = A7307B4D15A6E51100A90BDF /* DBError.m */; settings = {COMPILER_FLAGS = "-fno-objc-arc"; }; };
+		A783234415EE3173004BB4F7 /* DBKeychain-iOS.m in Sources */ = {isa = PBXBuildFile; fileRef = A7307B4E15A6E51100A90BDF /* DBKeychain-iOS.m */; settings = {COMPILER_FLAGS = "-fno-objc-arc -w"; }; };
+		A783234515EE3173004BB4F7 /* DBLog.m in Sources */ = {isa = PBXBuildFile; fileRef = A7307B5015A6E51100A90BDF /* DBLog.m */; settings = {COMPILER_FLAGS = "-fno-objc-arc"; }; };
+		A783234615EE3173004BB4F7 /* DBMetadata.m in Sources */ = {isa = PBXBuildFile; fileRef = A7307B5115A6E51100A90BDF /* DBMetadata.m */; settings = {COMPILER_FLAGS = "-fno-objc-arc"; }; };
+		A783234715EE3173004BB4F7 /* DBQuota.m in Sources */ = {isa = PBXBuildFile; fileRef = A7307B5215A6E51100A90BDF /* DBQuota.m */; settings = {COMPILER_FLAGS = "-fno-objc-arc"; }; };
+		A783234815EE3173004BB4F7 /* DBRequest.m in Sources */ = {isa = PBXBuildFile; fileRef = A7307B5315A6E51100A90BDF /* DBRequest.m */; settings = {COMPILER_FLAGS = "-fno-objc-arc"; }; };
+		A783234915EE3173004BB4F7 /* DBRestClient.m in Sources */ = {isa = PBXBuildFile; fileRef = A7307B5515A6E51100A90BDF /* DBRestClient.m */; settings = {COMPILER_FLAGS = "-fno-objc-arc -w"; }; };
+		A783234A15EE3173004BB4F7 /* DBSession+iOS.m in Sources */ = {isa = PBXBuildFile; fileRef = A7307B5615A6E51100A90BDF /* DBSession+iOS.m */; settings = {COMPILER_FLAGS = "-fno-objc-arc"; }; };
+		A783234B15EE3173004BB4F7 /* DBSession.m in Sources */ = {isa = PBXBuildFile; fileRef = A7307B5715A6E51100A90BDF /* DBSession.m */; settings = {COMPILER_FLAGS = "-fno-objc-arc"; }; };
+		A783234C15EE3173004BB4F7 /* DBJSON.m in Sources */ = {isa = PBXBuildFile; fileRef = A7307B8D15A6E51100A90BDF /* DBJSON.m */; settings = {COMPILER_FLAGS = "-fno-objc-arc"; }; };
+		A783234D15EE3173004BB4F7 /* DBJsonBase.m in Sources */ = {isa = PBXBuildFile; fileRef = A7307B8F15A6E51100A90BDF /* DBJsonBase.m */; settings = {COMPILER_FLAGS = "-fno-objc-arc"; }; };
+		A783234E15EE3173004BB4F7 /* DBJsonParser.m in Sources */ = {isa = PBXBuildFile; fileRef = A7307B9115A6E51100A90BDF /* DBJsonParser.m */; settings = {COMPILER_FLAGS = "-fno-objc-arc"; }; };
+		A783234F15EE3173004BB4F7 /* DBJsonWriter.m in Sources */ = {isa = PBXBuildFile; fileRef = A7307B9315A6E51100A90BDF /* DBJsonWriter.m */; settings = {COMPILER_FLAGS = "-fno-objc-arc"; }; };
+		A783235015EE3173004BB4F7 /* NSObject+DBJSON.m in Sources */ = {isa = PBXBuildFile; fileRef = A7307B9615A6E51100A90BDF /* NSObject+DBJSON.m */; settings = {COMPILER_FLAGS = "-fno-objc-arc"; }; };
+		A783235115EE3173004BB4F7 /* NSString+DBJSON.m in Sources */ = {isa = PBXBuildFile; fileRef = A7307B9815A6E51100A90BDF /* NSString+DBJSON.m */; settings = {COMPILER_FLAGS = "-fno-objc-arc"; }; };
+		A783235215EE3173004BB4F7 /* Base64Transcoder.c in Sources */ = {isa = PBXBuildFile; fileRef = A7307B9B15A6E51100A90BDF /* Base64Transcoder.c */; settings = {COMPILER_FLAGS = "-fno-objc-arc"; }; };
+		A783235315EE3173004BB4F7 /* MPOAuthAPI.m in Sources */ = {isa = PBXBuildFile; fileRef = A7307B9C15A6E51100A90BDF /* MPOAuthAPI.m */; settings = {COMPILER_FLAGS = "-fno-objc-arc"; }; };
+		A783235415EE3173004BB4F7 /* MPOAuthAPIRequestLoader.m in Sources */ = {isa = PBXBuildFile; fileRef = A7307B9D15A6E51100A90BDF /* MPOAuthAPIRequestLoader.m */; settings = {COMPILER_FLAGS = "-fno-objc-arc"; }; };
+		A783235515EE3173004BB4F7 /* MPOAuthAuthenticationMethod.m in Sources */ = {isa = PBXBuildFile; fileRef = A7307B9E15A6E51100A90BDF /* MPOAuthAuthenticationMethod.m */; settings = {COMPILER_FLAGS = "-fno-objc-arc"; }; };
+		A783235615EE3173004BB4F7 /* MPOAuthAuthenticationMethodOAuth.m in Sources */ = {isa = PBXBuildFile; fileRef = A7307B9F15A6E51100A90BDF /* MPOAuthAuthenticationMethodOAuth.m */; settings = {COMPILER_FLAGS = "-fno-objc-arc"; }; };
+		A783235715EE3173004BB4F7 /* MPOAuthConnection.m in Sources */ = {isa = PBXBuildFile; fileRef = A7307BA015A6E51100A90BDF /* MPOAuthConnection.m */; settings = {COMPILER_FLAGS = "-fno-objc-arc"; }; };
+		A783235815EE3173004BB4F7 /* MPOAuthCredentiaIConcreteStore+KeychainAdditionsMac.m in Sources */ = {isa = PBXBuildFile; fileRef = A7307BA115A6E51100A90BDF /* MPOAuthCredentiaIConcreteStore+KeychainAdditionsMac.m */; settings = {COMPILER_FLAGS = "-fno-objc-arc"; }; };
+		A783235915EE3173004BB4F7 /* MPOAuthCredentialConcreteStore+KeychainAdditionsiPhone.m in Sources */ = {isa = PBXBuildFile; fileRef = A7307BA215A6E51100A90BDF /* MPOAuthCredentialConcreteStore+KeychainAdditionsiPhone.m */; settings = {COMPILER_FLAGS = "-fno-objc-arc"; }; };
+		A783235A15EE3173004BB4F7 /* MPOAuthCredentialConcreteStore.m in Sources */ = {isa = PBXBuildFile; fileRef = A7307BA315A6E51100A90BDF /* MPOAuthCredentialConcreteStore.m */; settings = {COMPILER_FLAGS = "-fno-objc-arc"; }; };
+		A783235B15EE3173004BB4F7 /* MPOAuthSignatureParameter.m in Sources */ = {isa = PBXBuildFile; fileRef = A7307BA415A6E51100A90BDF /* MPOAuthSignatureParameter.m */; settings = {COMPILER_FLAGS = "-fno-objc-arc"; }; };
+		A783235C15EE3173004BB4F7 /* MPOAuthURLRequest.m in Sources */ = {isa = PBXBuildFile; fileRef = A7307BA515A6E51100A90BDF /* MPOAuthURLRequest.m */; settings = {COMPILER_FLAGS = "-fno-objc-arc"; }; };
+		A783235D15EE3173004BB4F7 /* MPOAuthURLResponse.m in Sources */ = {isa = PBXBuildFile; fileRef = A7307BA615A6E51100A90BDF /* MPOAuthURLResponse.m */; settings = {COMPILER_FLAGS = "-fno-objc-arc"; }; };
+		A783235E15EE3173004BB4F7 /* MPURLRequestParameter.m in Sources */ = {isa = PBXBuildFile; fileRef = A7307BA715A6E51100A90BDF /* MPURLRequestParameter.m */; settings = {COMPILER_FLAGS = "-fno-objc-arc"; }; };
+		A783235F15EE3173004BB4F7 /* NSString+URLEscapingAdditions.m in Sources */ = {isa = PBXBuildFile; fileRef = A7307BA815A6E51100A90BDF /* NSString+URLEscapingAdditions.m */; settings = {COMPILER_FLAGS = "-fno-objc-arc"; }; };
+		A783236015EE3173004BB4F7 /* NSURL+MPURLParameterAdditions.m in Sources */ = {isa = PBXBuildFile; fileRef = A7307BA915A6E51100A90BDF /* NSURL+MPURLParameterAdditions.m */; settings = {COMPILER_FLAGS = "-fno-objc-arc"; }; };
+		A783236115EE3173004BB4F7 /* NSURLResponse+Encoding.m in Sources */ = {isa = PBXBuildFile; fileRef = A7307BAA15A6E51100A90BDF /* NSURLResponse+Encoding.m */; settings = {COMPILER_FLAGS = "-fno-objc-arc"; }; };
+		A783236215EE3173004BB4F7 /* NSDictionary+Dropbox.m in Sources */ = {isa = PBXBuildFile; fileRef = A7307BAB15A6E51100A90BDF /* NSDictionary+Dropbox.m */; settings = {COMPILER_FLAGS = "-fno-objc-arc"; }; };
+		A783236315EE3173004BB4F7 /* NSString+Dropbox.m in Sources */ = {isa = PBXBuildFile; fileRef = A7307BAC15A6E51100A90BDF /* NSString+Dropbox.m */; settings = {COMPILER_FLAGS = "-fno-objc-arc"; }; };
+		A783236415EE3173004BB4F7 /* UIAlertView+Dropbox.m in Sources */ = {isa = PBXBuildFile; fileRef = A7307BAD15A6E51100A90BDF /* UIAlertView+Dropbox.m */; settings = {COMPILER_FLAGS = "-fno-objc-arc"; }; };
+		A783236515EE3173004BB4F7 /* ZPNavigationController.m in Sources */ = {isa = PBXBuildFile; fileRef = A71A166615A783DA007BB40D /* ZPNavigationController.m */; };
+		A783236615EE3173004BB4F7 /* ZPHelpPopover.m in Sources */ = {isa = PBXBuildFile; fileRef = A7DBE6D215B2BA9300DA48C1 /* ZPHelpPopover.m */; };
+		A783236715EE3173004BB4F7 /* ZPItemListViewDataSource.m in Sources */ = {isa = PBXBuildFile; fileRef = A74F8E6915B83D8500C72096 /* ZPItemListViewDataSource.m */; };
+		A783236815EE3173004BB4F7 /* ZPMasterItemListViewController.m in Sources */ = {isa = PBXBuildFile; fileRef = A74F8E6D15B83DF100C72096 /* ZPMasterItemListViewController.m */; };
+		A783236915EE3173004BB4F7 /* NSData+Base64.m in Sources */ = {isa = PBXBuildFile; fileRef = A75D4B4515BC9B56003291CB /* NSData+Base64.m */; };
+		A783236A15EE3173004BB4F7 /* NSString+Base64.m in Sources */ = {isa = PBXBuildFile; fileRef = A75D4B4715BC9B56003291CB /* NSString+Base64.m */; };
+		A783236C15EE3173004BB4F7 /* libUserVoice.a in Frameworks */ = {isa = PBXBuildFile; fileRef = A77E0DCC15D65FAB00134D35 /* libUserVoice.a */; };
+		A783236D15EE3173004BB4F7 /* libDTCoreText.a in Frameworks */ = {isa = PBXBuildFile; fileRef = A7ABAB4615A3046300EA8B7B /* libDTCoreText.a */; };
+		A783236E15EE3173004BB4F7 /* CoreFoundation.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = A7699E56159A6C44002F09DA /* CoreFoundation.framework */; };
+		A783236F15EE3173004BB4F7 /* MessageUI.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = A70399B015979EC1002F4293 /* MessageUI.framework */; };
+		A783237015EE3173004BB4F7 /* CoreText.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = A7BD5EC5156121A3003252EA /* CoreText.framework */; };
+		A783237115EE3173004BB4F7 /* QuartzCore.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 320AF8492C47A4D819F7C450 /* QuartzCore.framework */; };
+		A783237215EE3173004BB4F7 /* libxml2.dylib in Frameworks */ = {isa = PBXBuildFile; fileRef = A7A7CA0E147AA339004D8756 /* libxml2.dylib */; };
+		A783237315EE3173004BB4F7 /* ImageIO.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = A7BD5EC315612181003252EA /* ImageIO.framework */; };
+		A783237415EE3173004BB4F7 /* libz.dylib in Frameworks */ = {isa = PBXBuildFile; fileRef = A7F8637F14C21D8800021662 /* libz.dylib */; };
+		A783237515EE3173004BB4F7 /* QuickLook.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = A7D3C07F14AEDE7B00DB975D /* QuickLook.framework */; };
+		A783237615EE3173004BB4F7 /* CoreGraphics.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = A7200DD814718DC0004347C9 /* CoreGraphics.framework */; };
+		A783237715EE3173004BB4F7 /* MobileCoreServices.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = A76D3C7714AD97D6000C3ED9 /* MobileCoreServices.framework */; };
+		A783237815EE3173004BB4F7 /* SystemConfiguration.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = A76D3C7514AD97CB000C3ED9 /* SystemConfiguration.framework */; };
+		A783237915EE3173004BB4F7 /* CFNetwork.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = A76D3C7314AD97BA000C3ED9 /* CFNetwork.framework */; };
+		A783237A15EE3173004BB4F7 /* Security.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = A7A7CA0C147AA329004D8756 /* Security.framework */; };
+		A783237B15EE3173004BB4F7 /* libsqlite3.dylib in Frameworks */ = {isa = PBXBuildFile; fileRef = A7200DF7147193C0004347C9 /* libsqlite3.dylib */; };
+		A783237C15EE3173004BB4F7 /* UIKit.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = A7200DD414718DC0004347C9 /* UIKit.framework */; };
+		A783237D15EE3173004BB4F7 /* Foundation.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = A7200DD614718DC0004347C9 /* Foundation.framework */; };
+		A783237E15EE3173004BB4F7 /* libTestFlight.a in Frameworks */ = {isa = PBXBuildFile; fileRef = A73D1BF91560E234002D4A2D /* libTestFlight.a */; };
+		A783238015EE3173004BB4F7 /* InfoPlist.strings in Resources */ = {isa = PBXBuildFile; fileRef = A7200DDD14718DC0004347C9 /* InfoPlist.strings */; };
+		A783238115EE3173004BB4F7 /* MainStoryboard_iPhone.storyboard in Resources */ = {isa = PBXBuildFile; fileRef = A786F7771476A56200B35B92 /* MainStoryboard_iPhone.storyboard */; };
+		A783238215EE3173004BB4F7 /* database.sql in Resources */ = {isa = PBXBuildFile; fileRef = A7A3F94F147BAB6C00CA7266 /* database.sql */; };
+		A783238315EE3173004BB4F7 /* Settings.bundle in Resources */ = {isa = PBXBuildFile; fileRef = A73D635014879D15007999F3 /* Settings.bundle */; };
+		A783238415EE3173004BB4F7 /* MainStoryboard_iPad.storyboard in Resources */ = {isa = PBXBuildFile; fileRef = A72C3CA61487C9DA00F6744E /* MainStoryboard_iPad.storyboard */; };
+		A783238515EE3173004BB4F7 /* AppIcon72x72-beta.png in Resources */ = {isa = PBXBuildFile; fileRef = A7CD067A151612DE007A8E1D /* AppIcon72x72-beta.png */; };
+		A783238615EE3173004BB4F7 /* AppIcon144x144-beta.png in Resources */ = {isa = PBXBuildFile; fileRef = A7CD078215162FA7007A8E1D /* AppIcon144x144-beta.png */; };
+		A783238715EE3173004BB4F7 /* AppIcon57x57-beta.png in Resources */ = {isa = PBXBuildFile; fileRef = A79E6FF615320E5600612DD9 /* AppIcon57x57-beta.png */; };
+		A783238815EE3173004BB4F7 /* AppIcon114x114-beta.png in Resources */ = {isa = PBXBuildFile; fileRef = A79E6FF815320E7B00612DD9 /* AppIcon114x114-beta.png */; };
+		A783238915EE3173004BB4F7 /* Default@2x.png in Resources */ = {isa = PBXBuildFile; fileRef = A7F249D5153306ED00537B54 /* Default@2x.png */; };
+		A783238A15EE3173004BB4F7 /* Default-Landscape~ipad.png in Resources */ = {isa = PBXBuildFile; fileRef = A7F249D71533072300537B54 /* Default-Landscape~ipad.png */; };
+		A783238B15EE3173004BB4F7 /* Default-Portrait~ipad.png in Resources */ = {isa = PBXBuildFile; fileRef = A7F249D91533072A00537B54 /* Default-Portrait~ipad.png */; };
+		A783238C15EE3173004BB4F7 /* Default.png in Resources */ = {isa = PBXBuildFile; fileRef = A7F249E3153311B200537B54 /* Default.png */; };
+		A783238D15EE3173004BB4F7 /* Default-Portrait@2x~ipad.png in Resources */ = {isa = PBXBuildFile; fileRef = A7F249E5153311BC00537B54 /* Default-Portrait@2x~ipad.png */; };
+		A783238E15EE3173004BB4F7 /* Default-Landscape@2x~ipad.png in Resources */ = {isa = PBXBuildFile; fileRef = A7F249F11533175E00537B54 /* Default-Landscape@2x~ipad.png */; };
+		A783238F15EE3173004BB4F7 /* barbutton_image_up_state~iphone.png in Resources */ = {isa = PBXBuildFile; fileRef = A7F249FA1533179700537B54 /* barbutton_image_up_state~iphone.png */; };
+		A783239015EE3173004BB4F7 /* barbutton_image_up_state@2x~iphone.png in Resources */ = {isa = PBXBuildFile; fileRef = A7F249F91533179700537B54 /* barbutton_image_up_state@2x~iphone.png */; };
+		A783239115EE3173004BB4F7 /* barbutton_image_up_state~ipad.png in Resources */ = {isa = PBXBuildFile; fileRef = A7F249F81533179700537B54 /* barbutton_image_up_state~ipad.png */; };
+		A783239215EE3173004BB4F7 /* barbutton_image_up_state@2x~ipad.png in Resources */ = {isa = PBXBuildFile; fileRef = A7F249F71533179700537B54 /* barbutton_image_up_state@2x~ipad.png */; };
+		A783239315EE3173004BB4F7 /* barbutton_image_down_state~iphone.png in Resources */ = {isa = PBXBuildFile; fileRef = A7F249F61533179700537B54 /* barbutton_image_down_state~iphone.png */; };
+		A783239415EE3173004BB4F7 /* barbutton_image_down_state@2x~iphone.png in Resources */ = {isa = PBXBuildFile; fileRef = A7F249F51533179700537B54 /* barbutton_image_down_state@2x~iphone.png */; };
+		A783239515EE3173004BB4F7 /* barbutton_image_down_state~ipad.png in Resources */ = {isa = PBXBuildFile; fileRef = A7F249F41533179700537B54 /* barbutton_image_down_state~ipad.png */; };
+		A783239615EE3173004BB4F7 /* barbutton_image_down_state@2x~ipad.png in Resources */ = {isa = PBXBuildFile; fileRef = A7F249F31533179700537B54 /* barbutton_image_down_state@2x~ipad.png */; };
+		A783239715EE3173004BB4F7 /* application-epub+zip.svgz in Resources */ = {isa = PBXBuildFile; fileRef = A708EE49153F0FAA0083A506 /* application-epub+zip.svgz */; };
+		A783239815EE3173004BB4F7 /* application-illustrator.svgz in Resources */ = {isa = PBXBuildFile; fileRef = A708EE4A153F0FAA0083A506 /* application-illustrator.svgz */; };
+		A783239915EE3173004BB4F7 /* application-javascript.svgz in Resources */ = {isa = PBXBuildFile; fileRef = A708EE4B153F0FAA0083A506 /* application-javascript.svgz */; };
+		A783239A15EE3173004BB4F7 /* application-msword-template.svgz in Resources */ = {isa = PBXBuildFile; fileRef = A708EE4C153F0FAA0083A506 /* application-msword-template.svgz */; };
+		A783239B15EE3173004BB4F7 /* application-msword.svgz in Resources */ = {isa = PBXBuildFile; fileRef = A708EE4D153F0FAA0083A506 /* application-msword.svgz */; };
+		A783239C15EE3173004BB4F7 /* application-octet-stream.svgz in Resources */ = {isa = PBXBuildFile; fileRef = A708EE4E153F0FAA0083A506 /* application-octet-stream.svgz */; };
+		A783239D15EE3173004BB4F7 /* application-pdf.svgz in Resources */ = {isa = PBXBuildFile; fileRef = A708EE4F153F0FAA0083A506 /* application-pdf.svgz */; };
+		A783239E15EE3173004BB4F7 /* application-pgp-encrypted.svgz in Resources */ = {isa = PBXBuildFile; fileRef = A708EE50153F0FAA0083A506 /* application-pgp-encrypted.svgz */; };
+		A783239F15EE3173004BB4F7 /* application-pgp-keys.svgz in Resources */ = {isa = PBXBuildFile; fileRef = A708EE51153F0FAA0083A506 /* application-pgp-keys.svgz */; };
+		A78323A015EE3173004BB4F7 /* application-pgp-signature.svgz in Resources */ = {isa = PBXBuildFile; fileRef = A708EE52153F0FAA0083A506 /* application-pgp-signature.svgz */; };
+		A78323A115EE3173004BB4F7 /* application-pkcs7-mime.svgz in Resources */ = {isa = PBXBuildFile; fileRef = A708EE53153F0FAA0083A506 /* application-pkcs7-mime.svgz */; };
+		A78323A215EE3173004BB4F7 /* application-pkcs7-signature.svgz in Resources */ = {isa = PBXBuildFile; fileRef = A708EE54153F0FAA0083A506 /* application-pkcs7-signature.svgz */; };
+		A78323A315EE3173004BB4F7 /* application-postscript.svgz in Resources */ = {isa = PBXBuildFile; fileRef = A708EE55153F0FAA0083A506 /* application-postscript.svgz */; };
+		A78323A415EE3173004BB4F7 /* application-relaxng.svgz in Resources */ = {isa = PBXBuildFile; fileRef = A708EE56153F0FAA0083A506 /* application-relaxng.svgz */; };
+		A78323A515EE3173004BB4F7 /* application-rss+xml.svgz in Resources */ = {isa = PBXBuildFile; fileRef = A708EE57153F0FAA0083A506 /* application-rss+xml.svgz */; };
+		A78323A615EE3173004BB4F7 /* application-rtf.svgz in Resources */ = {isa = PBXBuildFile; fileRef = A708EE58153F0FAA0083A506 /* application-rtf.svgz */; };
+		A78323A715EE3173004BB4F7 /* application-sxw.svgz in Resources */ = {isa = PBXBuildFile; fileRef = A708EE59153F0FAA0083A506 /* application-sxw.svgz */; };
+		A78323A815EE3173004BB4F7 /* application-vnd.iccprofile.svgz in Resources */ = {isa = PBXBuildFile; fileRef = A708EE5A153F0FAA0083A506 /* application-vnd.iccprofile.svgz */; };
+		A78323A915EE3173004BB4F7 /* application-vnd.ms-access.svgz in Resources */ = {isa = PBXBuildFile; fileRef = A708EE5B153F0FAA0083A506 /* application-vnd.ms-access.svgz */; };
+		A78323AA15EE3173004BB4F7 /* application-vnd.ms-excel.svgz in Resources */ = {isa = PBXBuildFile; fileRef = A708EE5C153F0FAA0083A506 /* application-vnd.ms-excel.svgz */; };
+		A78323AB15EE3173004BB4F7 /* application-vnd.ms-powerpoint.svgz in Resources */ = {isa = PBXBuildFile; fileRef = A708EE5D153F0FAA0083A506 /* application-vnd.ms-powerpoint.svgz */; };
+		A78323AC15EE3173004BB4F7 /* application-vnd.oasis.opendocument.chart.svgz in Resources */ = {isa = PBXBuildFile; fileRef = A708EE5E153F0FAA0083A506 /* application-vnd.oasis.opendocument.chart.svgz */; };
+		A78323AD15EE3173004BB4F7 /* application-vnd.oasis.opendocument.database.svgz in Resources */ = {isa = PBXBuildFile; fileRef = A708EE5F153F0FAA0083A506 /* application-vnd.oasis.opendocument.database.svgz */; };
+		A78323AE15EE3173004BB4F7 /* application-vnd.oasis.opendocument.formula-template.svgz in Resources */ = {isa = PBXBuildFile; fileRef = A708EE60153F0FAA0083A506 /* application-vnd.oasis.opendocument.formula-template.svgz */; };
+		A78323AF15EE3173004BB4F7 /* application-vnd.oasis.opendocument.formula.svgz in Resources */ = {isa = PBXBuildFile; fileRef = A708EE61153F0FAA0083A506 /* application-vnd.oasis.opendocument.formula.svgz */; };
+		A78323B015EE3173004BB4F7 /* application-vnd.oasis.opendocument.graphics.svgz in Resources */ = {isa = PBXBuildFile; fileRef = A708EE62153F0FAA0083A506 /* application-vnd.oasis.opendocument.graphics.svgz */; };
+		A78323B115EE3173004BB4F7 /* application-vnd.oasis.opendocument.image.svgz in Resources */ = {isa = PBXBuildFile; fileRef = A708EE63153F0FAA0083A506 /* application-vnd.oasis.opendocument.image.svgz */; };
+		A78323B215EE3173004BB4F7 /* application-vnd.oasis.opendocument.presentation-template.svgz in Resources */ = {isa = PBXBuildFile; fileRef = A708EE64153F0FAA0083A506 /* application-vnd.oasis.opendocument.presentation-template.svgz */; };
+		A78323B315EE3173004BB4F7 /* application-vnd.oasis.opendocument.presentation.svgz in Resources */ = {isa = PBXBuildFile; fileRef = A708EE65153F0FAA0083A506 /* application-vnd.oasis.opendocument.presentation.svgz */; };
+		A78323B415EE3173004BB4F7 /* application-vnd.oasis.opendocument.spreadsheet-template.svgz in Resources */ = {isa = PBXBuildFile; fileRef = A708EE66153F0FAA0083A506 /* application-vnd.oasis.opendocument.spreadsheet-template.svgz */; };
+		A78323B515EE3173004BB4F7 /* application-vnd.oasis.opendocument.spreadsheet.svgz in Resources */ = {isa = PBXBuildFile; fileRef = A708EE67153F0FAA0083A506 /* application-vnd.oasis.opendocument.spreadsheet.svgz */; };
+		A78323B615EE3173004BB4F7 /* application-vnd.oasis.opendocument.text.svgz in Resources */ = {isa = PBXBuildFile; fileRef = A708EE68153F0FAA0083A506 /* application-vnd.oasis.opendocument.text.svgz */; };
+		A78323B715EE3173004BB4F7 /* application-vnd.openxmlformats-officedocument.wordprocessingml.document.svgz in Resources */ = {isa = PBXBuildFile; fileRef = A708EE69153F0FAA0083A506 /* application-vnd.openxmlformats-officedocument.wordprocessingml.document.svgz */; };
+		A78323B815EE3173004BB4F7 /* application-vnd.rn-realmedia.svgz in Resources */ = {isa = PBXBuildFile; fileRef = A708EE6A153F0FAA0083A506 /* application-vnd.rn-realmedia.svgz */; };
+		A78323B915EE3173004BB4F7 /* application-vnd.scribus.svgz in Resources */ = {isa = PBXBuildFile; fileRef = A708EE6B153F0FAA0083A506 /* application-vnd.scribus.svgz */; };
+		A78323BA15EE3173004BB4F7 /* application-vnd.stardivision.calc.svgz in Resources */ = {isa = PBXBuildFile; fileRef = A708EE6C153F0FAA0083A506 /* application-vnd.stardivision.calc.svgz */; };
+		A78323BB15EE3173004BB4F7 /* application-vnd.stardivision.draw.svgz in Resources */ = {isa = PBXBuildFile; fileRef = A708EE6D153F0FAA0083A506 /* application-vnd.stardivision.draw.svgz */; };
+		A78323BC15EE3173004BB4F7 /* application-vnd.stardivision.mail.svgz in Resources */ = {isa = PBXBuildFile; fileRef = A708EE6E153F0FAA0083A506 /* application-vnd.stardivision.mail.svgz */; };
+		A78323BD15EE3173004BB4F7 /* application-vnd.stardivision.math.svgz in Resources */ = {isa = PBXBuildFile; fileRef = A708EE6F153F0FAA0083A506 /* application-vnd.stardivision.math.svgz */; };
+		A78323BE15EE3173004BB4F7 /* application-vnd.sun.xml.calc.svgz in Resources */ = {isa = PBXBuildFile; fileRef = A708EE70153F0FAA0083A506 /* application-vnd.sun.xml.calc.svgz */; };
+		A78323BF15EE3173004BB4F7 /* application-vnd.sun.xml.calc.template.svgz in Resources */ = {isa = PBXBuildFile; fileRef = A708EE71153F0FAA0083A506 /* application-vnd.sun.xml.calc.template.svgz */; };
+		A78323C015EE3173004BB4F7 /* application-vnd.sun.xml.draw.svgz in Resources */ = {isa = PBXBuildFile; fileRef = A708EE72153F0FAA0083A506 /* application-vnd.sun.xml.draw.svgz */; };
+		A78323C115EE3173004BB4F7 /* application-vnd.sun.xml.draw.template.svgz in Resources */ = {isa = PBXBuildFile; fileRef = A708EE73153F0FAA0083A506 /* application-vnd.sun.xml.draw.template.svgz */; };
+		A78323C215EE3173004BB4F7 /* application-vnd.sun.xml.math.svgz in Resources */ = {isa = PBXBuildFile; fileRef = A708EE74153F0FAA0083A506 /* application-vnd.sun.xml.math.svgz */; };
+		A78323C315EE3173004BB4F7 /* application-vnd.sun.xml.writer.template.svgz in Resources */ = {isa = PBXBuildFile; fileRef = A708EE75153F0FAA0083A506 /* application-vnd.sun.xml.writer.template.svgz */; };
+		A78323C415EE3173004BB4F7 /* application-vnd.wordperfect.svgz in Resources */ = {isa = PBXBuildFile; fileRef = A708EE76153F0FAA0083A506 /* application-vnd.wordperfect.svgz */; };
+		A78323C515EE3173004BB4F7 /* application-x-7z-compressed.svgz in Resources */ = {isa = PBXBuildFile; fileRef = A708EE77153F0FAA0083A506 /* application-x-7z-compressed.svgz */; };
+		A78323C615EE3173004BB4F7 /* application-x-abiword.svgz in Resources */ = {isa = PBXBuildFile; fileRef = A708EE78153F0FAA0083A506 /* application-x-abiword.svgz */; };
+		A78323C715EE3173004BB4F7 /* application-x-ace.svgz in Resources */ = {isa = PBXBuildFile; fileRef = A708EE79153F0FAA0083A506 /* application-x-ace.svgz */; };
+		A78323C815EE3173004BB4F7 /* application-x-applix-spreadsheet.svgz in Resources */ = {isa = PBXBuildFile; fileRef = A708EE7A153F0FAA0083A506 /* application-x-applix-spreadsheet.svgz */; };
+		A78323C915EE3173004BB4F7 /* application-x-applix-word.svgz in Resources */ = {isa = PBXBuildFile; fileRef = A708EE7B153F0FAA0083A506 /* application-x-applix-word.svgz */; };
+		A78323CA15EE3173004BB4F7 /* application-x-ar.svgz in Resources */ = {isa = PBXBuildFile; fileRef = A708EE7C153F0FAA0083A506 /* application-x-ar.svgz */; };
+		A78323CB15EE3173004BB4F7 /* application-x-arc.svgz in Resources */ = {isa = PBXBuildFile; fileRef = A708EE7D153F0FAA0083A506 /* application-x-arc.svgz */; };
+		A78323CC15EE3173004BB4F7 /* application-x-archive.svgz in Resources */ = {isa = PBXBuildFile; fileRef = A708EE7E153F0FAA0083A506 /* application-x-archive.svgz */; };
+		A78323CD15EE3173004BB4F7 /* application-x-arj.svgz in Resources */ = {isa = PBXBuildFile; fileRef = A708EE7F153F0FAA0083A506 /* application-x-arj.svgz */; };
+		A78323CE15EE3173004BB4F7 /* application-x-awk.svgz in Resources */ = {isa = PBXBuildFile; fileRef = A708EE80153F0FAA0083A506 /* application-x-awk.svgz */; };
+		A78323CF15EE3173004BB4F7 /* application-x-bittorrent.svgz in Resources */ = {isa = PBXBuildFile; fileRef = A708EE81153F0FAA0083A506 /* application-x-bittorrent.svgz */; };
+		A78323D015EE3173004BB4F7 /* application-x-blender.svgz in Resources */ = {isa = PBXBuildFile; fileRef = A708EE82153F0FAA0083A506 /* application-x-blender.svgz */; };
+		A78323D115EE3173004BB4F7 /* application-x-bzdvi.svgz in Resources */ = {isa = PBXBuildFile; fileRef = A708EE83153F0FAA0083A506 /* application-x-bzdvi.svgz */; };
+		A78323D215EE3173004BB4F7 /* application-x-bzip-compressed-tar.svgz in Resources */ = {isa = PBXBuildFile; fileRef = A708EE84153F0FAA0083A506 /* application-x-bzip-compressed-tar.svgz */; };
+		A78323D315EE3173004BB4F7 /* application-x-bzip.svgz in Resources */ = {isa = PBXBuildFile; fileRef = A708EE85153F0FAA0083A506 /* application-x-bzip.svgz */; };
+		A78323D415EE3173004BB4F7 /* application-x-cd-image.svgz in Resources */ = {isa = PBXBuildFile; fileRef = A708EE86153F0FAA0083A506 /* application-x-cd-image.svgz */; };
+		A78323D515EE3173004BB4F7 /* application-x-cda.svgz in Resources */ = {isa = PBXBuildFile; fileRef = A708EE87153F0FAA0083A506 /* application-x-cda.svgz */; };
+		A78323D615EE3173004BB4F7 /* application-x-chm.svgz in Resources */ = {isa = PBXBuildFile; fileRef = A708EE88153F0FAA0083A506 /* application-x-chm.svgz */; };
+		A78323D715EE3173004BB4F7 /* application-x-compress.svgz in Resources */ = {isa = PBXBuildFile; fileRef = A708EE89153F0FAA0083A506 /* application-x-compress.svgz */; };
+		A78323D815EE3173004BB4F7 /* application-x-compressed-tar.svgz in Resources */ = {isa = PBXBuildFile; fileRef = A708EE8A153F0FAA0083A506 /* application-x-compressed-tar.svgz */; };
+		A78323D915EE3173004BB4F7 /* application-x-cpio.svgz in Resources */ = {isa = PBXBuildFile; fileRef = A708EE8B153F0FAA0083A506 /* application-x-cpio.svgz */; };
+		A78323DA15EE3173004BB4F7 /* application-x-cue.svgz in Resources */ = {isa = PBXBuildFile; fileRef = A708EE8C153F0FAA0083A506 /* application-x-cue.svgz */; };
+		A78323DB15EE3173004BB4F7 /* application-x-deb.svgz in Resources */ = {isa = PBXBuildFile; fileRef = A708EE8D153F0FAA0083A506 /* application-x-deb.svgz */; };
+		A78323DC15EE3173004BB4F7 /* application-x-designer.svgz in Resources */ = {isa = PBXBuildFile; fileRef = A708EE8E153F0FAA0083A506 /* application-x-designer.svgz */; };
+		A78323DD15EE3173004BB4F7 /* application-x-desktop.svgz in Resources */ = {isa = PBXBuildFile; fileRef = A708EE8F153F0FAA0083A506 /* application-x-desktop.svgz */; };
+		A78323DE15EE3173004BB4F7 /* application-x-egon.svgz in Resources */ = {isa = PBXBuildFile; fileRef = A708EE90153F0FAA0083A506 /* application-x-egon.svgz */; };
+		A78323DF15EE3173004BB4F7 /* application-x-executable-script.svgz in Resources */ = {isa = PBXBuildFile; fileRef = A708EE91153F0FAA0083A506 /* application-x-executable-script.svgz */; };
+		A78323E015EE3173004BB4F7 /* application-x-executable.svgz in Resources */ = {isa = PBXBuildFile; fileRef = A708EE92153F0FAA0083A506 /* application-x-executable.svgz */; };
+		A78323E115EE3173004BB4F7 /* application-x-font-afm.svgz in Resources */ = {isa = PBXBuildFile; fileRef = A708EE93153F0FAA0083A506 /* application-x-font-afm.svgz */; };
+		A78323E215EE3173004BB4F7 /* application-x-font-bdf.svgz in Resources */ = {isa = PBXBuildFile; fileRef = A708EE94153F0FAA0083A506 /* application-x-font-bdf.svgz */; };
+		A78323E315EE3173004BB4F7 /* application-x-font-otf.svgz in Resources */ = {isa = PBXBuildFile; fileRef = A708EE95153F0FAA0083A506 /* application-x-font-otf.svgz */; };
+		A78323E415EE3173004BB4F7 /* application-x-font-pcf.svgz in Resources */ = {isa = PBXBuildFile; fileRef = A708EE96153F0FAA0083A506 /* application-x-font-pcf.svgz */; };
+		A78323E515EE3173004BB4F7 /* application-x-font-snf.svgz in Resources */ = {isa = PBXBuildFile; fileRef = A708EE97153F0FAA0083A506 /* application-x-font-snf.svgz */; };
+		A78323E615EE3173004BB4F7 /* application-x-font-ttf.svgz in Resources */ = {isa = PBXBuildFile; fileRef = A708EE98153F0FAA0083A506 /* application-x-font-ttf.svgz */; };
+		A78323E715EE3173004BB4F7 /* application-x-font-type1.svgz in Resources */ = {isa = PBXBuildFile; fileRef = A708EE99153F0FAA0083A506 /* application-x-font-type1.svgz */; };
+		A78323E815EE3173004BB4F7 /* application-x-gnumeric.svgz in Resources */ = {isa = PBXBuildFile; fileRef = A708EE9A153F0FAA0083A506 /* application-x-gnumeric.svgz */; };
+		A78323E915EE3173004BB4F7 /* application-x-gzdvi.svgz in Resources */ = {isa = PBXBuildFile; fileRef = A708EE9B153F0FAA0083A506 /* application-x-gzdvi.svgz */; };
+		A78323EA15EE3173004BB4F7 /* application-x-gzip.svgz in Resources */ = {isa = PBXBuildFile; fileRef = A708EE9C153F0FAA0083A506 /* application-x-gzip.svgz */; };
+		A78323EB15EE3173004BB4F7 /* application-x-gzpostscript.svgz in Resources */ = {isa = PBXBuildFile; fileRef = A708EE9D153F0FAA0083A506 /* application-x-gzpostscript.svgz */; };
+		A78323EC15EE3173004BB4F7 /* application-x-it87.svgz in Resources */ = {isa = PBXBuildFile; fileRef = A708EE9E153F0FAA0083A506 /* application-x-it87.svgz */; };
+		A78323ED15EE3173004BB4F7 /* application-x-java-applet.svgz in Resources */ = {isa = PBXBuildFile; fileRef = A708EE9F153F0FAA0083A506 /* application-x-java-applet.svgz */; };
+		A78323EE15EE3173004BB4F7 /* application-x-java-archive.svgz in Resources */ = {isa = PBXBuildFile; fileRef = A708EEA0153F0FAA0083A506 /* application-x-java-archive.svgz */; };
+		A78323EF15EE3173004BB4F7 /* application-x-java.svgz in Resources */ = {isa = PBXBuildFile; fileRef = A708EEA1153F0FAA0083A506 /* application-x-java.svgz */; };
+		A78323F015EE3173004BB4F7 /* application-x-javascript.svgz in Resources */ = {isa = PBXBuildFile; fileRef = A708EEA2153F0FAA0083A506 /* application-x-javascript.svgz */; };
+		A78323F115EE3173004BB4F7 /* application-x-k3b.svgz in Resources */ = {isa = PBXBuildFile; fileRef = A708EEA3153F0FAA0083A506 /* application-x-k3b.svgz */; };
+		A78323F215EE3173004BB4F7 /* application-x-kcsrc.svgz in Resources */ = {isa = PBXBuildFile; fileRef = A708EEA4153F0FAA0083A506 /* application-x-kcsrc.svgz */; };
+		A78323F315EE3173004BB4F7 /* application-x-kformula.svgz in Resources */ = {isa = PBXBuildFile; fileRef = A708EEA5153F0FAA0083A506 /* application-x-kformula.svgz */; };
+		A78323F415EE3173004BB4F7 /* application-x-kgetlist.svgz in Resources */ = {isa = PBXBuildFile; fileRef = A708EEA6153F0FAA0083A506 /* application-x-kgetlist.svgz */; };
+		A78323F515EE3173004BB4F7 /* application-x-kontour.svgz in Resources */ = {isa = PBXBuildFile; fileRef = A708EEA7153F0FAA0083A506 /* application-x-kontour.svgz */; };
+		A78323F615EE3173004BB4F7 /* application-x-kplato.svgz in Resources */ = {isa = PBXBuildFile; fileRef = A708EEA8153F0FAA0083A506 /* application-x-kplato.svgz */; };
+		A78323F715EE3173004BB4F7 /* application-x-krita.svgz in Resources */ = {isa = PBXBuildFile; fileRef = A708EEA9153F0FAA0083A506 /* application-x-krita.svgz */; };
+		A78323F815EE3173004BB4F7 /* application-x-kvtml.svgz in Resources */ = {isa = PBXBuildFile; fileRef = A708EEAA153F0FAA0083A506 /* application-x-kvtml.svgz */; };
+		A78323F915EE3173004BB4F7 /* application-x-kword.svgz in Resources */ = {isa = PBXBuildFile; fileRef = A708EEAB153F0FAA0083A506 /* application-x-kword.svgz */; };
+		A78323FA15EE3173004BB4F7 /* application-x-lha.svgz in Resources */ = {isa = PBXBuildFile; fileRef = A708EEAC153F0FAA0083A506 /* application-x-lha.svgz */; };
+		A78323FB15EE3173004BB4F7 /* application-x-lyx.svgz in Resources */ = {isa = PBXBuildFile; fileRef = A708EEAD153F0FAA0083A506 /* application-x-lyx.svgz */; };
+		A78323FC15EE3173004BB4F7 /* application-x-lzma-compressed-tar.svgz in Resources */ = {isa = PBXBuildFile; fileRef = A708EEAE153F0FAA0083A506 /* application-x-lzma-compressed-tar.svgz */; };
+		A78323FD15EE3173004BB4F7 /* application-x-lzop.svgz in Resources */ = {isa = PBXBuildFile; fileRef = A708EEAF153F0FAA0083A506 /* application-x-lzop.svgz */; };
+		A78323FE15EE3173004BB4F7 /* application-x-m4.svgz in Resources */ = {isa = PBXBuildFile; fileRef = A708EEB0153F0FAA0083A506 /* application-x-m4.svgz */; };
+		A78323FF15EE3173004BB4F7 /* application-x-marble.svgz in Resources */ = {isa = PBXBuildFile; fileRef = A708EEB1153F0FAA0083A506 /* application-x-marble.svgz */; };
+		A783240015EE3173004BB4F7 /* application-x-mimearchive.svgz in Resources */ = {isa = PBXBuildFile; fileRef = A708EEB2153F0FAA0083A506 /* application-x-mimearchive.svgz */; };
+		A783240115EE3173004BB4F7 /* application-x-mplayer2.svgz in Resources */ = {isa = PBXBuildFile; fileRef = A708EEB3153F0FAA0083A506 /* application-x-mplayer2.svgz */; };
+		A783240215EE3173004BB4F7 /* application-x-ms-dos-executable.svgz in Resources */ = {isa = PBXBuildFile; fileRef = A708EEB4153F0FAA0083A506 /* application-x-ms-dos-executable.svgz */; };
+		A783240315EE3173004BB4F7 /* application-x-mswinurl.svgz in Resources */ = {isa = PBXBuildFile; fileRef = A708EEB5153F0FAA0083A506 /* application-x-mswinurl.svgz */; };
+		A783240415EE3173004BB4F7 /* application-x-mswrite.svgz in Resources */ = {isa = PBXBuildFile; fileRef = A708EEB6153F0FAA0083A506 /* application-x-mswrite.svgz */; };
+		A783240515EE3173004BB4F7 /* application-x-nzb.svgz in Resources */ = {isa = PBXBuildFile; fileRef = A708EEB7153F0FAA0083A506 /* application-x-nzb.svgz */; };
+		A783240615EE3173004BB4F7 /* application-x-object.svgz in Resources */ = {isa = PBXBuildFile; fileRef = A708EEB8153F0FAA0083A506 /* application-x-object.svgz */; };
+		A783240715EE3173004BB4F7 /* application-x-pak.svgz in Resources */ = {isa = PBXBuildFile; fileRef = A708EEB9153F0FAA0083A506 /* application-x-pak.svgz */; };
+		A783240815EE3173004BB4F7 /* application-x-pem-key.svgz in Resources */ = {isa = PBXBuildFile; fileRef = A708EEBA153F0FAA0083A506 /* application-x-pem-key.svgz */; };
+		A783240915EE3173004BB4F7 /* application-x-perl.svgz in Resources */ = {isa = PBXBuildFile; fileRef = A708EEBB153F0FAA0083A506 /* application-x-perl.svgz */; };
+		A783240A15EE3173004BB4F7 /* application-x-php.svgz in Resources */ = {isa = PBXBuildFile; fileRef = A708EEBC153F0FAA0083A506 /* application-x-php.svgz */; };
+		A783240B15EE3173004BB4F7 /* application-x-plasma.svgz in Resources */ = {isa = PBXBuildFile; fileRef = A708EEBD153F0FAA0083A506 /* application-x-plasma.svgz */; };
+		A783240C15EE3173004BB4F7 /* application-x-python-bytecode.svgz in Resources */ = {isa = PBXBuildFile; fileRef = A708EEBE153F0FAA0083A506 /* application-x-python-bytecode.svgz */; };
+		A783240D15EE3173004BB4F7 /* application-x-qet-element.svgz in Resources */ = {isa = PBXBuildFile; fileRef = A708EEBF153F0FAA0083A506 /* application-x-qet-element.svgz */; };
+		A783240E15EE3173004BB4F7 /* application-x-qet-project.svgz in Resources */ = {isa = PBXBuildFile; fileRef = A708EEC0153F0FAA0083A506 /* application-x-qet-project.svgz */; };
+		A783240F15EE3173004BB4F7 /* application-x-quattropro.svgz in Resources */ = {isa = PBXBuildFile; fileRef = A708EEC1153F0FAA0083A506 /* application-x-quattropro.svgz */; };
+		A783241015EE3173004BB4F7 /* application-x-rar.svgz in Resources */ = {isa = PBXBuildFile; fileRef = A708EEC2153F0FAA0083A506 /* application-x-rar.svgz */; };
+		A783241115EE3173004BB4F7 /* application-x-rpm.svgz in Resources */ = {isa = PBXBuildFile; fileRef = A708EEC3153F0FAA0083A506 /* application-x-rpm.svgz */; };
+		A783241215EE3173004BB4F7 /* application-x-ruby.svgz in Resources */ = {isa = PBXBuildFile; fileRef = A708EEC4153F0FAA0083A506 /* application-x-ruby.svgz */; };
+		A783241315EE3173004BB4F7 /* application-x-sharedlib.svgz in Resources */ = {isa = PBXBuildFile; fileRef = A708EEC5153F0FAA0083A506 /* application-x-sharedlib.svgz */; };
+		A783241415EE3173004BB4F7 /* application-x-shellscript.svgz in Resources */ = {isa = PBXBuildFile; fileRef = A708EEC6153F0FAA0083A506 /* application-x-shellscript.svgz */; };
+		A783241515EE3173004BB4F7 /* application-x-shockwave-flash.svgz in Resources */ = {isa = PBXBuildFile; fileRef = A708EEC7153F0FAA0083A506 /* application-x-shockwave-flash.svgz */; };
+		A783241615EE3173004BB4F7 /* application-x-siag.svgz in Resources */ = {isa = PBXBuildFile; fileRef = A708EEC8153F0FAA0083A506 /* application-x-siag.svgz */; };
+		A783241715EE3173004BB4F7 /* application-x-smb-server.svgz in Resources */ = {isa = PBXBuildFile; fileRef = A708EEC9153F0FAA0083A506 /* application-x-smb-server.svgz */; };
+		A783241815EE3173004BB4F7 /* application-x-smb-workgroup.svgz in Resources */ = {isa = PBXBuildFile; fileRef = A708EECA153F0FAA0083A506 /* application-x-smb-workgroup.svgz */; };
+		A783241915EE3173004BB4F7 /* application-x-srt.svgz in Resources */ = {isa = PBXBuildFile; fileRef = A708EECB153F0FAA0083A506 /* application-x-srt.svgz */; };
+		A783241A15EE3173004BB4F7 /* application-x-srtrip.svgz in Resources */ = {isa = PBXBuildFile; fileRef = A708EECC153F0FAA0083A506 /* application-x-srtrip.svgz */; };
+		A783241B15EE3173004BB4F7 /* application-x-subrip.svgz in Resources */ = {isa = PBXBuildFile; fileRef = A708EECD153F0FAA0083A506 /* application-x-subrip.svgz */; };
+		A783241C15EE3173004BB4F7 /* application-x-tar.svgz in Resources */ = {isa = PBXBuildFile; fileRef = A708EECE153F0FAA0083A506 /* application-x-tar.svgz */; };
+		A783241D15EE3173004BB4F7 /* application-x-tarz.svgz in Resources */ = {isa = PBXBuildFile; fileRef = A708EECF153F0FAA0083A506 /* application-x-tarz.svgz */; };
+		A783241E15EE3173004BB4F7 /* application-x-tgif.svgz in Resources */ = {isa = PBXBuildFile; fileRef = A708EED0153F0FAA0083A506 /* application-x-tgif.svgz */; };
+		A783241F15EE3173004BB4F7 /* application-x-trash.svgz in Resources */ = {isa = PBXBuildFile; fileRef = A708EED1153F0FAA0083A506 /* application-x-trash.svgz */; };
+		A783242015EE3173004BB4F7 /* application-x-troff-man.svgz in Resources */ = {isa = PBXBuildFile; fileRef = A708EED2153F0FAA0083A506 /* application-x-troff-man.svgz */; };
+		A783242115EE3173004BB4F7 /* application-x-tzo.svgz in Resources */ = {isa = PBXBuildFile; fileRef = A708EED3153F0FAA0083A506 /* application-x-tzo.svgz */; };
+		A783242215EE3173004BB4F7 /* application-x-wmf.svgz in Resources */ = {isa = PBXBuildFile; fileRef = A708EED4153F0FAA0083A506 /* application-x-wmf.svgz */; };
+		A783242315EE3173004BB4F7 /* application-x-zerosize.svgz in Resources */ = {isa = PBXBuildFile; fileRef = A708EED5153F0FAA0083A506 /* application-x-zerosize.svgz */; };
+		A783242415EE3173004BB4F7 /* application-x-zoo.svgz in Resources */ = {isa = PBXBuildFile; fileRef = A708EED6153F0FAA0083A506 /* application-x-zoo.svgz */; };
+		A783242515EE3173004BB4F7 /* application-xhtml+xml.svgz in Resources */ = {isa = PBXBuildFile; fileRef = A708EED7153F0FAA0083A506 /* application-xhtml+xml.svgz */; };
+		A783242615EE3173004BB4F7 /* application-xml.svgz in Resources */ = {isa = PBXBuildFile; fileRef = A708EED8153F0FAA0083A506 /* application-xml.svgz */; };
+		A783242715EE3173004BB4F7 /* application-xsd.svgz in Resources */ = {isa = PBXBuildFile; fileRef = A708EED9153F0FAB0083A506 /* application-xsd.svgz */; };
+		A783242815EE3173004BB4F7 /* application-xslt+xml.svgz in Resources */ = {isa = PBXBuildFile; fileRef = A708EEDA153F0FAB0083A506 /* application-xslt+xml.svgz */; };
+		A783242915EE3173004BB4F7 /* application-zip.svgz in Resources */ = {isa = PBXBuildFile; fileRef = A708EEDB153F0FAB0083A506 /* application-zip.svgz */; };
+		A783242A15EE3173004BB4F7 /* audio-ac3.svgz in Resources */ = {isa = PBXBuildFile; fileRef = A708EEDC153F0FAB0083A506 /* audio-ac3.svgz */; };
+		A783242B15EE3173004BB4F7 /* audio-midi.svgz in Resources */ = {isa = PBXBuildFile; fileRef = A708EEDD153F0FAB0083A506 /* audio-midi.svgz */; };
+		A783242C15EE3173004BB4F7 /* audio-prs.sid.svgz in Resources */ = {isa = PBXBuildFile; fileRef = A708EEDE153F0FAB0083A506 /* audio-prs.sid.svgz */; };
+		A783242D15EE3173004BB4F7 /* audio-vn.rn-realmedia.svgz in Resources */ = {isa = PBXBuildFile; fileRef = A708EEDF153F0FAB0083A506 /* audio-vn.rn-realmedia.svgz */; };
+		A783242E15EE3173004BB4F7 /* audio-vn.rn-realvideo.svgz in Resources */ = {isa = PBXBuildFile; fileRef = A708EEE0153F0FAB0083A506 /* audio-vn.rn-realvideo.svgz */; };
+		A783242F15EE3173004BB4F7 /* audio-vnd.rn-realvideo.svgz in Resources */ = {isa = PBXBuildFile; fileRef = A708EEE1153F0FAB0083A506 /* audio-vnd.rn-realvideo.svgz */; };
+		A783243015EE3173004BB4F7 /* audio-x-adpcm.svgz in Resources */ = {isa = PBXBuildFile; fileRef = A708EEE2153F0FAB0083A506 /* audio-x-adpcm.svgz */; };
+		A783243115EE3173004BB4F7 /* audio-x-aiff.svgz in Resources */ = {isa = PBXBuildFile; fileRef = A708EEE3153F0FAB0083A506 /* audio-x-aiff.svgz */; };
+		A783243215EE3173004BB4F7 /* audio-x-flac.svgz in Resources */ = {isa = PBXBuildFile; fileRef = A708EEE4153F0FAB0083A506 /* audio-x-flac.svgz */; };
+		A783243315EE3173004BB4F7 /* audio-x-flac+ogg.svgz in Resources */ = {isa = PBXBuildFile; fileRef = A708EEE5153F0FAB0083A506 /* audio-x-flac+ogg.svgz */; };
+		A783243415EE3173004BB4F7 /* audio-x-generic.svgz in Resources */ = {isa = PBXBuildFile; fileRef = A708EEE6153F0FAB0083A506 /* audio-x-generic.svgz */; };
+		A783243515EE3173004BB4F7 /* audio-x-monkey.svgz in Resources */ = {isa = PBXBuildFile; fileRef = A708EEE7153F0FAB0083A506 /* audio-x-monkey.svgz */; };
+		A783243615EE3173004BB4F7 /* audio-x-speex+ogg.svgz in Resources */ = {isa = PBXBuildFile; fileRef = A708EEE8153F0FAB0083A506 /* audio-x-speex+ogg.svgz */; };
+		A783243715EE3173004BB4F7 /* audio-x-wav.svgz in Resources */ = {isa = PBXBuildFile; fileRef = A708EEE9153F0FAB0083A506 /* audio-x-wav.svgz */; };
+		A783243815EE3173004BB4F7 /* encrypted.svgz in Resources */ = {isa = PBXBuildFile; fileRef = A708EEEA153F0FAB0083A506 /* encrypted.svgz */; };
+		A783243915EE3173004BB4F7 /* image-svg+xml-compressed.svgz in Resources */ = {isa = PBXBuildFile; fileRef = A708EEEB153F0FAB0083A506 /* image-svg+xml-compressed.svgz */; };
+		A783243A15EE3173004BB4F7 /* image-svg+xml.svgz in Resources */ = {isa = PBXBuildFile; fileRef = A708EEEC153F0FAB0083A506 /* image-svg+xml.svgz */; };
+		A783243B15EE3173004BB4F7 /* image-vnd.dgn.svgz in Resources */ = {isa = PBXBuildFile; fileRef = A708EEED153F0FAB0083A506 /* image-vnd.dgn.svgz */; };
+		A783243C15EE3173004BB4F7 /* image-vnd.dwg.svgz in Resources */ = {isa = PBXBuildFile; fileRef = A708EEEE153F0FAB0083A506 /* image-vnd.dwg.svgz */; };
+		A783243D15EE3173004BB4F7 /* image-x-adobe-dng.svgz in Resources */ = {isa = PBXBuildFile; fileRef = A708EEEF153F0FAB0083A506 /* image-x-adobe-dng.svgz */; };
+		A783243E15EE3173004BB4F7 /* image-x-eps.svgz in Resources */ = {isa = PBXBuildFile; fileRef = A708EEF0153F0FAB0083A506 /* image-x-eps.svgz */; };
+		A783243F15EE3173004BB4F7 /* image-x-generic.svgz in Resources */ = {isa = PBXBuildFile; fileRef = A708EEF1153F0FAB0083A506 /* image-x-generic.svgz */; };
+		A783244015EE3173004BB4F7 /* image-x-vnd.trolltech.qpicture.svgz in Resources */ = {isa = PBXBuildFile; fileRef = A708EEF2153F0FAB0083A506 /* image-x-vnd.trolltech.qpicture.svgz */; };
+		A783244115EE3173004BB4F7 /* image-x-xfig.svgz in Resources */ = {isa = PBXBuildFile; fileRef = A708EEF3153F0FAB0083A506 /* image-x-xfig.svgz */; };
+		A783244215EE3173004BB4F7 /* inode-directory.svgz in Resources */ = {isa = PBXBuildFile; fileRef = A708EEF4153F0FAB0083A506 /* inode-directory.svgz */; };
+		A783244315EE3173004BB4F7 /* message-news.svgz in Resources */ = {isa = PBXBuildFile; fileRef = A708EEF5153F0FAB0083A506 /* message-news.svgz */; };
+		A783244415EE3173004BB4F7 /* message-partial.svgz in Resources */ = {isa = PBXBuildFile; fileRef = A708EEF6153F0FAB0083A506 /* message-partial.svgz */; };
+		A783244515EE3173004BB4F7 /* message-rfc822.svgz in Resources */ = {isa = PBXBuildFile; fileRef = A708EEF7153F0FAB0083A506 /* message-rfc822.svgz */; };
+		A783244615EE3173004BB4F7 /* message-x-gnu-rmail.svgz in Resources */ = {isa = PBXBuildFile; fileRef = A708EEF8153F0FAB0083A506 /* message-x-gnu-rmail.svgz */; };
+		A783244715EE3173004BB4F7 /* message.svgz in Resources */ = {isa = PBXBuildFile; fileRef = A708EEF9153F0FAB0083A506 /* message.svgz */; };
+		A783244815EE3173004BB4F7 /* mime2.svgz in Resources */ = {isa = PBXBuildFile; fileRef = A708EEFA153F0FAB0083A506 /* mime2.svgz */; };
+		A783244915EE3173004BB4F7 /* package-x-generic.svgz in Resources */ = {isa = PBXBuildFile; fileRef = A708EEFB153F0FAB0083A506 /* package-x-generic.svgz */; };
+		A783244A15EE3173004BB4F7 /* text-calendar.svgz in Resources */ = {isa = PBXBuildFile; fileRef = A708EEFC153F0FAB0083A506 /* text-calendar.svgz */; };
+		A783244B15EE3173004BB4F7 /* text-css.svgz in Resources */ = {isa = PBXBuildFile; fileRef = A708EEFD153F0FAB0083A506 /* text-css.svgz */; };
+		A783244C15EE3173004BB4F7 /* text-csv.svgz in Resources */ = {isa = PBXBuildFile; fileRef = A708EEFE153F0FAB0083A506 /* text-csv.svgz */; };
+		A783244D15EE3173004BB4F7 /* text-directory.svgz in Resources */ = {isa = PBXBuildFile; fileRef = A708EEFF153F0FAB0083A506 /* text-directory.svgz */; };
+		A783244E15EE3173004BB4F7 /* text-enriched.svgz in Resources */ = {isa = PBXBuildFile; fileRef = A708EF00153F0FAB0083A506 /* text-enriched.svgz */; };
+		A783244F15EE3173004BB4F7 /* text-html.svgz in Resources */ = {isa = PBXBuildFile; fileRef = A708EF01153F0FAB0083A506 /* text-html.svgz */; };
+		A783245015EE3173004BB4F7 /* text-mathml.svgz in Resources */ = {isa = PBXBuildFile; fileRef = A708EF02153F0FAB0083A506 /* text-mathml.svgz */; };
+		A783245115EE3173004BB4F7 /* text-plain.svgz in Resources */ = {isa = PBXBuildFile; fileRef = A708EF03153F0FAB0083A506 /* text-plain.svgz */; };
+		A783245215EE3173004BB4F7 /* text-rdf.svgz in Resources */ = {isa = PBXBuildFile; fileRef = A708EF04153F0FAB0083A506 /* text-rdf.svgz */; };
+		A783245315EE3173004BB4F7 /* text-rdf+xml.svgz in Resources */ = {isa = PBXBuildFile; fileRef = A708EF05153F0FAB0083A506 /* text-rdf+xml.svgz */; };
+		A783245415EE3173004BB4F7 /* text-rtf.svgz in Resources */ = {isa = PBXBuildFile; fileRef = A708EF06153F0FAB0083A506 /* text-rtf.svgz */; };
+		A783245515EE3173004BB4F7 /* text-sgml.svgz in Resources */ = {isa = PBXBuildFile; fileRef = A708EF07153F0FAB0083A506 /* text-sgml.svgz */; };
+		A783245615EE3173004BB4F7 /* text-troff.svgz in Resources */ = {isa = PBXBuildFile; fileRef = A708EF08153F0FAB0083A506 /* text-troff.svgz */; };
+		A783245715EE3173004BB4F7 /* text-vcalendar.svgz in Resources */ = {isa = PBXBuildFile; fileRef = A708EF09153F0FAB0083A506 /* text-vcalendar.svgz */; };
+		A783245815EE3173004BB4F7 /* text-vnd.abc.svgz in Resources */ = {isa = PBXBuildFile; fileRef = A708EF0A153F0FAB0083A506 /* text-vnd.abc.svgz */; };
+		A783245915EE3173004BB4F7 /* text-vnd.wap.wml.svgz in Resources */ = {isa = PBXBuildFile; fileRef = A708EF0B153F0FAB0083A506 /* text-vnd.wap.wml.svgz */; };
+		A783245A15EE3173004BB4F7 /* text-x-adasrc.svgz in Resources */ = {isa = PBXBuildFile; fileRef = A708EF0C153F0FAB0083A506 /* text-x-adasrc.svgz */; };
+		A783245B15EE3173004BB4F7 /* text-x-authors.svgz in Resources */ = {isa = PBXBuildFile; fileRef = A708EF0D153F0FAB0083A506 /* text-x-authors.svgz */; };
+		A783245C15EE3173004BB4F7 /* text-x-bibtex.svgz in Resources */ = {isa = PBXBuildFile; fileRef = A708EF0E153F0FAB0083A506 /* text-x-bibtex.svgz */; };
+		A783245D15EE3173004BB4F7 /* text-x-c++hdr.svgz in Resources */ = {isa = PBXBuildFile; fileRef = A708EF0F153F0FAB0083A506 /* text-x-c++hdr.svgz */; };
+		A783245E15EE3173004BB4F7 /* text-x-c++src.svgz in Resources */ = {isa = PBXBuildFile; fileRef = A708EF10153F0FAB0083A506 /* text-x-c++src.svgz */; };
+		A783245F15EE3173004BB4F7 /* text-x-changelog.svgz in Resources */ = {isa = PBXBuildFile; fileRef = A708EF11153F0FAB0083A506 /* text-x-changelog.svgz */; };
+		A783246015EE3173004BB4F7 /* text-x-chdr.svgz in Resources */ = {isa = PBXBuildFile; fileRef = A708EF12153F0FAB0083A506 /* text-x-chdr.svgz */; };
+		A783246115EE3173004BB4F7 /* text-x-cmake.svgz in Resources */ = {isa = PBXBuildFile; fileRef = A708EF13153F0FAB0083A506 /* text-x-cmake.svgz */; };
+		A783246215EE3173004BB4F7 /* text-x-copying.svgz in Resources */ = {isa = PBXBuildFile; fileRef = A708EF14153F0FAB0083A506 /* text-x-copying.svgz */; };
+		A783246315EE3173004BB4F7 /* text-x-csharp.svgz in Resources */ = {isa = PBXBuildFile; fileRef = A708EF15153F0FAB0083A506 /* text-x-csharp.svgz */; };
+		A783246415EE3173004BB4F7 /* text-x-csrc.svgz in Resources */ = {isa = PBXBuildFile; fileRef = A708EF16153F0FAB0083A506 /* text-x-csrc.svgz */; };
+		A783246515EE3173004BB4F7 /* text-x-dtd.svgz in Resources */ = {isa = PBXBuildFile; fileRef = A708EF17153F0FAB0083A506 /* text-x-dtd.svgz */; };
+		A783246615EE3173004BB4F7 /* text-x-generic.svgz in Resources */ = {isa = PBXBuildFile; fileRef = A708EF18153F0FAB0083A506 /* text-x-generic.svgz */; };
+		A783246715EE3173004BB4F7 /* text-x-haskell.svgz in Resources */ = {isa = PBXBuildFile; fileRef = A708EF19153F0FAB0083A506 /* text-x-haskell.svgz */; };
+		A783246815EE3173004BB4F7 /* text-x-hex.svgz in Resources */ = {isa = PBXBuildFile; fileRef = A708EF1A153F0FAB0083A506 /* text-x-hex.svgz */; };
+		A783246915EE3173004BB4F7 /* text-x-install.svgz in Resources */ = {isa = PBXBuildFile; fileRef = A708EF1B153F0FAB0083A506 /* text-x-install.svgz */; };
+		A783246A15EE3173004BB4F7 /* text-x-java.svgz in Resources */ = {isa = PBXBuildFile; fileRef = A708EF1C153F0FAB0083A506 /* text-x-java.svgz */; };
+		A783246B15EE3173004BB4F7 /* text-x-katefilelist.svgz in Resources */ = {isa = PBXBuildFile; fileRef = A708EF1D153F0FAB0083A506 /* text-x-katefilelist.svgz */; };
+		A783246C15EE3173004BB4F7 /* text-x-ldif.svgz in Resources */ = {isa = PBXBuildFile; fileRef = A708EF1E153F0FAB0083A506 /* text-x-ldif.svgz */; };
+		A783246D15EE3173004BB4F7 /* text-x-lilypond.svgz in Resources */ = {isa = PBXBuildFile; fileRef = A708EF1F153F0FAB0083A506 /* text-x-lilypond.svgz */; };
+		A783246E15EE3173004BB4F7 /* text-x-log.svgz in Resources */ = {isa = PBXBuildFile; fileRef = A708EF20153F0FAB0083A506 /* text-x-log.svgz */; };
+		A783246F15EE3173004BB4F7 /* text-x-makefile.svgz in Resources */ = {isa = PBXBuildFile; fileRef = A708EF21153F0FAB0083A506 /* text-x-makefile.svgz */; };
+		A783247015EE3173004BB4F7 /* text-x-nfo.svgz in Resources */ = {isa = PBXBuildFile; fileRef = A708EF22153F0FAB0083A506 /* text-x-nfo.svgz */; };
+		A783247115EE3173004BB4F7 /* text-x-objchdr.svgz in Resources */ = {isa = PBXBuildFile; fileRef = A708EF23153F0FAB0083A506 /* text-x-objchdr.svgz */; };
+		A783247215EE3173004BB4F7 /* text-x-objcsrc.svgz in Resources */ = {isa = PBXBuildFile; fileRef = A708EF24153F0FAB0083A506 /* text-x-objcsrc.svgz */; };
+		A783247315EE3173004BB4F7 /* text-x-pascal.svgz in Resources */ = {isa = PBXBuildFile; fileRef = A708EF25153F0FAB0083A506 /* text-x-pascal.svgz */; };
+		A783247415EE3173004BB4F7 /* text-x-patch.svgz in Resources */ = {isa = PBXBuildFile; fileRef = A708EF26153F0FAB0083A506 /* text-x-patch.svgz */; };
+		A783247515EE3173004BB4F7 /* text-x-po.svgz in Resources */ = {isa = PBXBuildFile; fileRef = A708EF27153F0FAB0083A506 /* text-x-po.svgz */; };
+		A783247615EE3173004BB4F7 /* text-x-python.svgz in Resources */ = {isa = PBXBuildFile; fileRef = A708EF28153F0FAB0083A506 /* text-x-python.svgz */; };
+		A783247715EE3173004BB4F7 /* text-x-qml.svgz in Resources */ = {isa = PBXBuildFile; fileRef = A708EF29153F0FAB0083A506 /* text-x-qml.svgz */; };
+		A783247815EE3173004BB4F7 /* text-x-readme.svgz in Resources */ = {isa = PBXBuildFile; fileRef = A708EF2A153F0FAB0083A506 /* text-x-readme.svgz */; };
+		A783247915EE3173004BB4F7 /* text-x-rpm-spec.svgz in Resources */ = {isa = PBXBuildFile; fileRef = A708EF2B153F0FAB0083A506 /* text-x-rpm-spec.svgz */; };
+		A783247A15EE3173004BB4F7 /* text-x-script.svgz in Resources */ = {isa = PBXBuildFile; fileRef = A708EF2C153F0FAB0083A506 /* text-x-script.svgz */; };
+		A783247B15EE3173004BB4F7 /* text-x-sql.svgz in Resources */ = {isa = PBXBuildFile; fileRef = A708EF2D153F0FAB0083A506 /* text-x-sql.svgz */; };
+		A783247C15EE3173004BB4F7 /* text-x-tcl.svgz in Resources */ = {isa = PBXBuildFile; fileRef = A708EF2E153F0FAB0083A506 /* text-x-tcl.svgz */; };
+		A783247D15EE3173004BB4F7 /* text-x-tex.svgz in Resources */ = {isa = PBXBuildFile; fileRef = A708EF2F153F0FAB0083A506 /* text-x-tex.svgz */; };
+		A783247E15EE3173004BB4F7 /* text-x-texinfo.svgz in Resources */ = {isa = PBXBuildFile; fileRef = A708EF30153F0FAB0083A506 /* text-x-texinfo.svgz */; };
+		A783247F15EE3173004BB4F7 /* text-x-vcard.svgz in Resources */ = {isa = PBXBuildFile; fileRef = A708EF31153F0FAB0083A506 /* text-x-vcard.svgz */; };
+		A783248015EE3173004BB4F7 /* text-x-xslfo.svgz in Resources */ = {isa = PBXBuildFile; fileRef = A708EF32153F0FAB0083A506 /* text-x-xslfo.svgz */; };
+		A783248115EE3173004BB4F7 /* text-xmcd.svgz in Resources */ = {isa = PBXBuildFile; fileRef = A708EF33153F0FAB0083A506 /* text-xmcd.svgz */; };
+		A783248215EE3173004BB4F7 /* text-xml.svgz in Resources */ = {isa = PBXBuildFile; fileRef = A708EF34153F0FAB0083A506 /* text-xml.svgz */; };
+		A783248315EE3173004BB4F7 /* unknown.svgz in Resources */ = {isa = PBXBuildFile; fileRef = A708EF35153F0FAB0083A506 /* unknown.svgz */; };
+		A783248415EE3173004BB4F7 /* uri-mms.svgz in Resources */ = {isa = PBXBuildFile; fileRef = A708EF36153F0FAB0083A506 /* uri-mms.svgz */; };
+		A783248515EE3173004BB4F7 /* uri-mmst.svgz in Resources */ = {isa = PBXBuildFile; fileRef = A708EF37153F0FAB0083A506 /* uri-mmst.svgz */; };
+		A783248615EE3173004BB4F7 /* uri-mmsu.svgz in Resources */ = {isa = PBXBuildFile; fileRef = A708EF38153F0FAB0083A506 /* uri-mmsu.svgz */; };
+		A783248715EE3173004BB4F7 /* uri-pnm.svgz in Resources */ = {isa = PBXBuildFile; fileRef = A708EF39153F0FAB0083A506 /* uri-pnm.svgz */; };
+		A783248815EE3173004BB4F7 /* uri-rtspt.svgz in Resources */ = {isa = PBXBuildFile; fileRef = A708EF3A153F0FAB0083A506 /* uri-rtspt.svgz */; };
+		A783248915EE3173004BB4F7 /* uri-rtspu.svgz in Resources */ = {isa = PBXBuildFile; fileRef = A708EF3B153F0FAB0083A506 /* uri-rtspu.svgz */; };
+		A783248A15EE3173004BB4F7 /* video-x-generic.svgz in Resources */ = {isa = PBXBuildFile; fileRef = A708EF3C153F0FAB0083A506 /* video-x-generic.svgz */; };
+		A783248B15EE3173004BB4F7 /* video-x-mng.svgz in Resources */ = {isa = PBXBuildFile; fileRef = A708EF3D153F0FAB0083A506 /* video-x-mng.svgz */; };
+		A783248C15EE3173004BB4F7 /* x-kde-nsplugin-generated.svgz in Resources */ = {isa = PBXBuildFile; fileRef = A708EF3E153F0FAB0083A506 /* x-kde-nsplugin-generated.svgz */; };
+		A783248D15EE3173004BB4F7 /* x-media-podcast.svgz in Resources */ = {isa = PBXBuildFile; fileRef = A708EF3F153F0FAB0083A506 /* x-media-podcast.svgz */; };
+		A783248E15EE3173004BB4F7 /* x-office-address-book.svgz in Resources */ = {isa = PBXBuildFile; fileRef = A708EF40153F0FAB0083A506 /* x-office-address-book.svgz */; };
+		A783248F15EE3173004BB4F7 /* x-office-calendar.svgz in Resources */ = {isa = PBXBuildFile; fileRef = A708EF41153F0FAB0083A506 /* x-office-calendar.svgz */; };
+		A783249015EE3173004BB4F7 /* x-office-contact.svgz in Resources */ = {isa = PBXBuildFile; fileRef = A708EF42153F0FAB0083A506 /* x-office-contact.svgz */; };
+		A783249115EE3173004BB4F7 /* x-office-document.svgz in Resources */ = {isa = PBXBuildFile; fileRef = A708EF43153F0FAB0083A506 /* x-office-document.svgz */; };
+		A783249215EE3173004BB4F7 /* x-office-spreadsheet.svgz in Resources */ = {isa = PBXBuildFile; fileRef = A708EF44153F0FAB0083A506 /* x-office-spreadsheet.svgz */; };
+		A783249315EE3173004BB4F7 /* README.txt in Resources */ = {isa = PBXBuildFile; fileRef = A73D1BFA1560E234002D4A2D /* README.txt */; };
+		A783249415EE3173004BB4F7 /* release_notes.txt in Resources */ = {isa = PBXBuildFile; fileRef = A73D1BFB1560E234002D4A2D /* release_notes.txt */; };
+		A783249515EE3173004BB4F7 /* emblem-locked.svgz in Resources */ = {isa = PBXBuildFile; fileRef = A76ECD26159CDEDD0062E95A /* emblem-locked.svgz */; };
+		A783249615EE3173004BB4F7 /* emblem-symbolic-link.svgz in Resources */ = {isa = PBXBuildFile; fileRef = A76ECD27159CDEDD0062E95A /* emblem-symbolic-link.svgz */; };
+		A783249715EE3173004BB4F7 /* gear.png in Resources */ = {isa = PBXBuildFile; fileRef = A77FD060159F702D00774D50 /* gear.png */; };
+		A783249815EE3173004BB4F7 /* gear@2x.png in Resources */ = {isa = PBXBuildFile; fileRef = A77FD061159F702E00774D50 /* gear@2x.png */; };
+		A783249915EE3173004BB4F7 /* DropboxOSX-Info.plist in Resources */ = {isa = PBXBuildFile; fileRef = A7307B5815A6E51100A90BDF /* DropboxOSX-Info.plist */; };
+		A783249A15EE3173004BB4F7 /* DropboxSDK-Info.plist in Resources */ = {isa = PBXBuildFile; fileRef = A7307B8815A6E51100A90BDF /* DropboxSDK-Info.plist */; };
+		A783249B15EE3173004BB4F7 /* iphone.pdf in Resources */ = {isa = PBXBuildFile; fileRef = A74B93E915A8B6560073D303 /* iphone.pdf */; };
+		A783249C15EE3173004BB4F7 /* UserManual.pdf in Resources */ = {isa = PBXBuildFile; fileRef = A74B93EA15A8B6560073D303 /* UserManual.pdf */; };
+		A783249D15EE3173004BB4F7 /* link_zotero_mac_unix.sh in Resources */ = {isa = PBXBuildFile; fileRef = A7FC2ECB15AE12B400CF4A5B /* link_zotero_mac_unix.sh */; };
+		A783249E15EE3173004BB4F7 /* link_zotero_windows.vbs in Resources */ = {isa = PBXBuildFile; fileRef = A7FC2ECE15AE1AEE00CF4A5B /* link_zotero_windows.vbs */; };
+		A783249F15EE3173004BB4F7 /* Dropbox_instructions.txt in Resources */ = {isa = PBXBuildFile; fileRef = A7FC2ED115AE1B1A00CF4A5B /* Dropbox_instructions.txt */; };
+		A78324A015EE3173004BB4F7 /* icon-down-black.png in Resources */ = {isa = PBXBuildFile; fileRef = A7B051B715B187BF0049C5A2 /* icon-down-black.png */; };
+		A78324A115EE3173004BB4F7 /* icon-down-black@x2.png in Resources */ = {isa = PBXBuildFile; fileRef = A7B051B815B187BF0049C5A2 /* icon-down-black@x2.png */; };
+		A78324A215EE3173004BB4F7 /* icon-up-black.png in Resources */ = {isa = PBXBuildFile; fileRef = A7B051B915B187BF0049C5A2 /* icon-up-black.png */; };
+		A78324A315EE3173004BB4F7 /* icon-up-black@2x.png in Resources */ = {isa = PBXBuildFile; fileRef = A7B051BA15B187BF0049C5A2 /* icon-up-black@2x.png */; };
+		A78324A415EE3173004BB4F7 /* upgrade1.0to1.1.sql in Resources */ = {isa = PBXBuildFile; fileRef = A7B2BCC815B3E22500381E23 /* upgrade1.0to1.1.sql */; };
 		A786F7781476A56200B35B92 /* MainStoryboard_iPhone.storyboard in Resources */ = {isa = PBXBuildFile; fileRef = A786F7771476A56200B35B92 /* MainStoryboard_iPhone.storyboard */; };
 		A79299C3149E0CFE000F8B42 /* ZPZoteroDataObject.m in Sources */ = {isa = PBXBuildFile; fileRef = A79299C2149E0CFE000F8B42 /* ZPZoteroDataObject.m */; };
 		A793153E14B185E800E1ABF0 /* ZPAttachmentFileInteractionController.m in Sources */ = {isa = PBXBuildFile; fileRef = A793153D14B185E800E1ABF0 /* ZPAttachmentFileInteractionController.m */; };
@@ -962,6 +1421,20 @@
 			proxyType = 1;
 			remoteGlobalIDString = A70F11DD148632CD009202BF;
 			remoteInfo = "Static Library";
+		};
+		A78322D415EE3173004BB4F7 /* PBXContainerItemProxy */ = {
+			isa = PBXContainerItemProxy;
+			containerPortal = A7ABAB3315A3046300EA8B7B /* DTCoreText.xcodeproj */;
+			proxyType = 1;
+			remoteGlobalIDString = A70F11DD148632CD009202BF;
+			remoteInfo = "Static Library";
+		};
+		A78322D615EE3173004BB4F7 /* PBXContainerItemProxy */ = {
+			isa = PBXContainerItemProxy;
+			containerPortal = A77E0DC415D65FAB00134D35 /* UserVoice.xcodeproj */;
+			proxyType = 1;
+			remoteGlobalIDString = D2AAC07D0554694100DB518D;
+			remoteInfo = UserVoice;
 		};
 		A7ABAB4115A3046300EA8B7B /* PBXContainerItemProxy */ = {
 			isa = PBXContainerItemProxy;
@@ -1503,6 +1976,8 @@
 		A77FD061159F702E00774D50 /* gear@2x.png */ = {isa = PBXFileReference; lastKnownFileType = image.png; name = "gear@2x.png"; path = "Icons/gear@2x.png"; sourceTree = SOURCE_ROOT; };
 		A77FD066159F750700774D50 /* ZPLogViewController.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = ZPLogViewController.h; sourceTree = "<group>"; };
 		A77FD067159F750900774D50 /* ZPLogViewController.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = ZPLogViewController.m; sourceTree = "<group>"; };
+		A78324A915EE3174004BB4F7 /* ZotPad beta copy.app */ = {isa = PBXFileReference; explicitFileType = wrapper.application; includeInIndex = 0; path = "ZotPad beta copy.app"; sourceTree = BUILT_PRODUCTS_DIR; };
+		A78324AB15EE3174004BB4F7 /* ZotPad beta copy-Info.plist */ = {isa = PBXFileReference; lastKnownFileType = text.plist.xml; name = "ZotPad beta copy-Info.plist"; path = "/Users/mronkko/Documents/Software/ZotPad/ZotPad beta copy-Info.plist"; sourceTree = "<absolute>"; };
 		A786F7771476A56200B35B92 /* MainStoryboard_iPhone.storyboard */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = file.storyboard; path = MainStoryboard_iPhone.storyboard; sourceTree = "<group>"; };
 		A79299C1149E0CFE000F8B42 /* ZPZoteroDataObject.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = ZPZoteroDataObject.h; sourceTree = "<group>"; };
 		A79299C2149E0CFE000F8B42 /* ZPZoteroDataObject.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = ZPZoteroDataObject.m; sourceTree = "<group>"; };
@@ -1688,6 +2163,32 @@
 				A7200DD514718DC0004347C9 /* UIKit.framework in Frameworks */,
 				A7200DD714718DC0004347C9 /* Foundation.framework in Frameworks */,
 				A73D1BFD1560E234002D4A2D /* libTestFlight.a in Frameworks */,
+			);
+			runOnlyForDeploymentPostprocessing = 0;
+		};
+		A783236B15EE3173004BB4F7 /* Frameworks */ = {
+			isa = PBXFrameworksBuildPhase;
+			buildActionMask = 2147483647;
+			files = (
+				A783236C15EE3173004BB4F7 /* libUserVoice.a in Frameworks */,
+				A783236D15EE3173004BB4F7 /* libDTCoreText.a in Frameworks */,
+				A783236E15EE3173004BB4F7 /* CoreFoundation.framework in Frameworks */,
+				A783236F15EE3173004BB4F7 /* MessageUI.framework in Frameworks */,
+				A783237015EE3173004BB4F7 /* CoreText.framework in Frameworks */,
+				A783237115EE3173004BB4F7 /* QuartzCore.framework in Frameworks */,
+				A783237215EE3173004BB4F7 /* libxml2.dylib in Frameworks */,
+				A783237315EE3173004BB4F7 /* ImageIO.framework in Frameworks */,
+				A783237415EE3173004BB4F7 /* libz.dylib in Frameworks */,
+				A783237515EE3173004BB4F7 /* QuickLook.framework in Frameworks */,
+				A783237615EE3173004BB4F7 /* CoreGraphics.framework in Frameworks */,
+				A783237715EE3173004BB4F7 /* MobileCoreServices.framework in Frameworks */,
+				A783237815EE3173004BB4F7 /* SystemConfiguration.framework in Frameworks */,
+				A783237915EE3173004BB4F7 /* CFNetwork.framework in Frameworks */,
+				A783237A15EE3173004BB4F7 /* Security.framework in Frameworks */,
+				A783237B15EE3173004BB4F7 /* libsqlite3.dylib in Frameworks */,
+				A783237C15EE3173004BB4F7 /* UIKit.framework in Frameworks */,
+				A783237D15EE3173004BB4F7 /* Foundation.framework in Frameworks */,
+				A783237E15EE3173004BB4F7 /* libTestFlight.a in Frameworks */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
@@ -2084,6 +2585,7 @@
 				A7200DDA14718DC0004347C9 /* ZotPad */,
 				A7200DD314718DC0004347C9 /* Frameworks */,
 				A7200DD114718DC0004347C9 /* Products */,
+				A78324AB15EE3174004BB4F7 /* ZotPad beta copy-Info.plist */,
 			);
 			sourceTree = "<group>";
 		};
@@ -2092,6 +2594,7 @@
 			children = (
 				A7200DD014718DC0004347C9 /* ZotPad.app */,
 				A7CD077515161555007A8E1D /* ZotPad beta.app */,
+				A78324A915EE3174004BB4F7 /* ZotPad beta copy.app */,
 			);
 			name = Products;
 			sourceTree = "<group>";
@@ -2812,6 +3315,26 @@
 			productReference = A7200DD014718DC0004347C9 /* ZotPad.app */;
 			productType = "com.apple.product-type.application";
 		};
+		A78322D215EE3173004BB4F7 /* ZotPad iAnnotate alpha */ = {
+			isa = PBXNativeTarget;
+			buildConfigurationList = A78324A615EE3173004BB4F7 /* Build configuration list for PBXNativeTarget "ZotPad iAnnotate alpha" */;
+			buildPhases = (
+				A78322D715EE3173004BB4F7 /* Sources */,
+				A783236B15EE3173004BB4F7 /* Frameworks */,
+				A783237F15EE3173004BB4F7 /* Resources */,
+				A78324A515EE3173004BB4F7 /* Run Script */,
+			);
+			buildRules = (
+			);
+			dependencies = (
+				A78322D315EE3173004BB4F7 /* PBXTargetDependency */,
+				A78322D515EE3173004BB4F7 /* PBXTargetDependency */,
+			);
+			name = "ZotPad iAnnotate alpha";
+			productName = ZotPad;
+			productReference = A78324A915EE3174004BB4F7 /* ZotPad beta copy.app */;
+			productType = "com.apple.product-type.application";
+		};
 		A7CD06FB15161555007A8E1D /* ZotPad beta */ = {
 			isa = PBXNativeTarget;
 			buildConfigurationList = A7CD077215161555007A8E1D /* Build configuration list for PBXNativeTarget "ZotPad beta" */;
@@ -2867,6 +3390,7 @@
 			targets = (
 				A7200DCF14718DC0004347C9 /* ZotPad */,
 				A7CD06FB15161555007A8E1D /* ZotPad beta */,
+				A78322D215EE3173004BB4F7 /* ZotPad iAnnotate alpha */,
 			);
 		};
 /* End PBXProject section */
@@ -3224,6 +3748,306 @@
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
+		A783237F15EE3173004BB4F7 /* Resources */ = {
+			isa = PBXResourcesBuildPhase;
+			buildActionMask = 2147483647;
+			files = (
+				A783238015EE3173004BB4F7 /* InfoPlist.strings in Resources */,
+				A783238115EE3173004BB4F7 /* MainStoryboard_iPhone.storyboard in Resources */,
+				A783238215EE3173004BB4F7 /* database.sql in Resources */,
+				A783238315EE3173004BB4F7 /* Settings.bundle in Resources */,
+				A783238415EE3173004BB4F7 /* MainStoryboard_iPad.storyboard in Resources */,
+				A783238515EE3173004BB4F7 /* AppIcon72x72-beta.png in Resources */,
+				A783238615EE3173004BB4F7 /* AppIcon144x144-beta.png in Resources */,
+				A783238715EE3173004BB4F7 /* AppIcon57x57-beta.png in Resources */,
+				A783238815EE3173004BB4F7 /* AppIcon114x114-beta.png in Resources */,
+				A783238915EE3173004BB4F7 /* Default@2x.png in Resources */,
+				A783238A15EE3173004BB4F7 /* Default-Landscape~ipad.png in Resources */,
+				A783238B15EE3173004BB4F7 /* Default-Portrait~ipad.png in Resources */,
+				A783238C15EE3173004BB4F7 /* Default.png in Resources */,
+				A783238D15EE3173004BB4F7 /* Default-Portrait@2x~ipad.png in Resources */,
+				A783238E15EE3173004BB4F7 /* Default-Landscape@2x~ipad.png in Resources */,
+				A783238F15EE3173004BB4F7 /* barbutton_image_up_state~iphone.png in Resources */,
+				A783239015EE3173004BB4F7 /* barbutton_image_up_state@2x~iphone.png in Resources */,
+				A783239115EE3173004BB4F7 /* barbutton_image_up_state~ipad.png in Resources */,
+				A783239215EE3173004BB4F7 /* barbutton_image_up_state@2x~ipad.png in Resources */,
+				A783239315EE3173004BB4F7 /* barbutton_image_down_state~iphone.png in Resources */,
+				A783239415EE3173004BB4F7 /* barbutton_image_down_state@2x~iphone.png in Resources */,
+				A783239515EE3173004BB4F7 /* barbutton_image_down_state~ipad.png in Resources */,
+				A783239615EE3173004BB4F7 /* barbutton_image_down_state@2x~ipad.png in Resources */,
+				A783239715EE3173004BB4F7 /* application-epub+zip.svgz in Resources */,
+				A783239815EE3173004BB4F7 /* application-illustrator.svgz in Resources */,
+				A783239915EE3173004BB4F7 /* application-javascript.svgz in Resources */,
+				A783239A15EE3173004BB4F7 /* application-msword-template.svgz in Resources */,
+				A783239B15EE3173004BB4F7 /* application-msword.svgz in Resources */,
+				A783239C15EE3173004BB4F7 /* application-octet-stream.svgz in Resources */,
+				A783239D15EE3173004BB4F7 /* application-pdf.svgz in Resources */,
+				A783239E15EE3173004BB4F7 /* application-pgp-encrypted.svgz in Resources */,
+				A783239F15EE3173004BB4F7 /* application-pgp-keys.svgz in Resources */,
+				A78323A015EE3173004BB4F7 /* application-pgp-signature.svgz in Resources */,
+				A78323A115EE3173004BB4F7 /* application-pkcs7-mime.svgz in Resources */,
+				A78323A215EE3173004BB4F7 /* application-pkcs7-signature.svgz in Resources */,
+				A78323A315EE3173004BB4F7 /* application-postscript.svgz in Resources */,
+				A78323A415EE3173004BB4F7 /* application-relaxng.svgz in Resources */,
+				A78323A515EE3173004BB4F7 /* application-rss+xml.svgz in Resources */,
+				A78323A615EE3173004BB4F7 /* application-rtf.svgz in Resources */,
+				A78323A715EE3173004BB4F7 /* application-sxw.svgz in Resources */,
+				A78323A815EE3173004BB4F7 /* application-vnd.iccprofile.svgz in Resources */,
+				A78323A915EE3173004BB4F7 /* application-vnd.ms-access.svgz in Resources */,
+				A78323AA15EE3173004BB4F7 /* application-vnd.ms-excel.svgz in Resources */,
+				A78323AB15EE3173004BB4F7 /* application-vnd.ms-powerpoint.svgz in Resources */,
+				A78323AC15EE3173004BB4F7 /* application-vnd.oasis.opendocument.chart.svgz in Resources */,
+				A78323AD15EE3173004BB4F7 /* application-vnd.oasis.opendocument.database.svgz in Resources */,
+				A78323AE15EE3173004BB4F7 /* application-vnd.oasis.opendocument.formula-template.svgz in Resources */,
+				A78323AF15EE3173004BB4F7 /* application-vnd.oasis.opendocument.formula.svgz in Resources */,
+				A78323B015EE3173004BB4F7 /* application-vnd.oasis.opendocument.graphics.svgz in Resources */,
+				A78323B115EE3173004BB4F7 /* application-vnd.oasis.opendocument.image.svgz in Resources */,
+				A78323B215EE3173004BB4F7 /* application-vnd.oasis.opendocument.presentation-template.svgz in Resources */,
+				A78323B315EE3173004BB4F7 /* application-vnd.oasis.opendocument.presentation.svgz in Resources */,
+				A78323B415EE3173004BB4F7 /* application-vnd.oasis.opendocument.spreadsheet-template.svgz in Resources */,
+				A78323B515EE3173004BB4F7 /* application-vnd.oasis.opendocument.spreadsheet.svgz in Resources */,
+				A78323B615EE3173004BB4F7 /* application-vnd.oasis.opendocument.text.svgz in Resources */,
+				A78323B715EE3173004BB4F7 /* application-vnd.openxmlformats-officedocument.wordprocessingml.document.svgz in Resources */,
+				A78323B815EE3173004BB4F7 /* application-vnd.rn-realmedia.svgz in Resources */,
+				A78323B915EE3173004BB4F7 /* application-vnd.scribus.svgz in Resources */,
+				A78323BA15EE3173004BB4F7 /* application-vnd.stardivision.calc.svgz in Resources */,
+				A78323BB15EE3173004BB4F7 /* application-vnd.stardivision.draw.svgz in Resources */,
+				A78323BC15EE3173004BB4F7 /* application-vnd.stardivision.mail.svgz in Resources */,
+				A78323BD15EE3173004BB4F7 /* application-vnd.stardivision.math.svgz in Resources */,
+				A78323BE15EE3173004BB4F7 /* application-vnd.sun.xml.calc.svgz in Resources */,
+				A78323BF15EE3173004BB4F7 /* application-vnd.sun.xml.calc.template.svgz in Resources */,
+				A78323C015EE3173004BB4F7 /* application-vnd.sun.xml.draw.svgz in Resources */,
+				A78323C115EE3173004BB4F7 /* application-vnd.sun.xml.draw.template.svgz in Resources */,
+				A78323C215EE3173004BB4F7 /* application-vnd.sun.xml.math.svgz in Resources */,
+				A78323C315EE3173004BB4F7 /* application-vnd.sun.xml.writer.template.svgz in Resources */,
+				A78323C415EE3173004BB4F7 /* application-vnd.wordperfect.svgz in Resources */,
+				A78323C515EE3173004BB4F7 /* application-x-7z-compressed.svgz in Resources */,
+				A78323C615EE3173004BB4F7 /* application-x-abiword.svgz in Resources */,
+				A78323C715EE3173004BB4F7 /* application-x-ace.svgz in Resources */,
+				A78323C815EE3173004BB4F7 /* application-x-applix-spreadsheet.svgz in Resources */,
+				A78323C915EE3173004BB4F7 /* application-x-applix-word.svgz in Resources */,
+				A78323CA15EE3173004BB4F7 /* application-x-ar.svgz in Resources */,
+				A78323CB15EE3173004BB4F7 /* application-x-arc.svgz in Resources */,
+				A78323CC15EE3173004BB4F7 /* application-x-archive.svgz in Resources */,
+				A78323CD15EE3173004BB4F7 /* application-x-arj.svgz in Resources */,
+				A78323CE15EE3173004BB4F7 /* application-x-awk.svgz in Resources */,
+				A78323CF15EE3173004BB4F7 /* application-x-bittorrent.svgz in Resources */,
+				A78323D015EE3173004BB4F7 /* application-x-blender.svgz in Resources */,
+				A78323D115EE3173004BB4F7 /* application-x-bzdvi.svgz in Resources */,
+				A78323D215EE3173004BB4F7 /* application-x-bzip-compressed-tar.svgz in Resources */,
+				A78323D315EE3173004BB4F7 /* application-x-bzip.svgz in Resources */,
+				A78323D415EE3173004BB4F7 /* application-x-cd-image.svgz in Resources */,
+				A78323D515EE3173004BB4F7 /* application-x-cda.svgz in Resources */,
+				A78323D615EE3173004BB4F7 /* application-x-chm.svgz in Resources */,
+				A78323D715EE3173004BB4F7 /* application-x-compress.svgz in Resources */,
+				A78323D815EE3173004BB4F7 /* application-x-compressed-tar.svgz in Resources */,
+				A78323D915EE3173004BB4F7 /* application-x-cpio.svgz in Resources */,
+				A78323DA15EE3173004BB4F7 /* application-x-cue.svgz in Resources */,
+				A78323DB15EE3173004BB4F7 /* application-x-deb.svgz in Resources */,
+				A78323DC15EE3173004BB4F7 /* application-x-designer.svgz in Resources */,
+				A78323DD15EE3173004BB4F7 /* application-x-desktop.svgz in Resources */,
+				A78323DE15EE3173004BB4F7 /* application-x-egon.svgz in Resources */,
+				A78323DF15EE3173004BB4F7 /* application-x-executable-script.svgz in Resources */,
+				A78323E015EE3173004BB4F7 /* application-x-executable.svgz in Resources */,
+				A78323E115EE3173004BB4F7 /* application-x-font-afm.svgz in Resources */,
+				A78323E215EE3173004BB4F7 /* application-x-font-bdf.svgz in Resources */,
+				A78323E315EE3173004BB4F7 /* application-x-font-otf.svgz in Resources */,
+				A78323E415EE3173004BB4F7 /* application-x-font-pcf.svgz in Resources */,
+				A78323E515EE3173004BB4F7 /* application-x-font-snf.svgz in Resources */,
+				A78323E615EE3173004BB4F7 /* application-x-font-ttf.svgz in Resources */,
+				A78323E715EE3173004BB4F7 /* application-x-font-type1.svgz in Resources */,
+				A78323E815EE3173004BB4F7 /* application-x-gnumeric.svgz in Resources */,
+				A78323E915EE3173004BB4F7 /* application-x-gzdvi.svgz in Resources */,
+				A78323EA15EE3173004BB4F7 /* application-x-gzip.svgz in Resources */,
+				A78323EB15EE3173004BB4F7 /* application-x-gzpostscript.svgz in Resources */,
+				A78323EC15EE3173004BB4F7 /* application-x-it87.svgz in Resources */,
+				A78323ED15EE3173004BB4F7 /* application-x-java-applet.svgz in Resources */,
+				A78323EE15EE3173004BB4F7 /* application-x-java-archive.svgz in Resources */,
+				A78323EF15EE3173004BB4F7 /* application-x-java.svgz in Resources */,
+				A78323F015EE3173004BB4F7 /* application-x-javascript.svgz in Resources */,
+				A78323F115EE3173004BB4F7 /* application-x-k3b.svgz in Resources */,
+				A78323F215EE3173004BB4F7 /* application-x-kcsrc.svgz in Resources */,
+				A78323F315EE3173004BB4F7 /* application-x-kformula.svgz in Resources */,
+				A78323F415EE3173004BB4F7 /* application-x-kgetlist.svgz in Resources */,
+				A78323F515EE3173004BB4F7 /* application-x-kontour.svgz in Resources */,
+				A78323F615EE3173004BB4F7 /* application-x-kplato.svgz in Resources */,
+				A78323F715EE3173004BB4F7 /* application-x-krita.svgz in Resources */,
+				A78323F815EE3173004BB4F7 /* application-x-kvtml.svgz in Resources */,
+				A78323F915EE3173004BB4F7 /* application-x-kword.svgz in Resources */,
+				A78323FA15EE3173004BB4F7 /* application-x-lha.svgz in Resources */,
+				A78323FB15EE3173004BB4F7 /* application-x-lyx.svgz in Resources */,
+				A78323FC15EE3173004BB4F7 /* application-x-lzma-compressed-tar.svgz in Resources */,
+				A78323FD15EE3173004BB4F7 /* application-x-lzop.svgz in Resources */,
+				A78323FE15EE3173004BB4F7 /* application-x-m4.svgz in Resources */,
+				A78323FF15EE3173004BB4F7 /* application-x-marble.svgz in Resources */,
+				A783240015EE3173004BB4F7 /* application-x-mimearchive.svgz in Resources */,
+				A783240115EE3173004BB4F7 /* application-x-mplayer2.svgz in Resources */,
+				A783240215EE3173004BB4F7 /* application-x-ms-dos-executable.svgz in Resources */,
+				A783240315EE3173004BB4F7 /* application-x-mswinurl.svgz in Resources */,
+				A783240415EE3173004BB4F7 /* application-x-mswrite.svgz in Resources */,
+				A783240515EE3173004BB4F7 /* application-x-nzb.svgz in Resources */,
+				A783240615EE3173004BB4F7 /* application-x-object.svgz in Resources */,
+				A783240715EE3173004BB4F7 /* application-x-pak.svgz in Resources */,
+				A783240815EE3173004BB4F7 /* application-x-pem-key.svgz in Resources */,
+				A783240915EE3173004BB4F7 /* application-x-perl.svgz in Resources */,
+				A783240A15EE3173004BB4F7 /* application-x-php.svgz in Resources */,
+				A783240B15EE3173004BB4F7 /* application-x-plasma.svgz in Resources */,
+				A783240C15EE3173004BB4F7 /* application-x-python-bytecode.svgz in Resources */,
+				A783240D15EE3173004BB4F7 /* application-x-qet-element.svgz in Resources */,
+				A783240E15EE3173004BB4F7 /* application-x-qet-project.svgz in Resources */,
+				A783240F15EE3173004BB4F7 /* application-x-quattropro.svgz in Resources */,
+				A783241015EE3173004BB4F7 /* application-x-rar.svgz in Resources */,
+				A783241115EE3173004BB4F7 /* application-x-rpm.svgz in Resources */,
+				A783241215EE3173004BB4F7 /* application-x-ruby.svgz in Resources */,
+				A783241315EE3173004BB4F7 /* application-x-sharedlib.svgz in Resources */,
+				A783241415EE3173004BB4F7 /* application-x-shellscript.svgz in Resources */,
+				A783241515EE3173004BB4F7 /* application-x-shockwave-flash.svgz in Resources */,
+				A783241615EE3173004BB4F7 /* application-x-siag.svgz in Resources */,
+				A783241715EE3173004BB4F7 /* application-x-smb-server.svgz in Resources */,
+				A783241815EE3173004BB4F7 /* application-x-smb-workgroup.svgz in Resources */,
+				A783241915EE3173004BB4F7 /* application-x-srt.svgz in Resources */,
+				A783241A15EE3173004BB4F7 /* application-x-srtrip.svgz in Resources */,
+				A783241B15EE3173004BB4F7 /* application-x-subrip.svgz in Resources */,
+				A783241C15EE3173004BB4F7 /* application-x-tar.svgz in Resources */,
+				A783241D15EE3173004BB4F7 /* application-x-tarz.svgz in Resources */,
+				A783241E15EE3173004BB4F7 /* application-x-tgif.svgz in Resources */,
+				A783241F15EE3173004BB4F7 /* application-x-trash.svgz in Resources */,
+				A783242015EE3173004BB4F7 /* application-x-troff-man.svgz in Resources */,
+				A783242115EE3173004BB4F7 /* application-x-tzo.svgz in Resources */,
+				A783242215EE3173004BB4F7 /* application-x-wmf.svgz in Resources */,
+				A783242315EE3173004BB4F7 /* application-x-zerosize.svgz in Resources */,
+				A783242415EE3173004BB4F7 /* application-x-zoo.svgz in Resources */,
+				A783242515EE3173004BB4F7 /* application-xhtml+xml.svgz in Resources */,
+				A783242615EE3173004BB4F7 /* application-xml.svgz in Resources */,
+				A783242715EE3173004BB4F7 /* application-xsd.svgz in Resources */,
+				A783242815EE3173004BB4F7 /* application-xslt+xml.svgz in Resources */,
+				A783242915EE3173004BB4F7 /* application-zip.svgz in Resources */,
+				A783242A15EE3173004BB4F7 /* audio-ac3.svgz in Resources */,
+				A783242B15EE3173004BB4F7 /* audio-midi.svgz in Resources */,
+				A783242C15EE3173004BB4F7 /* audio-prs.sid.svgz in Resources */,
+				A783242D15EE3173004BB4F7 /* audio-vn.rn-realmedia.svgz in Resources */,
+				A783242E15EE3173004BB4F7 /* audio-vn.rn-realvideo.svgz in Resources */,
+				A783242F15EE3173004BB4F7 /* audio-vnd.rn-realvideo.svgz in Resources */,
+				A783243015EE3173004BB4F7 /* audio-x-adpcm.svgz in Resources */,
+				A783243115EE3173004BB4F7 /* audio-x-aiff.svgz in Resources */,
+				A783243215EE3173004BB4F7 /* audio-x-flac.svgz in Resources */,
+				A783243315EE3173004BB4F7 /* audio-x-flac+ogg.svgz in Resources */,
+				A783243415EE3173004BB4F7 /* audio-x-generic.svgz in Resources */,
+				A783243515EE3173004BB4F7 /* audio-x-monkey.svgz in Resources */,
+				A783243615EE3173004BB4F7 /* audio-x-speex+ogg.svgz in Resources */,
+				A783243715EE3173004BB4F7 /* audio-x-wav.svgz in Resources */,
+				A783243815EE3173004BB4F7 /* encrypted.svgz in Resources */,
+				A783243915EE3173004BB4F7 /* image-svg+xml-compressed.svgz in Resources */,
+				A783243A15EE3173004BB4F7 /* image-svg+xml.svgz in Resources */,
+				A783243B15EE3173004BB4F7 /* image-vnd.dgn.svgz in Resources */,
+				A783243C15EE3173004BB4F7 /* image-vnd.dwg.svgz in Resources */,
+				A783243D15EE3173004BB4F7 /* image-x-adobe-dng.svgz in Resources */,
+				A783243E15EE3173004BB4F7 /* image-x-eps.svgz in Resources */,
+				A783243F15EE3173004BB4F7 /* image-x-generic.svgz in Resources */,
+				A783244015EE3173004BB4F7 /* image-x-vnd.trolltech.qpicture.svgz in Resources */,
+				A783244115EE3173004BB4F7 /* image-x-xfig.svgz in Resources */,
+				A783244215EE3173004BB4F7 /* inode-directory.svgz in Resources */,
+				A783244315EE3173004BB4F7 /* message-news.svgz in Resources */,
+				A783244415EE3173004BB4F7 /* message-partial.svgz in Resources */,
+				A783244515EE3173004BB4F7 /* message-rfc822.svgz in Resources */,
+				A783244615EE3173004BB4F7 /* message-x-gnu-rmail.svgz in Resources */,
+				A783244715EE3173004BB4F7 /* message.svgz in Resources */,
+				A783244815EE3173004BB4F7 /* mime2.svgz in Resources */,
+				A783244915EE3173004BB4F7 /* package-x-generic.svgz in Resources */,
+				A783244A15EE3173004BB4F7 /* text-calendar.svgz in Resources */,
+				A783244B15EE3173004BB4F7 /* text-css.svgz in Resources */,
+				A783244C15EE3173004BB4F7 /* text-csv.svgz in Resources */,
+				A783244D15EE3173004BB4F7 /* text-directory.svgz in Resources */,
+				A783244E15EE3173004BB4F7 /* text-enriched.svgz in Resources */,
+				A783244F15EE3173004BB4F7 /* text-html.svgz in Resources */,
+				A783245015EE3173004BB4F7 /* text-mathml.svgz in Resources */,
+				A783245115EE3173004BB4F7 /* text-plain.svgz in Resources */,
+				A783245215EE3173004BB4F7 /* text-rdf.svgz in Resources */,
+				A783245315EE3173004BB4F7 /* text-rdf+xml.svgz in Resources */,
+				A783245415EE3173004BB4F7 /* text-rtf.svgz in Resources */,
+				A783245515EE3173004BB4F7 /* text-sgml.svgz in Resources */,
+				A783245615EE3173004BB4F7 /* text-troff.svgz in Resources */,
+				A783245715EE3173004BB4F7 /* text-vcalendar.svgz in Resources */,
+				A783245815EE3173004BB4F7 /* text-vnd.abc.svgz in Resources */,
+				A783245915EE3173004BB4F7 /* text-vnd.wap.wml.svgz in Resources */,
+				A783245A15EE3173004BB4F7 /* text-x-adasrc.svgz in Resources */,
+				A783245B15EE3173004BB4F7 /* text-x-authors.svgz in Resources */,
+				A783245C15EE3173004BB4F7 /* text-x-bibtex.svgz in Resources */,
+				A783245D15EE3173004BB4F7 /* text-x-c++hdr.svgz in Resources */,
+				A783245E15EE3173004BB4F7 /* text-x-c++src.svgz in Resources */,
+				A783245F15EE3173004BB4F7 /* text-x-changelog.svgz in Resources */,
+				A783246015EE3173004BB4F7 /* text-x-chdr.svgz in Resources */,
+				A783246115EE3173004BB4F7 /* text-x-cmake.svgz in Resources */,
+				A783246215EE3173004BB4F7 /* text-x-copying.svgz in Resources */,
+				A783246315EE3173004BB4F7 /* text-x-csharp.svgz in Resources */,
+				A783246415EE3173004BB4F7 /* text-x-csrc.svgz in Resources */,
+				A783246515EE3173004BB4F7 /* text-x-dtd.svgz in Resources */,
+				A783246615EE3173004BB4F7 /* text-x-generic.svgz in Resources */,
+				A783246715EE3173004BB4F7 /* text-x-haskell.svgz in Resources */,
+				A783246815EE3173004BB4F7 /* text-x-hex.svgz in Resources */,
+				A783246915EE3173004BB4F7 /* text-x-install.svgz in Resources */,
+				A783246A15EE3173004BB4F7 /* text-x-java.svgz in Resources */,
+				A783246B15EE3173004BB4F7 /* text-x-katefilelist.svgz in Resources */,
+				A783246C15EE3173004BB4F7 /* text-x-ldif.svgz in Resources */,
+				A783246D15EE3173004BB4F7 /* text-x-lilypond.svgz in Resources */,
+				A783246E15EE3173004BB4F7 /* text-x-log.svgz in Resources */,
+				A783246F15EE3173004BB4F7 /* text-x-makefile.svgz in Resources */,
+				A783247015EE3173004BB4F7 /* text-x-nfo.svgz in Resources */,
+				A783247115EE3173004BB4F7 /* text-x-objchdr.svgz in Resources */,
+				A783247215EE3173004BB4F7 /* text-x-objcsrc.svgz in Resources */,
+				A783247315EE3173004BB4F7 /* text-x-pascal.svgz in Resources */,
+				A783247415EE3173004BB4F7 /* text-x-patch.svgz in Resources */,
+				A783247515EE3173004BB4F7 /* text-x-po.svgz in Resources */,
+				A783247615EE3173004BB4F7 /* text-x-python.svgz in Resources */,
+				A783247715EE3173004BB4F7 /* text-x-qml.svgz in Resources */,
+				A783247815EE3173004BB4F7 /* text-x-readme.svgz in Resources */,
+				A783247915EE3173004BB4F7 /* text-x-rpm-spec.svgz in Resources */,
+				A783247A15EE3173004BB4F7 /* text-x-script.svgz in Resources */,
+				A783247B15EE3173004BB4F7 /* text-x-sql.svgz in Resources */,
+				A783247C15EE3173004BB4F7 /* text-x-tcl.svgz in Resources */,
+				A783247D15EE3173004BB4F7 /* text-x-tex.svgz in Resources */,
+				A783247E15EE3173004BB4F7 /* text-x-texinfo.svgz in Resources */,
+				A783247F15EE3173004BB4F7 /* text-x-vcard.svgz in Resources */,
+				A783248015EE3173004BB4F7 /* text-x-xslfo.svgz in Resources */,
+				A783248115EE3173004BB4F7 /* text-xmcd.svgz in Resources */,
+				A783248215EE3173004BB4F7 /* text-xml.svgz in Resources */,
+				A783248315EE3173004BB4F7 /* unknown.svgz in Resources */,
+				A783248415EE3173004BB4F7 /* uri-mms.svgz in Resources */,
+				A783248515EE3173004BB4F7 /* uri-mmst.svgz in Resources */,
+				A783248615EE3173004BB4F7 /* uri-mmsu.svgz in Resources */,
+				A783248715EE3173004BB4F7 /* uri-pnm.svgz in Resources */,
+				A783248815EE3173004BB4F7 /* uri-rtspt.svgz in Resources */,
+				A783248915EE3173004BB4F7 /* uri-rtspu.svgz in Resources */,
+				A783248A15EE3173004BB4F7 /* video-x-generic.svgz in Resources */,
+				A783248B15EE3173004BB4F7 /* video-x-mng.svgz in Resources */,
+				A783248C15EE3173004BB4F7 /* x-kde-nsplugin-generated.svgz in Resources */,
+				A783248D15EE3173004BB4F7 /* x-media-podcast.svgz in Resources */,
+				A783248E15EE3173004BB4F7 /* x-office-address-book.svgz in Resources */,
+				A783248F15EE3173004BB4F7 /* x-office-calendar.svgz in Resources */,
+				A783249015EE3173004BB4F7 /* x-office-contact.svgz in Resources */,
+				A783249115EE3173004BB4F7 /* x-office-document.svgz in Resources */,
+				A783249215EE3173004BB4F7 /* x-office-spreadsheet.svgz in Resources */,
+				A783249315EE3173004BB4F7 /* README.txt in Resources */,
+				A783249415EE3173004BB4F7 /* release_notes.txt in Resources */,
+				A783249515EE3173004BB4F7 /* emblem-locked.svgz in Resources */,
+				A783249615EE3173004BB4F7 /* emblem-symbolic-link.svgz in Resources */,
+				A783249715EE3173004BB4F7 /* gear.png in Resources */,
+				A783249815EE3173004BB4F7 /* gear@2x.png in Resources */,
+				A783249915EE3173004BB4F7 /* DropboxOSX-Info.plist in Resources */,
+				A783249A15EE3173004BB4F7 /* DropboxSDK-Info.plist in Resources */,
+				A783249B15EE3173004BB4F7 /* iphone.pdf in Resources */,
+				A783249C15EE3173004BB4F7 /* UserManual.pdf in Resources */,
+				A783249D15EE3173004BB4F7 /* link_zotero_mac_unix.sh in Resources */,
+				A783249E15EE3173004BB4F7 /* link_zotero_windows.vbs in Resources */,
+				A783249F15EE3173004BB4F7 /* Dropbox_instructions.txt in Resources */,
+				A78324A015EE3173004BB4F7 /* icon-down-black.png in Resources */,
+				A78324A115EE3173004BB4F7 /* icon-down-black@x2.png in Resources */,
+				A78324A215EE3173004BB4F7 /* icon-up-black.png in Resources */,
+				A78324A315EE3173004BB4F7 /* icon-up-black@2x.png in Resources */,
+				A78324A415EE3173004BB4F7 /* upgrade1.0to1.1.sql in Resources */,
+			);
+			runOnlyForDeploymentPostprocessing = 0;
+		};
 		A7CD076315161555007A8E1D /* Resources */ = {
 			isa = PBXResourcesBuildPhase;
 			buildActionMask = 2147483647;
@@ -3540,6 +4364,20 @@
 			shellPath = /bin/bash;
 			shellScript = "TARGET=\"$PROJECT_DIR/${PRODUCT_NAME}-Info.plist\"\necho $TARGET\nif [ ! -f \"$TARGET\" ]; then\necho \"missing file $TARGET\"\nexit 1;\nfi\n\n# the perl regex splits out the last part of a build number (ie: 1.1.1) and increments it by one\n# if you have a build number that is more than 3 components, add a '\\.\\d+' into the first part of the regex.\n\nNEW_VERSION=`/usr/libexec/PlistBuddy -c \"Print CFBundleVersion\" \"$TARGET\" | /usr/bin/perl -pe 's/(\\d+\\.\\d+\\.)(\\d+)/$1.($2+2)/eg'`\necho $NEW_VERSION;\n/usr/libexec/PListBuddy -c \"Set CFBundleVersion $NEW_VERSION\" \"$TARGET\"";
 		};
+		A78324A515EE3173004BB4F7 /* Run Script */ = {
+			isa = PBXShellScriptBuildPhase;
+			buildActionMask = 2147483647;
+			files = (
+			);
+			inputPaths = (
+			);
+			name = "Run Script";
+			outputPaths = (
+			);
+			runOnlyForDeploymentPostprocessing = 0;
+			shellPath = /bin/bash;
+			shellScript = "TARGET=\"$PROJECT_DIR/${PRODUCT_NAME}-Info.plist\"\necho $TARGET\nif [ ! -f \"$TARGET\" ]; then\necho \"missing file $TARGET\"\nexit 1;\nfi\n\n# the perl regex splits out the last part of a build number (ie: 1.1.1) and increments it by one\n# if you have a build number that is more than 3 components, add a '\\.\\d+' into the first part of the regex.\n\nNEW_VERSION=`/usr/libexec/PlistBuddy -c \"Print CFBundleVersion\" \"$TARGET\" | /usr/bin/perl -pe 's/(\\d+\\.\\d+\\.)(\\d+)/$1.($2+2)/eg'`\necho $NEW_VERSION;\n/usr/libexec/PListBuddy -c \"Set CFBundleVersion $NEW_VERSION\" \"$TARGET\"";
+		};
 		A7FC2ECA15ADFE3100CF4A5B /* Run Script */ = {
 			isa = PBXShellScriptBuildPhase;
 			buildActionMask = 2147483647;
@@ -3708,6 +4546,160 @@
 				A74F8E6E15B83DF100C72096 /* ZPMasterItemListViewController.m in Sources */,
 				A75D4B5B15BC9B57003291CB /* NSData+Base64.m in Sources */,
 				A75D4B5D15BC9B57003291CB /* NSString+Base64.m in Sources */,
+			);
+			runOnlyForDeploymentPostprocessing = 0;
+		};
+		A78322D715EE3173004BB4F7 /* Sources */ = {
+			isa = PBXSourcesBuildPhase;
+			buildActionMask = 2147483647;
+			files = (
+				A78322D815EE3173004BB4F7 /* main.m in Sources */,
+				A78322D915EE3173004BB4F7 /* ZPAppDelegate.m in Sources */,
+				A78322DA15EE3173004BB4F7 /* ZPLibraryAndCollectionListViewController.m in Sources */,
+				A78322DB15EE3173004BB4F7 /* ZPDataLayer.m in Sources */,
+				A78322DC15EE3173004BB4F7 /* ZPServerConnection.m in Sources */,
+				A78322DD15EE3173004BB4F7 /* NSMutableURLRequest+Parameters.m in Sources */,
+				A78322DE15EE3173004BB4F7 /* NSString+URLEncoding.m in Sources */,
+				A78322DF15EE3173004BB4F7 /* NSURL+Base.m in Sources */,
+				A78322E015EE3173004BB4F7 /* hmac.c in Sources */,
+				A78322E115EE3173004BB4F7 /* sha1.c in Sources */,
+				A78322E215EE3173004BB4F7 /* OAAttachment.m in Sources */,
+				A78322E315EE3173004BB4F7 /* OACall.m in Sources */,
+				A78322E415EE3173004BB4F7 /* OAConsumer.m in Sources */,
+				A78322E515EE3173004BB4F7 /* OADataFetcher.m in Sources */,
+				A78322E615EE3173004BB4F7 /* OAHMAC_SHA1SignatureProvider.m in Sources */,
+				A78322E715EE3173004BB4F7 /* OAMutableURLRequest.m in Sources */,
+				A78322E815EE3173004BB4F7 /* OAPlaintextSignatureProvider.m in Sources */,
+				A78322E915EE3173004BB4F7 /* OAProblem.m in Sources */,
+				A78322EA15EE3173004BB4F7 /* OARequestParameter.m in Sources */,
+				A78322EB15EE3173004BB4F7 /* OAServiceTicket.m in Sources */,
+				A78322EC15EE3173004BB4F7 /* OAToken.m in Sources */,
+				A78322ED15EE3173004BB4F7 /* OATokenManager.m in Sources */,
+				A78322EE15EE3173004BB4F7 /* ZPAuthenticationDialog.m in Sources */,
+				A78322EF15EE3173004BB4F7 /* ZPServerResponseXMLParser.m in Sources */,
+				A78322F015EE3173004BB4F7 /* ZPZoteroItem.m in Sources */,
+				A78322F115EE3173004BB4F7 /* ZPZoteroLibrary.m in Sources */,
+				A78322F215EE3173004BB4F7 /* ZPZoteroCollection.m in Sources */,
+				A78322F315EE3173004BB4F7 /* FMDatabase.m in Sources */,
+				A78322F415EE3173004BB4F7 /* FMDatabaseAdditions.m in Sources */,
+				A78322F515EE3173004BB4F7 /* FMResultSet.m in Sources */,
+				A78322F615EE3173004BB4F7 /* DSActivityView.m in Sources */,
+				A78322F715EE3173004BB4F7 /* ZPItemDetailViewController.m in Sources */,
+				A78322F815EE3173004BB4F7 /* iCarousel.m in Sources */,
+				A78322F915EE3173004BB4F7 /* ZPZoteroAttachment.m in Sources */,
+				A78322FA15EE3173004BB4F7 /* NSObject+SBJson.m in Sources */,
+				A78322FB15EE3173004BB4F7 /* SBJsonParser.m in Sources */,
+				A78322FC15EE3173004BB4F7 /* SBJsonStreamParser.m in Sources */,
+				A78322FD15EE3173004BB4F7 /* SBJsonStreamParserAccumulator.m in Sources */,
+				A78322FE15EE3173004BB4F7 /* SBJsonStreamParserAdapter.m in Sources */,
+				A78322FF15EE3173004BB4F7 /* SBJsonStreamParserState.m in Sources */,
+				A783230015EE3173004BB4F7 /* SBJsonStreamWriter.m in Sources */,
+				A783230115EE3173004BB4F7 /* SBJsonStreamWriterAccumulator.m in Sources */,
+				A783230215EE3173004BB4F7 /* SBJsonStreamWriterState.m in Sources */,
+				A783230315EE3173004BB4F7 /* SBJsonTokeniser.m in Sources */,
+				A783230415EE3173004BB4F7 /* SBJsonUTF8Stream.m in Sources */,
+				A783230515EE3173004BB4F7 /* SBJsonWriter.m in Sources */,
+				A783230615EE3173004BB4F7 /* ZPDatabase.m in Sources */,
+				A783230715EE3173004BB4F7 /* ZPCacheController.m in Sources */,
+				A783230815EE3173004BB4F7 /* ZPPreferences.m in Sources */,
+				A783230915EE3173004BB4F7 /* ZPServerResponseXMLParserLibrary.m in Sources */,
+				A783230A15EE3173004BB4F7 /* ZPServerResponseXMLParserCollection.m in Sources */,
+				A783230B15EE3173004BB4F7 /* ZPServerResponseXMLParserItem.m in Sources */,
+				A783230C15EE3173004BB4F7 /* ZPZoteroDataObject.m in Sources */,
+				A783230D15EE3173004BB4F7 /* ZPZoteroNote.m in Sources */,
+				A783230E15EE3173004BB4F7 /* ASIHTTPRequest.m in Sources */,
+				A783230F15EE3173004BB4F7 /* Reachability.m in Sources */,
+				A783231015EE3173004BB4F7 /* ASIAuthenticationDialog.m in Sources */,
+				A783231115EE3173004BB4F7 /* ASIDataCompressor.m in Sources */,
+				A783231215EE3173004BB4F7 /* ASIDataDecompressor.m in Sources */,
+				A783231315EE3173004BB4F7 /* ASIInputStream.m in Sources */,
+				A783231415EE3173004BB4F7 /* ZPLocalization.m in Sources */,
+				A783231515EE3173004BB4F7 /* ZPAttachmentFileInteractionController.m in Sources */,
+				A783231615EE3173004BB4F7 /* ZPItemListViewController.m in Sources */,
+				A783231715EE3173004BB4F7 /* ZPCacheStatusToolbarController.m in Sources */,
+				A783231815EE3173004BB4F7 /* ZPFileChannel.m in Sources */,
+				A783231915EE3173004BB4F7 /* ZPFileChannel_ZoteroStorage.m in Sources */,
+				A783231A15EE3173004BB4F7 /* ZPFileChannel_WebDAV.m in Sources */,
+				A783231B15EE3173004BB4F7 /* ZPFileChannel_Dropbox.m in Sources */,
+				A783231C15EE3173004BB4F7 /* ZPFileImportViewController.m in Sources */,
+				A783231D15EE3173004BB4F7 /* ZPSplitViewController.m in Sources */,
+				A783231E15EE3173004BB4F7 /* ioapi.c in Sources */,
+				A783231F15EE3173004BB4F7 /* mztools.c in Sources */,
+				A783232015EE3173004BB4F7 /* unzip.c in Sources */,
+				A783232115EE3173004BB4F7 /* zip.c in Sources */,
+				A783232215EE3173004BB4F7 /* ZipArchive.mm in Sources */,
+				A783232315EE3173004BB4F7 /* ZPServerResponseXMLParserKeyPermissions.m in Sources */,
+				A783232415EE3173004BB4F7 /* OHAttributedLabel.m in Sources */,
+				A783232515EE3173004BB4F7 /* NSAttributedString+Attributes.m in Sources */,
+				A783232615EE3173004BB4F7 /* ZPPreviewController.m in Sources */,
+				A783232715EE3173004BB4F7 /* ZPAttachmentCarouselDelegate.m in Sources */,
+				A783232815EE3173004BB4F7 /* ASIFormDataRequest.m in Sources */,
+				A783232915EE3173004BB4F7 /* FileMD5Hash.c in Sources */,
+				A783232A15EE3173004BB4F7 /* ZPUploadVersionConflictViewControllerViewController.m in Sources */,
+				A783232B15EE3173004BB4F7 /* DDFileLogger.m in Sources */,
+				A783232C15EE3173004BB4F7 /* DDLog.m in Sources */,
+				A783232D15EE3173004BB4F7 /* DDTTYLogger.m in Sources */,
+				A783232E15EE3173004BB4F7 /* TestFlightLogger.m in Sources */,
+				A783232F15EE3173004BB4F7 /* CompressingLogFileManager.m in Sources */,
+				A783233015EE3173004BB4F7 /* ZPLogViewController.m in Sources */,
+				A783233115EE3173004BB4F7 /* ZPAttachmentIconImageFactory.m in Sources */,
+				A783233215EE3173004BB4F7 /* IASKAppSettingsViewController.m in Sources */,
+				A783233315EE3173004BB4F7 /* IASKAppSettingsWebViewController.m in Sources */,
+				A783233415EE3173004BB4F7 /* IASKSpecifierValuesViewController.m in Sources */,
+				A783233515EE3173004BB4F7 /* IASKSettingsReader.m in Sources */,
+				A783233615EE3173004BB4F7 /* IASKSettingsStore.m in Sources */,
+				A783233715EE3173004BB4F7 /* IASKSettingsStoreFile.m in Sources */,
+				A783233815EE3173004BB4F7 /* IASKSettingsStoreUserDefaults.m in Sources */,
+				A783233915EE3173004BB4F7 /* IASKSpecifier.m in Sources */,
+				A783233A15EE3173004BB4F7 /* IASKPSSliderSpecifierViewCell.m in Sources */,
+				A783233B15EE3173004BB4F7 /* IASKPSTextFieldSpecifierViewCell.m in Sources */,
+				A783233C15EE3173004BB4F7 /* IASKPSTitleValueSpecifierViewCell.m in Sources */,
+				A783233D15EE3173004BB4F7 /* IASKSlider.m in Sources */,
+				A783233E15EE3173004BB4F7 /* IASKSwitch.m in Sources */,
+				A783233F15EE3173004BB4F7 /* IASKTextField.m in Sources */,
+				A783234015EE3173004BB4F7 /* DBAccountInfo.m in Sources */,
+				A783234115EE3173004BB4F7 /* DBConnectController.m in Sources */,
+				A783234215EE3173004BB4F7 /* DBDeltaEntry.m in Sources */,
+				A783234315EE3173004BB4F7 /* DBError.m in Sources */,
+				A783234415EE3173004BB4F7 /* DBKeychain-iOS.m in Sources */,
+				A783234515EE3173004BB4F7 /* DBLog.m in Sources */,
+				A783234615EE3173004BB4F7 /* DBMetadata.m in Sources */,
+				A783234715EE3173004BB4F7 /* DBQuota.m in Sources */,
+				A783234815EE3173004BB4F7 /* DBRequest.m in Sources */,
+				A783234915EE3173004BB4F7 /* DBRestClient.m in Sources */,
+				A783234A15EE3173004BB4F7 /* DBSession+iOS.m in Sources */,
+				A783234B15EE3173004BB4F7 /* DBSession.m in Sources */,
+				A783234C15EE3173004BB4F7 /* DBJSON.m in Sources */,
+				A783234D15EE3173004BB4F7 /* DBJsonBase.m in Sources */,
+				A783234E15EE3173004BB4F7 /* DBJsonParser.m in Sources */,
+				A783234F15EE3173004BB4F7 /* DBJsonWriter.m in Sources */,
+				A783235015EE3173004BB4F7 /* NSObject+DBJSON.m in Sources */,
+				A783235115EE3173004BB4F7 /* NSString+DBJSON.m in Sources */,
+				A783235215EE3173004BB4F7 /* Base64Transcoder.c in Sources */,
+				A783235315EE3173004BB4F7 /* MPOAuthAPI.m in Sources */,
+				A783235415EE3173004BB4F7 /* MPOAuthAPIRequestLoader.m in Sources */,
+				A783235515EE3173004BB4F7 /* MPOAuthAuthenticationMethod.m in Sources */,
+				A783235615EE3173004BB4F7 /* MPOAuthAuthenticationMethodOAuth.m in Sources */,
+				A783235715EE3173004BB4F7 /* MPOAuthConnection.m in Sources */,
+				A783235815EE3173004BB4F7 /* MPOAuthCredentiaIConcreteStore+KeychainAdditionsMac.m in Sources */,
+				A783235915EE3173004BB4F7 /* MPOAuthCredentialConcreteStore+KeychainAdditionsiPhone.m in Sources */,
+				A783235A15EE3173004BB4F7 /* MPOAuthCredentialConcreteStore.m in Sources */,
+				A783235B15EE3173004BB4F7 /* MPOAuthSignatureParameter.m in Sources */,
+				A783235C15EE3173004BB4F7 /* MPOAuthURLRequest.m in Sources */,
+				A783235D15EE3173004BB4F7 /* MPOAuthURLResponse.m in Sources */,
+				A783235E15EE3173004BB4F7 /* MPURLRequestParameter.m in Sources */,
+				A783235F15EE3173004BB4F7 /* NSString+URLEscapingAdditions.m in Sources */,
+				A783236015EE3173004BB4F7 /* NSURL+MPURLParameterAdditions.m in Sources */,
+				A783236115EE3173004BB4F7 /* NSURLResponse+Encoding.m in Sources */,
+				A783236215EE3173004BB4F7 /* NSDictionary+Dropbox.m in Sources */,
+				A783236315EE3173004BB4F7 /* NSString+Dropbox.m in Sources */,
+				A783236415EE3173004BB4F7 /* UIAlertView+Dropbox.m in Sources */,
+				A783236515EE3173004BB4F7 /* ZPNavigationController.m in Sources */,
+				A783236615EE3173004BB4F7 /* ZPHelpPopover.m in Sources */,
+				A783236715EE3173004BB4F7 /* ZPItemListViewDataSource.m in Sources */,
+				A783236815EE3173004BB4F7 /* ZPMasterItemListViewController.m in Sources */,
+				A783236915EE3173004BB4F7 /* NSData+Base64.m in Sources */,
+				A783236A15EE3173004BB4F7 /* NSString+Base64.m in Sources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
@@ -3888,6 +4880,16 @@
 			name = "Static Library";
 			targetProxy = A77E0DD415D660C200134D35 /* PBXContainerItemProxy */;
 		};
+		A78322D315EE3173004BB4F7 /* PBXTargetDependency */ = {
+			isa = PBXTargetDependency;
+			name = "Static Library";
+			targetProxy = A78322D415EE3173004BB4F7 /* PBXContainerItemProxy */;
+		};
+		A78322D515EE3173004BB4F7 /* PBXTargetDependency */ = {
+			isa = PBXTargetDependency;
+			name = UserVoice;
+			targetProxy = A78322D615EE3173004BB4F7 /* PBXContainerItemProxy */;
+		};
 /* End PBXTargetDependency section */
 
 /* Begin PBXVariantGroup section */
@@ -4043,6 +5045,85 @@
 			};
 			name = Release;
 		};
+		A78324A715EE3173004BB4F7 /* Debug */ = {
+			isa = XCBuildConfiguration;
+			buildSettings = {
+				ALTERNATE_GROUP = 70000;
+				ALWAYS_SEARCH_USER_PATHS = YES;
+				CODE_SIGN_IDENTITY = "iPhone Developer";
+				"CODE_SIGN_IDENTITY[sdk=iphoneos*]" = "iPhone Developer";
+				FRAMEWORK_SEARCH_PATHS = (
+					"$(inherited)",
+					"\"$(DEVELOPER_FRAMEWORKS_DIR)\"",
+					"\"$(SRCROOT)\"",
+				);
+				GCC_PRECOMPILE_PREFIX_HEADER = YES;
+				GCC_PREFIX_HEADER = "ZotPad/ZotPad-Prefix.pch";
+				GCC_PREPROCESSOR_DEFINITIONS = (
+					"ZPDEBUG=1",
+					"BETA=1",
+				);
+				GCC_PREPROCESSOR_DEFINITIONS_NOT_USED_IN_PRECOMPS = "";
+				HEADER_SEARCH_PATHS = /usr/include/libxml2;
+				INFOPLIST_FILE = "ZotPad beta copy-Info.plist";
+				INSTALL_GROUP = 70000;
+				LIBRARY_SEARCH_PATHS = (
+					"$(inherited)",
+					"\"$(SRCROOT)\"",
+					"\"$(SRCROOT)/TestFlightSDK1\"",
+					"\"$(SDKROOT)/usr/lib/system\"",
+				);
+				PRODUCT_NAME = "ZotPad beta copy";
+				PROVISIONING_PROFILE = "";
+				"PROVISIONING_PROFILE[sdk=iphoneos*]" = "";
+				PUBLIC_HEADERS_FOLDER_PATH = "$(CONTENTS_FOLDER_PATH)/PrivateHeaders";
+				SKIP_INSTALL = NO;
+				TARGETED_DEVICE_FAMILY = "1,2";
+				USER_HEADER_SEARCH_PATHS = "\"$(SRCROOT)\"/**";
+				WRAPPER_EXTENSION = app;
+			};
+			name = Debug;
+		};
+		A78324A815EE3173004BB4F7 /* Release */ = {
+			isa = XCBuildConfiguration;
+			buildSettings = {
+				ALTERNATE_GROUP = 70000;
+				ALWAYS_SEARCH_USER_PATHS = YES;
+				CODE_SIGN_IDENTITY = "iPhone Distribution: Mikko Ronkko";
+				"CODE_SIGN_IDENTITY[sdk=iphoneos*]" = "iPhone Distribution: Mikko Ronkko";
+				COPY_PHASE_STRIP = NO;
+				FRAMEWORK_SEARCH_PATHS = (
+					"$(inherited)",
+					"\"$(DEVELOPER_FRAMEWORKS_DIR)\"",
+					"\"$(SRCROOT)\"",
+				);
+				GCC_PRECOMPILE_PREFIX_HEADER = YES;
+				GCC_PREFIX_HEADER = "ZotPad/ZotPad-Prefix.pch";
+				GCC_PREPROCESSOR_DEFINITIONS = (
+					"ZPDEBUG=1",
+					"BETA=1",
+				);
+				GCC_PREPROCESSOR_DEFINITIONS_NOT_USED_IN_PRECOMPS = "";
+				HEADER_SEARCH_PATHS = /usr/include/libxml2;
+				INFOPLIST_FILE = "ZotPad beta copy-Info.plist";
+				INSTALL_GROUP = 70000;
+				LIBRARY_SEARCH_PATHS = (
+					"$(inherited)",
+					"\"$(SRCROOT)\"",
+					"\"$(SRCROOT)/TestFlightSDK1\"",
+					"\"$(SDKROOT)/usr/lib/system\"",
+				);
+				PRODUCT_NAME = "ZotPad beta copy";
+				PROVISIONING_PROFILE = "AE9438C2-FEB3-4CFE-8857-34811EBD85A4";
+				"PROVISIONING_PROFILE[sdk=iphoneos*]" = "AE9438C2-FEB3-4CFE-8857-34811EBD85A4";
+				PUBLIC_HEADERS_FOLDER_PATH = "$(CONTENTS_FOLDER_PATH)/PrivateHeaders";
+				SKIP_INSTALL = NO;
+				TARGETED_DEVICE_FAMILY = "1,2";
+				USER_HEADER_SEARCH_PATHS = "\"$(SRCROOT)\"/**";
+				WRAPPER_EXTENSION = app;
+			};
+			name = Release;
+		};
 		A7CD077315161555007A8E1D /* Debug */ = {
 			isa = XCBuildConfiguration;
 			buildSettings = {
@@ -4139,6 +5220,15 @@
 			buildConfigurations = (
 				A7200DF214718DC1004347C9 /* Debug */,
 				A7200DF314718DC1004347C9 /* Release */,
+			);
+			defaultConfigurationIsVisible = 0;
+			defaultConfigurationName = Release;
+		};
+		A78324A615EE3173004BB4F7 /* Build configuration list for PBXNativeTarget "ZotPad iAnnotate alpha" */ = {
+			isa = XCConfigurationList;
+			buildConfigurations = (
+				A78324A715EE3173004BB4F7 /* Debug */,
+				A78324A815EE3173004BB4F7 /* Release */,
 			);
 			defaultConfigurationIsVisible = 0;
 			defaultConfigurationName = Release;

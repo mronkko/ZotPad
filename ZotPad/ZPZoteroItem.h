@@ -36,12 +36,9 @@
 @property (retain) NSDictionary* fields;
 @property (retain) NSString* itemKey;
 
-//Used for versioning by Zotero
 
-@property (retain) NSString* etag;
 
-// This is not stored in DB, but only used to temporarily store what the server returns us so that we can construct more robust updates.
-@property (retain) NSString* jsonFromServer;
+
 
 +(void) dropCache;
 +(ZPZoteroItem*) itemWithKey:(NSString*) key;
