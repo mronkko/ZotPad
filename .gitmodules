@@ -43,3 +43,6 @@
 [submodule "uservoice-iphone-sdk"]
 	path = uservoice-iphone-sdk
 	url = https://github.com/mronkko/uservoice-iphone-sdk.git
+[submodule "FRLayeredNavigationController"]
+	path = FRLayeredNavigationController
+	url = https://github.com/weissi/FRLayeredNavigationController

@@ -1255,6 +1255,9 @@
 		A7BD5EAA15611F46003252EA /* NSAttributedString+Attributes.m in Sources */ = {isa = PBXBuildFile; fileRef = A7BD5E9315611F28003252EA /* NSAttributedString+Attributes.m */; settings = {COMPILER_FLAGS = "-fno-objc-arc"; }; };
 		A7BD5EC415612181003252EA /* ImageIO.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = A7BD5EC315612181003252EA /* ImageIO.framework */; };
 		A7BD5EC6156121A3003252EA /* CoreText.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = A7BD5EC5156121A3003252EA /* CoreText.framework */; };
+		A7C1A00415F4D5F700A5AF49 /* libFRLayeredNavigationController.a in Frameworks */ = {isa = PBXBuildFile; fileRef = A7C1A00115F4D5D100A5AF49 /* libFRLayeredNavigationController.a */; };
+		A7C1A00515F4D60200A5AF49 /* libFRLayeredNavigationController.a in Frameworks */ = {isa = PBXBuildFile; fileRef = A7C1A00115F4D5D100A5AF49 /* libFRLayeredNavigationController.a */; };
+		A7C1A00615F4D60C00A5AF49 /* libFRLayeredNavigationController.a in Frameworks */ = {isa = PBXBuildFile; fileRef = A7C1A00115F4D5D100A5AF49 /* libFRLayeredNavigationController.a */; };
 		A7CC252F1493E14E00FDEAF4 /* iCarousel.m in Sources */ = {isa = PBXBuildFile; fileRef = A7CC252C1493E14D00FDEAF4 /* iCarousel.m */; };
 		A7CD070B15161555007A8E1D /* main.m in Sources */ = {isa = PBXBuildFile; fileRef = A7200DE014718DC0004347C9 /* main.m */; };
 		A7CD070C15161555007A8E1D /* ZPAppDelegate.m in Sources */ = {isa = PBXBuildFile; fileRef = A7200DE414718DC0004347C9 /* ZPAppDelegate.m */; };
@@ -1474,6 +1477,20 @@
 			proxyType = 2;
 			remoteGlobalIDString = A7F7EFCD1573603100F5A4D0;
 			remoteInfo = "Static Library (no DTFoundation)";
+		};
+		A7C1A00015F4D5D100A5AF49 /* PBXContainerItemProxy */ = {
+			isa = PBXContainerItemProxy;
+			containerPortal = A7C19FF715F4D5D100A5AF49 /* FRLayeredNavigationController.xcodeproj */;
+			proxyType = 2;
+			remoteGlobalIDString = DA4FACC615591AB300D85A7E;
+			remoteInfo = FRLayeredNavigationController;
+		};
+		A7C1A00215F4D5D100A5AF49 /* PBXContainerItemProxy */ = {
+			isa = PBXContainerItemProxy;
+			containerPortal = A7C19FF715F4D5D100A5AF49 /* FRLayeredNavigationController.xcodeproj */;
+			proxyType = 2;
+			remoteGlobalIDString = DA4FAD0215591BD500D85A7E;
+			remoteInfo = FRLayeredNavigationControllerDemo;
 		};
 /* End PBXContainerItemProxy section */
 
@@ -2087,6 +2104,7 @@
 		A7BD5E9515611F28003252EA /* OHAttributedLabel.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = OHAttributedLabel.m; sourceTree = "<group>"; };
 		A7BD5EC315612181003252EA /* ImageIO.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; name = ImageIO.framework; path = System/Library/Frameworks/ImageIO.framework; sourceTree = SDKROOT; };
 		A7BD5EC5156121A3003252EA /* CoreText.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; name = CoreText.framework; path = System/Library/Frameworks/CoreText.framework; sourceTree = SDKROOT; };
+		A7C19FF715F4D5D100A5AF49 /* FRLayeredNavigationController.xcodeproj */ = {isa = PBXFileReference; lastKnownFileType = "wrapper.pb-project"; name = FRLayeredNavigationController.xcodeproj; path = FRLayeredNavigationController/FRLayeredNavigationController.xcodeproj; sourceTree = "<group>"; };
 		A7CC252B1493E14D00FDEAF4 /* iCarousel.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = iCarousel.h; sourceTree = "<group>"; };
 		A7CC252C1493E14D00FDEAF4 /* iCarousel.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = iCarousel.m; sourceTree = "<group>"; };
 		A7CD067A151612DE007A8E1D /* AppIcon72x72-beta.png */ = {isa = PBXFileReference; lastKnownFileType = image.png; name = "AppIcon72x72-beta.png"; path = "../Icons/AppIcon72x72-beta.png"; sourceTree = "<group>"; };
@@ -2136,6 +2154,7 @@
 			isa = PBXFrameworksBuildPhase;
 			buildActionMask = 2147483647;
 			files = (
+				A7C1A00615F4D60C00A5AF49 /* libFRLayeredNavigationController.a in Frameworks */,
 				A77E0DCD15D6603200134D35 /* libUserVoice.a in Frameworks */,
 				A7ABAB6A15A3095900EA8B7B /* libDTCoreText.a in Frameworks */,
 				A7ABAB3215A3034800EA8B7B /* ImageIO.framework in Frameworks */,
@@ -2162,6 +2181,7 @@
 			isa = PBXFrameworksBuildPhase;
 			buildActionMask = 2147483647;
 			files = (
+				A7C1A00515F4D60200A5AF49 /* libFRLayeredNavigationController.a in Frameworks */,
 				A783236C15EE3173004BB4F7 /* libUserVoice.a in Frameworks */,
 				A783236D15EE3173004BB4F7 /* libDTCoreText.a in Frameworks */,
 				A783236E15EE3173004BB4F7 /* CoreFoundation.framework in Frameworks */,
@@ -2188,6 +2208,7 @@
 			isa = PBXFrameworksBuildPhase;
 			buildActionMask = 2147483647;
 			files = (
+				A7C1A00415F4D5F700A5AF49 /* libFRLayeredNavigationController.a in Frameworks */,
 				A77E0DD615D660CF00134D35 /* libUserVoice.a in Frameworks */,
 				A7093C3115A44C6B00F7B5CF /* libDTCoreText.a in Frameworks */,
 				A7699E57159A6C44002F09DA /* CoreFoundation.framework in Frameworks */,
@@ -2594,6 +2615,7 @@
 		A7200DD314718DC0004347C9 /* Frameworks */ = {
 			isa = PBXGroup;
 			children = (
+				A7C19FF715F4D5D100A5AF49 /* FRLayeredNavigationController.xcodeproj */,
 				A77E0DC415D65FAB00134D35 /* UserVoice.xcodeproj */,
 				A75D4B4215BC9B56003291CB /* Base64 */,
 				A7307B4715A6E51100A90BDF /* Dropbox */,
@@ -3201,6 +3223,15 @@
 			path = OHAttributedLabel;
 			sourceTree = "<group>";
 		};
+		A7C19FF815F4D5D100A5AF49 /* Products */ = {
+			isa = PBXGroup;
+			children = (
+				A7C1A00115F4D5D100A5AF49 /* libFRLayeredNavigationController.a */,
+				A7C1A00315F4D5D100A5AF49 /* FRLayeredNavigationControllerDemo.app */,
+			);
+			name = Products;
+			sourceTree = "<group>";
+		};
 		A7CC252A1493E14D00FDEAF4 /* iCarousel */ = {
 			isa = PBXGroup;
 			children = (
@@ -3369,6 +3400,10 @@
 					ProjectRef = A7ABAB3315A3046300EA8B7B /* DTCoreText.xcodeproj */;
 				},
 				{
+					ProductGroup = A7C19FF815F4D5D100A5AF49 /* Products */;
+					ProjectRef = A7C19FF715F4D5D100A5AF49 /* FRLayeredNavigationController.xcodeproj */;
+				},
+				{
 					ProductGroup = A77E0DC515D65FAB00134D35 /* Products */;
 					ProjectRef = A77E0DC415D65FAB00134D35 /* UserVoice.xcodeproj */;
 				},
@@ -3430,6 +3465,20 @@
 			fileType = archive.ar;
 			path = libDTCoreText_no_DTFoundation.a;
 			remoteRef = A7ABAB4B15A3046300EA8B7B /* PBXContainerItemProxy */;
+			sourceTree = BUILT_PRODUCTS_DIR;
+		};
+		A7C1A00115F4D5D100A5AF49 /* libFRLayeredNavigationController.a */ = {
+			isa = PBXReferenceProxy;
+			fileType = archive.ar;
+			path = libFRLayeredNavigationController.a;
+			remoteRef = A7C1A00015F4D5D100A5AF49 /* PBXContainerItemProxy */;
+			sourceTree = BUILT_PRODUCTS_DIR;
+		};
+		A7C1A00315F4D5D100A5AF49 /* FRLayeredNavigationControllerDemo.app */ = {
+			isa = PBXReferenceProxy;
+			fileType = wrapper.application;
+			path = FRLayeredNavigationControllerDemo.app;
+			remoteRef = A7C1A00215F4D5D100A5AF49 /* PBXContainerItemProxy */;
 			sourceTree = BUILT_PRODUCTS_DIR;
 		};
 /* End PBXReferenceProxy section */

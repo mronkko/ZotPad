@@ -258,6 +258,8 @@
 	subController.currentlibraryID=[selectedNode libraryID];
 	subController.currentCollectionKey=[selectedNode key];
 	
+    NSObject* navi = self.navigationController;
+    
 	[self.navigationController pushViewController: subController animated: YES];
 	
 }
