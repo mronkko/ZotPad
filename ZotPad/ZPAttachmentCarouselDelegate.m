@@ -11,8 +11,8 @@
 
 #import "ZPAttachmentCarouselDelegate.h"
 #import "ZPPreviewController.h"
-#import "ZPServerConnection.h"
-#import "ZPDataLayer.h"
+#import "ZPServerConnectionManager.h"
+
 #import "ZPAttachmentIconImageFactory.h"
 #import <QuartzCore/QuartzCore.h>
 #import <zlib.h>
@@ -65,9 +65,18 @@ NSInteger const ZPATTACHMENTICONGVIEWCONTROLLER_TAG_TITLELABEL = -5;
     _progressViews = [[NSMutableSet alloc] init];
 
     //Register self as observer for item downloads
-    [[ZPDataLayer instance] registerAttachmentObserver:self];
-    [[ZPDataLayer instance] registerItemObserver:self];
+    [[NSNotificationCenter defaultCenter] addObserver:self selector:@selector(notifyAttachmentDownloadCompleted:) name:ZPNOTIFICATION_ATTACHMENT_FILE_DOWNLOAD_FINISHED object:nil];
+    [[NSNotificationCenter defaultCenter] addObserver:self selector:@selector(notifyAttachmentDownloadFailed:) name:ZPNOTIFICATION_ATTACHMENT_FILE_DOWNLOAD_FAILED object:nil];
+    [[NSNotificationCenter defaultCenter] addObserver:self selector:@selector(notifyAttachmentDownloadStarted:) name:ZPNOTIFICATION_ATTACHMENT_FILE_DOWNLOAD_STARTED object:nil];
 
+    [[NSNotificationCenter defaultCenter] addObserver:self selector:@selector(notifyAttachmentDeleted:) name:ZPNOTIFICATION_ATTACHMENT_FILE_DELETED object:nil];
+
+    [[NSNotificationCenter defaultCenter] addObserver:self selector:@selector(notifyAttachmentUploadCompleted:) name:ZPNOTIFICATION_ATTACHMENT_FILE_UPLOAD_FINISHED object:nil];
+    [[NSNotificationCenter defaultCenter] addObserver:self selector:@selector(notifyAttachmentUploadFailed:) name:ZPNOTIFICATION_ATTACHMENT_FILE_UPLOAD_FAILED object:nil];
+    [[NSNotificationCenter defaultCenter] addObserver:self selector:@selector(notifyAttachmentUploadStarted:) name:ZPNOTIFICATION_ATTACHMENT_FILE_UPLOAD_STARTED object:nil];
+
+    [[NSNotificationCenter defaultCenter] addObserver:self selector:@selector(notifyItemsAvailable:) name:ZPNOTIFICATION_ITEMS_AVAILABLE object:nil];
+    
     return self;
 }
 
@@ -78,8 +87,7 @@ NSInteger const ZPATTACHMENTICONGVIEWCONTROLLER_TAG_TITLELABEL = -5;
             
         }
     }
-    [[ZPDataLayer instance] removeItemObserver:self];
-    [[ZPDataLayer instance] removeAttachmentObserver:self];
+    [[NSNotificationCenter defaultCenter] removeObserver:self];
 }
 
 
@@ -315,8 +323,8 @@ NSInteger const ZPATTACHMENTICONGVIEWCONTROLLER_TAG_TITLELABEL = -5;
                           
     if(thisMode == ZPATTACHMENTICONGVIEWCONTROLLER_MODE_DOWNLOAD){
 
-        if([ZPServerConnection isAttachmentDownloading:attachment]){
-            [self notifyAttachmentDownloadStarted:attachment];
+        if([ZPServerConnectionManager isAttachmentDownloading:attachment]){
+            [self notifyAttachmentDownloadStarted:[NSNotification notificationWithName:ZPNOTIFICATION_ATTACHMENT_FILE_DOWNLOAD_STARTED object:attachment]];
         }
         else{
             
@@ -379,8 +387,8 @@ NSInteger const ZPATTACHMENTICONGVIEWCONTROLLER_TAG_TITLELABEL = -5;
     else if(self.mode == ZPATTACHMENTICONGVIEWCONTROLLER_MODE_UPLOAD){
         label.hidden = FALSE;
         
-        if([ZPServerConnection isAttachmentDownloading:attachment]){
-            [self notifyAttachmentDownloadStarted:attachment];
+        if([ZPServerConnectionManager isAttachmentDownloading:attachment]){
+            [self notifyAttachmentDownloadStarted:[NSNotification notificationWithName:ZPNOTIFICATION_ATTACHMENT_FILE_DOWNLOAD_STARTED object:attachment]];
         }
         else{
             label.text = @"Waiting for upload";
@@ -418,7 +426,7 @@ NSInteger const ZPATTACHMENTICONGVIEWCONTROLLER_TAG_TITLELABEL = -5;
             
             [ZPPreviewController displayQuicklookWithAttachment:attachment source:self];
         }
-        else if(attachment.linkMode == LINK_MODE_LINKED_URL && [ZPServerConnection hasInternetConnection]){
+        else if(attachment.linkMode == LINK_MODE_LINKED_URL && [ZPServerConnectionManager hasInternetConnection]){
             [[UIApplication sharedApplication] openURL:[NSURL URLWithString:attachment.url]];
         }
         else if(self.mode == ZPATTACHMENTICONGVIEWCONTROLLER_MODE_DOWNLOAD && ( attachment.linkMode == LINK_MODE_IMPORTED_FILE || 
@@ -427,8 +435,8 @@ NSInteger const ZPATTACHMENTICONGVIEWCONTROLLER_TAG_TITLELABEL = -5;
 
             
             
-            if([ZPServerConnection hasInternetConnection] && ! [ZPServerConnection isAttachmentDownloading:attachment]){
-                [ZPServerConnection checkIfCanBeDownloadedAndStartDownloadingAttachment:attachment];   
+            if([ZPServerConnectionManager hasInternetConnection] && ! [ZPServerConnectionManager isAttachmentDownloading:attachment]){
+                [ZPServerConnectionManager checkIfCanBeDownloadedAndStartDownloadingAttachment:attachment];   
             }
             
         }
@@ -461,20 +469,24 @@ NSInteger const ZPATTACHMENTICONGVIEWCONTROLLER_TAG_TITLELABEL = -5;
  These are called by data layer to notify that more information about an item has become available from the server
  */
 
--(void) notifyItemAvailable:(ZPZoteroItem*) item{
+-(void) notifyItemsAvailable:(NSNotification*) notification{
     
-    if([item.key isEqualToString:_item.key]){
-        _item = item;
-        _attachments = item.attachments;
-        
-        if([self.attachmentCarousel numberOfItems]!= _attachments.count){
-            if([_attachments count]==0){
-                [self.attachmentCarousel setHidden:TRUE];
-            }
-            else{
-                [self.attachmentCarousel setHidden:FALSE];
-                [self.attachmentCarousel setScrollEnabled:[_attachments count]>1];
-                [self.attachmentCarousel performSelectorOnMainThread:@selector(reloadData) withObject:NULL waitUntilDone:NO];
+    NSArray* items = notification.object;
+    
+    for(ZPZoteroItem* item in items){
+        if([item.key isEqualToString:_item.key]){
+            _item = item;
+            _attachments = item.attachments;
+            
+            if([self.attachmentCarousel numberOfItems]!= _attachments.count){
+                if([_attachments count]==0){
+                    [self.attachmentCarousel setHidden:TRUE];
+                }
+                else{
+                    [self.attachmentCarousel setHidden:FALSE];
+                    [self.attachmentCarousel setScrollEnabled:[_attachments count]>1];
+                    [self.attachmentCarousel performSelectorOnMainThread:@selector(reloadData) withObject:NULL waitUntilDone:NO];
+                }
             }
         }
     }
@@ -496,8 +508,10 @@ NSInteger const ZPATTACHMENTICONGVIEWCONTROLLER_TAG_TITLELABEL = -5;
 #pragma mark - Attachment observer methods
 
 
--(void) notifyAttachmentDownloadCompleted:(ZPZoteroAttachment*) attachment{
+-(void) notifyAttachmentDownloadCompleted:(NSNotification *) notification{
 
+    ZPZoteroAttachment* attachment = notification.object;
+    
     if(mode ==ZPATTACHMENTICONGVIEWCONTROLLER_MODE_DOWNLOAD || 
        (ZPATTACHMENTICONGVIEWCONTROLLER_MODE_FIRST_STATIC_SECOND_DOWNLOAD && [_attachments indexOfObject:attachment]==2)){
         
@@ -505,51 +519,73 @@ NSInteger const ZPATTACHMENTICONGVIEWCONTROLLER_TAG_TITLELABEL = -5;
         [self _setLabelsForAttachment:attachment progressText:NULL errorText:NULL mode:ZPATTACHMENTICONGVIEWCONTROLLER_MODE_STATIC reconfigureIcon:TRUE];
     }
 }
--(void) notifyAttachmentDownloadFailed:(ZPZoteroAttachment *)attachment withError:(NSError *)error{
-    
-    if(mode ==ZPATTACHMENTICONGVIEWCONTROLLER_MODE_DOWNLOAD || 
+-(void) notifyAttachmentDownloadFailed:(NSNotification *) notification{
+
+    ZPZoteroAttachment* attachment = notification.object;
+
+    if(mode ==ZPATTACHMENTICONGVIEWCONTROLLER_MODE_DOWNLOAD ||
        (ZPATTACHMENTICONGVIEWCONTROLLER_MODE_FIRST_STATIC_SECOND_DOWNLOAD && [_attachments indexOfObject:attachment]==2)){
-        [self _setLabelsForAttachment:attachment progressText:@"Download failed" errorText:[error localizedDescription] mode:ZPATTACHMENTICONGVIEWCONTROLLER_MODE_STATIC reconfigureIcon:FALSE];    
+        [self _setLabelsForAttachment:attachment progressText:@"Download failed" errorText:[notification.userInfo objectForKey:NSLocalizedDescriptionKey] mode:ZPATTACHMENTICONGVIEWCONTROLLER_MODE_STATIC reconfigureIcon:FALSE];
     }
 }
 
--(void) notifyAttachmentDownloadStarted:(ZPZoteroAttachment*) attachment{
-    if(mode ==ZPATTACHMENTICONGVIEWCONTROLLER_MODE_DOWNLOAD || 
+-(void) notifyAttachmentDownloadStarted:(NSNotification *) notification{
+    
+    ZPZoteroAttachment* attachment = notification.object;
+
+    if(mode ==ZPATTACHMENTICONGVIEWCONTROLLER_MODE_DOWNLOAD ||
        (ZPATTACHMENTICONGVIEWCONTROLLER_MODE_FIRST_STATIC_SECOND_DOWNLOAD && [_attachments indexOfObject:attachment]==2)){
         [self _setLabelsForAttachment:attachment progressText:@"Downloading" errorText:NULL mode:ZPATTACHMENTICONGVIEWCONTROLLER_MODE_DOWNLOAD reconfigureIcon:FALSE];    
     }
 }
 
--(void) notifyAttachmentDeleted:(ZPZoteroAttachment*) attachment fileAttributes:(NSDictionary*) fileAttributes{
+-(void) notifyAttachmentDeleted:(NSNotification *) notification{
     
+    ZPZoteroAttachment* attachment = notification.object;
+
     [self _toggleActionButtonState];
     [self _setLabelsForAttachment:attachment progressText:@"File deleted" errorText:NULL mode:ZPATTACHMENTICONGVIEWCONTROLLER_MODE_STATIC reconfigureIcon:FALSE];
 
 }
 
--(void) notifyAttachmentUploadCompleted:(ZPZoteroAttachment*) attachment{
+-(void) notifyAttachmentUploadCompleted:(NSNotification *) notification{
+    
+    ZPZoteroAttachment* attachment = notification.object;
+
     if(mode ==ZPATTACHMENTICONGVIEWCONTROLLER_MODE_UPLOAD){
         [self _setLabelsForAttachment:attachment progressText:@"Upload completed" errorText:NULL mode:ZPATTACHMENTICONGVIEWCONTROLLER_MODE_STATIC reconfigureIcon:FALSE];
     }
 }
 
--(void) notifyAttachmentUploadFailed:(ZPZoteroAttachment*) attachment withError:(NSError*) error{
+-(void) notifyAttachmentUploadFailed:(NSNotification *) notification{
+    
+    ZPZoteroAttachment* attachment = notification.object;
+    
     if(mode ==ZPATTACHMENTICONGVIEWCONTROLLER_MODE_UPLOAD){
-        [self _setLabelsForAttachment:attachment progressText:@"Upload failed" errorText:[error localizedDescription] mode:ZPATTACHMENTICONGVIEWCONTROLLER_MODE_STATIC reconfigureIcon:FALSE];
+        [self _setLabelsForAttachment:attachment progressText:@"Upload failed" errorText:[notification.userInfo objectForKey:NSLocalizedDescriptionKey] mode:ZPATTACHMENTICONGVIEWCONTROLLER_MODE_STATIC reconfigureIcon:FALSE];
     }
 }
 
--(void) notifyAttachmentUploadStarted:(ZPZoteroAttachment*) attachment{
+-(void) notifyAttachmentUploadStarted:(NSNotification *) notification{
+    
+    ZPZoteroAttachment* attachment = notification.object;
+
     if(mode ==ZPATTACHMENTICONGVIEWCONTROLLER_MODE_UPLOAD){
         [self _setLabelsForAttachment:attachment progressText:@"Uploading" errorText:NULL mode:ZPATTACHMENTICONGVIEWCONTROLLER_MODE_UPLOAD reconfigureIcon:FALSE];
     }
 }
 
--(void) notifyAttachmentUploadCanceled:(ZPZoteroAttachment*) attachment{
+// This is not in use, but implemented nevertheless
+
+-(void) notifyAttachmentUploadCanceled:(NSNotification *) notification{
+    
+    ZPZoteroAttachment* attachment = notification.object;
+    
     if(mode ==ZPATTACHMENTICONGVIEWCONTROLLER_MODE_UPLOAD){
         [self _setLabelsForAttachment:attachment progressText:@"Upload canceled" errorText:NULL mode:ZPATTACHMENTICONGVIEWCONTROLLER_MODE_STATIC reconfigureIcon:FALSE];
     }
 }
+
 
 -(void) _setLabelsForAttachment:(ZPZoteroAttachment*)attachment progressText:(NSString*)progressText errorText:(NSString*)errorText mode:(NSInteger)aMode reconfigureIcon:(BOOL)reconfigureIcon{
     NSInteger index = [_attachments indexOfObject:attachment];    
@@ -588,13 +624,13 @@ NSInteger const ZPATTACHMENTICONGVIEWCONTROLLER_TAG_TITLELABEL = -5;
                 else if (aMode==ZPATTACHMENTICONGVIEWCONTROLLER_MODE_UPLOAD){
                     progressView.hidden = FALSE;
                     progressView.progress = 0.0f;
-                    [ZPServerConnection useProgressView:progressView forUploadingAttachment:attachment];
+                    [ZPServerConnectionManager useProgressView:progressView forUploadingAttachment:attachment];
                     view.userInteractionEnabled = TRUE;
                 }
                 else if (aMode==ZPATTACHMENTICONGVIEWCONTROLLER_MODE_DOWNLOAD){
                     progressView.hidden = FALSE;
                     progressView.progress = 0.0f;
-                    [ZPServerConnection useProgressView:progressView forDownloadingAttachment:attachment];
+                    [ZPServerConnectionManager useProgressView:progressView forDownloadingAttachment:attachment];
                     view.userInteractionEnabled = FALSE;
                 }
                 

@@ -12,13 +12,12 @@
 
 @implementation ZPZoteroCollection
 
-@synthesize parentCollectionKey;
 
 static NSCache* _objectCache = NULL;
 
 +(ZPZoteroCollection*) collectionWithDictionary:(NSDictionary*) fields{
     
-    NSString* key = [fields objectForKey:@"collectionKey"];
+    NSString* key = [fields objectForKey:ZPKEY_COLLECTION_KEY];
     
     if(key == NULL){
         [NSException raise:@"Key is null" format:@"ZPZoteroCollection cannot be instantiated with NULL key"];
@@ -59,19 +58,16 @@ static NSCache* _objectCache = NULL;
     return obj;
 }
 
+
 +(void) dropCache{
     [_objectCache removeAllObjects];
 }
 
-// An alias for setParentCollectionKey
-- (void) setParentKey:(NSString*)key{
-    [self setParentCollectionKey:key];    
-}
 
--(NSString *) collectionKey{
-    return [self key];
+-(void) setCollectionKey:(NSString *)itemCollection{
+    [super setKey:itemCollection];
 }
--(void) setCollectionKey:(NSString *)collectionKey{
-    [self setKey:collectionKey];
+-(NSString*)collectionKey{
+    return [super key];
 }
 @end

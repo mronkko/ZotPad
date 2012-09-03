@@ -12,8 +12,8 @@
 #import "ZPZoteroAttachment.h"
 #import "ZPPreferences.h"
 #import <QuartzCore/QuartzCore.h>
-#import "ZPDataLayer.h"
-#import "ZPServerConnection.h"
+
+#import "ZPServerConnectionManager.h"
 #import <zlib.h>
 
 

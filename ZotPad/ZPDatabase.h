@@ -42,6 +42,10 @@
 +(NSArray*) getItemKeysForLibrary:(NSInteger)libraryID collectionKey:(NSString*)collectionKey
                       searchString:(NSString*)searchString orderField:(NSString*)orderField sortDescending:(BOOL)sortDescending;
 
+
+//These are hard coded for now.
++ (NSArray*) fieldsThatCanBeUsedForSorting;
+
 +(NSString*) getFirstItemKeyWithTimestamp:(NSString*)timestamp from:(NSInteger)libraryID;
 
 

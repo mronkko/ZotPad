@@ -7,12 +7,13 @@
 //
 
 #import <Foundation/Foundation.h>
-#import "ZPLibraryObserver.h"
-#import "ZPAttachmentObserver.h"
+
+
 #import "ZPZoteroCollection.h"
 #import "ZPCacheStatusToolbarController.h"
 
-@interface ZPCacheController : NSObject <ZPLibraryObserver, ZPAttachmentObserver>{
+
+@interface ZPCacheController : NSObject{
     
     //These two arrays contain a list of IDs/Keys that will be cached
     
@@ -24,27 +25,20 @@
     NSMutableArray* _filesToDownload;
     NSMutableSet* _attachmentsToUpload;
     
-    // An operation que to fetch items in the background
-    NSOperationQueue* _serverRequestQueue;
-
     // Size of the folder in kilo bytes    
     unsigned long long int _sizeOfDocumentsFolder;
     
-    ZPCacheStatusToolbarController* _statusView;
-
 }
--(void) setStatusView:(ZPCacheStatusToolbarController*) statusView;
 
 +(ZPCacheController*) instance;
 
+- (void) setStatusView:(ZPCacheStatusToolbarController*)statusView;
 
-// These methods tell the cache that the user is currently viewing something
-//-(void) setCurrentCollection:(NSString*) collectionKey;
-//-(void) setCurrentLibrary:(NSInteger) libraryID;
-//-(void) setCurrentItem:(NSString*) itemKey;
+
+//Metadata
+
 -(void) updateLibrariesAndCollectionsFromServer;
 -(void) updateCollectionsForLibraryFromServer:(ZPZoteroLibrary*) libraryID;
--(void) purgeAllAttachmentFilesFromCache;
 
 -(void) refreshActiveItem:(ZPZoteroItem*) item;
 -(void) setActiveLibrary:(NSInteger)libraryID collection:(NSString*)collectionKey;
@@ -52,7 +46,18 @@
 -(void) addToLibrariesQueue:(ZPZoteroLibrary*)object priority:(BOOL)priority;
 -(void) addToCollectionsQueue:(ZPZoteroCollection*)object priority:(BOOL)priority;
 -(void) addToItemQueue:(NSArray*)items libraryID:(NSInteger)libraryID priority:(BOOL)priority;
--(void) addAttachmentToUploadQueue:(ZPZoteroAttachment*) attachment withNewFile:(NSURL*)urlToFile; 
+
+//Attachments
+-(void) purgeAllAttachmentFilesFromCache;
+-(void) addAttachmentToUploadQueue:(ZPZoteroAttachment*) attachment withNewFile:(NSURL*)urlToFile;
 -(void) addAttachmentToDowloadQueue:(ZPZoteroAttachment *)attachment;
+
+//Call backs
+-(void) processNewItemsFromServer:(NSArray*)items forLibraryID:(NSInteger)libraryID;
+-(void) processNewLibrariesFromServer:(NSArray*)items;
+-(void) processNewCollectionsFromServer:(NSArray*)items forLibraryID:(NSInteger)libraryID;
+-(void) processNewItemKeyListFromServer:(NSArray*)items forLibraryID:(NSInteger) libraryID;
+-(void) processNewTopLevelItemKeyListFromServer:(NSArray*)items userInfo:(NSDictionary*)parameters;
+-(void) processNewTimeStampForLibrary:(NSInteger)libraryID collection:(NSString*)key timestampValue:(NSString*)value;
 
 @end

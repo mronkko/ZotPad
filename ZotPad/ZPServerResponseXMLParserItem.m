@@ -107,6 +107,20 @@
         if([_currentElement isKindOfClass:[ZPZoteroItem class]]){
             [(ZPZoteroItem*) _currentElement setFields:fields];
         }
+        //Notes and attachments do not have fields.
+        else{
+            NSEnumerator* e = [fields keyEnumerator];
+            NSString* key;
+
+            while(key = [e nextObject]){
+                NSString* value = [fields objectForKey:key];
+                if(![value isEqual:@""]){
+                    if([_currentElement respondsToSelector:NSSelectorFromString(key)]){
+                        [_currentElement setValue:value forKey:key];
+                    }
+                }
+            }
+        }
         
     }
     else if([key isEqualToString:@"published"]){
@@ -123,7 +137,7 @@
     //Choose what to create based on the item type 
     NSString* itemType = [_temporaryFieldStorage objectForKey:@"zapi:itemType"];
     
-    if([itemType isEqualToString:@"attachment"]){
+    if([itemType isEqualToString:ZPKEY_ATTACHMENT]){
         _currentElement = [ZPZoteroAttachment attachmentWithKey:id];
     }
     else if([itemType isEqualToString:@"note"]){

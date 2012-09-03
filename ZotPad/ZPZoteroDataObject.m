@@ -10,7 +10,7 @@
 
 @implementation ZPZoteroDataObject
 
-@synthesize key, title, libraryID, cacheTimestamp, serverTimestamp, dateAdded, etag,jsonFromServer;
+@synthesize key, title, libraryID, cacheTimestamp, serverTimestamp, dateAdded, etag,jsonFromServer,parentKey;
 @synthesize numChildren;
 
 // This is very useful for troubleshooting, but because of memory issues, is only used for debug builds

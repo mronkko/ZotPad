@@ -27,7 +27,7 @@ extern NSInteger const ZPATTACHMENTICONGVIEWCONTROLLER_TAG_STATUSLABEL;
 extern NSInteger const ZPATTACHMENTICONGVIEWCONTROLLER_TAG_PROGRESSVIEW;
 extern NSInteger const ZPATTACHMENTICONGVIEWCONTROLLER_TAG_TITLELABEL;
 
-@interface ZPAttachmentCarouselDelegate : NSObject <iCarouselDelegate, iCarouselDataSource, ZPAttachmentObserver, ZPItemObserver, ZPPreviewSource>{
+@interface ZPAttachmentCarouselDelegate : NSObject <iCarouselDelegate, iCarouselDataSource, ZPPreviewSource>{
     ZPZoteroItem* _item;
     NSArray* _attachments;
     NSInteger _selectedIndex;

@@ -18,7 +18,7 @@ ALTER TABLE collections RENAME TO temp;
 
 CREATE TABLE collections (
     title TEXT NOT NULL,
-    parentCollectionKey TEXT DEFAULT NULL,
+    parentKey TEXT DEFAULT NULL,
     cacheTimestamp TEXT DEFAULT NULL,
     libraryID INT,
     collectionKey TEXT PRIMARY KEY
@@ -27,7 +27,7 @@ CREATE TABLE collections (
 INSERT INTO collections SELECT * FROM temp;
 DROP TABLE temp;
 
-CREATE INDEX collections_parentCollectionKey ON collections (parentCollectionKey);
+CREATE INDEX collections_parentKey ON collections (parentKey);
 
 
 
@@ -56,7 +56,7 @@ CREATE INDEX items_libraryID ON items (libraryID);
 ALTER TABLE notes RENAME TO temp;
 
 CREATE TABLE notes (
-    parentItemKey TEXT NOT NULL,
+    parentKey TEXT NOT NULL,
     itemKey TEXT PRIMARY KEY,
     cacheTimestamp TEXT NOT NULL
 );
@@ -64,14 +64,14 @@ CREATE TABLE notes (
 INSERT INTO notes SELECT * FROM temp;
 DROP TABLE temp;
 
-CREATE INDEX notes_parentItemKey ON notes (parentItemKey);
+CREATE INDEX notes_parentKey ON notes (parentKey);
 
 
 
 ALTER TABLE attachments RENAME TO temp;
 
 CREATE TABLE attachments (
-    parentItemKey TEXT NOT NULL,
+    parentKey TEXT NOT NULL,
     itemKey TEXT PRIMARY KEY,
     title TEXT NOT NULL,
     cacheTimestamp TEXT NOT NULL,
@@ -88,11 +88,11 @@ CREATE TABLE attachments (
     versionIdentifier_local TEXT DEFAULT NULL
 );
 
-INSERT INTO attachments SELECT parentItemKey, key, attachmentTitle, lastTimestamp, 0, attachmentTitle, attachmentType, NULL, attachmentURL IS NOT NULL, NULL, lastViewed, NULL, 1, NULL, NULL  FROM temp WHERE attachmentTitle IS NOT NULL;
+INSERT INTO attachments SELECT parentKey, key, attachmentTitle, lastTimestamp, 0, attachmentTitle, attachmentType, NULL, attachmentURL IS NOT NULL, NULL, lastViewed, NULL, 1, NULL, NULL  FROM temp WHERE attachmentTitle IS NOT NULL;
 
 DROP TABLE temp;
 
-CREATE INDEX attachments_parentItemKey ON attachments (parentItemKey);
+CREATE INDEX attachments_parentKey ON attachments (parentKey);
 
 
 

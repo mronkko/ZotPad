@@ -11,13 +11,13 @@
 #import "ZPItemDetailViewController.h"
 #import "ZPLibraryAndCollectionListViewController.h"
 #import "ZPItemListViewDataSource.h"
-#import "ZPDataLayer.h"
+
 #import "ZPLocalization.h"
 #import "ZPAttachmentFileInteractionController.h"
 #import "ZPPreviewController.h"
 
 #import "ZPAppDelegate.h"
-#import "ZPServerConnection.h"
+#import "ZPServerConnectionManager.h"
 #import "ZPPreferences.h"
 #import "ZPAttachmentIconImageFactory.h"
 #import "ZPAttachmentCarouselDelegate.h"
@@ -95,7 +95,7 @@
     
     [[NSNotificationCenter defaultCenter] addObserver:self
                                              selector:@selector(notifyItemAvailable:) 
-                                                 name:@"ItemDataAvailable"
+                                                 name:ZPNOTIFICATION_ITEMS_AVAILABLE
                                                object:nil];
 
 
@@ -145,13 +145,11 @@
 
 -(void) configure{
     
-    if([ZPServerConnection hasInternetConnection]){
+    if([ZPServerConnectionManager hasInternetConnection]){
         [_activityIndicator startAnimating];
-        [[ZPDataLayer instance] updateItemDetailsFromServer:_currentItem];
+        [ZPServerConnectionManager retrieveSingleItemDetailsFromServer:_currentItem];
     }
         
-
-    
     [self _reconfigureDetailTableView:FALSE];
     [_carouselDelegate configureWithZoteroItem:_currentItem];
     [_carousel reloadData];
@@ -228,7 +226,7 @@
     }
     //Creators
     if(section==1){
-        if(_currentItem.creators!=NULL || [_currentItem.itemType isEqualToString:@"attachment"]|| [_currentItem.itemType isEqualToString:@"note"]){
+        if(_currentItem.creators!=NULL || [_currentItem.itemType isEqualToString:ZPKEY_ATTACHMENT]|| [_currentItem.itemType isEqualToString:@"note"]){
             return [_currentItem.creators count];
         }
         else{
@@ -237,7 +235,7 @@
     }
     //Rest of the fields
     if(section==2){
-        if(_currentItem.fields!=NULL || [_currentItem.itemType isEqualToString:@"attachment"]|| [_currentItem.itemType isEqualToString:@"note"]){
+        if(_currentItem.fields!=NULL || [_currentItem.itemType isEqualToString:ZPKEY_ATTACHMENT]|| [_currentItem.itemType isEqualToString:@"note"]){
             //Two fields, itemType and title, are shown separately
             return [_currentItem.fields count]-2;
         }
@@ -471,7 +469,7 @@
 
 -(void) notifyItemAvailable:(NSNotification*) notification{
     
-    ZPZoteroItem* item = [notification.userInfo objectForKey:@"item"];
+    ZPZoteroItem* item = [notification.userInfo objectForKey:ZPKEY_ITEM];
     
     if([item.key isEqualToString:_currentItem.key]){
         _currentItem = item;

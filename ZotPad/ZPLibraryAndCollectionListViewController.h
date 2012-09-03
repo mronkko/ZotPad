@@ -8,12 +8,12 @@
 
 #import <UIKit/UIKit.h>
 #import "ZPItemListViewController.h"
-#import "ZPDataLayer.h"
-#import "ZPLibraryObserver.h"
+
+
 
 @class ZPItemListViewController;
 
-@interface ZPLibraryAndCollectionListViewController : UITableViewController <ZPLibraryObserver>{
+@interface ZPLibraryAndCollectionListViewController : UITableViewController{
     NSArray* _content;
     NSInteger _currentlibraryID;
     NSString* _currentCollectionKey;

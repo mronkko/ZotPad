@@ -10,7 +10,7 @@
 
 #import "ZPFileChannel.h"
 #import "ZPZoteroAttachment.h"
-#import "ZPServerConnection.h"
+#import "ZPServerConnectionManager.h"
 #import "ZPUploadVersionConflictViewControllerViewController.h"
 #import "ZPFileImportViewController.h"
 #import "ZPAppDelegate.h"
@@ -93,7 +93,7 @@
         UIViewController* root = [UIApplication sharedApplication].delegate.window.rootViewController;
         
         //TODO: Consider refactoring this some place else
-        NSDictionary* sender = [NSDictionary dictionaryWithObjectsAndKeys:self,@"fileChannel",attachment,@"attachment", nil];
+        NSDictionary* sender = [NSDictionary dictionaryWithObjectsAndKeys:self,@"fileChannel",attachment,ZPKEY_ATTACHMENT, nil];
         if(root.presentedViewController == NULL){
             [root performSegueWithIdentifier:@"FileUploadConflict" sender:sender];
         }

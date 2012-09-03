@@ -9,14 +9,14 @@
 #import "ZPCore.h"
 
 #import "ZPItemListViewController.h"
-#import "ZPDataLayer.h"
+
 #import "DSActivityView.h"
 #import "ZPLocalization.h"
 #import "ZPPreferences.h"
 #import "ZPAppDelegate.h"
 
 //TODO: Refactor so that these would not be needed
-#import "ZPServerConnection.h"
+#import "ZPServerConnectionManager.h"
 #import "ZPDatabase.h"
 #import "ZPCacheController.h"
 
@@ -27,6 +27,7 @@
 
 #pragma mark - Helper class for requesting item data from the server
 
+/*
 @interface ZPUncachedItemsOperation : NSOperation {
 @private
     NSString*_searchString;
@@ -49,7 +50,7 @@
     _itemListDataSource = dataSource;
     _itemListController=itemListController;
     _searchString = dataSource.searchString;
-    _collectionKey = dataSource.collectionKey;
+    _collectionKey = dataSource.key;
     _libraryID = dataSource.libraryID;
     _orderField = dataSource.orderField;
     _sortDescending = dataSource.sortDescending;
@@ -64,7 +65,7 @@
     
     [_itemListDataSource clearTable];
     //DDLogVerbose(@"Retrieving cached keys");
-    NSArray* cacheKeys= [[ZPDataLayer instance] getItemKeysFromCacheForLibrary:_libraryID collection:_collectionKey
+    NSArray* cacheKeys= [ZPDatabase getItemKeysFromCacheForLibrary:_libraryID collection:_collectionKey
                                                                   searchString:_searchString orderField:_orderField sortDescending:_sortDescending];
     //DDLogVerbose(@"Got cached keys");
     if ( self.isCancelled ) return;
@@ -86,7 +87,7 @@
             //DDLogVerbose(@"Making view busy");
             [_itemListController performSelectorOnMainThread:@selector(makeBusy) withObject:NULL waitUntilDone:FALSE];        
         }
-        NSArray* serverKeys =[ZPServerConnection retrieveKeysInContainer:_libraryID collectionKey:_collectionKey searchString:_searchString orderField:_orderField sortDescending:_sortDescending];
+        NSArray* serverKeys =[ZPServerConnectionManager retrieveKeysInLibrary:_libraryID collection:_collectionKey searchString:_searchString orderField:_orderField sortDescending:_sortDescending];
         
         NSMutableArray* uncachedItems = [NSMutableArray arrayWithArray:serverKeys];
         [uncachedItems removeObjectsInArray:cacheKeys];
@@ -131,7 +132,7 @@
 }
 @end
 
-
+*/
 
 //A helped class for setting sort buttons
 
@@ -156,7 +157,7 @@
     self=[super init];
     
     NSMutableArray* fieldTitles = [NSMutableArray array];
-    NSArray* fieldValues = [[ZPDataLayer instance] fieldsThatCanBeUsedForSorting];
+    NSArray* fieldValues = [ZPDatabase fieldsThatCanBeUsedForSorting];
     
     for(NSString* value in fieldValues){
         [fieldTitles addObject:[ZPLocalization getLocalizationStringWithKey:value type:@"field"]];
@@ -215,9 +216,9 @@
 #pragma mark - Start of main class
 
 @interface ZPItemListViewController (){
-    NSOperationQueue* _uiEventQueue;
     ZPItemListViewController_sortHelper* _sortHelper;
     UIView* _overlay;
+    BOOL _waitingForData;
 }
 
 -(void) _configureSortButton:(UIButton*)button;
@@ -245,47 +246,93 @@
 
 - (void)configureView
 {
+    if(! [NSThread isMainThread]) [NSException raise:@"configureView must be called in main thread" format:@"configureView must be called in main thread"];
+    
     //Clear item keys shown so that UI knows to stop drawing the old items
 
-    if(_dataSource.libraryID!=0){
+    if(_dataSource.libraryID!=LIBRARY_ID_NOT_SET){
+        
+        //Set the data source to target this view
+        
+        _dataSource.targetTableView = self.tableView;
+        
+        //Set the navigation item
+        
+        if(_dataSource.collectionKey != NULL){
+            ZPZoteroCollection* currentCollection = [ZPZoteroCollection collectionWithKey:_dataSource.collectionKey];
+            self.navigationItem.title = currentCollection.title;
+        }
+        else {
+            ZPZoteroLibrary* currentLibrary = [ZPZoteroLibrary libraryWithID:_dataSource.libraryID];
+            self.navigationItem.title = currentLibrary.title;
+        }
+        
+        // Hide the side panel that might be visible if iPad is in portrait orientation
+        
+        if (self.masterPopoverController != nil) {
+            [self.masterPopoverController dismissPopoverAnimated:YES];
+        }
+            
+        // Configuring the item list content starts here.
+         
+        
+        if([ZPServerConnectionManager hasInternetConnection]){
 
-        if([NSThread isMainThread]){
+            [_activityIndicator startAnimating];
             
-            _dataSource.targetTableView = self.tableView;
-            //Set the navigation item
-            
-            if(_dataSource.collectionKey != NULL){
-                ZPZoteroCollection* currentCollection = [ZPZoteroCollection collectionWithKey:_dataSource.collectionKey];
-                self.navigationItem.title = currentCollection.title;
-            }
-            else {
-                ZPZoteroLibrary* currentLibrary = [ZPZoteroLibrary libraryWithID:_dataSource.libraryID];
-                self.navigationItem.title = currentLibrary.title;
-            }
+            [ZPServerConnectionManager retrieveKeysInLibrary:_dataSource.libraryID
+                                                  collection:_dataSource.collectionKey
+                                                searchString:_dataSource.searchString
+                                                  orderField:_dataSource.orderField
+                                              sortDescending:_dataSource.sortDescending];
 
-            if (self.masterPopoverController != nil) {
-                [self.masterPopoverController dismissPopoverAnimated:YES];
-            }
-            
+            [_dataSource configureServerKeys:[NSArray array]];
+            _waitingForData = TRUE;
+        }
+        
+        // Configure the data source with content from the cache
+        
+        [_dataSource clearTable];
+        NSArray* cacheKeys= [ZPDatabase getItemKeysForLibrary:_dataSource.libraryID
+                                                collectionKey:_dataSource.collectionKey
+                                                 searchString:_dataSource.searchString
+                                                   orderField:_dataSource.orderField
+                                               sortDescending:_dataSource.sortDescending];
+        
+
+        [_dataSource configureCachedKeys:cacheKeys];
+        
+        
+        //If there is nothing to display, make the view busy until we receive something from the server.
+        
+        if([ZPServerConnectionManager hasInternetConnection] && [cacheKeys count]==0) [self makeBusy];
+        
+    }
+}
+
+-(void)processItemListAvailableNotification:(NSNotification*)notification{
+    
+    NSDictionary* userInfo =notification.userInfo;
+    
+    if(_waitingForData){
+        NSInteger libraryID = [[userInfo objectForKey:ZPKEY_LIBRARY_ID] integerValue];
+        NSString* collectionKey = [userInfo objectForKey:ZPKEY_COLLECTION_KEY];
+        NSString* searchString = [userInfo objectForKey:ZPKEY_SEARCH_STRING];
+        NSString* orderField = [userInfo objectForKey:ZPKEY_SORT_COLUMN];
+        BOOL sortDescending = [[userInfo objectForKey:ZPKEY_ORDER_DIRECTION] boolValue];
+                    
+        //Check if this item list is the one that we are waiting for
+
+        if(_dataSource.libraryID == libraryID &&
+           ((_dataSource.collectionKey == NULL && collectionKey == NULL) || [collectionKey isEqualToString:_dataSource.collectionKey]) &&
+           ((_dataSource.searchString == NULL && searchString == NULL) || [searchString isEqualToString:_dataSource.searchString]) &&
+           [orderField isEqualToString:_dataSource.orderField] &&
+           sortDescending == _dataSource.sortDescending){
+        
+            NSArray* itemKeys = notification.object;
+            [_dataSource configureServerKeys:itemKeys];
             [self makeAvailable];
-            
-            // Retrieve the item IDs if a library is selected. 
-            
-            
-            if([ZPPreferences online]) [_activityIndicator startAnimating];
-            
-            
-            //This queue is only used for retrieving key lists for uncahced items, so we can just invalidate all previous requests
-            [_uiEventQueue cancelAllOperations];
-            ZPUncachedItemsOperation* operation = [[ZPUncachedItemsOperation alloc] initWithItemListController:self dataSource:_dataSource];
-            [_uiEventQueue addOperation:operation];
-            //DDLogVerbose(@"UI update events in queue %i",[_uiEventQueue operationCount]);
-            
         }
-        else{
-            [self performSelectorOnMainThread:@selector(configureView) withObject:NULL waitUntilDone:FALSE];
-        }
-
     }
 }
 
@@ -355,6 +402,11 @@
 - (void)viewDidLoad
 {
 
+    [[NSNotificationCenter defaultCenter] addObserver:self
+                                             selector:@selector(processItemListAvailableNotification:)
+                                                 name:ZPNOTIFICATION_ITEM_LIST_AVAILABLE
+                                               object:nil];
+
     DDLogInfo(@"Loading item list in the content area");
 
     [super viewDidLoad];
@@ -363,17 +415,6 @@
     _tableView.dataSource = _dataSource;
     
     // Do any additional setup after loading the view, typically from a nib.
-    	
-	//  update the last update date
-	// [_refreshHeaderView refreshLastUpdatedDate];
-
-    
-    //Configure objects
-    
-    _uiEventQueue =[[NSOperationQueue alloc] init];
-    [_uiEventQueue setMaxConcurrentOperationCount:3];
-
-    
     
     //Set up activity indicator. 
 
@@ -460,6 +501,7 @@
 - (void)viewDidUnload
 {
     [super viewDidUnload];
+    [[NSNotificationCenter defaultCenter] removeObserver:self];
     // Release any retained subviews of the main view.
     // e.g. self.myOutlet = nil;
 }
@@ -593,7 +635,7 @@
         _sortDirectionArrow.center = CGPointMake(bounds.size.width / 2, bounds.size.height / 2);
         
     }
-    //TODO: consider storing the images
+    //OPTIMIZATION: consider storing the images
     _sortDirectionArrow.image = [UIImage imageNamed:(_dataSource.sortDescending ? @"icon-down-black.png":@"icon-up-black.png")];
 
 }
@@ -615,7 +657,7 @@
     
     if(_sortHelper == NULL){
         _sortHelper = [[ZPItemListViewController_sortHelper alloc] init]; 
-        //TODO: iPhone support
+        
         if ([[UIDevice currentDevice] userInterfaceIdiom] == UIUserInterfaceIdiomPad) {
             _sortHelper.popover = [[UIPopoverController alloc] initWithContentViewController:_sortHelper];
         }

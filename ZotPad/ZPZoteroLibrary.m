@@ -22,7 +22,7 @@ static NSCache* _objectCache = NULL;
 
 +(ZPZoteroLibrary*) libraryWithDictionary:(NSDictionary*) fields{
     
-    NSNumber* libraryIDObj = [fields objectForKey:@"libraryID"];
+    NSNumber* libraryIDObj = [fields objectForKey:ZPKEY_LIBRARY_ID];
     
     if(libraryIDObj == NULL || [libraryIDObj integerValue] == LIBRARY_ID_NOT_SET)
         [NSException raise:@"ID is null" format:@"ZPZoteroLibrary cannot be instantiated with NULL ID"];

@@ -10,8 +10,8 @@
 
 #import "ZPFileImportViewController.h"
 #include <QuartzCore/QuartzCore.h>
-#import "ZPDataLayer.h"
-#import "ZPServerConnection.h"
+
+#import "ZPServerConnectionManager.h"
 #import "ZPCacheController.h"
 #import "ZPAttachmentCarouselDelegate.h"
 #import "ZPUploadVersionConflictViewControllerViewController.h"
@@ -76,7 +76,7 @@
     if([segue.identifier isEqualToString:@"FileUploadConflictFromDialog"]){
         ZPUploadVersionConflictViewControllerViewController* target = segue.destinationViewController;
         target.fileChannel = [(NSDictionary*) sender objectForKey:@"fileChannel"];
-        target.attachment = [(NSDictionary*) sender objectForKey:@"attachment"];
+        target.attachment = [(NSDictionary*) sender objectForKey:ZPKEY_ATTACHMENT];
     }
 }
 

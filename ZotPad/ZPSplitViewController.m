@@ -8,6 +8,7 @@
 
 #import "ZPCore.h"
 
+#import "ZPItemListViewController.h"
 #import "ZPSplitViewController.h"
 #import "ZPFileImportViewController.h"
 #import "ZPUploadVersionConflictViewControllerViewController.h"
@@ -57,7 +58,7 @@
     else if([segue.identifier isEqualToString:@"FileUploadConflict"]){
         ZPUploadVersionConflictViewControllerViewController* target = segue.destinationViewController;
         target.fileChannel = [(NSDictionary*) sender objectForKey:@"fileChannel"];
-        target.attachment = [(NSDictionary*) sender objectForKey:@"attachment"];
+        target.attachment = [(NSDictionary*) sender objectForKey:ZPKEY_ATTACHMENT];
     }
 }
 

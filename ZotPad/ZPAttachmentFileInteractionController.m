@@ -15,10 +15,10 @@
 #import <MobileCoreServices/MobileCoreServices.h>
 #import <QuartzCore/QuartzCore.h>
 #import "ZPItemDetailViewController.h"
-#import "ZPServerConnection.h"
+#import "ZPServerConnectionManager.h"
 
 #import "ZPPreferences.h"
-#import "ZPDataLayer.h"
+
 
 
 
@@ -140,7 +140,7 @@
                 [_docController presentOpenInMenuFromBarButtonItem:_sourceButton animated:YES];
             }
             else if(buttonIndex==4){
-                ZPZoteroItem* parentItem = [ZPZoteroItem itemWithKey:_activeAttachment.parentItemKey];
+                ZPZoteroItem* parentItem = [ZPZoteroItem itemWithKey:_activeAttachment.parentKey];
                 _mailController = [[MFMailComposeViewController alloc] init];
                 [_mailController setSubject:parentItem.shortCitation];
                 [_mailController setMessageBody:[NSString stringWithFormat:@"<body>Please find the following file attached:<br>%@<br><br></body>",parentItem.fullCitation] isHTML:YES];

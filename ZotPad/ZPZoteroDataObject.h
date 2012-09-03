@@ -20,6 +20,7 @@
 @property (assign) NSInteger libraryID;
 @property (retain) NSString* key;
 @property (retain) NSString* dateAdded;
+@property (retain) NSString* parentKey;
 
 @property (retain) NSString* etag;
 

@@ -68,6 +68,7 @@ static NSMutableDictionary* dbPrimaryKeysByTables;
         _database = [FMDatabase databaseWithPath:dbPath];
 #ifdef BETA
         _database.crashOnErrors = TRUE;
+        _database.traceExecution = TRUE;
 #endif
         [_database open];
     }
@@ -154,6 +155,7 @@ static NSMutableDictionary* dbPrimaryKeysByTables;
         _database = [FMDatabase databaseWithPath:dbPath];
 #ifdef BETA
         _database.crashOnErrors = TRUE;
+        _database.traceExecution = TRUE;
 #endif
         [_database open];
         //Prevent backing up of DB
@@ -602,7 +604,7 @@ static NSMutableDictionary* dbPrimaryKeysByTables;
     //Group libraries
     @synchronized(self){
         
-        FMResultSet* resultSet = [_database executeQuery:@"SELECT *, (SELECT count(*) FROM collections WHERE libraryID=libraries.libraryID AND parentCollectionKey IS NULL) AS numChildren FROM libraries ORDER BY libraryID <> ? ,LOWER(title)",[NSNumber numberWithInt:LIBRARY_ID_MY_LIBRARY]];
+        FMResultSet* resultSet = [_database executeQuery:@"SELECT *, (SELECT count(*) FROM collections WHERE libraryID=libraries.libraryID AND parentKey IS NULL) AS numChildren FROM libraries ORDER BY libraryID <> ? ,LOWER(title)",[NSNumber numberWithInt:LIBRARY_ID_MY_LIBRARY]];
         
         while([resultSet next]) {
             [returnArray addObject:[ZPZoteroLibrary libraryWithDictionary:[resultSet resultDictionary]]];
@@ -619,7 +621,7 @@ static NSMutableDictionary* dbPrimaryKeysByTables;
 +(void) addAttributesToGroupLibrary:(ZPZoteroLibrary*) library{
     @synchronized(self){
         
-        FMResultSet* resultSet = [_database executeQuery:@"SELECT *, (SELECT count(*) FROM collections WHERE libraryID=libraryID AND parentCollectionKey IS NULL) AS numChildren FROM libraries WHERE libraryID = ? LIMIT 1",[NSNumber numberWithInt:library.libraryID]];
+        FMResultSet* resultSet = [_database executeQuery:@"SELECT *, (SELECT count(*) FROM collections WHERE libraryID=libraryID AND parentKey IS NULL) AS numChildren FROM libraries WHERE libraryID = ? LIMIT 1",[NSNumber numberWithInt:library.libraryID]];
         
         if([resultSet next]){
             [library configureWithDictionary:[resultSet resultDictionary]];
@@ -700,10 +702,10 @@ static NSMutableDictionary* dbPrimaryKeysByTables;
         
         FMResultSet* resultSet;
         if(collectionKey == NULL)
-            resultSet= [_database executeQuery:@"SELECT *, (SELECT count(*) FROM collections WHERE parentCollectionKey = parent.collectionKey) AS numChildren FROM collections parent WHERE libraryID=? AND parentCollectionKey IS NULL ORDER BY LOWER(title)",[NSNumber numberWithInt:libraryID]];
+            resultSet= [_database executeQuery:@"SELECT *, (SELECT count(*) FROM collections WHERE parentKey = parent.collectionKey) AS numChildren FROM collections parent WHERE libraryID=? AND parentKey IS NULL ORDER BY LOWER(title)",[NSNumber numberWithInt:libraryID]];
         
         else
-            resultSet= [_database executeQuery:@"SELECT *, (SELECT count(*) FROM collections WHERE parentCollectionKey = parent.collectionKey) AS numChildren FROM collections parent WHERE libraryID=? AND parentCollectionKey = ? ORDER BY LOWER(title)",[NSNumber numberWithInt:libraryID],collectionKey];
+            resultSet= [_database executeQuery:@"SELECT *, (SELECT count(*) FROM collections WHERE parentKey = parent.collectionKey) AS numChildren FROM collections parent WHERE libraryID=? AND parentKey = ? ORDER BY LOWER(title)",[NSNumber numberWithInt:libraryID],collectionKey];
         
         while([resultSet next]) {
             NSDictionary* dict = [resultSet resultDictionary];
@@ -722,7 +724,7 @@ static NSMutableDictionary* dbPrimaryKeysByTables;
 	@synchronized(self){
         
         FMResultSet* resultSet;
-        resultSet= [_database executeQuery:@"SELECT *, (SELECT count(*) FROM collections WHERE parentCollectionKey = parent.collectionKey) AS numChildren FROM collections parent WHERE libraryID=?",[NSNumber numberWithInt:libraryID]];
+        resultSet= [_database executeQuery:@"SELECT *, (SELECT count(*) FROM collections WHERE parentKey = parent.collectionKey) AS numChildren FROM collections parent WHERE libraryID=?",[NSNumber numberWithInt:libraryID]];
            
         while([resultSet next]) {
             [returnArray addObject:[ZPZoteroCollection collectionWithDictionary:[resultSet resultDictionary]]];
@@ -740,7 +742,7 @@ static NSMutableDictionary* dbPrimaryKeysByTables;
     
     
 	@synchronized(self){
-        FMResultSet* resultSet = [_database executeQuery:@"SELECT *, collectionKey IN (SELECT DISTINCT parentCollectionKey FROM collections) AS hasChildren FROM collections WHERE collectionKey=? LIMIT 1",collection.key];
+        FMResultSet* resultSet = [_database executeQuery:@"SELECT *, collectionKey IN (SELECT DISTINCT parentKey FROM collections) AS hasChildren FROM collections WHERE collectionKey=? LIMIT 1",collection.key];
         
         
         if([resultSet next]){
@@ -772,10 +774,10 @@ Deletes items, notes, and attachments based in array of keys from a library
         [_database executeUpdate:[NSString stringWithFormat:@"DELETE FROM items WHERE libraryID = ? AND itemKey NOT IN ('%@')",
                                   keyString],[NSNumber numberWithInt:libraryID]];
         
-        [_database executeUpdate:[NSString stringWithFormat:@"DELETE FROM attachments WHERE itemKey NOT IN ('%@') AND parentItemKey NOT IN ('%@') AND parentItemKey IN (SELECT itemKey FROM items WHERE libraryID = ?)",
+        [_database executeUpdate:[NSString stringWithFormat:@"DELETE FROM attachments WHERE itemKey NOT IN ('%@') AND parentKey NOT IN ('%@') AND parentKey IN (SELECT itemKey FROM items WHERE libraryID = ?)",
                                   keyString,keyString],[NSNumber numberWithInt:libraryID]];
 
-        [_database executeUpdate:[NSString stringWithFormat:@"DELETE FROM notes WHERE itemKey NOT IN ('%@') AND parentItemKey NOT IN ('%@') AND parentItemKey in (SELECT itemKey FROM items WHERE libraryID = ?)",
+        [_database executeUpdate:[NSString stringWithFormat:@"DELETE FROM notes WHERE itemKey NOT IN ('%@') AND parentKey NOT IN ('%@') AND parentKey in (SELECT itemKey FROM items WHERE libraryID = ?)",
                                   keyString,keyString],[NSNumber numberWithInt:libraryID]];
 
 
@@ -834,7 +836,7 @@ Deletes items, notes, and attachments based in array of keys from a library
     NSMutableArray* relationships= [NSMutableArray arrayWithCapacity:[keys count]];
 
     for(NSString* key in keys){
-        [relationships addObject:[NSDictionary dictionaryWithObjects:[NSArray arrayWithObjects:key, collectionKey, nil] forKeys:[NSArray arrayWithObjects:@"itemKey",@"collectionKey", nil]]];
+        [relationships addObject:[NSDictionary dictionaryWithObjects:[NSArray arrayWithObjects:key, collectionKey, nil] forKeys:[NSArray arrayWithObjects:ZPKEY_ITEM_KEY,ZPKEY_COLLECTION_KEY, nil]]];
     }
 
     [self writeObjects:relationships intoTable:@"collectionItems" checkTimestamp:NO];
@@ -852,7 +854,7 @@ Deletes items, notes, and attachments based in array of keys from a library
         if ([resultSet next]) {
             results = [resultSet resultDictionary];
         }
-        else results = [NSDictionary dictionaryWithObject:key forKey:@"itemKey"];
+        else results = [NSDictionary dictionaryWithObject:key forKey:ZPKEY_ITEM_KEY];
 
         [resultSet close];
         
@@ -869,7 +871,7 @@ Deletes items, notes, and attachments based in array of keys from a library
         if ([resultSet next]) {
             results = [resultSet resultDictionary];
         }
-        else results = [NSDictionary dictionaryWithObject:key forKey:@"itemKey"];
+        else results = [NSDictionary dictionaryWithObject:key forKey:ZPKEY_ITEM_KEY];
         
         [resultSet close];
         
@@ -886,7 +888,7 @@ Deletes items, notes, and attachments based in array of keys from a library
         if ([resultSet next]) {
             results = [resultSet resultDictionary];
         }
-        else results = [NSDictionary dictionaryWithObject:key forKey:@"itemKey"];
+        else results = [NSDictionary dictionaryWithObject:key forKey:ZPKEY_ITEM_KEY];
         
         [resultSet close];
         
@@ -910,7 +912,7 @@ Deletes items, notes, and attachments based in array of keys from a library
 
     for(ZPZoteroItem* item in items){
         for(NSMutableDictionary* creator in item.creators){
-            [creator setObject:item.key forKey:@"itemKey"];
+            [creator setObject:item.key forKey:ZPKEY_ITEM_KEY];
             [creators addObject:creator];
         }
         if(deleteSQL == NULL){
@@ -942,7 +944,7 @@ Deletes items, notes, and attachments based in array of keys from a library
         
         for(NSString* key in item.fields){
             [fields addObject:[NSDictionary dictionaryWithObjects:[NSArray arrayWithObjects:key,[item.fields objectForKey:key],item.key, nil]
-                                                          forKeys:[NSArray arrayWithObjects:@"fieldName",@"fieldValue",@"itemKey",nil]]];
+                                                          forKeys:[NSArray arrayWithObjects:@"fieldName",@"fieldValue",ZPKEY_ITEM_KEY,nil]]];
         }
         if(deleteSQL == NULL){
             deleteSQL = [NSMutableString stringWithFormat:@"DELETE FROM fields WHERE (itemKey = '%@' AND fieldName NOT IN ('%@'))",item.key,
@@ -998,7 +1000,7 @@ Deletes items, notes, and attachments based in array of keys from a library
     NSMutableArray* collections = [[NSMutableArray alloc] init];
     
     @synchronized(self){
-        FMResultSet* resultSet = [_database executeQuery: @"SELECT * FROM collectionItems, collections WHERE itemKey = ? AND collectionItems.collectionKey = collections.collectionKey ORDER BY LOWER(title)",item.key];
+        FMResultSet* resultSet = [_database executeQuery: @"SELECT * FROM collectionItems, collections WHERE itemKey = ? AND collectionItems.key = collections.key ORDER BY LOWER(title)",item.key];
         
         while([resultSet next]) {
             [collections addObject:[ZPZoteroCollection collectionWithDictionary:[resultSet resultDictionary]]];
@@ -1023,7 +1025,7 @@ Deletes items, notes, and attachments based in array of keys from a library
 +(void) addAttachmentsToItem: (ZPZoteroItem*) item  {
     
     @synchronized(self){
-        FMResultSet* resultSet = [_database executeQuery: @"SELECT * FROM attachments WHERE parentItemKey = ? ORDER BY title ASC",item.key];
+        FMResultSet* resultSet = [_database executeQuery: @"SELECT * FROM attachments WHERE parentKey = ? ORDER BY title ASC",item.key];
         
         NSMutableArray* attachments = [[NSMutableArray alloc] init];
         while([resultSet next]) {
@@ -1071,10 +1073,10 @@ Deletes items, notes, and attachments based in array of keys from a library
         FMResultSet* resultSet;
         
         if(collectionKey==NULL){
-            resultSet= [_database executeQuery: @"SELECT * FROM attachments, items WHERE parentItemKey = items.itemKey AND items.libraryID = ? ORDER BY attachments.cacheTimestamp DESC",[NSNumber numberWithInt:libraryID]];
+            resultSet= [_database executeQuery: @"SELECT * FROM attachments, items WHERE parentKey = items.itemKey AND items.libraryID = ? ORDER BY attachments.cacheTimestamp DESC",[NSNumber numberWithInt:libraryID]];
         }
         else{
-            resultSet= [_database executeQuery: @"SELECT * FROM attachments, collectionItems WHERE parentItemKey = itemsKey AND collectionKey = ? ORDER BY attachments.cacheTimestamp DESC",collectionKey];
+            resultSet= [_database executeQuery: @"SELECT * FROM attachments, collectionItems WHERE parentKey = itemsKey AND collectionKey = ? ORDER BY attachments.cacheTimestamp DESC",collectionKey];
         }
         
         while([resultSet next]){
@@ -1123,7 +1125,7 @@ Deletes items, notes, and attachments based in array of keys from a library
 +(void) addNotesToItem: (ZPZoteroItem*) item  {
     
     @synchronized(self){
-        FMResultSet* resultSet = [_database executeQuery: @"SELECT * FROM notes WHERE parentItemKey = ? ",item.key];
+        FMResultSet* resultSet = [_database executeQuery: @"SELECT * FROM notes WHERE parentKey = ? ",item.key];
         
         NSMutableArray* notes = [[NSMutableArray alloc] init];
         while([resultSet next]) {
@@ -1177,6 +1179,7 @@ Deletes items, notes, and attachments based in array of keys from a library
     
 }
 
+
 /*
 
  This is the item "search" function
@@ -1213,7 +1216,7 @@ Deletes items, notes, and attachments based in array of keys from a library
     [parameters addObject:[NSNumber numberWithInt:libraryID]];
     
     if(collectionKey!=NULL){
-        sql=[sql stringByAppendingString:@" AND collectionItems.collectionKey = ? and collectionItems.itemKey = items.itemKey"];
+        sql=[sql stringByAppendingString:@" AND collectionItems.key = ? and collectionItems.itemKey = items.itemKey"];
         [parameters addObject:collectionKey];
     }
 
@@ -1290,7 +1293,6 @@ Deletes items, notes, and attachments based in array of keys from a library
     
     @synchronized(self){
         FMResultSet* resultSet;
-        
         resultSet = [_database executeQuery: sql withArgumentsInArray:parameters];
         
         while([resultSet next]){
@@ -1298,10 +1300,21 @@ Deletes items, notes, and attachments based in array of keys from a library
         }
         
         [resultSet close];
+        
+        DDLogVerbose(@"Refreshing items from DB %@ (%i results)",sql,[keys count]);
+
     }
 
     return keys;
 }
+
+//These are hard coded for now.
++(NSArray*) fieldsThatCanBeUsedForSorting{
+    
+    return [NSArray arrayWithObjects: @"dateAdded", @"dateModified", @"title", @"creator", @"itemType", @"date", @"publisher", @"publicationTitle", @"journalAbbreviation", @"language", @"accessDate", @"libraryCatalog", @"callNumber", @"rights", nil];
+    //These are available through the API, but not used: @"addedBy" @"numItems"
+}
+
 
 +(NSString*) getLocalizationStringWithKey:(NSString*) key type:(NSString*) type locale:(NSString*) locale{
    

@@ -546,7 +546,6 @@
 		A7200DE114718DC0004347C9 /* main.m in Sources */ = {isa = PBXBuildFile; fileRef = A7200DE014718DC0004347C9 /* main.m */; };
 		A7200DE514718DC0004347C9 /* ZPAppDelegate.m in Sources */ = {isa = PBXBuildFile; fileRef = A7200DE414718DC0004347C9 /* ZPAppDelegate.m */; };
 		A7200DEB14718DC1004347C9 /* ZPLibraryAndCollectionListViewController.m in Sources */ = {isa = PBXBuildFile; fileRef = A7200DEA14718DC1004347C9 /* ZPLibraryAndCollectionListViewController.m */; };
-		A7200DF614718F44004347C9 /* ZPDataLayer.m in Sources */ = {isa = PBXBuildFile; fileRef = A7200DF514718F44004347C9 /* ZPDataLayer.m */; };
 		A7200DF8147193C0004347C9 /* libsqlite3.dylib in Frameworks */ = {isa = PBXBuildFile; fileRef = A7200DF7147193C0004347C9 /* libsqlite3.dylib */; };
 		A72853F9147E319700D3FE97 /* ZPZoteroLibrary.m in Sources */ = {isa = PBXBuildFile; fileRef = A72853F8147E319600D3FE97 /* ZPZoteroLibrary.m */; };
 		A72853FD147E31B600D3FE97 /* ZPZoteroCollection.m in Sources */ = {isa = PBXBuildFile; fileRef = A72853FC147E31B500D3FE97 /* ZPZoteroCollection.m */; };
@@ -703,8 +702,7 @@
 		A78322D815EE3173004BB4F7 /* main.m in Sources */ = {isa = PBXBuildFile; fileRef = A7200DE014718DC0004347C9 /* main.m */; };
 		A78322D915EE3173004BB4F7 /* ZPAppDelegate.m in Sources */ = {isa = PBXBuildFile; fileRef = A7200DE414718DC0004347C9 /* ZPAppDelegate.m */; };
 		A78322DA15EE3173004BB4F7 /* ZPLibraryAndCollectionListViewController.m in Sources */ = {isa = PBXBuildFile; fileRef = A7200DEA14718DC1004347C9 /* ZPLibraryAndCollectionListViewController.m */; };
-		A78322DB15EE3173004BB4F7 /* ZPDataLayer.m in Sources */ = {isa = PBXBuildFile; fileRef = A7200DF514718F44004347C9 /* ZPDataLayer.m */; settings = {COMPILER_FLAGS = "-w"; }; };
-		A78322DC15EE3173004BB4F7 /* ZPServerConnection.m in Sources */ = {isa = PBXBuildFile; fileRef = A7A7C9B0147A8144004D8756 /* ZPServerConnection.m */; };
+		A78322DC15EE3173004BB4F7 /* ZPServerConnectionManager.m in Sources */ = {isa = PBXBuildFile; fileRef = A7A7C9B0147A8144004D8756 /* ZPServerConnectionManager.m */; };
 		A78322DD15EE3173004BB4F7 /* NSMutableURLRequest+Parameters.m in Sources */ = {isa = PBXBuildFile; fileRef = A7A7C9D0147AA2EE004D8756 /* NSMutableURLRequest+Parameters.m */; settings = {COMPILER_FLAGS = "-fno-objc-arc"; }; };
 		A78322DE15EE3173004BB4F7 /* NSString+URLEncoding.m in Sources */ = {isa = PBXBuildFile; fileRef = A7A7C9D2147AA2EE004D8756 /* NSString+URLEncoding.m */; settings = {COMPILER_FLAGS = "-fno-objc-arc"; }; };
 		A78322DF15EE3173004BB4F7 /* NSURL+Base.m in Sources */ = {isa = PBXBuildFile; fileRef = A7A7C9D4147AA2EE004D8756 /* NSURL+Base.m */; settings = {COMPILER_FLAGS = "-fno-objc-arc"; }; };
@@ -1207,7 +1205,7 @@
 		A7A54B0C14878E4F00EBAD80 /* FMDatabaseAdditions.m in Sources */ = {isa = PBXBuildFile; fileRef = A7A54B0814878E4F00EBAD80 /* FMDatabaseAdditions.m */; settings = {COMPILER_FLAGS = "-fno-objc-arc"; }; };
 		A7A54B0D14878E4F00EBAD80 /* FMResultSet.m in Sources */ = {isa = PBXBuildFile; fileRef = A7A54B0A14878E4F00EBAD80 /* FMResultSet.m */; settings = {COMPILER_FLAGS = "-fno-objc-arc"; }; };
 		A7A54B1114878EE000EBAD80 /* DSActivityView.m in Sources */ = {isa = PBXBuildFile; fileRef = A7A54B1014878EE000EBAD80 /* DSActivityView.m */; };
-		A7A7C9B1147A8144004D8756 /* ZPServerConnection.m in Sources */ = {isa = PBXBuildFile; fileRef = A7A7C9B0147A8144004D8756 /* ZPServerConnection.m */; };
+		A7A7C9B1147A8144004D8756 /* ZPServerConnectionManager.m in Sources */ = {isa = PBXBuildFile; fileRef = A7A7C9B0147A8144004D8756 /* ZPServerConnectionManager.m */; };
 		A7A7C9F8147AA2EE004D8756 /* NSMutableURLRequest+Parameters.m in Sources */ = {isa = PBXBuildFile; fileRef = A7A7C9D0147AA2EE004D8756 /* NSMutableURLRequest+Parameters.m */; settings = {COMPILER_FLAGS = "-fno-objc-arc"; }; };
 		A7A7C9F9147AA2EE004D8756 /* NSString+URLEncoding.m in Sources */ = {isa = PBXBuildFile; fileRef = A7A7C9D2147AA2EE004D8756 /* NSString+URLEncoding.m */; settings = {COMPILER_FLAGS = "-fno-objc-arc"; }; };
 		A7A7C9FA147AA2EE004D8756 /* NSURL+Base.m in Sources */ = {isa = PBXBuildFile; fileRef = A7A7C9D4147AA2EE004D8756 /* NSURL+Base.m */; settings = {COMPILER_FLAGS = "-fno-objc-arc"; }; };
@@ -1261,8 +1259,7 @@
 		A7CD070B15161555007A8E1D /* main.m in Sources */ = {isa = PBXBuildFile; fileRef = A7200DE014718DC0004347C9 /* main.m */; };
 		A7CD070C15161555007A8E1D /* ZPAppDelegate.m in Sources */ = {isa = PBXBuildFile; fileRef = A7200DE414718DC0004347C9 /* ZPAppDelegate.m */; };
 		A7CD070D15161555007A8E1D /* ZPLibraryAndCollectionListViewController.m in Sources */ = {isa = PBXBuildFile; fileRef = A7200DEA14718DC1004347C9 /* ZPLibraryAndCollectionListViewController.m */; };
-		A7CD070E15161555007A8E1D /* ZPDataLayer.m in Sources */ = {isa = PBXBuildFile; fileRef = A7200DF514718F44004347C9 /* ZPDataLayer.m */; settings = {COMPILER_FLAGS = "-w"; }; };
-		A7CD070F15161555007A8E1D /* ZPServerConnection.m in Sources */ = {isa = PBXBuildFile; fileRef = A7A7C9B0147A8144004D8756 /* ZPServerConnection.m */; };
+		A7CD070F15161555007A8E1D /* ZPServerConnectionManager.m in Sources */ = {isa = PBXBuildFile; fileRef = A7A7C9B0147A8144004D8756 /* ZPServerConnectionManager.m */; };
 		A7CD071015161555007A8E1D /* NSMutableURLRequest+Parameters.m in Sources */ = {isa = PBXBuildFile; fileRef = A7A7C9D0147AA2EE004D8756 /* NSMutableURLRequest+Parameters.m */; settings = {COMPILER_FLAGS = "-fno-objc-arc"; }; };
 		A7CD071115161555007A8E1D /* NSString+URLEncoding.m in Sources */ = {isa = PBXBuildFile; fileRef = A7A7C9D2147AA2EE004D8756 /* NSString+URLEncoding.m */; settings = {COMPILER_FLAGS = "-fno-objc-arc"; }; };
 		A7CD071215161555007A8E1D /* NSURL+Base.m in Sources */ = {isa = PBXBuildFile; fileRef = A7A7C9D4147AA2EE004D8756 /* NSURL+Base.m */; settings = {COMPILER_FLAGS = "-fno-objc-arc"; }; };
@@ -1484,7 +1481,6 @@
 		320AF8492C47A4D819F7C450 /* QuartzCore.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.frameworks; name = QuartzCore.framework; path = System/Library/Frameworks/QuartzCore.framework; sourceTree = SDKROOT; };
 		A7025017149B0BB1004F2AAB /* ZPDatabase.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = ZPDatabase.h; sourceTree = "<group>"; };
 		A7025018149B0BB1004F2AAB /* ZPDatabase.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = ZPDatabase.m; sourceTree = "<group>"; };
-		A702501A149B2D6D004F2AAB /* ZPLibraryObserver.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = ZPLibraryObserver.h; sourceTree = "<group>"; };
 		A702501B149B33E1004F2AAB /* ZPCacheController.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = ZPCacheController.h; sourceTree = "<group>"; };
 		A702501C149B33E1004F2AAB /* ZPCacheController.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = ZPCacheController.m; sourceTree = "<group>"; };
 		A702501E149C6C3C004F2AAB /* ZPPreferences.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = ZPPreferences.h; sourceTree = "<group>"; };
@@ -1794,8 +1790,6 @@
 		A7200DE414718DC0004347C9 /* ZPAppDelegate.m */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.objc; path = ZPAppDelegate.m; sourceTree = "<group>"; };
 		A7200DE914718DC1004347C9 /* ZPLibraryAndCollectionListViewController.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = ZPLibraryAndCollectionListViewController.h; sourceTree = "<group>"; };
 		A7200DEA14718DC1004347C9 /* ZPLibraryAndCollectionListViewController.m */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.objc; path = ZPLibraryAndCollectionListViewController.m; sourceTree = "<group>"; };
-		A7200DF414718F44004347C9 /* ZPDataLayer.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = ZPDataLayer.h; sourceTree = "<group>"; };
-		A7200DF514718F44004347C9 /* ZPDataLayer.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = ZPDataLayer.m; sourceTree = "<group>"; };
 		A7200DF7147193C0004347C9 /* libsqlite3.dylib */ = {isa = PBXFileReference; lastKnownFileType = "compiled.mach-o.dylib"; name = libsqlite3.dylib; path = usr/lib/libsqlite3.dylib; sourceTree = SDKROOT; };
 		A72853F7147E319600D3FE97 /* ZPZoteroLibrary.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = ZPZoteroLibrary.h; sourceTree = "<group>"; };
 		A72853F8147E319600D3FE97 /* ZPZoteroLibrary.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = ZPZoteroLibrary.m; sourceTree = "<group>"; };
@@ -1949,7 +1943,6 @@
 		A7699E5B159B1AC7002F09DA /* ZPUploadVersionConflictViewControllerViewController.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = ZPUploadVersionConflictViewControllerViewController.m; sourceTree = "<group>"; };
 		A76D3C6514A9F3F3000C3ED9 /* ZPZoteroNote.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = ZPZoteroNote.h; sourceTree = "<group>"; };
 		A76D3C6614A9F3F3000C3ED9 /* ZPZoteroNote.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = ZPZoteroNote.m; sourceTree = "<group>"; };
-		A76D3C6B14AC4836000C3ED9 /* ZPAttachmentObserver.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = ZPAttachmentObserver.h; sourceTree = "<group>"; };
 		A76D3C7314AD97BA000C3ED9 /* CFNetwork.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; name = CFNetwork.framework; path = System/Library/Frameworks/CFNetwork.framework; sourceTree = SDKROOT; };
 		A76D3C7514AD97CB000C3ED9 /* SystemConfiguration.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; name = SystemConfiguration.framework; path = System/Library/Frameworks/SystemConfiguration.framework; sourceTree = SDKROOT; };
 		A76D3C7714AD97D6000C3ED9 /* MobileCoreServices.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; name = MobileCoreServices.framework; path = System/Library/Frameworks/MobileCoreServices.framework; sourceTree = SDKROOT; };
@@ -2038,8 +2031,8 @@
 		A7A54B0F14878EE000EBAD80 /* DSActivityView.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; name = DSActivityView.h; path = DSActivityView/Sources/DSActivityView.h; sourceTree = "<group>"; };
 		A7A54B1014878EE000EBAD80 /* DSActivityView.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; name = DSActivityView.m; path = DSActivityView/Sources/DSActivityView.m; sourceTree = "<group>"; };
 		A7A6B90315B8B44200A99BB4 /* ZPPreviewSource.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; name = ZPPreviewSource.h; path = ../ZPPreviewSource.h; sourceTree = "<group>"; };
-		A7A7C9AF147A8144004D8756 /* ZPServerConnection.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = ZPServerConnection.h; sourceTree = "<group>"; };
-		A7A7C9B0147A8144004D8756 /* ZPServerConnection.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = ZPServerConnection.m; sourceTree = "<group>"; };
+		A7A7C9AF147A8144004D8756 /* ZPServerConnectionManager.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = ZPServerConnectionManager.h; sourceTree = "<group>"; };
+		A7A7C9B0147A8144004D8756 /* ZPServerConnectionManager.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = ZPServerConnectionManager.m; sourceTree = "<group>"; };
 		A7A7C9CF147AA2EE004D8756 /* NSMutableURLRequest+Parameters.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = "NSMutableURLRequest+Parameters.h"; sourceTree = "<group>"; };
 		A7A7C9D0147AA2EE004D8756 /* NSMutableURLRequest+Parameters.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = "NSMutableURLRequest+Parameters.m"; sourceTree = "<group>"; };
 		A7A7C9D1147AA2EE004D8756 /* NSString+URLEncoding.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = "NSString+URLEncoding.h"; sourceTree = "<group>"; };
@@ -2113,7 +2106,6 @@
 		A7D3C07F14AEDE7B00DB975D /* QuickLook.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; name = QuickLook.framework; path = System/Library/Frameworks/QuickLook.framework; sourceTree = SDKROOT; };
 		A7D3C08114AEE70F00DB975D /* ZPLocalization.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = ZPLocalization.h; sourceTree = "<group>"; };
 		A7D3C08214AEE70F00DB975D /* ZPLocalization.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = ZPLocalization.m; sourceTree = "<group>"; };
-		A7D4A1801494B1B700935847 /* ZPItemObserver.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = ZPItemObserver.h; sourceTree = "<group>"; };
 		A7D5E2DA14F5690700593A39 /* ZPCacheStatusToolbarController.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = ZPCacheStatusToolbarController.h; sourceTree = "<group>"; };
 		A7D5E2DB14F5690700593A39 /* ZPCacheStatusToolbarController.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = ZPCacheStatusToolbarController.m; sourceTree = "<group>"; };
 		A7DBE6D115B2BA9300DA48C1 /* ZPHelpPopover.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = ZPHelpPopover.h; sourceTree = "<group>"; };
@@ -2226,8 +2218,8 @@
 			children = (
 				A7CD078615164DFA007A8E1D /* File channels */,
 				A702506F149C8D3D004F2AAB /* Response parsers */,
-				A7A7C9AF147A8144004D8756 /* ZPServerConnection.h */,
-				A7A7C9B0147A8144004D8756 /* ZPServerConnection.m */,
+				A7A7C9AF147A8144004D8756 /* ZPServerConnectionManager.h */,
+				A7A7C9B0147A8144004D8756 /* ZPServerConnectionManager.m */,
 			);
 			name = "Server connection";
 			sourceTree = "<group>";
@@ -2693,17 +2685,12 @@
 			isa = PBXGroup;
 			children = (
 				A7B2BCC715B3E1D600381E23 /* SQL */,
-				A7200DF414718F44004347C9 /* ZPDataLayer.h */,
-				A7200DF514718F44004347C9 /* ZPDataLayer.m */,
 				A702501B149B33E1004F2AAB /* ZPCacheController.h */,
 				A702501C149B33E1004F2AAB /* ZPCacheController.m */,
 				A702501E149C6C3C004F2AAB /* ZPPreferences.h */,
 				A702501F149C6C3D004F2AAB /* ZPPreferences.m */,
 				A7025017149B0BB1004F2AAB /* ZPDatabase.h */,
 				A7025018149B0BB1004F2AAB /* ZPDatabase.m */,
-				A7D4A1801494B1B700935847 /* ZPItemObserver.h */,
-				A702501A149B2D6D004F2AAB /* ZPLibraryObserver.h */,
-				A76D3C6B14AC4836000C3ED9 /* ZPAttachmentObserver.h */,
 			);
 			name = "Data layer";
 			sourceTree = "<group>";
@@ -4402,8 +4389,7 @@
 				A7200DE114718DC0004347C9 /* main.m in Sources */,
 				A7200DE514718DC0004347C9 /* ZPAppDelegate.m in Sources */,
 				A7200DEB14718DC1004347C9 /* ZPLibraryAndCollectionListViewController.m in Sources */,
-				A7200DF614718F44004347C9 /* ZPDataLayer.m in Sources */,
-				A7A7C9B1147A8144004D8756 /* ZPServerConnection.m in Sources */,
+				A7A7C9B1147A8144004D8756 /* ZPServerConnectionManager.m in Sources */,
 				A7A7C9F8147AA2EE004D8756 /* NSMutableURLRequest+Parameters.m in Sources */,
 				A7A7C9F9147AA2EE004D8756 /* NSString+URLEncoding.m in Sources */,
 				A7A7C9FA147AA2EE004D8756 /* NSURL+Base.m in Sources */,
@@ -4556,8 +4542,7 @@
 				A78322D815EE3173004BB4F7 /* main.m in Sources */,
 				A78322D915EE3173004BB4F7 /* ZPAppDelegate.m in Sources */,
 				A78322DA15EE3173004BB4F7 /* ZPLibraryAndCollectionListViewController.m in Sources */,
-				A78322DB15EE3173004BB4F7 /* ZPDataLayer.m in Sources */,
-				A78322DC15EE3173004BB4F7 /* ZPServerConnection.m in Sources */,
+				A78322DC15EE3173004BB4F7 /* ZPServerConnectionManager.m in Sources */,
 				A78322DD15EE3173004BB4F7 /* NSMutableURLRequest+Parameters.m in Sources */,
 				A78322DE15EE3173004BB4F7 /* NSString+URLEncoding.m in Sources */,
 				A78322DF15EE3173004BB4F7 /* NSURL+Base.m in Sources */,
@@ -4710,8 +4695,7 @@
 				A7CD070B15161555007A8E1D /* main.m in Sources */,
 				A7CD070C15161555007A8E1D /* ZPAppDelegate.m in Sources */,
 				A7CD070D15161555007A8E1D /* ZPLibraryAndCollectionListViewController.m in Sources */,
-				A7CD070E15161555007A8E1D /* ZPDataLayer.m in Sources */,
-				A7CD070F15161555007A8E1D /* ZPServerConnection.m in Sources */,
+				A7CD070F15161555007A8E1D /* ZPServerConnectionManager.m in Sources */,
 				A7CD071015161555007A8E1D /* NSMutableURLRequest+Parameters.m in Sources */,
 				A7CD071115161555007A8E1D /* NSString+URLEncoding.m in Sources */,
 				A7CD071215161555007A8E1D /* NSURL+Base.m in Sources */,

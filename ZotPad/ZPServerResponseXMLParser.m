@@ -10,7 +10,6 @@
 
 #import "ZPServerResponseXMLParser.h"
 
-
 //TODO: parse this from collections <zapi:numItems>0</zapi:numItems>
 
 @implementation ZPServerResponseXMLParser
@@ -58,26 +57,28 @@
             [self _initNewElementWithID:_currentID];
             [self _processTemporaryFieldStorage];
             //Current element MUST have a libraryID
-            if([_currentElement performSelector:@selector(libraryID)] == NULL) [NSException raise:@"Data object is missing library ID" format:@"All data objects must have library ID. Object with missing Library ID: %@",_currentElement];
+            if(_currentElement.libraryID == LIBRARY_ID_NOT_SET) [NSException raise:@"Data object is missing library ID" format:@"All data objects must have library ID. Object with missing Library ID: %@",_currentElement];
             
             //If this is a standalone note, add itself as a parent
-            if([_currentElement isKindOfClass:[ZPZoteroAttachment class]] && [(ZPZoteroAttachment*) _currentElement parentItemKey] == NULL){
+            if([_currentElement isKindOfClass:[ZPZoteroAttachment class]] && [(ZPZoteroAttachment*) _currentElement parentKey] == NULL){
                 ZPZoteroItem* standAloneParent = [ZPZoteroItem itemWithKey:_currentElement.key];
                 standAloneParent.title = _currentElement.title;
                 standAloneParent.fullCitation = @"Standalone attachment";
-                standAloneParent.fields = [NSDictionary dictionaryWithObject:@"attachment" forKey:@"itemType"];
+                standAloneParent.fields = [NSDictionary dictionaryWithObject:ZPKEY_ATTACHMENT forKey:@"itemType"];
                 standAloneParent.attachments = [NSArray arrayWithObject:_currentElement];
-                [(ZPZoteroAttachment*) _currentElement setParentItemKey:_currentElement.key];
+                standAloneParent.libraryID = _currentElement.libraryID;
+                [(ZPZoteroAttachment*) _currentElement setParentKey:_currentElement.key];
                 [_resultArray addObject:standAloneParent];
             }
             //If this is a standalone attachment, add itself as a parent
-            else if([_currentElement isKindOfClass:[ZPZoteroNote class]] && [(ZPZoteroNote*) _currentElement parentItemKey] == NULL){
+            else if([_currentElement isKindOfClass:[ZPZoteroNote class]] && [(ZPZoteroNote*) _currentElement parentKey] == NULL){
                 ZPZoteroItem* standAloneParent = [ZPZoteroItem itemWithKey:_currentElement.key];
                 standAloneParent.title = _currentElement.title;
                 standAloneParent.fullCitation = @"Standalone note";
                 standAloneParent.notes = [NSArray arrayWithObject:_currentElement];
                 standAloneParent.fields = [NSDictionary dictionaryWithObject:@"note" forKey:@"itemType"];
-                [(ZPZoteroNote*) _currentElement setParentItemKey:_currentElement.key];
+                standAloneParent.libraryID = _currentElement.libraryID;
+                [(ZPZoteroNote*) _currentElement setParentKey:_currentElement.key];
                 [_resultArray addObject:standAloneParent];
             }
             
@@ -130,7 +131,7 @@
 
             }
             else if([@"up" isEqualToString:(NSString*)[attributeDict objectForKey:@"rel"]]){
-                [self _setField:@"ParentKey" toValue:value];
+                [self _setField:@"parentKey" toValue:value];
             }
             else if([@"enclosure" isEqualToString:(NSString*)[attributeDict objectForKey:@"rel"]]){
                 
@@ -173,6 +174,9 @@
         
         if([_currentElement respondsToSelector:NSSelectorFromString(attributeName)]){
             [_currentElement setValue:value forKey:attributeName];
+        }
+        else{
+//            DDLogVerbose(@"XML parser rejected field %@",attributeName);
         }
     }
 

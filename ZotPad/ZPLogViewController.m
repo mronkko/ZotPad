@@ -14,6 +14,7 @@
 #import "UserVoice.h"
 #import "UVSession.h"
 #import "UVClientConfig.h"
+#import <MessageUI/MessageUI.h>
 
 @interface ZPLogViewController (){
     MFMailComposeViewController *mailController;

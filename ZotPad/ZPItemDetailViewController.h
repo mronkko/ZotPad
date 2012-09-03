@@ -9,10 +9,10 @@
 
 #import <UIKit/UIKit.h>
 #import "ZPZoteroItem.h"
-#import "ZPAttachmentObserver.h"
+
 #import "iCarousel.h"
 #import "ZPAttachmentFileInteractionController.h"
-#import "ZPItemObserver.h"
+
 
 
 @interface ZPItemDetailViewController : UITableViewController <UINavigationControllerDelegate >{

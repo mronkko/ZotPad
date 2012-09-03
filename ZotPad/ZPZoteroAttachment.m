@@ -38,10 +38,10 @@ NSInteger const VERSION_SOURCE_DROPBOX =3;
 
 static NSCache* _objectCache = NULL;
 
-@synthesize lastViewed, attachmentSize, existsOnZoteroServer, filename, url, versionSource,  charset, itemKey;
+@synthesize lastViewed, attachmentSize, existsOnZoteroServer, filename, url, versionSource,  charset;
 @synthesize versionIdentifier_server;
 @synthesize versionIdentifier_local;
-@synthesize contentType,parentItemKey;
+@synthesize contentType;
 
 +(void)initialize{
     _objectCache =  [[NSCache alloc] init];
@@ -50,7 +50,7 @@ static NSCache* _objectCache = NULL;
 
 +(ZPZoteroAttachment*) attachmentWithDictionary:(NSDictionary *)fields{
     
-    NSString* key = [fields objectForKey:@"itemKey"];
+    NSString* key = [fields objectForKey:ZPKEY_ITEM_KEY];
 
     if(key == NULL || [key isEqual:@""])
         [NSException raise:@"Key is empty" format:@"ZPZoteroAttachment cannot be instantiated with empty key"];
@@ -81,11 +81,19 @@ static NSCache* _objectCache = NULL;
     
 }
 
+
+-(void) setItemKey:(NSString *)itemKey{
+    [super setKey:itemKey];
+}
+-(NSString*)itemKey{
+    return [super key];
+}
+
 - (NSInteger) libraryID{
     //Child attachments
     if(super.libraryID==LIBRARY_ID_NOT_SET){
-        if(self.parentItemKey != NULL){
-            return [ZPZoteroItem itemWithKey:self.parentItemKey].libraryID;
+        if(self.parentKey != NULL){
+            return [ZPZoteroItem itemWithKey:self.parentKey].libraryID;
         }
         else {
             [NSException raise:@"Internal consistency error" format:@"Standalone items must have library IDs. Standalone attachment with key %@ had a null library ID",self.key];
@@ -97,13 +105,6 @@ static NSCache* _objectCache = NULL;
         return super.libraryID;
     }
 }
-
-
-// An alias for setParentCollectionKey
-- (void) setParentKey:(NSString*)key{
-    [self setParentItemKey:key];    
-}
-
 
 +(ZPZoteroAttachment*) dataObjectForAttachedFile:(NSString*) filename{
 
@@ -279,7 +280,7 @@ static NSCache* _objectCache = NULL;
     if([self fileExists_original]){
         NSDictionary* fileAttributes = [[NSFileManager defaultManager] attributesOfItemAtPath:self.fileSystemPath_original error:NULL];
         [[NSFileManager defaultManager] removeItemAtPath:self.fileSystemPath_original error:NULL];
-        [[ZPDataLayer instance] notifyAttachmentDeleted:self fileAttributes:fileAttributes];
+        [[NSNotificationCenter defaultCenter] postNotificationName:ZPNOTIFICATION_ATTACHMENT_FILE_DELETED object:self userInfo:fileAttributes];
         DDLogWarn(@"File %@ (version from server) was deleted: %@",self.filename,reason);
     }
 }
@@ -287,7 +288,7 @@ static NSCache* _objectCache = NULL;
     if([self fileExists_modified]){
         NSDictionary* fileAttributes = [[NSFileManager defaultManager] attributesOfItemAtPath:self.fileSystemPath_modified error:NULL];
         [[NSFileManager defaultManager] removeItemAtPath:self.fileSystemPath_modified error:NULL];
-        [[ZPDataLayer instance] notifyAttachmentDeleted:self fileAttributes:fileAttributes];
+        [[NSNotificationCenter defaultCenter] postNotificationName:ZPNOTIFICATION_ATTACHMENT_FILE_DELETED object:self userInfo:fileAttributes];
         DDLogWarn(@"File %@ (locally modified) was deleted: %@",self.filename,reason);
     }
 }

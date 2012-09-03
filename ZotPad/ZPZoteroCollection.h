@@ -11,8 +11,6 @@
 
 @interface ZPZoteroCollection : ZPZoteroDataObject{
 }
-
-@property (retain, nonatomic) NSString* parentCollectionKey;
 @property (retain) NSString* collectionKey;
 
 +(void) dropCache;

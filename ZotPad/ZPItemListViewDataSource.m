@@ -6,14 +6,14 @@
 //  Copyright (c) 2012 Helsiki University of Technology. All rights reserved.
 //
 
-#import "ZPDataLayer.h"
+
 #import "ZPItemListViewDataSource.h"
 #import "DTCoreText.h"
 #import "OHAttributedLabel.h"
 #import "ZPAttachmentIconImageFactory.h"
 #import "ZPPreviewController.h"
-#import "ZPServerConnection.h"
-
+#import "ZPServerConnectionManager.h"
+#import "ZPCacheController.h"
 
 #define SIZE_OF_TABLEVIEW_UPDATE_BATCH 25
 #define SIZE_OF_DATABASE_UPDATE_BATCH 50
@@ -38,11 +38,27 @@ static ZPItemListViewDataSource* _instance;
     return _instance;
 }
 
+
 -(id)init{
     self= [super init];
-    [[ZPDataLayer instance] registerItemObserver:self];
+
+    [[NSNotificationCenter defaultCenter] addObserver:self
+                                             selector:@selector(notifyItemsAvailable:)
+                                                 name:ZPNOTIFICATION_ITEMS_AVAILABLE
+                                               object:nil];
+    
+    //Set default sort values
+    _orderField = @"dateModified";
+    _sortDescending = FALSE;
+    
     return self;
 }
+
+- (void) dealloc
+{
+    [[NSNotificationCenter defaultCenter] removeObserver:self];
+}
+
 /*
  Called from data layer to notify that there is data for this view and it can be shown
  */
@@ -79,10 +95,11 @@ static ZPItemListViewDataSource* _instance;
 }
 
 
-- (void) configureUncachedKeys:(NSArray*)uncachedItems{
+- (void) configureServerKeys:(NSArray*)uncachedItems{
     
     //Only update the uncached keys if we are still showing the same item key list
     _itemKeysNotInCache = [NSMutableArray arrayWithArray:uncachedItems];
+    [_itemKeysNotInCache removeObjectsInArray:_itemKeysShown];
     _invalidated = FALSE;
     [self _performTableUpdates:FALSE];
     //DDLogVerbose(@"Configured uncached keys");
@@ -104,7 +121,7 @@ static ZPItemListViewDataSource* _instance;
         //Copy the array to be safe from accessing it using multiple threads
         NSMutableArray* newItemKeysShown = [NSMutableArray arrayWithArray:_itemKeysShown];
         
-        NSArray* newKeys = [[ZPDataLayer instance] getItemKeysFromCacheForLibrary:self.libraryID collection:self.collectionKey
+        NSArray* newKeys = [ZPDatabase getItemKeysForLibrary:self.libraryID collectionKey:self.collectionKey
                                                                      searchString:[self.searchString stringByTrimmingCharactersInSet:[NSCharacterSet whitespaceAndNewlineCharacterSet]]orderField:self.orderField sortDescending:self.sortDescending];
         
         
@@ -258,8 +275,9 @@ static ZPItemListViewDataSource* _instance;
 }
 
 
--(void) notifyItemAvailable:(ZPZoteroItem *)item{
+-(void) notifyItemsAvailable:(NSNotification*)notification{
     
+    NSArray* items = notification.object;
     //DDLogVerbose(@"Received item %@",item.fullCitation);
     
     @synchronized(self){
@@ -267,17 +285,21 @@ static ZPItemListViewDataSource* _instance;
         BOOL found = FALSE;
         BOOL update = FALSE;
         @synchronized(_itemKeysNotInCache){
-            if([_itemKeysNotInCache containsObject:item.key]){
-                [_itemKeysNotInCache removeObject:item.key];
-                found=TRUE;
+            
+            for(ZPZoteroItem* item in items){
+                DDLogVerbose(@"Checking if item should be displayed %@, %@",item.key,item.title);
+                if([_itemKeysNotInCache containsObject:item.key]){
+                    [_itemKeysNotInCache removeObject:item.key];
+                    found=TRUE;
+                }
+                //DDLogVerbose(@"Item keys not in cache deacreased to %i after removing key %@",[_itemKeysNotInCache count],item.key);
+                
+                //Update the view if we have received sufficient number of new items
+                update = update || ([_itemKeysNotInCache count] % SIZE_OF_DATABASE_UPDATE_BATCH ==0 ||
+                          [_itemKeysShown count] == 0 ||
+                          [_itemKeysShown lastObject]!=[NSNull null]);
+                
             }
-            //DDLogVerbose(@"Item keys not in cache deacreased to %i after removing key %@",[_itemKeysNotInCache count],item.key);
-            
-            //Update the view if we have received sufficient number of new items
-            update = ([_itemKeysNotInCache count] % SIZE_OF_DATABASE_UPDATE_BATCH ==0 ||
-                      [_itemKeysShown count] == 0 ||
-                      [_itemKeysShown lastObject]!=[NSNull null]);
-            
         }
         
         
@@ -439,7 +461,7 @@ static ZPItemListViewDataSource* _instance;
                     [ZPAttachmentIconImageFactory renderFileTypeIconForAttachment:attachment intoImageView:articleThumbnail];
                     // Enable or disable depending whether file is available or not
                     
-                    if(attachment.fileExists || (attachment.linkMode == LINK_MODE_LINKED_URL && [ZPServerConnection hasInternetConnection])){
+                    if(attachment.fileExists || (attachment.linkMode == LINK_MODE_LINKED_URL && [ZPServerConnectionManager hasInternetConnection])){
                         articleThumbnail.alpha = 1;
                         articleThumbnail.userInteractionEnabled = TRUE;
                         
@@ -484,7 +506,7 @@ static ZPItemListViewDataSource* _instance;
     
     ZPZoteroAttachment* attachment = [item.attachments objectAtIndex:0];
     
-    if(attachment.linkMode == LINK_MODE_LINKED_URL && [ZPServerConnection hasInternetConnection]){
+    if(attachment.linkMode == LINK_MODE_LINKED_URL && [ZPServerConnectionManager hasInternetConnection]){
         [[UIApplication sharedApplication] openURL:[NSURL URLWithString:attachment.url]];
     }
     else{
@@ -519,7 +541,7 @@ static ZPItemListViewDataSource* _instance;
     }
     
     @synchronized(self){
-        NSInteger index = [_itemKeysShown indexOfObject:_attachmentInQuicklook.parentItemKey];
+        NSInteger index = [_itemKeysShown indexOfObject:_attachmentInQuicklook.parentKey];
         UITableViewCell* cell = [_tableView cellForRowAtIndexPath:[NSIndexPath indexPathForRow:index inSection:0]];
         UIView* ret = [cell viewWithTag:4];
         return ret;

@@ -143,7 +143,7 @@ static ZPPreviewControllerDelegate* _sharedDelegate;
 +(void) displayQuicklookWithAttachment:(ZPZoteroAttachment*)attachment source:(id <ZPPreviewSource>)source{
     
     if(attachment.linkMode == LINK_MODE_LINKED_URL){
-        NSString* urlString = [[(ZPZoteroItem*)[ZPZoteroItem itemWithKey:attachment.parentItemKey] fields] objectForKey:@"url"];
+        NSString* urlString = [[(ZPZoteroItem*)[ZPZoteroItem itemWithKey:attachment.parentKey] fields] objectForKey:@"url"];
         
         //Links will be opened with safari.
         NSURL* url = [NSURL URLWithString: urlString];

@@ -54,15 +54,16 @@
 
 #import "ZPCacheController.h"
 #import "ZPPreferences.h"
-#import "ZPDataLayer.h"
+
 #import "ZPDatabase.h"
 #import "ZPServerResponseXMLParser.h"
-#import "ZPServerConnection.h"
+#import "ZPServerConnectionManager.h"
 #import "ZPZoteroCollection.h"
 #import "ZPZoteroAttachment.h"
 #import "ZPZoteroNote.h"
 
 #define NUMBER_OF_ITEMS_TO_RETRIEVE 50
+#define NUMBER_OF_PARALLEL_REQUESTS 6
 
 
 @interface ZPCacheController (){
@@ -73,29 +74,29 @@
     //Variables indicating if we are currently refreshing lobraries and collectiosn from server
     BOOL _isRefresingLibraries;
     NSMutableSet* _librariesWhoseCollectionsAreBeingRefreshed;
+    ZPCacheStatusToolbarController* _statusView;
 }
 
+// Check if there is something to dowload or upload
 -(void) _checkQueues;
+
+
+// Metadata
+
 -(void) _checkMetadataQueue;
--(void) _checkDownloadQueue;
--(void) _checkUploadQueue;
 
--(void) _scanFilesToUpload;
-
--(void) _doItemRetrieval:(NSArray*) itemKeys fromLibrary:(NSInteger)libraryID;
-
--(void) _cacheItemsAndAttachToParentsIfNeeded:(NSArray*) items;
-//-(void) _attachChildItemsToParents:(NSArray*) items;
-
-//Gets one item details and writes these to the database
--(void) _updateItemDetailsFromServer:(ZPZoteroItem*) item;
 
 -(void) _checkIfLibraryNeedsCacheRefreshAndQueue:(NSInteger) libraryID;
 -(void) _checkIfCollectionNeedsCacheRefreshAndQueue:(NSString*)collectionKey;
--(void) _checkIfAttachmentExistsAndQueueForDownload:(ZPZoteroAttachment*)attachment;
 
-//TODO: refactor this method
+
+//Attachment Downloads and uploads
+-(void) _checkDownloadQueue;
+-(void) _checkUploadQueue;
+-(void) _scanFilesToUpload;
+
 -(void) _checkIfAttachmentsExistWithParentKeysAndQueueForDownload:(NSArray*)parentKeys;
+-(void) _checkIfAttachmentExistsAndQueueForDownload:(ZPZoteroAttachment*)attachment;
 
 - (unsigned long long int) _documentsFolderSize;
 - (void) _scanAndSetSizeOfDocumentsFolder;
@@ -110,15 +111,10 @@
 
 static ZPCacheController* _instance = nil;
 
-
 -(id)init
 {
     self = [super init];
     
-    
-    //Initialize OperationQueues for retrieving data from server and writing it to cache
-    _serverRequestQueue = [[NSOperationQueue alloc] init];
-    [_serverRequestQueue setMaxConcurrentOperationCount:4];
     
     //These collections contain things that we need to cache. These have been checked so that we know that they are either missing or outdated
     
@@ -130,12 +126,6 @@ static ZPCacheController* _instance = nil;
     _filesToDownload = [[NSMutableArray alloc] init];
     _attachmentsToUpload = [[NSMutableSet alloc] init];
     
-    //Register as observer so that we can follow the size of the cache
-    [[ZPDataLayer instance] registerAttachmentObserver:self];
-    
-    //Observe new libraries so that we know to cache them
-    [[ZPDataLayer instance] registerLibraryObserver:self];
-
     _sizeOfDocumentsFolder = 0;    [self performSelectorInBackground:@selector(_scanAndSetSizeOfDocumentsFolder) withObject:NULL];
 	
     _isRefresingLibraries =FALSE;
@@ -152,17 +142,11 @@ static ZPCacheController* _instance = nil;
         ZPZoteroLibrary* library;
         for(library in libraries){
             if([ZPPreferences cacheAttachmentsAllLibraries]){
-                //TODO: refactor so that this block is not needed
-                dispatch_async(dispatch_get_global_queue(DISPATCH_QUEUE_PRIORITY_BACKGROUND,0), ^{
-                    NSArray* itemKeysToCheck = [ZPDatabase getItemKeysForLibrary:library.libraryID collectionKey:NULL searchString:NULL orderField:NULL sortDescending:FALSE];
-                    [self _checkIfAttachmentsExistWithParentKeysAndQueueForDownload:itemKeysToCheck];
-                });
+                NSArray* itemKeysToCheck = [ZPDatabase getItemKeysForLibrary:library.libraryID collectionKey:NULL searchString:NULL orderField:NULL sortDescending:FALSE];
+                [self _checkIfAttachmentsExistWithParentKeysAndQueueForDownload:itemKeysToCheck];
             }
             if([ZPPreferences cacheMetadataAllLibraries]){
-                dispatch_async(dispatch_get_global_queue(DISPATCH_QUEUE_PRIORITY_BACKGROUND,0), ^{
-                    [self _checkIfLibraryNeedsCacheRefreshAndQueue:library.libraryID];
-                });
-
+                [self _checkIfLibraryNeedsCacheRefreshAndQueue:library.libraryID];
             }
         }
     }
@@ -170,6 +154,7 @@ static ZPCacheController* _instance = nil;
     [self performSelectorInBackground:@selector(_scanFilesToUpload) withObject:NULL];
     [self performSelectorInBackground:@selector(_cleanUpCache) withObject:NULL];
      
+
     return self;
 }
 
@@ -202,9 +187,14 @@ static ZPCacheController* _instance = nil;
 
 -(void) _checkQueues{
 
-    [self _checkDownloadQueue];
-    [self _checkMetadataQueue];
-    [self _checkUploadQueue];
+    if([NSThread isMainThread]){
+        [self performSelectorInBackground:@selector(_checkQueues) withObject:NULL];
+    }
+    else{
+        [self _checkDownloadQueue];
+        [self _checkMetadataQueue];
+        [self _checkUploadQueue];
+    }
 }
 
 -(void) _checkDownloadQueue{
@@ -218,11 +208,11 @@ static ZPCacheController* _instance = nil;
             //Only cache up to 95% full
             if(_sizeOfDocumentsFolder < 0.95*[ZPPreferences maxCacheSize]){
 //                DDLogVerbose(@"There is space on device");
-                if([ZPServerConnection hasInternetConnection] && [ZPServerConnection numberOfFilesDownloading] <1){
+                if([ZPServerConnectionManager hasInternetConnection] && [ZPServerConnectionManager numberOfFilesDownloading] <1){
                     ZPZoteroAttachment* attachment = [_filesToDownload objectAtIndex:0];
                     [_filesToDownload removeObjectAtIndex:0];
-                    while ( ![ZPServerConnection checkIfCanBeDownloadedAndStartDownloadingAttachment:attachment] && [_filesToDownload count] >0){
-                        DDLogWarn(@"File %@ (key: %@) belonging to item %@ (key: %@)  could not be found for download",attachment.filename,attachment.key,[(ZPZoteroItem*)[ZPZoteroItem itemWithKey:attachment.parentItemKey] fullCitation],attachment.parentItemKey);
+                    while ( ![ZPServerConnectionManager checkIfCanBeDownloadedAndStartDownloadingAttachment:attachment] && [_filesToDownload count] >0){
+                        DDLogWarn(@"File %@ (key: %@) belonging to item %@ (key: %@)  could not be found for download",attachment.filename,attachment.key,[(ZPZoteroItem*)[ZPZoteroItem itemWithKey:attachment.parentKey] fullCitation],attachment.parentKey);
                         attachment = [_filesToDownload objectAtIndex:0];
                         [_filesToDownload removeObjectAtIndex:0];
                     }
@@ -241,11 +231,11 @@ static ZPCacheController* _instance = nil;
 //        DDLogVerbose(@"Checked upload queue: Files to upload %i",[_attachmentsToUpload count]);
         
         if([_attachmentsToUpload count]>0){
-            if([ZPServerConnection hasInternetConnection] && [ZPServerConnection numberOfFilesUploading] <1){
+            if([ZPServerConnectionManager hasInternetConnection] && [ZPServerConnectionManager numberOfFilesUploading] <1){
                 ZPZoteroAttachment* attachment = [_attachmentsToUpload anyObject];
                 //Remove from queue and upload
                 [_attachmentsToUpload removeObject:attachment];
-                [ZPServerConnection uploadVersionOfAttachment:attachment];
+                [ZPServerConnectionManager uploadVersionOfAttachment:attachment];
                 
             }
         }        
@@ -255,237 +245,97 @@ static ZPCacheController* _instance = nil;
 
 -(void) _checkMetadataQueue{
     
-    @synchronized(_serverRequestQueue){
-        while([_serverRequestQueue operationCount] <= [_serverRequestQueue maxConcurrentOperationCount]){
-            
-            @synchronized(_librariesToCache){
-                if([_librariesToCache count]>0){
-                    
-                    NSOperation* retrieveOperation = [[NSInvocationOperation alloc] initWithTarget:self selector:@selector(_doContainerRetrieval:) object:[_librariesToCache lastObject]];
-                    
-                    //Remove the items that we are retrieving
-                    [_librariesToCache removeLastObject];
-                    
-                    [_serverRequestQueue addOperation:retrieveOperation];
-                    DDLogVerbose(@"Started Library retrieval operation. Operations in queue is %i. Number of libraries in queue is %i",[_serverRequestQueue operationCount],[_librariesToCache count]);
-                    
-                } 
-            }
-            //Choose the queue the active library or choose a first non-empty queue
-            
-            @synchronized(_itemKeysToRetrieve){
-                
-                NSInteger itemsToDownload=0;
-                for(NSObject* key in _itemKeysToRetrieve){
-                    itemsToDownload += [(NSArray*)[_itemKeysToRetrieve objectForKey:key] count];
-                }
-                [_statusView setItemDownloads:itemsToDownload];
-
-                //Choose a library to retrieve
-                NSMutableArray* keyArray = [_itemKeysToRetrieve objectForKey:[NSNumber numberWithInt:_activelibraryID]];
-                NSEnumerator* e = [_itemKeysToRetrieve keyEnumerator];
-                NSInteger libraryID = _activelibraryID;
-            
-                //If the active library does not have anything to retrieve, loop over all libraries to see if there is something to retrieve
-                
-                while(keyArray == NULL || [keyArray count]==0){
-                    if( !( libraryID = [[e nextObject] integerValue])){
-                        break;
-                        
-                    }
-                    keyArray = [_itemKeysToRetrieve objectForKey:[NSNumber numberWithInt:libraryID]];
-                    
-
-                }
-                
-                //If we found a non-empty que, queue item retrival
-                if(keyArray != NULL && [keyArray count]>0){
-                    
-                    if(libraryID == LIBRARY_ID_NOT_SET){
-                        [NSException raise:@"LibraryID cannot be NULL" format:@""];
-                    }
-                    
-                    NSArray* keysToRetrieve;
-                    @synchronized(keyArray){
-                        NSRange range = NSMakeRange(0, MIN(NUMBER_OF_ITEMS_TO_RETRIEVE,[keyArray count]));
-                        keysToRetrieve = [keyArray subarrayWithRange:range];
-                        
-                        //Remove the items that we are retrieving
-                        [keyArray removeObjectsInRange:range];
-                        
-                        //If the array became empty, mark this library as completely cached
-                        if([keyArray count]==0){
-                            NSNumber* keyObject = [NSNumber numberWithInt:libraryID];
-                            NSString* timestamp = [_libraryTimestamps objectForKey:keyObject];
-                            if(timestamp!=NULL){
-                                //Update both the DB and the in-memory cache.
-                                [ZPDatabase setUpdatedTimestampForLibrary:libraryID toValue:timestamp];
-                                [[ZPZoteroLibrary libraryWithID:libraryID] setCacheTimestamp:timestamp];
-                                DDLogVerbose(@"Library %i is now fully cached", libraryID);
-                                [_libraryTimestamps removeObjectForKey:keyObject];
-                            }
-                        }
-                        
-                    }
-                    
-                    //Create an invocation
-                    SEL selector = @selector(_doItemRetrieval:fromLibrary:);
-                    NSMethodSignature* signature = [[self class] instanceMethodSignatureForSelector:selector];
-                    NSInvocation* invocation  = [NSInvocation invocationWithMethodSignature:signature];
-                    [invocation setTarget:self];
-                    [invocation setSelector:selector];
-                    
-                    //Set arguments
-                    [invocation setArgument:&keysToRetrieve atIndex:2];
-                    [invocation setArgument:&libraryID atIndex:3];
-                    
-                    //Create operation and queue it for background retrieval
-                    NSOperation* retrieveOperation = [[NSInvocationOperation alloc] initWithInvocation:invocation];
-                    [_serverRequestQueue addOperation:retrieveOperation];
-                    
-                }
-                
-            }
-
-            // Last, check collection memberships
-            @synchronized(_collectionsToCache){
-                
-                if([_collectionsToCache count]>0){
-                    
-                    NSOperation* retrieveOperation = [[NSInvocationOperation alloc] initWithTarget:self selector:@selector(_doContainerRetrieval:) object:[_collectionsToCache lastObject]];
-                    
-                    //Remove the items that we are retrieving
-                    [_collectionsToCache removeLastObject];
-                    
-                    [_serverRequestQueue addOperation:retrieveOperation];
-                    DDLogVerbose(@"Started collection retrieval operation. Operations in queue is %i. Number of collections in queue is %i",[_serverRequestQueue operationCount],[_collectionsToCache count]);
-                    
-                } 
-                else break;
-            }
-        }
-    }
-}
-
-
-- (void) _doItemRetrieval:(NSArray*) itemKeys fromLibrary:(NSInteger)libraryID{
-    
-    DDLogVerbose(@"Retrieving items %@",[itemKeys componentsJoinedByString:@", "]);
-    
-    
-    NSArray* items = [ZPServerConnection retrieveItemsFromLibrary:libraryID itemKeys:itemKeys];
+    BOOL continueRetrieving;
+    while([ZPServerConnectionManager numberOfActiveMetadataRequests]<= NUMBER_OF_PARALLEL_REQUESTS && continueRetrieving){
         
-    [self _cacheItemsAndAttachToParentsIfNeeded:items];
+        continueRetrieving = FALSE;
+        @synchronized(_librariesToCache){
+            if([_librariesToCache count]>0){
+                
+                [self _doContainerRetrieval:[_librariesToCache lastObject]];
+                [_librariesToCache removeLastObject];
+                continueRetrieving = TRUE;
+            }
+        }
 
-    //Perform checking the queue in another thread so that the current operation can exit
-    DDLogVerbose(@"Rechecking queues");
-    [self performSelectorInBackground:@selector(_checkQueues) withObject:NULL];
-}
-
-
--(void) _cacheItemsAndAttachToParentsIfNeeded:(NSArray*) items{
-    
-    DDLogVerbose(@"Writing %i items to cache",[items count]);
-           
-    ZPZoteroItem* item;
-
-    NSMutableArray* normalItems = [NSMutableArray array];
-    NSMutableArray* attachments = [NSMutableArray array];
-    NSMutableArray* notes = [NSMutableArray array];
-    NSMutableArray* parentItemsForAttachments = [NSMutableArray array];
-    NSMutableArray* parentItemsForNotes = [NSMutableArray array];
-    
-    for(item in items){
-        if( [item needsToBeWrittenToCache]){
-
-            //TODO: Refactor. This is very confusing. 
-            //TODO: Make sure that this logic still works after breaking inheritance between attachment and item
+        //Choose the queue the active library or choose a first non-empty queue
+        
+        @synchronized(_itemKeysToRetrieve){
             
-            /*
-             
-             The following if clause is used to prevent this bug from happening. A more robust fix is needed, but this is better done after refactoring the server connection code to use asynchronous requests and NSNotification.
-             
-             4 ZotPad beta 0x00091df7 -[ZPDatabase updateObjects:intoTable:] (ZPDatabase.m:256)
-             5 ZotPad beta 0x00092635 -[ZPDatabase writeObjects:intoTable:checkTimestamp:] (ZPDatabase.m:347)
-             6 ZotPad beta 0x00094849 -[ZPDatabase writeAttachments:] (ZPDatabase.m:727)
-             7 ZotPad beta 0x00099099 -[ZPCacheController _cacheItemsAndAttachToParentsIfNeeded:] (ZPCacheController.m:433)
-             8 ZotPad beta 0x00099aab -[ZPCacheController _updateItemDetailsFromServer:] (ZPCacheController.m:587)
-             
-             */
-            if(item.serverTimestamp == NULL){
-#ifdef ZPDEBUG
-//                DDLogError(@"Item %@ has an empty server timestamp and will not be written to cache. The item was created from the following server response: \n\n%@",item.key,item.responseDataFromWhichThisItemWasCreated);
-#endif
-                continue;
+            NSInteger itemsToDownload=0;
+            for(NSObject* key in _itemKeysToRetrieve){
+                itemsToDownload += [(NSArray*)[_itemKeysToRetrieve objectForKey:key] count];
             }
             
-            item.cacheTimestamp = item.serverTimestamp;
+            //Choose a library to retrieve
+            NSMutableArray* keyArray = [_itemKeysToRetrieve objectForKey:[NSNumber numberWithInt:_activelibraryID]];
+            NSEnumerator* e = [_itemKeysToRetrieve keyEnumerator];
+            NSInteger libraryID = _activelibraryID;
             
-            if([item isKindOfClass:[ZPZoteroAttachment class]]){       
-                ZPZoteroAttachment* attachment = (ZPZoteroAttachment*) item;
-
-                [attachments addObject:attachment];
-                [self _checkIfAttachmentExistsAndQueueForDownload:attachment];
-                
-                ZPZoteroItem* parent;
-                //Standalone attachments
-                
-                if(attachment.parentItemKey==attachment.key){
-                    parent =  [ZPZoteroItem itemWithKey:attachment.key];
+            //If the active library does not have anything to retrieve, loop over all libraries to see if there is something to retrieve
+            
+            while(keyArray == NULL || [keyArray count]==0){
+                if( !( libraryID = [[e nextObject] integerValue])){
+                    break;
+                    
                 }
-                else{
-                    parent =  [ZPZoteroItem itemWithKey:attachment.parentItemKey];
-                }
-                if(![parentItemsForAttachments containsObject:parent]) [parentItemsForAttachments addObject:parent];
-            }
-            //If this is a note item, store the note information
-            else if([item isKindOfClass:[ZPZoteroNote class]]){
-                ZPZoteroNote* note = (ZPZoteroNote*) item;
-                [notes addObject:note];
+                keyArray = [_itemKeysToRetrieve objectForKey:[NSNumber numberWithInt:libraryID]];
                 
-                //Standalone notes
-                
-                ZPZoteroItem* parent;
-
-                if(note.parentItemKey==note.key){
-                    parent =  [ZPZoteroItem itemWithKey:note.key];
-                    [normalItems addObject:parent];
-                }
-                else{
-                    parent = (ZPZoteroItem*) [ZPZoteroItem itemWithKey:note.parentItemKey];
-                    if(![parentItemsForNotes containsObject:parent]) [parentItemsForNotes addObject:parent];
-                }
-
                 
             }
-            //Normal item
-            else{
-                [normalItems addObject:item];
+            
+            //If we found a non-empty que, queue item retrival
+            if(keyArray != NULL && [keyArray count]>0){
+                
+                if(libraryID == LIBRARY_ID_NOT_SET){
+                    [NSException raise:@"LibraryID cannot be NULL" format:@""];
+                }
+                
+                NSArray* keysToRetrieve;
+                @synchronized(keyArray){
+                    NSRange range = NSMakeRange(0, MIN(NUMBER_OF_ITEMS_TO_RETRIEVE,[keyArray count]));
+                    keysToRetrieve = [keyArray subarrayWithRange:range];
+                    
+                    //Remove the items that we are retrieving
+                    [keyArray removeObjectsInRange:range];
+                    
+                    //If the array became empty, mark this library as completely cached
+                    if([keyArray count]==0){
+                        NSNumber* keyObject = [NSNumber numberWithInt:libraryID];
+                        NSString* timestamp = [_libraryTimestamps objectForKey:keyObject];
+                        if(timestamp!=NULL){
+                            //Update both the DB and the in-memory cache.
+                            [ZPDatabase setUpdatedTimestampForLibrary:libraryID toValue:timestamp];
+                            [[ZPZoteroLibrary libraryWithID:libraryID] setCacheTimestamp:timestamp];
+                            DDLogVerbose(@"Library %i is now fully cached", libraryID);
+                            [_libraryTimestamps removeObjectForKey:keyObject];
+                        }
+                    }
+                    
+                }
+                
+                [ZPServerConnectionManager retrieveItemsFromLibrary:libraryID itemKeys:keysToRetrieve];
+                continueRetrieving = TRUE;
+
+            }
+            
+        }
+        
+        // Last, check collection memberships
+        @synchronized(_collectionsToCache){
+            
+            if([_collectionsToCache count]>0){
+                
+                [self _doContainerRetrieval:[_collectionsToCache lastObject]];
+                [_collectionsToCache removeLastObject];
+                continueRetrieving = TRUE;
+
             }
         }
     }
-
-    [ZPDatabase writeAttachments:attachments];
-    [ZPDatabase writeNotes:notes];
-
-    NSArray* topLevelItemsThatWereWrittenToCache = [ZPDatabase writeItems:normalItems];
-    NSMutableArray* itemsThatNeedCreatorsAndFields = [NSMutableArray arrayWithArray:topLevelItemsThatWereWrittenToCache];
-                            
-    [ZPDatabase writeItemsFields:itemsThatNeedCreatorsAndFields];
-    [ZPDatabase writeItemsCreators:itemsThatNeedCreatorsAndFields];
-
-    //Refresh the attachments for those items that got new attachments
-    for(item in parentItemsForAttachments){
-        [ZPDatabase addAttachmentsToItem:item];
-    }
-    for(item in parentItemsForNotes){
-        [ZPDatabase addNotesToItem:item];
-    }
-    
-    [[ZPDataLayer instance] performSelectorInBackground:@selector(notifyItemsAvailable:)
-                                              withObject:[[topLevelItemsThatWereWrittenToCache arrayByAddingObjectsFromArray:parentItemsForNotes]arrayByAddingObjectsFromArray:parentItemsForAttachments]];
-    
 }
+
+
 
 /*
  
@@ -505,124 +355,21 @@ static ZPCacheController* _instance = nil;
     }
     else{
         libraryID = [(ZPZoteroCollection*)container libraryID];
-        collectionKey = [(ZPZoteroCollection*)container collectionKey];
+        collectionKey = [(ZPZoteroCollection*)container key];
     }
     
-    NSString* newTimestamp = [ZPServerConnection retrieveTimestampForContainer:libraryID collectionKey:collectionKey];
-
-    if(collectionKey==NULL){
-        //Check that we are not already cacheing this item.
-        NSNumber* keyObj = [NSNumber numberWithInt:libraryID];
-        if([_libraryTimestamps objectForKey:keyObj]==NULL){
-            [_libraryTimestamps setObject:newTimestamp forKey:keyObj];
-            DDLogVerbose(@"Checking if we need to cache library %i",libraryID);
-            NSArray* serverKeys = [ZPServerConnection retrieveAllItemKeysFromLibrary:libraryID];
-            
-            [ZPDatabase deleteItemKeysNotInArray:serverKeys fromLibrary:libraryID]; 
-            
-            //If there is data in the library, start cacheing it
-            
-            if([serverKeys count]>0){
-                //Get all keys in the library
-                NSArray* cacheKeys = [ZPDatabase getAllItemKeysForLibrary:libraryID];
-                
-                NSString* markerKey = [ZPDatabase getFirstItemKeyWithTimestamp:[(ZPZoteroLibrary*)container cacheTimestamp] from:libraryID];
-                
-                //Iterate the arrays backward until we find a difference
-                
-                NSInteger index = [serverKeys indexOfObject:markerKey];
-                
-                //Sanity check
-                if(index == NSNotFound){
-                    index = [serverKeys count]-1;
-                }
-                
-                NSArray* itemKeysThatNeedToBeRetrieved = [serverKeys subarrayWithRange:NSMakeRange(0, index)];
-                
-                /*
-                 Old check. Do not remove. 
-                 
-                 NSInteger index;
-                 
-                 for(index=0; index < [serverKeys count]; index++){
-                 
-                 if(index >=[cacheKeys count]) break;
-                 
-                 NSString* serverKey = [serverKeys objectAtIndex:[serverKeys count]-index-1];
-                 NSString* cacheKey = [cacheKeys objectAtIndex:[cacheKeys count]-index-1];
-                 
-                 if(![serverKey isEqualToString:cacheKey]) break;
-                 }
-                 
-                 DDLogVerbose(@"Adding items to queue up to last %i",index);
-                 
-                 // Queue all the items that were different
-                 NSArray* itemKeysThatNeedToBeRetrieved = [serverKeys subarrayWithRange:NSMakeRange(0, [serverKeys count]-index-1)];
-                 
-                 */
-                
-                
-                // First add all items that do not exist in the cache
-                NSMutableArray* nonExistingKeys = [NSMutableArray arrayWithArray:itemKeysThatNeedToBeRetrieved];
-                [nonExistingKeys removeObjectsInArray:cacheKeys];
-                if([nonExistingKeys count]>0){
-                    [self addToItemQueue:nonExistingKeys libraryID:libraryID priority:FALSE];
-                    DDLogVerbose(@"Added %i non-existing keys that need data",[nonExistingKeys count]);
-                }
-                
-                // Then add the rest of the items
-                NSMutableArray* existingKeys = [NSMutableArray arrayWithArray:itemKeysThatNeedToBeRetrieved];
-                [existingKeys removeObjectsInArray:nonExistingKeys];
-                if([existingKeys count]>0){
-                    [self addToItemQueue:existingKeys libraryID:libraryID priority:FALSE];   
-                    DDLogVerbose(@"Added %i existing keys that might need new data",[existingKeys count]);
-                }
-                
-            }            
-        }        
-    }
-    else{
-        NSArray* itemKeys = [ZPServerConnection retrieveKeysInContainer:libraryID collectionKey:collectionKey];
-
-        NSArray* cachedKeys = [ZPDatabase getItemKeysForLibrary:libraryID collectionKey:collectionKey searchString:NULL orderField:NULL sortDescending:FALSE];
-        
-        NSMutableArray* uncachedItems = [NSMutableArray arrayWithArray:itemKeys];
-        [uncachedItems removeObjectsInArray:cachedKeys];
-        
-        if([uncachedItems count]>0) [ZPDatabase addItemKeys:uncachedItems toCollection:collectionKey];
-        if([itemKeys count] >0) [ZPDatabase removeItemKeysNotInArray:itemKeys fromCollection:collectionKey]; 
-        [ZPDatabase setUpdatedTimestampForCollection:collectionKey toValue:newTimestamp];
-    }
-
-    [self performSelectorInBackground:@selector(_checkQueues) withObject:NULL];
+    [ZPServerConnectionManager retrieveTimestampForLibrary:libraryID collection:collectionKey];
+    
 }
 
 -(void) refreshActiveItem:(ZPZoteroItem*) item {
-    if(item == NULL){
-        [NSException raise:@"Item cannot be null" format:@"Method refresh active item was called with an argument that was null."];
-    }
-    [self performSelectorInBackground:@selector(_updateItemDetailsFromServer:) withObject:item];
     
-}
-
--(void) _updateItemDetailsFromServer:(ZPZoteroItem*)item{
-
     if(item == NULL){
-        [NSException raise:@"Item cannot be null" format:@"Method _updateItemDetailsFromServer was called with an argument that was null."];
+        [NSException raise:@"Item cannot be null" format:@"MethodrefreshActiveItem  was called with an argument that was null."];
     }
-    _activeItemKey = item.key;
     
-    item = [ZPServerConnection retrieveSingleItemDetailsFromServer:item];
-    if(item != NULL){
-        NSMutableArray* items = [NSMutableArray arrayWithObject:item];
-        [items addObjectsFromArray:item.attachments];
-        [items addObjectsFromArray:item.notes];
-        
-        [self _cacheItemsAndAttachToParentsIfNeeded:items];
-        
-        //The method call above will only fire a notification if the item was actually updated. Fire it here again so that we will always get a notification and know that the item has been updated.
-        [[ZPDataLayer instance] notifyItemsAvailable:[NSArray arrayWithObject:item]];
-    }       
+    
+    [ZPServerConnectionManager retrieveSingleItemDetailsFromServer:item];
 }
 
 -(void) setActiveLibrary:(NSInteger)libraryID collection:(NSString*)collectionKey{
@@ -706,7 +453,7 @@ static ZPCacheController* _instance = nil;
         }
         //Check if the parent belongs to active the collection
         else if([ZPPreferences cacheAttachmentsActiveCollection]){
-            ZPZoteroItem* parent = (ZPZoteroItem*)[ZPZoteroItem itemWithKey:attachment.parentItemKey];
+            ZPZoteroItem* parent = (ZPZoteroItem*)[ZPZoteroItem itemWithKey:attachment.parentKey];
             if(parent.libraryID == _activelibraryID && _activeCollectionKey == NULL){
                 doCache=true;
             }
@@ -715,7 +462,7 @@ static ZPCacheController* _instance = nil;
             }
         }
         else if([ZPPreferences cacheAttachmentsActiveItem]){
-            doCache =( attachment.parentItemKey == _activeItemKey);
+            doCache =( attachment.parentKey == _activeItemKey);
         }
         
         if(doCache){
@@ -789,39 +536,7 @@ static ZPCacheController* _instance = nil;
 
 -(void) _checkIfLibraryNeedsCacheRefreshAndQueue:(NSInteger) libraryID{
    
-    NSString* timestamp = [ZPServerConnection retrieveTimestampForContainer:libraryID collectionKey:NULL];
-    
-    
-    if(timestamp != NULL){
-        
-        ZPZoteroLibrary* container = (ZPZoteroLibrary*) [ZPZoteroLibrary libraryWithID:libraryID];
-        
-        if(![timestamp isEqualToString:container.cacheTimestamp]){
-            
-            [self addToLibrariesQueue:container priority:FALSE];
-            [self _checkQueues];
-
-            if([ZPPreferences cacheMetadataActiveLibrary]){
-                
-                //Retrieve all collections for this library and add them to cache
-                for(ZPZoteroCollection* collection in [ZPDatabase collectionsForLibrary:container.libraryID]){
-                    
-                    timestamp = [ZPServerConnection retrieveTimestampForContainer:libraryID collectionKey:collection.collectionKey];
-                    
-                    if(timestamp != NULL){
-                        
-                        if(![timestamp isEqualToString:collection.cacheTimestamp]){
-                                                        
-                            [self addToCollectionsQueue:collection priority:FALSE];
-                            [self _checkQueues];
-
-                        }
-                    }
-                    
-                }
-            }
-        }
-    }
+    [ZPServerConnectionManager retrieveTimestampForLibrary:libraryID collection:NULL];
 }
 
 -(void) _checkIfCollectionNeedsCacheRefreshAndQueue:(NSString*)collectionKey{
@@ -833,21 +548,9 @@ static ZPCacheController* _instance = nil;
     
     //Get the time stamp to see if we need to retrieve more
     
-    NSString* timestamp = [ZPServerConnection retrieveTimestampForContainer:libraryID collectionKey:collectionKey];
+    [ZPServerConnectionManager retrieveTimestampForLibrary:libraryID collection:collectionKey];
 
     
-    if(timestamp != NULL){
-        
-        if(![timestamp isEqualToString:container.cacheTimestamp]){
-            
-            //If a Collection needs to be cached, check if a library needs cache as well.
-            [self _checkIfLibraryNeedsCacheRefreshAndQueue:libraryID];
-        
-            [self addToCollectionsQueue:container priority:FALSE];
-
-            [self _checkQueues];
-        }
-    }
 }
 
     
@@ -859,23 +562,8 @@ static ZPCacheController* _instance = nil;
         _isRefresingLibraries = TRUE;
  
         DDLogVerbose(@"Loading library information from server");
-        NSArray* libraries = [ZPServerConnection retrieveLibrariesFromServer];
+       [ZPServerConnectionManager retrieveLibrariesFromServer];
         
-        if(libraries!=NULL){
-            
-            NSEnumerator* e = [libraries objectEnumerator];
-            
-            ZPZoteroLibrary* library;
-            
-            while ( library = (ZPZoteroLibrary*) [e nextObject]) {
-                
-                [self performSelectorInBackground:@selector(updateCollectionsForLibraryFromServer:) withObject:library];
-                
-            }
-            [ZPDatabase writeLibraries:libraries];
-        }
-        
-        _isRefresingLibraries = FALSE;
     }
 }
 
@@ -893,16 +581,289 @@ static ZPCacheController* _instance = nil;
     if(shouldRefresh){
         DDLogVerbose(@"Loading collections for library %@",library.title);
 
-        NSArray* collections = [ZPServerConnection retrieveCollectionsForLibraryFromServer:library.libraryID];
-        if(collections!=NULL){
-            [ZPDatabase writeCollections:collections toLibrary:library];
-            [[ZPDataLayer instance] notifyLibraryWithCollectionsAvailable:library];
-        }
-        @synchronized(_librariesWhoseCollectionsAreBeingRefreshed){
-            [_librariesWhoseCollectionsAreBeingRefreshed removeObject:[NSNumber numberWithInt:library.libraryID]];
-        }
+        [ZPServerConnectionManager retrieveCollectionsForLibraryFromServer:library.libraryID];
     }
 }
+
+#pragma mark - Metadata callbacks
+
+//Called by server connections to process new data
+-(void) processNewItemsFromServer:(NSArray*)items forLibraryID:(NSInteger)libraryID{
+        
+    
+    DDLogVerbose(@"Writing %i items to cache",[items count]);
+    
+    ZPZoteroItem* item;
+    
+    NSMutableArray* normalItems = [NSMutableArray array];
+    NSMutableArray* attachments = [NSMutableArray array];
+    NSMutableArray* notes = [NSMutableArray array];
+    NSMutableArray* parentItemsForAttachments = [NSMutableArray array];
+    NSMutableArray* parentItemsForNotes = [NSMutableArray array];
+    
+    for(item in items){
+        if( [item needsToBeWrittenToCache]){
+            
+            //TODO: Refactor. This is very confusing.
+            //TODO: Make sure that this logic still works after breaking inheritance between attachment and item
+            
+            /*
+             
+             The following if clause is used to prevent this bug from happening. A more robust fix is needed, but this is better done after refactoring the server connection code to use asynchronous requests and NSNotification.
+             
+             4 ZotPad beta 0x00091df7 -[ZPDatabase updateObjects:intoTable:] (ZPDatabase.m:256)
+             5 ZotPad beta 0x00092635 -[ZPDatabase writeObjects:intoTable:checkTimestamp:] (ZPDatabase.m:347)
+             6 ZotPad beta 0x00094849 -[ZPDatabase writeAttachments:] (ZPDatabase.m:727)
+             7 ZotPad beta 0x00099099 -[ZPCacheController _cacheItemsAndAttachToParentsIfNeeded:] (ZPCacheController.m:433)
+             8 ZotPad beta 0x00099aab -[ZPCacheController _updateItemDetailsFromServer:] (ZPCacheController.m:587)
+             
+             */
+            if(item.serverTimestamp == NULL){
+#ifdef ZPDEBUG
+                //                DDLogError(@"Item %@ has an empty server timestamp and will not be written to cache. The item was created from the following server response: \n\n%@",item.key,item.responseDataFromWhichThisItemWasCreated);
+#endif
+                continue;
+            }
+            
+            item.cacheTimestamp = item.serverTimestamp;
+            
+            if([item isKindOfClass:[ZPZoteroAttachment class]]){
+                ZPZoteroAttachment* attachment = (ZPZoteroAttachment*) item;
+                
+                [attachments addObject:attachment];
+                [self _checkIfAttachmentExistsAndQueueForDownload:attachment];
+                
+                ZPZoteroItem* parent;
+                //Standalone attachments
+                
+                if(attachment.parentKey==attachment.key){
+                    parent =  [ZPZoteroItem itemWithKey:attachment.key];
+                }
+                else{
+                    parent =  [ZPZoteroItem itemWithKey:attachment.parentKey];
+                }
+                if(![parentItemsForAttachments containsObject:parent]) [parentItemsForAttachments addObject:parent];
+            }
+            //If this is a note item, store the note information
+            else if([item isKindOfClass:[ZPZoteroNote class]]){
+                ZPZoteroNote* note = (ZPZoteroNote*) item;
+                [notes addObject:note];
+                
+                //Standalone notes
+                
+                ZPZoteroItem* parent;
+                
+                if(note.parentKey==note.key){
+                    parent =  [ZPZoteroItem itemWithKey:note.key];
+                    [normalItems addObject:parent];
+                }
+                else{
+                    parent = (ZPZoteroItem*) [ZPZoteroItem itemWithKey:note.parentKey];
+                    if(![parentItemsForNotes containsObject:parent]) [parentItemsForNotes addObject:parent];
+                }
+                
+                
+            }
+            //Normal item
+            else{
+                [normalItems addObject:item];
+            }
+        }
+    }
+    
+    [ZPDatabase writeAttachments:attachments];
+    [ZPDatabase writeNotes:notes];
+    
+    NSArray* topLevelItemsThatWereWrittenToCache = [ZPDatabase writeItems:normalItems];
+    NSMutableArray* itemsThatNeedCreatorsAndFields = [NSMutableArray arrayWithArray:topLevelItemsThatWereWrittenToCache];
+    
+    [ZPDatabase writeItemsFields:itemsThatNeedCreatorsAndFields];
+    [ZPDatabase writeItemsCreators:itemsThatNeedCreatorsAndFields];
+    
+    //Refresh the attachments for those items that got new attachments
+    for(item in parentItemsForAttachments){
+        [ZPDatabase addAttachmentsToItem:item];
+    }
+    for(item in parentItemsForNotes){
+        [ZPDatabase addNotesToItem:item];
+    }
+    
+    [[NSNotificationCenter defaultCenter]
+     postNotificationName:ZPNOTIFICATION_ITEMS_AVAILABLE
+     object:[[topLevelItemsThatWereWrittenToCache arrayByAddingObjectsFromArray:parentItemsForNotes]arrayByAddingObjectsFromArray:parentItemsForAttachments]];
+    
+    [self _checkQueues];
+    
+
+}
+-(void) processNewLibrariesFromServer:(NSArray*)libraries{
+    
+        
+    NSEnumerator* e = [libraries objectEnumerator];
+    
+    ZPZoteroLibrary* library;
+    
+    while ( library = (ZPZoteroLibrary*) [e nextObject]) {
+        [ZPServerConnectionManager retrieveCollectionsForLibraryFromServer:library.libraryID];
+    }
+
+    [ZPDatabase writeLibraries:libraries];
+    
+    _isRefresingLibraries = FALSE;
+
+    while ( library = (ZPZoteroLibrary*) [e nextObject]) {
+        if([ZPPreferences cacheMetadataAllLibraries]){
+            [self _checkIfLibraryNeedsCacheRefreshAndQueue:library.libraryID];
+        }
+        
+    }
+    [self _checkQueues];
+
+}
+-(void) processNewCollectionsFromServer:(NSArray*)collections forLibraryID:(NSInteger)libraryID;{
+    
+    ZPZoteroLibrary* library = [ZPZoteroLibrary libraryWithID:libraryID];
+    [ZPDatabase writeCollections:collections toLibrary:library];
+
+    @synchronized(_librariesWhoseCollectionsAreBeingRefreshed){
+        [_librariesWhoseCollectionsAreBeingRefreshed removeObject:[NSNumber numberWithInt:library.libraryID]];
+    }
+    [[NSNotificationCenter defaultCenter] postNotificationName:ZPNOTIFICATION_LIBRARY_WITH_COLLECTIONS_AVAILABLE object:library];
+    [self _checkQueues];
+
+    
+}
+
+/*
+
+ Processes a list containing all keys in a library
+ 
+ */
+
+-(void) processNewItemKeyListFromServer:(NSArray*)serverKeys forLibraryID:(NSInteger) libraryID{
+
+    [ZPDatabase deleteItemKeysNotInArray:serverKeys fromLibrary:libraryID];
+    
+    //If there is data in the library, start cacheing it
+    
+    if([serverKeys count]>0){
+        
+        //Get all keys in the library
+        NSArray* cacheKeys = [ZPDatabase getAllItemKeysForLibrary:libraryID];
+        
+        //How far along the key list we want to retrieve
+        NSString* markerKey = [ZPDatabase getFirstItemKeyWithTimestamp:[[ZPZoteroLibrary libraryWithID:libraryID] cacheTimestamp] from:libraryID];
+        
+        //Iterate the arrays backward until we find a difference
+        NSInteger index = [serverKeys indexOfObject:markerKey];
+        
+        //Sanity check
+        if(index == NSNotFound){
+            index = [serverKeys count];
+        }
+        
+        NSArray* itemKeysThatNeedToBeRetrieved = [serverKeys subarrayWithRange:NSMakeRange(0, index)];
+        
+        // First add all items that do not exist in the cache
+        NSMutableArray* nonExistingKeys = [NSMutableArray arrayWithArray:itemKeysThatNeedToBeRetrieved];
+        [nonExistingKeys removeObjectsInArray:cacheKeys];
+        if([nonExistingKeys count]>0){
+            [self addToItemQueue:nonExistingKeys libraryID:libraryID priority:FALSE];
+            DDLogVerbose(@"Added %i non-existing keys that need data",[nonExistingKeys count]);
+        }
+        
+        // Then add the rest of the items
+        NSMutableArray* existingKeys = [NSMutableArray arrayWithArray:itemKeysThatNeedToBeRetrieved];
+        [existingKeys removeObjectsInArray:nonExistingKeys];
+        if([existingKeys count]>0){
+            [self addToItemQueue:existingKeys libraryID:libraryID priority:FALSE];
+            DDLogVerbose(@"Added %i existing keys that might need new data",[existingKeys count]);
+        }
+        
+    }
+
+    [self _checkQueues];
+
+}
+-(void) processNewTopLevelItemKeyListFromServer:(NSArray*)itemKeys userInfo:(NSDictionary*)parameters{
+
+    NSString* collectionKey = [parameters objectForKey:ZPKEY_COLLECTION_KEY];
+    NSInteger libraryID = [[parameters objectForKey:ZPKEY_LIBRARY_ID] integerValue];
+    
+    //Update collection memberships
+    if(collectionKey!=NULL && [parameters objectForKey: ZPKEY_SEARCH_STRING]!= NULL){
+        NSArray* cachedKeys = [ZPDatabase getItemKeysForLibrary:libraryID collectionKey:collectionKey searchString:NULL orderField:NULL sortDescending:FALSE];
+        
+        NSMutableArray* uncachedItems = [NSMutableArray arrayWithArray:itemKeys];
+        [uncachedItems removeObjectsInArray:cachedKeys];
+        
+        if([uncachedItems count]>0) [ZPDatabase addItemKeys:uncachedItems toCollection:collectionKey];
+        if([itemKeys count] >0) [ZPDatabase removeItemKeysNotInArray:itemKeys fromCollection:collectionKey];
+    }
+    
+    [[NSNotificationCenter defaultCenter]
+     postNotificationName:ZPNOTIFICATION_ITEM_LIST_AVAILABLE
+     object:itemKeys
+     userInfo:parameters];
+
+    [self _checkQueues];
+
+}
+
+/*
+ Compares a timestamp agains cached timestamp and stars retrieving data if needed
+ */
+-(void) processNewTimeStampForLibrary:(NSInteger)libraryID collection:(NSString*)collectionKey timestampValue:(NSString*)newTimestamp{
+
+    //Library timestamp
+    
+    if(collectionKey==NULL){
+        //Check that we are not already cacheing this item.
+
+        NSNumber* keyObj = [NSNumber numberWithInt:libraryID];
+        
+        if([_libraryTimestamps objectForKey:keyObj]==NULL){
+        
+            [_libraryTimestamps setObject:newTimestamp forKey:keyObj];
+   
+            DDLogVerbose(@"Checking if we need to cache library %i",libraryID);
+            [ZPServerConnectionManager retrieveAllItemKeysFromLibrary:libraryID];
+        
+            
+            //Retrieve collections
+            
+            ZPZoteroLibrary* container = (ZPZoteroLibrary*) [ZPZoteroLibrary libraryWithID:libraryID];
+            
+            if(![newTimestamp isEqualToString:container.cacheTimestamp]){
+                
+                [self addToLibrariesQueue:container priority:FALSE];
+                
+                if([ZPPreferences cacheMetadataActiveLibrary]){
+                    
+                    //Retrieve all collections for this library and add them to cache
+                    for(ZPZoteroCollection* collection in [ZPDatabase collectionsForLibrary:container.libraryID]){
+                        [ZPServerConnectionManager retrieveTimestampForLibrary:libraryID collection:collection.key];
+                    }
+                }
+            }
+
+        }
+        
+    }
+    
+    //Collection timestamp
+    
+    else{
+        ZPZoteroCollection* collection = [ZPZoteroCollection collectionWithKey:collectionKey];
+        if(![newTimestamp isEqualToString:collection.cacheTimestamp]){
+            [ZPServerConnectionManager retrieveKeysInLibrary:libraryID collection:collectionKey];
+            [ZPDatabase setUpdatedTimestampForCollection:collectionKey toValue:newTimestamp];
+        }
+    }
+    
+    [self _checkQueues];
+}
+
 
 #pragma mark -
 #pragma mark Notifier methods for metadata
@@ -922,6 +883,7 @@ static ZPCacheController* _instance = nil;
 #pragma mark -
 #pragma mark Attachment cache
 
+//TODO: refactor these methods. Remove those that are not used and convert others to use NSNotification
 
 -(void) notifyAttachmentDownloadCompleted:(ZPZoteroAttachment*) attachment{
     if(attachment.fileExists) [self _updateCacheSizeAfterAddingAttachment:attachment];
@@ -946,9 +908,9 @@ static ZPCacheController* _instance = nil;
 }
 
 
-               -(void) notifyAttachmentUploadStarted:(ZPZoteroAttachment*) attachment{
-                   
-               }
+-(void) notifyAttachmentUploadStarted:(ZPZoteroAttachment*) attachment{
+    
+}
 
                
 -(void) notifyAttachmentDeleted:(ZPZoteroAttachment*) attachment fileAttributes:(NSDictionary*) fileAttributes{

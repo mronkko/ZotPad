@@ -9,6 +9,7 @@
 
 #import <QuickLook/QuickLook.h>
 #import "ZPPreviewSource.h"
+#import "ZPAttachmentFileInteractionController.h"
 
 @interface ZPPreviewController : QLPreviewController <QLPreviewControllerDelegate>{
     id <ZPPreviewSource> _source;

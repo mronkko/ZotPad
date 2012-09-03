@@ -8,7 +8,7 @@
 
 #import "ZPZoteroItem.h"
 #import "ZPZoteroAttachment.h"
-#import "ZPAttachmentObserver.h"
+
 
 #import <Foundation/Foundation.h>
 

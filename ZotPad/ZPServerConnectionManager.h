@@ -1,5 +1,5 @@
 //
-//  ZPServerConnection.h
+//  ZPServerConnectionManager.h
 //  ZotPad
 //
 //  Handles communication with Zotero server. Used as a singleton.
@@ -18,7 +18,7 @@
 #import "ZPFileChannel.h"
 
 
-@interface ZPServerConnection : NSObject <UIAlertViewDelegate>{
+@interface ZPServerConnectionManager : NSObject{
 }
 
 // Check if the connection is already authenticated
@@ -26,19 +26,24 @@
 +(BOOL) hasInternetConnection;
 
 // Methods to get data from the server
-+(NSArray*) retrieveLibrariesFromServer;
-+(NSArray*) retrieveCollectionsForLibraryFromServer:(NSInteger)libraryID;
++(void) retrieveLibrariesFromServer;
++(void) retrieveCollectionsForLibraryFromServer:(NSInteger)libraryID;
 
-+(NSArray*) retrieveItemsFromLibrary:(NSInteger)libraryID itemKeys:(NSArray*)keys;
++(void) retrieveItemsFromLibrary:(NSInteger)libraryID itemKeys:(NSArray*)keys;
 
-+(NSArray*) retrieveKeysInContainer:(NSInteger)libraryID collectionKey:(NSString*)key;
-+(NSArray*) retrieveKeysInContainer:(NSInteger)libraryID collectionKey:(NSString*)collectionKey searchString:(NSString*)searchString orderField:(NSString*)orderField sortDescending:(BOOL)sortDescending;
++(void) retrieveKeysInLibrary:(NSInteger)libraryID collection:(NSString*)key;
++(void) retrieveKeysInLibrary:(NSInteger)libraryID collection:(NSString*)collectionKey searchString:(NSString*)searchString orderField:(NSString*)orderField sortDescending:(BOOL)sortDescending;
     
-+(NSString*) retrieveTimestampForContainer:(NSInteger)libraryID collectionKey:(NSString*)key;
-+(NSArray*) retrieveAllItemKeysFromLibrary:(NSInteger)libraryID;
++(void) retrieveTimestampForLibrary:(NSInteger)libraryID collection:(NSString*)key;
++(void) retrieveAllItemKeysFromLibrary:(NSInteger)libraryID;
 
 //This retrieves single item details and notes and attachments associated with that item
-+(ZPZoteroItem*) retrieveSingleItemDetailsFromServer:(ZPZoteroItem*)item;
++(void) retrieveSingleItemDetailsFromServer:(ZPZoteroItem*)item;
+
++(NSInteger) numberOfActiveMetadataRequests;
+
+/* File uploads and downloads */
+
 
 // Asynchronous downloading of files
 +(NSInteger) numberOfFilesDownloading;

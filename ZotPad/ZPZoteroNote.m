@@ -11,17 +11,17 @@
 
 @implementation ZPZoteroNote
 
-@synthesize itemKey, parentItemKey;
-
 +(void)initialize{
     _objectCache =  [[NSCache alloc] init];
 }
 
 static NSCache* _objectCache = NULL;
 
+
+
 +(ZPZoteroNote*) noteWithDictionary:(NSDictionary *)fields{
     
-    NSString* key = [fields objectForKey:@"itemKey"];
+    NSString* key = [fields objectForKey:ZPKEY_ITEM_KEY];
     
     if(key == NULL || [key isEqual:@""])
         [NSException raise:@"Key is empty" format:@"ZPZoteroNote cannot be instantiated with empty key"];
@@ -51,19 +51,11 @@ static NSCache* _objectCache = NULL;
     return note;
     
 }
-// An alias for setParentCollectionKey
-- (void) setParentKey:(NSString*)key{
-    [self setParentItemKey:key];    
+-(void) setItemKey:(NSString *)itemKey{
+    [super setKey:itemKey];
 }
-- (NSArray*) creators{
-    return [NSArray array];
-}
-- (NSDictionary*) fields{
-    return [NSDictionary dictionary];
-}
-
--(NSString*) itemType{
-    return @"note";
+-(NSString*)itemKey{
+    return [super key];
 }
 
 

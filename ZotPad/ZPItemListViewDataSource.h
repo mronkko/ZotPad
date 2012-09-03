@@ -10,7 +10,7 @@
 #import "ZPCore.h"
 #import "ZPPreviewSource.h"
 
-@interface ZPItemListViewDataSource : NSObject <UITableViewDataSource, ZPItemObserver, ZPPreviewSource>{
+@interface ZPItemListViewDataSource : NSObject <UITableViewDataSource, ZPPreviewSource>{
  
     //This is an array instead of a mutable array because of thread safety
     NSArray* _itemKeysShown;
@@ -46,7 +46,7 @@
 
 - (void)clearTable;
 - (void)configureCachedKeys:(NSArray*)array;
-- (void)configureUncachedKeys:(NSArray*)uncachedItems;
+- (void)configureServerKeys:(NSArray*)uncachedItems;
 
 -(void) _updateRowForItem:(ZPZoteroItem*)item;
 -(void) _performRowInsertions:(NSArray*)insertIndexPaths reloads:(NSArray*)reloadIndexPaths tableLength:(NSInteger)tableLength;

@@ -9,8 +9,8 @@
 #import "ZPCore.h"
 #import "ZPLibraryAndCollectionListViewController.h"
 #import "ZPItemListViewController.h"
-#import "ZPDataLayer.h"
-#import "ZPServerConnection.h"
+#import "ZPDatabase.h"
+#import "ZPServerConnectionManager.h"
 #import "ZPAuthenticationDialog.h"
 #import "ZPAppDelegate.h"
 #import "ZPCacheController.h"
@@ -97,12 +97,12 @@
     //If the current library is not defined, show a list of libraries
     if(self->_currentlibraryID == LIBRARY_ID_NOT_SET){
         [[ZPCacheController instance] performSelectorInBackground:@selector(updateLibrariesAndCollectionsFromServer) withObject:NULL];
-        self->_content = [[ZPDataLayer instance] libraries];
+        self->_content = [ZPDatabase libraries];
     }
     //If a library is chosen, show collections level collections for that library
     else{
         [[ZPCacheController instance] performSelectorInBackground:@selector(updateCollectionsForLibraryFromServer:) withObject:[ZPZoteroLibrary libraryWithID:_currentlibraryID]];
-        self->_content = [[ZPDataLayer instance] collectionsForLibrary:self->_currentlibraryID withParentCollection:self->_currentCollectionKey];        
+        self->_content = [ZPDatabase collectionsForLibrary:self->_currentlibraryID withParentCollection:self->_currentCollectionKey];
     }
     
     [self.tableView reloadData];
@@ -110,15 +110,25 @@
 
 - (void)viewDidAppear:(BOOL)animated
 {
-    [[ZPDataLayer instance] registerLibraryObserver:self];
+    [[NSNotificationCenter defaultCenter] addObserver:self selector:@selector(notifyLibraryWithCollectionsAvailable:) name:ZPNOTIFICATION_LIBRARY_WITH_COLLECTIONS_AVAILABLE object:nil];
     self.detailViewController = (ZPItemListViewController *)[[self.splitViewController.viewControllers lastObject] topViewController];
     [super viewDidAppear:animated];
+    
+    //Show help popover on iPad if not yet shown
+    
+    if(UI_USER_INTERFACE_IDIOM() == UIUserInterfaceIdiomPad){
+        if([[NSUserDefaults standardUserDefaults] objectForKey:@"hasPresentedMainHelpPopover"]==NULL){
+            [ZPHelpPopover displayHelpPopoverFromToolbarButton:gearButton];
+            [[NSUserDefaults standardUserDefaults] setObject:@"1" forKey:@"hasPresentedMainHelpPopover"];
+        }
+    }
+
     
 }
 
 - (void)viewWillDisappear:(BOOL)animated
 {
-    [[ZPDataLayer instance] removeLibraryObserver:self];
+    [[NSNotificationCenter defaultCenter] removeObserver:self];
 	[super viewWillDisappear:animated];
 }
 
@@ -259,136 +269,129 @@
 #pragma mark - 
 #pragma mark Notified methods
 
--(void) notifyLibraryWithCollectionsAvailable:(ZPZoteroLibrary*) library{
+-(void) notifyLibraryWithCollectionsAvailable:(NSNotification*) notification{
     
-    //Show popover
-    if(UI_USER_INTERFACE_IDIOM() == UIUserInterfaceIdiomPad){
-        if([[NSUserDefaults standardUserDefaults] objectForKey:@"hasPresentedMainHelpPopover"]==NULL){
-            [ZPHelpPopover displayHelpPopoverFromToolbarButton:gearButton];
-            [[NSUserDefaults standardUserDefaults] setObject:@"1" forKey:@"hasPresentedMainHelpPopover"];
-        }
-    }
+    ZPZoteroLibrary* library = notification.object;
 
 
     //If this is a library that we are not showing now, just return;
     
-    if(self->_currentlibraryID != library.libraryID) return;
-    
-    if([NSThread isMainThread]){
-        
-        //Loop over the existing content to see if we need to refresh the content of the cells that are already showing
-        
-        ZPZoteroDataObject* shownObject;
-        NSInteger index=-1;
-        
-        for(shownObject in _content){
-            index++;
-
-            UITableViewCell* cell = [self.tableView cellForRowAtIndexPath:[NSIndexPath indexPathForRow:index inSection:0]];
-            //Check accessory button
-            BOOL noAccessory = cell.accessoryType == UITableViewCellAccessoryNone;
-            if(shownObject.hasChildren && noAccessory){
-                cell.accessoryType = UITableViewCellAccessoryDetailDisclosureButton;
-            }
-            else if(!shownObject.hasChildren && ! noAccessory){
-                cell.accessoryType = UITableViewCellAccessoryNone;
-            }
+    if(_currentlibraryID == LIBRARY_ID_NOT_SET || _currentlibraryID == library.libraryID){
+        if([NSThread isMainThread]){
             
-            //Check title
+            //Loop over the existing content to see if we need to refresh the content of the cells that are already showing
             
-            if(![cell.textLabel.text isEqualToString:shownObject.title]){
-                cell.textLabel.text = shownObject.title;
-            }
-        }
-        
-        //Then check if we need to insert, delete, or move cells
-        
-        NSArray* newContent;
-        
-        if(_currentlibraryID == LIBRARY_ID_NOT_SET){
-            newContent = [[ZPDataLayer instance] libraries];        
-        }
-        else if(_currentlibraryID == library.libraryID){
-            newContent = [[ZPDataLayer instance] collectionsForLibrary:self->_currentlibraryID withParentCollection:self->_currentCollectionKey];        
-        }
-
-        NSMutableArray* deleteArray = [[NSMutableArray alloc] init ];
-        NSMutableArray* insertArray = [[NSMutableArray alloc] init ];
-
-        NSMutableArray* shownContent = [NSMutableArray arrayWithArray:_content];
-        
-        index=-1;
-        ZPZoteroDataObject* newObject;
-        
-        //First check which need to be inserted
-        for(newObject in newContent){
-            index++;
+            ZPZoteroDataObject* shownObject;
+            NSInteger index=-1;
             
-            NSInteger oldIndexOfNewObject= [shownContent indexOfObject:newObject];
+            for(shownObject in _content){
+                index++;
                 
-            if(oldIndexOfNewObject == NSNotFound){
-                [insertArray addObject:[NSIndexPath indexPathForRow:index inSection:0]];
-                [shownContent insertObject:newObject atIndex:index];
+                UITableViewCell* cell = [self.tableView cellForRowAtIndexPath:[NSIndexPath indexPathForRow:index inSection:0]];
+                //Check accessory button
+                BOOL noAccessory = cell.accessoryType == UITableViewCellAccessoryNone;
+                if(shownObject.hasChildren && noAccessory){
+                    cell.accessoryType = UITableViewCellAccessoryDetailDisclosureButton;
+                }
+                else if(!shownObject.hasChildren && ! noAccessory){
+                    cell.accessoryType = UITableViewCellAccessoryNone;
+                }
+                
+                //Check title
+                
+                if(![cell.textLabel.text isEqualToString:shownObject.title]){
+                    cell.textLabel.text = shownObject.title;
+                }
             }
-        }
-        
-        //Then check which need to be deleted
-
-        index=-1;
-        
-        for(shownObject in [NSArray arrayWithArray:shownContent]){
-            index++;
-            NSInteger newIndexOfOldObject= [newContent indexOfObject:shownObject];
-
-            if(newIndexOfOldObject == NSNotFound){
-                //If the new object does not exist in th old array, insert it
-                [deleteArray addObject:[NSIndexPath indexPathForRow:index inSection:0]];
-                [shownContent removeObjectAtIndex:index];
+            
+            //Then check if we need to insert, delete, or move cells
+            
+            NSArray* newContent;
+            
+            if(_currentlibraryID == LIBRARY_ID_NOT_SET){
+                newContent = [ZPDatabase libraries];
             }
-        }
-        
-        ZPZoteroDataObject* dataObj;
-        
-        DDLogVerbose(@"Libraries / collections before update");
-        for(dataObj in _content){
-            DDLogVerbose(@"%@",dataObj.title); 
-        }
-        _content = shownContent;
-        
-        [self.tableView beginUpdates];
-         
-        if([insertArray count]>0){
-            [self.tableView insertRowsAtIndexPaths:insertArray withRowAnimation:UITableViewRowAnimationAutomatic];
-            DDLogVerbose(@"Inserting rows into indices");
-            NSIndexPath* temp;
-            for(temp in insertArray){
-                DDLogVerbose(@"%i",temp.row); 
+            else if(_currentlibraryID == library.libraryID){
+                newContent = [ZPDatabase collectionsForLibrary:self->_currentlibraryID withParentCollection:self->_currentCollectionKey];
             }
-
-        }
-        if([deleteArray count]>0){
-            [self.tableView deleteRowsAtIndexPaths:deleteArray withRowAnimation:UITableViewRowAnimationAutomatic];
-            DDLogVerbose(@"Deleting rows from indices");
-            NSIndexPath* temp;
-            for(temp in insertArray){
-                DDLogVerbose(@"%i",temp.row); 
+            
+            NSMutableArray* deleteArray = [[NSMutableArray alloc] init ];
+            NSMutableArray* insertArray = [[NSMutableArray alloc] init ];
+            
+            NSMutableArray* shownContent = [NSMutableArray arrayWithArray:_content];
+            
+            index=-1;
+            ZPZoteroDataObject* newObject;
+            
+            //First check which need to be inserted
+            for(newObject in newContent){
+                index++;
+                
+                NSInteger oldIndexOfNewObject= [shownContent indexOfObject:newObject];
+                
+                if(oldIndexOfNewObject == NSNotFound){
+                    [insertArray addObject:[NSIndexPath indexPathForRow:index inSection:0]];
+                    [shownContent insertObject:newObject atIndex:index];
+                }
             }
+            
+            //Then check which need to be deleted
+            
+            index=-1;
+            
+            for(shownObject in [NSArray arrayWithArray:shownContent]){
+                index++;
+                NSInteger newIndexOfOldObject= [newContent indexOfObject:shownObject];
+                
+                if(newIndexOfOldObject == NSNotFound){
+                    //If the new object does not exist in th old array, insert it
+                    [deleteArray addObject:[NSIndexPath indexPathForRow:index inSection:0]];
+                    [shownContent removeObjectAtIndex:index];
+                }
+            }
+            
+            ZPZoteroDataObject* dataObj;
+            
+            DDLogVerbose(@"Libraries / collections before update");
+            for(dataObj in _content){
+                DDLogVerbose(@"%@",dataObj.title);
+            }
+            _content = shownContent;
+            
+            [self.tableView beginUpdates];
+            
+            if([insertArray count]>0){
+                [self.tableView insertRowsAtIndexPaths:insertArray withRowAnimation:UITableViewRowAnimationAutomatic];
+                DDLogVerbose(@"Inserting rows into indices");
+                NSIndexPath* temp;
+                for(temp in insertArray){
+                    DDLogVerbose(@"%i",temp.row);
+                }
+                
+            }
+            if([deleteArray count]>0){
+                [self.tableView deleteRowsAtIndexPaths:deleteArray withRowAnimation:UITableViewRowAnimationAutomatic];
+                DDLogVerbose(@"Deleting rows from indices");
+                NSIndexPath* temp;
+                for(temp in insertArray){
+                    DDLogVerbose(@"%i",temp.row);
+                }
+            }
+            
+            [self.tableView endUpdates];
+            DDLogVerbose(@"Libraries / collections after update");
+            for(dataObj in _content){
+                DDLogVerbose(@"%@",dataObj.title); 
+            }
+            
+            //TODO: Figure out a way to keep the activity view spinning until the last library is loaded.
+            //[_activityIndicator stopAnimating];
+            
         }
-        
-        [self.tableView endUpdates];
-        DDLogVerbose(@"Libraries / collections after update");
-        for(dataObj in _content){
-            DDLogVerbose(@"%@",dataObj.title); 
+        else{
+            [self performSelectorOnMainThread:@selector( notifyLibraryWithCollectionsAvailable:) withObject:notification waitUntilDone:YES];
         }
-        
-    //TODO: Figure out a way to keep the activity view spinning until the last library is loaded.
-    //[_activityIndicator stopAnimating];
-        
     }
-    else{
-        [self performSelectorOnMainThread:@selector( notifyLibraryWithCollectionsAvailable:) withObject:library waitUntilDone:YES];
-    }
-    
 }
 
 

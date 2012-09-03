@@ -25,8 +25,6 @@ extern NSInteger const VERSION_SOURCE_WEBDAV;
     NSInteger _linkMode;
 }
 
-@property (retain) NSString* itemKey;
-@property (retain) NSString* parentItemKey;
 @property (retain) NSString* contentType;
 @property (assign) NSInteger linkMode;
 @property (assign) BOOL existsOnZoteroServer;
@@ -35,6 +33,7 @@ extern NSInteger const VERSION_SOURCE_WEBDAV;
 @property (retain) NSString* url;
 @property (retain) NSString* filename;
 @property (retain) NSString* charset;
+@property (retain) NSString* itemKey;
 
 // Needed for versioning
 
@@ -48,9 +47,6 @@ extern NSInteger const VERSION_SOURCE_WEBDAV;
 +(ZPZoteroAttachment*) attachmentWithKey:(NSString*) key;
 +(ZPZoteroAttachment*) attachmentWithDictionary:(NSDictionary*) fields;
 
-
-// An alias for setParentItemKey
-- (void) setParentKey:(NSString*)key;
 - (NSString*) fileSystemPath;
 - (NSString*) fileSystemPath_modified;
 - (NSString*) fileSystemPath_original;

@@ -100,7 +100,7 @@
     [ZPDatabase writeVersionInfoForAttachment:attachment];
     [fileChannel startUploadingAttachment:attachment overWriteConflictingServerVersion:YES];
     [self dismissModalViewControllerAnimated:YES];
-    [[ZPDataLayer instance] notifyAttachmentUploadStarted:attachment];
+    [[NSNotificationCenter defaultCenter] postNotificationName:ZPNOTIFICATION_ATTACHMENT_FILE_UPLOAD_STARTED object:attachment];
 }
 -(IBAction)useRemoteVersion:(id)sender{
     attachment.versionIdentifier_local = NULL;
@@ -108,7 +108,7 @@
     [ZPDatabase writeVersionInfoForAttachment:attachment];
     [fileChannel cancelUploadingAttachment:attachment];
     [self dismissModalViewControllerAnimated:YES];
-    [[ZPDataLayer instance] notifyAttachmentUploadCanceled:attachment];    
+    [[NSNotificationCenter defaultCenter] postNotificationName:ZPNOTIFICATION_ATTACHMENT_FILE_UPLOAD_CANCELED object:attachment];
 }
 
 

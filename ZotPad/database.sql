@@ -32,13 +32,13 @@ CREATE TABLE IF NOT EXISTS libraries (
 
 CREATE TABLE IF NOT EXISTS collections (
     title TEXT NOT NULL,
-    parentCollectionKey TEXT DEFAULT NULL,
+    parentKey TEXT DEFAULT NULL,
     cacheTimestamp TEXT DEFAULT NULL,
     libraryID INT,
     collectionKey TEXT PRIMARY KEY
 );
 
-CREATE INDEX collections_parentCollectionKey ON collections (parentCollectionKey);
+CREATE INDEX collections_parentKey ON collections (parentKey);
 
 
 CREATE TABLE IF NOT EXISTS items (
@@ -56,22 +56,22 @@ CREATE INDEX items_libraryID ON items (libraryID);
 
 /*
  
- Notes and attachments are subclasses of item, so they have itemKey as primary key.
+ Notes and attachments are subclasses of item, so they have key as primary key.
 
 */
 
 
 CREATE TABLE IF NOT EXISTS notes (
-    parentItemKey TEXT NOT NULL,
+    parentKey TEXT NOT NULL,
     itemKey TEXT PRIMARY KEY,
     cacheTimestamp TEXT NOT NULL
 );
 
-CREATE INDEX notes_parentItemKey ON notes (parentItemKey);
+CREATE INDEX notes_parentKey ON notes (parentKey);
 
 
 CREATE TABLE IF NOT EXISTS attachments (
-    parentItemKey TEXT NOT NULL,
+    parentKey TEXT NOT NULL,
     itemKey TEXT PRIMARY KEY,
     title TEXT NOT NULL,
     cacheTimestamp TEXT NOT NULL,
@@ -88,7 +88,7 @@ CREATE TABLE IF NOT EXISTS attachments (
     versionIdentifier_local TEXT DEFAULT NULL
 );
 
-CREATE INDEX attachments_parentItemKey ON attachments (parentItemKey);
+CREATE INDEX attachments_parentKey ON attachments (parentKey);
 
 
 

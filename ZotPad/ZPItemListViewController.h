@@ -14,7 +14,7 @@
 
 @class ZPItemListViewDataSource;
 
-@interface ZPItemListViewController : UIViewController <UISplitViewControllerDelegate, UISearchBarDelegate, ZPItemObserver>{
+@interface ZPItemListViewController : UIViewController <UISplitViewControllerDelegate, UISearchBarDelegate>{
 
     ZPItemListViewDataSource* _dataSource;
     DSBezelActivityView* _activityView;
@@ -34,7 +34,7 @@
 @property (strong, nonatomic) UIPopoverController *masterPopoverController;
 
 -(void)configureView;
-
+-(void)processItemListAvailableNotification:(NSDictionary*)content;
 - (void)makeBusy;
 - (void)makeAvailable;
 

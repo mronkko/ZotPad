@@ -62,6 +62,7 @@
         if(row==1) col=col+1;
 
     }
+    
     [[ZPCacheController instance] setStatusView:self];
     
     return self;

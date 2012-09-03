@@ -10,9 +10,9 @@
 
 
 #import "ZPAuthenticationDialog.h"
-#import "ZPServerConnection.h"
+#import "ZPServerConnectionManager.h"
 #import "OAToken.h"
-#import "ZPDataLayer.h"
+
 #import "DSActivityView.h"
 #import "ZPCacheController.h"
 

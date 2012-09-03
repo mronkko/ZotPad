@@ -11,7 +11,7 @@
 
 @implementation ZPZoteroItem
 
-@synthesize fullCitation, numTags,dateAdded,etag,jsonFromServer;
+@synthesize fullCitation, numTags,dateAdded,etag;
 
 //TODO: Consider what happens when the cache is purged. This may result in duplicate objects with the same key.
 
@@ -33,7 +33,7 @@ static NSCache* _objectCache = NULL;
 
 +(ZPZoteroItem*) itemWithDictionary:(NSDictionary *)fields{
     
-    NSString* key = [fields objectForKey:@"itemKey"];
+    NSString* key = [fields objectForKey:ZPKEY_ITEM_KEY];
     
     if(key == NULL || [key isEqual:@""])
         [NSException raise:@"Key is empty" format:@"ZPZoteroItem cannot be instantiated with empty key"];
@@ -79,13 +79,20 @@ static NSCache* _objectCache = NULL;
     return obj;
 }
 
+-(void) setItemKey:(NSString *)itemKey{
+    [super setKey:itemKey];
+}
+-(NSString*)itemKey{
+    return [super key];
+}
+
 +(void) dropCache{
     [_objectCache removeAllObjects];
 }
 
 -(NSString*) publicationDetails{
     
-    if([self.fields count] == 0 || [self.itemType isEqualToString:@"note"] || [self.itemType isEqualToString:@"attachment"]){
+    if([self.fields count] == 0 || [self.itemType isEqualToString:@"note"] || [self.itemType isEqualToString:ZPKEY_ATTACHMENT]){
         return @"";
     }
     
@@ -133,7 +140,7 @@ static NSCache* _objectCache = NULL;
 
 -(NSString*) creatorSummary{
     
-    if([self.fields count] == 0 || [self.itemType isEqualToString:@"note"] || [self.itemType isEqualToString:@"attachment"]){
+    if([self.fields count] == 0 || [self.itemType isEqualToString:@"note"] || [self.itemType isEqualToString:ZPKEY_ATTACHMENT]){
         return @"";
     }
 
@@ -245,15 +252,6 @@ static NSCache* _objectCache = NULL;
     }
     return _collections;
 }
-
--(NSString *) itemKey{
-    return [self key];
-}
-
--(void) setItemKey:(NSString*)key{
-    [super setKey:key];
-}
-
 
 - (NSString*) shortCitation{
 
