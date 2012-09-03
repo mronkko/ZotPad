@@ -451,7 +451,8 @@ const NSInteger ZPServerConnectionManagerRequestLastModifiedItem = 11;
     }
     
     //Process data
-    else if([parsedArray count] >0){
+    
+    else {
         switch(request.tag){
                 
             case ZPServerConnectionManagerRequestPermissions:
@@ -486,9 +487,9 @@ const NSInteger ZPServerConnectionManagerRequestLastModifiedItem = 11;
                             [returnArray addObjectsFromArray:groups];
                         }
                         //My library
-                        else if([parsedArray indexOfObject:[NSString stringWithFormat:@"%i",LIBRARY_ID_MY_LIBRARY]]!=NSNotFound){
-                            [returnArray addObject:[ZPZoteroLibrary libraryWithID:LIBRARY_ID_MY_LIBRARY]];
-                        }
+//                        else if(libraryString isEqualToString:[NSString stringWithFormat:@"%i",LIBRARY_ID_MY_LIBRARY]]){
+//                            [returnArray addObject:[ZPZoteroLibrary libraryWithID:LIBRARY_ID_MY_LIBRARY]];
+//                        }
                         //Group
                         else{
                             [returnArray addObject:[ZPZoteroLibrary libraryWithID:[libraryString integerValue]]];
@@ -507,7 +508,7 @@ const NSInteger ZPServerConnectionManagerRequestLastModifiedItem = 11;
                 
             case ZPServerConnectionManagerRequestCollections:
             case ZPServerConnectionManagerRequestSingleCollection:
-                if([parsedArray count]>0) [[ZPCacheController instance] processNewCollectionsFromServer:parsedArray forLibraryID:[[userInfo objectForKey:ZPKEY_LIBRARY_ID] integerValue]];
+                [[ZPCacheController instance] processNewCollectionsFromServer:parsedArray forLibraryID:[[userInfo objectForKey:ZPKEY_LIBRARY_ID] integerValue]];
                 break;
                 
                 
