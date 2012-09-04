@@ -18,6 +18,13 @@
 #import "ZPItemListViewDataSource.h"
 #import "ZPHelpPopover.h"
 #import "ZPMasterItemListViewController.h"
+#import "FRLayeredNavigationController.h"
+#import "FRLayeredNavigationItem.h"
+#import "UIViewController+FRLayeredNavigationController.h"
+
+@interface ZPLibraryAndCollectionListViewController()
+-(void) _adjustLayeredNavigationControllerLayerWidths;
+@end
 
 @implementation ZPLibraryAndCollectionListViewController
 
@@ -68,6 +75,9 @@
     self.clearsSelectionOnViewWillAppear = NO;
     
 	// Do any additional setup after loading the view, typically from a nib.
+    
+    //TODO: Implement this on iPhone as well.
+    
     if(UI_USER_INTERFACE_IDIOM() == UIUserInterfaceIdiomPad){
         
         //Show Cache controller status, only on iPad
@@ -208,7 +218,7 @@
 	ZPZoteroDataObject* node = [self->_content objectAtIndex: indexPath.row];
 	if ( [node hasChildren])
 	{
-		cell.accessoryType = UITableViewCellAccessoryDetailDisclosureButton;
+		cell.accessoryType = UITableViewCellAccessoryDisclosureIndicator;
 	}
 	else
 	{
@@ -241,34 +251,59 @@
         //Clear search when changing collection. This is how Zotero behaves
         [self.detailViewController clearSearch];
         [self.detailViewController configureView];
-    }    
+    }
+
+    // If there are subcollections, drill down.
+    if(node.hasChildren){
+    
+        ZPLibraryAndCollectionListViewController* subController = [self.storyboard instantiateViewControllerWithIdentifier:@"LibraryAndCollectionList"];
+        subController.currentlibraryID=[node libraryID];
+        subController.currentCollectionKey=[node key];
+
+        //For some reason the view lifecycle methods are not called
+        [subController loadView];
+        [subController viewWillAppear:NO];
+        [subController viewDidAppear:NO];
+
+        subController.layeredNavigationItem.hasChrome = FALSE;
+        
+        [self.layeredNavigationController pushViewController:subController
+                                                   inFrontOf:self
+                                                maximumWidth:YES
+                                                    animated: YES];
+
+        [self _adjustLayeredNavigationControllerLayerWidths];
+    }
+    else{
+        //Pop everything on top of this
+        [self.layeredNavigationController popToViewController:self
+                                                    animated: YES];
+        [self _adjustLayeredNavigationControllerLayerWidths];
+
+    }
+}
+
+-(void) _adjustLayeredNavigationControllerLayerWidths{
+    NSInteger maxOverLap = 64;
+    NSInteger maxSpaceForLayers = 128;
+    NSInteger numberOfLayers = [self.layeredNavigationController.viewControllers count]-1;
+    
+    if(numberOfLayers==0) return;
+    
+    CGFloat nextItemDistance = MIN(maxOverLap, maxSpaceForLayers/(CGFloat) numberOfLayers);
+    CGFloat x=0;
+    
+    for(UIViewController* viewController in self.layeredNavigationController.viewControllers){
+        viewController.layeredNavigationItem.nextItemDistance = nextItemDistance;
+        viewController.layeredNavigationItem.currentViewPosition = CGPointMake(x, viewController.layeredNavigationItem.currentViewPosition.y);
+        viewController.layeredNavigationItem.initialViewPosition = CGPointMake(x, viewController.layeredNavigationItem.initialViewPosition.y);
+        x=x+nextItemDistance;
+    }
+    [self.layeredNavigationController doLayout];
 }
 
 
-- (void) tableView: (UITableView *) aTableView accessoryButtonTappedForRowWithIndexPath: (NSIndexPath *) indexPath
-{
-    /*
-     Drill down to a library or collection
-    */
-    
-    
-    ZPLibraryAndCollectionListViewController* subController = [self.storyboard instantiateViewControllerWithIdentifier:@"LibraryAndCollectionList"];
-	subController.detailViewController = self.detailViewController;
-    ZPZoteroDataObject* selectedNode  = [self->_content objectAtIndex: indexPath.row];
-	subController.currentlibraryID=[selectedNode libraryID];
-	subController.currentCollectionKey=[selectedNode key];
-	
-    NSObject* navi = self.navigationController;
-    
-	[self.navigationController pushViewController: subController animated: YES];
-	
-}
-
-
-
-
-
-#pragma mark - 
+#pragma mark -
 #pragma mark Notified methods
 
 -(void) notifyLibraryWithCollectionsAvailable:(NSNotification*) notification{
@@ -293,7 +328,7 @@
                 //Check accessory button
                 BOOL noAccessory = cell.accessoryType == UITableViewCellAccessoryNone;
                 if(shownObject.hasChildren && noAccessory){
-                    cell.accessoryType = UITableViewCellAccessoryDetailDisclosureButton;
+                    cell.accessoryType = UITableViewCellAccessoryDisclosureIndicator;
                 }
                 else if(!shownObject.hasChildren && ! noAccessory){
                     cell.accessoryType = UITableViewCellAccessoryNone;

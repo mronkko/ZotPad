@@ -22,8 +22,8 @@
 #import "DDFileLogger.h"
 #import "TestFlightLogger.h"
 #import "CompressingLogFileManager.h"
-
-
+#import "FRLayeredNavigationController.h"
+#import "FRLayeredNavigationItem.h"
 
 @interface ZPFileLogFormatter : NSObject <DDLogFormatter>{
     NSInteger _level;
@@ -125,11 +125,11 @@ didFinishLaunchingWithOptions:(NSDictionary *)launchOptions
     NSUserDefaults* defaults = [NSUserDefaults standardUserDefaults];
     [defaults setObject:@"" forKey:@"userID"];
     [defaults setObject:@"" forKey:@"OAuthKey"];
-     */
     
     //Uncomment these to always reset the app after launch
     [ZPDatabase resetDatabase];
     [[ZPCacheController instance] performSelectorInBackground:@selector(purgeAllAttachmentFilesFromCache) withObject:NULL];
+     */
     
     
     
@@ -142,8 +142,15 @@ didFinishLaunchingWithOptions:(NSDictionary *)launchOptions
 
         if ([splitViewController respondsToSelector:@selector(setPresentsWithGesture:)]) {
             [splitViewController setPresentsWithGesture:NO];
-        }
 
+        }
+        UINavigationController *masterController = [splitViewController.viewControllers objectAtIndex:0];
+        [masterController pushViewController:[[FRLayeredNavigationController alloc] initWithRootViewController:[splitViewController.storyboard instantiateViewControllerWithIdentifier:@"LibraryAndCollectionList"]
+                                                                                                 configuration:^(FRLayeredNavigationItem *item) {
+                                                                                                     item.width = 320;
+                                                                                                     return;
+                                                                                                 }] animated:NO];
+        
         UINavigationController *navigationController = [splitViewController.viewControllers lastObject];
         splitViewController.delegate = (id)navigationController.topViewController;
     }

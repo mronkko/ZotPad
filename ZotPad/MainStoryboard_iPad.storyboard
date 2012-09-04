@@ -1,6 +1,7 @@
 <?xml version="1.0" encoding="UTF-8" standalone="no"?>
 <document type="com.apple.InterfaceBuilder3.CocoaTouch.Storyboard.XIB" version="2.0" toolsVersion="2549" systemVersion="11E53" targetRuntime="iOS.CocoaTouch.iPad" propertyAccessControl="none" initialViewController="5">
     <dependencies>
+        <deployment defaultVersion="1296" identifier="iOS"/>
         <plugIn identifier="com.apple.InterfaceBuilder.IBCocoaTouchPlugin" version="1498"/>
     </dependencies>
     <scenes>
@@ -275,11 +276,11 @@
             </objects>
             <point key="canvasLocation" x="-711" y="-178"/>
         </scene>
-        <!--Layered Navigation Controller-->
+        <!--Navigation Controller-->
         <scene sceneID="puq-IN-Mjn">
             <objects>
                 <placeholder placeholderIdentifier="IBFirstResponder" id="ouz-JB-wLz" userLabel="First Responder" sceneMemberID="firstResponder"/>
-                <viewController id="TTV-Zg-eug" customClass="FRLayeredNavigationController" sceneMemberID="viewController">
+                <viewController id="TTV-Zg-eug" customClass="UINavigationController" sceneMemberID="viewController">
                     <view key="view" contentMode="scaleToFill" id="afU-YI-ao2">
                         <rect key="frame" x="0.0" y="20" width="320" height="748"/>
                         <autoresizingMask key="autoresizingMask" flexibleMaxX="YES" flexibleMaxY="YES"/>
@@ -293,17 +294,17 @@
         <!--Library And Collection List View Controller - Libraries-->
         <scene sceneID="24">
             <objects>
-                <tableViewController storyboardIdentifier="LibraryAndCollectionList" title="Libraries" clearsSelectionOnViewWillAppear="NO" id="19" customClass="ZPLibraryAndCollectionListViewController" sceneMemberID="viewController">
+                <tableViewController storyboardIdentifier="LibraryAndCollectionList" clearsSelectionOnViewWillAppear="NO" id="19" customClass="ZPLibraryAndCollectionListViewController" sceneMemberID="viewController">
                     <tableView key="view" clipsSubviews="YES" contentMode="scaleToFill" alwaysBounceVertical="YES" dataMode="prototypes" style="plain" rowHeight="44" sectionHeaderHeight="22" sectionFooterHeight="22" id="20">
                         <rect key="frame" x="0.0" y="20" width="320" height="788"/>
                         <autoresizingMask key="autoresizingMask" widthSizable="YES" heightSizable="YES"/>
                         <color key="backgroundColor" white="1" alpha="1" colorSpace="calibratedWhite"/>
                         <prototypes>
-                            <tableViewCell contentMode="scaleToFill" selectionStyle="blue" hidesAccessoryWhenEditing="NO" indentationLevel="1" indentationWidth="0.0" reuseIdentifier="CollectionCell" id="5KY-wq-uum">
+                            <tableViewCell contentMode="scaleToFill" selectionStyle="blue" accessoryType="disclosureIndicator" hidesAccessoryWhenEditing="NO" indentationLevel="1" indentationWidth="0.0" reuseIdentifier="CollectionCell" id="5KY-wq-uum">
                                 <rect key="frame" x="0.0" y="22" width="320" height="44"/>
                                 <autoresizingMask key="autoresizingMask"/>
                                 <view key="contentView" opaque="NO" clipsSubviews="YES" multipleTouchEnabled="YES" contentMode="center">
-                                    <rect key="frame" x="0.0" y="0.0" width="320" height="43"/>
+                                    <rect key="frame" x="0.0" y="0.0" width="300" height="43"/>
                                     <autoresizingMask key="autoresizingMask"/>
                                     <color key="backgroundColor" white="0.0" alpha="0.0" colorSpace="calibratedWhite"/>
                                 </view>
@@ -500,7 +501,7 @@
             <objects>
                 <viewController storyboardIdentifier="" title="Version conflict" modalPresentationStyle="pageSheet" id="htM-EZ-pFH" customClass="ZPUploadVersionConflictViewControllerViewController" sceneMemberID="viewController">
                     <view key="view" contentMode="scaleToFill" id="tzC-ae-egO">
-                        <rect key="frame" x="0.0" y="20" width="768" height="748"/>
+                        <rect key="frame" x="0.0" y="0.0" width="768" height="768"/>
                         <autoresizingMask key="autoresizingMask" flexibleMaxX="YES" flexibleMaxY="YES"/>
                         <subviews>
                             <navigationBar contentMode="scaleToFill" id="g4v-7I-ScY">
@@ -511,7 +512,7 @@
                                 </items>
                             </navigationBar>
                             <button opaque="NO" contentMode="scaleToFill" contentHorizontalAlignment="center" contentVerticalAlignment="center" buttonType="roundedRect" lineBreakMode="middleTruncation" id="WTL-gR-2yA">
-                                <rect key="frame" x="42" y="675" width="300" height="37"/>
+                                <rect key="frame" x="42" y="694" width="300" height="37"/>
                                 <autoresizingMask key="autoresizingMask" flexibleMinX="YES" flexibleMaxX="YES" flexibleMinY="YES" flexibleMaxY="YES"/>
                                 <fontDescription key="fontDescription" type="boldSystem" pointSize="15"/>
                                 <state key="normal" title="Use my version">
@@ -526,7 +527,7 @@
                                 </connections>
                             </button>
                             <button opaque="NO" contentMode="scaleToFill" contentHorizontalAlignment="center" contentVerticalAlignment="center" buttonType="roundedRect" lineBreakMode="middleTruncation" id="52t-gZ-FLk">
-                                <rect key="frame" x="425" y="675" width="300" height="37"/>
+                                <rect key="frame" x="425" y="694" width="300" height="37"/>
                                 <autoresizingMask key="autoresizingMask" flexibleMinX="YES" flexibleMaxX="YES" flexibleMinY="YES" flexibleMaxY="YES"/>
                                 <fontDescription key="fontDescription" type="boldSystem" pointSize="15"/>
                                 <state key="normal" title="Use server version">
@@ -541,19 +542,19 @@
                                 </connections>
                             </button>
                             <label opaque="NO" clipsSubviews="YES" userInteractionEnabled="NO" contentMode="left" text="The following file has changed on the server" lineBreakMode="tailTruncation" numberOfLines="2" baselineAdjustment="alignBaselines" minimumFontSize="10" id="LNC-vG-Hyq">
-                                <rect key="frame" x="20" y="49" width="728" height="59"/>
+                                <rect key="frame" x="20" y="50" width="728" height="59"/>
                                 <autoresizingMask key="autoresizingMask" widthSizable="YES" flexibleMinY="YES" flexibleMaxY="YES"/>
                                 <fontDescription key="fontDescription" type="system" pointSize="17"/>
                                 <color key="textColor" cocoaTouchSystemColor="darkTextColor"/>
                                 <nil key="highlightedColor"/>
                             </label>
                             <view contentMode="scaleToFill" id="JcT-DL-d1h" customClass="iCarousel">
-                                <rect key="frame" x="403" y="181" width="345" height="386"/>
+                                <rect key="frame" x="403" y="181" width="345" height="406"/>
                                 <autoresizingMask key="autoresizingMask" widthSizable="YES" heightSizable="YES"/>
                                 <color key="backgroundColor" white="1" alpha="1" colorSpace="custom" customColorSpace="calibratedWhite"/>
                             </view>
                             <view contentMode="scaleToFill" id="yWo-77-JOF" customClass="iCarousel">
-                                <rect key="frame" x="20" y="181" width="345" height="386"/>
+                                <rect key="frame" x="20" y="181" width="345" height="406"/>
                                 <autoresizingMask key="autoresizingMask" widthSizable="YES" heightSizable="YES"/>
                                 <color key="backgroundColor" white="1" alpha="1" colorSpace="custom" customColorSpace="calibratedWhite"/>
                             </view>
@@ -662,97 +663,12 @@
     <resources>
         <image name="gear.png" width="20" height="20"/>
     </resources>
-    <classes>
-        <class className="FRLayeredNavigationController" superclassName="UIViewController">
-            <source key="sourceIdentifier" type="project" relativePath="./Classes/FRLayeredNavigationController.h"/>
-        </class>
-        <class className="OHAttributedLabel" superclassName="UILabel">
-            <source key="sourceIdentifier" type="project" relativePath="./Classes/OHAttributedLabel.h"/>
-            <relationships>
-                <relationship kind="outlet" name="delegate"/>
-            </relationships>
-        </class>
-        <class className="ZPAuthenticationDialog" superclassName="UIViewController">
-            <source key="sourceIdentifier" type="project" relativePath="./Classes/ZPAuthenticationDialog.h"/>
-            <relationships>
-                <relationship kind="action" name="loadFirstPage:"/>
-                <relationship kind="outlet" name="webView" candidateClass="UIWebView"/>
-            </relationships>
-        </class>
-        <class className="ZPFileImportViewController" superclassName="UIViewController">
-            <source key="sourceIdentifier" type="project" relativePath="./Classes/ZPFileImportViewController.h"/>
-            <relationships>
-                <relationship kind="outlet" name="carousel" candidateClass="iCarousel"/>
-            </relationships>
-        </class>
-        <class className="ZPItemDetailViewController" superclassName="UITableViewController">
-            <source key="sourceIdentifier" type="project" relativePath="./Classes/ZPItemDetailViewController.h"/>
-            <relationships>
-                <relationship kind="action" name="actionButtonPressed:"/>
-                <relationship kind="outlet" name="actionButton" candidateClass="UIBarButtonItem"/>
-            </relationships>
-        </class>
-        <class className="ZPItemListViewController" superclassName="UIViewController">
-            <source key="sourceIdentifier" type="project" relativePath="./Classes/ZPItemListViewController.h"/>
-            <relationships>
-                <relationship kind="action" name="sortButtonPressed:"/>
-                <relationship kind="outlet" name="searchBar" candidateClass="UISearchBar"/>
-                <relationship kind="outlet" name="tableView" candidateClass="UITableView"/>
-                <relationship kind="outlet" name="toolBar" candidateClass="UIToolbar"/>
-            </relationships>
-        </class>
-        <class className="ZPLibraryAndCollectionListViewController" superclassName="UITableViewController">
-            <source key="sourceIdentifier" type="project" relativePath="./Classes/ZPLibraryAndCollectionListViewController.h"/>
-            <relationships>
-                <relationship kind="outlet" name="cacheControllerPlaceHolder" candidateClass="UIBarButtonItem"/>
-                <relationship kind="outlet" name="gearButton" candidateClass="UIBarButtonItem"/>
-            </relationships>
-        </class>
-        <class className="ZPLogViewController" superclassName="UIViewController">
-            <source key="sourceIdentifier" type="project" relativePath="./Classes/ZPLogViewController.h"/>
-            <relationships>
-                <relationship kind="action" name="dismiss:"/>
-                <relationship kind="action" name="emailSupport:"/>
-                <relationship kind="action" name="knowledgeBase:"/>
-                <relationship kind="action" name="manageKey:"/>
-                <relationship kind="action" name="showManual:"/>
-                <relationship kind="outlet" name="logView" candidateClass="UITextView"/>
-                <relationship kind="outlet" name="manualButton" candidateClass="UIBarButtonItem"/>
-            </relationships>
-        </class>
-        <class className="ZPMasterItemListViewController" superclassName="UITableViewController">
-            <source key="sourceIdentifier" type="project" relativePath="./Classes/ZPMasterItemListViewController.h"/>
-        </class>
-        <class className="ZPSplitViewController" superclassName="UISplitViewController">
-            <source key="sourceIdentifier" type="project" relativePath="./Classes/ZPSplitViewController.h"/>
-            <relationships>
-                <relationship kind="action" name="showLogView:"/>
-            </relationships>
-        </class>
-        <class className="ZPUploadVersionConflictViewControllerViewController" superclassName="UIViewController">
-            <source key="sourceIdentifier" type="project" relativePath="./Classes/ZPUploadVersionConflictViewControllerViewController.h"/>
-            <relationships>
-                <relationship kind="action" name="useMyVersion:"/>
-                <relationship kind="action" name="useRemoteVersion:"/>
-                <relationship kind="outlet" name="carousel" candidateClass="iCarousel"/>
-                <relationship kind="outlet" name="label" candidateClass="UILabel"/>
-                <relationship kind="outlet" name="secondaryCarousel" candidateClass="iCarousel"/>
-            </relationships>
-        </class>
-        <class className="iCarousel" superclassName="UIView">
-            <source key="sourceIdentifier" type="project" relativePath="./Classes/iCarousel.h"/>
-            <relationships>
-                <relationship kind="outlet" name="dataSource"/>
-                <relationship kind="outlet" name="delegate"/>
-            </relationships>
-        </class>
-    </classes>
     <simulatedMetricsContainer key="defaultSimulatedMetrics">
         <simulatedStatusBarMetrics key="statusBar" statusBarStyle="blackTranslucent"/>
         <simulatedOrientationMetrics key="orientation"/>
         <simulatedScreenMetrics key="destination"/>
     </simulatedMetricsContainer>
     <inferredMetricsTieBreakers>
-        <segue reference="bAm-Ev-B5H"/>
+        <segue reference="GHg-CO-l1D"/>
     </inferredMetricsTieBreakers>
 </document>
