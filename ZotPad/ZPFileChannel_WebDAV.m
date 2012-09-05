@@ -283,6 +283,9 @@ NSInteger const ZPFILECHANNEL_WEBDAV_UPLOAD_REGISTER = 5;
     
     [uploadRequest setRequestMethod:@"PUT"];
     
+    //Ensure that persistent connections are not in use
+    [uploadRequest setShouldAttemptPersistentConnection:NO];
+    
     [uploadRequest startAsynchronous];
     
 }
@@ -458,23 +461,24 @@ NSInteger const ZPFILECHANNEL_WEBDAV_UPLOAD_REGISTER = 5;
     
     else {
         
-        
-        if(request.tag == ZPFILECHANNEL_WEBDAV_UPLOAD_FILE && (request.responseStatusCode == 204 || request.responseStatusCode == 201)){
-            [self _performWebDAVUploadForAttachment:attachment tag:ZPFILECHANNEL_WEBDAV_UPLOAD_UPDATE_PROP userInfo:request.userInfo];
-        }        
-        else if(request.tag == ZPFILECHANNEL_WEBDAV_UPLOAD_UPDATE_PROP && (request.responseStatusCode == 204 || request.responseStatusCode == 201)){
-            [self _performWebDAVUploadForAttachment:attachment tag:ZPFILECHANNEL_WEBDAV_UPLOAD_UPDATE_LASTSYNC userInfo:request.userInfo];
-        }
-        else if(request.tag == ZPFILECHANNEL_WEBDAV_UPLOAD_UPDATE_LASTSYNC &&  (request.responseStatusCode == 204 || request.responseStatusCode == 201)){
-            [self _registerWebDAVUploadWithZoteroServer:attachment userInfo:request.userInfo];   
-        }
-        
-        else if(request.tag == ZPFILECHANNEL_WEBDAV_UPLOAD_REGISTER && request.responseStatusCode == 200){
+        if(request.responseStatusCode >=200 && request.responseStatusCode <300){
+            if(request.tag == ZPFILECHANNEL_WEBDAV_UPLOAD_FILE){
+                [self _performWebDAVUploadForAttachment:attachment tag:ZPFILECHANNEL_WEBDAV_UPLOAD_UPDATE_PROP userInfo:request.userInfo];
+            }
+            else if(request.tag == ZPFILECHANNEL_WEBDAV_UPLOAD_UPDATE_PROP){
+                [self _performWebDAVUploadForAttachment:attachment tag:ZPFILECHANNEL_WEBDAV_UPLOAD_UPDATE_LASTSYNC userInfo:request.userInfo];
+            }
+            else if(request.tag == ZPFILECHANNEL_WEBDAV_UPLOAD_UPDATE_LASTSYNC){
+                [self _registerWebDAVUploadWithZoteroServer:attachment userInfo:request.userInfo];
+            }
             
-            //DDLogVerbose([self requestDumpAsString:request]);
-            //All done
-            [[ZPServerConnection instance] finishedUploadingAttachment:attachment withVersionIdentifier:[request.userInfo objectForKey:@"md5"]];
-            [self cleanupAfterFinishingAttachment:attachment];
+            else if(request.tag == ZPFILECHANNEL_WEBDAV_UPLOAD_REGISTER){
+                
+                //DDLogVerbose([self requestDumpAsString:request]);
+                //All done
+                [[ZPServerConnection instance] finishedUploadingAttachment:attachment withVersionIdentifier:[request.userInfo objectForKey:@"md5"]];
+                [self cleanupAfterFinishingAttachment:attachment];
+            }
             
         }
         else if(request.tag == ZPFILECHANNEL_WEBDAV_UPLOAD_REGISTER && request.responseStatusCode == 412){
