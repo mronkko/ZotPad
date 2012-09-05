@@ -43,3 +43,6 @@
 [submodule "uservoice-iphone-sdk"]
 	path = uservoice-iphone-sdk
 	url = https://github.com/mronkko/uservoice-iphone-sdk.git
+[submodule "CoconutKit"]
+	path = CoconutKit
+	url = https://github.com/defagos/CoconutKit.git
