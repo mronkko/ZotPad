@@ -101,7 +101,7 @@
     }
     //If a library is chosen, show collections level collections for that library
     else{
-        [[ZPCacheController instance] performSelectorInBackground:@selector(updateCollectionsForLibraryFromServer:) withObject:[ZPZoteroLibrary libraryWithID:_currentlibraryID]];
+        [ZPServerConnectionManager retrieveCollectionsForLibraryFromServer:_currentlibraryID];
         self->_content = [ZPDatabase collectionsForLibrary:self->_currentlibraryID withParentCollection:self->_currentCollectionKey];
     }
     
