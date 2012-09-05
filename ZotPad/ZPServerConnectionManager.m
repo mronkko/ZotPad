@@ -431,11 +431,13 @@ const NSInteger ZPServerConnectionManagerRequestLastModifiedItem = 11;
     NSInteger tag = request.tag;
  
     if(allResults != NULL){
-        parsedArray = [allResults arrayByAddingObjectsFromArray:parsedArray];
+        allResults = [allResults arrayByAddingObjectsFromArray:parsedArray];
+    }
+    else{
+        allResults = parsedArray;
     }
     
-    
-    if([parsedArray count] < parserDelegate.totalResults && tag != ZPServerConnectionManagerRequestLastModifiedItem){
+    if([allResults count] < parserDelegate.totalResults && tag != ZPServerConnectionManagerRequestLastModifiedItem){
         NSMutableDictionary* newUserInfo;
         NSMutableDictionary* newParams = [NSMutableDictionary dictionaryWithDictionary:parameters];
         if(userInfo == NULL){
@@ -446,7 +448,7 @@ const NSInteger ZPServerConnectionManagerRequestLastModifiedItem = 11;
         }
         
         [newUserInfo setObject:allResults forKey:ZPKEY_ALL_RESULTS];
-        [newParams setObject:[NSString stringWithFormat:@"%i",[parsedArray count]] forKey:@"start"];
+        [newParams setObject:[NSString stringWithFormat:@"%i",[allResults count]] forKey:@"start"];
         [self makeServerRequest:tag withParameters:newParams userInfo:newUserInfo];
     }
     
@@ -459,7 +461,7 @@ const NSInteger ZPServerConnectionManagerRequestLastModifiedItem = 11;
                 
                 //Are group specifid permissions in use
             {
-                if([parsedArray count] == 0){
+                if([allResults count] == 0){
                      
                      //Set ZotPad offline and ask the user what to do
                      [ZPPreferences setOnline:FALSE];
@@ -476,7 +478,7 @@ const NSInteger ZPServerConnectionManagerRequestLastModifiedItem = 11;
                     
                     NSMutableArray* returnArray = [[NSMutableArray alloc] init];
                     
-                    for(NSString* libraryString in parsedArray){
+                    for(NSString* libraryString in allResults){
                         //All groups
                         if([libraryString isEqualToString:@"all"]){
 
@@ -502,13 +504,13 @@ const NSInteger ZPServerConnectionManagerRequestLastModifiedItem = 11;
 
             case ZPServerConnectionManagerRequestGroups:
                 
-                [self makeServerRequest:ZPServerConnectionManagerRequestPermissions withParameters:NULL userInfo:[NSDictionary dictionaryWithObject:parsedArray forKey:@"groups"]];
+                [self makeServerRequest:ZPServerConnectionManagerRequestPermissions withParameters:NULL userInfo:[NSDictionary dictionaryWithObject:allResults forKey:@"groups"]];
 
                 break;
                 
             case ZPServerConnectionManagerRequestCollections:
             case ZPServerConnectionManagerRequestSingleCollection:
-                [[ZPCacheController instance] processNewCollectionsFromServer:parsedArray forLibraryID:[[userInfo objectForKey:ZPKEY_LIBRARY_ID] integerValue]];
+                [[ZPCacheController instance] processNewCollectionsFromServer:allResults forLibraryID:[[userInfo objectForKey:ZPKEY_LIBRARY_ID] integerValue]];
                 break;
                 
                 
@@ -517,10 +519,10 @@ const NSInteger ZPServerConnectionManagerRequestLastModifiedItem = 11;
                 NSString* itemKey = [parameters objectForKey:ZPKEY_ITEM_KEY];
                 ZPZoteroItem* item = [ZPZoteroItem itemWithKey:itemKey];
 
-                NSMutableArray* notes= [[NSMutableArray alloc] initWithCapacity:[parsedArray count]];
-                NSMutableArray* attachments = [[NSMutableArray alloc] initWithCapacity:[parsedArray count]];
+                NSMutableArray* notes= [[NSMutableArray alloc] initWithCapacity:[allResults count]];
+                NSMutableArray* attachments = [[NSMutableArray alloc] initWithCapacity:[allResults count]];
 
-                for(NSObject* child in parsedArray){
+                for(NSObject* child in allResults){
                     if([child isKindOfClass:[ZPZoteroAttachment class]]){
                         [attachments addObject:child];
                     }
@@ -540,7 +542,7 @@ const NSInteger ZPServerConnectionManagerRequestLastModifiedItem = 11;
             case ZPServerConnectionManagerRequestItemsAndChildren:
             case ZPServerConnectionManagerRequestSingleItem:
                 
-                [[ZPCacheController instance] processNewItemsFromServer:parsedArray forLibraryID:[[parameters objectForKey:ZPKEY_LIBRARY_ID] integerValue]];
+                [[ZPCacheController instance] processNewItemsFromServer:allResults forLibraryID:[[parameters objectForKey:ZPKEY_LIBRARY_ID] integerValue]];
                 break;
                 
             case ZPServerConnectionManagerRequestLastModifiedItem:
@@ -552,7 +554,7 @@ const NSInteger ZPServerConnectionManagerRequestLastModifiedItem = 11;
                 break;
                 //All keys for a library
             case ZPServerConnectionManagerRequestKeys:
-                [[ZPCacheController instance] processNewItemKeyListFromServer:parsedArray forLibraryID:[(NSNumber*)[parameters objectForKey:ZPKEY_LIBRARY_ID] integerValue]];
+                [[ZPCacheController instance] processNewItemKeyListFromServer:allResults forLibraryID:[(NSNumber*)[parameters objectForKey:ZPKEY_LIBRARY_ID] integerValue]];
                 break;
                 
                 //Keys for an item list
@@ -562,7 +564,7 @@ const NSInteger ZPServerConnectionManagerRequestLastModifiedItem = 11;
                                                                      collection:[parameters objectForKey:ZPKEY_COLLECTION_KEY]
                                                                  timestampValue:parserDelegate.updateTimestamp];
                 else
-                    [[ZPCacheController instance] processNewTopLevelItemKeyListFromServer:parsedArray userInfo:parameters];
+                    [[ZPCacheController instance] processNewTopLevelItemKeyListFromServer:allResults userInfo:parameters];
                 break;
         }
     }

@@ -791,7 +791,7 @@ static ZPCacheController* _instance = nil;
     NSInteger libraryID = [[parameters objectForKey:ZPKEY_LIBRARY_ID] integerValue];
     
     //Update collection memberships
-    if(collectionKey!=NULL && [parameters objectForKey: ZPKEY_SEARCH_STRING]!= NULL){
+    if(collectionKey!=NULL && [parameters objectForKey: ZPKEY_SEARCH_STRING] == NULL){
         NSArray* cachedKeys = [ZPDatabase getItemKeysForLibrary:libraryID collectionKey:collectionKey searchString:NULL orderField:NULL sortDescending:FALSE];
         
         NSMutableArray* uncachedItems = [NSMutableArray arrayWithArray:itemKeys];
@@ -800,12 +800,14 @@ static ZPCacheController* _instance = nil;
         if([uncachedItems count]>0) [ZPDatabase addItemKeys:uncachedItems toCollection:collectionKey];
         if([itemKeys count] >0) [ZPDatabase removeItemKeysNotInArray:itemKeys fromCollection:collectionKey];
     }
-    
+
     [[NSNotificationCenter defaultCenter]
      postNotificationName:ZPNOTIFICATION_ITEM_LIST_AVAILABLE
      object:itemKeys
      userInfo:parameters];
-
+    
+    //Queue these items for retrieval
+    [self addToItemQueue:itemKeys libraryID:libraryID priority:YES];
     [self _checkQueues];
 
 }
