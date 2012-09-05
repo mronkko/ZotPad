@@ -111,7 +111,7 @@
     }
     //If a library is chosen, show collections level collections for that library
     else{
-        [[ZPCacheController instance] performSelectorInBackground:@selector(updateCollectionsForLibraryFromServer:) withObject:[ZPZoteroLibrary libraryWithID:_currentlibraryID]];
+        [ZPServerConnectionManager retrieveCollectionsForLibraryFromServer:_currentlibraryID];
         self->_content = [ZPDatabase collectionsForLibrary:self->_currentlibraryID withParentCollection:self->_currentCollectionKey];
     }
     
@@ -259,11 +259,13 @@
         ZPLibraryAndCollectionListViewController* subController = [self.storyboard instantiateViewControllerWithIdentifier:@"LibraryAndCollectionList"];
         subController.currentlibraryID=[node libraryID];
         subController.currentCollectionKey=[node key];
-
+        
         //For some reason the view lifecycle methods are not called
         [subController loadView];
         [subController viewWillAppear:NO];
         [subController viewDidAppear:NO];
+
+        subController.detailViewController = self.detailViewController;
 
         subController.layeredNavigationItem.hasChrome = FALSE;
         
@@ -284,8 +286,8 @@
 }
 
 -(void) _adjustLayeredNavigationControllerLayerWidths{
-    NSInteger maxOverLap = 64;
-    NSInteger maxSpaceForLayers = 128;
+    NSInteger maxOverLap = 40;
+    NSInteger maxSpaceForLayers = 80;
     NSInteger numberOfLayers = [self.layeredNavigationController.viewControllers count]-1;
     
     if(numberOfLayers==0) return;
