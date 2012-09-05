@@ -121,15 +121,15 @@ didFinishLaunchingWithOptions:(NSDictionary *)launchOptions
     
      //Manual override for userID and Key. Useful for running the code in debugger with other people's credentials.
     
-
+    /*
     NSUserDefaults* defaults = [NSUserDefaults standardUserDefaults];
-    [defaults setObject:@"38627" forKey:@"userID"];
-    [defaults setObject:@"0ETwQgMPui7v2spZxPmm5Jj2" forKey:@"OAuthKey"];
+    [defaults setObject:@"" forKey:@"userID"];
+    [defaults setObject:@"" forKey:@"OAuthKey"];
          
     //Uncomment these to always reset the app after launch
     [ZPDatabase resetDatabase];
     [[ZPCacheController instance] performSelectorInBackground:@selector(purgeAllAttachmentFilesFromCache) withObject:NULL];
-    
+    */
     
     
     [ZPPreferences checkAndProcessApplicationResetPreferences];
