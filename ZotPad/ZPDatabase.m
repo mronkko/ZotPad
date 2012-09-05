@@ -1264,7 +1264,7 @@ Deletes items, notes, and attachments based in array of keys from a library
             sql=[sql stringByAppendingString:@" ORDER BY fieldValue"];
         }
         else if([orderField isEqualToString:@"creator"]){
-            sql=[sql stringByAppendingFormat:@" ORDER BY itemKey IN (SELECT DISTINCT itemKey FROM creators) %@, fullCitation", ascOrDesc];
+            sql=[sql stringByAppendingFormat:@" ORDER BY items.itemKey IN (SELECT DISTINCT itemKey FROM creators) %@, fullCitation", ascOrDesc];
         }
         else if([orderField isEqualToString:@"dateModified"]){
             sql=[sql stringByAppendingString:@" ORDER BY cacheTimestamp"];
