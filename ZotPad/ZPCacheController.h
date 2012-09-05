@@ -37,9 +37,6 @@
 
 //Metadata
 
--(void) updateLibrariesAndCollectionsFromServer;
--(void) updateCollectionsForLibraryFromServer:(ZPZoteroLibrary*) libraryID;
-
 -(void) refreshActiveItem:(ZPZoteroItem*) item;
 -(void) setActiveLibrary:(NSInteger)libraryID collection:(NSString*)collectionKey;
 

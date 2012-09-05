@@ -225,7 +225,7 @@
         
         //Tell the application to start updating libraries and collections from server
         //TODO: Refactor to use notifications
-        [[ZPCacheController instance] updateLibrariesAndCollectionsFromServer];
+        [ZPServerConnectionManager retrieveLibrariesFromServer];
         
     }
     

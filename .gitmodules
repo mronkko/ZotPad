@@ -46,3 +46,6 @@
 [submodule "FRLayeredNavigationController"]
 	path = FRLayeredNavigationController
 	url = https://github.com/weissi/FRLayeredNavigationController
+[submodule "CoconutKit"]
+	path = CoconutKit
+	url = https://github.com/defagos/CoconutKit.git

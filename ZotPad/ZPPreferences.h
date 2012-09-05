@@ -54,7 +54,7 @@
 +(NSInteger) maxTitleLengthInDropboxFilenames;
 +(NSInteger) maxNumberOfAuthorsInDropboxFilenames;
 +(NSString*) authorSuffixInDropboxFilenames;
-
++(BOOL) downloadLinkedFilesWithDropbox;
 +(BOOL) reportErrors;
 
 +(NSString*) webDAVURL;
