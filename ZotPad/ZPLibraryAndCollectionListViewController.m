@@ -96,7 +96,7 @@
     
     //If the current library is not defined, show a list of libraries
     if(self->_currentlibraryID == LIBRARY_ID_NOT_SET){
-        [[ZPCacheController instance] performSelectorInBackground:@selector(updateLibrariesAndCollectionsFromServer) withObject:NULL];
+        [ZPServerConnectionManager retrieveLibrariesFromServer];
         self->_content = [ZPDatabase libraries];
     }
     //If a library is chosen, show collections level collections for that library

@@ -338,8 +338,9 @@ NSInteger const ZPATTACHMENTICONGVIEWCONTROLLER_TAG_TITLELABEL = -5;
             else{
                 exists = [attachment fileExists];
             }
-            if((linkMode == LINK_MODE_IMPORTED_FILE || linkMode == LINK_MODE_IMPORTED_URL )
-               && ! exists){
+            if((linkMode == LINK_MODE_IMPORTED_FILE || linkMode == LINK_MODE_IMPORTED_URL ||
+                (linkMode == LINK_MODE_LINKED_FILE && [ZPPreferences downloadLinkedFilesWithDropbox]))
+               && ! exists ){
                                 
                 if([ZPPreferences online]){
                     

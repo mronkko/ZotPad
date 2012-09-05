@@ -268,7 +268,10 @@ static NSInteger _maxCacheSize;
     NSUserDefaults* defaults = [NSUserDefaults standardUserDefaults];
     return [defaults stringForKey:@"dropboxauthorsuffix"];
 }
-
++(BOOL) downloadLinkedFilesWithDropbox{
+    NSUserDefaults* defaults = [NSUserDefaults standardUserDefaults];
+    return [defaults boolForKey:@"dropboxdownloadlinkedfiles"];
+}
 +(BOOL) useWebDAV{
     NSUserDefaults* defaults = [NSUserDefaults standardUserDefaults];
     return [[defaults objectForKey:@"filechannel"] isEqualToString:@"webdavzotero"];

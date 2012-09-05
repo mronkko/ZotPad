@@ -71,9 +71,7 @@
     NSString* _activeCollectionKey;
     NSString* _activeItemKey;
     
-    //Variables indicating if we are currently refreshing lobraries and collectiosn from server
-    BOOL _isRefresingLibraries;
-    NSMutableSet* _librariesWhoseCollectionsAreBeingRefreshed;
+    //Variables indicating if we are currently refreshing lobraries and collections from server
     ZPCacheStatusToolbarController* _statusView;
 }
 
@@ -128,10 +126,8 @@ static ZPCacheController* _instance = nil;
     
     _sizeOfDocumentsFolder = 0;    [self performSelectorInBackground:@selector(_scanAndSetSizeOfDocumentsFolder) withObject:NULL];
 	
-    _isRefresingLibraries =FALSE;
-    _librariesWhoseCollectionsAreBeingRefreshed = [[NSMutableSet alloc] init];
-
-    [self performSelectorInBackground:@selector(updateLibrariesAndCollectionsFromServer) withObject:NULL];
+    [ZPServerConnectionManager retrieveLibrariesFromServer];
+    
     /*
     Start building cache immediately if the user has chosen to cache all libraries
      */
@@ -266,6 +262,8 @@ static ZPCacheController* _instance = nil;
             for(NSObject* key in _itemKeysToRetrieve){
                 itemsToDownload += [(NSArray*)[_itemKeysToRetrieve objectForKey:key] count];
             }
+            
+            [_statusView setItemDownloads:itemsToDownload];
             
             //Choose a library to retrieve
             NSMutableArray* keyArray = [_itemKeysToRetrieve objectForKey:[NSNumber numberWithInt:_activelibraryID]];
@@ -554,37 +552,6 @@ static ZPCacheController* _instance = nil;
 }
 
     
--(void) updateLibrariesAndCollectionsFromServer{
-
-    //TODO: This does not currently remove libraries from the UI if they are removed from the key
-
-    if(! _isRefresingLibraries){
-        _isRefresingLibraries = TRUE;
- 
-        DDLogVerbose(@"Loading library information from server");
-       [ZPServerConnectionManager retrieveLibrariesFromServer];
-        
-    }
-}
-
--(void) updateCollectionsForLibraryFromServer:(ZPZoteroLibrary*) library{
-
-    
-    BOOL shouldRefresh = FALSE;
-    @synchronized(_librariesWhoseCollectionsAreBeingRefreshed){
-        if(! [_librariesWhoseCollectionsAreBeingRefreshed containsObject:[NSNumber numberWithInt:library.libraryID]]){
-            shouldRefresh = TRUE;
-            [_librariesWhoseCollectionsAreBeingRefreshed addObject:[NSNumber numberWithInt:library.libraryID]];
-        }
-    }
-    
-    if(shouldRefresh){
-        DDLogVerbose(@"Loading collections for library %@",library.title);
-
-        [ZPServerConnectionManager retrieveCollectionsForLibraryFromServer:library.libraryID];
-    }
-}
-
 #pragma mark - Metadata callbacks
 
 //Called by server connections to process new data
@@ -709,8 +676,6 @@ static ZPCacheController* _instance = nil;
 
     [ZPDatabase writeLibraries:libraries];
     
-    _isRefresingLibraries = FALSE;
-
     while ( library = (ZPZoteroLibrary*) [e nextObject]) {
         if([ZPPreferences cacheMetadataAllLibraries]){
             [self _checkIfLibraryNeedsCacheRefreshAndQueue:library.libraryID];
@@ -725,9 +690,6 @@ static ZPCacheController* _instance = nil;
     ZPZoteroLibrary* library = [ZPZoteroLibrary libraryWithID:libraryID];
     [ZPDatabase writeCollections:collections toLibrary:library];
 
-    @synchronized(_librariesWhoseCollectionsAreBeingRefreshed){
-        [_librariesWhoseCollectionsAreBeingRefreshed removeObject:[NSNumber numberWithInt:library.libraryID]];
-    }
     [[NSNotificationCenter defaultCenter] postNotificationName:ZPNOTIFICATION_LIBRARY_WITH_COLLECTIONS_AVAILABLE object:library];
     [self _checkQueues];
 

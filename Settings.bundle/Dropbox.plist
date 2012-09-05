@@ -52,6 +52,16 @@
 		</dict>
 		<dict>
 			<key>Type</key>
+			<string>PSToggleSwitchSpecifier</string>
+			<key>Title</key>
+			<string>Download linked files</string>
+			<key>Key</key>
+			<string>dropboxdownloadlinkedfiles</string>
+			<key>DefaultValue</key>
+			<false/>
+		</dict>
+		<dict>
+			<key>Type</key>
 			<string>PSTextFieldSpecifier</string>
 			<key>Title</key>
 			<string>Filename pattern</string>
@@ -60,7 +70,7 @@
 			<key>DefaultValue</key>
 			<string>%a_%y_%t</string>
 		</dict>
-        <dict>
+		<dict>
 			<key>Type</key>
 			<string>PSTextFieldSpecifier</string>
 			<key>Title</key>
@@ -70,7 +80,7 @@
 			<key>DefaultValue</key>
 			<string>%a_%y_%t</string>
 		</dict>
-        <dict>
+		<dict>
 			<key>Type</key>
 			<string>PSTextFieldSpecifier</string>
 			<key>Title</key>
@@ -90,7 +100,7 @@
 			<key>DefaultValue</key>
 			<false/>
 		</dict>
-        <dict>
+		<dict>
 			<key>Type</key>
 			<string>PSToggleSwitchSpecifier</string>
 			<key>Title</key>
@@ -100,7 +110,6 @@
 			<key>DefaultValue</key>
 			<false/>
 		</dict>
-
 		<dict>
 			<key>Type</key>
 			<string>PSToggleSwitchSpecifier</string>

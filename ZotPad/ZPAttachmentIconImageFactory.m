@@ -66,7 +66,7 @@ static ZPAttachmentIconImageFactory* _webViewDelegate;
     if(attachment.linkMode == LINK_MODE_LINKED_URL){
         emblem =@"emblem-symbolic-link";
         useEmblem = TRUE;
-    }else if( attachment.linkMode == LINK_MODE_LINKED_FILE){
+    }else if( attachment.linkMode == LINK_MODE_LINKED_FILE && ! [ZPPreferences downloadLinkedFilesWithDropbox]){
         emblem =@"emblem-locked";
         useEmblem = TRUE;
     }
