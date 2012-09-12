@@ -298,7 +298,18 @@ const NSInteger ZPServerConnectionManagerRequestLastModifiedItem = 11;
                     }
                 }
             }
-            
+            if(type!=ZPServerConnectionManagerRequestPermissions){
+                
+                NSString *alphabet  = @"abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXZY0123456789";
+                NSMutableString *s = [NSMutableString stringWithCapacity:20];
+                for (NSUInteger i = 0U; i < 20; i++) {
+                    u_int32_t r = arc4random() % [alphabet length];
+                    unichar c = [alphabet characterAtIndex:r];
+                    [s appendFormat:@"%C", c];
+                }
+                
+                urlString = [urlString stringByAppendingFormat:@"&t=%@",s];
+            }
             DDLogVerbose(@"Staring request %@",urlString);
             
             __weak ASIHTTPRequest* request = [ASIHTTPRequest requestWithURL:[NSURL URLWithString:urlString]];
@@ -311,6 +322,7 @@ const NSInteger ZPServerConnectionManagerRequestLastModifiedItem = 11;
                 //If we receive a 403 (forbidden) error, delete the authorization key because we know that it is
                 //no longer valid.
                 
+                DDLogVerbose(@"Request to %@ returned status code %i",request.url,request.responseStatusCode);
                 if(request.responseStatusCode==403){
                     
                     if(request.tag == ZPServerConnectionManagerRequestKeys){
@@ -349,14 +361,18 @@ const NSInteger ZPServerConnectionManagerRequestLastModifiedItem = 11;
                 
             }];
             [request setFailedBlock:^{
+
                 if([ZPPreferences online]){
-                    [ZPPreferences setOnline:FALSE];
+                    
+                     [ZPPreferences setOnline:FALSE];
                     if(connectionErrorAlertViewDelegate == NULL) connectionErrorAlertViewDelegate = [[ZPConnectionErrorAlertViewDelegate alloc] init];
                     
                     [[[UIAlertView alloc] initWithTitle:@"Connection error"
                                                 message:[NSString stringWithFormat:@"ZotPad experienced an error connecting to Zotero server and is now operating in offline model. (Error: %@)",request.error.localizedDescription]
                                                delegate:connectionErrorAlertViewDelegate
                                       cancelButtonTitle:@"Stay offline" otherButtonTitles:@"Return online", nil] show];
+                     
+                    
                     DDLogError(@"Connection to Zotero server (%@) failed %@",urlString,request.error.localizedDescription);
                 }
             }];

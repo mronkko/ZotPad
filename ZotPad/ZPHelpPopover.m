@@ -23,6 +23,7 @@
 static UIPopoverController* helpPopover;
 
 + (void) displayHelpPopoverFromToolbarButton:(UIBarButtonItem*)button{
+
     if([NSThread isMainThread]){
         ZPHelpPopover* content = [[ZPHelpPopover alloc] init];
         UILabel* label = [[UILabel alloc] init];

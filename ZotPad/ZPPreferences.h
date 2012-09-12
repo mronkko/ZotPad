@@ -38,6 +38,13 @@
 +(BOOL) cacheAttachmentsActiveItem;
 
 +(BOOL) useCache;
++(NSString*) webDAVURL;
++(NSInteger) maxCacheSize;
+
++(void) resetUserCredentials;
+
++(void) reload;
++(void) checkAndProcessApplicationResetPreferences;
 
 //Dropbox spesific settings
 +(BOOL) useDropbox;
@@ -57,12 +64,15 @@
 +(BOOL) downloadLinkedFilesWithDropbox;
 +(BOOL) reportErrors;
 
-+(NSString*) webDAVURL;
-+(NSInteger) maxCacheSize;
+//Advanced settings
 
-+(void) resetUserCredentials;
++(BOOL) includeDatabaseWithSupportRequest;
++(BOOL) includeFileListWithSupportRequest;
++(BOOL) recursiveCollections;
++(BOOL) layeredCollectionsNavigation;
++(BOOL) unifiedCollectionsNavigation;
 
-+(void) reload;
-+(void) checkAndProcessApplicationResetPreferences;
+
+
 
 @end

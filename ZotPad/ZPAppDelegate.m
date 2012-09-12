@@ -24,7 +24,6 @@
 #import "CompressingLogFileManager.h"
 
 
-
 @interface ZPFileLogFormatter : NSObject <DDLogFormatter>{
     NSInteger _level;
     NSDateFormatter* _dateFormatter;
@@ -125,11 +124,12 @@ didFinishLaunchingWithOptions:(NSDictionary *)launchOptions
     NSUserDefaults* defaults = [NSUserDefaults standardUserDefaults];
     [defaults setObject:@"" forKey:@"userID"];
     [defaults setObject:@"" forKey:@"OAuthKey"];
-         
+    
     //Uncomment these to always reset the app after launch
     [ZPDatabase resetDatabase];
     [[ZPCacheController instance] performSelectorInBackground:@selector(purgeAllAttachmentFilesFromCache) withObject:NULL];
-    */
+     */
+    
     
     
     [ZPPreferences checkAndProcessApplicationResetPreferences];
@@ -141,8 +141,8 @@ didFinishLaunchingWithOptions:(NSDictionary *)launchOptions
 
         if ([splitViewController respondsToSelector:@selector(setPresentsWithGesture:)]) {
             [splitViewController setPresentsWithGesture:NO];
-        }
 
+        }
         UINavigationController *navigationController = [splitViewController.viewControllers lastObject];
         splitViewController.delegate = (id)navigationController.topViewController;
     }

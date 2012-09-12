@@ -330,4 +330,31 @@ static NSInteger _maxCacheSize;
     [defaults setValue:value forKey:@"cachesizecurrent"];
 }
 
+//Advanced settings
+
++(BOOL) includeDatabaseWithSupportRequest{
+    NSUserDefaults* defaults = [NSUserDefaults standardUserDefaults];
+    return [defaults boolForKey:@"supportincludedatabase"];
+}
+
++(BOOL) includeFileListWithSupportRequest{
+    NSUserDefaults* defaults = [NSUserDefaults standardUserDefaults];
+    return [defaults boolForKey:@"supportincludefilelisting"];
+}
+
++(BOOL) recursiveCollections{
+    NSUserDefaults* defaults = [NSUserDefaults standardUserDefaults];
+    return [defaults boolForKey:@"recursivecollections"];
+}
+
++(BOOL) layeredCollectionsNavigation{
+    NSUserDefaults* defaults = [NSUserDefaults standardUserDefaults];
+    return [defaults boolForKey:@"layeredcollectionsnavigation"];
+}
+
++(BOOL) unifiedCollectionsNavigation{
+    NSUserDefaults* defaults = [NSUserDefaults standardUserDefaults];
+    return [defaults boolForKey:@"unifiedcollectionsnavigation"];
+}
+
 @end

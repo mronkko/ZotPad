@@ -70,4 +70,14 @@
    // NSLog(@"Cannot set %@ to %@",aKey,value);
 }
 
+/*
+ 
+ Set atomic values to zero when nil is used
+ 
+ */
+
+- (void)setNilValueForKey:(NSString *)key{
+    
+}
+
 @end
