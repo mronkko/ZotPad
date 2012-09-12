@@ -23,7 +23,7 @@
 #import "UIViewController+FRLayeredNavigationController.h"
 
 @interface ZPLibraryAndCollectionListViewController()
--(void) _adjustLayeredNavigationControllerLayerWidths;
+-(void) _drillIntoIndexPath:(NSIndexPath *)indexPath;
 @end
 
 @implementation ZPLibraryAndCollectionListViewController
@@ -31,7 +31,14 @@
 @synthesize detailViewController = _detailViewController;
 @synthesize currentlibraryID = _currentlibraryID;
 @synthesize currentCollectionKey = _currentCollectionKey;
-@synthesize gearButton, cacheControllerPlaceHolder;
+@synthesize drilledCollectionIndex, selectedCollectionIndex;
+
+- (id) initWithCoder:(NSCoder *)aDecoder{
+    self = [super initWithCoder:aDecoder];
+    self.drilledCollectionIndex = -1;
+    self.selectedCollectionIndex = -1;
+    return self;
+}
 
 - (void)awakeFromNib
 {
@@ -75,20 +82,6 @@
     self.clearsSelectionOnViewWillAppear = NO;
     
 	// Do any additional setup after loading the view, typically from a nib.
-    
-    //TODO: Implement this on iPhone as well.
-    
-    if(UI_USER_INTERFACE_IDIOM() == UIUserInterfaceIdiomPad){
-        
-        //Show Cache controller status, only on iPad
-        ZPCacheStatusToolbarController* statusController = [[ZPCacheStatusToolbarController alloc] init];
-        cacheControllerPlaceHolder.customView = statusController.view;
-
-        UIViewController* root = [UIApplication sharedApplication].delegate.window.rootViewController;
-        gearButton.target = root;
-        gearButton.action = @selector(showLogView:);
-    }
- 
 
 }
 
@@ -126,14 +119,6 @@
     
     //Show help popover on iPad if not yet shown
     
-    if(UI_USER_INTERFACE_IDIOM() == UIUserInterfaceIdiomPad){
-        if([[NSUserDefaults standardUserDefaults] objectForKey:@"hasPresentedMainHelpPopover"]==NULL){
-            [ZPHelpPopover displayHelpPopoverFromToolbarButton:gearButton];
-            [[NSUserDefaults standardUserDefaults] setObject:@"1" forKey:@"hasPresentedMainHelpPopover"];
-        }
-    }
-
-    
 }
 
 - (void)viewWillDisappear:(BOOL)animated
@@ -147,41 +132,6 @@
 	[super viewDidDisappear:animated];
 }
 
-// On iPhone the item list is shown with a segue
-
--(void) prepareForSegue:(UIStoryboardSegue *)segue sender:(id)sender{
-    if([segue.identifier isEqualToString:@"PushItemList"]){
-        ZPItemListViewController* target = (ZPItemListViewController*) segue.destinationViewController;
-        ZPZoteroDataObject* node = [self->_content objectAtIndex: self.tableView.indexPathForSelectedRow.row];
-        
-        [ZPItemListViewDataSource instance].libraryID = [node libraryID];
-        [ZPItemListViewDataSource instance].collectionKey = [node key];
-        
-        //Clear search when changing collection. This is how Zotero behaves
-        [target clearSearch];
-        [target configureView];
-        
-    }
-    if([segue.identifier isEqualToString:@"PushItemsToNavigator"]){
-        
-        
-        ZPMasterItemListViewController* target = (ZPMasterItemListViewController*) segue.destinationViewController;
-        target.detailViewController = sender;
-        target.tableView.delegate = sender;
-        
-        target.navigationItem.hidesBackButton = YES;
-        target.clearsSelectionOnViewWillAppear = NO;
-        
-        //Keep the same toolbar
-        [target setToolbarItems:self.toolbarItems];
-         
-         // Get the selected row from the item list
-        ZPZoteroItem* selectedItem = [(ZPItemDetailViewController*)sender selectedItem];
-        NSInteger index = [[[ZPItemListViewDataSource instance] itemKeysShown] indexOfObject:selectedItem.key];
-        NSIndexPath* indexPath = [NSIndexPath indexPathForRow:index inSection:0];
-        [target.tableView selectRowAtIndexPath:indexPath animated:NO scrollPosition:UITableViewScrollPositionMiddle]; 
-    }
-}
 
 - (BOOL)shouldAutorotateToInterfaceOrientation:(UIInterfaceOrientation)interfaceOrientation
 {
@@ -212,13 +162,19 @@
     if (cell == nil)
 	{
         cell = [[UITableViewCell alloc] initWithStyle:UITableViewCellStyleDefault reuseIdentifier:CellIdentifier];
+
     }
     
     // Configure the cell.
 	ZPZoteroDataObject* node = [self->_content objectAtIndex: indexPath.row];
 	if ( [node hasChildren])
 	{
-		cell.accessoryType = UITableViewCellAccessoryDisclosureIndicator;
+        if([ZPPreferences unifiedCollectionsNavigation]){
+            cell.accessoryType = UITableViewCellAccessoryDisclosureIndicator;
+        }
+        else{
+            cell.accessoryType = UITableViewCellAccessoryDetailDisclosureButton;
+        }
 	}
 	else
 	{
@@ -234,10 +190,26 @@
 	return cell;
 }
 
+- (NSIndexPath *)tableView:(UITableView *)tableView willSelectRowAtIndexPath:(NSIndexPath *)indexPath{
+    //Deselect previous cell
+    
+    if(self.selectedCollectionIndex != -1){
+        if(self.selectedCollectionIndex == self.drilledCollectionIndex){
+            NSLog(@"Graying out cell at row %i",self.drilledCollectionIndex);
+            [self.tableView cellForRowAtIndexPath:[NSIndexPath indexPathForRow:self.drilledCollectionIndex inSection:0]].selectionStyle = UITableViewCellSelectionStyleGray;
+        }
+        else{
+            NSLog(@"Deselecting cell at row %i",self.selectedCollectionIndex);
+            [self.tableView deselectRowAtIndexPath:[NSIndexPath indexPathForRow:self.selectedCollectionIndex inSection:0] animated:NO];
+        }
+    }
+    return indexPath;
+}
 
 // On iPad the item list is always shown if library and collection list is visible
 
 - (void)tableView:(UITableView *)aTableView didSelectRowAtIndexPath:(NSIndexPath *)indexPath {
+    
     
     /*
      When a row is selected, set the detail view controller's library and collection and refresh
@@ -253,56 +225,111 @@
         [self.detailViewController configureView];
     }
 
-    // If there are subcollections, drill down.
-    if(node.hasChildren){
+    /*
+     Update selections and possibly drill down
+     */
     
-        ZPLibraryAndCollectionListViewController* subController = [self.storyboard instantiateViewControllerWithIdentifier:@"LibraryAndCollectionList"];
-        subController.currentlibraryID=[node libraryID];
-        subController.currentCollectionKey=[node key];
+    
+    self.selectedCollectionIndex = indexPath.row;
+
+    
+    // If there are subcollections, drill down.
+    
+    if([ZPPreferences layeredCollectionsNavigation]){
+        if(node.hasChildren && [ZPPreferences unifiedCollectionsNavigation]){
+            [self _drillIntoIndexPath:indexPath];
+        }
+        else{
+            //Pop everything on top of this
+            [self.layeredNavigationController popToViewController:self
+                                                         animated: YES];
+            if(self.drilledCollectionIndex != self.selectedCollectionIndex){
+                [self.tableView cellForRowAtIndexPath:[NSIndexPath indexPathForRow:self.drilledCollectionIndex inSection:0]].selected = FALSE;
+            }
+            self.drilledCollectionIndex = -1;
+        }
         
-        //For some reason the view lifecycle methods are not called
+        //Select with blue
+        [aTableView cellForRowAtIndexPath:indexPath].selectionStyle = UITableViewCellSelectionStyleBlue;
+        
+        //Mark all other selections with grey
+        
+        for(ZPLibraryAndCollectionListViewController* controller in self.layeredNavigationController.viewControllers){
+            if(controller!=self){
+                //Grey out previously selected paths
+                if(controller.drilledCollectionIndex == controller.selectedCollectionIndex){
+                    controller.selectedCollectionIndex = -1;
+                    [controller.tableView cellForRowAtIndexPath:[NSIndexPath indexPathForRow:controller.drilledCollectionIndex inSection:0 ]].selectionStyle = UITableViewCellSelectionStyleGray;
+                }
+                else if(controller.selectedCollectionIndex != -1){
+                    [controller.tableView deselectRowAtIndexPath:[NSIndexPath indexPathForRow:controller.selectedCollectionIndex inSection:0 ] animated:NO];
+                    controller.selectedCollectionIndex = -1;
+                }
+            }
+        }
+    }
+}
+
+-(void) tableView:(UITableView *)tableView accessoryButtonTappedForRowWithIndexPath:(NSIndexPath *)indexPath{
+    
+    //Select with gray if not selected
+    UITableViewCell* cell = [tableView cellForRowAtIndexPath:indexPath];
+
+    if(!cell.selected){
+        cell.selected = TRUE;;
+        cell.selectionStyle = UITableViewCellSelectionStyleGray;
+    }
+    [self _drillIntoIndexPath:indexPath];
+}
+
+-(void) _drillIntoIndexPath:(NSIndexPath *)indexPath{
+    
+    ZPZoteroDataObject* node = [self->_content objectAtIndex: indexPath.row];
+
+    ZPLibraryAndCollectionListViewController* subController = [self.storyboard instantiateViewControllerWithIdentifier:@"LibraryAndCollectionList"];
+    subController.currentlibraryID=[node libraryID];
+    subController.currentCollectionKey=[node key];
+
+    
+    //For some reason the view lifecycle methods are not called
+    if([ZPPreferences layeredCollectionsNavigation]){
         [subController loadView];
         [subController viewWillAppear:NO];
         [subController viewDidAppear:NO];
-
-        subController.detailViewController = self.detailViewController;
-
-        subController.layeredNavigationItem.hasChrome = FALSE;
+    }
+    subController.detailViewController = self.detailViewController;
+    
+    if([ZPPreferences layeredCollectionsNavigation]){
         
         [self.layeredNavigationController pushViewController:subController
                                                    inFrontOf:self
                                                 maximumWidth:YES
                                                     animated: YES];
+        
+        subController.layeredNavigationItem.hasChrome = FALSE;
 
-        [self _adjustLayeredNavigationControllerLayerWidths];
+        
+        
     }
     else{
-        //Pop everything on top of this
-        [self.layeredNavigationController popToViewController:self
-                                                    animated: YES];
-        [self _adjustLayeredNavigationControllerLayerWidths];
-
+        [self.navigationController pushViewController:subController animated:YES];
     }
+
+    //Clear the previously drilled index path
+    if(self.drilledCollectionIndex != -1 && self.drilledCollectionIndex != self.selectedCollectionIndex){
+        [self.tableView deselectRowAtIndexPath:[NSIndexPath indexPathForRow:self.drilledCollectionIndex inSection:0 ]animated:NO];
+    }
+    
+    //Set the new drilled index path
+    UITableViewCell* cell = [self.tableView cellForRowAtIndexPath:indexPath];
+    if(! cell.selected){
+        cell.selected = TRUE;
+        cell.selectionStyle = UITableViewCellSelectionStyleGray;
+    }
+    
+    self.drilledCollectionIndex = indexPath.row;
 }
 
--(void) _adjustLayeredNavigationControllerLayerWidths{
-    NSInteger maxOverLap = 40;
-    NSInteger maxSpaceForLayers = 80;
-    NSInteger numberOfLayers = [self.layeredNavigationController.viewControllers count]-1;
-    
-    if(numberOfLayers==0) return;
-    
-    CGFloat nextItemDistance = MIN(maxOverLap, maxSpaceForLayers/(CGFloat) numberOfLayers);
-    CGFloat x=0;
-    
-    for(UIViewController* viewController in self.layeredNavigationController.viewControllers){
-        viewController.layeredNavigationItem.nextItemDistance = nextItemDistance;
-        viewController.layeredNavigationItem.currentViewPosition = CGPointMake(x, viewController.layeredNavigationItem.currentViewPosition.y);
-        viewController.layeredNavigationItem.initialViewPosition = CGPointMake(x, viewController.layeredNavigationItem.initialViewPosition.y);
-        x=x+nextItemDistance;
-    }
-    [self.layeredNavigationController doLayout];
-}
 
 
 #pragma mark -

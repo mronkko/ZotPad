@@ -33,6 +33,9 @@
 
 @interface  ZPDatabase (){
 }
++(void) _buildWhereForCollectionsRecursively:(NSString*) collectionKey intoMutableString:(NSMutableString*)sql intoParameterArray:(NSMutableArray*) parameters;
+    
+
 +(NSDictionary*) fieldsForItem:(ZPZoteroItem*)item;
 +(NSArray*) creatorsForItem:(ZPZoteroItem*)item;
 +(void) _executeSQLFromFile:(NSString*)filename;
@@ -1000,7 +1003,7 @@ Deletes items, notes, and attachments based in array of keys from a library
     NSMutableArray* collections = [[NSMutableArray alloc] init];
     
     @synchronized(self){
-        FMResultSet* resultSet = [_database executeQuery: @"SELECT * FROM collectionItems, collections WHERE itemKey = ? AND collectionItems.key = collections.key ORDER BY LOWER(title)",item.key];
+        FMResultSet* resultSet = [_database executeQuery: @"SELECT * FROM collectionItems, collections WHERE itemKey = ? AND collectionItems.collectionKey = collections..collectionKey ORDER BY LOWER(title)",item.key];
         
         while([resultSet next]) {
             [collections addObject:[ZPZoteroCollection collectionWithDictionary:[resultSet resultDictionary]]];
@@ -1195,10 +1198,10 @@ Deletes items, notes, and attachments based in array of keys from a library
     
     //Build the SQL query as a string first. 
     
-    NSString* sql = @"SELECT DISTINCT items.itemKey FROM items";
+    NSMutableString* sql = [NSMutableString stringWithString:@"SELECT DISTINCT items.itemKey FROM items"];
     
     if(collectionKey!=NULL)
-        sql=[sql stringByAppendingString:@", collectionItems"];
+        [sql appendString:@", collectionItems"];
 
     //These are available through the API, but are not fields
     NSArray* specialSortColumns = [NSArray arrayWithObjects: @"itemType", @"dateAdded", @"dateModified", @"creator", @"title", @"addedBy", @"numItems",@"date", nil ];
@@ -1206,18 +1209,34 @@ Deletes items, notes, and attachments based in array of keys from a library
     //Sort
     if(orderField!=NULL){
         if([specialSortColumns indexOfObject:orderField]==NSNotFound){
-            sql=[sql stringByAppendingString:@" LEFT JOIN (SELECT itemkey, fieldValue FROM fields WHERE fieldName = ?) fields ON items.itemKey = fields.itemKey"];
+            [sql appendString:@" LEFT JOIN (SELECT itemkey, fieldValue FROM fields WHERE fieldName = ?) fields ON items.itemKey = fields.itemKey"];
             [parameters addObject:orderField];
         }
     }
     //Conditions
 
-    sql=[sql stringByAppendingString:@" WHERE libraryID = ?"];
+    [sql appendString:@" WHERE libraryID = ?"];
     [parameters addObject:[NSNumber numberWithInt:libraryID]];
     
     if(collectionKey!=NULL){
-        sql=[sql stringByAppendingString:@" AND collectionItems.collectionKey = ? and collectionItems.itemKey = items.itemKey"];
-        [parameters addObject:collectionKey];
+        //Recursive collections
+        if([ZPPreferences recursiveCollections]){
+
+            //Root collection
+            [sql appendString:@" AND (collectionItems.collectionKey = ?"];
+            [parameters addObject:collectionKey];
+            
+            //Recurse subcollections
+            [self _buildWhereForCollectionsRecursively:collectionKey intoMutableString:sql intoParameterArray:parameters];
+            
+            [sql appendString:@") AND collectionItems.itemKey = items.itemKey"];
+
+        }
+        //Normal, non-recursive collectins
+        else{
+            [sql appendString:@" AND collectionItems.collectionKey = ? AND collectionItems.itemKey = items.itemKey"];
+            [parameters addObject:collectionKey];
+        }
     }
 
     if(searchString != NULL){
@@ -1226,22 +1245,23 @@ Deletes items, notes, and attachments based in array of keys from a library
         //This query is designed to minimize the amount of table scans. 
         NSMutableArray* newParameters = [NSMutableArray arrayWithArray:parameters ];
 
-        NSString* newSql=[sql stringByAppendingString:@" AND items.title LIKE '%' || ? || '%' OR items.itemKey IN (SELECT itemKey FROM fields WHERE fieldValue LIKE '%' || ? || '%' AND itemKey IN ("];
+        NSMutableString* newSql = [NSMutableString stringWithString:sql];
+        [newSql appendString:@" AND items.title LIKE '%' || ? || '%' OR items.itemKey IN (SELECT itemKey FROM fields WHERE fieldValue LIKE '%' || ? || '%' AND itemKey IN ("];
         [newParameters addObject:searchString];
         [newParameters addObject:searchString];
         
-        newSql = [newSql stringByAppendingString:sql];
+        [newSql appendString:sql];
         [newParameters addObjectsFromArray:parameters];
         
-        newSql = [newSql stringByAppendingString:@" ) UNION SELECT itemKey FROM creators WHERE (firstName LIKE '%' || ? || '%' OR lastName LIKE '%' || ? || '%' OR shortName LIKE '%' || ? || '%') AND itemKey IN ("];
+        [newSql appendString:@" ) UNION SELECT itemKey FROM creators WHERE (firstName LIKE '%' || ? || '%' OR lastName LIKE '%' || ? || '%' OR shortName LIKE '%' || ? || '%') AND itemKey IN ("];
         [newParameters addObject:searchString];
         [newParameters addObject:searchString];
         [newParameters addObject:searchString];
 
-        newSql = [newSql stringByAppendingString:sql];
+        [newSql appendString:sql];
         [newParameters addObjectsFromArray:parameters];
         
-        newSql =[newSql stringByAppendingString:@"))"];
+        [newSql appendString:@"))"];
         
         sql=newSql;
         parameters=newParameters;
@@ -1259,35 +1279,35 @@ Deletes items, notes, and attachments based in array of keys from a library
         
         
         if([specialSortColumns indexOfObject:orderField]==NSNotFound){
-            sql=[sql stringByAppendingString:@" ORDER BY fieldValue"];
+            [sql appendString:@" ORDER BY fieldValue"];
         }
         else if([orderField isEqualToString:@"creator"]){
-            sql=[sql stringByAppendingFormat:@" ORDER BY items.itemKey IN (SELECT DISTINCT itemKey FROM creators) %@, fullCitation", ascOrDesc];
+            [sql appendFormat:@" ORDER BY items.itemKey IN (SELECT DISTINCT itemKey FROM creators) %@, fullCitation", ascOrDesc];
         }
         else if([orderField isEqualToString:@"dateModified"]){
-            sql=[sql stringByAppendingString:@" ORDER BY cacheTimestamp"];
+            [sql appendString:@" ORDER BY cacheTimestamp"];
         }
         else if([orderField isEqualToString:@"dateAdded"]){
-            sql=[sql stringByAppendingString:@" ORDER BY dateAdded"];
+            [sql appendString:@" ORDER BY dateAdded"];
         }
         else if([orderField isEqualToString:@"title"]){
-            sql=[sql stringByAppendingString:@" ORDER BY title"];
+            [sql appendString:@" ORDER BY title"];
         }
         else if([orderField isEqualToString:@"date"]){
-            sql=[sql stringByAppendingString:@" ORDER BY year"];
+            [sql appendString:@" ORDER BY year"];
         }
         else if([orderField isEqualToString:@"itemType"]){
-            sql=[sql stringByAppendingString:@" ORDER BY itemType"];
+            [sql appendString:@" ORDER BY itemType"];
         }
 
         else{
             [NSException raise:@"Not implemented" format:@"Sorting by %@ has not been implemented",orderField];
         }
 
-        sql=[sql stringByAppendingFormat:@" COLLATE NOCASE %@",ascOrDesc];
+        [sql appendFormat:@" COLLATE NOCASE %@",ascOrDesc];
     }
     else{
-        sql=[sql stringByAppendingFormat:@" ORDER BY items.cacheTimestamp DESC"];
+        [sql appendFormat:@" ORDER BY items.cacheTimestamp DESC"];
     }
     
     
@@ -1306,6 +1326,28 @@ Deletes items, notes, and attachments based in array of keys from a library
     }
 
     return keys;
+}
+
++(void) _buildWhereForCollectionsRecursively:(NSString*) collectionKey intoMutableString:(NSMutableString*)sql intoParameterArray:(NSMutableArray*) parameters{
+
+    NSMutableArray* childCollections = [[NSMutableArray alloc] init];
+    
+    @synchronized(self){
+        FMResultSet* resultSet = [_database executeQuery: @"SELECT collectionKey FROM collections WHERE parentKey =?",collectionKey];
+            
+        while ([resultSet next]) {
+            [childCollections addObject:[resultSet stringForColumnIndex:0]];
+        }
+        
+        [resultSet close];
+    }
+    
+    for(NSString* childKey in childCollections){
+        [sql appendFormat:@" OR collectionItems.collectionKey = ?"];
+        [parameters addObject:childKey];
+        [self _buildWhereForCollectionsRecursively:childKey intoMutableString:sql intoParameterArray:parameters];
+    }
+    
 }
 
 //These are hard coded for now.

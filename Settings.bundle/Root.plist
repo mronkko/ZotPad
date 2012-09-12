@@ -228,6 +228,22 @@
 			<key>DefaultValue</key>
 			<true/>
 		</dict>
+        <dict>
+			<key>Type</key>
+			<string>PSGroupSpecifier</string>
+			<key>Title</key>
+			<string>Advanced settings</string>
+			<key>FooterText</key>
+			<string>Advanced settings can be used to alter the default behavior of ZotPad.</string>
+		</dict>
+        <dict>
+			<key>Type</key>
+			<string>PSChildPaneSpecifier</string>
+			<key>Title</key>
+			<string>Advanced settings</string>
+			<key>File</key>
+			<string>Advanced</string>
+		</dict>
 	</array>
 	<key>StringsTable</key>
 	<string>Root</string>

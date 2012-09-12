@@ -23,7 +23,7 @@
 @property (strong, nonatomic) ZPItemListViewController *detailViewController;
 @property (assign) NSInteger currentlibraryID;
 @property (retain, nonatomic) NSString* currentCollectionKey;
-@property IBOutlet UIBarButtonItem* gearButton;
-@property IBOutlet UIBarButtonItem* cacheControllerPlaceHolder;
+@property (assign) NSInteger drilledCollectionIndex;
+@property (assign) NSInteger selectedCollectionIndex;
 
 @end

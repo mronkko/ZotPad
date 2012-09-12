@@ -63,7 +63,7 @@
 #import "ZPZoteroNote.h"
 
 #define NUMBER_OF_ITEMS_TO_RETRIEVE 50
-#define NUMBER_OF_PARALLEL_REQUESTS 6
+#define NUMBER_OF_PARALLEL_REQUESTS 8
 
 
 @interface ZPCacheController (){

@@ -628,6 +628,11 @@
 		A7307BFF15A6E51100A90BDF /* NSString+Dropbox.m in Sources */ = {isa = PBXBuildFile; fileRef = A7307BAC15A6E51100A90BDF /* NSString+Dropbox.m */; settings = {COMPILER_FLAGS = "-fno-objc-arc"; }; };
 		A7307C0015A6E51100A90BDF /* UIAlertView+Dropbox.m in Sources */ = {isa = PBXBuildFile; fileRef = A7307BAD15A6E51100A90BDF /* UIAlertView+Dropbox.m */; settings = {COMPILER_FLAGS = "-fno-objc-arc"; }; };
 		A7307C0115A6E51100A90BDF /* UIAlertView+Dropbox.m in Sources */ = {isa = PBXBuildFile; fileRef = A7307BAD15A6E51100A90BDF /* UIAlertView+Dropbox.m */; settings = {COMPILER_FLAGS = "-fno-objc-arc"; }; };
+		A733F7B915F8B62A00E8A2D6 /* ZPCollectionsAndTagsViewController.m in Sources */ = {isa = PBXBuildFile; fileRef = A733F7B815F8B62A00E8A2D6 /* ZPCollectionsAndTagsViewController.m */; };
+		A733F7BA15F8B62A00E8A2D6 /* ZPCollectionsAndTagsViewController.m in Sources */ = {isa = PBXBuildFile; fileRef = A733F7B815F8B62A00E8A2D6 /* ZPCollectionsAndTagsViewController.m */; };
+		A733F7BB15F8B62A00E8A2D6 /* ZPCollectionsAndTagsViewController.m in Sources */ = {isa = PBXBuildFile; fileRef = A733F7B815F8B62A00E8A2D6 /* ZPCollectionsAndTagsViewController.m */; };
+		A733F7CC15F8B68400E8A2D6 /* libCoconutKit.a in Frameworks */ = {isa = PBXBuildFile; fileRef = A733F7C815F8B66A00E8A2D6 /* libCoconutKit.a */; };
+		A733F7CE15F8C1DB00E8A2D6 /* CoreData.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = A733F7CD15F8C1DB00E8A2D6 /* CoreData.framework */; };
 		A73D1BFD1560E234002D4A2D /* libTestFlight.a in Frameworks */ = {isa = PBXBuildFile; fileRef = A73D1BF91560E234002D4A2D /* libTestFlight.a */; };
 		A73D1BFE1560E234002D4A2D /* libTestFlight.a in Frameworks */ = {isa = PBXBuildFile; fileRef = A73D1BF91560E234002D4A2D /* libTestFlight.a */; };
 		A73D1BFF1560E234002D4A2D /* README.txt in Resources */ = {isa = PBXBuildFile; fileRef = A73D1BFA1560E234002D4A2D /* README.txt */; };
@@ -635,6 +640,9 @@
 		A73D1C011560E234002D4A2D /* release_notes.txt in Resources */ = {isa = PBXBuildFile; fileRef = A73D1BFB1560E234002D4A2D /* release_notes.txt */; };
 		A73D1C021560E234002D4A2D /* release_notes.txt in Resources */ = {isa = PBXBuildFile; fileRef = A73D1BFB1560E234002D4A2D /* release_notes.txt */; };
 		A73D635114879D15007999F3 /* Settings.bundle in Resources */ = {isa = PBXBuildFile; fileRef = A73D635014879D15007999F3 /* Settings.bundle */; };
+		A7406C271600BFE900549D89 /* horizontalLines.png in Resources */ = {isa = PBXBuildFile; fileRef = A7406C261600BFE900549D89 /* horizontalLines.png */; };
+		A7406C281600C1B100549D89 /* horizontalLines.png in Resources */ = {isa = PBXBuildFile; fileRef = A7406C261600BFE900549D89 /* horizontalLines.png */; };
+		A7406C291600C1B200549D89 /* horizontalLines.png in Resources */ = {isa = PBXBuildFile; fileRef = A7406C261600BFE900549D89 /* horizontalLines.png */; };
 		A74348D7147AB37A00DA6FC3 /* ZPAuthenticationDialog.m in Sources */ = {isa = PBXBuildFile; fileRef = A74348D6147AB37A00DA6FC3 /* ZPAuthenticationDialog.m */; };
 		A74B93EB15A8B6560073D303 /* iphone.pdf in Resources */ = {isa = PBXBuildFile; fileRef = A74B93E915A8B6560073D303 /* iphone.pdf */; };
 		A74B93EC15A8B6560073D303 /* iphone.pdf in Resources */ = {isa = PBXBuildFile; fileRef = A74B93E915A8B6560073D303 /* iphone.pdf */; };
@@ -1387,6 +1395,20 @@
 /* End PBXBuildFile section */
 
 /* Begin PBXContainerItemProxy section */
+		A733F7C715F8B66A00E8A2D6 /* PBXContainerItemProxy */ = {
+			isa = PBXContainerItemProxy;
+			containerPortal = A733F7BC15F8B66900E8A2D6 /* CoconutKit.xcodeproj */;
+			proxyType = 2;
+			remoteGlobalIDString = D2AAC07E0554694100DB518D;
+			remoteInfo = CoconutKit;
+		};
+		A733F7CA15F8B67A00E8A2D6 /* PBXContainerItemProxy */ = {
+			isa = PBXContainerItemProxy;
+			containerPortal = A733F7BC15F8B66900E8A2D6 /* CoconutKit.xcodeproj */;
+			proxyType = 1;
+			remoteGlobalIDString = D2AAC07D0554694100DB518D;
+			remoteInfo = CoconutKit;
+		};
 		A77E0DCB15D65FAB00134D35 /* PBXContainerItemProxy */ = {
 			isa = PBXContainerItemProxy;
 			containerPortal = A77E0DC415D65FAB00134D35 /* UserVoice.xcodeproj */;
@@ -1911,11 +1933,16 @@
 		A7307BAB15A6E51100A90BDF /* NSDictionary+Dropbox.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = "NSDictionary+Dropbox.m"; sourceTree = "<group>"; };
 		A7307BAC15A6E51100A90BDF /* NSString+Dropbox.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = "NSString+Dropbox.m"; sourceTree = "<group>"; };
 		A7307BAD15A6E51100A90BDF /* UIAlertView+Dropbox.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = "UIAlertView+Dropbox.m"; sourceTree = "<group>"; };
+		A733F7B715F8B62A00E8A2D6 /* ZPCollectionsAndTagsViewController.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = ZPCollectionsAndTagsViewController.h; sourceTree = "<group>"; };
+		A733F7B815F8B62A00E8A2D6 /* ZPCollectionsAndTagsViewController.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = ZPCollectionsAndTagsViewController.m; sourceTree = "<group>"; };
+		A733F7BC15F8B66900E8A2D6 /* CoconutKit.xcodeproj */ = {isa = PBXFileReference; lastKnownFileType = "wrapper.pb-project"; name = CoconutKit.xcodeproj; path = CoconutKit/CoconutKit/CoconutKit.xcodeproj; sourceTree = "<group>"; };
+		A733F7CD15F8C1DB00E8A2D6 /* CoreData.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; name = CoreData.framework; path = System/Library/Frameworks/CoreData.framework; sourceTree = SDKROOT; };
 		A73D1BF91560E234002D4A2D /* libTestFlight.a */ = {isa = PBXFileReference; lastKnownFileType = archive.ar; path = libTestFlight.a; sourceTree = "<group>"; };
 		A73D1BFA1560E234002D4A2D /* README.txt */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = text; path = README.txt; sourceTree = "<group>"; };
 		A73D1BFB1560E234002D4A2D /* release_notes.txt */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = text; path = release_notes.txt; sourceTree = "<group>"; };
 		A73D1BFC1560E234002D4A2D /* TestFlight.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = TestFlight.h; sourceTree = "<group>"; };
 		A73D635014879D15007999F3 /* Settings.bundle */ = {isa = PBXFileReference; explicitFileType = wrapper.application; name = Settings.bundle; path = ../Settings.bundle; sourceTree = "<group>"; };
+		A7406C261600BFE900549D89 /* horizontalLines.png */ = {isa = PBXFileReference; lastKnownFileType = image.png; name = horizontalLines.png; path = Icons/horizontalLines.png; sourceTree = SOURCE_ROOT; };
 		A74348D5147AB37A00DA6FC3 /* ZPAuthenticationDialog.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = ZPAuthenticationDialog.h; sourceTree = "<group>"; };
 		A74348D6147AB37A00DA6FC3 /* ZPAuthenticationDialog.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = ZPAuthenticationDialog.m; sourceTree = "<group>"; };
 		A74B93E915A8B6560073D303 /* iphone.pdf */ = {isa = PBXFileReference; lastKnownFileType = image.pdf; name = iphone.pdf; path = Docs/iphone.pdf; sourceTree = SOURCE_ROOT; };
@@ -1924,6 +1951,7 @@
 		A74F8E6915B83D8500C72096 /* ZPItemListViewDataSource.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = ZPItemListViewDataSource.m; sourceTree = "<group>"; };
 		A74F8E6C15B83DF100C72096 /* ZPMasterItemListViewController.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = ZPMasterItemListViewController.h; sourceTree = "<group>"; };
 		A74F8E6D15B83DF100C72096 /* ZPMasterItemListViewController.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = ZPMasterItemListViewController.m; sourceTree = "<group>"; };
+		A7513F6E15FE1F1D00E07C79 /* ZPPreviewSource.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = ZPPreviewSource.h; sourceTree = "<group>"; };
 		A75D4B4415BC9B56003291CB /* NSData+Base64.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; name = "NSData+Base64.h"; path = "Base64/NSData+Base64.h"; sourceTree = "<group>"; };
 		A75D4B4515BC9B56003291CB /* NSData+Base64.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; name = "NSData+Base64.m"; path = "Base64/NSData+Base64.m"; sourceTree = "<group>"; };
 		A75D4B4615BC9B56003291CB /* NSString+Base64.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; name = "NSString+Base64.h"; path = "Base64/NSString+Base64.h"; sourceTree = "<group>"; };
@@ -1987,7 +2015,6 @@
 		A77FD066159F750700774D50 /* ZPLogViewController.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = ZPLogViewController.h; sourceTree = "<group>"; };
 		A77FD067159F750900774D50 /* ZPLogViewController.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = ZPLogViewController.m; sourceTree = "<group>"; };
 		A78324A915EE3174004BB4F7 /* ZotPad beta copy.app */ = {isa = PBXFileReference; explicitFileType = wrapper.application; includeInIndex = 0; path = "ZotPad beta copy.app"; sourceTree = BUILT_PRODUCTS_DIR; };
-		A78324AB15EE3174004BB4F7 /* ZotPad beta copy-Info.plist */ = {isa = PBXFileReference; lastKnownFileType = text.plist.xml; name = "ZotPad beta copy-Info.plist"; path = "/Users/mronkko/Documents/Software/ZotPad/ZotPad beta copy-Info.plist"; sourceTree = "<absolute>"; };
 		A786F7771476A56200B35B92 /* MainStoryboard_iPhone.storyboard */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = file.storyboard; path = MainStoryboard_iPhone.storyboard; sourceTree = "<group>"; };
 		A79299C1149E0CFE000F8B42 /* ZPZoteroDataObject.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = ZPZoteroDataObject.h; sourceTree = "<group>"; };
 		A79299C2149E0CFE000F8B42 /* ZPZoteroDataObject.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = ZPZoteroDataObject.m; sourceTree = "<group>"; };
@@ -2047,7 +2074,6 @@
 		A7A54B0A14878E4F00EBAD80 /* FMResultSet.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; name = FMResultSet.m; path = FMDB/src/FMResultSet.m; sourceTree = "<group>"; };
 		A7A54B0F14878EE000EBAD80 /* DSActivityView.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; name = DSActivityView.h; path = DSActivityView/Sources/DSActivityView.h; sourceTree = "<group>"; };
 		A7A54B1014878EE000EBAD80 /* DSActivityView.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; name = DSActivityView.m; path = DSActivityView/Sources/DSActivityView.m; sourceTree = "<group>"; };
-		A7A6B90315B8B44200A99BB4 /* ZPPreviewSource.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; name = ZPPreviewSource.h; path = ../ZPPreviewSource.h; sourceTree = "<group>"; };
 		A7A7C9AF147A8144004D8756 /* ZPServerConnectionManager.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = ZPServerConnectionManager.h; sourceTree = "<group>"; };
 		A7A7C9B0147A8144004D8756 /* ZPServerConnectionManager.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = ZPServerConnectionManager.m; sourceTree = "<group>"; };
 		A7A7C9CF147AA2EE004D8756 /* NSMutableURLRequest+Parameters.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = "NSMutableURLRequest+Parameters.h"; sourceTree = "<group>"; };
@@ -2208,13 +2234,15 @@
 			isa = PBXFrameworksBuildPhase;
 			buildActionMask = 2147483647;
 			files = (
+				A7CD075D15161555007A8E1D /* QuartzCore.framework in Frameworks */,
+				A733F7CE15F8C1DB00E8A2D6 /* CoreData.framework in Frameworks */,
+				A733F7CC15F8B68400E8A2D6 /* libCoconutKit.a in Frameworks */,
 				A7C1A00415F4D5F700A5AF49 /* libFRLayeredNavigationController.a in Frameworks */,
 				A77E0DD615D660CF00134D35 /* libUserVoice.a in Frameworks */,
 				A7093C3115A44C6B00F7B5CF /* libDTCoreText.a in Frameworks */,
 				A7699E57159A6C44002F09DA /* CoreFoundation.framework in Frameworks */,
 				A70399B115979EC1002F4293 /* MessageUI.framework in Frameworks */,
 				A7BD5EC6156121A3003252EA /* CoreText.framework in Frameworks */,
-				A7CD075D15161555007A8E1D /* QuartzCore.framework in Frameworks */,
 				A7CD075E15161555007A8E1D /* libxml2.dylib in Frameworks */,
 				A7BD5EC415612181003252EA /* ImageIO.framework in Frameworks */,
 				A7CD075715161555007A8E1D /* libz.dylib in Frameworks */,
@@ -2598,7 +2626,6 @@
 				A7200DDA14718DC0004347C9 /* ZotPad */,
 				A7200DD314718DC0004347C9 /* Frameworks */,
 				A7200DD114718DC0004347C9 /* Products */,
-				A78324AB15EE3174004BB4F7 /* ZotPad beta copy-Info.plist */,
 			);
 			sourceTree = "<group>";
 		};
@@ -2615,6 +2642,8 @@
 		A7200DD314718DC0004347C9 /* Frameworks */ = {
 			isa = PBXGroup;
 			children = (
+				A733F7CD15F8C1DB00E8A2D6 /* CoreData.framework */,
+				A733F7BC15F8B66900E8A2D6 /* CoconutKit.xcodeproj */,
 				A7C19FF715F4D5D100A5AF49 /* FRLayeredNavigationController.xcodeproj */,
 				A77E0DC415D65FAB00134D35 /* UserVoice.xcodeproj */,
 				A75D4B4215BC9B56003291CB /* Base64 */,
@@ -2691,6 +2720,8 @@
 			children = (
 				A786F7771476A56200B35B92 /* MainStoryboard_iPhone.storyboard */,
 				A72C3CA61487C9DA00F6744E /* MainStoryboard_iPad.storyboard */,
+				A733F7B715F8B62A00E8A2D6 /* ZPCollectionsAndTagsViewController.h */,
+				A733F7B815F8B62A00E8A2D6 /* ZPCollectionsAndTagsViewController.m */,
 				A7D3C08114AEE70F00DB975D /* ZPLocalization.h */,
 				A7D3C08214AEE70F00DB975D /* ZPLocalization.m */,
 				A7F36B3415B6B4B600492DC3 /* RootViewControllers */,
@@ -2874,6 +2905,14 @@
 			path = Crypto;
 			sourceTree = "<group>";
 		};
+		A733F7BD15F8B66900E8A2D6 /* Products */ = {
+			isa = PBXGroup;
+			children = (
+				A733F7C815F8B66A00E8A2D6 /* libCoconutKit.a */,
+			);
+			name = Products;
+			sourceTree = "<group>";
+		};
 		A73D1BF81560E234002D4A2D /* TestFlightSDK1 */ = {
 			isa = PBXGroup;
 			children = (
@@ -3032,7 +3071,7 @@
 		A79D60141599DB3000F55C54 /* Attachments */ = {
 			isa = PBXGroup;
 			children = (
-				A7A6B90315B8B44200A99BB4 /* ZPPreviewSource.h */,
+				A7513F6E15FE1F1D00E07C79 /* ZPPreviewSource.h */,
 				A7093C2A15A4241300F7B5CF /* ZPAttachmentIconImageFactory.h */,
 				A7093C2B15A4241300F7B5CF /* ZPAttachmentIconImageFactory.m */,
 				A793153C14B185E800E1ABF0 /* ZPAttachmentFileInteractionController.h */,
@@ -3271,6 +3310,7 @@
 		A7D6DA4F14F4CA0B00420FF1 /* In-App icons */ = {
 			isa = PBXGroup;
 			children = (
+				A7406C261600BFE900549D89 /* horizontalLines.png */,
 				A7B051B715B187BF0049C5A2 /* icon-down-black.png */,
 				A7B051B815B187BF0049C5A2 /* icon-down-black@x2.png */,
 				A7B051B915B187BF0049C5A2 /* icon-up-black.png */,
@@ -3365,6 +3405,7 @@
 			buildRules = (
 			);
 			dependencies = (
+				A733F7CB15F8B67A00E8A2D6 /* PBXTargetDependency */,
 				A77E0DD515D660C200134D35 /* PBXTargetDependency */,
 				A77E0DD315D660BC00134D35 /* PBXTargetDependency */,
 			);
@@ -3396,6 +3437,10 @@
 			projectDirPath = "";
 			projectReferences = (
 				{
+					ProductGroup = A733F7BD15F8B66900E8A2D6 /* Products */;
+					ProjectRef = A733F7BC15F8B66900E8A2D6 /* CoconutKit.xcodeproj */;
+				},
+				{
 					ProductGroup = A7ABAB3415A3046300EA8B7B /* Products */;
 					ProjectRef = A7ABAB3315A3046300EA8B7B /* DTCoreText.xcodeproj */;
 				},
@@ -3418,6 +3463,13 @@
 /* End PBXProject section */
 
 /* Begin PBXReferenceProxy section */
+		A733F7C815F8B66A00E8A2D6 /* libCoconutKit.a */ = {
+			isa = PBXReferenceProxy;
+			fileType = archive.ar;
+			path = libCoconutKit.a;
+			remoteRef = A733F7C715F8B66A00E8A2D6 /* PBXContainerItemProxy */;
+			sourceTree = BUILT_PRODUCTS_DIR;
+		};
 		A77E0DCC15D65FAB00134D35 /* libUserVoice.a */ = {
 			isa = PBXReferenceProxy;
 			fileType = archive.ar;
@@ -3781,6 +3833,7 @@
 				A7B051BF15B187BF0049C5A2 /* icon-up-black.png in Resources */,
 				A7B051C115B187BF0049C5A2 /* icon-up-black@2x.png in Resources */,
 				A7B2BCC915B3E22500381E23 /* upgrade1.0to1.1.sql in Resources */,
+				A7406C271600BFE900549D89 /* horizontalLines.png in Resources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
@@ -4081,6 +4134,7 @@
 				A78324A215EE3173004BB4F7 /* icon-up-black.png in Resources */,
 				A78324A315EE3173004BB4F7 /* icon-up-black@2x.png in Resources */,
 				A78324A415EE3173004BB4F7 /* upgrade1.0to1.1.sql in Resources */,
+				A7406C291600C1B200549D89 /* horizontalLines.png in Resources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
@@ -4381,6 +4435,7 @@
 				A7B051C015B187BF0049C5A2 /* icon-up-black.png in Resources */,
 				A7B051C215B187BF0049C5A2 /* icon-up-black@2x.png in Resources */,
 				A7B2BCCA15B3E22500381E23 /* upgrade1.0to1.1.sql in Resources */,
+				A7406C281600C1B100549D89 /* horizontalLines.png in Resources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
@@ -4581,6 +4636,7 @@
 				A74F8E6E15B83DF100C72096 /* ZPMasterItemListViewController.m in Sources */,
 				A75D4B5B15BC9B57003291CB /* NSData+Base64.m in Sources */,
 				A75D4B5D15BC9B57003291CB /* NSString+Base64.m in Sources */,
+				A733F7B915F8B62A00E8A2D6 /* ZPCollectionsAndTagsViewController.m in Sources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
@@ -4734,6 +4790,7 @@
 				A783236815EE3173004BB4F7 /* ZPMasterItemListViewController.m in Sources */,
 				A783236915EE3173004BB4F7 /* NSData+Base64.m in Sources */,
 				A783236A15EE3173004BB4F7 /* NSString+Base64.m in Sources */,
+				A733F7BB15F8B62A00E8A2D6 /* ZPCollectionsAndTagsViewController.m in Sources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
@@ -4887,12 +4944,18 @@
 				A74F8E6F15B83DF100C72096 /* ZPMasterItemListViewController.m in Sources */,
 				A75D4B5C15BC9B57003291CB /* NSData+Base64.m in Sources */,
 				A75D4B5E15BC9B57003291CB /* NSString+Base64.m in Sources */,
+				A733F7BA15F8B62A00E8A2D6 /* ZPCollectionsAndTagsViewController.m in Sources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
 /* End PBXSourcesBuildPhase section */
 
 /* Begin PBXTargetDependency section */
+		A733F7CB15F8B67A00E8A2D6 /* PBXTargetDependency */ = {
+			isa = PBXTargetDependency;
+			name = CoconutKit;
+			targetProxy = A733F7CA15F8B67A00E8A2D6 /* PBXContainerItemProxy */;
+		};
 		A77E0DCF15D660AF00134D35 /* PBXTargetDependency */ = {
 			isa = PBXTargetDependency;
 			name = "Static Library";

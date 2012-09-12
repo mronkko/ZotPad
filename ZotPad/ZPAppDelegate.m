@@ -22,8 +22,7 @@
 #import "DDFileLogger.h"
 #import "TestFlightLogger.h"
 #import "CompressingLogFileManager.h"
-#import "FRLayeredNavigationController.h"
-#import "FRLayeredNavigationItem.h"
+
 
 @interface ZPFileLogFormatter : NSObject <DDLogFormatter>{
     NSInteger _level;
@@ -144,13 +143,6 @@ didFinishLaunchingWithOptions:(NSDictionary *)launchOptions
             [splitViewController setPresentsWithGesture:NO];
 
         }
-        UINavigationController *masterController = [splitViewController.viewControllers objectAtIndex:0];
-        [masterController pushViewController:[[FRLayeredNavigationController alloc] initWithRootViewController:[splitViewController.storyboard instantiateViewControllerWithIdentifier:@"LibraryAndCollectionList"]
-                                                                                                 configuration:^(FRLayeredNavigationItem *item) {
-                                                                                                     item.width = 320;
-                                                                                                     return;
-                                                                                                 }] animated:NO];
-        
         UINavigationController *navigationController = [splitViewController.viewControllers lastObject];
         splitViewController.delegate = (id)navigationController.topViewController;
     }
