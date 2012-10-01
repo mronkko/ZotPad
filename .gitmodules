@@ -49,3 +49,6 @@
 [submodule "CoconutKit"]
 	path = CoconutKit
 	url = https://github.com/defagos/CoconutKit.git
+[submodule "CSLProcessor"]
+	path = CSLProcessor
+	url = https://github.com/mronkko/CSLProcessor
