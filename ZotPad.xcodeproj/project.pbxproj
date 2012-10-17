@@ -647,6 +647,7 @@
 		A74F8E6B15B83D8500C72096 /* ZPItemListViewDataSource.m in Sources */ = {isa = PBXBuildFile; fileRef = A74F8E6915B83D8500C72096 /* ZPItemListViewDataSource.m */; };
 		A74F8E6E15B83DF100C72096 /* ZPMasterItemListViewController.m in Sources */ = {isa = PBXBuildFile; fileRef = A74F8E6D15B83DF100C72096 /* ZPMasterItemListViewController.m */; };
 		A74F8E6F15B83DF100C72096 /* ZPMasterItemListViewController.m in Sources */ = {isa = PBXBuildFile; fileRef = A74F8E6D15B83DF100C72096 /* ZPMasterItemListViewController.m */; };
+		A75C1145162F379500F14B69 /* Default-568h@2x.png in Resources */ = {isa = PBXBuildFile; fileRef = A75C1144162F379500F14B69 /* Default-568h@2x.png */; };
 		A75D4B5B15BC9B57003291CB /* NSData+Base64.m in Sources */ = {isa = PBXBuildFile; fileRef = A75D4B4515BC9B56003291CB /* NSData+Base64.m */; };
 		A75D4B5C15BC9B57003291CB /* NSData+Base64.m in Sources */ = {isa = PBXBuildFile; fileRef = A75D4B4515BC9B56003291CB /* NSData+Base64.m */; };
 		A75D4B5D15BC9B57003291CB /* NSString+Base64.m in Sources */ = {isa = PBXBuildFile; fileRef = A75D4B4715BC9B56003291CB /* NSString+Base64.m */; };
@@ -1456,6 +1457,7 @@
 		A74F8E6915B83D8500C72096 /* ZPItemListViewDataSource.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = ZPItemListViewDataSource.m; sourceTree = "<group>"; };
 		A74F8E6C15B83DF100C72096 /* ZPMasterItemListViewController.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = ZPMasterItemListViewController.h; sourceTree = "<group>"; };
 		A74F8E6D15B83DF100C72096 /* ZPMasterItemListViewController.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = ZPMasterItemListViewController.m; sourceTree = "<group>"; };
+		A75C1144162F379500F14B69 /* Default-568h@2x.png */ = {isa = PBXFileReference; lastKnownFileType = image.png; name = "Default-568h@2x.png"; path = "../Default-568h@2x.png"; sourceTree = "<group>"; };
 		A75D4B4415BC9B56003291CB /* NSData+Base64.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; name = "NSData+Base64.h"; path = "Base64/NSData+Base64.h"; sourceTree = "<group>"; };
 		A75D4B4515BC9B56003291CB /* NSData+Base64.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; name = "NSData+Base64.m"; path = "Base64/NSData+Base64.m"; sourceTree = "<group>"; };
 		A75D4B4615BC9B56003291CB /* NSString+Base64.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; name = "NSString+Base64.h"; path = "Base64/NSString+Base64.h"; sourceTree = "<group>"; };
@@ -2531,6 +2533,7 @@
 		A78B7F0F149090D2008303BA /* Launch images */ = {
 			isa = PBXGroup;
 			children = (
+				A75C1144162F379500F14B69 /* Default-568h@2x.png */,
 				A7F249F11533175E00537B54 /* Default-Landscape@2x~ipad.png */,
 				A7F249E5153311BC00537B54 /* Default-Portrait@2x~ipad.png */,
 				A7F249E3153311B200537B54 /* Default.png */,
@@ -3268,6 +3271,7 @@
 				A7B051C115B187BF0049C5A2 /* icon-up-black@2x.png in Resources */,
 				A7B2BCC915B3E22500381E23 /* upgrade1.0to1.1.sql in Resources */,
 				A7225CDC15B4B0D1008C5878 /* ZotPad-Info.plist in Resources */,
+				A75C1145162F379500F14B69 /* Default-568h@2x.png in Resources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
@@ -4129,6 +4133,7 @@
 					"\"$(SRCROOT)/TestFlightSDK1\"",
 					"\"$(SDKROOT)/usr/lib/system\"",
 				);
+				ONLY_ACTIVE_ARCH = YES;
 				PRODUCT_NAME = "ZotPad beta";
 				PROVISIONING_PROFILE = "";
 				"PROVISIONING_PROFILE[sdk=iphoneos*]" = "";
@@ -4169,6 +4174,7 @@
 					"\"$(SRCROOT)/TestFlightSDK1\"",
 					"\"$(SDKROOT)/usr/lib/system\"",
 				);
+				ONLY_ACTIVE_ARCH = YES;
 				PRODUCT_NAME = "ZotPad beta";
 				PROVISIONING_PROFILE = "AE9438C2-FEB3-4CFE-8857-34811EBD85A4";
 				"PROVISIONING_PROFILE[sdk=iphoneos*]" = "AE9438C2-FEB3-4CFE-8857-34811EBD85A4";
