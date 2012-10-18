@@ -63,32 +63,27 @@
         while (_nextTagIndex<[_tags count]) {
             
             //TODO: Recycle these labels
-            UILabel* tagLabel = [[UILabel alloc] init];
-            tagLabel.text = [_tags objectAtIndex:_nextTagIndex];
-            [tagLabel sizeToFit];
+            UIButton* tagButton = [UIButton buttonWithType:UIButtonTypeRoundedRect];
+            [tagButton setTitle:[_tags objectAtIndex:_nextTagIndex] forState:UIControlStateNormal];
+            [tagButton sizeToFit];
+            tagButton.layer.cornerRadius = tagButton.frame.size.height/2;
             
             //If this is too large
-            if(xForNextTag+tagLabel.frame.size.width > tableView.frame.size.width-5){
+            if(xForNextTag+tagButton.frame.size.width > tableView.frame.size.width-5){
                 if(xForNextTag==5){
-                    tagLabel.frame = CGRectMake(5, 5, tableView.frame.size.width, tagLabel.frame.size.height-5);
+                    tagButton.frame = CGRectMake(5, 5, tableView.frame.size.width-10, tagButton.frame.size.height);
                 }
                 else break;
             }
             
             //Position the tag
-            tagLabel.frame = CGRectMake(xForNextTag, 5, tagLabel.frame.size.width+10, tagLabel.frame.size.height+10);
+            tagButton.frame = CGRectMake(xForNextTag, 5, tagButton.frame.size.width, tagButton.frame.size.height);
 
-            //Modify looks
-            tagLabel.backgroundColor = [UIColor yellowColor];
-            tagLabel.layer.cornerRadius =  tagLabel.frame.size.height/2;
-            
-//            tagLabel.layer.borderWidth = 2;
-            tagLabel.textAlignment = UITextAlignmentCenter;
 
             //Add the tag
-            xForNextTag = xForNextTag + tagLabel.frame.size.width+10;
-            [cell.contentView addSubview:tagLabel];
-            DDLogVerbose(@"Adding tag %@ with frame %@",tagLabel.text,NSStringFromCGRect(tagLabel.frame));
+            xForNextTag = xForNextTag + tagButton.frame.size.width+10;
+            [cell.contentView addSubview:tagButton];
+            DDLogVerbose(@"Adding tag %@ with frame %@",tagButton.titleLabel.text,NSStringFromCGRect(tagButton.frame));
 
             _nextTagIndex++;
         }
@@ -96,7 +91,7 @@
         //Update the estimated number of tags
         NSInteger difference = indexPath.row+1 + ([_tags count]-_nextTagIndex+2)/3 - _estimatedNumberOfRows;
 
-        if(difference!=0){
+        if(difference!=0 && FALSE){
 
             NSMutableArray* indexPaths = [[NSMutableArray alloc] initWithCapacity:abs(difference)];
             
@@ -107,7 +102,7 @@
                 [indexPaths addObject:[NSIndexPath indexPathForRow:i inSection:indexPath.section]];
             }
 
-            /*
+            
             _estimatedNumberOfRows = _estimatedNumberOfRows + difference;
 
             if(difference<0){
@@ -117,7 +112,6 @@
                 [tableView insertRowsAtIndexPaths:indexPaths withRowAnimation:UITableViewRowAnimationAutomatic];
             }
             DDLogVerbose(@"Adjusting tag rows by %i , count now %i",difference,_estimatedNumberOfRows);
-*/
 
         }
     }

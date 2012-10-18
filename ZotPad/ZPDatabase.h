@@ -61,6 +61,7 @@
 +(void) addFieldsToItem: (ZPZoteroItem*) item;
 +(void) addNotesToItem: (ZPZoteroItem*) item;
 +(void) addAttachmentsToItem: (ZPZoteroItem*) item;
++(void) addTagsToDataObject:(ZPZoteroDataObject*) dataObject;
 
 //Return a list of all attachment paths ordered by priority for removel
 +(NSArray*) getCachedAttachmentsOrderedByRemovalPriority;
@@ -77,6 +78,8 @@
 
 +(NSArray*) collectionsForItem:(ZPZoteroItem*)item;
     
++(NSArray*) tagsForItemKeys:(NSArray*)itemKeys;
+
 /*
  
  Methods for writing to DB
@@ -104,6 +107,7 @@
 
 +(void) writeItemsCreators:(NSArray*)items;
 +(void) writeItemsFields:(NSArray*)items;
++(void) writeDataObjectsTags:(NSArray*)dataObjects;
 
 
 // These remove items from the cache

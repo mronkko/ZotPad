@@ -77,7 +77,16 @@
             }
             [(ZPZoteroItem*) _currentElement setCreators:fixedAuthors];
         }
-        //TODO: Tags are include in the JSON, think how they should be processed. (This is for a future version)
+        NSArray* tags = [data objectForKey:@"tags"];
+
+
+        if(tags != NULL){
+            NSMutableArray* tagsArray = [[NSMutableArray alloc] initWithCapacity:[tags count]];
+            for(NSDictionary* tagDict in tags){
+                [tagsArray addObject:[tagDict objectForKey:@"tag"]];
+            }
+            _currentElement.tags = tagsArray;
+        }
         
         NSMutableDictionary* fields = [NSMutableDictionary dictionaryWithDictionary:data];
         

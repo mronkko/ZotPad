@@ -107,6 +107,11 @@ static ZPItemListViewDataSource* _instance;
     
 }
 
+- (NSArray*) itemKeys{
+    @synchronized(_itemKeysNotInCache){
+        return [_itemKeysNotInCache arrayByAddingObjectsFromArray:_itemKeysShown];
+    }
+}
 
 #pragma mark - Receiving data and updating the table view
 

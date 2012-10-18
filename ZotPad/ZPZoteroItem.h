@@ -16,7 +16,12 @@
     __strong NSArray* _attachments;
     __strong NSArray* _notes;
     __strong NSDictionary* _fields;
-
+    
+    NSString* _fullCitation;
+    NSString* _creatorSummary;
+    NSString* _publicationDetails;
+    NSInteger _year;
+    
     BOOL _isStandaloneAttachment;
     BOOL _isStandaloneNote;
     
@@ -24,7 +29,6 @@
 }
 
 @property (retain) NSString* dateAdded;
-@property (retain) NSString* fullCitation;
 @property (readonly) NSString* creatorSummary;
 @property (readonly) NSString* publicationDetails;
 @property (readonly) NSInteger year;
@@ -35,10 +39,7 @@
 @property (retain) NSArray* creators;
 @property (retain) NSDictionary* fields;
 @property (retain) NSString* itemKey;
-
-
-
-
+@property (readonly) NSString* fullCitation;
 
 +(void) dropCache;
 +(ZPZoteroItem*) itemWithKey:(NSString*) key;

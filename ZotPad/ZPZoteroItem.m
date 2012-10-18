@@ -8,10 +8,17 @@
 
 #import "ZPCore.h"
 #import "ZPDatabase.h"
+#import "CSLFormatter.h"
+
+@interface ZPZoteroItem()
+
+-(void) _configureFieldsDependingOnFullCitation;
+
+@end
 
 @implementation ZPZoteroItem
 
-@synthesize fullCitation, numTags,dateAdded,etag;
+@synthesize numTags,dateAdded,etag;
 
 //TODO: Consider what happens when the cache is purged. This may result in duplicate objects with the same key.
 
@@ -79,6 +86,52 @@ static NSCache* _objectCache = NULL;
     return obj;
 }
 
+-(void) _configureFieldsDependingOnFullCitation{
+    CSLFormatter* cslFormatter = [[CSLFormatter alloc] initWithCSLFile:@"apa.csl" localeFile:@"locales-en-US.xml" fieldMapFile:@"typeMap.xml"];
+    NSMutableDictionary* macroDict = [[NSMutableDictionary alloc] init];
+    
+    NSMutableDictionary* fields = [NSMutableDictionary dictionaryWithDictionary:self.fields];
+
+    //Add creators
+    
+    //Get creators as separate variables
+    for(NSDictionary* creator in self.creators){
+        NSString* type = [creator objectForKey:@"creatorType"];
+        
+        NSMutableArray* creatorArray = [fields objectForKey:type];
+        if(creatorArray == NULL){
+            creatorArray = [[NSMutableArray alloc] init];
+            [fields setObject:creatorArray forKey:type];
+        }
+        [creatorArray addObject:creator];
+    }
+    
+    _fullCitation = [cslFormatter formatBibliographyItemUsingVariables:fields storeMacrosInDictionary:macroDict];
+    
+    _creatorSummary = [NSString stringWithFormat:@"%@. %@",[macroDict objectForKey:@"creator"],[macroDict objectForKey:@"issued"] ];
+    _publicationDetails = [_fullCitation substringFromIndex:[_creatorSummary length]+2];
+    _year = [[macroDict objectForKey:@"issued"] integerValue];
+}
+
+-(NSString*) fullCitation{
+    if(_fullCitation == NULL) [self _configureFieldsDependingOnFullCitation];
+    return _fullCitation;
+}
+-(NSString*) publicationDetails{
+    if(_fullCitation == NULL) [self _configureFieldsDependingOnFullCitation];
+    return _publicationDetails;
+}
+
+-(NSString*) creatorSummary{
+    if(_fullCitation == NULL) [self _configureFieldsDependingOnFullCitation];
+    return _creatorSummary;
+}
+
+-(NSInteger) year{
+    if(_fullCitation == NULL) [self _configureFieldsDependingOnFullCitation];
+    return _year;
+}
+
 -(void) setItemKey:(NSString *)itemKey{
     [super setKey:itemKey];
 }
@@ -88,86 +141,6 @@ static NSCache* _objectCache = NULL;
 
 +(void) dropCache{
     [_objectCache removeAllObjects];
-}
-
--(NSString*) publicationDetails{
-    
-    if([self.fields count] == 0 || [self.itemType isEqualToString:@"note"] || [self.itemType isEqualToString:ZPKEY_ATTACHMENT]){
-        return @"";
-    }
-    
-    //If there are no authors.
-    if([[self creators] count]==0){
-        //Anything after the first closing parenthesis is publication details
-        NSRange range = [self.fullCitation rangeOfString:@")"];
-        if(range.location != NSNotFound){
-            return [[self.fullCitation substringFromIndex:(range.location+1)] stringByTrimmingCharactersInSet:[NSCharacterSet characterSetWithCharactersInString:@"., "]];   
-        }
-    }
-
-    //If that did not give us publication details, return everything after the title
-    
-    NSString* title = self.title;
-    NSRange range = [self.fullCitation rangeOfString:title];
-    
-    //Sometimes the title can contain characters that are not formatted properly by the CSL parser on Zotero server. In this case we will use less strict matching
-    
-    if(range.location==NSNotFound){
-        
-        NSRegularExpression* regex = [NSRegularExpression regularExpressionWithPattern:@"[^a-z0-9]"
-                                                                               options:NSRegularExpressionCaseInsensitive
-                                                                                 error:NULL];
-        NSString* tempFull = [regex stringByReplacingMatchesInString:self.fullCitation options:NSRegularExpressionCaseInsensitive range:NSMakeRange(0, [self.fullCitation length]) withTemplate:@" "];
-        NSString* tempTitle = [regex stringByReplacingMatchesInString:title options:NSRegularExpressionCaseInsensitive range:NSMakeRange(0, [title length]) withTemplate:@" "];
-        range = [tempFull rangeOfString:tempTitle];
-    }
-    
-    //If less strinct matching did not work, give up parsing
-    
-    if(range.location!=NSNotFound){
-        //Anything after the first space after the title is publication details
-        NSInteger index = range.location+range.length;
-        range = [self.fullCitation rangeOfString:@" " options:0 range:NSMakeRange(index, ([self.fullCitation length]-index))];
-        index = (range.location+1);
-        if(index<[self.fullCitation length]){
-            NSString* publicationTitle = [self.fullCitation substringFromIndex:index];
-            return [publicationTitle stringByTrimmingCharactersInSet:[NSCharacterSet characterSetWithCharactersInString:@"., "]];
-        }
-    }
-
-    return @"";
-}
-
--(NSString*) creatorSummary{
-    
-    if([self.fields count] == 0 || [self.itemType isEqualToString:@"note"] || [self.itemType isEqualToString:ZPKEY_ATTACHMENT]){
-        return @"";
-    }
-
-    //Anything before the first parenthesis in an APA citation is author unless it is in italic
-    
-    NSString* authors = (NSString*)[[self.fullCitation componentsSeparatedByString:@" ("] objectAtIndex:0];
-    
-    if([authors rangeOfString:@"<i>"].location == NSNotFound){
-        return authors;
-    }
-    else return @"";
-        
-}
-
--(NSInteger) year{
-    NSString* value = [[self fields] objectForKey:@"date"];
-    
-    NSRange r;
-    NSString *regEx = @"[0-9]{4}";
-    r = [value rangeOfString:regEx options:NSRegularExpressionSearch];
-    
-    if (r.location != NSNotFound) {
-        return [[value substringWithRange:r] integerValue];
-    }
-    else {
-       return 0;
-    }
 }
 
 

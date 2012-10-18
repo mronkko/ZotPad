@@ -63,7 +63,6 @@
             if([_currentElement isKindOfClass:[ZPZoteroAttachment class]] && [(ZPZoteroAttachment*) _currentElement parentKey] == NULL){
                 ZPZoteroItem* standAloneParent = [ZPZoteroItem itemWithKey:_currentElement.key];
                 standAloneParent.title = _currentElement.title;
-                standAloneParent.fullCitation = @"Standalone attachment";
                 standAloneParent.fields = [NSDictionary dictionaryWithObject:ZPKEY_ATTACHMENT forKey:@"itemType"];
                 standAloneParent.attachments = [NSArray arrayWithObject:_currentElement];
                 standAloneParent.libraryID = _currentElement.libraryID;
@@ -74,7 +73,6 @@
             else if([_currentElement isKindOfClass:[ZPZoteroNote class]] && [(ZPZoteroNote*) _currentElement parentKey] == NULL){
                 ZPZoteroItem* standAloneParent = [ZPZoteroItem itemWithKey:_currentElement.key];
                 standAloneParent.title = _currentElement.title;
-                standAloneParent.fullCitation = @"Standalone note";
                 standAloneParent.notes = [NSArray arrayWithObject:_currentElement];
                 standAloneParent.fields = [NSDictionary dictionaryWithObject:@"note" forKey:@"itemType"];
                 standAloneParent.libraryID = _currentElement.libraryID;

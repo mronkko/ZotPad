@@ -124,11 +124,11 @@ didFinishLaunchingWithOptions:(NSDictionary *)launchOptions
     NSUserDefaults* defaults = [NSUserDefaults standardUserDefaults];
     [defaults setObject:@"" forKey:@"userID"];
     [defaults setObject:@"" forKey:@"OAuthKey"];
-    
+    */
     //Uncomment these to always reset the app after launch
     [ZPDatabase resetDatabase];
     [[ZPCacheController instance] performSelectorInBackground:@selector(purgeAllAttachmentFilesFromCache) withObject:NULL];
-     */
+     
     
     
     

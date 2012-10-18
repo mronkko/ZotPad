@@ -44,6 +44,8 @@
 @property (assign) BOOL sortDescending;
 @property (nonatomic, retain) UIViewController* owner;
 
+- (NSArray*) itemKeys;
+
 - (void)clearTable;
 - (void)configureCachedKeys:(NSArray*)array;
 - (void)configureServerKeys:(NSArray*)uncachedItems;

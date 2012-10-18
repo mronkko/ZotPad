@@ -746,8 +746,7 @@ const NSInteger ZPServerConnectionManagerRequestLastModifiedItem = 11;
     
     NSMutableDictionary* parameters = [NSMutableDictionary dictionaryWithObject:[NSNumber numberWithInt:libraryID]  forKey:ZPKEY_LIBRARY_ID];
     
-    [parameters setObject:@"bib,json" forKey:@"content"];
-    [parameters setObject:@"apa" forKey:@"style"];
+    [parameters setObject:@"json" forKey:@"content"];
     [parameters setObject:[keys componentsJoinedByString:@","] forKey:ZPKEY_ITEM_KEY];
         
     [self makeServerRequest:ZPServerConnectionManagerRequestItemsAndChildren withParameters:parameters userInfo:NULL];

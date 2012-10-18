@@ -357,7 +357,12 @@
                 //Check accessory button
                 BOOL noAccessory = cell.accessoryType == UITableViewCellAccessoryNone;
                 if(shownObject.hasChildren && noAccessory){
-                    cell.accessoryType = UITableViewCellAccessoryDisclosureIndicator;
+                    if([ZPPreferences unifiedCollectionsNavigation]){
+                        cell.accessoryType = UITableViewCellAccessoryDisclosureIndicator;
+                    }
+                    else{
+                        cell.accessoryType = UITableViewCellAccessoryDetailDisclosureButton;
+                    }
                 }
                 else if(!shownObject.hasChildren && ! noAccessory){
                     cell.accessoryType = UITableViewCellAccessoryNone;

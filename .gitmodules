@@ -40,9 +40,6 @@
 [submodule "dropbox-sdk-ios"]
 	path = dropbox-sdk-ios
 	url = https://github.com/dropbox-sdk-mirror/dropbox-sdk-ios.git
-[submodule "uservoice-iphone-sdk"]
-	path = uservoice-iphone-sdk
-	url = https://github.com/mronkko/uservoice-iphone-sdk.git
 [submodule "FRLayeredNavigationController"]
 	path = FRLayeredNavigationController
 	url = https://github.com/mronkko/FRLayeredNavigationController

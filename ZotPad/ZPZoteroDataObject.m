@@ -18,25 +18,6 @@
 //@synthesize responseDataFromWhichThisItemWasCreated;
 #endif
 
-/*
- 
- Sub classes need to implement this method that creates and caches data objects.
- 
- */
-
-+(ZPZoteroDataObject*) itemWithKey:(NSObject*) key{
-    [NSException raise:@"Not implemented" format:@"Subclasses of ZPZoteroDataObject need to implement itemWithKey method"];
-    return nil;
-}
-
-+(ZPZoteroDataObject*) itemWithDictionary:(NSDictionary*) fields{
-    [NSException raise:@"Not implemented" format:@"Subclasses of ZPZoteroDataObject need to implement itemWithDictionary method"];
-    return nil;
-}
-
-/*
- 
- */
 
 -(void) configureWithDictionary:(NSDictionary*) dictionary{
     [self setValuesForKeysWithDictionary:dictionary];
@@ -58,6 +39,16 @@
 }
 -(BOOL) hasChildren{
     return self.numChildren >0;
+}
+
+-(NSArray*) tags{
+    if(_tags == NULL){
+    }
+    return  _tags;
+}
+
+-(void)setTags:(NSArray *)tags{
+    _tags = tags;
 }
 
 /*

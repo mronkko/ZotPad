@@ -46,7 +46,6 @@ CREATE TABLE IF NOT EXISTS items (
     libraryID INT,
     title TEXT,
     year INT DEFAULT NULL,
-    fullCitation TEXT NOT NULL,
     itemType TEXT NOT NULL,
     cacheTimestamp TEXT DEFAULT NULL,
     dateAdded TEXT DEFAULT NULL
@@ -117,6 +116,12 @@ CREATE TABLE  IF NOT EXISTS  fields (
     fieldName TEXT NOT NULL,
     fieldValue TeXT NOT NULL,
     PRIMARY KEY (itemKey, fieldName)
+);
+
+CREATE TABLE  IF NOT EXISTS  tags (
+    itemKey TEXT NOT NULL,
+    tagName TEXT NOT NULL,
+    PRIMARY KEY (itemKey, tagName)
 );
 
 CREATE TABLE IF NOT EXISTS localization (

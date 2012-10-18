@@ -756,8 +756,31 @@ static NSMutableDictionary* dbPrimaryKeysByTables;
     }
 }
 
+#pragma mark - Tags methods
 
-#pragma mark - 
++(NSArray*) tagsForItemKeys:(NSArray*)itemKeys{
+
+    NSMutableArray* returnArray = [[NSMutableArray alloc] init];
+    
+    if([itemKeys count]>0){
+        @synchronized(self){
+            
+            FMResultSet* resultSet;
+            resultSet= [_database executeQuery:[NSString stringWithFormat:@"SELECT tagName FROM tags WHERE itemKey in ('%@')",[itemKeys componentsJoinedByString:@"', '"]]];
+                        
+            while([resultSet next]) {
+                [returnArray addObject:[resultSet stringForColumnIndex:0]];
+                
+            }
+            [resultSet close];
+            
+        }
+    }
+	return returnArray;
+}
+
+
+#pragma mark -
 #pragma mark Item methods
 
 
@@ -967,6 +990,35 @@ Deletes items, notes, and attachments based in array of keys from a library
 
 }
 
++(void) writeDataObjectsTags:(NSArray*)dataObjects{
+    
+    if([dataObjects count]==0) return;
+    
+    NSMutableArray* tags= [NSMutableArray array];
+    NSMutableString* deleteSQL;
+    
+    for(ZPZoteroDataObject* dataObject in dataObjects){
+        
+        for(NSString* tag in dataObject.tags){
+            [tags addObject:[NSDictionary dictionaryWithObjects:[NSArray arrayWithObjects:tag, dataObject.key, nil]
+                                                          forKeys:[NSArray arrayWithObjects:@"tagName",ZPKEY_ITEM_KEY,nil]]];
+        }
+        if(deleteSQL == NULL){
+            deleteSQL = [NSMutableString stringWithFormat:@"DELETE FROM tags WHERE (itemKey = '%@' AND tagName NOT IN ('%@'))",dataObject.key,
+                         [dataObject.tags componentsJoinedByString:@"', '"]];
+        }
+        else{
+            [deleteSQL appendFormat:@" OR (itemKey = '%@' AND tagName NOT IN ('%@'))",dataObject.key,
+             [dataObject.tags componentsJoinedByString:@"', '"]];
+        }
+    }
+    
+    [self writeObjects:tags intoTable:@"tags" checkTimestamp:FALSE];
+    
+    @synchronized(self){
+        [_database executeUpdate:deleteSQL];
+    }
+}
 +(NSDictionary*) fieldsForItem:(ZPZoteroItem*)item{
     NSMutableDictionary* fields=[[NSMutableDictionary alloc] init];
     
@@ -1042,6 +1094,23 @@ Deletes items, notes, and attachments based in array of keys from a library
         item.attachments = attachments;
 
     }
+}
+
++(void) addTagsToDataObject:(ZPZoteroDataObject*) dataObject{
+
+    @synchronized(self){
+        FMResultSet* resultSet = [_database executeQuery: @"SELECT tagTitle FROM tags WHERE itemKey = ? ORDER BY tagTitle ASC",dataObject.key];
+        
+        NSMutableArray* tags = [[NSMutableArray alloc] init];
+        while([resultSet next]) {
+            [tags addObject:[resultSet stringForColumn:0]];
+        }
+        
+        [resultSet close];
+        
+        dataObject.tags = tags;
+    }
+    
 }
 
 +(NSArray*) getCachedAttachmentsOrderedByRemovalPriority{
@@ -1282,7 +1351,7 @@ Deletes items, notes, and attachments based in array of keys from a library
             [sql appendString:@" ORDER BY fieldValue"];
         }
         else if([orderField isEqualToString:@"creator"]){
-            [sql appendFormat:@" ORDER BY items.itemKey IN (SELECT DISTINCT itemKey FROM creators) %@, fullCitation", ascOrDesc];
+            [sql appendFormat:@" ORDER BY (SELECT coalesce(lastName,shortName) FROM creators WHERE authorOrder=0 AND creators.itemKey = items.itemKey)"];
         }
         else if([orderField isEqualToString:@"dateModified"]){
             [sql appendString:@" ORDER BY cacheTimestamp"];

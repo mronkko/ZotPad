@@ -9,6 +9,7 @@
 #import <Foundation/Foundation.h>
 
 @interface ZPZoteroDataObject : NSObject{
+    NSArray* _tags;
 }
 
 // This is very useful for troubleshooting, but because of memory issues, is only used for debug builds
@@ -34,6 +35,7 @@
 
 @property (retain) NSString* cacheTimestamp;
 @property (retain) NSString* serverTimestamp;
+@property (retain) NSArray* tags;
 
 -(void) configureWithDictionary:(NSDictionary*) dictionary;
 -(BOOL) needsToBeWrittenToCache;

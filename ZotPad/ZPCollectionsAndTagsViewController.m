@@ -15,6 +15,8 @@
 #import "ZPItemListViewController.h"
 #import "ZPMasterItemListViewController.h"
 #import <QuartzCore/QuartzCore.h>
+#import "ZPTagController.h"
+#import "ZPItemListViewDataSource.h"
 
 @interface ZPCollectionsAndTagsViewController()
 
@@ -25,6 +27,8 @@
     UIViewController* _contentRoot;
     BOOL _tagsVisible;
     UITableView* _tagsList;
+    ZPTagController* _tagController;
+
 }
 
 @synthesize collectionsView, tagsView, tagsHeader;
@@ -217,36 +221,51 @@
 -(void)_toggleTagSelectionWithAnimationDuration:(float) duration toVisible:(BOOL)visible{
     
     // animate
-    [UIView beginAnimations:nil context:nil];
-    [UIView setAnimationDuration:duration];
     
     if(visible){
-        tagsView.frame = self.view.frame;
-        UIImage* image = [UIImage imageNamed:@"icon-down-black.png"];
-        headerArrowLeft.image = image;
-        headerArrowRight.image = image;
+        [UIView animateWithDuration:duration animations:^{
+            tagsView.frame = self.view.frame;
+            UIImage* image = [UIImage imageNamed:@"icon-down-black.png"];
+            headerArrowLeft.image = image;
+            headerArrowRight.image = image;
+        }];
     }
     else{
-        tagsView.frame = CGRectMake(0,
-                                    self.view.frame.size.height - tagsHeader.frame.size.height+1,
-                                    tagsView.frame.size.width,
-                                    tagsView.frame.size.height);
-        UIImage* image = [UIImage imageNamed:@"icon-up-black.png"];
-        headerArrowLeft.image = image;
-        headerArrowRight.image = image;
-        
+        [UIView animateWithDuration:duration animations:^{
+            tagsView.frame = CGRectMake(0,
+                                        self.view.frame.size.height - tagsHeader.frame.size.height+1,
+                                        tagsView.frame.size.width,
+                                        tagsView.frame.size.height);
+            UIImage* image = [UIImage imageNamed:@"icon-up-black.png"];
+            headerArrowLeft.image = image;
+            headerArrowRight.image = image;
+        }
+                         completion:^(BOOL finished){
+                             [_tagsList removeFromSuperview];
+                             _tagsList = NULL;
+                         }];
+
     }
-    [UIView commitAnimations];
     
 }
 
 
 -(void)_configureTagsList{
+
     _tagsList = [[UITableView alloc] initWithFrame:CGRectMake(0,
                                                               tagsHeader.frame.size.height+1,
                                                               self.view.frame.size.width,
                                                               self.view.frame.size.height-self.tagsHeader.frame.size.height)
                                              style:UITableViewStylePlain];
+    _tagsList.allowsSelection = FALSE;
+    _tagsList.separatorStyle = UITableViewCellSeparatorStyleNone;
+    
+    if(_tagController == NULL){
+        _tagController = [[ZPTagController alloc] init];
+    }
+    
+    [_tagController configure];
+    [_tagsList setDataSource:_tagController];
     [self.tagsView addSubview:_tagsList];
 
 }

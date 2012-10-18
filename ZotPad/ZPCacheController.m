@@ -567,30 +567,12 @@ static ZPCacheController* _instance = nil;
     NSMutableArray* notes = [NSMutableArray array];
     NSMutableArray* parentItemsForAttachments = [NSMutableArray array];
     NSMutableArray* parentItemsForNotes = [NSMutableArray array];
-    
+
     for(item in items){
         if( [item needsToBeWrittenToCache]){
             
             //TODO: Refactor. This is very confusing.
             //TODO: Make sure that this logic still works after breaking inheritance between attachment and item
-            
-            /*
-             
-             The following if clause is used to prevent this bug from happening. A more robust fix is needed, but this is better done after refactoring the server connection code to use asynchronous requests and NSNotification.
-             
-             4 ZotPad beta 0x00091df7 -[ZPDatabase updateObjects:intoTable:] (ZPDatabase.m:256)
-             5 ZotPad beta 0x00092635 -[ZPDatabase writeObjects:intoTable:checkTimestamp:] (ZPDatabase.m:347)
-             6 ZotPad beta 0x00094849 -[ZPDatabase writeAttachments:] (ZPDatabase.m:727)
-             7 ZotPad beta 0x00099099 -[ZPCacheController _cacheItemsAndAttachToParentsIfNeeded:] (ZPCacheController.m:433)
-             8 ZotPad beta 0x00099aab -[ZPCacheController _updateItemDetailsFromServer:] (ZPCacheController.m:587)
-             
-             */
-            if(item.serverTimestamp == NULL){
-#ifdef ZPDEBUG
-                //                DDLogError(@"Item %@ has an empty server timestamp and will not be written to cache. The item was created from the following server response: \n\n%@",item.key,item.responseDataFromWhichThisItemWasCreated);
-#endif
-                continue;
-            }
             
             item.cacheTimestamp = item.serverTimestamp;
             
@@ -603,13 +585,10 @@ static ZPCacheController* _instance = nil;
                 ZPZoteroItem* parent;
                 //Standalone attachments
                 
-                if(attachment.parentKey==attachment.key){
-                    parent =  [ZPZoteroItem itemWithKey:attachment.key];
-                }
-                else{
+                if(attachment.parentKey!=attachment.key){
                     parent =  [ZPZoteroItem itemWithKey:attachment.parentKey];
+                    if(![parentItemsForAttachments containsObject:parent]) [parentItemsForAttachments addObject:parent];
                 }
-                if(![parentItemsForAttachments containsObject:parent]) [parentItemsForAttachments addObject:parent];
             }
             //If this is a note item, store the note information
             else if([item isKindOfClass:[ZPZoteroNote class]]){
@@ -620,11 +599,7 @@ static ZPCacheController* _instance = nil;
                 
                 ZPZoteroItem* parent;
                 
-                if(note.parentKey==note.key){
-                    parent =  [ZPZoteroItem itemWithKey:note.key];
-                    [normalItems addObject:parent];
-                }
-                else{
+                if(note.parentKey!=note.key){
                     parent = (ZPZoteroItem*) [ZPZoteroItem itemWithKey:note.parentKey];
                     if(![parentItemsForNotes containsObject:parent]) [parentItemsForNotes addObject:parent];
                 }
@@ -646,6 +621,9 @@ static ZPCacheController* _instance = nil;
     
     [ZPDatabase writeItemsFields:itemsThatNeedCreatorsAndFields];
     [ZPDatabase writeItemsCreators:itemsThatNeedCreatorsAndFields];
+    
+    //TODO: Also Notes and attachments can have tags
+    [ZPDatabase writeDataObjectsTags:itemsThatNeedCreatorsAndFields];
     
     //Refresh the attachments for those items that got new attachments
     for(item in parentItemsForAttachments){
