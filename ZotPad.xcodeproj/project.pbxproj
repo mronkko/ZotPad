@@ -523,20 +523,7 @@
 		A708F13C153F0FAC0083A506 /* x-office-spreadsheet.svgz in Resources */ = {isa = PBXBuildFile; fileRef = A708EF44153F0FAB0083A506 /* x-office-spreadsheet.svgz */; };
 		A7093C2C15A4241300F7B5CF /* ZPAttachmentIconImageFactory.m in Sources */ = {isa = PBXBuildFile; fileRef = A7093C2B15A4241300F7B5CF /* ZPAttachmentIconImageFactory.m */; };
 		A7093C2D15A4241300F7B5CF /* ZPAttachmentIconImageFactory.m in Sources */ = {isa = PBXBuildFile; fileRef = A7093C2B15A4241300F7B5CF /* ZPAttachmentIconImageFactory.m */; };
-		A7093C3115A44C6B00F7B5CF /* libDTCoreText.a in Frameworks */ = {isa = PBXBuildFile; fileRef = A7ABAB4615A3046300EA8B7B /* libDTCoreText.a */; };
 		A716C0371494E9DF00BD6025 /* ZPZoteroAttachment.m in Sources */ = {isa = PBXBuildFile; fileRef = A716C0361494E9DE00BD6025 /* ZPZoteroAttachment.m */; };
-		A716C0511495131F00BD6025 /* NSObject+SBJson.m in Sources */ = {isa = PBXBuildFile; fileRef = A716C0391495131E00BD6025 /* NSObject+SBJson.m */; };
-		A716C0521495131F00BD6025 /* SBJsonParser.m in Sources */ = {isa = PBXBuildFile; fileRef = A716C03C1495131E00BD6025 /* SBJsonParser.m */; };
-		A716C0531495131F00BD6025 /* SBJsonStreamParser.m in Sources */ = {isa = PBXBuildFile; fileRef = A716C03E1495131E00BD6025 /* SBJsonStreamParser.m */; };
-		A716C0541495131F00BD6025 /* SBJsonStreamParserAccumulator.m in Sources */ = {isa = PBXBuildFile; fileRef = A716C0401495131E00BD6025 /* SBJsonStreamParserAccumulator.m */; };
-		A716C0551495131F00BD6025 /* SBJsonStreamParserAdapter.m in Sources */ = {isa = PBXBuildFile; fileRef = A716C0421495131E00BD6025 /* SBJsonStreamParserAdapter.m */; };
-		A716C0561495131F00BD6025 /* SBJsonStreamParserState.m in Sources */ = {isa = PBXBuildFile; fileRef = A716C0441495131E00BD6025 /* SBJsonStreamParserState.m */; };
-		A716C0571495131F00BD6025 /* SBJsonStreamWriter.m in Sources */ = {isa = PBXBuildFile; fileRef = A716C0461495131E00BD6025 /* SBJsonStreamWriter.m */; };
-		A716C0581495131F00BD6025 /* SBJsonStreamWriterAccumulator.m in Sources */ = {isa = PBXBuildFile; fileRef = A716C0481495131F00BD6025 /* SBJsonStreamWriterAccumulator.m */; };
-		A716C0591495131F00BD6025 /* SBJsonStreamWriterState.m in Sources */ = {isa = PBXBuildFile; fileRef = A716C04A1495131F00BD6025 /* SBJsonStreamWriterState.m */; };
-		A716C05A1495131F00BD6025 /* SBJsonTokeniser.m in Sources */ = {isa = PBXBuildFile; fileRef = A716C04C1495131F00BD6025 /* SBJsonTokeniser.m */; };
-		A716C05B1495131F00BD6025 /* SBJsonUTF8Stream.m in Sources */ = {isa = PBXBuildFile; fileRef = A716C04E1495131F00BD6025 /* SBJsonUTF8Stream.m */; };
-		A716C05C1495131F00BD6025 /* SBJsonWriter.m in Sources */ = {isa = PBXBuildFile; fileRef = A716C0501495131F00BD6025 /* SBJsonWriter.m */; };
 		A71A166715A783DA007BB40D /* ZPNavigationController.m in Sources */ = {isa = PBXBuildFile; fileRef = A71A166615A783DA007BB40D /* ZPNavigationController.m */; };
 		A71A166815A783DA007BB40D /* ZPNavigationController.m in Sources */ = {isa = PBXBuildFile; fileRef = A71A166615A783DA007BB40D /* ZPNavigationController.m */; };
 		A7200DD514718DC0004347C9 /* UIKit.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = A7200DD414718DC0004347C9 /* UIKit.framework */; };
@@ -633,10 +620,6 @@
 		A733F7CE15F8C1DB00E8A2D6 /* CoreData.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = A733F7CD15F8C1DB00E8A2D6 /* CoreData.framework */; };
 		A73D1BFD1560E234002D4A2D /* libTestFlight.a in Frameworks */ = {isa = PBXBuildFile; fileRef = A73D1BF91560E234002D4A2D /* libTestFlight.a */; };
 		A73D1BFE1560E234002D4A2D /* libTestFlight.a in Frameworks */ = {isa = PBXBuildFile; fileRef = A73D1BF91560E234002D4A2D /* libTestFlight.a */; };
-		A73D1BFF1560E234002D4A2D /* README.txt in Resources */ = {isa = PBXBuildFile; fileRef = A73D1BFA1560E234002D4A2D /* README.txt */; };
-		A73D1C001560E234002D4A2D /* README.txt in Resources */ = {isa = PBXBuildFile; fileRef = A73D1BFA1560E234002D4A2D /* README.txt */; };
-		A73D1C011560E234002D4A2D /* release_notes.txt in Resources */ = {isa = PBXBuildFile; fileRef = A73D1BFB1560E234002D4A2D /* release_notes.txt */; };
-		A73D1C021560E234002D4A2D /* release_notes.txt in Resources */ = {isa = PBXBuildFile; fileRef = A73D1BFB1560E234002D4A2D /* release_notes.txt */; };
 		A73D635114879D15007999F3 /* Settings.bundle in Resources */ = {isa = PBXBuildFile; fileRef = A73D635014879D15007999F3 /* Settings.bundle */; };
 		A7406C271600BFE900549D89 /* horizontalLines.png in Resources */ = {isa = PBXBuildFile; fileRef = A7406C261600BFE900549D89 /* horizontalLines.png */; };
 		A7406C281600C1B100549D89 /* horizontalLines.png in Resources */ = {isa = PBXBuildFile; fileRef = A7406C261600BFE900549D89 /* horizontalLines.png */; };
@@ -738,18 +721,6 @@
 		A78322F715EE3173004BB4F7 /* ZPItemDetailViewController.m in Sources */ = {isa = PBXBuildFile; fileRef = A79ED822148B2683003EE77C /* ZPItemDetailViewController.m */; };
 		A78322F815EE3173004BB4F7 /* iCarousel.m in Sources */ = {isa = PBXBuildFile; fileRef = A7CC252C1493E14D00FDEAF4 /* iCarousel.m */; };
 		A78322F915EE3173004BB4F7 /* ZPZoteroAttachment.m in Sources */ = {isa = PBXBuildFile; fileRef = A716C0361494E9DE00BD6025 /* ZPZoteroAttachment.m */; };
-		A78322FA15EE3173004BB4F7 /* NSObject+SBJson.m in Sources */ = {isa = PBXBuildFile; fileRef = A716C0391495131E00BD6025 /* NSObject+SBJson.m */; };
-		A78322FB15EE3173004BB4F7 /* SBJsonParser.m in Sources */ = {isa = PBXBuildFile; fileRef = A716C03C1495131E00BD6025 /* SBJsonParser.m */; };
-		A78322FC15EE3173004BB4F7 /* SBJsonStreamParser.m in Sources */ = {isa = PBXBuildFile; fileRef = A716C03E1495131E00BD6025 /* SBJsonStreamParser.m */; };
-		A78322FD15EE3173004BB4F7 /* SBJsonStreamParserAccumulator.m in Sources */ = {isa = PBXBuildFile; fileRef = A716C0401495131E00BD6025 /* SBJsonStreamParserAccumulator.m */; };
-		A78322FE15EE3173004BB4F7 /* SBJsonStreamParserAdapter.m in Sources */ = {isa = PBXBuildFile; fileRef = A716C0421495131E00BD6025 /* SBJsonStreamParserAdapter.m */; };
-		A78322FF15EE3173004BB4F7 /* SBJsonStreamParserState.m in Sources */ = {isa = PBXBuildFile; fileRef = A716C0441495131E00BD6025 /* SBJsonStreamParserState.m */; };
-		A783230015EE3173004BB4F7 /* SBJsonStreamWriter.m in Sources */ = {isa = PBXBuildFile; fileRef = A716C0461495131E00BD6025 /* SBJsonStreamWriter.m */; };
-		A783230115EE3173004BB4F7 /* SBJsonStreamWriterAccumulator.m in Sources */ = {isa = PBXBuildFile; fileRef = A716C0481495131F00BD6025 /* SBJsonStreamWriterAccumulator.m */; };
-		A783230215EE3173004BB4F7 /* SBJsonStreamWriterState.m in Sources */ = {isa = PBXBuildFile; fileRef = A716C04A1495131F00BD6025 /* SBJsonStreamWriterState.m */; };
-		A783230315EE3173004BB4F7 /* SBJsonTokeniser.m in Sources */ = {isa = PBXBuildFile; fileRef = A716C04C1495131F00BD6025 /* SBJsonTokeniser.m */; };
-		A783230415EE3173004BB4F7 /* SBJsonUTF8Stream.m in Sources */ = {isa = PBXBuildFile; fileRef = A716C04E1495131F00BD6025 /* SBJsonUTF8Stream.m */; };
-		A783230515EE3173004BB4F7 /* SBJsonWriter.m in Sources */ = {isa = PBXBuildFile; fileRef = A716C0501495131F00BD6025 /* SBJsonWriter.m */; };
 		A783230615EE3173004BB4F7 /* ZPDatabase.m in Sources */ = {isa = PBXBuildFile; fileRef = A7025018149B0BB1004F2AAB /* ZPDatabase.m */; };
 		A783230715EE3173004BB4F7 /* ZPCacheController.m in Sources */ = {isa = PBXBuildFile; fileRef = A702501C149B33E1004F2AAB /* ZPCacheController.m */; };
 		A783230815EE3173004BB4F7 /* ZPPreferences.m in Sources */ = {isa = PBXBuildFile; fileRef = A702501F149C6C3D004F2AAB /* ZPPreferences.m */; };
@@ -849,7 +820,6 @@
 		A783236915EE3173004BB4F7 /* NSData+Base64.m in Sources */ = {isa = PBXBuildFile; fileRef = A75D4B4515BC9B56003291CB /* NSData+Base64.m */; };
 		A783236A15EE3173004BB4F7 /* NSString+Base64.m in Sources */ = {isa = PBXBuildFile; fileRef = A75D4B4715BC9B56003291CB /* NSString+Base64.m */; };
 		A783236C15EE3173004BB4F7 /* libUserVoice.a in Frameworks */ = {isa = PBXBuildFile; fileRef = A77E0DCC15D65FAB00134D35 /* libUserVoice.a */; };
-		A783236D15EE3173004BB4F7 /* libDTCoreText.a in Frameworks */ = {isa = PBXBuildFile; fileRef = A7ABAB4615A3046300EA8B7B /* libDTCoreText.a */; };
 		A783236E15EE3173004BB4F7 /* CoreFoundation.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = A7699E56159A6C44002F09DA /* CoreFoundation.framework */; };
 		A783236F15EE3173004BB4F7 /* MessageUI.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = A70399B015979EC1002F4293 /* MessageUI.framework */; };
 		A783237015EE3173004BB4F7 /* CoreText.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = A7BD5EC5156121A3003252EA /* CoreText.framework */; };
@@ -1142,8 +1112,6 @@
 		A783249015EE3173004BB4F7 /* x-office-contact.svgz in Resources */ = {isa = PBXBuildFile; fileRef = A708EF42153F0FAB0083A506 /* x-office-contact.svgz */; };
 		A783249115EE3173004BB4F7 /* x-office-document.svgz in Resources */ = {isa = PBXBuildFile; fileRef = A708EF43153F0FAB0083A506 /* x-office-document.svgz */; };
 		A783249215EE3173004BB4F7 /* x-office-spreadsheet.svgz in Resources */ = {isa = PBXBuildFile; fileRef = A708EF44153F0FAB0083A506 /* x-office-spreadsheet.svgz */; };
-		A783249315EE3173004BB4F7 /* README.txt in Resources */ = {isa = PBXBuildFile; fileRef = A73D1BFA1560E234002D4A2D /* README.txt */; };
-		A783249415EE3173004BB4F7 /* release_notes.txt in Resources */ = {isa = PBXBuildFile; fileRef = A73D1BFB1560E234002D4A2D /* release_notes.txt */; };
 		A783249515EE3173004BB4F7 /* emblem-locked.svgz in Resources */ = {isa = PBXBuildFile; fileRef = A76ECD26159CDEDD0062E95A /* emblem-locked.svgz */; };
 		A783249615EE3173004BB4F7 /* emblem-symbolic-link.svgz in Resources */ = {isa = PBXBuildFile; fileRef = A76ECD27159CDEDD0062E95A /* emblem-symbolic-link.svgz */; };
 		A783249715EE3173004BB4F7 /* gear.png in Resources */ = {isa = PBXBuildFile; fileRef = A77FD060159F702D00774D50 /* gear.png */; };
@@ -1244,7 +1212,6 @@
 		A7ABAB6715A3071000EA8B7B /* Default-Portrait@2x~ipad.png in Resources */ = {isa = PBXBuildFile; fileRef = A7F249E5153311BC00537B54 /* Default-Portrait@2x~ipad.png */; };
 		A7ABAB6815A3071F00EA8B7B /* Default-Landscape@2x~ipad.png in Resources */ = {isa = PBXBuildFile; fileRef = A7F249F11533175E00537B54 /* Default-Landscape@2x~ipad.png */; };
 		A7ABAB6915A3072300EA8B7B /* Default-Landscape~ipad.png in Resources */ = {isa = PBXBuildFile; fileRef = A7F249D71533072300537B54 /* Default-Landscape~ipad.png */; };
-		A7ABAB6A15A3095900EA8B7B /* libDTCoreText.a in Frameworks */ = {isa = PBXBuildFile; fileRef = A7ABAB4615A3046300EA8B7B /* libDTCoreText.a */; };
 		A7B051BB15B187BF0049C5A2 /* icon-down-black.png in Resources */ = {isa = PBXBuildFile; fileRef = A7B051B715B187BF0049C5A2 /* icon-down-black.png */; };
 		A7B051BC15B187BF0049C5A2 /* icon-down-black.png in Resources */ = {isa = PBXBuildFile; fileRef = A7B051B715B187BF0049C5A2 /* icon-down-black.png */; };
 		A7B051BD15B187BF0049C5A2 /* icon-down-black@x2.png in Resources */ = {isa = PBXBuildFile; fileRef = A7B051B815B187BF0049C5A2 /* icon-down-black@x2.png */; };
@@ -1255,6 +1222,7 @@
 		A7B051C215B187BF0049C5A2 /* icon-up-black@2x.png in Resources */ = {isa = PBXBuildFile; fileRef = A7B051BA15B187BF0049C5A2 /* icon-up-black@2x.png */; };
 		A7B2BCC915B3E22500381E23 /* upgrade1.0to1.1.sql in Resources */ = {isa = PBXBuildFile; fileRef = A7B2BCC815B3E22500381E23 /* upgrade1.0to1.1.sql */; };
 		A7B2BCCA15B3E22500381E23 /* upgrade1.0to1.1.sql in Resources */ = {isa = PBXBuildFile; fileRef = A7B2BCC815B3E22500381E23 /* upgrade1.0to1.1.sql */; };
+		A7BA91991630888F00A76F61 /* libCSLProcessor.a in Frameworks */ = {isa = PBXBuildFile; fileRef = A7A6A5FE161ABE0D00C7DB72 /* libCSLProcessor.a */; };
 		A7BD5EC415612181003252EA /* ImageIO.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = A7BD5EC315612181003252EA /* ImageIO.framework */; };
 		A7BD5EC6156121A3003252EA /* CoreText.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = A7BD5EC5156121A3003252EA /* CoreText.framework */; };
 		A7C1A00415F4D5F700A5AF49 /* libFRLayeredNavigationController.a in Frameworks */ = {isa = PBXBuildFile; fileRef = A7C1A00115F4D5D100A5AF49 /* libFRLayeredNavigationController.a */; };
@@ -1294,18 +1262,6 @@
 		A7CD072C15161555007A8E1D /* ZPItemDetailViewController.m in Sources */ = {isa = PBXBuildFile; fileRef = A79ED822148B2683003EE77C /* ZPItemDetailViewController.m */; };
 		A7CD072D15161555007A8E1D /* iCarousel.m in Sources */ = {isa = PBXBuildFile; fileRef = A7CC252C1493E14D00FDEAF4 /* iCarousel.m */; };
 		A7CD072E15161555007A8E1D /* ZPZoteroAttachment.m in Sources */ = {isa = PBXBuildFile; fileRef = A716C0361494E9DE00BD6025 /* ZPZoteroAttachment.m */; };
-		A7CD072F15161555007A8E1D /* NSObject+SBJson.m in Sources */ = {isa = PBXBuildFile; fileRef = A716C0391495131E00BD6025 /* NSObject+SBJson.m */; };
-		A7CD073015161555007A8E1D /* SBJsonParser.m in Sources */ = {isa = PBXBuildFile; fileRef = A716C03C1495131E00BD6025 /* SBJsonParser.m */; };
-		A7CD073115161555007A8E1D /* SBJsonStreamParser.m in Sources */ = {isa = PBXBuildFile; fileRef = A716C03E1495131E00BD6025 /* SBJsonStreamParser.m */; };
-		A7CD073215161555007A8E1D /* SBJsonStreamParserAccumulator.m in Sources */ = {isa = PBXBuildFile; fileRef = A716C0401495131E00BD6025 /* SBJsonStreamParserAccumulator.m */; };
-		A7CD073315161555007A8E1D /* SBJsonStreamParserAdapter.m in Sources */ = {isa = PBXBuildFile; fileRef = A716C0421495131E00BD6025 /* SBJsonStreamParserAdapter.m */; };
-		A7CD073415161555007A8E1D /* SBJsonStreamParserState.m in Sources */ = {isa = PBXBuildFile; fileRef = A716C0441495131E00BD6025 /* SBJsonStreamParserState.m */; };
-		A7CD073515161555007A8E1D /* SBJsonStreamWriter.m in Sources */ = {isa = PBXBuildFile; fileRef = A716C0461495131E00BD6025 /* SBJsonStreamWriter.m */; };
-		A7CD073615161555007A8E1D /* SBJsonStreamWriterAccumulator.m in Sources */ = {isa = PBXBuildFile; fileRef = A716C0481495131F00BD6025 /* SBJsonStreamWriterAccumulator.m */; };
-		A7CD073715161555007A8E1D /* SBJsonStreamWriterState.m in Sources */ = {isa = PBXBuildFile; fileRef = A716C04A1495131F00BD6025 /* SBJsonStreamWriterState.m */; };
-		A7CD073815161555007A8E1D /* SBJsonTokeniser.m in Sources */ = {isa = PBXBuildFile; fileRef = A716C04C1495131F00BD6025 /* SBJsonTokeniser.m */; };
-		A7CD073915161555007A8E1D /* SBJsonUTF8Stream.m in Sources */ = {isa = PBXBuildFile; fileRef = A716C04E1495131F00BD6025 /* SBJsonUTF8Stream.m */; };
-		A7CD073A15161555007A8E1D /* SBJsonWriter.m in Sources */ = {isa = PBXBuildFile; fileRef = A716C0501495131F00BD6025 /* SBJsonWriter.m */; };
 		A7CD073B15161555007A8E1D /* ZPDatabase.m in Sources */ = {isa = PBXBuildFile; fileRef = A7025018149B0BB1004F2AAB /* ZPDatabase.m */; };
 		A7CD073C15161555007A8E1D /* ZPCacheController.m in Sources */ = {isa = PBXBuildFile; fileRef = A702501C149B33E1004F2AAB /* ZPCacheController.m */; };
 		A7CD073D15161555007A8E1D /* ZPPreferences.m in Sources */ = {isa = PBXBuildFile; fileRef = A702501F149C6C3D004F2AAB /* ZPPreferences.m */; };
@@ -1411,13 +1367,6 @@
 			remoteGlobalIDString = D2AAC07E0554694100DB518D;
 			remoteInfo = UserVoice;
 		};
-		A77E0DCE15D660AF00134D35 /* PBXContainerItemProxy */ = {
-			isa = PBXContainerItemProxy;
-			containerPortal = A7ABAB3315A3046300EA8B7B /* DTCoreText.xcodeproj */;
-			proxyType = 1;
-			remoteGlobalIDString = A70F11DD148632CD009202BF;
-			remoteInfo = "Static Library";
-		};
 		A77E0DD015D660B500134D35 /* PBXContainerItemProxy */ = {
 			isa = PBXContainerItemProxy;
 			containerPortal = A77E0DC415D65FAB00134D35 /* UserVoice.xcodeproj */;
@@ -1432,26 +1381,26 @@
 			remoteGlobalIDString = D2AAC07D0554694100DB518D;
 			remoteInfo = UserVoice;
 		};
-		A77E0DD415D660C200134D35 /* PBXContainerItemProxy */ = {
-			isa = PBXContainerItemProxy;
-			containerPortal = A7ABAB3315A3046300EA8B7B /* DTCoreText.xcodeproj */;
-			proxyType = 1;
-			remoteGlobalIDString = A70F11DD148632CD009202BF;
-			remoteInfo = "Static Library";
-		};
-		A78322D415EE3173004BB4F7 /* PBXContainerItemProxy */ = {
-			isa = PBXContainerItemProxy;
-			containerPortal = A7ABAB3315A3046300EA8B7B /* DTCoreText.xcodeproj */;
-			proxyType = 1;
-			remoteGlobalIDString = A70F11DD148632CD009202BF;
-			remoteInfo = "Static Library";
-		};
 		A78322D615EE3173004BB4F7 /* PBXContainerItemProxy */ = {
 			isa = PBXContainerItemProxy;
 			containerPortal = A77E0DC415D65FAB00134D35 /* UserVoice.xcodeproj */;
 			proxyType = 1;
 			remoteGlobalIDString = D2AAC07D0554694100DB518D;
 			remoteInfo = UserVoice;
+		};
+		A79E86551630A69A0090ECE1 /* PBXContainerItemProxy */ = {
+			isa = PBXContainerItemProxy;
+			containerPortal = A7C19FF715F4D5D100A5AF49 /* FRLayeredNavigationController.xcodeproj */;
+			proxyType = 1;
+			remoteGlobalIDString = DA4FACC515591AB300D85A7E;
+			remoteInfo = FRLayeredNavigationController;
+		};
+		A79E86571630A6A70090ECE1 /* PBXContainerItemProxy */ = {
+			isa = PBXContainerItemProxy;
+			containerPortal = A7ABAB3315A3046300EA8B7B /* DTCoreText.xcodeproj */;
+			proxyType = 1;
+			remoteGlobalIDString = A70F11DD148632CD009202BF;
+			remoteInfo = "Static Library";
 		};
 		A7A6A5FB161ABE0D00C7DB72 /* PBXContainerItemProxy */ = {
 			isa = PBXContainerItemProxy;
@@ -1474,42 +1423,42 @@
 			remoteGlobalIDString = A736E692161ABAA8004E71AF;
 			remoteInfo = CSLProcessor;
 		};
-		A7ABAB4115A3046300EA8B7B /* PBXContainerItemProxy */ = {
+		A7BA918C1630855D00A76F61 /* PBXContainerItemProxy */ = {
 			isa = PBXContainerItemProxy;
 			containerPortal = A7ABAB3315A3046300EA8B7B /* DTCoreText.xcodeproj */;
 			proxyType = 2;
 			remoteGlobalIDString = 1D6058910D05DD3D006BFB54;
 			remoteInfo = DemoApp;
 		};
-		A7ABAB4315A3046300EA8B7B /* PBXContainerItemProxy */ = {
+		A7BA918E1630855D00A76F61 /* PBXContainerItemProxy */ = {
 			isa = PBXContainerItemProxy;
 			containerPortal = A7ABAB3315A3046300EA8B7B /* DTCoreText.xcodeproj */;
 			proxyType = 2;
 			remoteGlobalIDString = A70F119B14863198009202BF;
 			remoteInfo = "Static Framework";
 		};
-		A7ABAB4515A3046300EA8B7B /* PBXContainerItemProxy */ = {
+		A7BA91901630855D00A76F61 /* PBXContainerItemProxy */ = {
 			isa = PBXContainerItemProxy;
 			containerPortal = A7ABAB3315A3046300EA8B7B /* DTCoreText.xcodeproj */;
 			proxyType = 2;
 			remoteGlobalIDString = A70F11DE148632CD009202BF;
 			remoteInfo = "Static Library";
 		};
-		A7ABAB4715A3046300EA8B7B /* PBXContainerItemProxy */ = {
+		A7BA91921630855D00A76F61 /* PBXContainerItemProxy */ = {
 			isa = PBXContainerItemProxy;
 			containerPortal = A7ABAB3315A3046300EA8B7B /* DTCoreText.xcodeproj */;
 			proxyType = 2;
 			remoteGlobalIDString = A788CA681486456100E1AFD9;
 			remoteInfo = UnitTest;
 		};
-		A7ABAB4915A3046300EA8B7B /* PBXContainerItemProxy */ = {
+		A7BA91941630855D00A76F61 /* PBXContainerItemProxy */ = {
 			isa = PBXContainerItemProxy;
 			containerPortal = A7ABAB3315A3046300EA8B7B /* DTCoreText.xcodeproj */;
 			proxyType = 2;
 			remoteGlobalIDString = A7949A5814CC456000A8CCDE;
 			remoteInfo = MacUnitTest;
 		};
-		A7ABAB4B15A3046300EA8B7B /* PBXContainerItemProxy */ = {
+		A7BA91961630855D00A76F61 /* PBXContainerItemProxy */ = {
 			isa = PBXContainerItemProxy;
 			containerPortal = A7ABAB3315A3046300EA8B7B /* DTCoreText.xcodeproj */;
 			proxyType = 2;
@@ -1820,31 +1769,6 @@
 		A70E4161154421A900D76A62 /* ASIHTTPRequestConfig.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; lineEnding = 0; name = ASIHTTPRequestConfig.h; path = "asi-http-request/Classes/ASIHTTPRequestConfig.h"; sourceTree = "<group>"; xcLanguageSpecificationIdentifier = xcode.lang.objcpp; };
 		A716C0351494E9DE00BD6025 /* ZPZoteroAttachment.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = ZPZoteroAttachment.h; sourceTree = "<group>"; };
 		A716C0361494E9DE00BD6025 /* ZPZoteroAttachment.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = ZPZoteroAttachment.m; sourceTree = "<group>"; };
-		A716C0381495131E00BD6025 /* NSObject+SBJson.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; name = "NSObject+SBJson.h"; path = "json-framework/Classes/NSObject+SBJson.h"; sourceTree = "<group>"; };
-		A716C0391495131E00BD6025 /* NSObject+SBJson.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; name = "NSObject+SBJson.m"; path = "json-framework/Classes/NSObject+SBJson.m"; sourceTree = "<group>"; };
-		A716C03A1495131E00BD6025 /* SBJson.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; name = SBJson.h; path = "json-framework/Classes/SBJson.h"; sourceTree = "<group>"; };
-		A716C03B1495131E00BD6025 /* SBJsonParser.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; name = SBJsonParser.h; path = "json-framework/Classes/SBJsonParser.h"; sourceTree = "<group>"; };
-		A716C03C1495131E00BD6025 /* SBJsonParser.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; name = SBJsonParser.m; path = "json-framework/Classes/SBJsonParser.m"; sourceTree = "<group>"; };
-		A716C03D1495131E00BD6025 /* SBJsonStreamParser.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; name = SBJsonStreamParser.h; path = "json-framework/Classes/SBJsonStreamParser.h"; sourceTree = "<group>"; };
-		A716C03E1495131E00BD6025 /* SBJsonStreamParser.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; name = SBJsonStreamParser.m; path = "json-framework/Classes/SBJsonStreamParser.m"; sourceTree = "<group>"; };
-		A716C03F1495131E00BD6025 /* SBJsonStreamParserAccumulator.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; name = SBJsonStreamParserAccumulator.h; path = "json-framework/Classes/SBJsonStreamParserAccumulator.h"; sourceTree = "<group>"; };
-		A716C0401495131E00BD6025 /* SBJsonStreamParserAccumulator.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; name = SBJsonStreamParserAccumulator.m; path = "json-framework/Classes/SBJsonStreamParserAccumulator.m"; sourceTree = "<group>"; };
-		A716C0411495131E00BD6025 /* SBJsonStreamParserAdapter.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; name = SBJsonStreamParserAdapter.h; path = "json-framework/Classes/SBJsonStreamParserAdapter.h"; sourceTree = "<group>"; };
-		A716C0421495131E00BD6025 /* SBJsonStreamParserAdapter.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; name = SBJsonStreamParserAdapter.m; path = "json-framework/Classes/SBJsonStreamParserAdapter.m"; sourceTree = "<group>"; };
-		A716C0431495131E00BD6025 /* SBJsonStreamParserState.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; name = SBJsonStreamParserState.h; path = "json-framework/Classes/SBJsonStreamParserState.h"; sourceTree = "<group>"; };
-		A716C0441495131E00BD6025 /* SBJsonStreamParserState.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; name = SBJsonStreamParserState.m; path = "json-framework/Classes/SBJsonStreamParserState.m"; sourceTree = "<group>"; };
-		A716C0451495131E00BD6025 /* SBJsonStreamWriter.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; name = SBJsonStreamWriter.h; path = "json-framework/Classes/SBJsonStreamWriter.h"; sourceTree = "<group>"; };
-		A716C0461495131E00BD6025 /* SBJsonStreamWriter.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; name = SBJsonStreamWriter.m; path = "json-framework/Classes/SBJsonStreamWriter.m"; sourceTree = "<group>"; };
-		A716C0471495131E00BD6025 /* SBJsonStreamWriterAccumulator.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; name = SBJsonStreamWriterAccumulator.h; path = "json-framework/Classes/SBJsonStreamWriterAccumulator.h"; sourceTree = "<group>"; };
-		A716C0481495131F00BD6025 /* SBJsonStreamWriterAccumulator.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; name = SBJsonStreamWriterAccumulator.m; path = "json-framework/Classes/SBJsonStreamWriterAccumulator.m"; sourceTree = "<group>"; };
-		A716C0491495131F00BD6025 /* SBJsonStreamWriterState.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; name = SBJsonStreamWriterState.h; path = "json-framework/Classes/SBJsonStreamWriterState.h"; sourceTree = "<group>"; };
-		A716C04A1495131F00BD6025 /* SBJsonStreamWriterState.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; name = SBJsonStreamWriterState.m; path = "json-framework/Classes/SBJsonStreamWriterState.m"; sourceTree = "<group>"; };
-		A716C04B1495131F00BD6025 /* SBJsonTokeniser.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; name = SBJsonTokeniser.h; path = "json-framework/Classes/SBJsonTokeniser.h"; sourceTree = "<group>"; };
-		A716C04C1495131F00BD6025 /* SBJsonTokeniser.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; name = SBJsonTokeniser.m; path = "json-framework/Classes/SBJsonTokeniser.m"; sourceTree = "<group>"; };
-		A716C04D1495131F00BD6025 /* SBJsonUTF8Stream.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; name = SBJsonUTF8Stream.h; path = "json-framework/Classes/SBJsonUTF8Stream.h"; sourceTree = "<group>"; };
-		A716C04E1495131F00BD6025 /* SBJsonUTF8Stream.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; name = SBJsonUTF8Stream.m; path = "json-framework/Classes/SBJsonUTF8Stream.m"; sourceTree = "<group>"; };
-		A716C04F1495131F00BD6025 /* SBJsonWriter.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; name = SBJsonWriter.h; path = "json-framework/Classes/SBJsonWriter.h"; sourceTree = "<group>"; };
-		A716C0501495131F00BD6025 /* SBJsonWriter.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; name = SBJsonWriter.m; path = "json-framework/Classes/SBJsonWriter.m"; sourceTree = "<group>"; };
 		A71A166515A783DA007BB40D /* ZPNavigationController.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = ZPNavigationController.h; sourceTree = "<group>"; };
 		A71A166615A783DA007BB40D /* ZPNavigationController.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = ZPNavigationController.m; sourceTree = "<group>"; };
 		A7200DD014718DC0004347C9 /* ZotPad.app */ = {isa = PBXFileReference; explicitFileType = wrapper.application; includeInIndex = 0; path = ZotPad.app; sourceTree = BUILT_PRODUCTS_DIR; };
@@ -1967,8 +1891,6 @@
 		A733F7BC15F8B66900E8A2D6 /* CoconutKit.xcodeproj */ = {isa = PBXFileReference; lastKnownFileType = "wrapper.pb-project"; name = CoconutKit.xcodeproj; path = CoconutKit/CoconutKit/CoconutKit.xcodeproj; sourceTree = "<group>"; };
 		A733F7CD15F8C1DB00E8A2D6 /* CoreData.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; name = CoreData.framework; path = System/Library/Frameworks/CoreData.framework; sourceTree = SDKROOT; };
 		A73D1BF91560E234002D4A2D /* libTestFlight.a */ = {isa = PBXFileReference; lastKnownFileType = archive.ar; path = libTestFlight.a; sourceTree = "<group>"; };
-		A73D1BFA1560E234002D4A2D /* README.txt */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = text; path = README.txt; sourceTree = "<group>"; };
-		A73D1BFB1560E234002D4A2D /* release_notes.txt */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = text; path = release_notes.txt; sourceTree = "<group>"; };
 		A73D1BFC1560E234002D4A2D /* TestFlight.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = TestFlight.h; sourceTree = "<group>"; };
 		A73D635014879D15007999F3 /* Settings.bundle */ = {isa = PBXFileReference; explicitFileType = wrapper.application; name = Settings.bundle; path = ../Settings.bundle; sourceTree = "<group>"; };
 		A7406C261600BFE900549D89 /* horizontalLines.png */ = {isa = PBXFileReference; lastKnownFileType = image.png; name = horizontalLines.png; path = Icons/horizontalLines.png; sourceTree = SOURCE_ROOT; };
@@ -2212,7 +2134,6 @@
 			files = (
 				A7C1A00615F4D60C00A5AF49 /* libFRLayeredNavigationController.a in Frameworks */,
 				A77E0DCD15D6603200134D35 /* libUserVoice.a in Frameworks */,
-				A7ABAB6A15A3095900EA8B7B /* libDTCoreText.a in Frameworks */,
 				A7ABAB3215A3034800EA8B7B /* ImageIO.framework in Frameworks */,
 				A7ABAB3115A2FEC500EA8B7B /* MessageUI.framework in Frameworks */,
 				A7ABAB3015A2FEA900EA8B7B /* CoreFoundation.framework in Frameworks */,
@@ -2239,7 +2160,6 @@
 			files = (
 				A7C1A00515F4D60200A5AF49 /* libFRLayeredNavigationController.a in Frameworks */,
 				A783236C15EE3173004BB4F7 /* libUserVoice.a in Frameworks */,
-				A783236D15EE3173004BB4F7 /* libDTCoreText.a in Frameworks */,
 				A783236E15EE3173004BB4F7 /* CoreFoundation.framework in Frameworks */,
 				A783236F15EE3173004BB4F7 /* MessageUI.framework in Frameworks */,
 				A783237015EE3173004BB4F7 /* CoreText.framework in Frameworks */,
@@ -2264,12 +2184,12 @@
 			isa = PBXFrameworksBuildPhase;
 			buildActionMask = 2147483647;
 			files = (
+				A7BA91991630888F00A76F61 /* libCSLProcessor.a in Frameworks */,
 				A7CD075D15161555007A8E1D /* QuartzCore.framework in Frameworks */,
 				A733F7CE15F8C1DB00E8A2D6 /* CoreData.framework in Frameworks */,
 				A733F7CC15F8B68400E8A2D6 /* libCoconutKit.a in Frameworks */,
 				A7C1A00415F4D5F700A5AF49 /* libFRLayeredNavigationController.a in Frameworks */,
 				A77E0DD615D660CF00134D35 /* libUserVoice.a in Frameworks */,
-				A7093C3115A44C6B00F7B5CF /* libDTCoreText.a in Frameworks */,
 				A7699E57159A6C44002F09DA /* CoreFoundation.framework in Frameworks */,
 				A70399B115979EC1002F4293 /* MessageUI.framework in Frameworks */,
 				A7BD5EC6156121A3003252EA /* CoreText.framework in Frameworks */,
@@ -2618,38 +2538,6 @@
 			name = "Mime icons";
 			sourceTree = "<group>";
 		};
-		A716C05D1495132200BD6025 /* json-framework */ = {
-			isa = PBXGroup;
-			children = (
-				A716C0381495131E00BD6025 /* NSObject+SBJson.h */,
-				A716C0391495131E00BD6025 /* NSObject+SBJson.m */,
-				A716C03A1495131E00BD6025 /* SBJson.h */,
-				A716C03B1495131E00BD6025 /* SBJsonParser.h */,
-				A716C03C1495131E00BD6025 /* SBJsonParser.m */,
-				A716C03D1495131E00BD6025 /* SBJsonStreamParser.h */,
-				A716C03E1495131E00BD6025 /* SBJsonStreamParser.m */,
-				A716C03F1495131E00BD6025 /* SBJsonStreamParserAccumulator.h */,
-				A716C0401495131E00BD6025 /* SBJsonStreamParserAccumulator.m */,
-				A716C0411495131E00BD6025 /* SBJsonStreamParserAdapter.h */,
-				A716C0421495131E00BD6025 /* SBJsonStreamParserAdapter.m */,
-				A716C0431495131E00BD6025 /* SBJsonStreamParserState.h */,
-				A716C0441495131E00BD6025 /* SBJsonStreamParserState.m */,
-				A716C0451495131E00BD6025 /* SBJsonStreamWriter.h */,
-				A716C0461495131E00BD6025 /* SBJsonStreamWriter.m */,
-				A716C0471495131E00BD6025 /* SBJsonStreamWriterAccumulator.h */,
-				A716C0481495131F00BD6025 /* SBJsonStreamWriterAccumulator.m */,
-				A716C0491495131F00BD6025 /* SBJsonStreamWriterState.h */,
-				A716C04A1495131F00BD6025 /* SBJsonStreamWriterState.m */,
-				A716C04B1495131F00BD6025 /* SBJsonTokeniser.h */,
-				A716C04C1495131F00BD6025 /* SBJsonTokeniser.m */,
-				A716C04D1495131F00BD6025 /* SBJsonUTF8Stream.h */,
-				A716C04E1495131F00BD6025 /* SBJsonUTF8Stream.m */,
-				A716C04F1495131F00BD6025 /* SBJsonWriter.h */,
-				A716C0501495131F00BD6025 /* SBJsonWriter.m */,
-			);
-			name = "json-framework";
-			sourceTree = "<group>";
-		};
 		A7200DC514718DBF004347C9 = {
 			isa = PBXGroup;
 			children = (
@@ -2672,43 +2560,42 @@
 		A7200DD314718DC0004347C9 /* Frameworks */ = {
 			isa = PBXGroup;
 			children = (
+				A7699E56159A6C44002F09DA /* CoreFoundation.framework */,
+				A70399B015979EC1002F4293 /* MessageUI.framework */,
+				A7BD5EC5156121A3003252EA /* CoreText.framework */,
+				A7BD5EC315612181003252EA /* ImageIO.framework */,
+				A7D3C07F14AEDE7B00DB975D /* QuickLook.framework */,
+				A76D3C7714AD97D6000C3ED9 /* MobileCoreServices.framework */,
+				A76D3C7514AD97CB000C3ED9 /* SystemConfiguration.framework */,
+				A76D3C7314AD97BA000C3ED9 /* CFNetwork.framework */,
+				320AF8492C47A4D819F7C450 /* QuartzCore.framework */,
+				A7A7CA0C147AA329004D8756 /* Security.framework */,
+				A7200DD414718DC0004347C9 /* UIKit.framework */,
+				A7200DD614718DC0004347C9 /* Foundation.framework */,
+				A7200DD814718DC0004347C9 /* CoreGraphics.framework */,
+				A733F7CD15F8C1DB00E8A2D6 /* CoreData.framework */,
+				A7ABAB3315A3046300EA8B7B /* DTCoreText.xcodeproj */,
 				A7A6A5F2161ABE0C00C7DB72 /* CSLProcessor.xcodeproj */,
 				A7EC0626161A33420008B314 /* OHAttributedLabel.xcodeproj */,
-				A733F7CD15F8C1DB00E8A2D6 /* CoreData.framework */,
 				A733F7BC15F8B66900E8A2D6 /* CoconutKit.xcodeproj */,
 				A7C19FF715F4D5D100A5AF49 /* FRLayeredNavigationController.xcodeproj */,
 				A77E0DC415D65FAB00134D35 /* UserVoice.xcodeproj */,
 				A75D4B4215BC9B56003291CB /* Base64 */,
 				A7307B4715A6E51100A90BDF /* Dropbox */,
 				A7A1C71515A6B6E00012BC7A /* InAppSettingsKit */,
-				A7ABAB3315A3046300EA8B7B /* DTCoreText.xcodeproj */,
 				A7699E58159A6C65002F09DA /* libcommonCrypto.dylib */,
-				A7699E56159A6C44002F09DA /* CoreFoundation.framework */,
-				A70399B015979EC1002F4293 /* MessageUI.framework */,
 				A7648031159F1BE40075CFB9 /* Cocoa-Lumberjack */,
 				A7699E52159A6908002F09DA /* FileMD5Hash */,
-				A7BD5EC5156121A3003252EA /* CoreText.framework */,
-				A7BD5EC315612181003252EA /* ImageIO.framework */,
 				A73D1BF81560E234002D4A2D /* TestFlightSDK1 */,
 				A75E1852153405740046988C /* ZipArchive */,
 				A7F8637F14C21D8800021662 /* libz.dylib */,
-				A7D3C07F14AEDE7B00DB975D /* QuickLook.framework */,
-				A76D3C7714AD97D6000C3ED9 /* MobileCoreServices.framework */,
-				A76D3C7514AD97CB000C3ED9 /* SystemConfiguration.framework */,
-				A76D3C7314AD97BA000C3ED9 /* CFNetwork.framework */,
 				A76D3C7B14AD9CEF000C3ED9 /* ASIHTTPRequest */,
-				A716C05D1495132200BD6025 /* json-framework */,
 				A7CC252A1493E14D00FDEAF4 /* iCarousel */,
 				A7A7C9CD147AA2EE004D8756 /* OAuthConsumer */,
 				A7A54B0E14878ECD00EBAD80 /* DSActivityView */,
 				A7A54B0414878E2600EBAD80 /* FMDB */,
-				320AF8492C47A4D819F7C450 /* QuartzCore.framework */,
 				A7A7CA0E147AA339004D8756 /* libxml2.dylib */,
-				A7A7CA0C147AA329004D8756 /* Security.framework */,
 				A7200DF7147193C0004347C9 /* libsqlite3.dylib */,
-				A7200DD414718DC0004347C9 /* UIKit.framework */,
-				A7200DD614718DC0004347C9 /* Foundation.framework */,
-				A7200DD814718DC0004347C9 /* CoreGraphics.framework */,
 			);
 			name = Frameworks;
 			sourceTree = "<group>";
@@ -2945,8 +2832,6 @@
 			isa = PBXGroup;
 			children = (
 				A73D1BF91560E234002D4A2D /* libTestFlight.a */,
-				A73D1BFA1560E234002D4A2D /* README.txt */,
-				A73D1BFB1560E234002D4A2D /* release_notes.txt */,
 				A73D1BFC1560E234002D4A2D /* TestFlight.h */,
 			);
 			path = TestFlightSDK1;
@@ -3267,19 +3152,6 @@
 			path = Crypto;
 			sourceTree = "<group>";
 		};
-		A7ABAB3415A3046300EA8B7B /* Products */ = {
-			isa = PBXGroup;
-			children = (
-				A7ABAB4215A3046300EA8B7B /* DemoApp.app */,
-				A7ABAB4415A3046300EA8B7B /* DTCoreText.framework */,
-				A7ABAB4615A3046300EA8B7B /* libDTCoreText.a */,
-				A7ABAB4815A3046300EA8B7B /* UnitTest.octest */,
-				A7ABAB4A15A3046300EA8B7B /* MacUnitTest.octest */,
-				A7ABAB4C15A3046300EA8B7B /* libDTCoreText_no_DTFoundation.a */,
-			);
-			name = Products;
-			sourceTree = "<group>";
-		};
 		A7B2BCC715B3E1D600381E23 /* SQL */ = {
 			isa = PBXGroup;
 			children = (
@@ -3287,6 +3159,19 @@
 				A7B2BCC815B3E22500381E23 /* upgrade1.0to1.1.sql */,
 			);
 			name = SQL;
+			sourceTree = "<group>";
+		};
+		A7BA91831630855D00A76F61 /* Products */ = {
+			isa = PBXGroup;
+			children = (
+				A7BA918D1630855D00A76F61 /* DemoApp.app */,
+				A7BA918F1630855D00A76F61 /* DTCoreText.framework */,
+				A7BA91911630855D00A76F61 /* libDTCoreText.a */,
+				A7BA91931630855D00A76F61 /* UnitTest.octest */,
+				A7BA91951630855D00A76F61 /* MacUnitTest.octest */,
+				A7BA91971630855D00A76F61 /* libDTCoreText_no_DTFoundation.a */,
+			);
+			name = Products;
 			sourceTree = "<group>";
 		};
 		A7C19FF815F4D5D100A5AF49 /* Products */ = {
@@ -3405,7 +3290,6 @@
 			);
 			dependencies = (
 				A77E0DD115D660B500134D35 /* PBXTargetDependency */,
-				A77E0DCF15D660AF00134D35 /* PBXTargetDependency */,
 			);
 			name = ZotPad;
 			productName = ZotPad;
@@ -3424,7 +3308,6 @@
 			buildRules = (
 			);
 			dependencies = (
-				A78322D315EE3173004BB4F7 /* PBXTargetDependency */,
 				A78322D515EE3173004BB4F7 /* PBXTargetDependency */,
 			);
 			name = "ZotPad iAnnotate alpha";
@@ -3444,10 +3327,11 @@
 			buildRules = (
 			);
 			dependencies = (
+				A79E86581630A6A70090ECE1 /* PBXTargetDependency */,
+				A79E86561630A69A0090ECE1 /* PBXTargetDependency */,
 				A7A6A600161ABE2500C7DB72 /* PBXTargetDependency */,
 				A7EC0630161A33530008B314 /* PBXTargetDependency */,
 				A733F7CB15F8B67A00E8A2D6 /* PBXTargetDependency */,
-				A77E0DD515D660C200134D35 /* PBXTargetDependency */,
 				A77E0DD315D660BC00134D35 /* PBXTargetDependency */,
 			);
 			name = "ZotPad beta";
@@ -3486,7 +3370,7 @@
 					ProjectRef = A7A6A5F2161ABE0C00C7DB72 /* CSLProcessor.xcodeproj */;
 				},
 				{
-					ProductGroup = A7ABAB3415A3046300EA8B7B /* Products */;
+					ProductGroup = A7BA91831630855D00A76F61 /* Products */;
 					ProjectRef = A7ABAB3315A3046300EA8B7B /* DTCoreText.xcodeproj */;
 				},
 				{
@@ -3540,46 +3424,46 @@
 			remoteRef = A7A6A5FD161ABE0D00C7DB72 /* PBXContainerItemProxy */;
 			sourceTree = BUILT_PRODUCTS_DIR;
 		};
-		A7ABAB4215A3046300EA8B7B /* DemoApp.app */ = {
+		A7BA918D1630855D00A76F61 /* DemoApp.app */ = {
 			isa = PBXReferenceProxy;
 			fileType = wrapper.application;
 			path = DemoApp.app;
-			remoteRef = A7ABAB4115A3046300EA8B7B /* PBXContainerItemProxy */;
+			remoteRef = A7BA918C1630855D00A76F61 /* PBXContainerItemProxy */;
 			sourceTree = BUILT_PRODUCTS_DIR;
 		};
-		A7ABAB4415A3046300EA8B7B /* DTCoreText.framework */ = {
+		A7BA918F1630855D00A76F61 /* DTCoreText.framework */ = {
 			isa = PBXReferenceProxy;
 			fileType = wrapper.cfbundle;
 			path = DTCoreText.framework;
-			remoteRef = A7ABAB4315A3046300EA8B7B /* PBXContainerItemProxy */;
+			remoteRef = A7BA918E1630855D00A76F61 /* PBXContainerItemProxy */;
 			sourceTree = BUILT_PRODUCTS_DIR;
 		};
-		A7ABAB4615A3046300EA8B7B /* libDTCoreText.a */ = {
+		A7BA91911630855D00A76F61 /* libDTCoreText.a */ = {
 			isa = PBXReferenceProxy;
 			fileType = archive.ar;
 			path = libDTCoreText.a;
-			remoteRef = A7ABAB4515A3046300EA8B7B /* PBXContainerItemProxy */;
+			remoteRef = A7BA91901630855D00A76F61 /* PBXContainerItemProxy */;
 			sourceTree = BUILT_PRODUCTS_DIR;
 		};
-		A7ABAB4815A3046300EA8B7B /* UnitTest.octest */ = {
+		A7BA91931630855D00A76F61 /* UnitTest.octest */ = {
 			isa = PBXReferenceProxy;
 			fileType = wrapper.cfbundle;
 			path = UnitTest.octest;
-			remoteRef = A7ABAB4715A3046300EA8B7B /* PBXContainerItemProxy */;
+			remoteRef = A7BA91921630855D00A76F61 /* PBXContainerItemProxy */;
 			sourceTree = BUILT_PRODUCTS_DIR;
 		};
-		A7ABAB4A15A3046300EA8B7B /* MacUnitTest.octest */ = {
+		A7BA91951630855D00A76F61 /* MacUnitTest.octest */ = {
 			isa = PBXReferenceProxy;
 			fileType = wrapper.cfbundle;
 			path = MacUnitTest.octest;
-			remoteRef = A7ABAB4915A3046300EA8B7B /* PBXContainerItemProxy */;
+			remoteRef = A7BA91941630855D00A76F61 /* PBXContainerItemProxy */;
 			sourceTree = BUILT_PRODUCTS_DIR;
 		};
-		A7ABAB4C15A3046300EA8B7B /* libDTCoreText_no_DTFoundation.a */ = {
+		A7BA91971630855D00A76F61 /* libDTCoreText_no_DTFoundation.a */ = {
 			isa = PBXReferenceProxy;
 			fileType = archive.ar;
 			path = libDTCoreText_no_DTFoundation.a;
-			remoteRef = A7ABAB4B15A3046300EA8B7B /* PBXContainerItemProxy */;
+			remoteRef = A7BA91961630855D00A76F61 /* PBXContainerItemProxy */;
 			sourceTree = BUILT_PRODUCTS_DIR;
 		};
 		A7C1A00115F4D5D100A5AF49 /* libFRLayeredNavigationController.a */ = {
@@ -3877,8 +3761,6 @@
 				A708F137153F0FAC0083A506 /* x-office-contact.svgz in Resources */,
 				A708F139153F0FAC0083A506 /* x-office-document.svgz in Resources */,
 				A708F13B153F0FAC0083A506 /* x-office-spreadsheet.svgz in Resources */,
-				A73D1BFF1560E234002D4A2D /* README.txt in Resources */,
-				A73D1C011560E234002D4A2D /* release_notes.txt in Resources */,
 				A76ECD28159CDEDD0062E95A /* emblem-locked.svgz in Resources */,
 				A76ECD2A159CDEDD0062E95A /* emblem-symbolic-link.svgz in Resources */,
 				A77FD062159F702E00774D50 /* gear.png in Resources */,
@@ -4186,8 +4068,6 @@
 				A783249015EE3173004BB4F7 /* x-office-contact.svgz in Resources */,
 				A783249115EE3173004BB4F7 /* x-office-document.svgz in Resources */,
 				A783249215EE3173004BB4F7 /* x-office-spreadsheet.svgz in Resources */,
-				A783249315EE3173004BB4F7 /* README.txt in Resources */,
-				A783249415EE3173004BB4F7 /* release_notes.txt in Resources */,
 				A783249515EE3173004BB4F7 /* emblem-locked.svgz in Resources */,
 				A783249615EE3173004BB4F7 /* emblem-symbolic-link.svgz in Resources */,
 				A783249715EE3173004BB4F7 /* gear.png in Resources */,
@@ -4487,8 +4367,6 @@
 				A708F138153F0FAC0083A506 /* x-office-contact.svgz in Resources */,
 				A708F13A153F0FAC0083A506 /* x-office-document.svgz in Resources */,
 				A708F13C153F0FAC0083A506 /* x-office-spreadsheet.svgz in Resources */,
-				A73D1C001560E234002D4A2D /* README.txt in Resources */,
-				A73D1C021560E234002D4A2D /* release_notes.txt in Resources */,
 				A76ECD29159CDEDD0062E95A /* emblem-locked.svgz in Resources */,
 				A76ECD2B159CDEDD0062E95A /* emblem-symbolic-link.svgz in Resources */,
 				A77FD063159F702E00774D50 /* gear.png in Resources */,
@@ -4594,18 +4472,6 @@
 				A79ED823148B2683003EE77C /* ZPItemDetailViewController.m in Sources */,
 				A7CC252F1493E14E00FDEAF4 /* iCarousel.m in Sources */,
 				A716C0371494E9DF00BD6025 /* ZPZoteroAttachment.m in Sources */,
-				A716C0511495131F00BD6025 /* NSObject+SBJson.m in Sources */,
-				A716C0521495131F00BD6025 /* SBJsonParser.m in Sources */,
-				A716C0531495131F00BD6025 /* SBJsonStreamParser.m in Sources */,
-				A716C0541495131F00BD6025 /* SBJsonStreamParserAccumulator.m in Sources */,
-				A716C0551495131F00BD6025 /* SBJsonStreamParserAdapter.m in Sources */,
-				A716C0561495131F00BD6025 /* SBJsonStreamParserState.m in Sources */,
-				A716C0571495131F00BD6025 /* SBJsonStreamWriter.m in Sources */,
-				A716C0581495131F00BD6025 /* SBJsonStreamWriterAccumulator.m in Sources */,
-				A716C0591495131F00BD6025 /* SBJsonStreamWriterState.m in Sources */,
-				A716C05A1495131F00BD6025 /* SBJsonTokeniser.m in Sources */,
-				A716C05B1495131F00BD6025 /* SBJsonUTF8Stream.m in Sources */,
-				A716C05C1495131F00BD6025 /* SBJsonWriter.m in Sources */,
 				A7025019149B0BB1004F2AAB /* ZPDatabase.m in Sources */,
 				A702501D149B33E1004F2AAB /* ZPCacheController.m in Sources */,
 				A7025020149C6C3E004F2AAB /* ZPPreferences.m in Sources */,
@@ -4746,18 +4612,6 @@
 				A78322F715EE3173004BB4F7 /* ZPItemDetailViewController.m in Sources */,
 				A78322F815EE3173004BB4F7 /* iCarousel.m in Sources */,
 				A78322F915EE3173004BB4F7 /* ZPZoteroAttachment.m in Sources */,
-				A78322FA15EE3173004BB4F7 /* NSObject+SBJson.m in Sources */,
-				A78322FB15EE3173004BB4F7 /* SBJsonParser.m in Sources */,
-				A78322FC15EE3173004BB4F7 /* SBJsonStreamParser.m in Sources */,
-				A78322FD15EE3173004BB4F7 /* SBJsonStreamParserAccumulator.m in Sources */,
-				A78322FE15EE3173004BB4F7 /* SBJsonStreamParserAdapter.m in Sources */,
-				A78322FF15EE3173004BB4F7 /* SBJsonStreamParserState.m in Sources */,
-				A783230015EE3173004BB4F7 /* SBJsonStreamWriter.m in Sources */,
-				A783230115EE3173004BB4F7 /* SBJsonStreamWriterAccumulator.m in Sources */,
-				A783230215EE3173004BB4F7 /* SBJsonStreamWriterState.m in Sources */,
-				A783230315EE3173004BB4F7 /* SBJsonTokeniser.m in Sources */,
-				A783230415EE3173004BB4F7 /* SBJsonUTF8Stream.m in Sources */,
-				A783230515EE3173004BB4F7 /* SBJsonWriter.m in Sources */,
 				A783230615EE3173004BB4F7 /* ZPDatabase.m in Sources */,
 				A783230715EE3173004BB4F7 /* ZPCacheController.m in Sources */,
 				A783230815EE3173004BB4F7 /* ZPPreferences.m in Sources */,
@@ -4898,18 +4752,6 @@
 				A7CD072C15161555007A8E1D /* ZPItemDetailViewController.m in Sources */,
 				A7CD072D15161555007A8E1D /* iCarousel.m in Sources */,
 				A7CD072E15161555007A8E1D /* ZPZoteroAttachment.m in Sources */,
-				A7CD072F15161555007A8E1D /* NSObject+SBJson.m in Sources */,
-				A7CD073015161555007A8E1D /* SBJsonParser.m in Sources */,
-				A7CD073115161555007A8E1D /* SBJsonStreamParser.m in Sources */,
-				A7CD073215161555007A8E1D /* SBJsonStreamParserAccumulator.m in Sources */,
-				A7CD073315161555007A8E1D /* SBJsonStreamParserAdapter.m in Sources */,
-				A7CD073415161555007A8E1D /* SBJsonStreamParserState.m in Sources */,
-				A7CD073515161555007A8E1D /* SBJsonStreamWriter.m in Sources */,
-				A7CD073615161555007A8E1D /* SBJsonStreamWriterAccumulator.m in Sources */,
-				A7CD073715161555007A8E1D /* SBJsonStreamWriterState.m in Sources */,
-				A7CD073815161555007A8E1D /* SBJsonTokeniser.m in Sources */,
-				A7CD073915161555007A8E1D /* SBJsonUTF8Stream.m in Sources */,
-				A7CD073A15161555007A8E1D /* SBJsonWriter.m in Sources */,
 				A7CD073B15161555007A8E1D /* ZPDatabase.m in Sources */,
 				A7CD073C15161555007A8E1D /* ZPCacheController.m in Sources */,
 				A7CD073D15161555007A8E1D /* ZPPreferences.m in Sources */,
@@ -5021,11 +4863,6 @@
 			name = CoconutKit;
 			targetProxy = A733F7CA15F8B67A00E8A2D6 /* PBXContainerItemProxy */;
 		};
-		A77E0DCF15D660AF00134D35 /* PBXTargetDependency */ = {
-			isa = PBXTargetDependency;
-			name = "Static Library";
-			targetProxy = A77E0DCE15D660AF00134D35 /* PBXContainerItemProxy */;
-		};
 		A77E0DD115D660B500134D35 /* PBXTargetDependency */ = {
 			isa = PBXTargetDependency;
 			name = UserVoice;
@@ -5036,20 +4873,20 @@
 			name = UserVoice;
 			targetProxy = A77E0DD215D660BC00134D35 /* PBXContainerItemProxy */;
 		};
-		A77E0DD515D660C200134D35 /* PBXTargetDependency */ = {
-			isa = PBXTargetDependency;
-			name = "Static Library";
-			targetProxy = A77E0DD415D660C200134D35 /* PBXContainerItemProxy */;
-		};
-		A78322D315EE3173004BB4F7 /* PBXTargetDependency */ = {
-			isa = PBXTargetDependency;
-			name = "Static Library";
-			targetProxy = A78322D415EE3173004BB4F7 /* PBXContainerItemProxy */;
-		};
 		A78322D515EE3173004BB4F7 /* PBXTargetDependency */ = {
 			isa = PBXTargetDependency;
 			name = UserVoice;
 			targetProxy = A78322D615EE3173004BB4F7 /* PBXContainerItemProxy */;
+		};
+		A79E86561630A69A0090ECE1 /* PBXTargetDependency */ = {
+			isa = PBXTargetDependency;
+			name = FRLayeredNavigationController;
+			targetProxy = A79E86551630A69A0090ECE1 /* PBXContainerItemProxy */;
+		};
+		A79E86581630A6A70090ECE1 /* PBXTargetDependency */ = {
+			isa = PBXTargetDependency;
+			name = "Static Library";
+			targetProxy = A79E86571630A6A70090ECE1 /* PBXContainerItemProxy */;
 		};
 		A7A6A600161ABE2500C7DB72 /* PBXTargetDependency */ = {
 			isa = PBXTargetDependency;

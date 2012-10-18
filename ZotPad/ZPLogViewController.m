@@ -94,8 +94,6 @@
     
     //Allow starting tickets only by email.
     
-    [[[UVSession currentSession] clientConfig] setTicketsEnabled:NO];
-    
     [UserVoice presentUserVoiceInterfaceForParentViewController:self andConfig:config];
 }
 

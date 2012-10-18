@@ -49,3 +49,6 @@
 [submodule "CSLProcessor"]
 	path = CSLProcessor
 	url = https://github.com/mronkko/CSLProcessor
+[submodule "uservoice-iphone-sdk"]
+	path = uservoice-iphone-sdk
+	url = https://github.com/uservoice/uservoice-iphone-sdk.git
