@@ -1,7 +1,7 @@
 <?xml version="1.0" encoding="UTF-8" standalone="no"?>
-<document type="com.apple.InterfaceBuilder3.CocoaTouch.Storyboard.XIB" version="2.0" toolsVersion="2549" systemVersion="11E53" targetRuntime="iOS.CocoaTouch" propertyAccessControl="none" initialViewController="3">
+<document type="com.apple.InterfaceBuilder3.CocoaTouch.Storyboard.XIB" version="2.0" toolsVersion="2843" systemVersion="11G63" targetRuntime="iOS.CocoaTouch" propertyAccessControl="none" initialViewController="3">
     <dependencies>
-        <plugIn identifier="com.apple.InterfaceBuilder.IBCocoaTouchPlugin" version="1498"/>
+        <plugIn identifier="com.apple.InterfaceBuilder.IBCocoaTouchPlugin" version="1929"/>
     </dependencies>
     <scenes>
         <!--Navigation Controller-->
@@ -382,7 +382,7 @@
                                     <barButtonItem style="plain" systemItem="flexibleSpace" id="0Lf-S8-lfW"/>
                                     <barButtonItem title="Contact support" id="uNB-eo-5wS">
                                         <connections>
-                                            <action selector="emailSupport:" destination="AXa-IG-NNW" id="Uhg-dL-ZhS"/>
+                                            <action selector="contactSupport:" destination="AXa-IG-NNW" id="YGk-wF-CAj"/>
                                         </connections>
                                     </barButtonItem>
                                     <barButtonItem style="plain" systemItem="flexibleSpace" id="Vex-OU-zLx"/>
@@ -487,7 +487,6 @@
         <!--Collections And Tags View Controller-->
         <scene sceneID="7Jb-kk-KIl">
             <objects>
-                <placeholder placeholderIdentifier="IBFirstResponder" id="C4O-l3-C6l" userLabel="First Responder" sceneMemberID="firstResponder"/>
                 <viewController id="Awc-Eh-kqF" customClass="ZPCollectionsAndTagsViewController" sceneMemberID="viewController">
                     <view key="view" contentMode="scaleToFill" id="Lzk-el-3MM">
                         <rect key="frame" x="0.0" y="64" width="320" height="416"/>
@@ -542,6 +541,7 @@
                         <segue destination="21" kind="push" identifier="PushItemList" id="F6w-kk-h9s"/>
                     </connections>
                 </viewController>
+                <placeholder placeholderIdentifier="IBFirstResponder" id="C4O-l3-C6l" userLabel="First Responder" sceneMemberID="firstResponder"/>
             </objects>
             <point key="canvasLocation" x="455" y="64"/>
         </scene>
@@ -612,9 +612,14 @@
         <class className="ZPCollectionsAndTagsViewController" superclassName="HLSPlaceholderViewController">
             <source key="sourceIdentifier" type="project" relativePath="./Classes/ZPCollectionsAndTagsViewController.h"/>
             <relationships>
+                <relationship kind="action" name="handlePanGesture:" candidateClass="UIPanGestureRecognizer"/>
+                <relationship kind="action" name="toggleTagSelector:"/>
                 <relationship kind="outlet" name="cacheControllerPlaceHolder" candidateClass="UIBarButtonItem"/>
                 <relationship kind="outlet" name="collectionsView" candidateClass="UIView"/>
                 <relationship kind="outlet" name="gearButton" candidateClass="UIBarButtonItem"/>
+                <relationship kind="outlet" name="headerArrowLeft" candidateClass="UIImageView"/>
+                <relationship kind="outlet" name="headerArrowRight" candidateClass="UIImageView"/>
+                <relationship kind="outlet" name="tagsHeader" candidateClass="UIView"/>
                 <relationship kind="outlet" name="tagsView" candidateClass="UIView"/>
             </relationships>
         </class>
@@ -646,9 +651,8 @@
         <class className="ZPLogViewController" superclassName="UIViewController">
             <source key="sourceIdentifier" type="project" relativePath="./Classes/ZPLogViewController.h"/>
             <relationships>
+                <relationship kind="action" name="contactSupport:"/>
                 <relationship kind="action" name="dismiss:"/>
-                <relationship kind="action" name="emailSupport:"/>
-                <relationship kind="action" name="knowledgeBase:"/>
                 <relationship kind="action" name="manageKey:"/>
                 <relationship kind="action" name="showManual:"/>
                 <relationship kind="outlet" name="logView" candidateClass="UITextView"/>

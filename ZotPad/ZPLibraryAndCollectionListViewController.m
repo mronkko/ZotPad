@@ -99,12 +99,16 @@
     
     //If the current library is not defined, show a list of libraries
     if(self->_currentlibraryID == LIBRARY_ID_NOT_SET){
-        [ZPServerConnectionManager retrieveLibrariesFromServer];
+        dispatch_async(dispatch_get_global_queue(DISPATCH_QUEUE_PRIORITY_BACKGROUND,0), ^{
+            [ZPServerConnectionManager retrieveLibrariesFromServer];
+        });
         self->_content = [ZPDatabase libraries];
     }
     //If a library is chosen, show collections level collections for that library
     else{
-        [ZPServerConnectionManager retrieveCollectionsForLibraryFromServer:_currentlibraryID];
+        dispatch_async(dispatch_get_global_queue(DISPATCH_QUEUE_PRIORITY_BACKGROUND,0), ^{
+            [ZPServerConnectionManager retrieveCollectionsForLibraryFromServer:_currentlibraryID];
+        });
         self->_content = [ZPDatabase collectionsForLibrary:self->_currentlibraryID withParentCollection:self->_currentCollectionKey];
     }
     

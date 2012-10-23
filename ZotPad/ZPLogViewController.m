@@ -73,7 +73,7 @@
     [self presentModalViewController:ql animated:YES];
 }
 
-#ifdef BETA
+#if 0
 
 -(IBAction)knowledgeBase:(id)sender{
     [[[UIAlertView alloc] initWithTitle:@"Not implemented"
@@ -87,14 +87,29 @@
 
 #import "ZPSecrets.h"
 
--(IBAction)knowledgeBase:(id)sender{
+-(IBAction)contactSupport:(id)sender{
     UVConfig *config = [UVConfig configWithSite:@"zotpad.uservoice.com"
                                          andKey:USERVOICE_API_KEY
                                       andSecret:USERVOICE_SECRET];
     
-    //Allow starting tickets only by email.
+    UIDevice *currentDevice = [UIDevice currentDevice];
+    NSString *model = [currentDevice model];
+    NSString *systemVersion = [currentDevice systemVersion];
+
+    NSString* technicalInfo = [NSString stringWithFormat:@"\n\n --- Technical info ---\n\n%@ %@ (build %@)\n%@ (iOS %@)\nuserID: %@\nAPI key: %@\n\n --- Application log ----\n\n%@",
+                               [[NSBundle mainBundle] objectForInfoDictionaryKey:@"CFBundleDisplayName"],
+                               [[NSBundle mainBundle] objectForInfoDictionaryKey:@"CFBundleShortVersionString"],
+                               [[NSBundle mainBundle] objectForInfoDictionaryKey:@"CFBundleVersion"],
+                               [[UIDevice currentDevice] model],
+                               [[UIDevice currentDevice] systemVersion],
+                               [ZPPreferences userID],
+                               [ZPPreferences OAuthKey],
+                               logView.text];
+
+    config.customFields =  [NSDictionary dictionaryWithObject:technicalInfo
+                                                       forKey:@"Technical Information"];
     
-    [UserVoice presentUserVoiceInterfaceForParentViewController:self andConfig:config];
+    [UserVoice presentUserVoiceContactUsFormForParentViewController:self andConfig:config];
 }
 
 #endif
@@ -103,26 +118,6 @@
     [[UIApplication sharedApplication] openURL:[NSURL URLWithString:[@"https://www.zotero.org/settings/keys/edit/" stringByAppendingString:[ZPPreferences OAuthKey]]]];
 }
 
--(IBAction)emailSupport:(id)sender{
-    if([MFMailComposeViewController canSendMail]){
-        mailController = [[MFMailComposeViewController alloc] init];
-        [mailController setSubject:@"Support request"];
-        [mailController setToRecipients:[NSArray arrayWithObject:@"support@zotpad.com"]];
-        [mailController setMessageBody:[NSString stringWithFormat:@"<Please describe your problem here>\n\n\n\nMy userID is %@ and API key is %@. My current log file is attached.",[ZPPreferences userID], [ZPPreferences OAuthKey], nil] isHTML:NO];
-        
-        ZPAppDelegate* appDelegate = (ZPAppDelegate*) [[UIApplication sharedApplication] delegate];
-        NSString* logPath = [appDelegate.fileLogger.logFileManager.sortedLogFilePaths objectAtIndex:0];
-        NSData* data = [NSData dataWithContentsOfFile:logPath];
-        [mailController addAttachmentData:data mimeType:@"text/plain" fileName:@"log.txt"];
-        
-        mailController.mailComposeDelegate = self;
-        
-        [self presentModalViewController:mailController animated:YES];     
-    }
-    else{
-        [[[UIAlertView alloc] initWithTitle:@"Email not available" message:@"Your device is not configured for sending email." delegate:NULL cancelButtonTitle:@"Cancel" otherButtonTitles:nil] show];
-    }
-}
 -(IBAction)dismiss:(id)sender{
     [self dismissModalViewControllerAnimated:YES];
 }

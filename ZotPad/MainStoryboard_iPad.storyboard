@@ -1,8 +1,8 @@
 <?xml version="1.0" encoding="UTF-8" standalone="no"?>
-<document type="com.apple.InterfaceBuilder3.CocoaTouch.Storyboard.XIB" version="2.0" toolsVersion="2549" systemVersion="11E53" targetRuntime="iOS.CocoaTouch.iPad" propertyAccessControl="none" initialViewController="5">
+<document type="com.apple.InterfaceBuilder3.CocoaTouch.Storyboard.XIB" version="2.0" toolsVersion="2843" systemVersion="11G63" targetRuntime="iOS.CocoaTouch.iPad" propertyAccessControl="none" initialViewController="5">
     <dependencies>
-        <deployment defaultVersion="1296" identifier="iOS"/>
-        <plugIn identifier="com.apple.InterfaceBuilder.IBCocoaTouchPlugin" version="1498"/>
+        <deployment defaultVersion="1536" identifier="iOS"/>
+        <plugIn identifier="com.apple.InterfaceBuilder.IBCocoaTouchPlugin" version="1929"/>
     </dependencies>
     <scenes>
         <!--Item List View Controller - Detail-->
@@ -279,7 +279,6 @@
         <!--Collections And Tags View Controller-->
         <scene sceneID="GvH-U2-NHG">
             <objects>
-                <placeholder placeholderIdentifier="IBFirstResponder" id="zLI-X3-5vP" userLabel="First Responder" sceneMemberID="firstResponder"/>
                 <viewController id="Udn-q6-Hwa" customClass="ZPCollectionsAndTagsViewController" sceneMemberID="viewController">
                     <view key="view" contentMode="scaleToFill" id="Hxu-vf-F0U">
                         <rect key="frame" x="0.0" y="64" width="320" height="660"/>
@@ -364,6 +363,7 @@
                         <segue destination="WCH-zk-FP7" kind="push" identifier="PushItemsToNavigator" id="Zj4-1I-p69"/>
                     </connections>
                 </viewController>
+                <placeholder placeholderIdentifier="IBFirstResponder" id="zLI-X3-5vP" userLabel="First Responder" sceneMemberID="firstResponder"/>
                 <panGestureRecognizer minimumNumberOfTouches="1" id="fZw-ka-Iht">
                     <connections>
                         <action selector="handlePanGesture:" destination="Udn-q6-Hwa" id="SB6-cw-5BJ"/>
@@ -380,7 +380,6 @@
         <!--Navigation Controller-->
         <scene sceneID="Tzl-Xj-CtR">
             <objects>
-                <placeholder placeholderIdentifier="IBFirstResponder" id="KiF-gZ-pMT" userLabel="First Responder" sceneMemberID="firstResponder"/>
                 <navigationController definesPresentationContext="YES" toolbarHidden="NO" id="cEO-2j-Td0" sceneMemberID="viewController">
                     <navigationBar key="navigationBar" contentMode="scaleToFill" id="wgC-1q-9xX">
                         <autoresizingMask key="autoresizingMask"/>
@@ -393,6 +392,7 @@
                         <segue destination="Udn-q6-Hwa" kind="relationship" relationship="rootViewController" id="cJY-q4-n51"/>
                     </connections>
                 </navigationController>
+                <placeholder placeholderIdentifier="IBFirstResponder" id="KiF-gZ-pMT" userLabel="First Responder" sceneMemberID="firstResponder"/>
             </objects>
             <point key="canvasLocation" x="514" y="-192"/>
         </scene>
@@ -716,15 +716,9 @@
                                         </connections>
                                     </barButtonItem>
                                     <barButtonItem style="plain" systemItem="flexibleSpace" id="JR0-ml-0d3"/>
-                                    <barButtonItem title="Questions and feedback" id="4SY-i7-36O">
-                                        <connections>
-                                            <action selector="knowledgeBase:" destination="NMI-xk-7BP" id="J3Z-ox-Gjv"/>
-                                        </connections>
-                                    </barButtonItem>
-                                    <barButtonItem style="plain" systemItem="flexibleSpace" id="eC6-CW-rap"/>
                                     <barButtonItem title="Contact support" id="DwQ-yf-Wgd">
                                         <connections>
-                                            <action selector="emailSupport:" destination="NMI-xk-7BP" id="oOP-eD-dJP"/>
+                                            <action selector="contactSupport:" destination="NMI-xk-7BP" id="dmb-0Y-CPt"/>
                                         </connections>
                                     </barButtonItem>
                                     <barButtonItem style="plain" systemItem="flexibleSpace" id="rpu-nr-x9v"/>

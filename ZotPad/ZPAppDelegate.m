@@ -110,11 +110,6 @@ didFinishLaunchingWithOptions:(NSDictionary *)launchOptions
 //    [DDTTYLogger sharedInstance].logFormatter = [[ZPFileLogFormatter alloc] initWithLevel:LOG_LEVEL_VERBOSE];
 //    [DDLog addLogger:[DDTTYLogger sharedInstance]];
 
-    
-    DDLogInfo(@"%@ %@ (build %@)",
-              [[NSBundle mainBundle] objectForInfoDictionaryKey:@"CFBundleDisplayName"],
-              [[NSBundle mainBundle] objectForInfoDictionaryKey:@"CFBundleShortVersionString"],
-              [[NSBundle mainBundle] objectForInfoDictionaryKey:@"CFBundleVersion"]);
   
     DDLogVerbose(@"Verbose logging is enabled");
     
@@ -126,9 +121,10 @@ didFinishLaunchingWithOptions:(NSDictionary *)launchOptions
     [defaults setObject:@"" forKey:@"OAuthKey"];
     */
     //Uncomment these to always reset the app after launch
+    /*
     [ZPDatabase resetDatabase];
     [[ZPCacheController instance] performSelectorInBackground:@selector(purgeAllAttachmentFilesFromCache) withObject:NULL];
-     
+     */
     
     
     
@@ -295,9 +291,11 @@ didFinishLaunchingWithOptions:(NSDictionary *)launchOptions
 
     if([NSThread isMainThread]){
         UIViewController* root = self.window.rootViewController;  
+        UIViewController* presentedViewController = root.presentedViewController;
         
-        if(root.presentedViewController == NULL || ![root.presentedViewController isKindOfClass:[ZPAuthenticationDialog class]]){
+        if(presentedViewController == NULL || ![presentedViewController isKindOfClass:[ZPAuthenticationDialog class]]){
             [self dismissViewControllerHierarchy];
+            DDLogInfo(@"Displaying authentication view");
             [root performSegueWithIdentifier:@"Authentication" sender:NULL];
         }
     }

@@ -78,6 +78,8 @@
 // Check if there is something to dowload or upload
 -(void) _checkQueues;
 
+// Starts the cache building
+-(void) _start;
 
 // Metadata
 
@@ -124,14 +126,34 @@ static ZPCacheController* _instance = nil;
     _filesToDownload = [[NSMutableArray alloc] init];
     _attachmentsToUpload = [[NSMutableSet alloc] init];
     
-    _sizeOfDocumentsFolder = 0;    [self performSelectorInBackground:@selector(_scanAndSetSizeOfDocumentsFolder) withObject:NULL];
+    _sizeOfDocumentsFolder = 0;
+
+    return self;
+}
+
+/*
+ Singleton accessor
+ */
+
++(ZPCacheController*) instance {
+    if(_instance == NULL){
+        _instance = [[ZPCacheController alloc] init];
+        [_instance performSelectorInBackground:@selector(_start) withObject:NULL];
+    }
+    return _instance;
+}
+
+-(void) _start{
+    [self _scanAndSetSizeOfDocumentsFolder];
+    [self performSelectorInBackground:@selector(_scanFilesToUpload) withObject:NULL];
+    [self performSelectorInBackground:@selector(_cleanUpCache) withObject:NULL];
 	
     [ZPServerConnectionManager retrieveLibrariesFromServer];
     
     /*
-    Start building cache immediately if the user has chosen to cache all libraries
+     Start building cache immediately if the user has chosen to cache all libraries
      */
-     
+    
     if([ZPPreferences cacheAttachmentsAllLibraries] || [ZPPreferences cacheMetadataAllLibraries]){
         NSArray* libraries = [ZPDatabase libraries];
         
@@ -146,26 +168,9 @@ static ZPCacheController* _instance = nil;
             }
         }
     }
-     
-    [self performSelectorInBackground:@selector(_scanFilesToUpload) withObject:NULL];
-    [self performSelectorInBackground:@selector(_cleanUpCache) withObject:NULL];
-     
+    
 
-    return self;
 }
-
-/*
- Singleton accessor
- */
-
-+(ZPCacheController*) instance {
-    if(_instance == NULL){
-        _instance = [[ZPCacheController alloc] init];
-    }
-    return _instance;
-}
-
-
 -(void) setStatusView:(ZPCacheStatusToolbarController*) statusView{
     _statusView = statusView;
     

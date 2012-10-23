@@ -15,8 +15,7 @@
 @property (retain) IBOutlet UIBarButtonItem* manualButton;
 
 -(IBAction)showManual:(id)sender;
--(IBAction)knowledgeBase:(id)sender;
--(IBAction)emailSupport:(id)sender;
+-(IBAction)contactSupport:(id)sender;
 -(IBAction)manageKey:(id)sender;
 
 -(IBAction)dismiss:(id)sender;
