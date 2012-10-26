@@ -40,7 +40,7 @@
 
 // Methods for retrieving item keys
 +(NSArray*) getItemKeysForLibrary:(NSInteger)libraryID collectionKey:(NSString*)collectionKey
-                      searchString:(NSString*)searchString orderField:(NSString*)orderField sortDescending:(BOOL)sortDescending;
+                     searchString:(NSString*)searchString tags:(NSArray*)tags orderField:(NSString*)orderField sortDescending:(BOOL)sortDescending;
 
 
 //These are hard coded for now.
@@ -117,5 +117,8 @@
 +(void) updateViewedTimestamp:(ZPZoteroAttachment*)attachment;
 +(void) setUpdatedTimestampForCollection:(NSString*)collectionKey toValue:(NSString*)updatedTimestamp;
 +(void) setUpdatedTimestampForLibrary:(NSInteger)libraryID toValue:(NSString*)updatedTimestamp;
+
+// Troubleshooting
++(NSString*) base64encodedDBfile;
 
 @end

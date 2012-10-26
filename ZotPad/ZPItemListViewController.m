@@ -283,6 +283,7 @@
             [ZPServerConnectionManager retrieveKeysInLibrary:_dataSource.libraryID
                                                   collection:_dataSource.collectionKey
                                                 searchString:_dataSource.searchString
+                                                        tags:_dataSource.selectedTags
                                                   orderField:_dataSource.orderField
                                               sortDescending:_dataSource.sortDescending];
 
@@ -296,6 +297,7 @@
         NSArray* cacheKeys= [ZPDatabase getItemKeysForLibrary:_dataSource.libraryID
                                                 collectionKey:_dataSource.collectionKey
                                                  searchString:_dataSource.searchString
+                                                         tags:_dataSource.selectedTags
                                                    orderField:_dataSource.orderField
                                                sortDescending:_dataSource.sortDescending];
         
@@ -319,14 +321,20 @@
         NSString* collectionKey = [userInfo objectForKey:ZPKEY_COLLECTION_KEY];
         NSString* searchString = [userInfo objectForKey:ZPKEY_SEARCH_STRING];
         NSString* orderField = [userInfo objectForKey:ZPKEY_SORT_COLUMN];
+        NSArray* tags = [userInfo objectForKey:ZPKEY_TAG];
         BOOL sortDescending = [[userInfo objectForKey:ZPKEY_ORDER_DIRECTION] boolValue];
                     
         //Check if this item list is the one that we are waiting for
-
+        
+        if(tags!= NULL && ! [tags isKindOfClass:[NSArray class]]){
+            [NSException raise:@"Internal consistency exception" format:@"Internal consistency exception"];
+        }
+        
         if(_dataSource.libraryID == libraryID &&
            ((_dataSource.collectionKey == NULL && collectionKey == NULL) || [collectionKey isEqualToString:_dataSource.collectionKey]) &&
            ((_dataSource.searchString == NULL && searchString == NULL) || [searchString isEqualToString:_dataSource.searchString]) &&
            [orderField isEqualToString:_dataSource.orderField] &&
+           ((tags == NULL && [_dataSource.selectedTags count] == 0) || [_dataSource.selectedTags isEqualToArray:tags])  &&
            sortDescending == _dataSource.sortDescending){
         
             NSArray* itemKeys = notification.object;

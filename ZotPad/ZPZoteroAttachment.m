@@ -37,6 +37,7 @@ NSInteger const VERSION_SOURCE_DROPBOX =3;
 @implementation ZPZoteroAttachment
 
 static NSCache* _objectCache = NULL;
+static NSString* _documentsDirectory = NULL;
 
 @synthesize lastViewed, attachmentSize, existsOnZoteroServer, filename, url, versionSource,  charset;
 @synthesize versionIdentifier_server;
@@ -45,6 +46,7 @@ static NSCache* _objectCache = NULL;
 
 +(void)initialize{
     _objectCache =  [[NSCache alloc] init];
+    _documentsDirectory = [NSSearchPathForDirectoriesInDomains(NSDocumentDirectory, NSUserDomainMask, YES) objectAtIndex:0];
 }
 
 
@@ -165,8 +167,7 @@ static NSCache* _objectCache = NULL;
         }
     }
     
-    NSString* docs = [NSSearchPathForDirectoriesInDomains(NSDocumentDirectory, NSUserDomainMask, YES) objectAtIndex:0];
-    NSString* ret = [docs stringByAppendingPathComponent:path];
+    NSString* ret = [_documentsDirectory stringByAppendingPathComponent:path];
     
     return ret;
     

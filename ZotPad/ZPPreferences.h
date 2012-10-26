@@ -69,6 +69,7 @@
 +(BOOL) includeDatabaseWithSupportRequest;
 +(BOOL) includeFileListWithSupportRequest;
 +(BOOL) recursiveCollections;
++(BOOL) debugCitationParser;
 +(BOOL) layeredCollectionsNavigation;
 +(BOOL) unifiedCollectionsNavigation;
 

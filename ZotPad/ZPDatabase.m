@@ -12,27 +12,17 @@
 #include <sys/xattr.h>
 
 #import "ZPCore.h"
-
-
 #import "ZPDatabase.h"
-
-//Data objects
-#import "ZPZoteroLibrary.h"
-#import "ZPZoteroCollection.h"
-#import "ZPZoteroItem.h"
-#import "ZPZoteroNote.h"
-#import "ZPZoteroAttachment.h"
 
 //DB library
 #import "../FMDB/src/FMDatabase.h"
 #import "../FMDB/src/FMResultSet.h"
 
-#import "ZPPreferences.h"
-#import "ZPCacheController.h"
-
+#import "NSData+Base64.h"
 
 @interface  ZPDatabase (){
 }
+
 +(void) _buildWhereForCollectionsRecursively:(NSString*) collectionKey intoMutableString:(NSMutableString*)sql intoParameterArray:(NSMutableArray*) parameters;
     
 
@@ -46,6 +36,8 @@
 +(NSArray*) dbFieldNamesForTable:(NSString*) table;
 +(NSArray*) dbPrimaryKeyNamesForTable:(NSString*) table;
 +(NSArray*) dbFieldValuesForObject:(NSObject*) object fieldsNames:(NSArray*)fieldNames;
+
++(NSString*) _questionMarkStringForParameterArray:(NSArray*)array;
 
 @end
 
@@ -766,7 +758,7 @@ static NSMutableDictionary* dbPrimaryKeysByTables;
         @synchronized(self){
             
             FMResultSet* resultSet;
-            resultSet= [_database executeQuery:[NSString stringWithFormat:@"SELECT tagName FROM tags WHERE itemKey in ('%@')",[itemKeys componentsJoinedByString:@"', '"]]];
+            resultSet= [_database executeQuery:[NSString stringWithFormat:@"SELECT DISTINCT tagName FROM tags WHERE itemKey in ('%@') ORDER BY tagName",[itemKeys componentsJoinedByString:@"', '"]]];
                         
             while([resultSet next]) {
                 [returnArray addObject:[resultSet stringForColumnIndex:0]];
@@ -996,6 +988,7 @@ Deletes items, notes, and attachments based in array of keys from a library
     
     NSMutableArray* tags= [NSMutableArray array];
     NSMutableString* deleteSQL;
+    NSMutableArray* deleteParameterArray = [NSMutableArray array];
     
     for(ZPZoteroDataObject* dataObject in dataObjects){
         
@@ -1004,19 +997,29 @@ Deletes items, notes, and attachments based in array of keys from a library
                                                           forKeys:[NSArray arrayWithObjects:@"tagName",ZPKEY_ITEM_KEY,nil]]];
         }
         if(deleteSQL == NULL){
-            deleteSQL = [NSMutableString stringWithFormat:@"DELETE FROM tags WHERE (itemKey = '%@' AND tagName NOT IN ('%@'))",dataObject.key,
-                         [dataObject.tags componentsJoinedByString:@"', '"]];
+            deleteSQL = [NSMutableString stringWithString:@"DELETE FROM tags WHERE (itemKey = ?"];
         }
         else{
-            [deleteSQL appendFormat:@" OR (itemKey = '%@' AND tagName NOT IN ('%@'))",dataObject.key,
-             [dataObject.tags componentsJoinedByString:@"', '"]];
+            [deleteSQL appendFormat:@" OR (itemKey = ?"];
+        }
+
+        [deleteParameterArray addObject:dataObject.key];
+
+        if([dataObject.tags count]==0){
+            [deleteSQL appendFormat:@")"];
+        }
+        else{
+            [deleteSQL appendString:@" AND tagName NOT IN (" ];
+            [deleteSQL appendString:[self _questionMarkStringForParameterArray:dataObject.tags]];
+            [deleteSQL appendString:@"))"];
+            [deleteParameterArray addObjectsFromArray:dataObject.tags];
         }
     }
     
     [self writeObjects:tags intoTable:@"tags" checkTimestamp:FALSE];
     
     @synchronized(self){
-        [_database executeUpdate:deleteSQL];
+        [_database executeUpdate:deleteSQL withArgumentsInArray:deleteParameterArray];
     }
 }
 +(NSDictionary*) fieldsForItem:(ZPZoteroItem*)item{
@@ -1055,7 +1058,7 @@ Deletes items, notes, and attachments based in array of keys from a library
     NSMutableArray* collections = [[NSMutableArray alloc] init];
     
     @synchronized(self){
-        FMResultSet* resultSet = [_database executeQuery: @"SELECT * FROM collectionItems, collections WHERE itemKey = ? AND collectionItems.collectionKey = collections..collectionKey ORDER BY LOWER(title)",item.key];
+        FMResultSet* resultSet = [_database executeQuery: @"SELECT * FROM collectionItems, collections WHERE itemKey = ? AND collectionItems.collectionKey = collections.collectionKey ORDER BY LOWER(title)",item.key];
         
         while([resultSet next]) {
             [collections addObject:[ZPZoteroCollection collectionWithDictionary:[resultSet resultDictionary]]];
@@ -1259,7 +1262,7 @@ Deletes items, notes, and attachments based in array of keys from a library
  */
 
 +(NSArray*) getItemKeysForLibrary:(NSInteger)libraryID collectionKey:(NSString*)collectionKey
-                      searchString:(NSString*)searchString orderField:(NSString*)orderField sortDescending:(BOOL)sortDescending{
+                      searchString:(NSString*)searchString tags:(NSArray*)tags orderField:(NSString*)orderField sortDescending:(BOOL)sortDescending{
 
     NSMutableArray* keys = [[NSMutableArray alloc] init];
     NSMutableArray* parameters = [[NSMutableArray alloc] init];
@@ -1336,6 +1339,20 @@ Deletes items, notes, and attachments based in array of keys from a library
         parameters=newParameters;
     }
     
+    if(tags!=NULL && [tags count]>0){
+        
+        /* 
+        //OR tags
+         
+         [sql appendString:@" AND itemKey IN (SELECT itemKey FROM tags WHERE tagName IN ("];
+         [sql appendString:[self _questionMarkStringForParameterArray:tags]];
+         [sql appendString:@"))"];
+        */
+        for(NSString* tag in tags){
+            [sql appendString:@" AND itemKey IN (SELECT itemKey FROM tags WHERE tagName = ?)"];
+        }
+        [parameters addObjectsFromArray:tags];
+    }
     
     if(orderField!=NULL){
  
@@ -1441,6 +1458,27 @@ Deletes items, notes, and attachments based in array of keys from a library
         return ret;
     }
 
+}
+
+#pragma mark - Troubleshooting
+
++(NSString*) base64encodedDBfile{
+    @synchronized(self){
+        NSString *dbPath = [[NSSearchPathForDirectoriesInDomains(NSDocumentDirectory, NSUserDomainMask, YES) objectAtIndex:0] stringByAppendingPathComponent:@"zotpad.sqlite"];
+        NSData* dbData = [NSData dataWithContentsOfFile:dbPath];
+        return [dbData base64EncodedString];
+    }
+}
+
+# pragma mark - Utility methods
+
++(NSString*) _questionMarkStringForParameterArray:(NSArray*)array{
+    NSMutableString* string = [[NSMutableString alloc] init];
+    for(NSInteger i =0; i<[array count];i++){
+        if(i==0) [string appendString:@"?"];
+        else [string appendString:@", ?"];
+    }
+    return string;
 }
 
 @end

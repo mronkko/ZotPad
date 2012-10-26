@@ -23,6 +23,18 @@
 //TODO: Consider what happens when the cache is purged. This may result in duplicate objects with the same key.
 
 static NSCache* _objectCache = NULL;
+static CSLFormatter* _cslFormatter = NULL;
+
++(void) initialize{
+    if(_cslFormatter == NULL){
+        _cslFormatter = [[CSLFormatter alloc] initWithCSLFile:[[NSBundle mainBundle] pathForResource: @"apa" ofType: @"csl"]
+                                                            localeFile:[[NSBundle mainBundle] pathForResource: @"locales-en-US" ofType: @"xml"]
+                                                          fieldMapFile:[[NSBundle mainBundle] pathForResource: @"typeMap" ofType: @"xml"]];
+    }
+    
+    if(_objectCache == NULL) _objectCache = [[NSCache alloc] init];
+
+}
 
 +(BOOL) existsInCache:(NSString*) key{
     ZPZoteroItem* obj= [_objectCache objectForKey:key];
@@ -45,7 +57,6 @@ static NSCache* _objectCache = NULL;
     if(key == NULL || [key isEqual:@""])
         [NSException raise:@"Key is empty" format:@"ZPZoteroItem cannot be instantiated with empty key"];
         
-    if(_objectCache == NULL) _objectCache = [[NSCache alloc] init];
     
     ZPZoteroItem* obj= [_objectCache objectForKey:key];
     
@@ -70,8 +81,6 @@ static NSCache* _objectCache = NULL;
         [NSException raise:@"Key is empty" format:@"ZPZoteroItem cannot be instantiated with empty key"];
 
     
-    if(_objectCache == NULL) _objectCache = [[NSCache alloc] init];
-    
     ZPZoteroItem* obj= [_objectCache objectForKey:key];
     
     
@@ -87,7 +96,7 @@ static NSCache* _objectCache = NULL;
 }
 
 -(void) _configureFieldsDependingOnFullCitation{
-    CSLFormatter* cslFormatter = [[CSLFormatter alloc] initWithCSLFile:@"apa.csl" localeFile:@"locales-en-US.xml" fieldMapFile:@"typeMap.xml"];
+
     NSMutableDictionary* macroDict = [[NSMutableDictionary alloc] init];
     
     NSMutableDictionary* fields = [NSMutableDictionary dictionaryWithDictionary:self.fields];
@@ -106,11 +115,20 @@ static NSCache* _objectCache = NULL;
         [creatorArray addObject:creator];
     }
     
-    _fullCitation = [cslFormatter formatBibliographyItemUsingVariables:fields storeMacrosInDictionary:macroDict];
+    _fullCitation = [_cslFormatter formatBibliographyItemUsingVariables:fields storeMacrosInDictionary:macroDict];
     
-    _creatorSummary = [NSString stringWithFormat:@"%@. %@",[macroDict objectForKey:@"creator"],[macroDict objectForKey:@"issued"] ];
-    _publicationDetails = [_fullCitation substringFromIndex:[_creatorSummary length]+2];
-    _year = [[macroDict objectForKey:@"issued"] integerValue];
+    _creatorSummary = [NSString stringWithFormat:@"%@. %@",[macroDict objectForKey:@"author"],[macroDict objectForKey:@"issued"] ];
+    NSInteger index = [_creatorSummary length]+[[macroDict objectForKey:@"title"] length]+2;
+    if(index>[_fullCitation length]){
+        if([ZPPreferences debugCitationParser]){
+            [NSException raise:@"CSL Exception" format:@"CSL formatting error when processing item %@ (Key: %@, JSON: %@)", _fullCitation, self.itemKey, self.jsonFromServer];
+        }
+        DDLogError(@"CSL formatting error when processing %@",_fullCitation);
+    }
+    else{
+        _publicationDetails = [_fullCitation substringFromIndex:index];
+        _year = [[macroDict objectForKey:@"issued"] integerValue];
+    }
 }
 
 -(NSString*) fullCitation{

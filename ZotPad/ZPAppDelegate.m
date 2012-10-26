@@ -143,6 +143,12 @@ didFinishLaunchingWithOptions:(NSDictionary *)launchOptions
         splitViewController.delegate = (id)navigationController.topViewController;
     }
 
+    //TODO: Initialize ZoteroItem in the background. This is needed to initialize the citation formatter.
+    
+     dispatch_async(dispatch_get_global_queue(DISPATCH_QUEUE_PRIORITY_BACKGROUND,0), ^{
+         [ZPZoteroItem initialize];
+     });
+    
     DDLogInfo(@"Started");
     
     return YES;

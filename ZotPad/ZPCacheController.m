@@ -160,7 +160,7 @@ static ZPCacheController* _instance = nil;
         ZPZoteroLibrary* library;
         for(library in libraries){
             if([ZPPreferences cacheAttachmentsAllLibraries]){
-                NSArray* itemKeysToCheck = [ZPDatabase getItemKeysForLibrary:library.libraryID collectionKey:NULL searchString:NULL orderField:NULL sortDescending:FALSE];
+                NSArray* itemKeysToCheck = [ZPDatabase getItemKeysForLibrary:library.libraryID collectionKey:NULL searchString:NULL tags:NULL orderField:NULL sortDescending:FALSE];
                 [self _checkIfAttachmentsExistWithParentKeysAndQueueForDownload:itemKeysToCheck];
             }
             if([ZPPreferences cacheMetadataAllLibraries]){
@@ -404,7 +404,7 @@ static ZPCacheController* _instance = nil;
     //TODO: Refactor so that this block is not needed
     dispatch_async(dispatch_get_global_queue(DISPATCH_QUEUE_PRIORITY_BACKGROUND,0), ^{
 
-        NSArray* itemKeysToCheck = [ZPDatabase getItemKeysForLibrary:libraryID collectionKey:collectionKey searchString:NULL orderField:NULL sortDescending:FALSE];
+        NSArray* itemKeysToCheck = [ZPDatabase getItemKeysForLibrary:libraryID collectionKey:collectionKey searchString:NULL tags:NULL orderField:NULL sortDescending:FALSE];
         [self _checkIfAttachmentsExistWithParentKeysAndQueueForDownload:itemKeysToCheck];
         
         //Check if the container needs a refresh
@@ -423,21 +423,10 @@ static ZPCacheController* _instance = nil;
     for(NSString* key in parentKeys){
         ZPZoteroItem* item = (ZPZoteroItem*) [ZPZoteroItem itemWithKey:key];
 
-        //Troubleshooting
-        
-        //TODO: Remove this workaround
         NSArray* attachments = item.attachments;
-        if(attachments == NULL){
-            [NSException raise:@"Internal consistency exception" format:@"Item with key %@ had empty attachment array",key];
-        }
-        if(! [attachments isKindOfClass:[NSArray class]]){
-            //For troubleshooting crashes
-            item.attachments = NULL;
-        }
-        else{
-            for(ZPZoteroAttachment* attachment in attachments){
-                [self _checkIfAttachmentExistsAndQueueForDownload:attachment];
-            }
+
+        for(ZPZoteroAttachment* attachment in attachments){
+            [self _checkIfAttachmentExistsAndQueueForDownload:attachment];
         }
     }
 }
@@ -737,7 +726,7 @@ static ZPCacheController* _instance = nil;
     
     //Update collection memberships
     if(collectionKey!=NULL && [parameters objectForKey: ZPKEY_SEARCH_STRING] == NULL){
-        NSArray* cachedKeys = [ZPDatabase getItemKeysForLibrary:libraryID collectionKey:collectionKey searchString:NULL orderField:NULL sortDescending:FALSE];
+        NSArray* cachedKeys = [ZPDatabase getItemKeysForLibrary:libraryID collectionKey:collectionKey searchString:NULL tags:NULL orderField:NULL sortDescending:FALSE];
         
         NSMutableArray* uncachedItems = [NSMutableArray arrayWithArray:itemKeys];
         [uncachedItems removeObjectsInArray:cachedKeys];

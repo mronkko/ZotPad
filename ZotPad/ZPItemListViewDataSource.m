@@ -18,6 +18,7 @@
 #define SIZE_OF_TABLEVIEW_UPDATE_BATCH 25
 #define SIZE_OF_DATABASE_UPDATE_BATCH 50
 
+
 @implementation ZPItemListViewDataSource
 
 @synthesize collectionKey = _collectionKey;
@@ -50,6 +51,7 @@ static ZPItemListViewDataSource* _instance;
     //Set default sort values
     _orderField = @"dateModified";
     _sortDescending = FALSE;
+    _selectedTags = [NSArray array];
     
     return self;
 }
@@ -127,7 +129,10 @@ static ZPItemListViewDataSource* _instance;
         NSMutableArray* newItemKeysShown = [NSMutableArray arrayWithArray:_itemKeysShown];
         
         NSArray* newKeys = [ZPDatabase getItemKeysForLibrary:self.libraryID collectionKey:self.collectionKey
-                                                                     searchString:[self.searchString stringByTrimmingCharactersInSet:[NSCharacterSet whitespaceAndNewlineCharacterSet]]orderField:self.orderField sortDescending:self.sortDescending];
+                                                searchString:[self.searchString stringByTrimmingCharactersInSet:[NSCharacterSet whitespaceAndNewlineCharacterSet]]
+                                                        tags:_selectedTags
+                                                  orderField:self.orderField
+                                              sortDescending:self.sortDescending];
         
         
         //If there is a new set of items loaded, return without performing any updates. 
@@ -552,4 +557,23 @@ static ZPItemListViewDataSource* _instance;
         return ret;
     }
 }
+
+#pragma mark - Tag selecting
+-(void) selectTag:(NSString*)tag{
+    _selectedTags = [[_selectedTags arrayByAddingObject:tag] sortedArrayUsingSelector:@selector(compare:)];
+}
+-(void) deselectTag:(NSString*)tag{
+    NSMutableArray* temp = [NSMutableArray arrayWithArray:_selectedTags];
+    [temp removeObject:tag];
+    _selectedTags = temp;
+}
+
+-(BOOL) isTagSelected:(NSString*)tag{
+    return [_selectedTags containsObject:tag];
+}
+
+-(NSArray*) selectedTags{
+    return _selectedTags;
+}
+
 @end

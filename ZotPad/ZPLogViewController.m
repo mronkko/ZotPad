@@ -92,9 +92,6 @@
                                          andKey:USERVOICE_API_KEY
                                       andSecret:USERVOICE_SECRET];
     
-    UIDevice *currentDevice = [UIDevice currentDevice];
-    NSString *model = [currentDevice model];
-    NSString *systemVersion = [currentDevice systemVersion];
 
     NSString* technicalInfo = [NSString stringWithFormat:@"\n\n --- Technical info ---\n\n%@ %@ (build %@)\n%@ (iOS %@)\nuserID: %@\nAPI key: %@\n\n --- Application log ----\n\n%@",
                                [[NSBundle mainBundle] objectForInfoDictionaryKey:@"CFBundleDisplayName"],
@@ -106,6 +103,22 @@
                                [ZPPreferences OAuthKey],
                                logView.text];
 
+    //Do we want to include a database dump
+    if([ZPPreferences includeDatabaseWithSupportRequest]){
+        //Read the database file and append it as base64 encoded string
+        technicalInfo = [technicalInfo stringByAppendingFormat:@"\n\n --- Database file ---\n\n%@",[ZPDatabase base64encodedDBfile]];
+    }
+    if([ZPPreferences includeFileListWithSupportRequest]){
+        technicalInfo = [technicalInfo stringByAppendingString:@"\n\n --- Files in documents folder ---\n\n"];
+        
+        NSString* documentsDirectory = [NSSearchPathForDirectoriesInDomains(NSDocumentDirectory, NSUserDomainMask, YES)  objectAtIndex:0];
+        NSArray *directoryContent = [[NSFileManager defaultManager] contentsOfDirectoryAtPath:documentsDirectory error:NULL];
+        technicalInfo = [technicalInfo stringByAppendingString:[directoryContent componentsJoinedByString:@"\n"]];
+    }
+    
+    //Do we want to include a file list
+    
+    
     config.customFields =  [NSDictionary dictionaryWithObject:technicalInfo
                                                        forKey:@"Technical Information"];
     

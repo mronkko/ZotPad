@@ -10,6 +10,4 @@
 
 @interface ZPSplitViewController : UISplitViewController
 
--(IBAction)showLogView:(id)sender;
-
 @end

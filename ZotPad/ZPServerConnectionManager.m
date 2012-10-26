@@ -104,7 +104,7 @@
 
 static Reachability* _reach;
 static ZPAutenticationErrorAlertViewDelegate* alertViewDelegate;
-static ZPConnectionErrorAlertViewDelegate* connectionErrorAlertViewDelegate;
+//static ZPConnectionErrorAlertViewDelegate* connectionErrorAlertViewDelegate;
 
 static NSMutableSet* _activeDownloads;
 static NSMutableSet* _activeUploads;
@@ -298,22 +298,14 @@ const NSInteger ZPServerConnectionManagerRequestLastModifiedItem = 11;
                     }
                 }
             }
-            if(type!=ZPServerConnectionManagerRequestPermissions){
-                
-                NSString *alphabet  = @"abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXZY0123456789";
-                NSMutableString *s = [NSMutableString stringWithCapacity:20];
-                for (NSUInteger i = 0U; i < 20; i++) {
-                    u_int32_t r = arc4random() % [alphabet length];
-                    unichar c = [alphabet characterAtIndex:r];
-                    [s appendFormat:@"%C", c];
-                }
-                
-                urlString = [urlString stringByAppendingFormat:@"&t=%@",s];
-            }
+            
             DDLogVerbose(@"Staring request %@",urlString);
+            
+            //TODO: Document why this needs to be weak. (Check the compiler warnign that comes from disabling this)
             
             __weak ASIHTTPRequest* request = [ASIHTTPRequest requestWithURL:[NSURL URLWithString:urlString]];
             request.tag = type;
+            
             NSMutableDictionary* newUserInfo = [NSMutableDictionary dictionaryWithDictionary:userInfo];
             if(parameters != NULL) [newUserInfo setObject:parameters forKey:ZPKEY_PARAMETERS];
             request.userInfo = newUserInfo;
@@ -353,7 +345,14 @@ const NSInteger ZPServerConnectionManagerRequestLastModifiedItem = 11;
                     }
                 }
                 else if(request.responseStatusCode == 200){
-                    [self _processParsedResponse:[self _parseResponse:request] forRequest:request];
+                 
+                    // Parsing the response takes time, so do this in the background
+                    ASIHTTPRequest* retainedRequest = request;
+                    void (^responseProcessingBlock)() = ^{
+                        ZPServerResponseXMLParser* parserResponse = [self _parseResponse:retainedRequest];
+                        [self _processParsedResponse:parserResponse forRequest:retainedRequest];
+                    };
+                    dispatch_async(dispatch_get_global_queue(DISPATCH_QUEUE_PRIORITY_BACKGROUND,0),responseProcessingBlock);
                 }
                 else{
                     DDLogError(@"Connection to Zotero server (%@) resulted in error %i. Full response: %@",urlString,request.responseStatusCode,[[NSString alloc] initWithData:responseData encoding:NSUTF8StringEncoding]);
@@ -363,7 +362,10 @@ const NSInteger ZPServerConnectionManagerRequestLastModifiedItem = 11;
             [request setFailedBlock:^{
 
                 if([ZPPreferences online]){
-                    
+                    /*
+                     
+                     //TODO: Consider making this a preference item.
+                     
                      [ZPPreferences setOnline:FALSE];
                     if(connectionErrorAlertViewDelegate == NULL) connectionErrorAlertViewDelegate = [[ZPConnectionErrorAlertViewDelegate alloc] init];
                     
@@ -372,7 +374,7 @@ const NSInteger ZPServerConnectionManagerRequestLastModifiedItem = 11;
                                                delegate:connectionErrorAlertViewDelegate
                                       cancelButtonTitle:@"Stay offline" otherButtonTitles:@"Return online", nil] show];
                      
-                    
+                    */
                     DDLogError(@"Connection to Zotero server (%@) failed %@",urlString,request.error.localizedDescription);
                 }
             }];
@@ -394,6 +396,7 @@ const NSInteger ZPServerConnectionManagerRequestLastModifiedItem = 11;
 
     NSData* responseData = request.responseData;
     NSInteger type = request.tag;
+    
     
 
     ZPServerResponseXMLParser* parserDelegate = NULL;
@@ -612,7 +615,7 @@ const NSInteger ZPServerConnectionManagerRequestLastModifiedItem = 11;
                                                                      collection:[parameters objectForKey:ZPKEY_COLLECTION_KEY]
                                                                  timestampValue:parserDelegate.updateTimestamp];
                 else
-                    [[ZPCacheController instance] processNewTopLevelItemKeyListFromServer:allResults userInfo:parameters];
+                    [[ZPCacheController instance] processNewTopLevelItemKeyListFromServer:allResults userInfo:userInfo];
                 break;
         }
     }
@@ -622,7 +625,15 @@ const NSInteger ZPServerConnectionManagerRequestLastModifiedItem = 11;
 
     NSMutableDictionary* parameters = [NSMutableDictionary dictionaryWithObject:[NSNumber numberWithInt:item.libraryID] forKey:ZPKEY_LIBRARY_ID];
     [parameters setObject:item.key forKey:ZPKEY_ITEM_KEY];
-    
+
+    if([ZPPreferences debugCitationParser]){
+        [parameters setObject:@"json,bib" forKey:@"content"];
+        [parameters setObject:@"apa" forKey:@"style"];
+    }
+    else{
+        [parameters setObject:@"json" forKey:@"content"];
+    }
+
     [self makeServerRequest:ZPServerConnectionManagerRequestSingleItem withParameters:parameters userInfo:NULL];
     [self makeServerRequest:ZPServerConnectionManagerRequestSingleItemChildren withParameters:parameters userInfo:NULL];
 
@@ -746,7 +757,14 @@ const NSInteger ZPServerConnectionManagerRequestLastModifiedItem = 11;
     
     NSMutableDictionary* parameters = [NSMutableDictionary dictionaryWithObject:[NSNumber numberWithInt:libraryID]  forKey:ZPKEY_LIBRARY_ID];
     
-    [parameters setObject:@"json" forKey:@"content"];
+    if([ZPPreferences debugCitationParser]){
+        [parameters setObject:@"json,bib" forKey:@"content"];
+        [parameters setObject:@"apa" forKey:@"style"];
+    }
+    else{
+        [parameters setObject:@"json" forKey:@"content"];
+    }
+        
     [parameters setObject:[keys componentsJoinedByString:@","] forKey:ZPKEY_ITEM_KEY];
         
     [self makeServerRequest:ZPServerConnectionManagerRequestItemsAndChildren withParameters:parameters userInfo:NULL];
@@ -778,7 +796,7 @@ const NSInteger ZPServerConnectionManagerRequestLastModifiedItem = 11;
     [self makeServerRequest:ZPServerConnectionManagerRequestTopLevelKeys withParameters:parameters userInfo:userInfo];
 }
 
-+(void) retrieveKeysInLibrary:(NSInteger)libraryID collection:(NSString*)collectionKey searchString:(NSString*)searchString orderField:(NSString*)orderField sortDescending:(BOOL)sortDescending{
++(void) retrieveKeysInLibrary:(NSInteger)libraryID collection:(NSString*)collectionKey searchString:(NSString*)searchString tags:(NSArray*)tags orderField:(NSString*)orderField sortDescending:(BOOL)sortDescending{
     
     //This method should be called only from the user interface (i.e. the main thread)
     
@@ -792,6 +810,12 @@ const NSInteger ZPServerConnectionManagerRequestLastModifiedItem = 11;
     //Search
     if(searchString!=NULL && ! [searchString isEqualToString:@""]){
         [parameters setObject:searchString forKey: ZPKEY_SEARCH_STRING];
+    }
+    //Tags
+    if(tags!=NULL && [tags count]>0){
+        // OR tags
+        //[parameters setObject:[tags componentsJoinedByString:@" || "] forKey: ZPKEY_TAG];
+        [parameters setObject:[tags componentsJoinedByString:@"&tag="] forKey: ZPKEY_TAG];
     }
     //Sort
     if(orderField!=NULL){
@@ -809,7 +833,11 @@ const NSInteger ZPServerConnectionManagerRequestLastModifiedItem = 11;
         [NSException raise:@"Sort must be specified" format:@"Item key requests from user interface must specify sort field and direction"];
     }
     
-    [self makeServerRequest:ZPServerConnectionManagerRequestTopLevelKeys withParameters:parameters userInfo:parameters usingOperationQueue:_addHocKeyRetrievals];
+    //Store the tags as arry in userInfo
+    NSMutableDictionary* userInfo = [NSMutableDictionary dictionaryWithDictionary:parameters];
+    [userInfo setObject:tags forKey:ZPKEY_TAG];
+    
+    [self makeServerRequest:ZPServerConnectionManagerRequestTopLevelKeys withParameters:parameters userInfo:userInfo usingOperationQueue:_addHocKeyRetrievals];
     
     //Notify the cache that we need to download items for this library and collection
     [[ZPCacheController instance] setActiveLibrary:libraryID collection:collectionKey];

@@ -32,7 +32,7 @@
 +(void) retrieveItemsFromLibrary:(NSInteger)libraryID itemKeys:(NSArray*)keys;
 
 +(void) retrieveKeysInLibrary:(NSInteger)libraryID collection:(NSString*)key;
-+(void) retrieveKeysInLibrary:(NSInteger)libraryID collection:(NSString*)collectionKey searchString:(NSString*)searchString orderField:(NSString*)orderField sortDescending:(BOOL)sortDescending;
++(void) retrieveKeysInLibrary:(NSInteger)libraryID collection:(NSString*)collectionKey searchString:(NSString*)searchString tags:(NSArray*)tags orderField:(NSString*)orderField sortDescending:(BOOL)sortDescending;
     
 +(void) retrieveTimestampForLibrary:(NSInteger)libraryID collection:(NSString*)key;
 +(void) retrieveAllItemKeysFromLibrary:(NSInteger)libraryID;

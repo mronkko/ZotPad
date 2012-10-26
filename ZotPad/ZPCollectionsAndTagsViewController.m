@@ -22,6 +22,7 @@
 
 -(void)_configureTagsList;
 -(void)_toggleTagSelectionWithAnimationDuration:(float) duration toVisible:(BOOL) visible;
+
 @end
 @implementation ZPCollectionsAndTagsViewController{
     UIViewController* _contentRoot;
@@ -33,7 +34,7 @@
 
 @synthesize collectionsView, tagsView, tagsHeader;
 @synthesize gearButton, cacheControllerPlaceHolder;
-@synthesize headerArrowLeft, headerArrowRight;
+@synthesize headerArrowLeft, headerArrowRight, toolBar;
 
 -(void) viewDidLoad{
 
@@ -57,32 +58,53 @@
     }
     else{
         UINavigationController* navi = [[UINavigationController alloc] initWithRootViewController:_contentRoot];
+        navi.navigationBarHidden = TRUE;
         [self setInsetViewController:navi];
         
     }
-    //TODO: Implement this on iPhone as well.
     
-    if(UI_USER_INTERFACE_IDIOM() == UIUserInterfaceIdiomPad){
-        
-        //Show Cache controller status, only on iPad
-        ZPCacheStatusToolbarController* statusController = [[ZPCacheStatusToolbarController alloc] init];
-        cacheControllerPlaceHolder.customView = statusController.view;
-        
-        UIViewController* root = [UIApplication sharedApplication].delegate.window.rootViewController;
-        gearButton.target = root;
-        gearButton.action = @selector(showLogView:);
-    }
+    //Show Cache controller status
+    ZPCacheStatusToolbarController* statusController = [[ZPCacheStatusToolbarController alloc] init];
+    cacheControllerPlaceHolder.customView = statusController.view;
+    
+    UIViewController* root = [UIApplication sharedApplication].delegate.window.rootViewController;
+    gearButton.target = root;
+    gearButton.action = @selector(showLogView:);
     
     //Set the looks of the tag view
     
-    CAGradientLayer *gradient = [CAGradientLayer layer];
-    CGRect frame = tagsHeader.bounds;
-    gradient.frame = frame;
-    gradient.colors = [NSArray arrayWithObjects:(id)[[UIColor colorWithRed:239.0/255.0 green:240.0/255.0 blue:243.0/255.0 alpha:1.0] CGColor],
-                       (id)[[UIColor colorWithRed:165.0/255.0 green:169.0/255.0 blue:182.0/255.0 alpha:1.0] CGColor],
-                       nil];
+    CAGradientLayer *gradient = (CAGradientLayer*) tagsHeader.layer;
     
-    [tagsHeader.layer insertSublayer:gradient atIndex:0];
+    if(UI_USER_INTERFACE_IDIOM() == UIUserInterfaceIdiomPad){
+        
+        gradient.colors = [NSArray arrayWithObjects:(id)[[UIColor colorWithRed:239.0/255.0 green:240.0/255.0 blue:243.0/255.0 alpha:1.0] CGColor],
+                           (id)[[UIColor colorWithRed:165.0/255.0 green:169.0/255.0 blue:182.0/255.0 alpha:1.0] CGColor],
+                           nil];
+    }
+    else{
+        gradient.colors = [NSArray arrayWithObjects:(id)[[UIColor colorWithRed:193.0/255.0 green:205.0/255.0 blue:221.0/255.0 alpha:1.0] CGColor],
+                           (id)[[UIColor colorWithRed:87.0/255.0 green:114.0/255.0 blue:150.0/255.0 alpha:1.0] CGColor],
+                           nil];
+    }
+
+    //Load the tags list
+
+    //TODO: Set the selected tags.
+    
+    _tagsList = [[UITableView alloc] initWithFrame:CGRectMake(0,
+                                                              tagsHeader.frame.size.height+1,
+                                                              self.view.frame.size.width,
+                                                              self.view.frame.size.height-self.tagsHeader.frame.size.height)
+                                             style:UITableViewStylePlain];
+    _tagsList.rowHeight = 40;
+    _tagsList.allowsSelection = FALSE;
+    _tagsList.separatorStyle = UITableViewCellSeparatorStyleNone;
+    
+    _tagController = [[ZPTagController alloc] init];
+    
+    [_tagsList setDataSource:_tagController];
+    [self.tagsView addSubview:_tagsList];
+
 
 }
 
@@ -92,6 +114,11 @@
     [_contentRoot viewDidAppear:animated];
 
     if(UI_USER_INTERFACE_IDIOM() == UIUserInterfaceIdiomPad){
+
+        UISplitViewController* root =  (UISplitViewController*) [UIApplication sharedApplication].delegate.window.rootViewController;
+
+        _tagController.itemListViewController = (ZPItemListViewController *)[[root.viewControllers lastObject] topViewController];
+        
         if([[NSUserDefaults standardUserDefaults] objectForKey:@"hasPresentedMainHelpPopover"]==NULL){
             [ZPHelpPopover displayHelpPopoverFromToolbarButton:gearButton];
             [[NSUserDefaults standardUserDefaults] setObject:@"1" forKey:@"hasPresentedMainHelpPopover"];
@@ -101,16 +128,27 @@
 -(void) viewWillAppear:(BOOL)animated{
     [_contentRoot viewWillAppear:animated];
 
+    _tagsList.frame = CGRectMake(0,
+                                 tagsHeader.frame.size.height+1,
+                                 self.view.frame.size.width,
+                                 self.view.frame.size.height-self.tagsHeader.frame.size.height);
+
+
 }
 
 // On iPhone the item list is shown with a segue
 
 -(void) prepareForSegue:(UIStoryboardSegue *)segue sender:(id)sender{
     
-    //iPhone only
-    
+    /*
+     
+     //This is potentially abandoned code, but keep it here for now just in case
+
+     //iPhone only
+
     if([segue.identifier isEqualToString:@"PushItemList"]){
-        /*
+        
+        
         ZPItemListViewController* target = (ZPItemListViewController*) segue.destinationViewController;
         ZPZoteroDataObject* node = [self->_content objectAtIndex: self.tableView.indexPathForSelectedRow.row];
         
@@ -120,10 +158,11 @@
         //Clear search when changing collection. This is how Zotero behaves
         [target clearSearch];
         [target configureView];
-         */
-        
+     
     }
-    
+
+     */
+
     //iPad only
 
     if([segue.identifier isEqualToString:@"PushItemsToNavigator"]){
@@ -154,9 +193,6 @@
     switch (gestureRecognizer.state) {
             
         case UIGestureRecognizerStateBegan: {
-            if(_tagsList == NULL){
-                [self _configureTagsList];
-            }
             break;
         }
             
@@ -209,12 +245,8 @@
 
 -(IBAction)toggleTagSelector:(id)sender{
 
-    if(_tagsList == NULL){
-        [self _configureTagsList];
-    }
-
     _tagsVisible = ! _tagsVisible;
-
+    
     [self _toggleTagSelectionWithAnimationDuration:0.5 toVisible:_tagsVisible];
 }
 
@@ -223,51 +255,75 @@
     // animate
     
     if(visible){
+        
+        //Show
+        
+        [_tagController prepareToShow];
+        [_tagsList reloadData];
+        [_tagsList setScrollEnabled:TRUE];
         [UIView animateWithDuration:duration animations:^{
+
+            NSLog(NSStringFromCGRect(tagsView.frame));
+
             tagsView.frame = self.view.frame;
-            UIImage* image = [UIImage imageNamed:@"icon-down-black.png"];
+            
+            NSLog(NSStringFromCGRect(tagsView.frame));
+
+            UIImage* image = [UIImage imageNamed:@"icon-down-black"];
             headerArrowLeft.image = image;
             headerArrowRight.image = image;
         }];
+
+        tagsView.autoresizingMask = UIViewAutoresizingFlexibleHeight | UIViewAutoresizingFlexibleWidth;
+
     }
     else{
+        
+        //Hide
+        
+        [_tagController prepareToHide];
+        [_tagsList reloadData];
+        [_tagsList setScrollEnabled:FALSE];
+
         [UIView animateWithDuration:duration animations:^{
+            
+            NSInteger numberOfRowsToShow = [_tagController numberOfSelectedTagRowsToShow:_tagsList];
+            //NSInteger numberOfRowsToShow = [[[ZPItemListViewDataSource instance] selectedTags] count] >0 ? 3 : 0;
+
+
+            NSLog(NSStringFromCGRect(tagsView.frame));
+
             tagsView.frame = CGRectMake(0,
-                                        self.view.frame.size.height - tagsHeader.frame.size.height+1,
+                                        self.view.frame.size.height - tagsHeader.frame.size.height + 1 - numberOfRowsToShow * _tagsList.rowHeight - (toolBar!=NULL ? toolBar.frame.size.height : 0),
                                         tagsView.frame.size.width,
-                                        tagsView.frame.size.height);
-            UIImage* image = [UIImage imageNamed:@"icon-up-black.png"];
+                                        tagsHeader.frame.size.height + numberOfRowsToShow * _tagsList.rowHeight);
+
+            NSLog(NSStringFromCGRect(tagsView.frame));
+
+            //Resize the collections view as well so that it scrolls properly
+
+            NSLog(NSStringFromCGRect(self.placeholderView.frame));
+
+            self.placeholderView.frame = CGRectMake( self.placeholderView.frame.origin.x,
+                                                self.placeholderView.frame.origin.y,
+                                                self.placeholderView.frame.size.width,
+                                               tagsView.frame.origin.y-1);
+
+           
+            NSLog(NSStringFromCGRect(self.placeholderView.frame));
+
+            //Anchor to bottom
+            tagsView.autoresizingMask = UIViewAutoresizingFlexibleTopMargin | UIViewAutoresizingFlexibleWidth;
+            
+            UIImage* image = [UIImage imageNamed:@"icon-up-black"];
             headerArrowLeft.image = image;
             headerArrowRight.image = image;
-        }
-                         completion:^(BOOL finished){
-                             [_tagsList removeFromSuperview];
-                             _tagsList = NULL;
-                         }];
-
+        }];
+        
     }
     
 }
 
 
--(void)_configureTagsList{
-
-    _tagsList = [[UITableView alloc] initWithFrame:CGRectMake(0,
-                                                              tagsHeader.frame.size.height+1,
-                                                              self.view.frame.size.width,
-                                                              self.view.frame.size.height-self.tagsHeader.frame.size.height)
-                                             style:UITableViewStylePlain];
-    _tagsList.allowsSelection = FALSE;
-    _tagsList.separatorStyle = UITableViewCellSeparatorStyleNone;
-    
-    if(_tagController == NULL){
-        _tagController = [[ZPTagController alloc] init];
-    }
-    
-    [_tagController configure];
-    [_tagsList setDataSource:_tagController];
-    [self.tagsView addSubview:_tagsList];
-
-}
 
 @end

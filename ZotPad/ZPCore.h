@@ -51,6 +51,7 @@ static NSString *const ZPKEY_ITEM_KEY_ARRAY = @"itemKeys";
 static NSString *const ZPKEY_ITEM = @"item";
 static NSString *const ZPKEY_ATTACHMENT = @"attachment";
 
+static NSString *const ZPKEY_TAG = @"tag";
 static NSString *const ZPKEY_SEARCH_STRING = @"searchString";
 static NSString *const ZPKEY_SORT_COLUMN = @"order";
 static NSString *const ZPKEY_ORDER_DIRECTION = @"sort";

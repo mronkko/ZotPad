@@ -10,4 +10,6 @@
 
 @interface ZPNavigationController : UINavigationController
 
+-(IBAction)showLogView:(id)sender;
+
 @end

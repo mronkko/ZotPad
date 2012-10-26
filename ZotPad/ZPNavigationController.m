@@ -27,4 +27,8 @@
     }
 }
 
+-(IBAction)showLogView:(id)sender{
+    [self performSegueWithIdentifier:@"ShowLogView" sender:NULL];
+}
+
 @end

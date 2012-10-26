@@ -348,13 +348,19 @@ static NSInteger _maxCacheSize;
 }
 
 +(BOOL) layeredCollectionsNavigation{
+    if(UI_USER_INTERFACE_IDIOM() == UIUserInterfaceIdiomPhone) return TRUE;
     NSUserDefaults* defaults = [NSUserDefaults standardUserDefaults];
     return [defaults boolForKey:@"layeredcollectionsnavigation"];
 }
 
 +(BOOL) unifiedCollectionsNavigation{
+    if(UI_USER_INTERFACE_IDIOM() == UIUserInterfaceIdiomPhone) return FALSE;
     NSUserDefaults* defaults = [NSUserDefaults standardUserDefaults];
     return [defaults boolForKey:@"unifiedcollectionsnavigation"];
+}
++(BOOL) debugCitationParser{
+    NSUserDefaults* defaults = [NSUserDefaults standardUserDefaults];
+    return [defaults boolForKey:@"debugcitationparser"];
 }
 
 @end

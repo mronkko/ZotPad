@@ -111,8 +111,10 @@
         });
         self->_content = [ZPDatabase collectionsForLibrary:self->_currentlibraryID withParentCollection:self->_currentCollectionKey];
     }
+
+    // This is probably unnecessary now.
+   // [self.tableView reloadData];
     
-    [self.tableView reloadData];
 }
 
 - (void)viewDidAppear:(BOOL)animated
@@ -238,7 +240,7 @@
 
     
     // If there are subcollections, drill down.
-    
+
     if([ZPPreferences layeredCollectionsNavigation]){
         if(node.hasChildren && [ZPPreferences unifiedCollectionsNavigation]){
             [self _drillIntoIndexPath:indexPath];
@@ -271,6 +273,15 @@
                 }
             }
         }
+    }
+
+
+    //iPhone
+
+    if([[UIDevice currentDevice] userInterfaceIdiom] == UIUserInterfaceIdiomPhone) {
+
+        UINavigationController* rootNavigationController = (UINavigationController*)[UIApplication sharedApplication].delegate.window.rootViewController;
+        [rootNavigationController.topViewController performSegueWithIdentifier:@"PushItemList" sender:NULL];
     }
 }
 
@@ -424,20 +435,23 @@
                     [shownContent removeObjectAtIndex:index];
                 }
             }
-            
+
+            /*
+
             ZPZoteroDataObject* dataObj;
             
             DDLogVerbose(@"Libraries / collections before update");
             for(dataObj in _content){
                 DDLogVerbose(@"%@",dataObj.title);
             }
+            */
             _content = shownContent;
             
             [self.tableView beginUpdates];
             
             if([insertArray count]>0){
                 [self.tableView insertRowsAtIndexPaths:insertArray withRowAnimation:UITableViewRowAnimationAutomatic];
-                DDLogVerbose(@"Inserting rows into indices");
+//                DDLogVerbose(@"Inserting rows into indices");
                 NSIndexPath* temp;
                 for(temp in insertArray){
                     DDLogVerbose(@"%i",temp.row);
@@ -446,7 +460,7 @@
             }
             if([deleteArray count]>0){
                 [self.tableView deleteRowsAtIndexPaths:deleteArray withRowAnimation:UITableViewRowAnimationAutomatic];
-                DDLogVerbose(@"Deleting rows from indices");
+//                DDLogVerbose(@"Deleting rows from indices");
                 NSIndexPath* temp;
                 for(temp in insertArray){
                     DDLogVerbose(@"%i",temp.row);
@@ -454,10 +468,12 @@
             }
             
             [self.tableView endUpdates];
+/*
             DDLogVerbose(@"Libraries / collections after update");
             for(dataObj in _content){
                 DDLogVerbose(@"%@",dataObj.title); 
             }
+  */
             
             //TODO: Figure out a way to keep the activity view spinning until the last library is loaded.
             //[_activityIndicator stopAnimating];

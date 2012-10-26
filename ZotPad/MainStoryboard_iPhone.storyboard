@@ -186,7 +186,7 @@
                 </viewController>
                 <placeholder placeholderIdentifier="IBFirstResponder" id="23" sceneMemberID="firstResponder"/>
             </objects>
-            <point key="canvasLocation" x="1371" y="64"/>
+            <point key="canvasLocation" x="1273" y="70"/>
         </scene>
         <!--Authentication Dialog - Login to Zotero-->
         <scene sceneID="2b1-LZ-39S">
@@ -484,7 +484,7 @@
             </objects>
             <point key="canvasLocation" x="912" y="-644"/>
         </scene>
-        <!--Collections And Tags View Controller-->
+        <!--Collections And Tags View Controller - Libraries and collections-->
         <scene sceneID="7Jb-kk-KIl">
             <objects>
                 <viewController id="Awc-Eh-kqF" customClass="ZPCollectionsAndTagsViewController" sceneMemberID="viewController">
@@ -493,31 +493,60 @@
                         <autoresizingMask key="autoresizingMask" flexibleMaxX="YES" flexibleMaxY="YES"/>
                         <subviews>
                             <view contentMode="scaleToFill" id="kh8-Mi-ROW">
-                                <rect key="frame" x="0.0" y="0.0" width="320" height="639"/>
-                                <autoresizingMask key="autoresizingMask" flexibleMaxX="YES" flexibleMaxY="YES"/>
+                                <rect key="frame" x="0.0" y="0.0" width="320" height="353"/>
+                                <autoresizingMask key="autoresizingMask" widthSizable="YES" heightSizable="YES"/>
                                 <color key="backgroundColor" white="1" alpha="1" colorSpace="custom" customColorSpace="calibratedWhite"/>
                             </view>
                             <view contentMode="scaleToFill" id="0jr-6f-0SQ">
-                                <rect key="frame" x="0.0" y="637" width="320" height="0.0"/>
-                                <autoresizingMask key="autoresizingMask" widthSizable="YES" heightSizable="YES"/>
+                                <rect key="frame" x="0.0" y="352" width="320" height="639"/>
+                                <autoresizingMask key="autoresizingMask" widthSizable="YES" flexibleMinY="YES"/>
                                 <subviews>
-                                    <label opaque="NO" clipsSubviews="YES" userInteractionEnabled="NO" contentMode="left" text="Tags" lineBreakMode="tailTruncation" baselineAdjustment="alignBaselines" minimumFontSize="10" id="Cpw-of-sAf">
-                                        <rect key="frame" x="139" y="0.0" width="42" height="21"/>
-                                        <autoresizingMask key="autoresizingMask" flexibleMaxX="YES" flexibleMaxY="YES"/>
-                                        <fontDescription key="fontDescription" type="system" pointSize="17"/>
-                                        <color key="textColor" cocoaTouchSystemColor="darkTextColor"/>
-                                        <nil key="highlightedColor"/>
-                                    </label>
-                                    <imageView opaque="NO" clipsSubviews="YES" multipleTouchEnabled="YES" contentMode="center" image="icon-up-black.png" id="qAq-K7-5O8">
-                                        <rect key="frame" x="93" y="2" width="23" height="20"/>
-                                        <autoresizingMask key="autoresizingMask"/>
-                                    </imageView>
-                                    <imageView opaque="NO" clipsSubviews="YES" multipleTouchEnabled="YES" contentMode="center" image="icon-up-black.png" id="1k0-2b-o5F">
-                                        <rect key="frame" x="200" y="2" width="23" height="20"/>
-                                        <autoresizingMask key="autoresizingMask"/>
-                                    </imageView>
+                                    <view contentMode="scaleToFill" id="DgA-9N-ecv" customClass="ZPBarBackgroundGradientView">
+                                        <rect key="frame" x="0.0" y="0.0" width="320" height="20"/>
+                                        <autoresizingMask key="autoresizingMask" widthSizable="YES" flexibleMaxY="YES"/>
+                                        <subviews>
+                                            <view contentMode="scaleToFill" id="lqw-KJ-ZeB">
+                                                <rect key="frame" x="0.0" y="0.0" width="320" height="1"/>
+                                                <autoresizingMask key="autoresizingMask" widthSizable="YES" flexibleMaxY="YES"/>
+                                                <color key="backgroundColor" white="0.0" alpha="1" colorSpace="calibratedWhite"/>
+                                            </view>
+                                            <view contentMode="scaleToFill" id="Smi-93-YRg">
+                                                <rect key="frame" x="0.0" y="19" width="320" height="1"/>
+                                                <autoresizingMask key="autoresizingMask" widthSizable="YES" flexibleMinY="YES"/>
+                                                <color key="backgroundColor" white="0.0" alpha="1" colorSpace="calibratedWhite"/>
+                                            </view>
+                                            <label opaque="NO" clipsSubviews="YES" userInteractionEnabled="NO" alpha="0.5" contentMode="left" text="Tags" lineBreakMode="tailTruncation" baselineAdjustment="alignBaselines" minimumFontSize="10" id="1LR-fd-5bt">
+                                                <rect key="frame" x="143" y="-1" width="35" height="21"/>
+                                                <autoresizingMask key="autoresizingMask" flexibleMinX="YES" flexibleMaxX="YES" flexibleMinY="YES" flexibleMaxY="YES"/>
+                                                <fontDescription key="fontDescription" type="system" pointSize="15"/>
+                                                <color key="textColor" cocoaTouchSystemColor="darkTextColor"/>
+                                                <nil key="highlightedColor"/>
+                                            </label>
+                                            <imageView opaque="NO" clipsSubviews="YES" userInteractionEnabled="NO" alpha="0.5" contentMode="center" image="icon-up-black.png" id="YT4-pq-Bc8">
+                                                <rect key="frame" x="93" y="3" width="15" height="14"/>
+                                                <autoresizingMask key="autoresizingMask" flexibleMinX="YES" flexibleMaxX="YES" flexibleMinY="YES" flexibleMaxY="YES"/>
+                                            </imageView>
+                                            <imageView opaque="NO" clipsSubviews="YES" userInteractionEnabled="NO" alpha="0.5" contentMode="center" image="icon-up-black.png" id="9lm-cv-DDz">
+                                                <rect key="frame" x="211" y="3" width="15" height="14"/>
+                                                <autoresizingMask key="autoresizingMask" flexibleMinX="YES" flexibleMaxX="YES" flexibleMinY="YES" flexibleMaxY="YES"/>
+                                            </imageView>
+                                            <imageView opaque="NO" userInteractionEnabled="NO" alpha="0.30000001192092896" contentMode="scaleToFill" image="horizontalLines.png" id="b6b-1D-j3M">
+                                                <rect key="frame" x="0.0" y="4" width="80" height="12"/>
+                                                <autoresizingMask key="autoresizingMask" widthSizable="YES" flexibleMaxX="YES" flexibleMinY="YES" flexibleMaxY="YES"/>
+                                            </imageView>
+                                            <imageView opaque="NO" userInteractionEnabled="NO" alpha="0.30000001192092896" contentMode="scaleToFill" image="horizontalLines.png" id="yvx-Ur-ewc">
+                                                <rect key="frame" x="240" y="4" width="80" height="12"/>
+                                                <autoresizingMask key="autoresizingMask" flexibleMinX="YES" widthSizable="YES" flexibleMinY="YES" flexibleMaxY="YES"/>
+                                            </imageView>
+                                        </subviews>
+                                        <color key="backgroundColor" name="headerColor" catalog="System" colorSpace="catalog"/>
+                                        <gestureRecognizers/>
+                                        <connections>
+                                            <outletCollection property="gestureRecognizers" destination="Q1d-sw-SPD" appends="YES" id="9Na-XJ-UqK"/>
+                                            <outletCollection property="gestureRecognizers" destination="iRa-ww-qmD" appends="YES" id="QYi-33-eim"/>
+                                        </connections>
+                                    </view>
                                 </subviews>
-                                <color key="backgroundColor" white="0.66666666666666663" alpha="1" colorSpace="calibratedWhite"/>
                             </view>
                             <toolbar opaque="NO" clearsContextBeforeDrawing="NO" contentMode="scaleToFill" id="fGK-Fg-w0a">
                                 <rect key="frame" x="0.0" y="372" width="320" height="44"/>
@@ -531,16 +560,30 @@
                         </subviews>
                         <color key="backgroundColor" white="1" alpha="1" colorSpace="custom" customColorSpace="calibratedWhite"/>
                     </view>
-                    <navigationItem key="navigationItem" id="eKa-VG-pKp"/>
+                    <navigationItem key="navigationItem" title="Libraries and collections" id="eKa-VG-pKp"/>
                     <simulatedStatusBarMetrics key="simulatedStatusBarMetrics"/>
                     <connections>
                         <outlet property="cacheControllerPlaceHolder" destination="LwW-uo-cIv" id="l9t-gx-EeR"/>
                         <outlet property="gearButton" destination="wNc-yB-aKd" id="6xR-SW-n8u"/>
+                        <outlet property="headerArrowLeft" destination="YT4-pq-Bc8" id="Lh8-I3-ZY5"/>
+                        <outlet property="headerArrowRight" destination="9lm-cv-DDz" id="1Pw-9s-rY5"/>
                         <outlet property="placeholderView" destination="kh8-Mi-ROW" id="2F7-p3-Nkn"/>
+                        <outlet property="tagsHeader" destination="DgA-9N-ecv" id="Awf-W1-fYc"/>
                         <outlet property="tagsView" destination="0jr-6f-0SQ" id="INT-mr-UNL"/>
+                        <outlet property="toolBar" destination="fGK-Fg-w0a" id="6qc-OM-kpd"/>
                         <segue destination="21" kind="push" identifier="PushItemList" id="F6w-kk-h9s"/>
                     </connections>
                 </viewController>
+                <panGestureRecognizer minimumNumberOfTouches="1" id="iRa-ww-qmD">
+                    <connections>
+                        <action selector="handlePanGesture:" destination="Awc-Eh-kqF" id="KcI-tB-dYq"/>
+                    </connections>
+                </panGestureRecognizer>
+                <tapGestureRecognizer id="Q1d-sw-SPD">
+                    <connections>
+                        <action selector="toggleTagSelector:" destination="Awc-Eh-kqF" id="5Ys-DY-e3a"/>
+                    </connections>
+                </tapGestureRecognizer>
                 <placeholder placeholderIdentifier="IBFirstResponder" id="C4O-l3-C6l" userLabel="First Responder" sceneMemberID="firstResponder"/>
             </objects>
             <point key="canvasLocation" x="455" y="64"/>
@@ -583,6 +626,7 @@
     </scenes>
     <resources>
         <image name="gear.png" width="20" height="20"/>
+        <image name="horizontalLines.png" width="1" height="6"/>
         <image name="icon-up-black.png" width="23" height="20"/>
     </resources>
     <classes>
@@ -609,6 +653,9 @@
                 <relationship kind="outlet" name="webView" candidateClass="UIWebView"/>
             </relationships>
         </class>
+        <class className="ZPBarBackgroundGradientView" superclassName="UIView">
+            <source key="sourceIdentifier" type="project" relativePath="./Classes/ZPBarBackgroundGradientView.h"/>
+        </class>
         <class className="ZPCollectionsAndTagsViewController" superclassName="HLSPlaceholderViewController">
             <source key="sourceIdentifier" type="project" relativePath="./Classes/ZPCollectionsAndTagsViewController.h"/>
             <relationships>
@@ -619,8 +666,9 @@
                 <relationship kind="outlet" name="gearButton" candidateClass="UIBarButtonItem"/>
                 <relationship kind="outlet" name="headerArrowLeft" candidateClass="UIImageView"/>
                 <relationship kind="outlet" name="headerArrowRight" candidateClass="UIImageView"/>
-                <relationship kind="outlet" name="tagsHeader" candidateClass="UIView"/>
+                <relationship kind="outlet" name="tagsHeader" candidateClass="ZPBarBackgroundGradientView"/>
                 <relationship kind="outlet" name="tagsView" candidateClass="UIView"/>
+                <relationship kind="outlet" name="toolBar" candidateClass="UIToolbar"/>
             </relationships>
         </class>
         <class className="ZPFileImportViewController" superclassName="UIViewController">
@@ -661,6 +709,9 @@
         </class>
         <class className="ZPNavigationController" superclassName="UINavigationController">
             <source key="sourceIdentifier" type="project" relativePath="./Classes/ZPNavigationController.h"/>
+            <relationships>
+                <relationship kind="action" name="showLogView:"/>
+            </relationships>
         </class>
         <class className="ZPUploadVersionConflictViewControllerViewController" superclassName="UIViewController">
             <source key="sourceIdentifier" type="project" relativePath="./Classes/ZPUploadVersionConflictViewControllerViewController.h"/>

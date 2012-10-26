@@ -29,6 +29,8 @@
     UITableView* _tableView;
     
     ZPZoteroAttachment* _attachmentInQuicklook;
+    
+    NSArray* _selectedTags;
 }
 
 + (ZPItemListViewDataSource*) instance;
@@ -54,5 +56,10 @@
 -(void) _performRowInsertions:(NSArray*)insertIndexPaths reloads:(NSArray*)reloadIndexPaths tableLength:(NSInteger)tableLength;
 -(void) _performTableUpdates:(BOOL)animated;
 //-(void) _refreshCellAtIndexPaths:(NSArray*)indexPath;
+
+-(void) selectTag:(NSString*)tag;
+-(void) deselectTag:(NSString*)tag;
+-(BOOL) isTagSelected:(NSString*)tag;
+-(NSArray*) selectedTags;
 
 @end
