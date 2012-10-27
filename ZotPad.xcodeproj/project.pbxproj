@@ -8,6 +8,12 @@
 
 /* Begin PBXBuildFile section */
 		320AF8492C47A4D819F7C451 /* QuartzCore.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 320AF8492C47A4D819F7C450 /* QuartzCore.framework */; };
+		A700CA2F163BCD4E005D4115 /* Default-568h@2x.png in Resources */ = {isa = PBXBuildFile; fileRef = A7EC061F161A2D000008B314 /* Default-568h@2x.png */; };
+		A700CA30163BCD55005D4115 /* Default-568h@2x.png in Resources */ = {isa = PBXBuildFile; fileRef = A7EC061F161A2D000008B314 /* Default-568h@2x.png */; };
+		A700CA32163BD392005D4115 /* AppIcon57x57-alpha.png in Resources */ = {isa = PBXBuildFile; fileRef = A700CA31163BD392005D4115 /* AppIcon57x57-alpha.png */; };
+		A700CA34163BD3AE005D4115 /* AppIcon114x114-alpha.png in Resources */ = {isa = PBXBuildFile; fileRef = A700CA33163BD3AE005D4115 /* AppIcon114x114-alpha.png */; };
+		A700CA36163BD3ED005D4115 /* AppIcon72x72-alpha.png in Resources */ = {isa = PBXBuildFile; fileRef = A700CA35163BD3EC005D4115 /* AppIcon72x72-alpha.png */; };
+		A700CA38163BD3F8005D4115 /* AppIcon144x144-alpha.png in Resources */ = {isa = PBXBuildFile; fileRef = A700CA37163BD3F8005D4115 /* AppIcon144x144-alpha.png */; };
 		A7025019149B0BB1004F2AAB /* ZPDatabase.m in Sources */ = {isa = PBXBuildFile; fileRef = A7025018149B0BB1004F2AAB /* ZPDatabase.m */; };
 		A702501D149B33E1004F2AAB /* ZPCacheController.m in Sources */ = {isa = PBXBuildFile; fileRef = A702501C149B33E1004F2AAB /* ZPCacheController.m */; };
 		A7025020149C6C3E004F2AAB /* ZPPreferences.m in Sources */ = {isa = PBXBuildFile; fileRef = A702501F149C6C3D004F2AAB /* ZPPreferences.m */; };
@@ -1511,6 +1517,10 @@
 
 /* Begin PBXFileReference section */
 		320AF8492C47A4D819F7C450 /* QuartzCore.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.frameworks; name = QuartzCore.framework; path = System/Library/Frameworks/QuartzCore.framework; sourceTree = SDKROOT; };
+		A700CA31163BD392005D4115 /* AppIcon57x57-alpha.png */ = {isa = PBXFileReference; lastKnownFileType = image.png; name = "AppIcon57x57-alpha.png"; path = "../AppIcon57x57-alpha.png"; sourceTree = "<group>"; };
+		A700CA33163BD3AE005D4115 /* AppIcon114x114-alpha.png */ = {isa = PBXFileReference; lastKnownFileType = image.png; name = "AppIcon114x114-alpha.png"; path = "../AppIcon114x114-alpha.png"; sourceTree = "<group>"; };
+		A700CA35163BD3EC005D4115 /* AppIcon72x72-alpha.png */ = {isa = PBXFileReference; lastKnownFileType = image.png; name = "AppIcon72x72-alpha.png"; path = "../AppIcon72x72-alpha.png"; sourceTree = "<group>"; };
+		A700CA37163BD3F8005D4115 /* AppIcon144x144-alpha.png */ = {isa = PBXFileReference; lastKnownFileType = image.png; name = "AppIcon144x144-alpha.png"; path = "../AppIcon144x144-alpha.png"; sourceTree = "<group>"; };
 		A7025017149B0BB1004F2AAB /* ZPDatabase.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = ZPDatabase.h; sourceTree = "<group>"; };
 		A7025018149B0BB1004F2AAB /* ZPDatabase.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = ZPDatabase.m; sourceTree = "<group>"; };
 		A702501B149B33E1004F2AAB /* ZPCacheController.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = ZPCacheController.h; sourceTree = "<group>"; };
@@ -3006,6 +3016,10 @@
 		A78B7F0A14908DFF008303BA /* AppIcons */ = {
 			isa = PBXGroup;
 			children = (
+				A700CA37163BD3F8005D4115 /* AppIcon144x144-alpha.png */,
+				A700CA35163BD3EC005D4115 /* AppIcon72x72-alpha.png */,
+				A700CA33163BD3AE005D4115 /* AppIcon114x114-alpha.png */,
+				A700CA31163BD392005D4115 /* AppIcon57x57-alpha.png */,
 				A7ABAB6015A306A600EA8B7B /* AppIcon57x57.png */,
 				A7ABAB6215A306C600EA8B7B /* AppIcon114x114.png */,
 				A79E6FF815320E7B00612DD9 /* AppIcon114x114-beta.png */,
@@ -3839,6 +3853,7 @@
 				A7592E831637E83600CC4EA9 /* locales-en-US.xml in Resources */,
 				A7592E861637E83600CC4EA9 /* apa.csl in Resources */,
 				A7592E8E1637EF2A00CC4EA9 /* typeMap.xml in Resources */,
+				A700CA30163BCD55005D4115 /* Default-568h@2x.png in Resources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
@@ -4141,6 +4156,11 @@
 				A7592E851637E83600CC4EA9 /* locales-en-US.xml in Resources */,
 				A7592E881637E83600CC4EA9 /* apa.csl in Resources */,
 				A7592E901637EF2A00CC4EA9 /* typeMap.xml in Resources */,
+				A700CA2F163BCD4E005D4115 /* Default-568h@2x.png in Resources */,
+				A700CA32163BD392005D4115 /* AppIcon57x57-alpha.png in Resources */,
+				A700CA34163BD3AE005D4115 /* AppIcon114x114-alpha.png in Resources */,
+				A700CA36163BD3ED005D4115 /* AppIcon72x72-alpha.png in Resources */,
+				A700CA38163BD3F8005D4115 /* AppIcon144x144-alpha.png in Resources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
