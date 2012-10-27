@@ -11,7 +11,7 @@
 
 #import "ZPAttachmentCarouselDelegate.h"
 #import "ZPPreviewController.h"
-#import "ZPServerConnectionManager.h"
+
 
 #import "ZPAttachmentIconImageFactory.h"
 #import <QuartzCore/QuartzCore.h>
@@ -358,7 +358,7 @@ NSInteger const ZPATTACHMENTICONGVIEWCONTROLLER_TAG_TITLELABEL = -5;
                                 label.text = @"Download from Zotero";
                             }
                         }
-                        else label.text = @"File does not exists on Zotero server";
+                        else label.text = @"File does not exist on Zotero server";
                     }
                 }
                 else  label.text = @"File cannot be downloaded when offline";

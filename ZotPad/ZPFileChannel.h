@@ -7,7 +7,7 @@
 //
 
 #import <Foundation/Foundation.h>
-#import "ZPZoteroAttachment.h"
+
 #import "ASIHTTPRequest.h"
 
 

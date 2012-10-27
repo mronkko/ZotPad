@@ -8,18 +8,20 @@
 
 //Data objects
 
-#import "ZPZoteroDataObject.h"
 #import "ZPZoteroLibrary.h"
 #import "ZPZoteroCollection.h"
 #import "ZPZoteroItem.h"
 #import "ZPZoteroAttachment.h"
 #import "ZPZoteroNote.h"
 
+//Core classes for data and server connection
+
 #import "ZPPreferences.h"
 #import "ZPDatabase.h"
 #import "ZPServerConnectionManager.h"
 
-#import "TestFlight.h" 
+// Logger
+
 #import "DDLog.h"
 
 static const int ddLogLevel = LOG_LEVEL_VERBOSE;

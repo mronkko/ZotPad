@@ -9,11 +9,11 @@
 #import "ZPCore.h"
 
 #import "ZPAttachmentIconImageFactory.h"
-#import "ZPZoteroAttachment.h"
-#import "ZPPreferences.h"
+
+
 #import <QuartzCore/QuartzCore.h>
 
-#import "ZPServerConnectionManager.h"
+
 #import <zlib.h>
 
 

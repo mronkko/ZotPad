@@ -13,24 +13,24 @@
 #import "ZPCore.h"
 #import "ZPCacheController.h"
 #import "ZPAppDelegate.h"
-#import "ZPServerConnectionManager.h"
+
 #import "ZPAuthenticationDialog.h"
 #import "ZPServerResponseXMLParser.h"
 #import "ZPServerResponseXMLParserKeyPermissions.h"
 #import "ZPServerResponseXMLParserItem.h"
 #import "ZPServerResponseXMLParserLibrary.h"
 #import "ZPServerResponseXMLParserCollection.h"
-#import "ZPZoteroItem.h"
-#import "ZPZoteroCollection.h"
-#import "ZPZoteroLibrary.h"
-#import "ZPZoteroNote.h"
-#import "ZPZoteroAttachment.h"
 
-#import "ZPDatabase.h"
+
+
+
+
+
+
 #import "ASIHTTPRequest.h"
 #import "Reachability.h"
 
-#import "ZPPreferences.h"
+
 
 #import "ZPFileChannel.h"
 #import "ZPFileChannel_Dropbox.h"

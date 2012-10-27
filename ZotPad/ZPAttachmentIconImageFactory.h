@@ -7,7 +7,7 @@
 //
 
 #import <UIKit/UIKit.h>
-#import "ZPZoteroAttachment.h"
+
 
 
 

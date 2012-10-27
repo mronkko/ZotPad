@@ -6,8 +6,8 @@
 //  Copyright (c) 2012 Mikko Rönkkö. All rights reserved.
 //
 
-#import "ZPZoteroItem.h"
-#import "ZPZoteroAttachment.h"
+
+
 
 
 #import <Foundation/Foundation.h>

@@ -9,7 +9,7 @@
 #import <Foundation/Foundation.h>
 
 
-#import "ZPZoteroCollection.h"
+
 #import "ZPCacheStatusToolbarController.h"
 
 

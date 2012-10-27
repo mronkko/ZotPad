@@ -11,7 +11,7 @@
 #import "ZPHelpPopover.h"
 #import "FRLayeredNavigationController.h"
 #import "FRLayeredNavigationItem.h"
-#import "ZPPreferences.h"
+
 #import "ZPItemListViewController.h"
 #import "ZPMasterItemListViewController.h"
 #import <QuartzCore/QuartzCore.h>

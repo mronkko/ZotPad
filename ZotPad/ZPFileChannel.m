@@ -9,8 +9,8 @@
 #import "ZPCore.h"
 
 #import "ZPFileChannel.h"
-#import "ZPZoteroAttachment.h"
-#import "ZPServerConnectionManager.h"
+
+
 #import "ZPUploadVersionConflictViewControllerViewController.h"
 #import "ZPFileImportViewController.h"
 #import "ZPAppDelegate.h"

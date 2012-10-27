@@ -9,7 +9,7 @@
 
 
 #import "ZPCore.h"
-#import "ZPDatabase.h"
+
 #import "FileMD5Hash.h"
 #import "ZPCacheController.h"
 #import "NSString+Base64.h"

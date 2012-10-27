@@ -9,8 +9,8 @@
 #import "ZPCore.h"
 #import "ZPLibraryAndCollectionListViewController.h"
 #import "ZPItemListViewController.h"
-#import "ZPDatabase.h"
-#import "ZPServerConnectionManager.h"
+
+
 #import "ZPAuthenticationDialog.h"
 #import "ZPAppDelegate.h"
 #import "ZPCacheController.h"

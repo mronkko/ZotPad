@@ -8,7 +8,7 @@
 
 
 #import "ZPCore.h"
-#import "ZPDatabase.h"
+
 
 @implementation ZPZoteroCollection
 

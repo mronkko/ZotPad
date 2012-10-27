@@ -53,14 +53,14 @@
 
 
 #import "ZPCacheController.h"
-#import "ZPPreferences.h"
 
-#import "ZPDatabase.h"
+
+
 #import "ZPServerResponseXMLParser.h"
-#import "ZPServerConnectionManager.h"
-#import "ZPZoteroCollection.h"
-#import "ZPZoteroAttachment.h"
-#import "ZPZoteroNote.h"
+
+
+
+
 
 #define NUMBER_OF_ITEMS_TO_RETRIEVE 50
 #define NUMBER_OF_PARALLEL_REQUESTS 8

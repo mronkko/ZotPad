@@ -11,10 +11,10 @@
 #import <Foundation/Foundation.h>
 #import "ZPAuthenticationDialog.h"
 #import "ZPServerResponseXMLParser.h"
-#import "ZPZoteroItem.h"
-#import "ZPZoteroCollection.h"
-#import "ZPZoteroLibrary.h"
-#import "ZPZoteroAttachment.h"
+
+
+
+
 #import "ZPFileChannel.h"
 
 

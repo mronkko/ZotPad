@@ -10,7 +10,7 @@
 
 
 #import "ZPAuthenticationDialog.h"
-#import "ZPServerConnectionManager.h"
+
 #import "OAToken.h"
 
 #import "DSActivityView.h"

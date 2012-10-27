@@ -9,10 +9,10 @@
 #import "ZPCore.h"
 
 #import "ZPServerResponseXMLParserItem.h"
-#import "ZPZoteroItem.h"
-#import "ZPZoteroAttachment.h"
-#import "ZPZoteroNote.h"
-#import "ZPDatabase.h"
+
+
+
+
 
 #import "SBJson.h"
 

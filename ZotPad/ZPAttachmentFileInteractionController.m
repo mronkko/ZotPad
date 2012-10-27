@@ -9,15 +9,15 @@
 #import "ZPCore.h"
 
 #import "ZPAttachmentFileInteractionController.h"
-#import "ZPZoteroItem.h"
-#import "ZPZoteroAttachment.h"
-#import "ZPDatabase.h"
+
+
+
 #import <MobileCoreServices/MobileCoreServices.h>
 #import <QuartzCore/QuartzCore.h>
 #import "ZPItemDetailViewController.h"
-#import "ZPServerConnectionManager.h"
 
-#import "ZPPreferences.h"
+
+
 
 
 

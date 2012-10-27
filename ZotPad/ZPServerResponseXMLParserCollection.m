@@ -9,7 +9,7 @@
 #import "ZPCore.h"
 
 #import "ZPServerResponseXMLParserCollection.h"
-#import "ZPZoteroCollection.h"
+
 
 @implementation ZPServerResponseXMLParserCollection
 

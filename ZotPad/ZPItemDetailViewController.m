@@ -17,8 +17,8 @@
 #import "ZPPreviewController.h"
 
 #import "ZPAppDelegate.h"
-#import "ZPServerConnectionManager.h"
-#import "ZPPreferences.h"
+
+
 #import "ZPAttachmentIconImageFactory.h"
 #import "ZPAttachmentCarouselDelegate.h"
 #import "OHAttributedLabel.h"

@@ -7,7 +7,7 @@
 //
 
 #import "ZPCore.h"
-#import "ZPDatabase.h"
+
 
 NSInteger const LIBRARY_ID_MY_LIBRARY = -1;
 NSInteger const LIBRARY_ID_NOT_SET = 0;

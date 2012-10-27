@@ -9,10 +9,10 @@
 #import "ZPCore.h"
 #import "ZPAppDelegate.h"
 #import "ZPCacheController.h"
-#import "ZPPreferences.h"
+
 #import "ZPLocalization.h"
 #import <DropboxSDK/DropboxSDK.h>
-#import "ZPDatabase.h"
+
 #import "ZPFileImportViewController.h"
 #import "ZPFileChannel_Dropbox.h"
 #import "ZPAuthenticationDialog.h"

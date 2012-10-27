@@ -7,7 +7,7 @@
 //
 
 #import "ZPCore.h"
-#import "ZPDatabase.h"
+
 #import "ZPPreviewController.h"
 #import "ZPAttachmentFileInteractionController.h"
 #import "ZPAttachmentCarouselDelegate.h"

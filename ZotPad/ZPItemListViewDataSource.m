@@ -12,7 +12,7 @@
 #import "OHAttributedLabel.h"
 #import "ZPAttachmentIconImageFactory.h"
 #import "ZPPreviewController.h"
-#import "ZPServerConnectionManager.h"
+
 #import "ZPCacheController.h"
 
 #define SIZE_OF_TABLEVIEW_UPDATE_BATCH 25

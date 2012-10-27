@@ -12,7 +12,7 @@
 #include <sys/xattr.h>
 
 #import "ZPCore.h"
-#import "ZPDatabase.h"
+
 
 //DB library
 #import "../FMDB/src/FMDatabase.h"

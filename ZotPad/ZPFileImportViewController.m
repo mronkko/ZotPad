@@ -11,7 +11,7 @@
 #import "ZPFileImportViewController.h"
 #include <QuartzCore/QuartzCore.h>
 
-#import "ZPServerConnectionManager.h"
+
 #import "ZPCacheController.h"
 #import "ZPAttachmentCarouselDelegate.h"
 #import "ZPUploadVersionConflictViewControllerViewController.h"

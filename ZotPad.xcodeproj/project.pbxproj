@@ -14,6 +14,7 @@
 		A700CA34163BD3AE005D4115 /* AppIcon114x114-alpha.png in Resources */ = {isa = PBXBuildFile; fileRef = A700CA33163BD3AE005D4115 /* AppIcon114x114-alpha.png */; };
 		A700CA36163BD3ED005D4115 /* AppIcon72x72-alpha.png in Resources */ = {isa = PBXBuildFile; fileRef = A700CA35163BD3EC005D4115 /* AppIcon72x72-alpha.png */; };
 		A700CA38163BD3F8005D4115 /* AppIcon144x144-alpha.png in Resources */ = {isa = PBXBuildFile; fileRef = A700CA37163BD3F8005D4115 /* AppIcon144x144-alpha.png */; };
+		A700CA3A163BDAF2005D4115 /* ZotPad alpha-Info.plist in Resources */ = {isa = PBXBuildFile; fileRef = A700CA39163BDAF1005D4115 /* ZotPad alpha-Info.plist */; };
 		A7025019149B0BB1004F2AAB /* ZPDatabase.m in Sources */ = {isa = PBXBuildFile; fileRef = A7025018149B0BB1004F2AAB /* ZPDatabase.m */; };
 		A702501D149B33E1004F2AAB /* ZPCacheController.m in Sources */ = {isa = PBXBuildFile; fileRef = A702501C149B33E1004F2AAB /* ZPCacheController.m */; };
 		A7025020149C6C3E004F2AAB /* ZPPreferences.m in Sources */ = {isa = PBXBuildFile; fileRef = A702501F149C6C3D004F2AAB /* ZPPreferences.m */; };
@@ -1521,6 +1522,7 @@
 		A700CA33163BD3AE005D4115 /* AppIcon114x114-alpha.png */ = {isa = PBXFileReference; lastKnownFileType = image.png; name = "AppIcon114x114-alpha.png"; path = "../AppIcon114x114-alpha.png"; sourceTree = "<group>"; };
 		A700CA35163BD3EC005D4115 /* AppIcon72x72-alpha.png */ = {isa = PBXFileReference; lastKnownFileType = image.png; name = "AppIcon72x72-alpha.png"; path = "../AppIcon72x72-alpha.png"; sourceTree = "<group>"; };
 		A700CA37163BD3F8005D4115 /* AppIcon144x144-alpha.png */ = {isa = PBXFileReference; lastKnownFileType = image.png; name = "AppIcon144x144-alpha.png"; path = "../AppIcon144x144-alpha.png"; sourceTree = "<group>"; };
+		A700CA39163BDAF1005D4115 /* ZotPad alpha-Info.plist */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = text.plist.xml; path = "ZotPad alpha-Info.plist"; sourceTree = SOURCE_ROOT; };
 		A7025017149B0BB1004F2AAB /* ZPDatabase.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = ZPDatabase.h; sourceTree = "<group>"; };
 		A7025018149B0BB1004F2AAB /* ZPDatabase.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = ZPDatabase.m; sourceTree = "<group>"; };
 		A702501B149B33E1004F2AAB /* ZPCacheController.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = ZPCacheController.h; sourceTree = "<group>"; };
@@ -2658,6 +2660,7 @@
 				A73D635014879D15007999F3 /* Settings.bundle */,
 				A7200DDC14718DC0004347C9 /* ZotPad-Info.plist */,
 				A7CD077715161556007A8E1D /* ZotPad beta-Info.plist */,
+				A700CA39163BDAF1005D4115 /* ZotPad alpha-Info.plist */,
 				A7200DDD14718DC0004347C9 /* InfoPlist.strings */,
 				A7200DE014718DC0004347C9 /* main.m */,
 				A7200DE214718DC0004347C9 /* ZotPad-Prefix.pch */,
@@ -4161,6 +4164,7 @@
 				A700CA34163BD3AE005D4115 /* AppIcon114x114-alpha.png in Resources */,
 				A700CA36163BD3ED005D4115 /* AppIcon72x72-alpha.png in Resources */,
 				A700CA38163BD3F8005D4115 /* AppIcon144x144-alpha.png in Resources */,
+				A700CA3A163BDAF2005D4115 /* ZotPad alpha-Info.plist in Resources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
@@ -5155,7 +5159,7 @@
 				);
 				GCC_PREPROCESSOR_DEFINITIONS_NOT_USED_IN_PRECOMPS = "";
 				HEADER_SEARCH_PATHS = /usr/include/libxml2;
-				INFOPLIST_FILE = "ZotPad beta copy-Info.plist";
+				INFOPLIST_FILE = "$(SRCROOT)/ZotPad alpha-Info.plist";
 				INSTALL_GROUP = 70000;
 				LIBRARY_SEARCH_PATHS = (
 					"$(inherited)",
@@ -5195,7 +5199,7 @@
 				);
 				GCC_PREPROCESSOR_DEFINITIONS_NOT_USED_IN_PRECOMPS = "";
 				HEADER_SEARCH_PATHS = /usr/include/libxml2;
-				INFOPLIST_FILE = "ZotPad beta copy-Info.plist";
+				INFOPLIST_FILE = "$(SRCROOT)/ZotPad alpha-Info.plist";
 				INSTALL_GROUP = 70000;
 				LIBRARY_SEARCH_PATHS = (
 					"$(inherited)",

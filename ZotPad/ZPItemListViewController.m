@@ -12,12 +12,12 @@
 
 #import "DSActivityView.h"
 #import "ZPLocalization.h"
-#import "ZPPreferences.h"
+
 #import "ZPAppDelegate.h"
 
 //TODO: Refactor so that these would not be needed
-#import "ZPServerConnectionManager.h"
-#import "ZPDatabase.h"
+
+
 #import "ZPCacheController.h"
 
 

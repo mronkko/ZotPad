@@ -9,19 +9,14 @@
 	<key>CFBundleDocumentTypes</key>
 	<array>
 		<dict>
+			<key>CFBundleTypeName</key>
+			<string>All files</string>
 			<key>LSHandlerRank</key>
 			<string>Default</string>
 			<key>LSItemContentTypes</key>
 			<array>
-				<string>public.item</string>
-			</array>
-		</dict>
-		<dict>
-			<key>CFBundleTypeIconFiles</key>
-			<array/>
-			<key>LSItemContentTypes</key>
-			<array>
 				<string>com.adobe.pdf</string>
+				<string>public.item</string>
 			</array>
 		</dict>
 	</array>
@@ -33,22 +28,26 @@
 		<dict>
 			<key>CFBundleIconFiles</key>
 			<array>
-				<string>AppIcon144x144-beta.png</string>
-				<string>AppIcon72x72-beta.png</string>
-				<string>AppIcon57x57-beta.png</string>
-				<string>AppIcon114x114-beta.png</string>
-				<string>Default@2x.png</string>
-				<string>Default-Landscape~ipad.png</string>
-				<string>Default-Portrait~ipad.png</string>
+				<string>AppIcon144x144.png</string>
+				<string>AppIcon72x72.png</string>
+				<string>AppIcon57x57.png</string>
+				<string>AppIcon114x114.png</string>
 				<string>Default.png</string>
+				<string>Default@2x.png</string>
+				<string>Default-Portrait~ipad.png</string>
 				<string>Default-Portrait@2x~ipad.png</string>
 				<string>Default-Landscape@2x~ipad.png</string>
-				<string>Default-Landscape@2x~ipad.png</string>
+				<string>Default-Landscape~ipad.png</string>
+				<string>AppIcon57x57.png</string>
+				<string>AppIcon57x57-alpha.png</string>
+				<string>AppIcon114x114-alpha.png</string>
+				<string>AppIcon72x72-alpha.png</string>
+				<string>AppIcon144x144-alpha.png</string>
 			</array>
 		</dict>
 	</dict>
 	<key>CFBundleIdentifier</key>
-	<string>com.mronkko.zotpad-beta</string>
+	<string>com.yourcompany.PDFAnnotationSample</string>
 	<key>CFBundleInfoDictionaryVersion</key>
 	<string>6.0</string>
 	<key>CFBundleName</key>
@@ -62,9 +61,11 @@
 	<key>CFBundleURLTypes</key>
 	<array>
 		<dict>
+			<key>CFBundleTypeRole</key>
+			<string>Editor</string>
 			<key>CFBundleURLSchemes</key>
 			<array>
-				<string>db-or7xa2bxhzit1ws</string>
+				<string>db-nn6res38igpo4ec</string>
 			</array>
 		</dict>
 		<dict>
@@ -72,12 +73,12 @@
 			<string>Editor</string>
 			<key>CFBundleURLSchemes</key>
 			<array>
-				<string>db-w1nps3e4js2va7z</string>
+				<string>db-6tpvh0msumv6plh</string>
 			</array>
 		</dict>
 	</array>
 	<key>CFBundleVersion</key>
-	<string>1.2.1696</string>
+	<string>1.2.501</string>
 	<key>LSApplicationCategoryType</key>
 	<string></string>
 	<key>LSRequiresIPhoneOS</key>

@@ -7,11 +7,11 @@
 //
 
 #import <Foundation/Foundation.h>
-#import "ZPZoteroItem.h"
-#import "ZPZoteroNote.h"
-#import "ZPZoteroAttachment.h"
-#import "ZPZoteroLibrary.h"
-#import "ZPZoteroCollection.h"
+
+
+
+
+
 
 #import "../FMDB/src/FMDatabase.h"
 #import "../FMDB/src/FMResultSet.h"

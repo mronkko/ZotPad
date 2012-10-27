@@ -7,7 +7,7 @@
 //
 
 #import "ZPCore.h"
-#import "ZPDatabase.h"
+
 #import "CSLFormatter.h"
 
 @interface ZPZoteroItem()

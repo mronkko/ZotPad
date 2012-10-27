@@ -10,11 +10,11 @@
 #import "ZPCore.h"
 
 #import "ZPFileChannel_ZoteroStorage.h"
-#import "ZPPreferences.h"
+
 #import "ASIFormDataRequest.h"
 
-#import "ZPServerConnectionManager.h"
-#import "ZPDatabase.h"
+
+
 #import "SBJson.h"
 
 

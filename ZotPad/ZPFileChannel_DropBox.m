@@ -12,10 +12,10 @@
 #import "DBRestClient.h"
 #import "DBSession.h"
 #import "DBSession+iOS.h"
-#import "ZPPreferences.h"
+
 #import "ZPLocalization.h"
 
-#import "ZPServerConnectionManager.h"
+
 
 //Zipping and base64 encoding
 #import "ZipArchive.h"

@@ -8,7 +8,7 @@
 
 #import <Foundation/Foundation.h>
 
-#import "ZPZoteroItem.h"
+
 #import <QuickLook/QuickLook.h>
 
 

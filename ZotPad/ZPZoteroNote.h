@@ -7,7 +7,7 @@
 //
 
 #import <Foundation/Foundation.h>
-#import "ZPZoteroItem.h"
+
 
 @interface ZPZoteroNote : ZPZoteroDataObject{
 }
