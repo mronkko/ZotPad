@@ -308,6 +308,7 @@
         //If there is nothing to display, make the view busy until we receive something from the server.
         
         if([ZPServerConnectionManager hasInternetConnection] && [cacheKeys count]==0) [self makeBusy];
+        else [self makeAvailable];
         
     }
 }

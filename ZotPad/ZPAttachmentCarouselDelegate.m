@@ -348,15 +348,18 @@ NSInteger const ZPATTACHMENTICONGVIEWCONTROLLER_TAG_TITLELABEL = -5;
                     
                     if ([ZPPreferences useDropbox]) label.text = @"Download from Dropbox";
                     else if([ZPPreferences useWebDAV] && attachment.libraryID == 1) label.text = @"Download from WebDAV";
-                    else if (attachment.existsOnZoteroServer){
-                        if(attachment.attachmentSize!= 0){
-                            label.text =  [NSString stringWithFormat:@"Download from Zotero (%i KB)",attachment.attachmentSize/1024];
+                    else{
+                        
+                        if (attachment.existsOnZoteroServer){
+                            if(attachment.attachmentSize!= 0){
+                                label.text =  [NSString stringWithFormat:@"Download from Zotero (%i KB)",attachment.attachmentSize/1024];
+                            }
+                            else{
+                                label.text = @"Download from Zotero";
+                            }
                         }
-                        else{
-                            label.text = @"Download from Zotero";
-                        }
+                        else label.text = @"File does not exists on Zotero server";
                     }
-                    else label.text = @"File cannot be found for download";
                 }
                 else  label.text = @"File cannot be downloaded when offline";
             }
