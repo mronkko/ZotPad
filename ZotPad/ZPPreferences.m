@@ -348,7 +348,8 @@ static NSInteger _maxCacheSize;
 }
 
 +(BOOL) layeredCollectionsNavigation{
-    if(UI_USER_INTERFACE_IDIOM() == UIUserInterfaceIdiomPhone) return TRUE;
+    //For now this is always enabled
+    return TRUE;
     NSUserDefaults* defaults = [NSUserDefaults standardUserDefaults];
     return [defaults boolForKey:@"layeredcollectionsnavigation"];
 }

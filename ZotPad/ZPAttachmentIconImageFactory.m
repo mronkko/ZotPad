@@ -9,13 +9,9 @@
 #import "ZPCore.h"
 
 #import "ZPAttachmentIconImageFactory.h"
-
-
 #import <QuartzCore/QuartzCore.h>
-
-
 #import <zlib.h>
-
+#import "TestFlight.h"
 
 
 #define CHUNK 16384
