@@ -270,13 +270,14 @@
                         <segue destination="htM-EZ-pFH" kind="modal" identifier="FileUploadConflict" id="bAm-Ev-B5H"/>
                         <segue destination="krk-Vp-4gf" kind="modal" identifier="ShowLogView" modalPresentationStyle="fullScreen" modalTransitionStyle="flipHorizontal" id="ODr-oO-YQ7"/>
                         <segue destination="cEO-2j-Td0" kind="relationship" relationship="masterViewController" id="cyW-1i-zAw"/>
+                        <segue destination="BLe-jL-WRe" kind="modal" identifier="PresentDocumentViewer" modalPresentationStyle="fullScreen" modalTransitionStyle="crossDissolve" id="E8F-bp-ima"/>
                     </connections>
                 </splitViewController>
                 <placeholder placeholderIdentifier="IBFirstResponder" id="17" sceneMemberID="firstResponder"/>
             </objects>
             <point key="canvasLocation" x="-711" y="-178"/>
         </scene>
-        <!--Collections And Tags View Controller-->
+        <!--Collections And Tags View Controller - Libraries and collections-->
         <scene sceneID="GvH-U2-NHG">
             <objects>
                 <viewController id="Udn-q6-Hwa" customClass="ZPCollectionsAndTagsViewController" sceneMemberID="viewController">
@@ -350,7 +351,7 @@
                         <barButtonItem style="plain" systemItem="flexibleSpace" id="RpU-Ad-UTK"/>
                         <barButtonItem image="gear.png" id="DxZ-Ui-xk1"/>
                     </toolbarItems>
-                    <navigationItem key="navigationItem" id="MCp-TT-5Pp"/>
+                    <navigationItem key="navigationItem" title="Libraries and collections" id="MCp-TT-5Pp"/>
                     <simulatedToolbarMetrics key="simulatedBottomBarMetrics"/>
                     <connections>
                         <outlet property="cacheControllerPlaceHolder" destination="pJr-97-OZ5" id="HfH-qH-ehF"/>
@@ -500,6 +501,117 @@
                 <placeholder placeholderIdentifier="IBFirstResponder" id="uuF-id-wBA" userLabel="First Responder" sceneMemberID="firstResponder"/>
             </objects>
             <point key="canvasLocation" x="1847" y="-192"/>
+        </scene>
+        <!--File Viewer View Controller-->
+        <scene sceneID="WHd-ed-UCH">
+            <objects>
+                <viewController id="BLe-jL-WRe" customClass="ZPFileViewerViewController" sceneMemberID="viewController">
+                    <view key="view" multipleTouchEnabled="YES" contentMode="scaleToFill" id="1dD-9S-3eK">
+                        <rect key="frame" x="0.0" y="20" width="1024" height="748"/>
+                        <autoresizingMask key="autoresizingMask" flexibleMaxX="YES" flexibleMaxY="YES"/>
+                        <subviews>
+                            <view contentMode="scaleToFill" id="q7f-ZW-tk3">
+                                <rect key="frame" x="0.0" y="0.0" width="320" height="748"/>
+                                <autoresizingMask key="autoresizingMask" flexibleMaxX="YES" heightSizable="YES"/>
+                                <color key="backgroundColor" white="0.66666666666666663" alpha="1" colorSpace="calibratedWhite"/>
+                                <gestureRecognizers/>
+                                <connections>
+                                    <outletCollection property="gestureRecognizers" destination="3HD-aF-cIG" appends="YES" id="NSf-up-b5z"/>
+                                </connections>
+                            </view>
+                            <view contentMode="scaleToFill" id="zNO-63-agw">
+                                <rect key="frame" x="320" y="334" width="20" height="80"/>
+                                <autoresizingMask key="autoresizingMask" flexibleMaxX="YES" flexibleMinY="YES" flexibleMaxY="YES"/>
+                                <subviews>
+                                    <imageView userInteractionEnabled="NO" alpha="0.29999999999999999" contentMode="scaleToFill" image="verticalLines.png" id="4uU-Ml-yaw">
+                                        <rect key="frame" x="5" y="15" width="12" height="50"/>
+                                        <autoresizingMask key="autoresizingMask" widthSizable="YES" heightSizable="YES"/>
+                                    </imageView>
+                                </subviews>
+                                <color key="backgroundColor" white="0.66666666666666663" alpha="1" colorSpace="calibratedWhite"/>
+                                <gestureRecognizers/>
+                                <connections>
+                                    <outletCollection property="gestureRecognizers" destination="vu8-o9-6Jd" appends="YES" id="UX9-Vd-ybX"/>
+                                    <outletCollection property="gestureRecognizers" destination="NJy-vf-cQ9" appends="YES" id="FWc-fx-HWy"/>
+                                </connections>
+                            </view>
+                            <view contentMode="scaleToFill" id="tx3-Le-y5p">
+                                <rect key="frame" x="974" y="200" width="50" height="348"/>
+                                <autoresizingMask key="autoresizingMask" flexibleMinX="YES" flexibleMinY="YES" flexibleMaxY="YES"/>
+                                <color key="backgroundColor" white="0.66666666666666663" alpha="1" colorSpace="calibratedWhite"/>
+                                <gestureRecognizers/>
+                                <connections>
+                                    <outletCollection property="gestureRecognizers" destination="dtk-eB-uXC" appends="YES" id="KCj-hB-Sen"/>
+                                </connections>
+                            </view>
+                            <view contentMode="scaleToFill" id="Xab-2t-Ez1">
+                                <rect key="frame" x="954" y="334" width="20" height="80"/>
+                                <autoresizingMask key="autoresizingMask" flexibleMinX="YES" flexibleMinY="YES" flexibleMaxY="YES"/>
+                                <subviews>
+                                    <imageView userInteractionEnabled="NO" alpha="0.30000001192092896" contentMode="scaleToFill" image="verticalLines.png" id="bok-Xv-5bI">
+                                        <rect key="frame" x="2" y="15" width="12" height="50"/>
+                                        <autoresizingMask key="autoresizingMask" widthSizable="YES" heightSizable="YES"/>
+                                    </imageView>
+                                </subviews>
+                                <color key="backgroundColor" white="0.66666666666666663" alpha="1" colorSpace="calibratedWhite"/>
+                                <gestureRecognizers/>
+                                <connections>
+                                    <outletCollection property="gestureRecognizers" destination="Dwy-R2-aND" appends="YES" id="fhw-bY-zGY"/>
+                                    <outletCollection property="gestureRecognizers" destination="ekM-hN-KvU" appends="YES" id="Fp7-TS-7nZ"/>
+                                </connections>
+                            </view>
+                            <navigationBar contentMode="scaleToFill" barStyle="blackTranslucent" id="7gz-Up-uUz">
+                                <rect key="frame" x="0.0" y="0.0" width="1024" height="44"/>
+                                <autoresizingMask key="autoresizingMask" widthSizable="YES" flexibleMaxY="YES"/>
+                                <items>
+                                    <navigationItem title="Title" id="uwI-mv-ZqK"/>
+                                </items>
+                            </navigationBar>
+                        </subviews>
+                        <color key="backgroundColor" white="1" alpha="1" colorSpace="calibratedWhite"/>
+                        <simulatedOrientationMetrics key="simulatedOrientationMetrics" orientation="landscapeRight"/>
+                    </view>
+                    <connections>
+                        <outlet property="leftPullPane" destination="q7f-ZW-tk3" id="q4h-67-5qt"/>
+                        <outlet property="leftPullTab" destination="zNO-63-agw" id="dTq-Lt-zph"/>
+                        <outlet property="navigationBar" destination="7gz-Up-uUz" id="ugC-XP-o0v"/>
+                        <outlet property="rightPullPane" destination="tx3-Le-y5p" id="WiK-Jy-Ftk"/>
+                        <outlet property="rightPullTab" destination="Xab-2t-Ez1" id="u8O-kZ-UOw"/>
+                    </connections>
+                </viewController>
+                <placeholder placeholderIdentifier="IBFirstResponder" id="PbE-0C-2Pt" userLabel="First Responder" sceneMemberID="firstResponder"/>
+                <tapGestureRecognizer id="vu8-o9-6Jd">
+                    <connections>
+                        <action selector="togglePullPane:" destination="BLe-jL-WRe" id="vo1-sb-evW"/>
+                    </connections>
+                </tapGestureRecognizer>
+                <tapGestureRecognizer id="Dwy-R2-aND">
+                    <connections>
+                        <action selector="togglePullPane:" destination="BLe-jL-WRe" id="FJY-OE-3v8"/>
+                    </connections>
+                </tapGestureRecognizer>
+                <panGestureRecognizer minimumNumberOfTouches="1" id="3HD-aF-cIG">
+                    <connections>
+                        <action selector="handlePanGestureOnPullPane:" destination="BLe-jL-WRe" id="5ET-0e-mDv"/>
+                    </connections>
+                </panGestureRecognizer>
+                <panGestureRecognizer minimumNumberOfTouches="1" id="NJy-vf-cQ9">
+                    <connections>
+                        <action selector="handlePanGestureOnPullPane:" destination="BLe-jL-WRe" id="wYb-6E-2a6"/>
+                    </connections>
+                </panGestureRecognizer>
+                <panGestureRecognizer minimumNumberOfTouches="1" id="dtk-eB-uXC">
+                    <connections>
+                        <action selector="handlePanGestureOnPullPane:" destination="BLe-jL-WRe" id="M75-nx-Azr"/>
+                    </connections>
+                </panGestureRecognizer>
+                <panGestureRecognizer minimumNumberOfTouches="1" id="ekM-hN-KvU">
+                    <connections>
+                        <action selector="handlePanGestureOnPullPane:" destination="BLe-jL-WRe" id="rnv-TR-ure"/>
+                    </connections>
+                </panGestureRecognizer>
+            </objects>
+            <point key="canvasLocation" x="-1664" y="-1375"/>
         </scene>
         <!--Authentication Dialog - Login to Zotero-->
         <scene sceneID="kZo-Vw-R2l">
@@ -755,6 +867,7 @@
         <image name="gear.png" width="20" height="20"/>
         <image name="horizontalLines.png" width="1" height="6"/>
         <image name="icon-up-black.png" width="23" height="20"/>
+        <image name="verticalLines.png" width="6" height="1"/>
     </resources>
     <simulatedMetricsContainer key="defaultSimulatedMetrics">
         <simulatedStatusBarMetrics key="statusBar" statusBarStyle="blackTranslucent"/>
