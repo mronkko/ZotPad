@@ -14,7 +14,6 @@
 
 #import "ZPLocalization.h"
 #import "ZPAttachmentFileInteractionController.h"
-#import "ZPPreviewController.h"
 
 #import "ZPAppDelegate.h"
 
@@ -22,6 +21,8 @@
 #import "ZPAttachmentIconImageFactory.h"
 #import "ZPAttachmentCarouselDelegate.h"
 #import "OHAttributedLabel.h"
+#import "ZPStarBarButtonItem.h"
+
 
 #import <UIKit/UIKit.h>
 
@@ -91,7 +92,9 @@
     _activityIndicator = [[UIActivityIndicatorView alloc] initWithFrame:CGRectMake(0,0,20, 20)];
     [_activityIndicator hidesWhenStopped];
     UIBarButtonItem* barButton = [[UIBarButtonItem alloc] initWithCustomView:_activityIndicator];
-    self.navigationItem.rightBarButtonItems = [NSArray arrayWithObjects:self.actionButton, barButton, nil];
+    UIBarButtonItem* starButton = [[ZPStarBarButtonItem alloc] init];
+
+    self.navigationItem.rightBarButtonItems = [NSArray arrayWithObjects:self.actionButton, starButton, barButton, nil];
     
     [[NSNotificationCenter defaultCenter] addObserver:self
                                              selector:@selector(notifyItemAvailable:) 

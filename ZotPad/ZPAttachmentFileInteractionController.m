@@ -18,13 +18,6 @@
 
 
 
-
-
-
-
-//Presenting previews
-#import "ZPPreviewController.h"
-
 @interface ZPAttachmentFileInteractionController(){
     ZPZoteroAttachment* _activeAttachment;
     BOOL _fileCanBeOpened;
@@ -113,7 +106,7 @@
         //Dismiss the preview controller if it is visible
         UIViewController* root = [UIApplication sharedApplication].delegate.window.rootViewController;
         UIViewController* vc = [root modalViewController];
-        if(vc!=NULL && [vc isKindOfClass:[ZPPreviewController class]]) [root dismissModalViewControllerAnimated:YES];
+        //if(vc!=NULL && [vc isKindOfClass:[ZPPreviewController class]]) [root dismissModalViewControllerAnimated:YES];
 
     }
     else{

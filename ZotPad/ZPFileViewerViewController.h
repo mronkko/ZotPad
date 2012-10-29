@@ -9,13 +9,16 @@
 #import <UIKit/UIKit.h>
 #import "ZPAttachmentFileInteractionController.h"
 #import "ZPCore.h"
+#import "HLSPlaceholderViewController.h"
 
-@interface ZPFileViewerViewController : UIViewController{
+@interface ZPFileViewerViewController : HLSPlaceholderViewController <QLPreviewControllerDataSource>{
     ZPAttachmentFileInteractionController* _attachmentInteractionController;
     NSMutableArray* _attachments;
     NSInteger _activeAttachmentIndex;
     BOOL _leftPaneVisible;
     BOOL _rightPaneVisible;
+    QLPreviewController* _qlPreviewController;
+    UINavigationController* _itemViewers;
 }
 
 @property (retain, nonatomic) IBOutlet UINavigationBar* navigationBar;
@@ -35,6 +38,6 @@
 -(IBAction)togglePullPane:(id)sender;
 -(IBAction)handlePanGestureOnPullPane:(UIPanGestureRecognizer *)gestureRecognizer;
 
--(void) addAttachment:(ZPZoteroAttachment*)attachment;
+-(void) addAttachmentToViewer:(ZPZoteroAttachment*)attachment;
 
 @end

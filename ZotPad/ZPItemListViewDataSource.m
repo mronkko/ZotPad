@@ -11,7 +11,6 @@
 #import "DTCoreText.h"
 #import "OHAttributedLabel.h"
 #import "ZPAttachmentIconImageFactory.h"
-#import "ZPPreviewController.h"
 
 #import "ZPCacheController.h"
 
@@ -521,7 +520,7 @@ static ZPItemListViewDataSource* _instance;
     }
     else{
         _attachmentInQuicklook = attachment;
-        [ZPPreviewController displayQuicklookWithAttachment:attachment source:self];
+        [[UIApplication sharedApplication].delegate.window.rootViewController performSegueWithIdentifier:@"PresentDocumentViewer" sender:attachment];
     }
 }
 -(UIView*) sourceViewForQuickLook{

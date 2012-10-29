@@ -9,6 +9,7 @@
 #import "ZPNavigationController.h"
 #import "ZPFileImportViewController.h"
 #import "ZPUploadVersionConflictViewControllerViewController.h"
+#import "ZPFileViewerViewController.h"
 
 @implementation ZPNavigationController
 
@@ -24,6 +25,11 @@
         ZPUploadVersionConflictViewControllerViewController* target = segue.destinationViewController;
         target.fileChannel = [(NSDictionary*) sender objectForKey:@"fileChannel"];
         target.attachment = [(NSDictionary*) sender objectForKey:ZPKEY_ATTACHMENT];
+    }
+    else if([segue.identifier isEqualToString:@"PresentDocumentViewer"]){
+        ZPFileViewerViewController* target = segue.destinationViewController;
+        ZPZoteroAttachment* attachment = sender;
+        [target addAttachmentToViewer:attachment];
     }
 }
 

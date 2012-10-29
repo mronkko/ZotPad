@@ -8,6 +8,7 @@
 
 #import "ZPFileViewerViewController.h"
 
+//User interface
 #import "ZPStarBarButtonItem.h"
 #import <QuartzCore/QuartzCore.h>
 
@@ -15,11 +16,14 @@
 #import "ZipArchive.h"
 #import "NSString+Base64.h"
 
+#import "ZPDebugViewController.h"
+
 @interface ZPFileViewerViewController ()
 
 -(void)_togglePullPane:(UIView*)pane duration:(float) duration toVisible:(BOOL)visible;
 -(void)_moveView:(UIView*) view horizontallyBy:(float) amount;
 -(NSInteger) _xCoordinateForView:(UIView*) view isVisible:(BOOL) visible;
+-(void) _segmentChanged:(UISegmentedControl*) source;
 
 @end
 
@@ -36,10 +40,26 @@
     return self;
 }
 
+- (id) initWithCoder:(NSCoder *)aDecoder{
+    self = [super initWithCoder:aDecoder];
+    if (self) {
+        _attachments = [[NSMutableArray alloc] init];
+    }
+    return self;
+    
+}
 - (void)viewDidLoad
 {
     [super viewDidLoad];
 	// Do any additional setup after loading the view.
+    
+    // Disable the right pull pane for now. It will be used for the annotation tools in the future.
+    
+    [self.rightPullTab removeFromSuperview];
+    self.rightPullTab = NULL;
+    [self.rightPullPane removeFromSuperview];
+    self.rightPullPane = NULL;
+    
     
     // Set up buttons
     
@@ -49,6 +69,11 @@
     
     UISegmentedControl* segmentControl = [[UISegmentedControl alloc] initWithItems:[NSArray arrayWithObjects:[UIImage imageNamed:@"left"],[UIImage imageNamed:@"right"], nil]];
     segmentControl.segmentedControlStyle = UISegmentedControlStyleBar;
+
+    [segmentControl setWidth:40 forSegmentAtIndex:0];
+    [segmentControl setWidth:40 forSegmentAtIndex:1];
+    
+    [segmentControl addTarget:self action:@selector(_segmentChanged:) forControlEvents:UIControlEventValueChanged];
     
     UIBarButtonItem* forwardAndBackButtons = [[UIBarButtonItem alloc] initWithCustomView:segmentControl];
     
@@ -73,12 +98,29 @@
     
     [self.navigationBar pushNavigationItem:self.navigationItem animated:NO];
     
+    
+    //Configure the QuickLook attachment viewer
+    
+    _qlPreviewController = [[QLPreviewController alloc] init];
+    _qlPreviewController.dataSource = self;
+
+    _itemViewers = [self.storyboard instantiateViewControllerWithIdentifier:@"FileViewerNavigationViewController"];
+
+    [_itemViewers pushViewController:_qlPreviewController animated:NO];
+    
+    [self setInsetViewController:_itemViewers];
+    
+    
+   
 }
 
 -(void) viewWillAppear:(BOOL)animated{
+    
+    [super viewWillAppear:animated];
+    
     //Configure the pull panes
     
-    for(NSInteger index =0; index <2;++index){
+    for(NSInteger index =0; index <(1+(rightPullPane!=NULL));++index){
         
         UIView* pane;
         UIView* pullTab;
@@ -101,6 +143,7 @@
             x1=0;
             x2=x1 - pullTab.frame.size.width;
         }
+        
         
         UIBezierPath* shadowPath = [UIBezierPath bezierPath];
         
@@ -180,16 +223,17 @@
     
     //Hide both pull tabs
 
-    rightPullPane.frame = CGRectMake(rightPullPane.frame.origin.x + rightPullPane.frame.size.width,
-                                    rightPullPane.frame.origin.y,
-                                    rightPullPane.frame.size.width,
-                                    rightPullPane.frame.size.height);
-
-    rightPullTab.frame = CGRectMake(rightPullTab.frame.origin.x + rightPullPane.frame.size.width,
-                                    rightPullTab.frame.origin.y,
-                                    rightPullTab.frame.size.width,
-                                    rightPullTab.frame.size.height);
-
+    if(rightPullPane!=NULL){
+        rightPullPane.frame = CGRectMake(rightPullPane.frame.origin.x + rightPullPane.frame.size.width,
+                                         rightPullPane.frame.origin.y,
+                                         rightPullPane.frame.size.width,
+                                         rightPullPane.frame.size.height);
+        
+        rightPullTab.frame = CGRectMake(rightPullTab.frame.origin.x + rightPullPane.frame.size.width,
+                                        rightPullTab.frame.origin.y,
+                                        rightPullTab.frame.size.width,
+                                        rightPullTab.frame.size.height);
+    }
 
     leftPullPane.frame = CGRectMake(leftPullPane.frame.origin.x - leftPullPane.frame.size.width,
                                     leftPullPane.frame.origin.y,
@@ -208,6 +252,8 @@
 
 - (void) willAnimateRotationToInterfaceOrientation:(UIInterfaceOrientation)toInterfaceOrientation duration:(NSTimeInterval)duration {
 
+    [super willAnimateRotationToInterfaceOrientation:toInterfaceOrientation duration:duration];
+    
     UIView* pane = self.leftPullPane;
     UIView* pullTab = self.leftPullTab;
     NSInteger x0=0;
@@ -280,8 +326,8 @@
 
 #pragma mark - Managing the displayed items
 
-- (void) addAttachment:(ZPZoteroAttachment *)attachment{
-    
+-(void) addAttachmentToViewer:(ZPZoteroAttachment*)attachment{
+
     //Do not add the object if it already exists
     if([_attachments containsObject:attachment]){
         if([_attachments lastObject]!=attachment){
@@ -341,13 +387,22 @@
     [_attachmentInteractionController presentOptionsMenuFromBarButtonItem:sender];
 }
 
+-(void) _segmentChanged:(UISegmentedControl*) source{
+    if(source.selectedSegmentIndex==0) [self previous:source];
+    else [self next:source];
+    source.selectedSegmentIndex = UISegmentedControlNoSegment;
+}
+
 
 - (IBAction) next:(id)sender{
     
+    _qlPreviewController = [[QLPreviewController alloc] init];
+    _qlPreviewController.dataSource = self;
+    [_itemViewers pushViewController:_qlPreviewController animated:YES];
 }
 
 - (IBAction) previous:(id)sender{
-    
+    [_itemViewers popViewControllerAnimated:YES];
 }
 
 - (IBAction) presentAllFiles:(id)sender{
@@ -448,7 +503,19 @@
                                     pullTab.frame.origin.y,
                                     pullTab.frame.size.width,
                                     pullTab.frame.size.height);
+            
 
+            if(pane==leftPullPane && UIInterfaceOrientationIsLandscape([[UIApplication sharedApplication] statusBarOrientation])){
+                NSLog(NSStringFromCGRect(self.placeholderView.frame));
+                self.placeholderView.frame = CGRectMake(visible?leftPullPane.frame.size.width:0,
+                                                        self.placeholderView.frame.origin.y,
+                                                        [[UIScreen mainScreen] bounds].size.height - (visible?leftPullPane.frame.size.width:0),
+                                                        self.placeholderView.frame.size.height);
+
+                NSLog(NSStringFromCGRect(self.placeholderView.frame));
+
+            }
+            
         }];
     }
     
@@ -491,6 +558,25 @@
     }
 
 }
+
+#pragma mark - QLPreviewControllerDataSource
+
+
+- (NSInteger) startIndex{
+    return 0;
+}
+
+- (NSInteger) numberOfPreviewItemsInPreviewController: (QLPreviewController *) controller
+{
+    return 1;
+}
+
+
+- (id <QLPreviewItem>) previewController: (QLPreviewController *) controller previewItemAtIndex: (NSInteger) index{
+    return [_attachments objectAtIndex:_activeAttachmentIndex];
+}
+
+
 
 
 @end

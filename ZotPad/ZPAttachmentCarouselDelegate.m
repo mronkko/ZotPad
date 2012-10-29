@@ -10,8 +10,6 @@
 //
 
 #import "ZPAttachmentCarouselDelegate.h"
-#import "ZPPreviewController.h"
-
 
 #import "ZPAttachmentIconImageFactory.h"
 #import <QuartzCore/QuartzCore.h>
@@ -428,7 +426,7 @@ NSInteger const ZPATTACHMENTICONGVIEWCONTROLLER_TAG_TITLELABEL = -5;
                 }
             }
             
-            [ZPPreviewController displayQuicklookWithAttachment:attachment source:self];
+            [[UIApplication sharedApplication].delegate.window.rootViewController performSegueWithIdentifier:@"PresentDocumentViewer" sender:attachment];
         }
         else if(attachment.linkMode == LINK_MODE_LINKED_URL && [ZPServerConnectionManager hasInternetConnection]){
             [[UIApplication sharedApplication] openURL:[NSURL URLWithString:attachment.url]];
