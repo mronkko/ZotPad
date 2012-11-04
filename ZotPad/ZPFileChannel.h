@@ -36,7 +36,7 @@
 -(void) linkAttachment:(ZPZoteroAttachment*)attachment withRequest:(NSObject*)request;
 -(id) requestWithAttachment:(ZPZoteroAttachment*)attachment;
 
--(void) presentConflictViewForAttachment:(ZPZoteroAttachment*) attachment;
+-(void) presentConflictViewForAttachment:(ZPZoteroAttachment*) attachment reason:(NSString*) reason;
 
 /*
  Returns the content of a request and response as string. Useful for logging.

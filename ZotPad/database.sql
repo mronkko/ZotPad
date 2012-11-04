@@ -63,6 +63,7 @@ CREATE INDEX items_libraryID ON items (libraryID);
 CREATE TABLE IF NOT EXISTS notes (
     parentKey TEXT NOT NULL,
     itemKey TEXT PRIMARY KEY,
+    note TEXT DEFAULT NULL,
     cacheTimestamp TEXT NOT NULL
 );
 
@@ -73,6 +74,7 @@ CREATE TABLE IF NOT EXISTS attachments (
     parentKey TEXT NOT NULL,
     itemKey TEXT PRIMARY KEY,
     title TEXT NOT NULL,
+    note TEXT DEFAULT NULL,
     cacheTimestamp TEXT NOT NULL,
     linkMode INT NOT NULL,
     filename TEXT DEFAULT NULL,

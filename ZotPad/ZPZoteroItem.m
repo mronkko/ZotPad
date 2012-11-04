@@ -226,8 +226,7 @@ static CSLFormatter* _cslFormatter = NULL;
 - (NSArray*) notes{
     
     if(_notes == NULL){
-        //TODO: Implement notes
-        //[ZPDatabase addNotesItem:self];
+        [ZPDatabase addNotesToItem:self];
     }
     return _notes;
 }

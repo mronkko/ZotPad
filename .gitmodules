@@ -52,3 +52,9 @@
 [submodule "uservoice-iphone-sdk"]
 	path = uservoice-iphone-sdk
 	url = https://github.com/uservoice/uservoice-iphone-sdk.git
+[submodule "CMPopTipView"]
+	path = CMPopTipView
+	url = https://github.com/chrismiles/CMPopTipView.git
+[submodule "1202238"]
+	path = 1202238
+	url = git://gist.github.com/1202238.git

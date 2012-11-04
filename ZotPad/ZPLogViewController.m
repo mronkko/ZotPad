@@ -10,11 +10,10 @@
 #import "ZPLogViewController.h"
 #import "ZPAppDelegate.h"
 #import "DDFileLogger.h"
-#import "ZPHelpPopover.h"
+#import "CMPopTipView.h"
 #import "UserVoice.h"
 #import "UVSession.h"
 #import "UVClientConfig.h"
-#import <MessageUI/MessageUI.h>
 
 @interface ZPLogViewController (){
     MFMailComposeViewController *mailController;
@@ -48,11 +47,11 @@
 }
 - (void)viewDidAppear:(BOOL)animated{
     [super viewDidAppear:YES];
-    if(UI_USER_INTERFACE_IDIOM() == UIUserInterfaceIdiomPad){
-        if([[NSUserDefaults standardUserDefaults] objectForKey:@"hasPresentedSecondaryHelpPopover"]==NULL){
-            [ZPHelpPopover displayHelpPopoverFromToolbarButton:manualButton];
-            [[NSUserDefaults standardUserDefaults] setObject:@"1" forKey:@"hasPresentedSecondaryHelpPopover"];
-        }
+
+    if([[NSUserDefaults standardUserDefaults] objectForKey:@"hasPresentedSecondaryHelpPopover"]==NULL){
+        CMPopTipView* helpPopUp = [[CMPopTipView alloc] initWithMessage:@"Tap here for help"];
+        [helpPopUp presentPointingAtBarButtonItem:manualButton animated:YES];
+        [[NSUserDefaults standardUserDefaults] setObject:@"1" forKey:@"hasPresentedSecondaryHelpPopover"];
     }
 
 }

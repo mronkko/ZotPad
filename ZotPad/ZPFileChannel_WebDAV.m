@@ -193,7 +193,8 @@ NSInteger const ZPFILECHANNEL_WEBDAV_UPLOAD_REGISTER = 5;
             [attachment purge_original:@"File is outdated (WebDAV pre-check)"];
             
         }
-        [self presentConflictViewForAttachment:attachment];
+        [self presentConflictViewForAttachment:attachment reason:[NSString stringWithFormat:@"MD5 sums differ. Local metadata: %@, Local file: %@, Server file: %@",
+        attachment.md5, attachment.versionIdentifier_local, attachment.versionIdentifier_server]];
         
     }
     else{
@@ -457,7 +458,7 @@ NSInteger const ZPFILECHANNEL_WEBDAV_UPLOAD_REGISTER = 5;
         else if(request.tag == ZPFILECHANNEL_WEBDAV_UPLOAD_REGISTER && request.responseStatusCode == 412){
            
             [attachment purge_original:@"File is outdated (WebDAV conflict)"];
-            [self presentConflictViewForAttachment:attachment];
+            [self presentConflictViewForAttachment:attachment reason:@"Zotero server reported a version conflict when registering a file after WebDAV upload"];
         }
         else{
             NSError* error =[NSError errorWithDomain:request.url.host code:request.responseStatusCode userInfo:[NSDictionary dictionaryWithObject:request.responseStatusMessage forKey:NSLocalizedDescriptionKey]];

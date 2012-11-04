@@ -96,7 +96,7 @@
             for(NSDictionary* tagDict in tags){
                 [tagsArray addObject:[tagDict objectForKey:@"tag"]];
             }
-            _currentElement.tags = tagsArray;
+            _currentElement.tags = [tagsArray sortedArrayUsingSelector:@selector(localizedCaseInsensitiveCompare:)];
         }
         
         NSMutableDictionary* fields = [NSMutableDictionary dictionaryWithDictionary:data];
@@ -161,7 +161,6 @@
         _currentElement = [ZPZoteroAttachment attachmentWithKey:id];
     }
     else if([itemType isEqualToString:@"note"]){
-        //Notes are really note implemented yet
         _currentElement = [ZPZoteroNote noteWithKey:id];
     }
     else{

@@ -231,7 +231,7 @@ NSInteger const ZPFILECHANNEL_ZOTEROSTORAGE_UPLOAD_REGISTER = 4;
             }
             else{
                 
-                DDLogInfo(@"Upload of file %@ was atuhorized by Zotero server",attachment.filename);
+                DDLogInfo(@"Upload of file %@ was authorized by Zotero server",attachment.filename);
 
                 NSDictionary* responseDictionary = [[request responseString] JSONValue];
                 
@@ -299,14 +299,45 @@ NSInteger const ZPFILECHANNEL_ZOTEROSTORAGE_UPLOAD_REGISTER = 4;
             [self cleanupAfterFinishingAttachment:attachment];
         }
         else if(request.responseStatusCode == 412){
-
-            DDLogWarn(@"Zotero server reported a version conflict with file %@",attachment.filename);
+            NSString* reason;
+            switch (request.tag) {
+                case ZPFILECHANNEL_ZOTEROSTORAGE_UPLOAD_AUTHORIZATION:
+                    reason = @"Zotero server reported version conflict when getting upload authorization";
+                    break;
+                case ZPFILECHANNEL_ZOTEROSTORAGE_UPLOAD_FILE:
+                    reason = @"Zotero server reported version conflict when uploading file";
+                case ZPFILECHANNEL_ZOTEROSTORAGE_UPLOAD_REGISTER:
+                    reason = @"Zotero server reported version conflict when registering an upload";
+                    
+                default:
+                    break;
+            }
             [attachment purge_original:@"File is outdated (Zotero storage conflict)"];
-            [self presentConflictViewForAttachment:attachment];
+            [self presentConflictViewForAttachment:attachment reason:reason];
         }
+        else if(request.responseStatusCode == 413){
+            
+            DDLogWarn(@"Zotero server rejected upload of %@ because of insufficient storage space",attachment.filename);
+            NSError* error =[NSError errorWithDomain:@"zotero.org"
+                                                code:request.responseStatusCode
+                                            userInfo:[NSDictionary dictionaryWithObject:@"Storage space exceeded"
+                                                                                 forKey:NSLocalizedDescriptionKey]];
+            
+            if(! _alertVisible){
+                [[[UIAlertView alloc] initWithTitle:@"Storage space exceeded"
+                                            message:[NSString stringWithFormat:@"Uploading  of file (%@) failed because you have exceeded your storage space on the Zotero server",attachment.filename]
+                                           delegate:self
+                                  cancelButtonTitle:@"Cancel" otherButtonTitles:@"Check storage", @"Learn more", nil] show];
+                _alertVisible = TRUE;
+            }
+            
+            [ZPServerConnectionManager failedUploadingAttachment:attachment withError:error usingFileChannel:self toURL:[request.url absoluteString]];
+        }
+
         else {
             NSError* error =[NSError errorWithDomain:@"zotero.org" code:request.responseStatusCode userInfo:NULL];
             DDLogError(@"Uploading file %@ to Zotero server failed with error: %@",attachment.filename,request.responseStatusMessage);
+            
             [self cleanupAfterFinishingAttachment:attachment];
             [ZPServerConnectionManager failedUploadingAttachment:attachment withError:error usingFileChannel:self toURL:[request.url absoluteString]];
         }
@@ -366,6 +397,30 @@ NSInteger const ZPFILECHANNEL_ZOTEROSTORAGE_UPLOAD_REGISTER = 4;
     }
 }
 
+#pragma mark - UIAlertViewDelegate
 
+- (void)alertView:(UIAlertView *)alertView clickedButtonAtIndex:(NSInteger)buttonIndex{
+    
+    //0: cancel
+    
+    if(buttonIndex==1){
+        NSURL *url = [NSURL URLWithString:@"https://www.zotero.org/settings/storage"];
+        
+        if (![[UIApplication sharedApplication] openURL:url])
+            
+            NSLog(@"%@%@",@"Failed to open url:",[url description]);
+        
+    }
+    else if(buttonIndex==2){
+        NSURL *url = [NSURL URLWithString:@"http://zotpad.uservoice.com/knowledgebase/articles/103784-which-file-storage-solution-should-i-use-"];
+        
+        if (![[UIApplication sharedApplication] openURL:url])
+            
+            NSLog(@"%@%@",@"Failed to open url:",[url description]);
+        
+    }
+    
+    _alertVisible = false;
+}
 
 @end

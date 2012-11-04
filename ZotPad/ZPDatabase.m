@@ -758,7 +758,7 @@ static NSMutableDictionary* dbPrimaryKeysByTables;
         @synchronized(self){
             
             FMResultSet* resultSet;
-            resultSet= [_database executeQuery:[NSString stringWithFormat:@"SELECT DISTINCT tagName FROM tags WHERE itemKey in ('%@') ORDER BY tagName",[itemKeys componentsJoinedByString:@"', '"]]];
+            resultSet= [_database executeQuery:[NSString stringWithFormat:@"SELECT DISTINCT tagName FROM tags WHERE itemKey in ('%@') ORDER BY tagName COLLATE NOCASE",[itemKeys componentsJoinedByString:@"', '"]]];
                         
             while([resultSet next]) {
                 [returnArray addObject:[resultSet stringForColumnIndex:0]];
@@ -768,6 +768,26 @@ static NSMutableDictionary* dbPrimaryKeysByTables;
             
         }
     }
+	return returnArray;
+}
+
++(NSArray*) tagsForLibrary:(NSInteger)libraryID{
+    
+    NSMutableArray* returnArray = [[NSMutableArray alloc] init];
+    
+    @synchronized(self){
+        
+        FMResultSet* resultSet;
+        resultSet= [_database executeQuery:@"SELECT DISTINCT tagName FROM tags WHERE itemKey in (SELECT itemKey FROM items WHERE libraryID = ?) ORDER BY tagName COLLATE NOCASE",[NSNumber numberWithInt:libraryID]];
+        
+        while([resultSet next]) {
+            [returnArray addObject:[resultSet stringForColumnIndex:0]];
+            
+        }
+        [resultSet close];
+        
+    }
+
 	return returnArray;
 }
 
@@ -1083,7 +1103,7 @@ Deletes items, notes, and attachments based in array of keys from a library
 +(void) addAttachmentsToItem: (ZPZoteroItem*) item  {
     
     @synchronized(self){
-        FMResultSet* resultSet = [_database executeQuery: @"SELECT * FROM attachments WHERE parentKey = ? ORDER BY title ASC",item.key];
+        FMResultSet* resultSet = [_database executeQuery: @"SELECT * FROM attachments WHERE parentKey = ? ORDER BY title COLLATE NOCASE ASC",item.key];
         
         NSMutableArray* attachments = [[NSMutableArray alloc] init];
         while([resultSet next]) {
@@ -1102,11 +1122,11 @@ Deletes items, notes, and attachments based in array of keys from a library
 +(void) addTagsToDataObject:(ZPZoteroDataObject*) dataObject{
 
     @synchronized(self){
-        FMResultSet* resultSet = [_database executeQuery: @"SELECT tagTitle FROM tags WHERE itemKey = ? ORDER BY tagTitle ASC",dataObject.key];
+        FMResultSet* resultSet = [_database executeQuery: @"SELECT tagName FROM tags WHERE itemKey = ? ORDER BY tagName COLLATE NOCASE ASC",dataObject.key];
         
         NSMutableArray* tags = [[NSMutableArray alloc] init];
         while([resultSet next]) {
-            [tags addObject:[resultSet stringForColumn:0]];
+            [tags addObject:[resultSet stringForColumnIndex:0]];
         }
         
         [resultSet close];

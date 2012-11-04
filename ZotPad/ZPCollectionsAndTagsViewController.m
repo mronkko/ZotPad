@@ -8,7 +8,7 @@
 
 #import "ZPCollectionsAndTagsViewController.h"
 #import "ZPCacheStatusToolbarController.h"
-#import "ZPHelpPopover.h"
+#import "CMPopTipView.h"
 #import "FRLayeredNavigationController.h"
 #import "FRLayeredNavigationItem.h"
 
@@ -117,13 +117,16 @@
 
         UISplitViewController* root =  (UISplitViewController*) [UIApplication sharedApplication].delegate.window.rootViewController;
 
-        _tagController.itemListViewController = (ZPItemListViewController *)[[root.viewControllers lastObject] topViewController];
+        _tagController.tagOwner = [ZPItemListViewDataSource instance];
         
-        if([[NSUserDefaults standardUserDefaults] objectForKey:@"hasPresentedMainHelpPopover"]==NULL){
-            [ZPHelpPopover displayHelpPopoverFromToolbarButton:gearButton];
-            [[NSUserDefaults standardUserDefaults] setObject:@"1" forKey:@"hasPresentedMainHelpPopover"];
-        }
     }
+
+    if([[NSUserDefaults standardUserDefaults] objectForKey:@"hasPresentedMainHelpPopover"]==NULL){
+        CMPopTipView* helpPopUp = [[CMPopTipView alloc] initWithMessage:@"Tap here for help"];
+        [helpPopUp presentPointingAtBarButtonItem:gearButton animated:YES];
+        [[NSUserDefaults standardUserDefaults] setObject:@"1" forKey:@"hasPresentedMainHelpPopover"];
+    }
+
 }
 -(void) viewWillAppear:(BOOL)animated{
     [_contentRoot viewWillAppear:animated];

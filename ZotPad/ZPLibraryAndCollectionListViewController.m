@@ -16,7 +16,7 @@
 #import "ZPCacheController.h"
 #import "ZPCacheStatusToolbarController.h"
 #import "ZPItemListViewDataSource.h"
-#import "ZPHelpPopover.h"
+#import "CMPopTipView.h"
 #import "ZPMasterItemListViewController.h"
 #import "FRLayeredNavigationController.h"
 #import "FRLayeredNavigationItem.h"
@@ -115,6 +115,7 @@
     // This is probably unnecessary now.
    // [self.tableView reloadData];
     
+    
 }
 
 - (void)viewDidAppear:(BOOL)animated
@@ -123,7 +124,27 @@
     self.detailViewController = (ZPItemListViewController *)[[self.splitViewController.viewControllers lastObject] topViewController];
     [super viewDidAppear:animated];
     
-    //Show help popover on iPad if not yet shown
+    //Show tool tip for collections navigation
+    
+    if([[NSUserDefaults standardUserDefaults] objectForKey:@"hasPresentedCollectionsHelpPopover"]==NULL && ! [ZPPreferences unifiedCollectionsNavigation]){
+        
+        // Find the first tableViewCell that has a detail disclosure button
+        for(NSInteger row = 0; row < [self.tableView numberOfRowsInSection:0]; ++row){
+            
+            UITableViewCell* cell = [self.tableView cellForRowAtIndexPath:[NSIndexPath indexPathForRow:row inSection:0]];
+            
+            for(UIView* child in [cell subviews]){
+                if([child isKindOfClass:[UIButton class]]){
+                    CMPopTipView* helpPopUp = [[CMPopTipView alloc] initWithMessage:@"Tap the blue button to open collections"];
+                    [helpPopUp presentPointingAtView:child inView:self.tableView animated:YES];
+                    [[NSUserDefaults standardUserDefaults] setObject:@"1" forKey:@"hasPresentedCollectionsHelpPopover"];
+                    goto done;
+                }
+            }
+        }
+    done:;
+        
+    }
     
 }
 
@@ -180,6 +201,7 @@
         }
         else{
             cell.accessoryType = UITableViewCellAccessoryDetailDisclosureButton;
+
         }
 	}
 	else
@@ -445,7 +467,7 @@
                 DDLogVerbose(@"%@",dataObj.title);
             }
             */
-            _content = shownContent;
+            
             
             [self.tableView beginUpdates];
             
@@ -466,8 +488,11 @@
                     DDLogVerbose(@"%i",temp.row);
                 }
             }
+
+            _content = shownContent;
             
             [self.tableView endUpdates];
+            
 /*
             DDLogVerbose(@"Libraries / collections after update");
             for(dataObj in _content){

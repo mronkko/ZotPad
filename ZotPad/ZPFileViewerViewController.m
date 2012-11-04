@@ -11,6 +11,7 @@
 //User interface
 #import "ZPStarBarButtonItem.h"
 #import <QuartzCore/QuartzCore.h>
+#import "CMPopTipView.h"
 
 //Unzipping and base64 decoding
 #import "ZipArchive.h"
@@ -91,6 +92,14 @@
     
     UIBarButtonItem* starButton = [[ZPStarBarButtonItem alloc] init];
     
+    //Show tool tip about stars
+    
+    if([[NSUserDefaults standardUserDefaults] objectForKey:@"hasPresentedStarButtonHelpPopover"]==NULL){
+        CMPopTipView* helpPopUp = [[CMPopTipView alloc] initWithMessage:@"Use the star button to add an item to favourites"];
+        [helpPopUp presentPointingAtBarButtonItem:starButton animated:YES];
+        [[NSUserDefaults standardUserDefaults] setObject:@"1" forKey:@"hasPresentedStarButtonHelpPopover"];
+    }
+
     UIBarButtonItem* actionButton = [[UIBarButtonItem alloc] initWithBarButtonSystemItem:UIBarButtonSystemItemAction target:self action:@selector(actionButtonPressed:)];
     
     self.navigationItem.rightBarButtonItems = [NSArray arrayWithObjects:actionButton, starButton, nil];

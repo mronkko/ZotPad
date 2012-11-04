@@ -43,6 +43,7 @@
 
 -(NSArray*) tags{
     if(_tags == NULL){
+        [ZPDatabase addTagsToDataObject:self];
     }
     return  _tags;
 }

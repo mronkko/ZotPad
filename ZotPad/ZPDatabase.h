@@ -79,6 +79,7 @@
 +(NSArray*) collectionsForItem:(ZPZoteroItem*)item;
     
 +(NSArray*) tagsForItemKeys:(NSArray*)itemKeys;
++(NSArray*) tagsForLibrary:(NSInteger)libraryID;
 
 /*
  

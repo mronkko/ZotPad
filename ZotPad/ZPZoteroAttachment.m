@@ -39,7 +39,7 @@ NSInteger const VERSION_SOURCE_DROPBOX =3;
 static NSCache* _objectCache = NULL;
 static NSString* _documentsDirectory = NULL;
 
-@synthesize lastViewed, attachmentSize, existsOnZoteroServer, filename, url, versionSource,  charset;
+@synthesize lastViewed, attachmentSize, existsOnZoteroServer, filename, url, versionSource,  charset, note;
 @synthesize versionIdentifier_server;
 @synthesize versionIdentifier_local;
 @synthesize contentType;

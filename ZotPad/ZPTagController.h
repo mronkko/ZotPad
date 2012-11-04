@@ -7,7 +7,7 @@
 //
 
 #import <Foundation/Foundation.h>
-#import "ZPItemListViewController.h"
+#import "ZPTagOwner.h"
 
 @interface ZPTagController : NSObject <UITableViewDataSource>{
     NSArray* _tags;
@@ -18,11 +18,12 @@
 }
 
 // The controller that will be updated when tags are changed
-@property (nonatomic, retain) IBOutlet ZPItemListViewController* itemListViewController;
+@property (nonatomic, retain) NSObject<ZPTagOwner>* tagOwner;
 
 -(void) prepareToShow;
 -(void) prepareToHide;
 -(void) toggleTag:(UIButton*)tagButton;
 -(NSInteger) numberOfSelectedTagRowsToShow:(UITableView*)tableView;
++(UIButton*) tagButtonForTag:(NSString*)tag;
 
 @end

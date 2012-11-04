@@ -13,6 +13,7 @@
 }
 
 @property (retain) NSString* itemKey;
+@property (retain) NSString* note;
 
 +(ZPZoteroNote*) noteWithKey:(NSString*) key;
 +(ZPZoteroNote*) noteWithDictionary:(NSDictionary*) fields;

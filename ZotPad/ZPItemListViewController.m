@@ -283,7 +283,7 @@
             [ZPServerConnectionManager retrieveKeysInLibrary:_dataSource.libraryID
                                                   collection:_dataSource.collectionKey
                                                 searchString:_dataSource.searchString
-                                                        tags:_dataSource.selectedTags
+                                                        tags:_dataSource.tags
                                                   orderField:_dataSource.orderField
                                               sortDescending:_dataSource.sortDescending];
 
@@ -297,7 +297,7 @@
         NSArray* cacheKeys= [ZPDatabase getItemKeysForLibrary:_dataSource.libraryID
                                                 collectionKey:_dataSource.collectionKey
                                                  searchString:_dataSource.searchString
-                                                         tags:_dataSource.selectedTags
+                                                         tags:_dataSource.tags
                                                    orderField:_dataSource.orderField
                                                sortDescending:_dataSource.sortDescending];
         
@@ -335,7 +335,7 @@
            ((_dataSource.collectionKey == NULL && collectionKey == NULL) || [collectionKey isEqualToString:_dataSource.collectionKey]) &&
            ((_dataSource.searchString == NULL && searchString == NULL) || [searchString isEqualToString:_dataSource.searchString]) &&
            [orderField isEqualToString:_dataSource.orderField] &&
-           ((tags == NULL && [_dataSource.selectedTags count] == 0) || [_dataSource.selectedTags isEqualToArray:tags])  &&
+           ((tags == NULL && [_dataSource.tags count] == 0) || [_dataSource.tags isEqualToArray:tags])  &&
            sortDescending == _dataSource.sortDescending){
         
             NSArray* itemKeys = notification.object;

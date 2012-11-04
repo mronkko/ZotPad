@@ -77,14 +77,27 @@
     NSString* urlString = [[request mainDocumentURL] absoluteString];
     DDLogVerbose(@"Start loading URL %@",urlString);
 
+
+
+    NSString* requestBody = [[NSString alloc] initWithData:request.HTTPBody encoding:NSUTF8StringEncoding];
+
+    if([requestBody rangeOfString:@"&revoke="].location != NSNotFound){
+        
+        [[[UIAlertView alloc] initWithTitle:@"API key required"
+                                   message:@"You need to save the API key to use ZotPad"
+                                  delegate:NULL
+                         cancelButtonTitle:@"OK"
+                          otherButtonTitles: nil] show];
+        return FALSE;
+    }
+
     if(_activityView == NULL)
         _activityView = [DSBezelActivityView newActivityViewForView:webView];
 
     //If we are redirected to the front page, we do not need to show the web browser any more
-    
+
     if([urlString hasPrefix:@"https://www.zotero.org/?oauth_token="]){
         
-
         //Get permanent key with the temporary key
         NSString* verifier=[[urlString componentsSeparatedByString:@"="] lastObject];
 

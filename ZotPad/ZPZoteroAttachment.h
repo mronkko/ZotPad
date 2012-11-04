@@ -25,6 +25,7 @@ extern NSInteger const VERSION_SOURCE_WEBDAV;
     NSInteger _linkMode;
 }
 
+@property (retain) NSString* note;
 @property (retain) NSString* contentType;
 @property (assign) NSInteger linkMode;
 @property (assign) BOOL existsOnZoteroServer;

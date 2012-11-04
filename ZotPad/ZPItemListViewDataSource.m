@@ -13,6 +13,7 @@
 #import "ZPAttachmentIconImageFactory.h"
 
 #import "ZPCacheController.h"
+#import "ZPItemListViewController.h"
 
 #define SIZE_OF_TABLEVIEW_UPDATE_BATCH 25
 #define SIZE_OF_DATABASE_UPDATE_BATCH 50
@@ -557,22 +558,43 @@ static ZPItemListViewDataSource* _instance;
     }
 }
 
-#pragma mark - Tag selecting
+#pragma mark - ZPTagOwner protocol
+
 -(void) selectTag:(NSString*)tag{
     _selectedTags = [[_selectedTags arrayByAddingObject:tag] sortedArrayUsingSelector:@selector(compare:)];
+    
+    // Update the selection
+    // (TODO: Figure out a more clean way to do this.)
+    if(UI_USER_INTERFACE_IDIOM() == UIUserInterfaceIdiomPad){
+        UISplitViewController* root =  (UISplitViewController*) [UIApplication sharedApplication].delegate.window.rootViewController;
+        [(ZPItemListViewController *)[[root.viewControllers lastObject] topViewController] configureView];
+    }
 }
 -(void) deselectTag:(NSString*)tag{
     NSMutableArray* temp = [NSMutableArray arrayWithArray:_selectedTags];
     [temp removeObject:tag];
     _selectedTags = temp;
+    
+    // Update the selection
+    // (TODO: Figure out a more clean way to do this.)
+    if(UI_USER_INTERFACE_IDIOM() == UIUserInterfaceIdiomPad){
+        UISplitViewController* root =  (UISplitViewController*) [UIApplication sharedApplication].delegate.window.rootViewController;
+        [(ZPItemListViewController *)[[root.viewControllers lastObject] topViewController] configureView];
+    }
+
+}
+
+-(NSArray*) tags{
+    return _selectedTags;
+}
+
+-(NSArray*) availableTags{
+    //Get the tags for currently visible items
+    return [ZPDatabase tagsForItemKeys:_itemKeysShown];
 }
 
 -(BOOL) isTagSelected:(NSString*)tag{
     return [_selectedTags containsObject:tag];
-}
-
--(NSArray*) selectedTags{
-    return _selectedTags;
 }
 
 @end

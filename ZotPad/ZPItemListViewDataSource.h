@@ -9,8 +9,9 @@
 #import <Foundation/Foundation.h>
 #import "ZPCore.h"
 #import "ZPPreviewSource.h"
+#import "ZPTagOwner.h"
 
-@interface ZPItemListViewDataSource : NSObject <UITableViewDataSource, ZPPreviewSource>{
+@interface ZPItemListViewDataSource : NSObject <UITableViewDataSource, ZPPreviewSource, ZPTagOwner>{
  
     //This is an array instead of a mutable array because of thread safety
     NSArray* _itemKeysShown;
@@ -57,9 +58,6 @@
 -(void) _performTableUpdates:(BOOL)animated;
 //-(void) _refreshCellAtIndexPaths:(NSArray*)indexPath;
 
--(void) selectTag:(NSString*)tag;
--(void) deselectTag:(NSString*)tag;
 -(BOOL) isTagSelected:(NSString*)tag;
--(NSArray*) selectedTags;
 
 @end

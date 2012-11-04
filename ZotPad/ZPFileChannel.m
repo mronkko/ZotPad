@@ -82,7 +82,9 @@
 }
 
 
--(void) presentConflictViewForAttachment:(ZPZoteroAttachment*) attachment{
+-(void) presentConflictViewForAttachment:(ZPZoteroAttachment*) attachment reason:(NSString*) reason{
+    
+    DDLogWarn(@"Version conflict for file %@ (%@): %@",attachment.key, attachment.filename, reason);
     
     if(![NSThread isMainThread]){
         [self performSelectorOnMainThread:@selector(presentConflictViewForAttachment:) withObject:attachment waitUntilDone:YES];

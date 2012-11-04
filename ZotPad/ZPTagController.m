@@ -7,7 +7,6 @@
 //
 
 #import "ZPTagController.h"
-#import "ZPItemListViewDataSource.h"
 #import <QuartzCore/QuartzCore.h>
 
 
@@ -16,7 +15,7 @@
 static UIImage* blueBackgroundImage;
 static NSMutableArray* tagButtonCache;
 
-@synthesize itemListViewController;
+@synthesize tagOwner;
 
 +(void) initialize{
     CGRect rect = CGRectMake(0, 0, 1, 1);
@@ -36,16 +35,15 @@ static NSMutableArray* tagButtonCache;
 
 - (void) prepareToShow{
     //Get the currently visible items
-    NSArray* keysForVisibleItems = [[ZPItemListViewDataSource instance] itemKeys];
-    _tags = [ZPDatabase tagsForItemKeys:keysForVisibleItems];
-    _estimatedNumberOfRows = ([_tags count]+2)/3;
+    _tags = [tagOwner availableTags];
+    _estimatedNumberOfRows = ([_tags count]+10)/11;
     _currentNumberOfRows = _estimatedNumberOfRows;
     _nextTagIndex = 0;
     _tagRows = [[NSMutableArray alloc] init];
 }
 - (void) prepareToHide{
-    _tags = [[ZPItemListViewDataSource instance] selectedTags];
-    _estimatedNumberOfRows = ([_tags count]+2)/3;
+    _tags = [tagOwner tags];
+    _estimatedNumberOfRows = ([_tags count]+10)/11;
     _currentNumberOfRows = _estimatedNumberOfRows;
     _nextTagIndex = 0;
     _tagRows = [[NSMutableArray alloc] init];
@@ -55,9 +53,58 @@ static NSMutableArray* tagButtonCache;
     return 1;
 }
 
++(UIButton*) tagButtonForTag:(NSString*)tag{
+
+    UIButton* tagButton;
+    NSInteger margin = 20;
+    
+    if([tagButtonCache count]>0){
+        
+        
+        tagButton = [tagButtonCache lastObject];
+        [tagButtonCache removeLastObject];
+        
+        [tagButton setTitle:tag forState:UIControlStateNormal];
+        [tagButton sizeToFit];
+        
+        tagButton.frame = CGRectMake(tagButton.frame.origin.x,
+                                     tagButton.frame.origin.y,
+                                     tagButton.frame.size.width+margin,
+                                     tagButton.frame.size.height+margin);
+    }
+    else{
+        
+        //                NSLog(@"New Button: Tag %@",tag);
+        
+        tagButton = [UIButton buttonWithType:UIButtonTypeCustom];
+        
+        [tagButton setTitleColor:[UIColor blackColor] forState:UIControlStateNormal];
+        [tagButton setTitleColor:[UIColor whiteColor] forState:UIControlStateSelected];
+        [tagButton setBackgroundImage:blueBackgroundImage forState:UIControlStateSelected];
+        tagButton.titleLabel.font = [UIFont boldSystemFontOfSize:10];
+        
+        [tagButton setTitle:tag forState:UIControlStateNormal];
+        [tagButton sizeToFit];
+        
+        tagButton.frame = CGRectMake(tagButton.frame.origin.x,
+                                     tagButton.frame.origin.y,
+                                     tagButton.frame.size.width+margin,
+                                     tagButton.frame.size.height+margin);
+        
+        //Configure the looks of the button. This must be done after sizeToFit
+        CALayer * layer = tagButton.layer;
+        [layer setMasksToBounds:YES];
+        [layer setCornerRadius:tagButton.frame.size.height/2];
+        [layer setBorderWidth:1.0];
+        [layer setBorderColor:[[UIColor grayColor] CGColor]];
+    }
+    return tagButton;
+}
+
 - (UITableViewCell *)tableView:(UITableView *)tableView cellForRowAtIndexPath:(NSIndexPath *)indexPath{
 
-//    NSLog(@"Loading row %i",indexPath.row);
+    
+    //NSLog(@"Loading row %i",indexPath.row);
     
     NSString* identifier;
     BOOL hasTags;
@@ -127,57 +174,13 @@ static NSMutableArray* tagButtonCache;
 
             //Recycle buttons or create new
             
-            UIButton* tagButton;
+            UIButton* tagButton = [ZPTagController tagButtonForTag:tag];
 
-            NSInteger margin = 20;
+            [tagButton addTarget:self
+                          action:@selector(toggleTag:)
+                forControlEvents:UIControlEventTouchUpInside];
 
-            if([tagButtonCache count]>0){
-
-//                NSLog(@"Reusing Button: Tag %@",tag);
-
-                tagButton = [tagButtonCache lastObject];
-                [tagButtonCache removeLastObject];
-
-                [tagButton setTitle:tag forState:UIControlStateNormal];
-                [tagButton sizeToFit];
-                
-                tagButton.frame = CGRectMake(tagButton.frame.origin.x,
-                                             tagButton.frame.origin.y,
-                                             tagButton.frame.size.width+margin,
-                                             tagButton.frame.size.height+margin);
-            }
-            else{
-
-//                NSLog(@"New Button: Tag %@",tag);
-
-                tagButton = [UIButton buttonWithType:UIButtonTypeCustom];
-                
-                [tagButton addTarget:self
-                              action:@selector(toggleTag:)
-                    forControlEvents:UIControlEventTouchUpInside];
-                
-                [tagButton setTitleColor:[UIColor blackColor] forState:UIControlStateNormal];
-                [tagButton setTitleColor:[UIColor whiteColor] forState:UIControlStateSelected];
-                [tagButton setBackgroundImage:blueBackgroundImage forState:UIControlStateSelected];
-                tagButton.titleLabel.font = [UIFont boldSystemFontOfSize:10];
-                
-                [tagButton setTitle:tag forState:UIControlStateNormal];
-                [tagButton sizeToFit];
-                
-                tagButton.frame = CGRectMake(tagButton.frame.origin.x,
-                                             tagButton.frame.origin.y,
-                                             tagButton.frame.size.width+margin,
-                                             tagButton.frame.size.height+margin);
-
-                //Configure the looks of the button. This must be done after sizeToFit
-                CALayer * layer = tagButton.layer;
-                [layer setMasksToBounds:YES];
-                [layer setCornerRadius:tagButton.frame.size.height/2];
-                [layer setBorderWidth:1.0];
-                [layer setBorderColor:[[UIColor grayColor] CGColor]];
-            }
-
-            tagButton.selected = [[ZPItemListViewDataSource instance] isTagSelected:tag];
+            tagButton.selected = [tagOwner isTagSelected:tag];
 
             
             //If this is too large
@@ -220,7 +223,7 @@ static NSMutableArray* tagButtonCache;
                     
                        difference = _estimatedNumberOfRows - _currentNumberOfRows;
 
-                       NSLog(@"Updating the number of rows in tag selector by %i, previous rows: %i new rows: %i",difference,_currentNumberOfRows,_estimatedNumberOfRows);
+                       //NSLog(@"Updating the number of rows in tag selector by %i, previous rows: %i new rows: %i",difference,_currentNumberOfRows,_estimatedNumberOfRows);
 
                        NSMutableArray* indexPaths = [[NSMutableArray alloc] initWithCapacity:abs(difference)];
                        
@@ -232,13 +235,14 @@ static NSMutableArray* tagButtonCache;
                        }
 
                        _currentNumberOfRows = _estimatedNumberOfRows;
-                       
+
                        if(difference<0){
                            [tableView deleteRowsAtIndexPaths:indexPaths withRowAnimation:UITableViewRowAnimationNone];
                        }
                        else{
                            [tableView insertRowsAtIndexPaths:indexPaths withRowAnimation:UITableViewRowAnimationNone];
                        }
+                       
                    }
             }
         }
@@ -271,17 +275,12 @@ static NSMutableArray* tagButtonCache;
 -(void) toggleTag:(UIButton*)tagButton{
     if(tagButton.isSelected){
         tagButton.selected = FALSE;
-        [[ZPItemListViewDataSource instance] deselectTag:tagButton.titleLabel.text];
+        [tagOwner deselectTag:tagButton.titleLabel.text];
     }
     else{
         tagButton.selected = TRUE;
-        [[ZPItemListViewDataSource instance] selectTag:tagButton.titleLabel.text];
+        [tagOwner selectTag:tagButton.titleLabel.text];
     }
-
-    if (self.itemListViewController != NULL) {
-        [self.itemListViewController configureView];
-    }
-
 }
 
 @end

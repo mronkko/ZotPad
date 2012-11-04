@@ -11,18 +11,18 @@
 #import "ZPItemDetailViewController.h"
 #import "ZPLibraryAndCollectionListViewController.h"
 #import "ZPItemListViewDataSource.h"
-
 #import "ZPLocalization.h"
 #import "ZPAttachmentFileInteractionController.h"
-
+#import "ZPNoteEditingViewController.h"
 #import "ZPAppDelegate.h"
-
-
+#import "NSString_stripHtml.h"
 #import "ZPAttachmentIconImageFactory.h"
 #import "ZPAttachmentCarouselDelegate.h"
 #import "OHAttributedLabel.h"
 #import "ZPStarBarButtonItem.h"
-
+#import "ZPTagController.h"
+#import "CMPopTipView.h"
+#import "ZPTagEditingViewController.h"
 
 #import <UIKit/UIKit.h>
 
@@ -35,6 +35,8 @@
 @interface ZPItemDetailViewController(){
     ZPAttachmentFileInteractionController* _attachmentInteractionController;
     ZPAttachmentCarouselDelegate* _carouselDelegate;
+    NSMutableArray* _tagButtons;
+    NSInteger _tagCellHeight;
 }
 
 - (void) _reconfigureDetailTableView:(BOOL)animated;
@@ -91,10 +93,19 @@
     //Configure activity indicator.
     _activityIndicator = [[UIActivityIndicatorView alloc] initWithFrame:CGRectMake(0,0,20, 20)];
     [_activityIndicator hidesWhenStopped];
-    UIBarButtonItem* barButton = [[UIBarButtonItem alloc] initWithCustomView:_activityIndicator];
+    UIBarButtonItem* activityIndicator = [[UIBarButtonItem alloc] initWithCustomView:_activityIndicator];
     UIBarButtonItem* starButton = [[ZPStarBarButtonItem alloc] init];
+    
+    //Show tool tip about stars
+    
+    if([[NSUserDefaults standardUserDefaults] objectForKey:@"hasPresentedStarButtonHelpPopover"]==NULL){
+        CMPopTipView* helpPopUp = [[CMPopTipView alloc] initWithMessage:@"Use the star button to add an item to favourites"];
+        [helpPopUp presentPointingAtBarButtonItem:starButton animated:YES];
+        [[NSUserDefaults standardUserDefaults] setObject:@"1" forKey:@"hasPresentedStarButtonHelpPopover"];
+    }
 
-    self.navigationItem.rightBarButtonItems = [NSArray arrayWithObjects:self.actionButton, starButton, barButton, nil];
+    
+    self.navigationItem.rightBarButtonItems = [NSArray arrayWithObjects:self.actionButton, starButton, activityIndicator, nil];
     
     [[NSNotificationCenter defaultCenter] addObserver:self
                                              selector:@selector(notifyItemAvailable:) 
@@ -144,6 +155,22 @@
     [super didReceiveMemoryWarning];
 }
 
+
+- (void) prepareForSegue:(UIStoryboardSegue *)segue sender:(id)sender{
+    if([segue.identifier isEqualToString:@"PushNoteEditor"]){
+        //Sender is UITableViewCell
+        ZPNoteEditingViewController* target = segue.destinationViewController;
+        target.note = sender;
+        
+    }
+    if([segue.identifier isEqualToString:@"PushTagEditor"]){
+        //Sender is UITableViewCell
+        ZPTagEditingViewController* target = segue.destinationViewController;
+        target.item = sender;
+        
+    }
+    
+}
 #pragma mark - Configure view and subviews
 
 -(void) configure{
@@ -163,9 +190,51 @@
 }
 
 - (void)_reconfigureDetailTableView:(BOOL)animated{
+
+    //Reset the cached tag views
+    _tagButtons = [[NSMutableArray alloc] init];
+
+    NSInteger maxWidthOfTags;
+    if(UI_USER_INTERFACE_IDIOM() == UIUserInterfaceIdiomPad){
+        maxWidthOfTags=577;
+    }
+    else{
+        [NSException raise:@"Not implemented" format:@""];
+    }
+    
+    NSInteger x=10;
+    NSInteger y=10;
+    
+    for(NSString* tag in _currentItem.tags){
+        UIButton* tagButton = [ZPTagController tagButtonForTag:tag];
+        tagButton.selected = TRUE;
+        tagButton.userInteractionEnabled = FALSE;
+        
+        if(x+tagButton.frame.size.width>maxWidthOfTags){
+            if(x==10){
+                tagButton.frame = CGRectMake(x, y, maxWidthOfTags, tagButton.frame.size.height);
+                y=y+tagButton.frame.size.height+10;
+            }
+            else{
+                x=10;
+                y=y+tagButton.frame.size.height+10;
+                tagButton.frame = CGRectMake(x, y, MIN(tagButton.frame.size.width, maxWidthOfTags), tagButton.frame.size.height);
+                x=x+tagButton.frame.size.width+10;
+
+            }
+        }
+        else{
+            tagButton.frame = CGRectMake(x, y, MIN(tagButton.frame.size.width, maxWidthOfTags), tagButton.frame.size.height);
+            x=x+tagButton.frame.size.width+10;
+        }
+        
+        [_tagButtons addObject:tagButton];
+        //Update the required height of the tag row
+        _tagCellHeight = y + tagButton.frame.size.height + 10;
+        
+    }
     
     //Configure the size of the detail view table.
-    
     [self.tableView reloadData];
     [self.tableView layoutIfNeeded];
     
@@ -216,19 +285,28 @@
 
 */
 
-#pragma mark - Tableview delegate
+#pragma mark - Tableview data source 
 
 - (NSInteger)numberOfSectionsInTableView:(UITableView*)tableView {
-    return 3;
+    return 5;
 }
 
 - (NSInteger)tableView:(UITableView *)aTableView numberOfRowsInSection:(NSInteger)section {
-    //Item type and title
+    //Tags
     if(section==0){
+        return 1;
+    }
+    //Notes
+    if(section==1){
+        return [_currentItem.notes count]+1;
+    }
+    
+    //Item type and title
+    if(section==2){
         return 2;
     }
     //Creators
-    if(section==1){
+    if(section==3){
         if(_currentItem.creators!=NULL || [_currentItem.itemType isEqualToString:ZPKEY_ATTACHMENT]|| [_currentItem.itemType isEqualToString:@"note"]){
             return [_currentItem.creators count];
         }
@@ -237,7 +315,7 @@
         }
     }
     //Rest of the fields
-    if(section==2){
+    if(section==4){
         if(_currentItem.fields!=NULL || [_currentItem.itemType isEqualToString:ZPKEY_ATTACHMENT]|| [_currentItem.itemType isEqualToString:@"note"]){
             //Two fields, itemType and title, are shown separately
             return [_currentItem.fields count]-2;
@@ -274,6 +352,9 @@
         return textSize.height+margins;
        
     }
+    else if(tableView==self.tableView && [indexPath indexAtPosition:0]==0){
+        return MAX(_tagCellHeight,tableView.rowHeight);
+    }
     return tableView.rowHeight;
 }
 
@@ -293,7 +374,7 @@
 }
 
 - (BOOL) _useAbstractCell:(NSIndexPath*)indexPath{
-    if([indexPath indexAtPosition:0] != 2) return FALSE;
+    if([indexPath indexAtPosition:0] != 4) return FALSE;
     
     NSEnumerator* e = [_currentItem.fields keyEnumerator]; 
     
@@ -318,9 +399,10 @@
 
     NSString* returnString = NULL;
     
+    
     //Title and itemtype
 
-    if([indexPath indexAtPosition:0] == 0){
+    if([indexPath indexAtPosition:0] == 2){
         if(indexPath.row == 0){
             if(isTitle) returnString =  @"Title";
             else returnString =  _currentItem.title;
@@ -332,7 +414,7 @@
         
     }
     //Creators
-    else if([indexPath indexAtPosition:0] == 1){
+    else if([indexPath indexAtPosition:0] == 3){
         NSDictionary* creator=[_currentItem.creators objectAtIndex:indexPath.row];
         if(isTitle) returnString =  [ZPLocalization getLocalizationStringWithKey:[creator objectForKey:@"creatorType"] type:@"creatorType" ];
         else{
@@ -386,63 +468,138 @@
     UITableViewCell *cell;
     NSString* CellIdentifier;
     
-    BOOL isAbstract = [self _useAbstractCell:indexPath];
-
-    if(isAbstract){
-        CellIdentifier = @"ItemAbstractCell";        
+    //Tags
+    if([indexPath indexAtPosition:0] == 0){
+        if([_currentItem.tags count]==0){
+            CellIdentifier = @"NoTagsCell";
+            cell = [tableView dequeueReusableCellWithIdentifier:CellIdentifier];
+            if (cell == nil)
+            {
+                cell = [[UITableViewCell alloc] initWithStyle:UITableViewCellStyleDefault reuseIdentifier:CellIdentifier];
+            }
+        }
+        else{
+            CellIdentifier = @"TagsCell";
+            cell = [tableView dequeueReusableCellWithIdentifier:CellIdentifier];
+            if (cell == nil)
+            {
+                cell = [[UITableViewCell alloc] initWithStyle:UITableViewCellStyleDefault reuseIdentifier:CellIdentifier];
+            }
+            
+            //Clean the cell
+            for(UIView* child in cell.contentView.subviews){
+                [child removeFromSuperview];
+            }
+            for(UIButton* tagButton in _tagButtons){
+                [cell.contentView addSubview:tagButton];
+            }
+        }
     }
-    else {
-        CellIdentifier = @"ItemDetailCell";        
+    //Notes
+    else if([indexPath indexAtPosition:0] == 1){
+        if([indexPath indexAtPosition:1]>=[_currentItem.notes count]){
+            CellIdentifier = @"NewNoteCell";
+            cell = [tableView dequeueReusableCellWithIdentifier:CellIdentifier];
+            if (cell == nil)
+            {
+                cell = [[UITableViewCell alloc] initWithStyle:UITableViewCellStyleDefault reuseIdentifier:CellIdentifier];
+            }
+        }
+        else{
+            CellIdentifier = @"NoteCell";
+            cell = [tableView dequeueReusableCellWithIdentifier:CellIdentifier];
+            if (cell == nil)
+            {
+                cell = [[UITableViewCell alloc] initWithStyle:UITableViewCellStyleDefault reuseIdentifier:CellIdentifier];
+            }
+            UILabel* noteText = [cell viewWithTag:1];
+            noteText.text = [[[(ZPZoteroNote*) [_currentItem.notes objectAtIndex:[indexPath indexAtPosition:1]] note] stripHtml] stringByReplacingOccurrencesOfString:@"\n" withString:@" "];
+        }
     }
-
-    // Dequeue or create a cell of the appropriate type.
-    cell = [tableView dequeueReusableCellWithIdentifier:CellIdentifier];
-    if (cell == nil)
-    {
-        cell = [[UITableViewCell alloc] initWithStyle:UITableViewCellStyleDefault reuseIdentifier:CellIdentifier];
-    }
-
-    // Configure the cell
-    OHAttributedLabel* value = (OHAttributedLabel*) [cell viewWithTag:2];
-    value.automaticallyAddLinksForType = NSTextCheckingTypeLink;
-    
-    UILabel* title = (UILabel*) [cell viewWithTag:1];
-    
-    
-    value.text = [self _textAtIndexPath:indexPath isTitle:FALSE];
-    title.text = [self _textAtIndexPath:indexPath isTitle:TRUE];
-
-    if([title.text isEqualToString:@"DOI"]){
-        [value addCustomLink:[NSURL URLWithString:[@"http://dx.doi.org/" stringByAppendingString:value.text]] inRange:NSMakeRange(0,[value.text length])];
-    }
-    
-    
-    //Configure size of the value label
-    
-    if(!isAbstract){
-        CGSize labelSize = [title.text sizeWithFont:title.font];
-        CGRect frame = value.frame;
+    //Item metadata
+    else{
+        BOOL isAbstract = [self _useAbstractCell:indexPath];
         
-        NSInteger newWidth = cell.contentView.bounds.size.width - labelSize.width - 40; 
-        NSInteger widthChange = newWidth - value.frame.size.width;
-        frame.size.width = newWidth; 
-        frame.origin.x = frame.origin.x - widthChange;
-        value.frame = frame;
-    }
-    
-    if(cell == NULL || ! [cell isKindOfClass:[UITableViewCell class]]){
-        [NSException raise:@"Invalid cell" format:@""];
+        if(isAbstract){
+            CellIdentifier = @"ItemAbstractCell";
+        }
+        else {
+            CellIdentifier = @"ItemDetailCell";
+        }
+        
+        // Dequeue or create a cell of the appropriate type.
+        cell = [tableView dequeueReusableCellWithIdentifier:CellIdentifier];
+        if (cell == nil)
+        {
+            cell = [[UITableViewCell alloc] initWithStyle:UITableViewCellStyleDefault reuseIdentifier:CellIdentifier];
+        }
+        
+        // Configure the cell
+        OHAttributedLabel* value = (OHAttributedLabel*) [cell viewWithTag:2];
+        value.automaticallyAddLinksForType = NSTextCheckingTypeLink;
+        
+        UILabel* title = (UILabel*) [cell viewWithTag:1];
+        
+        
+        value.text = [self _textAtIndexPath:indexPath isTitle:FALSE];
+        title.text = [self _textAtIndexPath:indexPath isTitle:TRUE];
+        
+        if([title.text isEqualToString:@"DOI"]){
+            [value addCustomLink:[NSURL URLWithString:[@"http://dx.doi.org/" stringByAppendingString:value.text]] inRange:NSMakeRange(0,[value.text length])];
+        }
+        
+        
+        //Configure size of the value label
+        
+        if(!isAbstract){
+            CGSize labelSize = [title.text sizeWithFont:title.font];
+            CGRect frame = value.frame;
+            
+            NSInteger newWidth = cell.contentView.bounds.size.width - labelSize.width - 40;
+            NSInteger widthChange = newWidth - value.frame.size.width;
+            frame.size.width = newWidth;
+            frame.origin.x = frame.origin.x - widthChange;
+            value.frame = frame;
+        }
+        
+        if(cell == NULL || ! [cell isKindOfClass:[UITableViewCell class]]){
+            [NSException raise:@"Invalid cell" format:@""];
+        }
     }
 	return  cell;
 }
 
+- (NSString *)tableView:(UITableView *)tableView titleForHeaderInSection:(NSInteger)section{
+    if(section==0) return @"Tags";
+    else if(section==1) return @"Notes";
+    else if(section==2) return @"Item data";
+    else return nil;
+}
+
+#pragma mark - UITableViewDelegate
 
 - (void)tableView:(UITableView *)aTableView didSelectRowAtIndexPath:(NSIndexPath *)indexPath {
     
     // Item details
     
     if(aTableView == self.tableView){
-        
+        //Tags
+        if([indexPath indexAtPosition:0]==0){
+            [self performSegueWithIdentifier:@"PushTagEditor" sender:_currentItem];
+        }
+        //Notes
+        else if([indexPath indexAtPosition:0]==1){
+            ZPZoteroNote* note;
+            if([indexPath indexAtPosition:1]>=[_currentItem.notes count]){
+                note = [ZPZoteroNote noteWithKey:[NSString stringWithFormat:@"LOCAL_%@",[NSDate date]]];
+                note.parentKey = _currentItem.key;
+            }
+            else{
+                note = [_currentItem.notes objectAtIndex:[indexPath indexAtPosition:1]];
+            }
+            [self performSegueWithIdentifier:@"PushNoteEditor" sender:note];
+        }
+        [aTableView deselectRowAtIndexPath:indexPath animated:NO];
     }
     
     // Navigator

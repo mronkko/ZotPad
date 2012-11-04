@@ -375,10 +375,20 @@ const NSInteger ZPServerConnectionManagerRequestLastModifiedItem = 11;
                                       cancelButtonTitle:@"Stay offline" otherButtonTitles:@"Return online", nil] show];
                      
                     */
-                    DDLogError(@"Connection to Zotero server (%@) failed %@",urlString,request.error.localizedDescription);
+                    if(!request.isCancelled){
+                        DDLogError(@"Connection to Zotero server (%@) failed %@",urlString,request.error.localizedDescription);
+                        
+                        //We need to notify that an empty item list is available so that the user interface knows to remove the busy overlay
+                        if(request.tag == ZPServerConnectionManagerRequestTopLevelKeys){
+                            [[NSNotificationCenter defaultCenter]
+                             postNotificationName:ZPNOTIFICATION_ITEM_LIST_AVAILABLE
+                             object:[NSArray array]
+                             userInfo:request.userInfo];
+                        }
+                    }
                 }
             }];
-            
+
             if(queue == NULL){
                 [request startAsynchronous];
             }

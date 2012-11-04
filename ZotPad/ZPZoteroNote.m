@@ -11,6 +11,8 @@
 
 @implementation ZPZoteroNote
 
+@synthesize note;
+
 +(void)initialize{
     _objectCache =  [[NSCache alloc] init];
 }

@@ -1002,6 +1002,7 @@ static ZPCacheController* _instance = nil;
 
 -(void) addAttachmentToUploadQueue:(ZPZoteroAttachment*) attachment withNewFile:(NSURL*)urlToFile{
 
+    
     //Move the file to right place and increment cache size
     [attachment moveFileFromPathAsNewModifiedFile:[urlToFile path]];
 
@@ -1011,6 +1012,25 @@ static ZPCacheController* _instance = nil;
 
     //Add to upload queue
     @synchronized(_attachmentsToUpload){
+        
+        NSString* statusString;
+        
+        if([_attachmentsToUpload count]==0){
+            statusString = @"Upload queue was empty";
+        }
+        else{
+            statusString = [NSString stringWithFormat:@"Upload queue had previously %i file(s): ",[_attachmentsToUpload count]];
+            
+            BOOL first = TRUE;
+            for(ZPZoteroAttachment* uploadFile in _attachmentsToUpload){
+                if(!first) statusString = [statusString stringByAppendingString:@", "];
+                
+                statusString = [statusString stringByAppendingFormat:@"%@ (%@)",attachment.key, attachment.filename];
+                first = FALSE;
+            }
+        }
+        DDLogInfo(@"Added attachment %@ (%@) to upload queue. %@. Active uploads: %i", attachment.key, attachment.filename, statusString,[ZPServerConnectionManager numberOfFilesUploading]);
+
         [_attachmentsToUpload addObject:attachment];
     }
     [self performSelectorInBackground:@selector(_checkQueues) withObject:NULL];

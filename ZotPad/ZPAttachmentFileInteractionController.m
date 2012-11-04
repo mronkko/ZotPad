@@ -101,13 +101,8 @@
 
         //Purge
 
-        [_activeAttachment purge:@"Requested by user"];
+        [_activeAttachment purge:@"Purged using action menu"];
         
-        //Dismiss the preview controller if it is visible
-        UIViewController* root = [UIApplication sharedApplication].delegate.window.rootViewController;
-        UIViewController* vc = [root modalViewController];
-        //if(vc!=NULL && [vc isKindOfClass:[ZPPreviewController class]]) [root dismissModalViewControllerAnimated:YES];
-
     }
     else{
         //iPad does not have cancel button

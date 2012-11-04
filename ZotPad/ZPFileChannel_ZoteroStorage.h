@@ -15,7 +15,8 @@ extern NSInteger const ZPFILECHANNEL_ZOTEROSTORAGE_UPLOAD_REGISTER;
 extern NSInteger const ZPFILECHANNEL_ZOTEROSTORAGE_DOWNLOAD;
 
 
-@interface ZPFileChannel_ZoteroStorage : ZPFileChannel <ASIHTTPRequestDelegate>{
+@interface ZPFileChannel_ZoteroStorage : ZPFileChannel <ASIHTTPRequestDelegate, UIAlertViewDelegate>{
+    BOOL _alertVisible;
 }
 
 @end
