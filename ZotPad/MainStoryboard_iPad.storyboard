@@ -44,18 +44,17 @@
                                                     <color key="textColor" cocoaTouchSystemColor="darkTextColor"/>
                                                     <nil key="highlightedColor"/>
                                                 </label>
-                                                <view clipsSubviews="YES" tag="3" contentMode="scaleToFill" id="3me-IS-Kgf" customClass="OHAttributedLabel">
-                                                    <rect key="frame" x="75" y="37" width="588" height="30"/>
-                                                    <autoresizingMask key="autoresizingMask" flexibleMaxX="YES" flexibleMaxY="YES"/>
-                                                    <color key="backgroundColor" white="1" alpha="1" colorSpace="custom" customColorSpace="calibratedWhite"/>
-                                                    <accessibility key="accessibilityConfiguration">
-                                                        <accessibilityTraits key="traits" none="YES" staticText="YES" notEnabled="YES"/>
-                                                    </accessibility>
-                                                </view>
                                                 <imageView userInteractionEnabled="NO" tag="4" contentMode="scaleToFill" id="gYA-bR-Crd">
                                                     <rect key="frame" x="0.0" y="4" width="67" height="63"/>
                                                     <autoresizingMask key="autoresizingMask" flexibleMaxX="YES" flexibleMaxY="YES"/>
                                                 </imageView>
+                                                <label opaque="NO" clipsSubviews="YES" userInteractionEnabled="NO" tag="3" contentMode="left" text="" lineBreakMode="wordWrap" numberOfLines="3" baselineAdjustment="alignBaselines" adjustsFontSizeToFit="NO" id="Dwu-TU-iZl" customClass="OHAttributedLabel">
+                                                    <rect key="frame" x="75" y="37" width="608" height="30"/>
+                                                    <autoresizingMask key="autoresizingMask" flexibleMaxX="YES" flexibleMaxY="YES"/>
+                                                    <fontDescription key="fontDescription" type="system" pointSize="12"/>
+                                                    <color key="textColor" cocoaTouchSystemColor="darkTextColor"/>
+                                                    <color key="highlightedColor" white="1" alpha="1" colorSpace="calibratedWhite"/>
+                                                </label>
                                             </subviews>
                                             <color key="backgroundColor" white="0.0" alpha="0.0" colorSpace="calibratedWhite"/>
                                         </view>
@@ -257,15 +256,6 @@
                                 <view key="contentView" opaque="NO" clipsSubviews="YES" multipleTouchEnabled="YES" contentMode="center">
                                     <rect key="frame" x="43" y="0.0" width="597" height="43"/>
                                     <autoresizingMask key="autoresizingMask"/>
-                                    <subviews>
-                                        <label opaque="NO" clipsSubviews="YES" userInteractionEnabled="NO" tag="2" contentMode="left" text="Label" lineBreakMode="wordWrap" numberOfLines="0" baselineAdjustment="alignBaselines" minimumFontSize="10" adjustsFontSizeToFit="NO" id="wEe-S0-VzT" customClass="OHAttributedLabel">
-                                            <rect key="frame" x="10" y="39" width="567" height="0.0"/>
-                                            <autoresizingMask key="autoresizingMask" widthSizable="YES" heightSizable="YES"/>
-                                            <fontDescription key="fontDescription" type="system" pointSize="14"/>
-                                            <color key="textColor" red="0.1960784314" green="0.30980392159999998" blue="0.52156862749999999" alpha="1" colorSpace="calibratedRGB"/>
-                                            <color key="highlightedColor" white="1" alpha="1" colorSpace="calibratedWhite"/>
-                                        </label>
-                                    </subviews>
                                     <color key="backgroundColor" white="0.0" alpha="0.0" colorSpace="calibratedWhite"/>
                                 </view>
                                 <gestureRecognizers/>
@@ -354,7 +344,7 @@
         <!--Note Editing View Controller - Edit note-->
         <scene sceneID="uQT-6f-9Qf">
             <objects>
-                <viewController id="dy6-Ck-E0l" customClass="ZPNoteEditingViewController" sceneMemberID="viewController">
+                <viewController storyboardIdentifier="NoteEditingViewController" modalPresentationStyle="pageSheet" id="dy6-Ck-E0l" customClass="ZPNoteEditingViewController" sceneMemberID="viewController">
                     <view key="view" contentMode="scaleToFill" id="I2U-s1-Q33">
                         <rect key="frame" x="0.0" y="0.0" width="768" height="768"/>
                         <autoresizingMask key="autoresizingMask" widthSizable="YES" heightSizable="YES"/>
@@ -399,15 +389,26 @@
         <!--Tag Editing View Controller-->
         <scene sceneID="pmI-ur-LQt">
             <objects>
-                <viewController id="67Z-Og-ORg" customClass="ZPTagEditingViewController" sceneMemberID="viewController">
+                <viewController storyboardIdentifier="TagEditingViewController" modalPresentationStyle="pageSheet" id="67Z-Og-ORg" customClass="ZPTagEditingViewController" sceneMemberID="viewController">
                     <view key="view" contentMode="scaleToFill" id="HN0-Y7-fEg">
                         <rect key="frame" x="0.0" y="0.0" width="768" height="768"/>
                         <autoresizingMask key="autoresizingMask" flexibleMaxX="YES" flexibleMaxY="YES"/>
                         <subviews>
-                            <tableView clipsSubviews="YES" contentMode="scaleToFill" alwaysBounceVertical="YES" dataMode="prototypes" style="plain" rowHeight="44" sectionHeaderHeight="22" sectionFooterHeight="22" id="6T7-IW-q9D">
+                            <tableView clipsSubviews="YES" contentMode="scaleToFill" alwaysBounceVertical="YES" dataMode="prototypes" style="plain" separatorStyle="none" rowHeight="44" sectionHeaderHeight="22" sectionFooterHeight="22" id="6T7-IW-q9D">
                                 <rect key="frame" x="0.0" y="44" width="768" height="724"/>
                                 <autoresizingMask key="autoresizingMask" widthSizable="YES" heightSizable="YES"/>
                                 <color key="backgroundColor" white="1" alpha="1" colorSpace="calibratedWhite"/>
+                                <prototypes>
+                                    <tableViewCell contentMode="scaleToFill" selectionStyle="none" hidesAccessoryWhenEditing="NO" indentationLevel="1" indentationWidth="0.0" reuseIdentifier="TagsCell" id="OKG-Uj-eBG">
+                                        <rect key="frame" x="0.0" y="22" width="768" height="44"/>
+                                        <autoresizingMask key="autoresizingMask"/>
+                                        <view key="contentView" opaque="NO" clipsSubviews="YES" multipleTouchEnabled="YES" contentMode="center">
+                                            <rect key="frame" x="0.0" y="0.0" width="768" height="43"/>
+                                            <autoresizingMask key="autoresizingMask"/>
+                                            <color key="backgroundColor" white="0.0" alpha="0.0" colorSpace="calibratedWhite"/>
+                                        </view>
+                                    </tableViewCell>
+                                </prototypes>
                             </tableView>
                             <navigationBar contentMode="scaleToFill" id="YNF-iZ-A7a">
                                 <rect key="frame" x="0.0" y="0.0" width="768" height="44"/>
@@ -416,9 +417,7 @@
                                     <navigationItem title="Edit tags" id="6HQ-Cs-TiM">
                                         <barButtonItem key="leftBarButtonItem" systemItem="add" id="8WS-P5-66s">
                                             <connections>
-                                                <segue destination="NLQ-na-S2f" kind="popover" popoverAnchorBarButtonItem="8WS-P5-66s" id="W8C-b9-4gx">
-                                                    <popoverArrowDirection key="popoverArrowDirection" up="YES" down="YES" left="YES" right="YES"/>
-                                                </segue>
+                                                <action selector="showPopover:" destination="67Z-Og-ORg" id="8Ln-ZT-Nkt"/>
                                             </connections>
                                         </barButtonItem>
                                         <barButtonItem key="rightBarButtonItem" systemItem="done" id="DKP-HQ-ImW">
@@ -437,6 +436,9 @@
                     <connections>
                         <outlet property="navigationBar" destination="YNF-iZ-A7a" id="mkV-H8-2zV"/>
                         <outlet property="tableView" destination="6T7-IW-q9D" id="a7Y-Nm-Z2m"/>
+                        <segue destination="NLQ-na-S2f" kind="popover" identifier="NewTagPopover" popoverAnchorBarButtonItem="8WS-P5-66s" id="PnO-Xb-l9T">
+                            <popoverArrowDirection key="popoverArrowDirection" up="YES" down="YES" left="YES" right="YES"/>
+                        </segue>
                     </connections>
                 </viewController>
                 <placeholder placeholderIdentifier="IBFirstResponder" id="qnl-VW-dGV" userLabel="First Responder" sceneMemberID="firstResponder"/>
@@ -480,7 +482,7 @@
                         <color key="backgroundColor" white="1" alpha="1" colorSpace="custom" customColorSpace="calibratedWhite"/>
                         <simulatedOrientationMetrics key="simulatedOrientationMetrics" orientation="landscapeRight"/>
                     </view>
-                    <value key="contentSizeForViewInPopover" type="size" width="540" height="800"/>
+                    <value key="contentSizeForViewInPopover" type="size" width="540" height="60"/>
                 </viewController>
                 <placeholder placeholderIdentifier="IBFirstResponder" id="EU7-CY-Tq1" userLabel="First Responder" sceneMemberID="firstResponder"/>
             </objects>
@@ -732,67 +734,123 @@
             </objects>
             <point key="canvasLocation" x="1847" y="-192"/>
         </scene>
-        <!--File Viewer Navigation View Controller-->
-        <scene sceneID="XIB-gg-Kc6">
-            <objects>
-                <navigationController storyboardIdentifier="FileViewerNavigationViewController" definesPresentationContext="YES" navigationBarHidden="YES" id="luZ-Ib-SFg" customClass="ZPFileViewerNavigationViewController" sceneMemberID="viewController">
-                    <simulatedOrientationMetrics key="simulatedOrientationMetrics" orientation="landscapeRight"/>
-                    <navigationBar key="navigationBar" contentMode="scaleToFill" id="Kkp-SB-kbP">
-                        <autoresizingMask key="autoresizingMask"/>
-                    </navigationBar>
-                    <toolbar key="toolbar" opaque="NO" clearsContextBeforeDrawing="NO" contentMode="scaleToFill" id="L7D-2N-aPC">
-                        <rect key="frame" x="0.0" y="960" width="768" height="44"/>
-                        <autoresizingMask key="autoresizingMask"/>
-                    </toolbar>
-                    <connections>
-                        <segue destination="RIT-Wg-X0J" kind="relationship" relationship="rootViewController" id="498-bl-wLF"/>
-                    </connections>
-                </navigationController>
-                <placeholder placeholderIdentifier="IBFirstResponder" id="aHr-MA-aK7" userLabel="First Responder" sceneMemberID="firstResponder"/>
-            </objects>
-            <point key="canvasLocation" x="-2260" y="-2248"/>
-        </scene>
-        <!--View Controller-->
-        <scene sceneID="Fb2-rz-xoN">
-            <objects>
-                <viewController id="RIT-Wg-X0J" sceneMemberID="viewController">
-                    <view key="view" contentMode="scaleToFill" id="jBs-g3-rfu">
-                        <rect key="frame" x="0.0" y="20" width="1024" height="748"/>
-                        <autoresizingMask key="autoresizingMask" flexibleMaxX="YES" flexibleMaxY="YES"/>
-                        <subviews>
-                            <label opaque="NO" clipsSubviews="YES" userInteractionEnabled="NO" contentMode="left" text="DEBUG" lineBreakMode="tailTruncation" baselineAdjustment="alignBaselines" adjustsFontSizeToFit="NO" id="4aU-9j-ZoN">
-                                <rect key="frame" x="491" y="342" width="61" height="21"/>
-                                <autoresizingMask key="autoresizingMask" flexibleMaxX="YES" flexibleMaxY="YES"/>
-                                <fontDescription key="fontDescription" type="system" pointSize="17"/>
-                                <color key="textColor" cocoaTouchSystemColor="darkTextColor"/>
-                                <nil key="highlightedColor"/>
-                            </label>
-                        </subviews>
-                        <color key="backgroundColor" white="1" alpha="1" colorSpace="custom" customColorSpace="calibratedWhite"/>
-                        <simulatedOrientationMetrics key="simulatedOrientationMetrics" orientation="landscapeRight"/>
-                    </view>
-                    <navigationItem key="navigationItem" id="OSZ-wY-Zi4"/>
-                </viewController>
-                <placeholder placeholderIdentifier="IBFirstResponder" id="thy-za-e0E" userLabel="First Responder" sceneMemberID="firstResponder"/>
-            </objects>
-            <point key="canvasLocation" x="-1002" y="-2253"/>
-        </scene>
         <!--File Viewer View Controller-->
         <scene sceneID="WHd-ed-UCH">
             <objects>
-                <viewController id="BLe-jL-WRe" customClass="ZPFileViewerViewController" sceneMemberID="viewController">
+                <viewController storyboardIdentifier="FileViewerViewController" modalTransitionStyle="crossDissolve" id="BLe-jL-WRe" customClass="ZPFileViewerViewController" sceneMemberID="viewController">
                     <view key="view" multipleTouchEnabled="YES" contentMode="scaleToFill" id="1dD-9S-3eK">
                         <rect key="frame" x="0.0" y="20" width="1024" height="748"/>
                         <autoresizingMask key="autoresizingMask" flexibleMaxX="YES" flexibleMaxY="YES"/>
                         <subviews>
                             <view contentMode="scaleToFill" id="eKb-PL-jbg">
-                                <rect key="frame" x="0.0" y="0.0" width="1024" height="748"/>
+                                <rect key="frame" x="0.0" y="44" width="1024" height="704"/>
                                 <autoresizingMask key="autoresizingMask" widthSizable="YES" heightSizable="YES"/>
                                 <color key="backgroundColor" red="1" green="0.086419753089999995" blue="0.086419753089999995" alpha="1" colorSpace="calibratedRGB"/>
+                                <gestureRecognizers/>
                             </view>
                             <view contentMode="scaleToFill" id="q7f-ZW-tk3">
                                 <rect key="frame" x="0.0" y="0.0" width="320" height="748"/>
                                 <autoresizingMask key="autoresizingMask" flexibleMaxX="YES" heightSizable="YES"/>
+                                <subviews>
+                                    <tableView clipsSubviews="YES" contentMode="scaleToFill" alwaysBounceVertical="YES" showsHorizontalScrollIndicator="NO" dataMode="prototypes" style="grouped" separatorStyle="singleLineEtched" rowHeight="44" sectionHeaderHeight="10" sectionFooterHeight="10" id="Afk-4C-7S5">
+                                        <rect key="frame" x="0.0" y="43" width="314" height="705"/>
+                                        <autoresizingMask key="autoresizingMask" widthSizable="YES" heightSizable="YES"/>
+                                        <color key="backgroundColor" cocoaTouchSystemColor="groupTableViewBackgroundColor"/>
+                                        <simulatedOrientationMetrics key="simulatedOrientationMetrics" orientation="landscapeRight"/>
+                                        <prototypes>
+                                            <tableViewCell contentMode="scaleToFill" selectionStyle="blue" accessoryType="disclosureIndicator" hidesAccessoryWhenEditing="NO" indentationLevel="1" indentationWidth="0.0" reuseIdentifier="NoTagsCell" id="ufU-dC-eJ4">
+                                                <rect key="frame" x="0.0" y="34" width="314" height="45"/>
+                                                <autoresizingMask key="autoresizingMask" flexibleMaxY="YES"/>
+                                                <view key="contentView" opaque="NO" clipsSubviews="YES" multipleTouchEnabled="YES" contentMode="center">
+                                                    <rect key="frame" x="10" y="1" width="274" height="43"/>
+                                                    <autoresizingMask key="autoresizingMask"/>
+                                                    <subviews>
+                                                        <label opaque="NO" clipsSubviews="YES" userInteractionEnabled="NO" tag="1" contentMode="left" text="No tags" textAlignment="center" lineBreakMode="tailTruncation" baselineAdjustment="alignBaselines" adjustsFontSizeToFit="NO" id="Zt2-6j-Eec">
+                                                            <rect key="frame" x="0.0" y="11" width="280" height="21"/>
+                                                            <autoresizingMask key="autoresizingMask" flexibleMaxX="YES" flexibleMaxY="YES"/>
+                                                            <fontDescription key="fontDescription" type="system" pointSize="17"/>
+                                                            <color key="textColor" white="0.66666666666666663" alpha="1" colorSpace="calibratedWhite"/>
+                                                            <color key="highlightedColor" white="1" alpha="1" colorSpace="calibratedWhite"/>
+                                                        </label>
+                                                    </subviews>
+                                                    <color key="backgroundColor" white="0.0" alpha="0.0" colorSpace="calibratedWhite"/>
+                                                </view>
+                                            </tableViewCell>
+                                            <tableViewCell contentMode="scaleToFill" selectionStyle="blue" accessoryType="disclosureIndicator" hidesAccessoryWhenEditing="NO" indentationLevel="1" indentationWidth="0.0" reuseIdentifier="TagsCell" id="1Uj-zD-EjE">
+                                                <rect key="frame" x="0.0" y="79" width="314" height="44"/>
+                                                <autoresizingMask key="autoresizingMask" flexibleMaxY="YES"/>
+                                                <view key="contentView" opaque="NO" clipsSubviews="YES" multipleTouchEnabled="YES" contentMode="center">
+                                                    <rect key="frame" x="10" y="0.0" width="274" height="43"/>
+                                                    <autoresizingMask key="autoresizingMask"/>
+                                                    <color key="backgroundColor" white="0.0" alpha="0.0" colorSpace="calibratedWhite"/>
+                                                </view>
+                                                <gestureRecognizers/>
+                                            </tableViewCell>
+                                            <tableViewCell contentMode="scaleToFill" selectionStyle="blue" accessoryType="disclosureIndicator" hidesAccessoryWhenEditing="NO" indentationLevel="1" indentationWidth="0.0" reuseIdentifier="NoteCell" id="9dK-cU-p0l">
+                                                <rect key="frame" x="0.0" y="123" width="314" height="44"/>
+                                                <autoresizingMask key="autoresizingMask" flexibleMaxY="YES"/>
+                                                <view key="contentView" opaque="NO" clipsSubviews="YES" multipleTouchEnabled="YES" contentMode="center">
+                                                    <rect key="frame" x="10" y="0.0" width="274" height="43"/>
+                                                    <autoresizingMask key="autoresizingMask"/>
+                                                    <subviews>
+                                                        <label opaque="NO" clipsSubviews="YES" userInteractionEnabled="NO" tag="2" contentMode="left" text="Label" lineBreakMode="wordWrap" numberOfLines="0" baselineAdjustment="alignBaselines" minimumFontSize="10" adjustsFontSizeToFit="NO" id="nc6-iA-Fjl" customClass="OHAttributedLabel">
+                                                            <rect key="frame" x="10" y="39" width="244" height="0.0"/>
+                                                            <autoresizingMask key="autoresizingMask" widthSizable="YES" heightSizable="YES"/>
+                                                            <fontDescription key="fontDescription" type="system" pointSize="14"/>
+                                                            <color key="textColor" red="0.1960784314" green="0.30980392159999998" blue="0.52156862749999999" alpha="1" colorSpace="calibratedRGB"/>
+                                                            <color key="highlightedColor" white="1" alpha="1" colorSpace="calibratedWhite"/>
+                                                        </label>
+                                                        <label opaque="NO" clipsSubviews="YES" userInteractionEnabled="NO" tag="1" contentMode="left" text="Label" lineBreakMode="wordWrap" numberOfLines="2" minimumFontSize="10" adjustsFontSizeToFit="NO" id="BbG-Tk-6uk" customClass="OHAttributedLabel">
+                                                            <rect key="frame" x="58" y="0.0" width="196" height="43"/>
+                                                            <autoresizingMask key="autoresizingMask" widthSizable="YES" heightSizable="YES"/>
+                                                            <fontDescription key="fontDescription" type="system" pointSize="14"/>
+                                                            <color key="textColor" red="0.1960784314" green="0.30980392159999998" blue="0.52156862749999999" alpha="1" colorSpace="calibratedRGB"/>
+                                                            <color key="highlightedColor" white="1" alpha="1" colorSpace="calibratedWhite"/>
+                                                        </label>
+                                                        <imageView userInteractionEnabled="NO" contentMode="scaleToFill" image="AccountSettingsUI_com.apple.Dataclass.Notes.png" id="Npy-CB-1mc">
+                                                            <rect key="frame" x="21" y="10" width="29" height="29"/>
+                                                            <autoresizingMask key="autoresizingMask" flexibleMaxX="YES" flexibleMaxY="YES"/>
+                                                        </imageView>
+                                                    </subviews>
+                                                    <color key="backgroundColor" white="0.0" alpha="0.0" colorSpace="calibratedWhite"/>
+                                                </view>
+                                                <gestureRecognizers/>
+                                            </tableViewCell>
+                                            <tableViewCell contentMode="scaleToFill" selectionStyle="blue" accessoryType="disclosureIndicator" hidesAccessoryWhenEditing="NO" indentationLevel="1" indentationWidth="0.0" reuseIdentifier="NewNoteCell" id="fzz-cf-R2D">
+                                                <rect key="frame" x="0.0" y="167" width="314" height="45"/>
+                                                <autoresizingMask key="autoresizingMask" flexibleMaxY="YES"/>
+                                                <view key="contentView" opaque="NO" clipsSubviews="YES" multipleTouchEnabled="YES" contentMode="center">
+                                                    <rect key="frame" x="10" y="0.0" width="274" height="43"/>
+                                                    <autoresizingMask key="autoresizingMask"/>
+                                                    <subviews>
+                                                        <imageView userInteractionEnabled="NO" contentMode="scaleToFill" image="AccountSettingsUI_com.apple.Dataclass.Notes.png" id="Jdz-A5-MQd">
+                                                            <rect key="frame" x="20" y="7" width="29" height="29"/>
+                                                            <autoresizingMask key="autoresizingMask" flexibleMaxX="YES" flexibleMaxY="YES"/>
+                                                        </imageView>
+                                                        <imageView userInteractionEnabled="NO" contentMode="scaleToFill" image="AddSmall.png" id="zhZ-c7-cpS">
+                                                            <rect key="frame" x="38" y="4" width="15" height="15"/>
+                                                            <autoresizingMask key="autoresizingMask" flexibleMaxX="YES" flexibleMaxY="YES"/>
+                                                        </imageView>
+                                                        <label opaque="NO" clipsSubviews="YES" userInteractionEnabled="NO" tag="1" contentMode="left" text="New note ..." lineBreakMode="wordWrap" minimumFontSize="10" adjustsFontSizeToFit="NO" id="fOg-d4-KOT">
+                                                            <rect key="frame" x="58" y="4" width="196" height="32"/>
+                                                            <autoresizingMask key="autoresizingMask" widthSizable="YES" heightSizable="YES"/>
+                                                            <fontDescription key="fontDescription" type="system" pointSize="17"/>
+                                                            <color key="textColor" white="0.66666666666666663" alpha="1" colorSpace="calibratedWhite"/>
+                                                            <color key="highlightedColor" white="1" alpha="1" colorSpace="calibratedWhite"/>
+                                                        </label>
+                                                    </subviews>
+                                                    <color key="backgroundColor" white="0.0" alpha="0.0" colorSpace="calibratedWhite"/>
+                                                </view>
+                                                <gestureRecognizers/>
+                                            </tableViewCell>
+                                        </prototypes>
+                                        <sections/>
+                                        <connections>
+                                            <outlet property="dataSource" destination="BLe-jL-WRe" id="C06-45-PVa"/>
+                                            <outlet property="delegate" destination="BLe-jL-WRe" id="A0g-lZ-vHQ"/>
+                                        </connections>
+                                    </tableView>
+                                </subviews>
                                 <color key="backgroundColor" white="0.66666666666666663" alpha="1" colorSpace="calibratedWhite"/>
                                 <gestureRecognizers/>
                                 <connections>
@@ -840,7 +898,7 @@
                                     <outletCollection property="gestureRecognizers" destination="ekM-hN-KvU" appends="YES" id="Fp7-TS-7nZ"/>
                                 </connections>
                             </view>
-                            <navigationBar contentMode="scaleToFill" barStyle="blackTranslucent" id="7gz-Up-uUz">
+                            <navigationBar contentMode="scaleToFill" id="7gz-Up-uUz">
                                 <rect key="frame" x="0.0" y="0.0" width="1024" height="44"/>
                                 <autoresizingMask key="autoresizingMask" widthSizable="YES" flexibleMaxY="YES"/>
                                 <items>
@@ -855,6 +913,7 @@
                         <outlet property="leftPullPane" destination="q7f-ZW-tk3" id="q4h-67-5qt"/>
                         <outlet property="leftPullTab" destination="zNO-63-agw" id="dTq-Lt-zph"/>
                         <outlet property="navigationBar" destination="7gz-Up-uUz" id="ugC-XP-o0v"/>
+                        <outlet property="notesAndTagsTable" destination="Afk-4C-7S5" id="UaP-gs-zXT"/>
                         <outlet property="placeholderView" destination="eKb-PL-jbg" id="0On-Ch-Txx"/>
                         <outlet property="rightPullPane" destination="tx3-Le-y5p" id="WiK-Jy-Ftk"/>
                         <outlet property="rightPullTab" destination="Xab-2t-Ez1" id="u8O-kZ-UOw"/>
@@ -892,7 +951,7 @@
                     </connections>
                 </panGestureRecognizer>
             </objects>
-            <point key="canvasLocation" x="-1664" y="-1375"/>
+            <point key="canvasLocation" x="-1668" y="-1354"/>
         </scene>
         <!--Authentication Dialog - Login to Zotero-->
         <scene sceneID="kZo-Vw-R2l">
@@ -1152,145 +1211,6 @@
         <image name="icon-up-black.png" width="23" height="20"/>
         <image name="verticalLines.png" width="6" height="1"/>
     </resources>
-    <classes>
-        <class className="HLSPlaceholderViewController" superclassName="HLSViewController">
-            <source key="sourceIdentifier" type="project" relativePath="./Classes/HLSPlaceholderViewController.h"/>
-            <relationships>
-                <relationship kind="outlet" name="delegate"/>
-                <relationship kind="outlet" name="placeholderView" candidateClass="UIView"/>
-            </relationships>
-        </class>
-        <class className="HLSViewController" superclassName="UIViewController">
-            <source key="sourceIdentifier" type="project" relativePath="./Classes/HLSViewController.h"/>
-        </class>
-        <class className="OHAttributedLabel" superclassName="UILabel">
-            <source key="sourceIdentifier" type="project" relativePath="./Classes/OHAttributedLabel.h"/>
-            <relationships>
-                <relationship kind="outlet" name="delegate"/>
-            </relationships>
-        </class>
-        <class className="ZPAuthenticationDialog" superclassName="UIViewController">
-            <source key="sourceIdentifier" type="project" relativePath="./Classes/ZPAuthenticationDialog.h"/>
-            <relationships>
-                <relationship kind="action" name="loadFirstPage:"/>
-                <relationship kind="outlet" name="webView" candidateClass="UIWebView"/>
-            </relationships>
-        </class>
-        <class className="ZPBarBackgroundGradientView" superclassName="UIView">
-            <source key="sourceIdentifier" type="project" relativePath="./Classes/ZPBarBackgroundGradientView.h"/>
-        </class>
-        <class className="ZPCollectionsAndTagsViewController" superclassName="HLSPlaceholderViewController">
-            <source key="sourceIdentifier" type="project" relativePath="./Classes/ZPCollectionsAndTagsViewController.h"/>
-            <relationships>
-                <relationship kind="action" name="handlePanGesture:" candidateClass="UIPanGestureRecognizer"/>
-                <relationship kind="action" name="toggleTagSelector:"/>
-                <relationship kind="outlet" name="cacheControllerPlaceHolder" candidateClass="UIBarButtonItem"/>
-                <relationship kind="outlet" name="collectionsView" candidateClass="UIView"/>
-                <relationship kind="outlet" name="gearButton" candidateClass="UIBarButtonItem"/>
-                <relationship kind="outlet" name="headerArrowLeft" candidateClass="UIImageView"/>
-                <relationship kind="outlet" name="headerArrowRight" candidateClass="UIImageView"/>
-                <relationship kind="outlet" name="tagsHeader" candidateClass="ZPBarBackgroundGradientView"/>
-                <relationship kind="outlet" name="tagsView" candidateClass="UIView"/>
-                <relationship kind="outlet" name="toolBar" candidateClass="UIToolbar"/>
-            </relationships>
-        </class>
-        <class className="ZPFileImportViewController" superclassName="UIViewController">
-            <source key="sourceIdentifier" type="project" relativePath="./Classes/ZPFileImportViewController.h"/>
-            <relationships>
-                <relationship kind="outlet" name="carousel" candidateClass="iCarousel"/>
-            </relationships>
-        </class>
-        <class className="ZPFileViewerNavigationViewController" superclassName="UINavigationController">
-            <source key="sourceIdentifier" type="project" relativePath="./Classes/ZPFileViewerNavigationViewController.h"/>
-        </class>
-        <class className="ZPFileViewerViewController" superclassName="HLSPlaceholderViewController">
-            <source key="sourceIdentifier" type="project" relativePath="./Classes/ZPFileViewerViewController.h"/>
-            <relationships>
-                <relationship kind="action" name="actionButtonPressed:"/>
-                <relationship kind="action" name="dismiss:"/>
-                <relationship kind="action" name="handlePanGestureOnPullPane:" candidateClass="UIPanGestureRecognizer"/>
-                <relationship kind="action" name="next:"/>
-                <relationship kind="action" name="presentAllFiles:"/>
-                <relationship kind="action" name="previous:"/>
-                <relationship kind="action" name="togglePullPane:"/>
-                <relationship kind="action" name="toggleStar:"/>
-                <relationship kind="outlet" name="leftPullPane" candidateClass="UIView"/>
-                <relationship kind="outlet" name="leftPullTab" candidateClass="UIView"/>
-                <relationship kind="outlet" name="navigationBar" candidateClass="UINavigationBar"/>
-                <relationship kind="outlet" name="rightPullPane" candidateClass="UIView"/>
-                <relationship kind="outlet" name="rightPullTab" candidateClass="UIView"/>
-            </relationships>
-        </class>
-        <class className="ZPItemDetailViewController" superclassName="UITableViewController">
-            <source key="sourceIdentifier" type="project" relativePath="./Classes/ZPItemDetailViewController.h"/>
-            <relationships>
-                <relationship kind="action" name="actionButtonPressed:"/>
-                <relationship kind="outlet" name="actionButton" candidateClass="UIBarButtonItem"/>
-            </relationships>
-        </class>
-        <class className="ZPItemListViewController" superclassName="UIViewController">
-            <source key="sourceIdentifier" type="project" relativePath="./Classes/ZPItemListViewController.h"/>
-            <relationships>
-                <relationship kind="action" name="sortButtonPressed:"/>
-                <relationship kind="outlet" name="searchBar" candidateClass="UISearchBar"/>
-                <relationship kind="outlet" name="tableView" candidateClass="UITableView"/>
-                <relationship kind="outlet" name="toolBar" candidateClass="UIToolbar"/>
-            </relationships>
-        </class>
-        <class className="ZPLibraryAndCollectionListViewController" superclassName="UITableViewController">
-            <source key="sourceIdentifier" type="project" relativePath="./Classes/ZPLibraryAndCollectionListViewController.h"/>
-        </class>
-        <class className="ZPLogViewController" superclassName="UIViewController">
-            <source key="sourceIdentifier" type="project" relativePath="./Classes/ZPLogViewController.h"/>
-            <relationships>
-                <relationship kind="action" name="contactSupport:"/>
-                <relationship kind="action" name="dismiss:"/>
-                <relationship kind="action" name="manageKey:"/>
-                <relationship kind="action" name="showManual:"/>
-                <relationship kind="outlet" name="logView" candidateClass="UITextView"/>
-                <relationship kind="outlet" name="manualButton" candidateClass="UIBarButtonItem"/>
-            </relationships>
-        </class>
-        <class className="ZPMasterItemListViewController" superclassName="UITableViewController">
-            <source key="sourceIdentifier" type="project" relativePath="./Classes/ZPMasterItemListViewController.h"/>
-        </class>
-        <class className="ZPNoteEditingViewController" superclassName="UIViewController">
-            <source key="sourceIdentifier" type="project" relativePath="./Classes/ZPNoteEditingViewController.h"/>
-            <relationships>
-                <relationship kind="action" name="cancel:"/>
-                <relationship kind="action" name="save:"/>
-                <relationship kind="outlet" name="webView" candidateClass="UIWebView"/>
-            </relationships>
-        </class>
-        <class className="ZPSplitViewController" superclassName="UISplitViewController">
-            <source key="sourceIdentifier" type="project" relativePath="./Classes/ZPSplitViewController.h"/>
-        </class>
-        <class className="ZPTagEditingViewController" superclassName="UIViewController">
-            <source key="sourceIdentifier" type="project" relativePath="./Classes/ZPTagEditingViewController.h"/>
-            <relationships>
-                <relationship kind="action" name="dismiss:"/>
-                <relationship kind="outlet" name="navigationBar" candidateClass="UINavigationBar"/>
-                <relationship kind="outlet" name="tableView" candidateClass="UITableView"/>
-            </relationships>
-        </class>
-        <class className="ZPUploadVersionConflictViewControllerViewController" superclassName="UIViewController">
-            <source key="sourceIdentifier" type="project" relativePath="./Classes/ZPUploadVersionConflictViewControllerViewController.h"/>
-            <relationships>
-                <relationship kind="action" name="useMyVersion:"/>
-                <relationship kind="action" name="useRemoteVersion:"/>
-                <relationship kind="outlet" name="carousel" candidateClass="iCarousel"/>
-                <relationship kind="outlet" name="label" candidateClass="UILabel"/>
-                <relationship kind="outlet" name="secondaryCarousel" candidateClass="iCarousel"/>
-            </relationships>
-        </class>
-        <class className="iCarousel" superclassName="UIView">
-            <source key="sourceIdentifier" type="project" relativePath="./Classes/iCarousel.h"/>
-            <relationships>
-                <relationship kind="outlet" name="dataSource"/>
-                <relationship kind="outlet" name="delegate"/>
-            </relationships>
-        </class>
-    </classes>
     <simulatedMetricsContainer key="defaultSimulatedMetrics">
         <simulatedStatusBarMetrics key="statusBar" statusBarStyle="blackTranslucent"/>
         <simulatedOrientationMetrics key="orientation"/>

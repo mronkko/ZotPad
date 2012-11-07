@@ -11,6 +11,7 @@
 @interface ZPServerResponseXMLParserItem : ZPServerResponseXMLParser{
     BOOL _bibContent;
     BOOL _jsonContent;
+    
 }
 - (void) _setField:(NSString*)field toValue:(NSString*)value;
 - (void)parser:(NSXMLParser *)parser didStartElement:(NSString *)elementName namespaceURI:(NSString *)namespaceURI qualifiedName:(NSString *)qualifiedName attributes:(NSDictionary *)attributeDict;

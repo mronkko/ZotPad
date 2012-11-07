@@ -11,8 +11,9 @@
 
 @interface ZPTagEditingViewController (){
     NSArray* _selectedTags;
-    ZPZoteroItem* _item;
+    ZPZoteroDataObject* _item;
     ZPTagController* _tagDataSource;
+    __weak UIPopoverController *myPopover;
 }
 
 @end
@@ -20,6 +21,17 @@
 @implementation ZPTagEditingViewController
 
 @synthesize tableView, navigationBar;
+
+static ZPTagEditingViewController* _instance;
+
++(ZPTagEditingViewController*) instance{
+    if(_instance == NULL){
+        
+        _instance =[[UIApplication sharedApplication].delegate.window.rootViewController.storyboard instantiateViewControllerWithIdentifier:@"TagEditingViewController"];
+    }
+    return _instance;
+}
+
 
 - (id)initWithNibName:(NSString *)nibNameOrNil bundle:(NSBundle *)nibBundleOrNil
 {
@@ -37,8 +49,12 @@
     
     _tagDataSource = [[ZPTagController alloc] init];
     _tagDataSource.tagOwner = self;
-    [_tagDataSource prepareToShow];
     self.tableView.dataSource = _tagDataSource;
+}
+-(void)viewWillAppear:(BOOL)animated{
+    [super viewWillAppear:animated];
+    [_tagDataSource prepareToShow];
+    [tableView reloadData];
 }
 
 - (void)didReceiveMemoryWarning
@@ -47,11 +63,11 @@
     // Dispose of any resources that can be recreated.
 }
 
--(void) setItem:(ZPZoteroItem *)item{
+-(void) setItem:(ZPZoteroDataObject *)item{
     _item = item;
     _selectedTags = _item.tags;
 }
--(ZPZoteroItem*) item{
+-(ZPZoteroDataObject*) item{
     return _item;
 }
 
@@ -87,6 +103,19 @@
 
 -(void)createTag:(NSString*)tag{
     //Only create the tag if it does not exist
+}
+
+
+- (void)prepareForSegue:(UIStoryboardSegue *)segue sender:(id)sender {
+    // make sure it's the right segue if you have more than one in this VC
+    myPopover = [(UIStoryboardPopoverSegue *)segue popoverController];
+}
+
+- (IBAction)showPopover:(id)sender {
+    if (myPopover)
+        [myPopover dismissPopoverAnimated:YES];
+    else
+        [self performSegueWithIdentifier:@"NewTagPopover" sender:sender];
 }
 
 

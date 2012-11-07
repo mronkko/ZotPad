@@ -7,6 +7,7 @@
 //
 
 #import <Foundation/Foundation.h>
+#import "ZPZoteroDataObjectWithNote.h"
 
 
 #import <QuickLook/QuickLook.h>
@@ -21,7 +22,7 @@ extern NSInteger const VERSION_SOURCE_DROPBOX;
 extern NSInteger const VERSION_SOURCE_ZOTERO;
 extern NSInteger const VERSION_SOURCE_WEBDAV;
 
-@interface ZPZoteroAttachment : ZPZoteroDataObject <QLPreviewItem>{
+@interface ZPZoteroAttachment : ZPZoteroDataObject <QLPreviewItem, ZPZoteroDataObjectWithNote>{
     NSInteger _linkMode;
 }
 

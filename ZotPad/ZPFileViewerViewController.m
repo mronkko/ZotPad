@@ -12,25 +12,52 @@
 #import "ZPStarBarButtonItem.h"
 #import <QuartzCore/QuartzCore.h>
 #import "CMPopTipView.h"
+#import "ZPFileViewerNavigationViewController.h"
+#import "ZPQLPreviewControllerViewController.h"
+#import "ZPTagController.h"
+#import "NSString_stripHtml.h"
+#import "ZPTagEditingViewController.h"
+#import "ZPNoteEditingViewController.h"
 
 //Unzipping and base64 decoding
 #import "ZipArchive.h"
 #import "NSString+Base64.h"
 
-#import "ZPDebugViewController.h"
-
-@interface ZPFileViewerViewController ()
+@interface ZPFileViewerViewController (){
+    //An ugly way to load table view cells for tags twice so that they are sized correctly
+    NSArray* _tagButtonsForAttachment;
+    NSArray* _tagButtonsForParent;
+}
 
 -(void)_togglePullPane:(UIView*)pane duration:(float) duration toVisible:(BOOL)visible;
 -(void)_moveView:(UIView*) view horizontallyBy:(float) amount;
 -(NSInteger) _xCoordinateForView:(UIView*) view isVisible:(BOOL) visible;
 -(void) _segmentChanged:(UISegmentedControl*) source;
+-(void) _toggleArrows;
+-(void) _updateTitle;
+-(void) _updateLeftPullPane;
 
 @end
 
+
 @implementation ZPFileViewerViewController
 
-@synthesize navigationBar, leftPullPane, leftPullTab, rightPullPane, rightPullTab;
+static ZPFileViewerViewController* _instance;
+
++(ZPFileViewerViewController*) instance{
+    if(_instance == NULL){
+        
+        _instance =[[UIApplication sharedApplication].delegate.window.rootViewController.storyboard instantiateViewControllerWithIdentifier:@"FileViewerViewController"];
+    }
+    return _instance;
+}
+
++(void) presentWithAttachment:(ZPZoteroAttachment*)attachment{
+    ZPFileViewerViewController* vc = [self instance];
+    [vc addAttachmentToViewer:attachment];
+    [[UIApplication sharedApplication].delegate.window.rootViewController presentModalViewController:vc animated:YES];
+}
+@synthesize navigationBar, leftPullPane, leftPullTab, rightPullPane, rightPullTab, navigationArrows, notesAndTagsTable;
 
 - (id)initWithNibName:(NSString *)nibNameOrNil bundle:(NSBundle *)nibBundleOrNil
 {
@@ -45,6 +72,7 @@
     self = [super initWithCoder:aDecoder];
     if (self) {
         _attachments = [[NSMutableArray alloc] init];
+        _previewControllers = [[NSMutableArray alloc] init];
     }
     return self;
     
@@ -68,21 +96,35 @@
                                                                                 target:self
                                                                                 action:@selector(dismiss:)];
     
-    UISegmentedControl* segmentControl = [[UISegmentedControl alloc] initWithItems:[NSArray arrayWithObjects:[UIImage imageNamed:@"left"],[UIImage imageNamed:@"right"], nil]];
-    segmentControl.segmentedControlStyle = UISegmentedControlStyleBar;
+    navigationArrows = [[UISegmentedControl alloc] initWithItems:[NSArray arrayWithObjects:[UIImage imageNamed:@"left"],[UIImage imageNamed:@"right"], nil]];
+    navigationArrows.segmentedControlStyle = UISegmentedControlStyleBar;
 
-    [segmentControl setWidth:40 forSegmentAtIndex:0];
-    [segmentControl setWidth:40 forSegmentAtIndex:1];
+    //Need custome graphics because the segments are inconsistently colored because they are unselected
     
-    [segmentControl addTarget:self action:@selector(_segmentChanged:) forControlEvents:UIControlEventValueChanged];
-    
-    UIBarButtonItem* forwardAndBackButtons = [[UIBarButtonItem alloc] initWithCustomView:segmentControl];
-    
-    UIBarButtonItem* presentAllFilesButton = [[UIBarButtonItem alloc] initWithImage:[UIImage imageNamed:@"more"]
-                                                                              style:UIBarButtonItemStylePlain
-                                                                             target:self
-                                                                             action:@selector(presentAllFiles:)];
+    [navigationArrows setBackgroundImage:[UIImage imageNamed:@"barbutton_image_up_state"] forState:UIControlStateNormal barMetrics:UIBarMetricsDefault];
+    [navigationArrows setBackgroundImage:[UIImage imageNamed:@"barbutton_image_down_state"] forState:UIControlStateHighlighted barMetrics:UIBarMetricsDefault];
 
+    [navigationArrows setWidth:40 forSegmentAtIndex:0];
+    [navigationArrows setWidth:40 forSegmentAtIndex:1];
+    
+    [navigationArrows addTarget:self action:@selector(_segmentChanged:) forControlEvents:UIControlEventValueChanged];
+    
+    UIBarButtonItem* forwardAndBackButtons = [[UIBarButtonItem alloc] initWithCustomView:navigationArrows];
+    
+    UIBarButtonItem* presentAllFilesButton = NULL;
+    
+    //iPad and iOS 6 have "expose" function
+    /*
+     //Not implemented yet
+     if ([[[UIDevice currentDevice] systemVersion] floatValue] >= 6.0 &&
+     [[UIDevice currentDevice] userInterfaceIdiom] == UIUserInterfaceIdiomPad){
+     presentAllFilesButton = [[UIBarButtonItem alloc] initWithImage:[UIImage imageNamed:@"more"]
+     style:UIBarButtonItemStylePlain
+     target:self
+     action:@selector(presentAllFiles:)];
+     }
+     */
+    
     UIBarButtonItem* spacer = [[UIBarButtonItem alloc] initWithBarButtonSystemItem:UIBarButtonSystemItemFixedSpace target:nil action:nil];
     spacer.width = 20;
     
@@ -99,7 +141,7 @@
         [helpPopUp presentPointingAtBarButtonItem:starButton animated:YES];
         [[NSUserDefaults standardUserDefaults] setObject:@"1" forKey:@"hasPresentedStarButtonHelpPopover"];
     }
-
+    
     UIBarButtonItem* actionButton = [[UIBarButtonItem alloc] initWithBarButtonSystemItem:UIBarButtonSystemItemAction target:self action:@selector(actionButtonPressed:)];
     
     self.navigationItem.rightBarButtonItems = [NSArray arrayWithObjects:actionButton, starButton, nil];
@@ -110,17 +152,40 @@
     
     //Configure the QuickLook attachment viewer
     
-    _qlPreviewController = [[QLPreviewController alloc] init];
-    _qlPreviewController.dataSource = self;
-
-    _itemViewers = [self.storyboard instantiateViewControllerWithIdentifier:@"FileViewerNavigationViewController"];
-
-    [_itemViewers pushViewController:_qlPreviewController animated:NO];
+    _itemViewers = [[ZPFileViewerNavigationViewController alloc] init];
+    _itemViewers.navigationBarHidden = YES;
     
     [self setInsetViewController:_itemViewers];
     
+    //Hide both pull tabs
     
-   
+    if(rightPullPane!=NULL){
+        rightPullPane.frame = CGRectMake(rightPullPane.frame.origin.x + rightPullPane.frame.size.width,
+                                         rightPullPane.frame.origin.y,
+                                         rightPullPane.frame.size.width,
+                                         rightPullPane.frame.size.height);
+        
+        rightPullTab.frame = CGRectMake(rightPullTab.frame.origin.x + rightPullPane.frame.size.width,
+                                        rightPullTab.frame.origin.y,
+                                        rightPullTab.frame.size.width,
+                                        rightPullTab.frame.size.height);
+    }
+    
+    leftPullPane.frame = CGRectMake(leftPullPane.frame.origin.x - leftPullPane.frame.size.width,
+                                    leftPullPane.frame.origin.y,
+                                    leftPullPane.frame.size.width,
+                                    leftPullPane.frame.size.height);
+    
+    leftPullTab.frame = CGRectMake(leftPullTab.frame.origin.x - leftPullPane.frame.size.width,
+                                   leftPullTab.frame.origin.y,
+                                   leftPullTab.frame.size.width,
+                                   leftPullTab.frame.size.height);
+    
+    
+}
+-(void) _toggleArrows{
+    [navigationArrows setEnabled:_activeAttachmentIndex>0 forSegmentAtIndex:0];
+    [navigationArrows setEnabled:_activeAttachmentIndex<([_attachments count]-1) forSegmentAtIndex:1];
 }
 
 -(void) viewWillAppear:(BOOL)animated{
@@ -188,7 +253,7 @@
         pane.layer.shadowRadius = 10.0;
         pane.layer.shouldRasterize = YES;
         pane.layer.rasterizationScale = [UIScreen mainScreen].scale;
-
+        
         //Clip the pull tabs
         
         UIBezierPath* clipPath = [UIBezierPath bezierPath];
@@ -197,10 +262,10 @@
         NSInteger ty1 = pullTab.frame.size.width;
         NSInteger ty2 = pullTab.frame.size.height-pullTab.frame.size.width;
         NSInteger ty3 = pullTab.frame.size.height;
-
+        
         NSInteger tx0;
         NSInteger tx1;
-
+        
         if(index == 0){
             tx0 = 0;
             tx1 = pullTab.frame.size.width;
@@ -213,14 +278,14 @@
         [clipPath moveToPoint:CGPointMake(tx0, ty0) ];
         
         [clipPath addCurveToPoint:CGPointMake(tx1, ty1)
-                      controlPoint1:CGPointMake(tx0, ty1)
-                      controlPoint2:CGPointMake(tx1, ty0)];
+                    controlPoint1:CGPointMake(tx0, ty1)
+                    controlPoint2:CGPointMake(tx1, ty0)];
         
         [clipPath addLineToPoint:CGPointMake(tx1, ty2) ];
         
         [clipPath addCurveToPoint:CGPointMake(tx0, ty3)
-                      controlPoint1:CGPointMake(tx1, ty3)
-                      controlPoint2:CGPointMake(tx0, ty2)];
+                    controlPoint1:CGPointMake(tx1, ty3)
+                    controlPoint2:CGPointMake(tx0, ty2)];
         
         [clipPath closePath];
         
@@ -230,37 +295,20 @@
         
     }
     
-    //Hide both pull tabs
-
-    if(rightPullPane!=NULL){
-        rightPullPane.frame = CGRectMake(rightPullPane.frame.origin.x + rightPullPane.frame.size.width,
-                                         rightPullPane.frame.origin.y,
-                                         rightPullPane.frame.size.width,
-                                         rightPullPane.frame.size.height);
-        
-        rightPullTab.frame = CGRectMake(rightPullTab.frame.origin.x + rightPullPane.frame.size.width,
-                                        rightPullTab.frame.origin.y,
-                                        rightPullTab.frame.size.width,
-                                        rightPullTab.frame.size.height);
-    }
-
-    leftPullPane.frame = CGRectMake(leftPullPane.frame.origin.x - leftPullPane.frame.size.width,
-                                    leftPullPane.frame.origin.y,
-                                    leftPullPane.frame.size.width,
-                                    leftPullPane.frame.size.height);
-
-    leftPullTab.frame = CGRectMake(leftPullTab.frame.origin.x - leftPullPane.frame.size.width,
-                                   leftPullTab.frame.origin.y,
-                                   leftPullTab.frame.size.width,
-                                   leftPullTab.frame.size.height);
+    // Configure the previews
     
-    // Add gesture recognizers to pull tabs
-
+    [_itemViewers setViewControllers:_previewControllers animated:NO];
+    
+    //Configure arrows and title
+    
+    [self _toggleArrows];
+    [self _updateTitle];
+    [self _updateLeftPullPane];
 }
 
 
 - (void) willAnimateRotationToInterfaceOrientation:(UIInterfaceOrientation)toInterfaceOrientation duration:(NSTimeInterval)duration {
-
+    
     [super willAnimateRotationToInterfaceOrientation:toInterfaceOrientation duration:duration];
     
     UIView* pane = self.leftPullPane;
@@ -276,7 +324,7 @@
         CFRetain(oldShadowPath);
     
     UIBezierPath* shadowPath = [UIBezierPath bezierPath];
-
+    
     NSInteger newHeight;
     CGRect screenRect = [[UIScreen mainScreen] bounds];
     
@@ -325,6 +373,15 @@
         })()) forKey:@"transition"];
         CFRelease(oldShadowPath);
     }
+    
+    //Animate the placeholderview
+    BOOL reposition = UIInterfaceOrientationIsLandscape(toInterfaceOrientation) && _leftPaneVisible;
+    
+    self.placeholderView.frame = CGRectMake(reposition?leftPullPane.frame.size.width:0,
+                                            self.placeholderView.frame.origin.y,
+                                            (UIInterfaceOrientationIsLandscape(toInterfaceOrientation)?[[UIScreen mainScreen] bounds].size.height:[[UIScreen mainScreen] bounds].size.width)-(reposition?leftPullPane.frame.size.width:0),
+                                            self.placeholderView.frame.size.height);
+    
 }
 
 - (void)didReceiveMemoryWarning
@@ -336,12 +393,18 @@
 #pragma mark - Managing the displayed items
 
 -(void) addAttachmentToViewer:(ZPZoteroAttachment*)attachment{
-
+    
     //Do not add the object if it already exists
-    if([_attachments containsObject:attachment]){
+    
+    NSInteger attachmentIndex = [_attachments indexOfObject:attachment];
+    
+    if(attachmentIndex != NSNotFound){
         if([_attachments lastObject]!=attachment){
-            [_attachments removeObject:attachment];
+            [_attachments removeObjectAtIndex:attachmentIndex];
             [_attachments addObject:attachment];
+            
+            [_previewControllers addObject:[_previewControllers objectAtIndex:attachmentIndex]];
+            [_previewControllers removeObjectAtIndex:attachmentIndex];
         }
     }
     else{
@@ -377,14 +440,57 @@
             }
         }
         [_attachments addObject:attachment];
+        ZPQLPreviewControllerViewController* newPreviewController = [[ZPQLPreviewControllerViewController alloc] init];
+        newPreviewController.dataSource = self;
+        [_previewControllers addObject:newPreviewController];
     }
+    
     _activeAttachmentIndex = [_attachments count]-1;
+    
+    
+}
+
+-(void) _updateTitle{
+    ZPZoteroItem* parent = [ZPZoteroItem itemWithKey:[(ZPZoteroAttachment*) [_attachments objectAtIndex:_activeAttachmentIndex] parentKey]];
+    self.navigationBar.topItem.title = parent.shortCitation;
+}
+
+-(void) _updateLeftPullPane{
+    _tagButtonsForAttachment = NULL;
+    _tagButtonsForParent = NULL;
+    [self.notesAndTagsTable reloadData];
 }
 
 #pragma mark - Button actions
 
 -(IBAction) dismiss:(id)source{
     [self dismissModalViewControllerAnimated:YES];
+}
+
+// This is not currently in use because there is no practical way to detect taps
+// on QLPreviewController. This will be fully implemented when a real PDF library
+// is included in ZotPad
+
+- (IBAction) toggleNavigationBar:(id)sender{
+    
+    BOOL isHidden = self.navigationBar.hidden;
+    [UIView animateWithDuration:0.2f
+                     animations:^{
+                         // animations...
+                         if(isHidden){
+                             self.navigationBar.hidden = FALSE;
+                             self.navigationBar.alpha = 1;
+                         }
+                         else{
+                             self.navigationBar.alpha = 0;
+                         }
+                     }
+                     completion:^(BOOL finished){
+                         if(!isHidden){
+                             self.navigationBar.hidden = TRUE;
+                         }
+                     }
+     ];
 }
 
 - (IBAction) actionButtonPressed:(id)sender{
@@ -404,15 +510,22 @@
 
 
 - (IBAction) next:(id)sender{
-    
-    _qlPreviewController = [[QLPreviewController alloc] init];
-    _qlPreviewController.dataSource = self;
-    [_itemViewers pushViewController:_qlPreviewController animated:YES];
+    _activeAttachmentIndex++;
+    [self _toggleArrows];
+    [self _updateTitle];
+    [self _updateLeftPullPane];
+    [_itemViewers pushViewController:[_previewControllers objectAtIndex:_activeAttachmentIndex] animated:YES];
 }
 
 - (IBAction) previous:(id)sender{
+    _activeAttachmentIndex--;
+    [self _toggleArrows];
+    [self _updateTitle];
+    [self _updateLeftPullPane];
     [_itemViewers popViewControllerAnimated:YES];
 }
+
+//TODO: Implement for expose effect
 
 - (IBAction) presentAllFiles:(id)sender{
     
@@ -448,8 +561,8 @@
             
             [self _moveView:pullTab horizontallyBy:location.x];
             [self _moveView:pullPane horizontallyBy:location.x];
-        
-           break;
+            
+            break;
             
         }
             
@@ -459,7 +572,7 @@
             float v = [gestureRecognizer velocityInView:self.view].x;
             
             //Toggle based on velocity
-
+            
             BOOL toVisible;
             
             if(ABS(v)>1000){
@@ -471,7 +584,7 @@
                 toVisible = ABS([self _xCoordinateForView:pullPane isVisible:YES] - pullPane.frame.origin.x) <
                 ABS([self _xCoordinateForView:pullPane isVisible:NO] - pullPane.frame.origin.x);
             }
-
+            
             float time = ABS(pullPane.frame.origin.x-[self _xCoordinateForView:pullPane isVisible:toVisible])/1000.0f;
             
             [self _togglePullPane:pullPane duration:time toVisible:toVisible];
@@ -493,11 +606,11 @@
 }
 
 -(void)_togglePullPane:(UIView*)pane duration:(float) duration toVisible:(BOOL)visible{
-
+    
     //If the view is alreay in the correct place, the duration would be zero
     
     if(duration!=0){
-    
+        
         [UIView animateWithDuration:duration animations:^{
             UIView* pullTab;
             if(pane == self.leftPullPane) pullTab = self.leftPullTab;
@@ -509,23 +622,29 @@
                                     pane.frame.size.height);
             
             pullTab.frame = CGRectMake([self _xCoordinateForView:pullTab isVisible:visible],
-                                    pullTab.frame.origin.y,
-                                    pullTab.frame.size.width,
-                                    pullTab.frame.size.height);
+                                       pullTab.frame.origin.y,
+                                       pullTab.frame.size.width,
+                                       pullTab.frame.size.height);
             
-
+            
+        } completion:^(BOOL finished) {
             if(pane==leftPullPane && UIInterfaceOrientationIsLandscape([[UIApplication sharedApplication] statusBarOrientation])){
-                NSLog(NSStringFromCGRect(self.placeholderView.frame));
                 self.placeholderView.frame = CGRectMake(visible?leftPullPane.frame.size.width:0,
                                                         self.placeholderView.frame.origin.y,
                                                         [[UIScreen mainScreen] bounds].size.height - (visible?leftPullPane.frame.size.width:0),
                                                         self.placeholderView.frame.size.height);
-
-                NSLog(NSStringFromCGRect(self.placeholderView.frame));
-
             }
             
         }];
+    }
+    //Just configure the size of the preview controller
+    else if(pane==leftPullPane && UIInterfaceOrientationIsLandscape([[UIApplication sharedApplication] statusBarOrientation])){
+        self.placeholderView.frame = CGRectMake(visible?leftPullPane.frame.size.width:0,
+                                                self.placeholderView.frame.origin.y,
+                                                [[UIScreen mainScreen] bounds].size.height - (visible?leftPullPane.frame.size.width:0),
+                                                self.placeholderView.frame.size.height);
+        
+        
     }
     
     if(pane==leftPullPane) _leftPaneVisible = visible;
@@ -534,7 +653,7 @@
 }
 
 -(void)_moveView:(UIView*) view horizontallyBy:(float) amount{
-
+    
     NSInteger x = [self _xCoordinateForView:view isVisible:(view == rightPullTab || view == rightPullPane) ? _rightPaneVisible : _leftPaneVisible] + amount;
     
     NSInteger limit1 = [self _xCoordinateForView:view isVisible:NO];
@@ -547,7 +666,7 @@
                             view.frame.origin.y,
                             view.frame.size.width,
                             view.frame.size.height);
-
+    
 }
 
 -(NSInteger) _xCoordinateForView:(UIView*) view isVisible:(BOOL) visible{
@@ -565,26 +684,286 @@
         if(view == rightPullPane) return width - visible * rightPullPane.frame.size.width;
         else return width - visible * rightPullPane.frame.size.width - rightPullTab.frame.size.width;
     }
-
+    
 }
 
-#pragma mark - QLPreviewControllerDataSource
+#pragma mark - ZPQLPreviewControllerViewControllerDataSource
 
 
 - (NSInteger) startIndex{
     return 0;
 }
 
-- (NSInteger) numberOfPreviewItemsInPreviewController: (QLPreviewController *) controller
+- (NSInteger) numberOfPreviewItemsInPreviewController: (ZPQLPreviewControllerViewController *) controller
 {
     return 1;
 }
 
 
-- (id <QLPreviewItem>) previewController: (QLPreviewController *) controller previewItemAtIndex: (NSInteger) index{
-    return [_attachments objectAtIndex:_activeAttachmentIndex];
+- (id <QLPreviewItem>) previewController: (ZPQLPreviewControllerViewController *) controller previewItemAtIndex: (NSInteger) index{
+    return [_attachments objectAtIndex:[_previewControllers indexOfObject:controller]];
 }
 
+#pragma mark - UITableViewDataSource
+
+-(NSInteger) numberOfSectionsInTableView:(UITableView *)tableView{
+    
+    //Standalone attachments have 2 sections, normal attachments 4
+    ZPZoteroAttachment* attachment = (ZPZoteroAttachment*) [_attachments objectAtIndex:_activeAttachmentIndex];
+    BOOL isStandaloneAttachment = [attachment.parentKey isEqualToString:attachment.key];
+    
+    if(isStandaloneAttachment) return 2;
+    else return 4;
+}
+
+-(NSString*) tableView:(UITableView *)tableView titleForHeaderInSection:(NSInteger)section{
+    ZPZoteroAttachment* attachment = (ZPZoteroAttachment*) [_attachments objectAtIndex:_activeAttachmentIndex];
+    BOOL isStandaloneAttachment = [attachment.parentKey isEqualToString:attachment.key];
+    
+    if(isStandaloneAttachment){
+        if(section == 0) return @"Attachment tags";
+        else return @"Attachment note";
+    }
+    else{
+        if(section == 0) return @"Parent item tags";
+        else if(section == 1) return @"Attachment tags";
+        else if(section == 2) return @"Parent item notes";
+        else return @"Attachment note";
+    }
+}
+
+
+-(NSInteger) tableView:(UITableView *)tableView numberOfRowsInSection:(NSInteger)section{
+    if(section == 2){
+        ZPZoteroAttachment* attachment = (ZPZoteroAttachment*) [_attachments objectAtIndex:_activeAttachmentIndex];
+        ZPZoteroItem* parent = [ZPZoteroItem itemWithKey:attachment.parentKey];
+        return [parent.notes count]+1;
+    }
+    else return 1;
+}
+
+// Custom height for the tag views
+
+- (CGFloat)tableView:(UITableView *)tableView heightForRowAtIndexPath:(NSIndexPath *)indexPath{
+    if(indexPath.section <=1){
+        ZPZoteroAttachment* attachment = (ZPZoteroAttachment*) [_attachments objectAtIndex:_activeAttachmentIndex];
+
+        NSArray* tagButtons;
+        
+        //Standalone items
+
+        if([attachment.key isEqualToString:attachment.parentKey]){
+            if(indexPath.section == 0){
+                tagButtons = _tagButtonsForAttachment;
+            }
+        }
+        else{
+            if(indexPath.section == 0){
+                tagButtons = _tagButtonsForParent;
+            }
+            else{
+                tagButtons = _tagButtonsForAttachment;
+            }
+            
+        }
+        
+        if(tagButtons == NULL) return tableView.rowHeight;
+        else{
+            //Get the size based on content
+            NSInteger y=0;
+            for(UIView* subView in tagButtons){
+                y=MAX(y,subView.frame.origin.y+subView.frame.size.height);
+            }
+            
+            return MAX(y, tableView.rowHeight);
+        }
+    }
+    else{
+        return tableView.rowHeight;
+    }
+}
+
+
+-(UITableViewCell*) tableView:(UITableView *)tableView cellForRowAtIndexPath:(NSIndexPath *)indexPath{
+    UITableViewCell *cell;
+    NSString* CellIdentifier;
+    
+    ZPZoteroAttachment* attachment = (ZPZoteroAttachment*) [_attachments objectAtIndex:_activeAttachmentIndex];
+    ZPZoteroItem* parent;
+    
+    BOOL isStandaloneAttachment = [attachment.parentKey isEqualToString:attachment.key];
+    
+    ZPZoteroDataObject* tagSource = NULL;
+    
+    if(isStandaloneAttachment){
+        if(indexPath.section == 0) tagSource = attachment;
+    }
+    else{
+        if(indexPath.section == 0){
+            parent = [ZPZoteroItem itemWithKey:attachment.parentKey];
+            tagSource = parent;
+        }
+        else if(indexPath.section == 1) tagSource = attachment;
+    }
+    
+    if(tagSource != NULL){
+        if([tagSource.tags count]==0){
+            CellIdentifier = @"NoTagsCell";
+        }
+        else{
+            CellIdentifier = @"TagsCell";
+        }
+    }
+    else{
+        //Attachment note
+        if(isStandaloneAttachment || indexPath.section==3) CellIdentifier = @"NoteCell";
+        else{
+            parent = [ZPZoteroItem itemWithKey:attachment.parentKey];
+            if(indexPath.row == [parent.notes count]) CellIdentifier = @"NewNoteCell";
+            else CellIdentifier = @"NoteCell";
+        }
+    }
+
+    cell = [tableView dequeueReusableCellWithIdentifier:CellIdentifier];
+    if (cell == nil)
+    {
+        cell = [[UITableViewCell alloc] initWithStyle:UITableViewCellStyleDefault reuseIdentifier:CellIdentifier];
+    }
+
+    if([CellIdentifier isEqualToString:@"TagsCell"]){
+
+        //Clean the cell
+
+        [ZPTagController addTagButtonsToView:cell.contentView tags:[NSArray array]];
+
+        if(tagSource == attachment){
+            if(_tagButtonsForAttachment != NULL){
+                for(UIView* tagButton in _tagButtonsForAttachment){
+                    [cell addSubview:tagButton];
+                }
+            }
+        }
+        else{
+            if(_tagButtonsForAttachment != NULL){
+                for(UIView* tagButton in _tagButtonsForAttachment){
+                    [cell addSubview:tagButton];
+                }
+            }
+        }
+        
+        //Store the cell so that we know to reload it
+        if(tagSource == attachment) _tagButtonsForAttachment = cell.contentView.subviews;
+        else _tagButtonsForParent = cell.contentView.subviews;
+
+    }
+    else if([CellIdentifier isEqualToString:@"NoteCell"]){
+        UILabel* noteText = (UILabel*) [cell viewWithTag:1];
+        NSString* note;
+        
+        if(isStandaloneAttachment || indexPath.section==3){
+            note = attachment.note;
+        }
+        else{
+            note = [parent.notes objectAtIndex:indexPath.row];
+        }
+        noteText.text = [[note stripHtml] stringByReplacingOccurrencesOfString:@"\n" withString:@" "];
+    }
+
+    return  cell;
+}
+
+#pragma mark - UITableViewDelegate
+
+// Populate the tags cells after they are displayed
+
+- (void)tableView:(UITableView *)tableView willDisplayCell:(UITableViewCell *)cell forRowAtIndexPath:(NSIndexPath *)indexPath{
+    
+    if(indexPath.section<=1){
+        BOOL hasTags;
+        
+        ZPZoteroAttachment* attachment = (ZPZoteroAttachment*) [_attachments objectAtIndex:_activeAttachmentIndex];
+        BOOL isStandaloneAttachment = [attachment.parentKey isEqualToString:attachment.key];
+        ZPZoteroDataObject* tagSource;
+        
+        if(isStandaloneAttachment){
+            if(indexPath.section == 0){
+                tagSource = attachment;
+            }
+        }
+        else{
+            if(indexPath.section == 0){
+                ZPZoteroItem* parent = [ZPZoteroItem itemWithKey:attachment.parentKey];
+                tagSource = parent;
+            }
+            else if(indexPath.section == 1){
+                tagSource = attachment;
+            }
+        }
+        
+        if(tagSource != NULL && [tagSource.tags count]>0){
+            
+            //If the cell is empty, reload the content
+            if([cell.contentView.subviews count] == 0){
+                
+                //Add tags and reload
+                
+                if([tagSource.tags count]>0){
+                    [ZPTagController addTagButtonsToView:cell.contentView tags:tagSource.tags];
+                    
+                    if(tagSource == attachment) _tagButtonsForAttachment = cell.contentView.subviews;
+                    else _tagButtonsForParent = cell.contentView.subviews;
+                    
+                    [tableView reloadRowsAtIndexPaths:[NSArray arrayWithObject:indexPath] withRowAnimation:UITableViewRowAnimationNone];
+                }
+            }
+        }
+    }
+}
+- (void)tableView:(UITableView *)aTableView didSelectRowAtIndexPath:(NSIndexPath *)indexPath {
+    
+    ZPZoteroAttachment* attachment = (ZPZoteroAttachment*) [_attachments objectAtIndex:_activeAttachmentIndex];
+    BOOL isStandaloneAttachment = [attachment.parentKey isEqualToString:attachment.key];
+
+    //Parent tags
+    if(indexPath.section == 0 && ! isStandaloneAttachment){
+        ZPTagEditingViewController* tagController = [ZPTagEditingViewController instance];
+        tagController.item = [ZPZoteroItem itemWithKey:attachment.parentKey];
+        [self presentModalViewController:tagController animated:YES];
+    }
+    //Attachment tags
+    else if((indexPath.section == 0 && isStandaloneAttachment)||
+            (indexPath.section == 1 && ! isStandaloneAttachment)){
+
+        ZPTagEditingViewController* tagController = [ZPTagEditingViewController instance];
+        tagController.item = attachment;
+        [self presentModalViewController:tagController animated:YES];
+
+    }
+    //Parent notes
+    else if(indexPath.section == 2){
+        ZPNoteEditingViewController* noteController = [ZPNoteEditingViewController instance];
+        ZPZoteroItem* parent = [ZPZoteroItem itemWithKey:attachment.parentKey];
+        if([parent.notes count]>indexPath.row){
+            noteController.note = [parent.notes objectAtIndex:indexPath.row];
+        }
+        else{
+            noteController.note = NULL;
+        }
+        [self presentModalViewController:noteController animated:YES];
+
+    }
+    //Attachment note
+    else if(indexPath.section == 3 ||
+            (indexPath.section == 1 && isStandaloneAttachment)){
+
+        ZPNoteEditingViewController* noteController = [ZPNoteEditingViewController instance];
+        noteController.note = attachment;
+        [self presentModalViewController:noteController animated:YES];
+
+    }
+    [aTableView deselectRowAtIndexPath:indexPath animated:NO];
+
+}
 
 
 

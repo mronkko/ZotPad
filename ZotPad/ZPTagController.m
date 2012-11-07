@@ -9,11 +9,22 @@
 #import "ZPTagController.h"
 #import <QuartzCore/QuartzCore.h>
 
+@interface ZPTagController()
+
++(NSInteger) _widthForTag:(NSString*)tag;
++(UIButton*) _tagButtonForTag:(NSString*)tag;
+
+@end
+
+static NSMutableArray* buttonCache;
+static UIImage* blueBackgroundImage;
 
 @implementation ZPTagController
 
-static UIImage* blueBackgroundImage;
-static NSMutableArray* tagButtonCache;
+static const NSInteger margin = 10;
+static const NSInteger tagHeight = 30;
+static const NSInteger tagWidthMultiplier = 6;
+static const NSInteger tagBaseWidth = 20;
 
 @synthesize tagOwner;
 
@@ -25,8 +36,9 @@ static NSMutableArray* tagButtonCache;
     CGContextFillRect(context, rect);
     blueBackgroundImage = UIGraphicsGetImageFromCurrentImageContext();
     UIGraphicsEndImageContext();
-    tagButtonCache = [[NSMutableArray alloc] init];
+    buttonCache = [[NSMutableArray alloc] init];
 }
+
 
 - (id) init{
     self = [super init];
@@ -36,46 +48,21 @@ static NSMutableArray* tagButtonCache;
 - (void) prepareToShow{
     //Get the currently visible items
     _tags = [tagOwner availableTags];
-    _estimatedNumberOfRows = ([_tags count]+10)/11;
-    _currentNumberOfRows = _estimatedNumberOfRows;
-    _nextTagIndex = 0;
-    _tagRows = [[NSMutableArray alloc] init];
+    _indexOfFirstTagForEachRow = NULL;
 }
 - (void) prepareToHide{
     _tags = [tagOwner tags];
-    _estimatedNumberOfRows = ([_tags count]+10)/11;
-    _currentNumberOfRows = _estimatedNumberOfRows;
-    _nextTagIndex = 0;
-    _tagRows = [[NSMutableArray alloc] init];
+    _indexOfFirstTagForEachRow = NULL;
 }
 
-- (NSInteger)numberOfSectionsInTableView:(UITableView *)tableView{
-    return 1;
++(NSInteger) _widthForTag:(NSString*)tag{
+    return [tag length]*tagWidthMultiplier+tagBaseWidth;
 }
 
-+(UIButton*) tagButtonForTag:(NSString*)tag{
-
-    UIButton* tagButton;
-    NSInteger margin = 20;
++(UIButton*) _tagButtonForTag:(NSString*)tag{
     
-    if([tagButtonCache count]>0){
-        
-        
-        tagButton = [tagButtonCache lastObject];
-        [tagButtonCache removeLastObject];
-        
-        [tagButton setTitle:tag forState:UIControlStateNormal];
-        [tagButton sizeToFit];
-        
-        tagButton.frame = CGRectMake(tagButton.frame.origin.x,
-                                     tagButton.frame.origin.y,
-                                     tagButton.frame.size.width+margin,
-                                     tagButton.frame.size.height+margin);
-    }
-    else{
-        
-        //                NSLog(@"New Button: Tag %@",tag);
-        
+    UIButton* tagButton;
+    if([buttonCache count]==0){
         tagButton = [UIButton buttonWithType:UIButtonTypeCustom];
         
         [tagButton setTitleColor:[UIColor blackColor] forState:UIControlStateNormal];
@@ -83,23 +70,94 @@ static NSMutableArray* tagButtonCache;
         [tagButton setBackgroundImage:blueBackgroundImage forState:UIControlStateSelected];
         tagButton.titleLabel.font = [UIFont boldSystemFontOfSize:10];
         
-        [tagButton setTitle:tag forState:UIControlStateNormal];
-        [tagButton sizeToFit];
         
-        tagButton.frame = CGRectMake(tagButton.frame.origin.x,
-                                     tagButton.frame.origin.y,
-                                     tagButton.frame.size.width+margin,
-                                     tagButton.frame.size.height+margin);
-        
-        //Configure the looks of the button. This must be done after sizeToFit
         CALayer * layer = tagButton.layer;
         [layer setMasksToBounds:YES];
-        [layer setCornerRadius:tagButton.frame.size.height/2];
+        [layer setCornerRadius:tagHeight/2];
         [layer setBorderWidth:1.0];
         [layer setBorderColor:[[UIColor grayColor] CGColor]];
+        
     }
+    else{
+        tagButton = [buttonCache lastObject];
+        [buttonCache removeLastObject];
+    }
+    [tagButton setTitle:tag forState:UIControlStateNormal];
+    
+    
+    tagButton.frame = CGRectMake(0,
+                                 0,
+                                 [self _widthForTag:tag],
+                                 tagHeight);
+    
     return tagButton;
 }
+
+
++(void) addTagButtonsToView:(UIView*) view tags:(NSArray*)tags{
+    
+    //Recycle the existig tag buttons
+    
+    for(UIView* tagButton in view.subviews){
+        [tagButton removeFromSuperview];
+        [buttonCache addObject:tagButton];
+    }
+    
+    NSInteger maxWidthOfTags = view.frame.size.width;
+    NSInteger x=10;
+    NSInteger y=10;
+    
+    
+    for(NSString* tag in tags){
+        UIButton* tagButton = [ZPTagController _tagButtonForTag:tag];
+        tagButton.selected = TRUE;
+        tagButton.userInteractionEnabled = FALSE;
+        
+        if(x+tagButton.frame.size.width>maxWidthOfTags){
+            if(x==10){
+                tagButton.frame = CGRectMake(x, y, maxWidthOfTags, tagButton.frame.size.height);
+                y=y+tagButton.frame.size.height+10;
+            }
+            else{
+                x=10;
+                y=y+tagButton.frame.size.height+10;
+                tagButton.frame = CGRectMake(x, y, MIN(tagButton.frame.size.width, maxWidthOfTags), tagButton.frame.size.height);
+                x=x+tagButton.frame.size.width+10;
+                
+            }
+        }
+        else{
+            tagButton.frame = CGRectMake(x, y, MIN(tagButton.frame.size.width, maxWidthOfTags), tagButton.frame.size.height);
+            x=x+tagButton.frame.size.width+10;
+        }
+        
+        [view addSubview:tagButton];
+        
+    }
+
+}
+
++(NSInteger) heightForTagRowForUITableView:(UITableView*) tableView withTags:(NSArray*) tags{
+
+    UITableViewCell *cell = [tableView dequeueReusableCellWithIdentifier:@"TagsCell"];
+    
+    if (cell == nil) {
+        cell = [[UITableViewCell alloc] initWithStyle:UITableViewCellStyleDefault reuseIdentifier:@"TagsCell"];
+    }
+    [self addTagButtonsToView:cell.contentView tags:tags];
+    [cell.contentView sizeToFit];
+    [cell sizeToFit];
+    return cell.frame.size.height;
+
+}
+
+#pragma mark - UITableViewDataSource
+
+- (NSInteger)numberOfSectionsInTableView:(UITableView *)tableView{
+    return 1;
+}
+
+
 
 - (UITableViewCell *)tableView:(UITableView *)tableView cellForRowAtIndexPath:(NSIndexPath *)indexPath{
 
@@ -109,72 +167,47 @@ static NSMutableArray* tagButtonCache;
     NSString* identifier;
     BOOL hasTags;
     if([_tags count] ==0 ){
-        identifier = @"CellForNoTags";
+        identifier = @"NoTagsCell";
         hasTags = FALSE;
     }
     else{
-        identifier = @"CellWithTags";
+        identifier = @"TagsCell";
         hasTags = TRUE;
     }
     
     UITableViewCell *cell = [tableView dequeueReusableCellWithIdentifier:identifier];
 
     if (cell == nil) {
-        
         cell = [[UITableViewCell alloc] initWithStyle:UITableViewCellStyleDefault reuseIdentifier:identifier];
-        
-        if(! hasTags){
-            cell.textLabel.center = cell.contentView.center;
-            cell.textLabel.textColor = [UIColor grayColor];
-            cell.textLabel.font = [UIFont systemFontOfSize:12];
-            cell.textLabel.text = @"No tags";
-        }
-
     }
-    
-    if(hasTags){
+    else{
+        NSLog(@"Recycled cell %@ with %i subvies",cell,[cell.contentView.subviews count]);
+        
         //Clear existing tags
         for(UIView* view in cell.contentView.subviews){
             [view removeFromSuperview];
-            [tagButtonCache addObject:view];
+            [buttonCache addObject:view];
         }
-        
-        //Add tags to cell
-        NSInteger xForNextTag=5;
-        
-        //If the tags have already been laid out for this row, use them.
-        NSMutableArray* tagsForThisRow;
-        BOOL tagsLaidOutPreviously;
-        if([_tagRows count]>indexPath.row){
-            tagsForThisRow = [_tagRows objectAtIndex:indexPath.row];
-            tagsLaidOutPreviously=TRUE;
-        }
-        else{
-            tagsLaidOutPreviously=FALSE;
-            tagsForThisRow = [[NSMutableArray alloc] init];
-            [_tagRows addObject:tagsForThisRow];
-        }
-        
-        //Else fill the row until it is full or all tags are showing, or as long as we have tags that have been laid out previously
-        
-        NSInteger indexForThisTagRow = 0;
-        
-        while (tagsLaidOutPreviously ? indexForThisTagRow < [tagsForThisRow count]: _nextTagIndex<[_tags count]) {
-            
-            NSString* tag;
-            
-            if(tagsLaidOutPreviously){
-                tag = [tagsForThisRow objectAtIndex:indexForThisTagRow];
-                indexForThisTagRow++;
-            }
-            else{
-                tag = [_tags objectAtIndex:_nextTagIndex];
-            }
-            
 
+    }
+
+    if(hasTags){
+        
+
+        
+        NSInteger xForNextTag=margin;
+        NSInteger startIndex = [[_indexOfFirstTagForEachRow objectAtIndex:indexPath.row] integerValue];
+        NSInteger endIndex = (indexPath.row+1 == [_indexOfFirstTagForEachRow count] ? [_tags count]-1:
+                              [[_indexOfFirstTagForEachRow objectAtIndex:indexPath.row+1] integerValue]-1) ;
+        
+        for(NSInteger index = startIndex; index<=endIndex;++index){
+            
+            NSString* tag = [_tags objectAtIndex:index];
+            
             //Recycle buttons or create new
             
-            UIButton* tagButton = [ZPTagController tagButtonForTag:tag];
+            UIButton* tagButton = [ZPTagController _tagButtonForTag:tag];
+
 
             [tagButton addTarget:self
                           action:@selector(toggleTag:)
@@ -182,93 +215,66 @@ static NSMutableArray* tagButtonCache;
 
             tagButton.selected = [tagOwner isTagSelected:tag];
 
-            
-            //If this is too large
-            if(xForNextTag+tagButton.frame.size.width > tableView.frame.size.width-5){
-                if(xForNextTag==5 || tagsLaidOutPreviously){
-                    tagButton.frame = CGRectMake(5, 5, tableView.frame.size.width-10, tagButton.frame.size.height);
-                }
-                //This is simply too large tag, leave it to the next row
-                else break;
-            }
-            
             //Position the tag
-            tagButton.frame = CGRectMake(xForNextTag, 5, tagButton.frame.size.width, tagButton.frame.size.height);
+            tagButton.frame = CGRectMake(xForNextTag, margin/2, tagButton.frame.size.width, tagButton.frame.size.height);
 
 
             //Add the tag
-            xForNextTag = xForNextTag + tagButton.frame.size.width+10;
+            xForNextTag = xForNextTag + tagButton.frame.size.width+margin;
             [cell.contentView addSubview:tagButton];
 
-            if(!tagsLaidOutPreviously){
-                [tagsForThisRow addObject:tag];
-                _nextTagIndex++;
-            }
         }
         
-        if(!tagsLaidOutPreviously){
-            //Update the estimated number of tags and number of rows in the table
-            NSInteger difference = indexPath.row+1 + ([_tags count]-_nextTagIndex+2)/3 - _estimatedNumberOfRows;
-            
-            if(difference!=0){
-                
-                _estimatedNumberOfRows = _estimatedNumberOfRows + difference;
-                
-                // If this is the last cell and the estimated number of rows differs from the current rows, increase the size of the table
-                // Or if all the tags have been laid out and the estimated number differs, delete rows
-                
-                if(_estimatedNumberOfRows != _currentNumberOfRows &&
-                   (indexPath.row==_currentNumberOfRows-1 ||
-                    _nextTagIndex>=[_tags count])){
-                    
-                       difference = _estimatedNumberOfRows - _currentNumberOfRows;
+        //Optimize rendering
+        cell.contentView.opaque = YES;
+        cell.contentView.layer.shouldRasterize = YES;
+        cell.contentView.layer.rasterizationScale = [UIScreen mainScreen].scale;
 
-                       //NSLog(@"Updating the number of rows in tag selector by %i, previous rows: %i new rows: %i",difference,_currentNumberOfRows,_estimatedNumberOfRows);
+        NSLog(@"Configured cell %@ with %i subvies",cell, [cell.contentView.subviews count]);
 
-                       NSMutableArray* indexPaths = [[NSMutableArray alloc] initWithCapacity:abs(difference)];
-                       
-                       NSInteger lowerLimit = MIN(_currentNumberOfRows,_estimatedNumberOfRows);
-                       NSInteger upperLimit = MAX(_currentNumberOfRows,_estimatedNumberOfRows);
-                       
-                       for(NSInteger i = lowerLimit; i < upperLimit; i++){
-                           [indexPaths addObject:[NSIndexPath indexPathForRow:i inSection:indexPath.section]];
-                       }
-
-                       _currentNumberOfRows = _estimatedNumberOfRows;
-
-                       if(difference<0){
-                           [tableView deleteRowsAtIndexPaths:indexPaths withRowAnimation:UITableViewRowAnimationNone];
-                       }
-                       else{
-                           [tableView insertRowsAtIndexPaths:indexPaths withRowAnimation:UITableViewRowAnimationNone];
-                       }
-                       
-                   }
-            }
-        }
     }
 
     return cell;
 }
 
 - (NSInteger)tableView:(UITableView *)tableView numberOfRowsInSection:(NSInteger)section{
-    return MAX(1,_currentNumberOfRows);
+
+    NSMutableArray* indices = [[NSMutableArray alloc] init];
+    
+    if(_indexOfFirstTagForEachRow == NULL){
+        NSInteger x=margin;
+        NSInteger index=0;
+        BOOL firstInRow = TRUE;
+        for(NSString* tag in _tags){
+
+            NSInteger thisTagWidth = [ZPTagController _widthForTag:tag];
+            
+            if(firstInRow){
+                [indices addObject:[NSNumber numberWithInt:index]];
+
+                //Placement of the next tag
+                x=margin+thisTagWidth+margin;
+                firstInRow = x > tableView.frame.size.width;
+            }
+            else{
+                x=x+thisTagWidth+margin;
+                //If the tag would overflow, place on next row
+                if(x > tableView.frame.size.width){
+                    x=margin+thisTagWidth+margin;
+                    [indices addObject:[NSNumber numberWithInt:index]];
+                }
+            }
+            ++index;
+        }
+    }
+    
+    _indexOfFirstTagForEachRow = indices;
+    
+    return [_indexOfFirstTagForEachRow count];
 }
 
 -(NSInteger) numberOfSelectedTagRowsToShow:(UITableView*)tableView{
-
-    if([_tags count]==0) return 0;
-    
-    //Lay out up to 5 rows of the table
-    
-    for(NSInteger index=0;index<5;++index){
-        [self tableView:tableView cellForRowAtIndexPath:[NSIndexPath indexPathForRow:index inSection:0]];
-         //If this number of rows is sufficient to show all the tags
-        if(_nextTagIndex>=[_tags count]){
-            return index+1;
-        }
-    }
-    return 5;
+    return MIN(5,[self tableView:tableView numberOfRowsInSection:0]);
 }
 
 

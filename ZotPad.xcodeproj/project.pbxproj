@@ -899,6 +899,9 @@
 		A74FCCE21641C477002FEA90 /* ZPNoteEditingViewController.m in Sources */ = {isa = PBXBuildFile; fileRef = A74FCCE11641C477002FEA90 /* ZPNoteEditingViewController.m */; };
 		A74FCCE31641C477002FEA90 /* ZPNoteEditingViewController.m in Sources */ = {isa = PBXBuildFile; fileRef = A74FCCE11641C477002FEA90 /* ZPNoteEditingViewController.m */; };
 		A74FCCE41641C477002FEA90 /* ZPNoteEditingViewController.m in Sources */ = {isa = PBXBuildFile; fileRef = A74FCCE11641C477002FEA90 /* ZPNoteEditingViewController.m */; };
+		A758FC521648560E00D431BE /* ZPQLPreviewControllerViewController.m in Sources */ = {isa = PBXBuildFile; fileRef = A758FC511648560E00D431BE /* ZPQLPreviewControllerViewController.m */; };
+		A758FC531648560E00D431BE /* ZPQLPreviewControllerViewController.m in Sources */ = {isa = PBXBuildFile; fileRef = A758FC511648560E00D431BE /* ZPQLPreviewControllerViewController.m */; };
+		A758FC541648560E00D431BE /* ZPQLPreviewControllerViewController.m in Sources */ = {isa = PBXBuildFile; fileRef = A758FC511648560E00D431BE /* ZPQLPreviewControllerViewController.m */; };
 		A7592E831637E83600CC4EA9 /* locales-en-US.xml in Resources */ = {isa = PBXBuildFile; fileRef = A7592E801637E83600CC4EA9 /* locales-en-US.xml */; };
 		A7592E841637E83600CC4EA9 /* locales-en-US.xml in Resources */ = {isa = PBXBuildFile; fileRef = A7592E801637E83600CC4EA9 /* locales-en-US.xml */; };
 		A7592E851637E83600CC4EA9 /* locales-en-US.xml in Resources */ = {isa = PBXBuildFile; fileRef = A7592E801637E83600CC4EA9 /* locales-en-US.xml */; };
@@ -1350,9 +1353,6 @@
 		A793BB5E1601AAA9001CBEED /* ZPTagController.m in Sources */ = {isa = PBXBuildFile; fileRef = A793BB5D1601AAA9001CBEED /* ZPTagController.m */; };
 		A793BB5F1601AAA9001CBEED /* ZPTagController.m in Sources */ = {isa = PBXBuildFile; fileRef = A793BB5D1601AAA9001CBEED /* ZPTagController.m */; };
 		A793BB601601AAA9001CBEED /* ZPTagController.m in Sources */ = {isa = PBXBuildFile; fileRef = A793BB5D1601AAA9001CBEED /* ZPTagController.m */; };
-		A79B1E24163F148500E7665E /* ZPDebugViewController.m in Sources */ = {isa = PBXBuildFile; fileRef = A79B1E23163F148400E7665E /* ZPDebugViewController.m */; };
-		A79B1E25163F148500E7665E /* ZPDebugViewController.m in Sources */ = {isa = PBXBuildFile; fileRef = A79B1E23163F148400E7665E /* ZPDebugViewController.m */; };
-		A79B1E26163F148500E7665E /* ZPDebugViewController.m in Sources */ = {isa = PBXBuildFile; fileRef = A79B1E23163F148400E7665E /* ZPDebugViewController.m */; };
 		A79B219E163F300100E7665E /* ZPFileViewerNavigationViewController.m in Sources */ = {isa = PBXBuildFile; fileRef = A79B219D163F300000E7665E /* ZPFileViewerNavigationViewController.m */; };
 		A79B219F163F300100E7665E /* ZPFileViewerNavigationViewController.m in Sources */ = {isa = PBXBuildFile; fileRef = A79B219D163F300000E7665E /* ZPFileViewerNavigationViewController.m */; };
 		A79B21A0163F300100E7665E /* ZPFileViewerNavigationViewController.m in Sources */ = {isa = PBXBuildFile; fileRef = A79B219D163F300000E7665E /* ZPFileViewerNavigationViewController.m */; };
@@ -1607,6 +1607,62 @@
 			proxyType = 2;
 			remoteGlobalIDString = EE4290EF12B42F870088BD94;
 			remoteInfo = FMDB;
+		};
+		A7231AE11649A37F004ABB78 /* PBXContainerItemProxy */ = {
+			isa = PBXContainerItemProxy;
+			containerPortal = A7A6A5F2161ABE0C00C7DB72 /* CSLProcessor.xcodeproj */;
+			proxyType = 1;
+			remoteGlobalIDString = A736E692161ABAA8004E71AF;
+			remoteInfo = CSLProcessor;
+		};
+		A7231AE31649A391004ABB78 /* PBXContainerItemProxy */ = {
+			isa = PBXContainerItemProxy;
+			containerPortal = A7ABAB3315A3046300EA8B7B /* DTCoreText.xcodeproj */;
+			proxyType = 1;
+			remoteGlobalIDString = A70F11DD148632CD009202BF;
+			remoteInfo = "Static Library";
+		};
+		A7231AE51649A391004ABB78 /* PBXContainerItemProxy */ = {
+			isa = PBXContainerItemProxy;
+			containerPortal = A7028439163BE165003A0192 /* DropboxSDK.xcodeproj */;
+			proxyType = 1;
+			remoteGlobalIDString = D3933BE4145F12AD00E15FA7;
+			remoteInfo = SDropboxSDK;
+		};
+		A7231AE71649A391004ABB78 /* PBXContainerItemProxy */ = {
+			isa = PBXContainerItemProxy;
+			containerPortal = A733F7BC15F8B66900E8A2D6 /* CoconutKit.xcodeproj */;
+			proxyType = 1;
+			remoteGlobalIDString = D2AAC07D0554694100DB518D;
+			remoteInfo = CoconutKit;
+		};
+		A7231AE91649A391004ABB78 /* PBXContainerItemProxy */ = {
+			isa = PBXContainerItemProxy;
+			containerPortal = A7C19FF715F4D5D100A5AF49 /* FRLayeredNavigationController.xcodeproj */;
+			proxyType = 1;
+			remoteGlobalIDString = DA4FACC515591AB300D85A7E;
+			remoteInfo = FRLayeredNavigationController;
+		};
+		A7231AEB1649A391004ABB78 /* PBXContainerItemProxy */ = {
+			isa = PBXContainerItemProxy;
+			containerPortal = A702844E163BE32F003A0192 /* fmdb.xcodeproj */;
+			proxyType = 1;
+			remoteGlobalIDString = EE4290EE12B42F870088BD94;
+			remoteInfo = FMDB;
+		};
+		A7231AED1649A391004ABB78 /* PBXContainerItemProxy */ = {
+			isa = PBXContainerItemProxy;
+			containerPortal = A77E0DC415D65FAB00134D35 /* UserVoice.xcodeproj */;
+			proxyType = 1;
+			remoteGlobalIDString = D2AAC07D0554694100DB518D;
+			remoteInfo = UserVoice;
+		};
+		A7231AEF1649A391004ABB78 /* PBXContainerItemProxy */ = {
+			isa = PBXContainerItemProxy;
+			containerPortal = A7EC0626161A33420008B314 /* OHAttributedLabel.xcodeproj */;
+			proxyType = 1;
+			remoteGlobalIDString = 09E159E7160F573A003025B4;
+			remoteInfo = OHAttributedLabel;
 		};
 		A733F7C715F8B66A00E8A2D6 /* PBXContainerItemProxy */ = {
 			isa = PBXContainerItemProxy;
@@ -2274,6 +2330,7 @@
 		A7200DE914718DC1004347C9 /* ZPLibraryAndCollectionListViewController.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = ZPLibraryAndCollectionListViewController.h; sourceTree = "<group>"; };
 		A7200DEA14718DC1004347C9 /* ZPLibraryAndCollectionListViewController.m */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.objc; path = ZPLibraryAndCollectionListViewController.m; sourceTree = "<group>"; };
 		A7200DF7147193C0004347C9 /* libsqlite3.dylib */ = {isa = PBXFileReference; lastKnownFileType = "compiled.mach-o.dylib"; name = libsqlite3.dylib; path = usr/lib/libsqlite3.dylib; sourceTree = SDKROOT; };
+		A7231AF2164AF6F3004ABB78 /* ZPZoteroDataObjectWithNote.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = ZPZoteroDataObjectWithNote.h; sourceTree = "<group>"; };
 		A72853F7147E319600D3FE97 /* ZPZoteroLibrary.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = ZPZoteroLibrary.h; sourceTree = "<group>"; };
 		A72853F8147E319600D3FE97 /* ZPZoteroLibrary.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = ZPZoteroLibrary.m; sourceTree = "<group>"; };
 		A72853FB147E31B500D3FE97 /* ZPZoteroCollection.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = ZPZoteroCollection.h; sourceTree = "<group>"; };
@@ -2317,6 +2374,8 @@
 		A74FCCE01641C477002FEA90 /* ZPNoteEditingViewController.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = ZPNoteEditingViewController.h; sourceTree = "<group>"; };
 		A74FCCE11641C477002FEA90 /* ZPNoteEditingViewController.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = ZPNoteEditingViewController.m; sourceTree = "<group>"; };
 		A7513F6E15FE1F1D00E07C79 /* ZPPreviewSource.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = ZPPreviewSource.h; sourceTree = "<group>"; };
+		A758FC501648560E00D431BE /* ZPQLPreviewControllerViewController.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = ZPQLPreviewControllerViewController.h; sourceTree = "<group>"; };
+		A758FC511648560E00D431BE /* ZPQLPreviewControllerViewController.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = ZPQLPreviewControllerViewController.m; sourceTree = "<group>"; };
 		A7592E801637E83600CC4EA9 /* locales-en-US.xml */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = text.xml; name = "locales-en-US.xml"; path = "CSLProcessor/locales/locales-en-US.xml"; sourceTree = SOURCE_ROOT; };
 		A7592E811637E83600CC4EA9 /* apa.csl */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = text.xml; name = apa.csl; path = CSLProcessor/styles/apa.csl; sourceTree = SOURCE_ROOT; };
 		A7592E8D1637EF2A00CC4EA9 /* typeMap.xml */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = text.xml; name = typeMap.xml; path = ../CSLProcessor/z2csl/typeMap.xml; sourceTree = "<group>"; };
@@ -2379,8 +2438,6 @@
 		A793153D14B185E800E1ABF0 /* ZPAttachmentFileInteractionController.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = ZPAttachmentFileInteractionController.m; sourceTree = "<group>"; };
 		A793BB5C1601AAA8001CBEED /* ZPTagController.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = ZPTagController.h; sourceTree = "<group>"; };
 		A793BB5D1601AAA9001CBEED /* ZPTagController.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = ZPTagController.m; sourceTree = "<group>"; };
-		A79B1E22163F148400E7665E /* ZPDebugViewController.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = ZPDebugViewController.h; sourceTree = "<group>"; };
-		A79B1E23163F148400E7665E /* ZPDebugViewController.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = ZPDebugViewController.m; sourceTree = "<group>"; };
 		A79B219C163F300000E7665E /* ZPFileViewerNavigationViewController.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = ZPFileViewerNavigationViewController.h; sourceTree = "<group>"; };
 		A79B219D163F300000E7665E /* ZPFileViewerNavigationViewController.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = ZPFileViewerNavigationViewController.m; sourceTree = "<group>"; };
 		A79D6015159A304C00F55C54 /* ASIHTTPRequestDelegate.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; name = ASIHTTPRequestDelegate.h; path = "asi-http-request/Classes/ASIHTTPRequestDelegate.h"; sourceTree = "<group>"; };
@@ -3033,10 +3090,10 @@
 		A70399AD15970371002F4293 /* Item details */ = {
 			isa = PBXGroup;
 			children = (
-				A79ED821148B2683003EE77C /* ZPItemDetailViewController.h */,
-				A79ED822148B2683003EE77C /* ZPItemDetailViewController.m */,
 				A72EA7D7163C67D300E55F6E /* ZPStarBarButtonItem.h */,
 				A72EA7D8163C67D300E55F6E /* ZPStarBarButtonItem.m */,
+				A79ED821148B2683003EE77C /* ZPItemDetailViewController.h */,
+				A79ED822148B2683003EE77C /* ZPItemDetailViewController.m */,
 			);
 			name = "Item details";
 			sourceTree = "<group>";
@@ -3065,6 +3122,8 @@
 				A707A7DC163C077C00775E88 /* ZPFileViewerViewController.m */,
 				A79B219C163F300000E7665E /* ZPFileViewerNavigationViewController.h */,
 				A79B219D163F300000E7665E /* ZPFileViewerNavigationViewController.m */,
+				A758FC501648560E00D431BE /* ZPQLPreviewControllerViewController.h */,
+				A758FC511648560E00D431BE /* ZPQLPreviewControllerViewController.m */,
 			);
 			name = FileViewer;
 			sourceTree = "<group>";
@@ -3432,8 +3491,6 @@
 		A72853FE147E33F400D3FE97 /* User interface */ = {
 			isa = PBXGroup;
 			children = (
-				A79B1E22163F148400E7665E /* ZPDebugViewController.h */,
-				A79B1E23163F148400E7665E /* ZPDebugViewController.m */,
 				A74C48CC1639867400B14A55 /* Controllers */,
 				A74C48CB1639866D00B14A55 /* Views */,
 				A786F7771476A56200B35B92 /* MainStoryboard_iPhone.storyboard */,
@@ -3473,6 +3530,7 @@
 				A7692D83147D112D000C1A8F /* ZPZoteroItem.m */,
 				A76D3C6514A9F3F3000C3ED9 /* ZPZoteroNote.h */,
 				A76D3C6614A9F3F3000C3ED9 /* ZPZoteroNote.m */,
+				A7231AF2164AF6F3004ABB78 /* ZPZoteroDataObjectWithNote.h */,
 			);
 			name = "Data objects";
 			sourceTree = "<group>";
@@ -3506,13 +3564,13 @@
 		A74C48CC1639867400B14A55 /* Controllers */ = {
 			isa = PBXGroup;
 			children = (
-				A7D9BF6D1645B51E00288265 /* Notes */,
 				A7F36B3415B6B4B600492DC3 /* RootViewControllers */,
 				A7CD2322156B73A7001EA24A /* Library and collections list */,
-				A7F5ABE316450154005DC63C /* Tags */,
 				A70399AC1597034E002F4293 /* Item list */,
 				A70399AD15970371002F4293 /* Item details */,
 				A79D60141599DB3000F55C54 /* Attachments */,
+				A7F5ABE316450154005DC63C /* Tags */,
+				A7D9BF6D1645B51E00288265 /* Notes */,
 				A707A7D4163BFE3500775E88 /* FileViewer */,
 				A70399AF159703CD002F4293 /* Dialogs */,
 			);
@@ -4036,6 +4094,14 @@
 			buildRules = (
 			);
 			dependencies = (
+				A7231AE41649A391004ABB78 /* PBXTargetDependency */,
+				A7231AE61649A391004ABB78 /* PBXTargetDependency */,
+				A7231AE81649A391004ABB78 /* PBXTargetDependency */,
+				A7231AEA1649A391004ABB78 /* PBXTargetDependency */,
+				A7231AEC1649A391004ABB78 /* PBXTargetDependency */,
+				A7231AEE1649A391004ABB78 /* PBXTargetDependency */,
+				A7231AF01649A391004ABB78 /* PBXTargetDependency */,
+				A7231AE21649A37F004ABB78 /* PBXTargetDependency */,
 			);
 			name = "ZotPad beta";
 			productName = ZotPad;
@@ -5589,13 +5655,13 @@
 				A70284C5163BEE39003A0192 /* ZipArchive.mm in Sources */,
 				A707A7DD163C077C00775E88 /* ZPFileViewerViewController.m in Sources */,
 				A72EA7D9163C67D300E55F6E /* ZPStarBarButtonItem.m in Sources */,
-				A79B1E24163F148500E7665E /* ZPDebugViewController.m in Sources */,
 				A79B219E163F300100E7665E /* ZPFileViewerNavigationViewController.m in Sources */,
 				A74FCC971641029A002FEA90 /* CMPopTipView.m in Sources */,
 				A74FCCE21641C477002FEA90 /* ZPNoteEditingViewController.m in Sources */,
 				A7E0689A164254AE00A2597F /* NSString_stripHtml.m in Sources */,
 				A7F5ABE01644FF62005DC63C /* ZPTagEditingViewController.m in Sources */,
 				A7D9BF7016463C8B00288265 /* ZPNewTagViewController.m in Sources */,
+				A758FC521648560E00D431BE /* ZPQLPreviewControllerViewController.m in Sources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
@@ -5698,13 +5764,13 @@
 				A70284C7163BEE39003A0192 /* ZipArchive.mm in Sources */,
 				A707A7DF163C077C00775E88 /* ZPFileViewerViewController.m in Sources */,
 				A72EA7DB163C67D300E55F6E /* ZPStarBarButtonItem.m in Sources */,
-				A79B1E26163F148500E7665E /* ZPDebugViewController.m in Sources */,
 				A79B21A0163F300100E7665E /* ZPFileViewerNavigationViewController.m in Sources */,
 				A74FCC991641029A002FEA90 /* CMPopTipView.m in Sources */,
 				A74FCCE41641C477002FEA90 /* ZPNoteEditingViewController.m in Sources */,
 				A7E0689C164254AE00A2597F /* NSString_stripHtml.m in Sources */,
 				A7F5ABE21644FF62005DC63C /* ZPTagEditingViewController.m in Sources */,
 				A7D9BF7216463C8B00288265 /* ZPNewTagViewController.m in Sources */,
+				A758FC541648560E00D431BE /* ZPQLPreviewControllerViewController.m in Sources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
@@ -5807,17 +5873,60 @@
 				A70284C6163BEE39003A0192 /* ZipArchive.mm in Sources */,
 				A707A7DE163C077C00775E88 /* ZPFileViewerViewController.m in Sources */,
 				A72EA7DA163C67D300E55F6E /* ZPStarBarButtonItem.m in Sources */,
-				A79B1E25163F148500E7665E /* ZPDebugViewController.m in Sources */,
 				A79B219F163F300100E7665E /* ZPFileViewerNavigationViewController.m in Sources */,
 				A74FCC981641029A002FEA90 /* CMPopTipView.m in Sources */,
 				A74FCCE31641C477002FEA90 /* ZPNoteEditingViewController.m in Sources */,
 				A7E0689B164254AE00A2597F /* NSString_stripHtml.m in Sources */,
 				A7F5ABE11644FF62005DC63C /* ZPTagEditingViewController.m in Sources */,
 				A7D9BF7116463C8B00288265 /* ZPNewTagViewController.m in Sources */,
+				A758FC531648560E00D431BE /* ZPQLPreviewControllerViewController.m in Sources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
 /* End PBXSourcesBuildPhase section */
+
+/* Begin PBXTargetDependency section */
+		A7231AE21649A37F004ABB78 /* PBXTargetDependency */ = {
+			isa = PBXTargetDependency;
+			name = CSLProcessor;
+			targetProxy = A7231AE11649A37F004ABB78 /* PBXContainerItemProxy */;
+		};
+		A7231AE41649A391004ABB78 /* PBXTargetDependency */ = {
+			isa = PBXTargetDependency;
+			name = "Static Library";
+			targetProxy = A7231AE31649A391004ABB78 /* PBXContainerItemProxy */;
+		};
+		A7231AE61649A391004ABB78 /* PBXTargetDependency */ = {
+			isa = PBXTargetDependency;
+			name = SDropboxSDK;
+			targetProxy = A7231AE51649A391004ABB78 /* PBXContainerItemProxy */;
+		};
+		A7231AE81649A391004ABB78 /* PBXTargetDependency */ = {
+			isa = PBXTargetDependency;
+			name = CoconutKit;
+			targetProxy = A7231AE71649A391004ABB78 /* PBXContainerItemProxy */;
+		};
+		A7231AEA1649A391004ABB78 /* PBXTargetDependency */ = {
+			isa = PBXTargetDependency;
+			name = FRLayeredNavigationController;
+			targetProxy = A7231AE91649A391004ABB78 /* PBXContainerItemProxy */;
+		};
+		A7231AEC1649A391004ABB78 /* PBXTargetDependency */ = {
+			isa = PBXTargetDependency;
+			name = FMDB;
+			targetProxy = A7231AEB1649A391004ABB78 /* PBXContainerItemProxy */;
+		};
+		A7231AEE1649A391004ABB78 /* PBXTargetDependency */ = {
+			isa = PBXTargetDependency;
+			name = UserVoice;
+			targetProxy = A7231AED1649A391004ABB78 /* PBXContainerItemProxy */;
+		};
+		A7231AF01649A391004ABB78 /* PBXTargetDependency */ = {
+			isa = PBXTargetDependency;
+			name = OHAttributedLabel;
+			targetProxy = A7231AEF1649A391004ABB78 /* PBXContainerItemProxy */;
+		};
+/* End PBXTargetDependency section */
 
 /* Begin PBXVariantGroup section */
 		A7200DDD14718DC0004347C9 /* InfoPlist.strings */ = {

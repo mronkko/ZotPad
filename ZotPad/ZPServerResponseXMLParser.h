@@ -18,6 +18,9 @@
     NSString* _updateTimestamp;
     NSInteger _libraryID;
     NSString* _currentID;
+    
+    NSString* _formattedCitationForDebug;
+
 }
 
 #ifdef ZPDEBUG

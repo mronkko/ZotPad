@@ -117,12 +117,24 @@ static CSLFormatter* _cslFormatter = NULL;
     
     _fullCitation = [_cslFormatter formatBibliographyItemUsingVariables:fields storeMacrosInDictionary:macroDict];
     
-    _creatorSummary = [NSString stringWithFormat:@"%@. %@",[macroDict objectForKey:@"author"],[macroDict objectForKey:@"issued"] ];
-    NSInteger index = [_creatorSummary length]+[[macroDict objectForKey:@"title"] length]+2;
-    if(index>[_fullCitation length]){
-        if([ZPPreferences debugCitationParser]){
-            [NSException raise:@"CSL Exception" format:@"CSL formatting error when processing item %@ (Key: %@, JSON: %@)", _fullCitation, self.itemKey, self.jsonFromServer];
+    NSString* authorMacro = [macroDict objectForKey:@"author"];
+    NSString* dateMacro = [[macroDict objectForKey:@"issued"] stringByTrimmingCharactersInSet:[NSCharacterSet whitespaceCharacterSet]] ;
+    
+    if(authorMacro == NULL){
+        if([dateMacro isEqualToString:@"(n.d.)"]){
+            _creatorSummary = @"";
         }
+        else{
+            _creatorSummary = dateMacro;
+        }
+    }
+    else{
+        _creatorSummary = [[NSString stringWithFormat:@"%@. %@",authorMacro, dateMacro] stringByReplacingOccurrencesOfString:@".." withString:@"."];
+    }
+    
+    NSInteger index = [_creatorSummary length]+[[macroDict objectForKey:@"title"] length]+2;
+    
+    if(index>[_fullCitation length]){
         DDLogError(@"CSL formatting error when processing %@",_fullCitation);
     }
     else{

@@ -11,10 +11,7 @@
 
 @interface ZPTagController : NSObject <UITableViewDataSource>{
     NSArray* _tags;
-    NSInteger _estimatedNumberOfRows;
-    NSInteger _currentNumberOfRows;
-    NSInteger _nextTagIndex;
-    NSMutableArray* _tagRows;
+    NSArray* _indexOfFirstTagForEachRow;
 }
 
 // The controller that will be updated when tags are changed
@@ -23,7 +20,12 @@
 -(void) prepareToShow;
 -(void) prepareToHide;
 -(void) toggleTag:(UIButton*)tagButton;
+
 -(NSInteger) numberOfSelectedTagRowsToShow:(UITableView*)tableView;
-+(UIButton*) tagButtonForTag:(NSString*)tag;
+
+// Called from other table view data sources to lay out tags
++(void) addTagButtonsToView:(UIView*) view tags:(NSArray*)tags;
++(NSInteger) heightForTagRowForUITableView:(UITableView*) tableView withTags:(NSArray*) tags;
+
 
 @end

@@ -35,8 +35,6 @@
 @interface ZPItemDetailViewController(){
     ZPAttachmentFileInteractionController* _attachmentInteractionController;
     ZPAttachmentCarouselDelegate* _carouselDelegate;
-    NSMutableArray* _tagButtons;
-    NSInteger _tagCellHeight;
 }
 
 - (void) _reconfigureDetailTableView:(BOOL)animated;
@@ -155,22 +153,6 @@
     [super didReceiveMemoryWarning];
 }
 
-
-- (void) prepareForSegue:(UIStoryboardSegue *)segue sender:(id)sender{
-    if([segue.identifier isEqualToString:@"PushNoteEditor"]){
-        //Sender is UITableViewCell
-        ZPNoteEditingViewController* target = segue.destinationViewController;
-        target.note = sender;
-        
-    }
-    if([segue.identifier isEqualToString:@"PushTagEditor"]){
-        //Sender is UITableViewCell
-        ZPTagEditingViewController* target = segue.destinationViewController;
-        target.item = sender;
-        
-    }
-    
-}
 #pragma mark - Configure view and subviews
 
 -(void) configure{
@@ -191,49 +173,6 @@
 
 - (void)_reconfigureDetailTableView:(BOOL)animated{
 
-    //Reset the cached tag views
-    _tagButtons = [[NSMutableArray alloc] init];
-
-    NSInteger maxWidthOfTags;
-    if(UI_USER_INTERFACE_IDIOM() == UIUserInterfaceIdiomPad){
-        maxWidthOfTags=577;
-    }
-    else{
-        [NSException raise:@"Not implemented" format:@""];
-    }
-    
-    NSInteger x=10;
-    NSInteger y=10;
-    
-    for(NSString* tag in _currentItem.tags){
-        UIButton* tagButton = [ZPTagController tagButtonForTag:tag];
-        tagButton.selected = TRUE;
-        tagButton.userInteractionEnabled = FALSE;
-        
-        if(x+tagButton.frame.size.width>maxWidthOfTags){
-            if(x==10){
-                tagButton.frame = CGRectMake(x, y, maxWidthOfTags, tagButton.frame.size.height);
-                y=y+tagButton.frame.size.height+10;
-            }
-            else{
-                x=10;
-                y=y+tagButton.frame.size.height+10;
-                tagButton.frame = CGRectMake(x, y, MIN(tagButton.frame.size.width, maxWidthOfTags), tagButton.frame.size.height);
-                x=x+tagButton.frame.size.width+10;
-
-            }
-        }
-        else{
-            tagButton.frame = CGRectMake(x, y, MIN(tagButton.frame.size.width, maxWidthOfTags), tagButton.frame.size.height);
-            x=x+tagButton.frame.size.width+10;
-        }
-        
-        [_tagButtons addObject:tagButton];
-        //Update the required height of the tag row
-        _tagCellHeight = y + tagButton.frame.size.height + 10;
-        
-    }
-    
     //Configure the size of the detail view table.
     [self.tableView reloadData];
     [self.tableView layoutIfNeeded];
@@ -353,7 +292,7 @@
        
     }
     else if(tableView==self.tableView && [indexPath indexAtPosition:0]==0){
-        return MAX(_tagCellHeight,tableView.rowHeight);
+        return MAX([ZPTagController heightForTagRowForUITableView:tableView withTags:_currentItem.tags],tableView.rowHeight);
     }
     return tableView.rowHeight;
 }
@@ -485,14 +424,8 @@
             {
                 cell = [[UITableViewCell alloc] initWithStyle:UITableViewCellStyleDefault reuseIdentifier:CellIdentifier];
             }
-            
-            //Clean the cell
-            for(UIView* child in cell.contentView.subviews){
-                [child removeFromSuperview];
-            }
-            for(UIButton* tagButton in _tagButtons){
-                [cell.contentView addSubview:tagButton];
-            }
+        
+            [ZPTagController addTagButtonsToView:cell.contentView tags:_currentItem.tags];
         }
     }
     //Notes
@@ -585,7 +518,11 @@
     if(aTableView == self.tableView){
         //Tags
         if([indexPath indexAtPosition:0]==0){
-            [self performSegueWithIdentifier:@"PushTagEditor" sender:_currentItem];
+            if(_tagEditingViewController == NULL){
+                _tagEditingViewController = [self.storyboard instantiateViewControllerWithIdentifier:@"TagEditingViewController"];
+            }
+            _tagEditingViewController.item = _currentItem;
+            [self presentModalViewController:_tagEditingViewController animated:YES];
         }
         //Notes
         else if([indexPath indexAtPosition:0]==1){
@@ -597,7 +534,14 @@
             else{
                 note = [_currentItem.notes objectAtIndex:[indexPath indexAtPosition:1]];
             }
-            [self performSegueWithIdentifier:@"PushNoteEditor" sender:note];
+
+            if(_noteEditingViewController == NULL){
+                _noteEditingViewController = [self.storyboard instantiateViewControllerWithIdentifier:@"NoteEditingViewController"];
+            }
+            _noteEditingViewController.note = note;
+
+            [self presentModalViewController:_noteEditingViewController animated:YES];
+
         }
         [aTableView deselectRowAtIndexPath:indexPath animated:NO];
     }

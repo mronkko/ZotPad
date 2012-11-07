@@ -9,11 +9,6 @@
 #import "ZPCore.h"
 
 #import "ZPServerResponseXMLParserItem.h"
-
-
-
-
-
 #import "SBJson.h"
 
 @implementation ZPServerResponseXMLParserItem
@@ -25,18 +20,7 @@
         [self _setField:@"json" toValue:_currentStringContent];
     }else if(_bibContent && ! [elementName isEqualToString:@"i"]){
         _bibContent = FALSE;
-
-        // Compare the citation enerated by Zotero server to one generated locally
-        
-        if([ZPPreferences debugCitationParser] && [_currentElement isKindOfClass:[ZPZoteroItem class]]){
-            NSString* generatedCitation = [(ZPZoteroItem*) _currentElement fullCitation];
-            if(![generatedCitation isEqualToString:_currentStringContent]){
-                DDLogError(@"Citation created by local CSL formatter differs from citation received from Zotero server.\n\nCitation from Zotero:\n%@\n\nLocally generated citation:\n%@\n\nJSON data\n:%@",
-                           _currentStringContent,
-                           generatedCitation,
-                           [(ZPZoteroItem*) _currentElement jsonFromServer]);
-            }
-        }
+        _formattedCitationForDebug = _currentStringContent;
     }
     else{
         [super parser:parser didEndElement:elementName namespaceURI:namespaceURI qualifiedName:qName];
@@ -169,6 +153,7 @@
     }
     [(ZPZoteroItem*)_currentElement setLibraryID:_libraryID];
     [super _processTemporaryFieldStorage];
+    
 }
 
 @end

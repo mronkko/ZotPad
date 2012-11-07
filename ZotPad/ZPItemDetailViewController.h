@@ -12,16 +12,17 @@
 
 #import "iCarousel.h"
 #import "ZPAttachmentFileInteractionController.h"
-
-
+#import "ZPTagEditingViewController.h"
+#import "ZPNoteEditingViewController.h"
 
 @interface ZPItemDetailViewController : UITableViewController <UINavigationControllerDelegate >{
     ZPZoteroItem* _currentItem;
     iCarousel* _carousel;
     UIActivityIndicatorView* _activityIndicator;
     NSInteger _detailTitleWidth;
-        
     NSCache* _previewCache;
+    ZPTagEditingViewController* _tagEditingViewController;
+    ZPNoteEditingViewController* _noteEditingViewController;
 }
 
 - (void) configure;

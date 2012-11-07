@@ -10,6 +10,10 @@
 
 #import "ZPServerResponseXMLParser.h"
 
+//Neded for citation formatting debugging
+
+#import "NSString_stripHtml.h"
+
 //TODO: parse this from collections <zapi:numItems>0</zapi:numItems>
 
 @implementation ZPServerResponseXMLParser
@@ -82,6 +86,16 @@
             
             [_resultArray addObject:_currentElement];
             
+            if([ZPPreferences debugCitationParser] && [_currentElement isKindOfClass:[ZPZoteroItem class]] && _formattedCitationForDebug != NULL){
+                NSString* generatedCitation = [(ZPZoteroItem*) _currentElement fullCitation];
+                if(![[generatedCitation stripHtml] isEqualToString:[_formattedCitationForDebug stripHtml]]){
+                    DDLogError(@"Citation created by local CSL formatter differs from citation received from Zotero server.\n\nCitation from Zotero:\n%@\n\nLocally generated citation:\n%@\n\nJSON data\n:%@",
+                               _formattedCitationForDebug,
+                               generatedCitation,
+                               [(ZPZoteroItem*) _currentElement jsonFromServer]);
+                }
+            }
+            _formattedCitationForDebug = NULL;
             _currentElement = NULL;
             _insideEntry = FALSE;
             

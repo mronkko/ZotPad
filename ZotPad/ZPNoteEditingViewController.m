@@ -16,6 +16,16 @@
 
 @synthesize note, webView;
 
+static ZPNoteEditingViewController* _instance;
+
++(ZPNoteEditingViewController*) instance{
+    if(_instance == NULL){
+        
+        _instance =[[UIApplication sharedApplication].delegate.window.rootViewController.storyboard instantiateViewControllerWithIdentifier:@"NoteEditingViewController"];
+    }
+    return _instance;
+}
+
 - (id)initWithNibName:(NSString *)nibNameOrNil bundle:(NSBundle *)nibBundleOrNil
 {
     self = [super initWithNibName:nibNameOrNil bundle:nibBundleOrNil];
@@ -31,25 +41,24 @@
 	
     // Do any additional setup after loading the view.
     
-    //http://ios-blog.co.uk/tutorials/rich-text-editing-a-simple-start-part-1/
-    
-    if(note.note == NULL) note.note = @"";
-    
-    [webView loadHTMLString:[NSString stringWithFormat:@"<html><body><div id='content' contentEditable='true' style='font-family: Helvetica'>%@</div></body></html>",note.note]
-                    baseURL:NULL];
+
+    // Displaying the keyboard automatically requires iOS 6
+
+    if ([[[UIDevice currentDevice] systemVersion] floatValue] >= 6.0) {
+        webView.keyboardDisplayRequiresUserAction=NO;
+    }
     
 
 }
-- (void) viewDidAppear:(BOOL)animated{
-    [super viewDidAppear:animated];
-
-    // Displaying the keyboard automatically requires iOS 6
+-(void) viewWillAppear:(BOOL)animated{
+    [super viewWillAppear:animated];
     
-    if ([[[UIDevice currentDevice] systemVersion] floatValue] >= 6.0) {
-        webView.keyboardDisplayRequiresUserAction=NO;
-        [webView stringByEvaluatingJavaScriptFromString:@"if(document.getElementById('content') != null) { document.getElementById('content').focus() }"];
-        
-    }
+    NSString* noteString = note.note;
+    if(noteString == NULL) noteString = @"";
+    
+    [webView loadHTMLString:[NSString stringWithFormat:@"<html><body onload=\"document.getElementById('content').focus()\"><div id='content' contentEditable='true' style='font-family: Helvetica'>%@</div></body></html>",noteString]
+                    baseURL:NULL];
+
 }
 - (void)didReceiveMemoryWarning
 {

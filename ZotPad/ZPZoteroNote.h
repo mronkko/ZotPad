@@ -7,9 +7,9 @@
 //
 
 #import <Foundation/Foundation.h>
+#import "ZPZoteroDataObjectWithNote.h"
 
-
-@interface ZPZoteroNote : ZPZoteroDataObject{
+@interface ZPZoteroNote : ZPZoteroDataObject <ZPZoteroDataObjectWithNote>{
 }
 
 @property (retain) NSString* itemKey;

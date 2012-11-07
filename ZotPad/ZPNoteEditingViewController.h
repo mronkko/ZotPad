@@ -11,8 +11,10 @@
 
 @interface ZPNoteEditingViewController : UIViewController
 
-@property (retain, nonatomic) ZPZoteroNote* note;
+@property (retain, nonatomic) ZPZoteroDataObject<ZPZoteroDataObjectWithNote>* note;
 @property (retain, nonatomic) IBOutlet UIWebView* webView;
+
++(ZPNoteEditingViewController*) instance;
 
 -(IBAction)cancel:(id)sender;
 -(IBAction)save:(id)sender;

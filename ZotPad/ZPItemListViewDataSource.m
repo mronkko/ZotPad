@@ -14,6 +14,7 @@
 
 #import "ZPCacheController.h"
 #import "ZPItemListViewController.h"
+#import "ZPFileViewerViewController.h"
 
 #define SIZE_OF_TABLEVIEW_UPDATE_BATCH 25
 #define SIZE_OF_DATABASE_UPDATE_BATCH 50
@@ -521,7 +522,7 @@ static ZPItemListViewDataSource* _instance;
     }
     else{
         _attachmentInQuicklook = attachment;
-        [[UIApplication sharedApplication].delegate.window.rootViewController performSegueWithIdentifier:@"PresentDocumentViewer" sender:attachment];
+        [ZPFileViewerViewController presentWithAttachment:attachment];
     }
 }
 -(UIView*) sourceViewForQuickLook{
