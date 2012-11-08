@@ -1,3 +1,4 @@
+
 //
 //  ZPZoteroItem.m
 //  ZotPad
@@ -132,7 +133,7 @@ static CSLFormatter* _cslFormatter = NULL;
         _creatorSummary = [[NSString stringWithFormat:@"%@. %@",authorMacro, dateMacro] stringByReplacingOccurrencesOfString:@".." withString:@"."];
     }
     
-    NSInteger index = [_creatorSummary length]+[[macroDict objectForKey:@"title"] length]+2;
+    NSInteger index = [_creatorSummary length]+[[macroDict objectForKey:@"title"] length]+4;
     
     if(index>[_fullCitation length]){
         DDLogError(@"CSL formatting error when processing %@",_fullCitation);
