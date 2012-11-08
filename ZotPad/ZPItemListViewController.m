@@ -518,6 +518,8 @@
 - (void)viewWillAppear:(BOOL)animated
 {
     [super viewWillAppear:animated];
+    //Set the data source to serve this view
+    [ZPItemListViewDataSource instance].targetTableView = self.tableView;
 }
 
 - (void)viewDidAppear:(BOOL)animated

@@ -511,7 +511,8 @@ static ZPItemListViewDataSource* _instance;
     UITableViewCell* cell = (UITableViewCell* )[[imageView superview] superview];
     
     //Get the row of this cell
-    NSInteger row = [_tableView indexPathForCell:cell].row;
+    NSIndexPath* indexPath = [_tableView indexPathForCell:cell];
+    NSInteger row = indexPath.row;
     
     ZPZoteroItem* item = (ZPZoteroItem*) [ZPZoteroItem itemWithKey:[_itemKeysShown objectAtIndex:row]];
     
