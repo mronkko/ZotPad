@@ -598,7 +598,8 @@ static NSString *dbPath;
      */
     
     +(void) writeLibraries:(NSArray*)libraries{
-        [self writeObjects:libraries intoTable:@"libraries" checkTimestamp:FALSE];
+        //The code for checking timestamp currently requires a primary key that is string
+        [self writeObjects:libraries intoTable:@"libraries" checkTimestamp:NO];
         
         NSMutableArray* keys= [[NSMutableArray alloc] init];
         
@@ -691,7 +692,7 @@ static NSString *dbPath;
             [keys addObject:collection.key];
         }
         
-        [self writeObjects:collections intoTable:@"collections" checkTimestamp:FALSE];
+        [self writeObjects:collections intoTable:@"collections" checkTimestamp:YES];
         
         // Delete collections that no longer exist
         
