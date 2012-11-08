@@ -19,8 +19,7 @@ INSERT INTO version VALUES (2);
 
 /*
 
-Group is the same as library. My library is not stored, because it will
-always exists.
+Group is the same as library.
 
 */
 
