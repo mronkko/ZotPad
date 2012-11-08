@@ -15,5 +15,6 @@
 @property (retain, nonatomic) ZPTagEditingViewController* parent;
 
 -(IBAction)createTag:(id)sender;
+-(IBAction)cancel:(id)sender;
 
 @end

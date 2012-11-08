@@ -108,7 +108,9 @@ static ZPTagEditingViewController* _instance;
 
 - (void)prepareForSegue:(UIStoryboardSegue *)segue sender:(id)sender {
     // make sure it's the right segue if you have more than one in this VC
-    myPopover = [(UIStoryboardPopoverSegue *)segue popoverController];
+    if([segue.identifier isEqualToString:@"NewTagPopover"]){
+        myPopover = [(UIStoryboardPopoverSegue *)segue popoverController];
+    }
 }
 
 - (IBAction)showPopover:(id)sender {

@@ -42,6 +42,10 @@
 }
 
 -(IBAction)createTag:(id)sender{
-    
+    [self dismissModalViewControllerAnimated:YES];
 }
+-(IBAction)cancel:(id)sender{
+    [self dismissModalViewControllerAnimated:YES];
+}
+
 @end
