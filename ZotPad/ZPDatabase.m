@@ -61,12 +61,10 @@ static NSString *dbPath;
     
 	dbPath = [[NSSearchPathForDirectoriesInDomains(NSDocumentDirectory, NSUserDomainMask, YES) objectAtIndex:0] stringByAppendingPathComponent:@"zotpad.sqlite"];
     
-    // Uncomment to always reset database
-    // [self resetDatabase];
+    BOOL dbExists = [[NSFileManager defaultManager] fileExistsAtPath:dbPath];
     
     [self _initializeDatabaseConnections];
-    
-    if(! [[NSFileManager defaultManager] fileExistsAtPath:dbPath]) [self _createDatabase];
+    if(! dbExists) [self _createDatabase];
     else [self _upgradeDatabase];
 }
 
@@ -335,6 +333,7 @@ static NSString *dbPath;
         
         
         for (NSObject* object in objects){
+            
             FMDatabase* dbObject = [self _dbObject];
             @synchronized(dbObject){
                 NSArray* args = [self dbFieldValuesForObject:object fieldsNames:allFields];
@@ -378,6 +377,7 @@ static NSString *dbPath;
     
     //Because it is possible that the same item is received multiple times, it is important to use synchronized for almost the entire function to avoid inserting the same object twice
 
+    //TODO: Is it really necessary to read the timestamps from DB? Would it be possible to use the cacheTimestamp instance variable from the data objects themselves.
         
         NSMutableArray* insertObjects = [NSMutableArray array];
         NSMutableArray* updateObjects = [NSMutableArray array];
@@ -445,6 +445,8 @@ static NSString *dbPath;
                         [updateObjects addObject:object];
                         [returnArray addObject:object];
                     }
+            [(ZPZoteroDataObject*) object setCacheTimestamp:[(ZPZoteroDataObject*) object serverTimestamp]];
+            
                 }
                 [self updateObjects:updateObjects intoTable:table];
                 [self insertObjects:insertObjects intoTable:table];

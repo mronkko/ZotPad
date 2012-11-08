@@ -568,8 +568,6 @@ static ZPCacheController* _instance = nil;
             //TODO: Refactor. This is very confusing.
             //TODO: Make sure that this logic still works after breaking inheritance between attachment and item
             
-            item.cacheTimestamp = item.serverTimestamp;
-            
             if([item isKindOfClass:[ZPZoteroAttachment class]]){
                 ZPZoteroAttachment* attachment = (ZPZoteroAttachment*) item;
                 
