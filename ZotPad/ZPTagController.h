@@ -25,7 +25,6 @@
 
 // Called from other table view data sources to lay out tags
 +(void) addTagButtonsToView:(UIView*) view tags:(NSArray*)tags;
-+(NSInteger) heightForTagRowForUITableView:(UITableView*) tableView withTags:(NSArray*) tags;
 
 
 @end

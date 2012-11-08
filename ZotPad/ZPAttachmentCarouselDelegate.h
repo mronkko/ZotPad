@@ -9,7 +9,6 @@
 #import <UIKit/UIKit.h>
 #import "iCarousel.h"
 #import "ZPCore.h"
-#import "ZPPreviewSource.h"
 
 extern NSInteger const ZPATTACHMENTICONGVIEWCONTROLLER_MODE_UPLOAD;
 extern NSInteger const ZPATTACHMENTICONGVIEWCONTROLLER_MODE_DOWNLOAD;
@@ -27,7 +26,7 @@ extern NSInteger const ZPATTACHMENTICONGVIEWCONTROLLER_TAG_STATUSLABEL;
 extern NSInteger const ZPATTACHMENTICONGVIEWCONTROLLER_TAG_PROGRESSVIEW;
 extern NSInteger const ZPATTACHMENTICONGVIEWCONTROLLER_TAG_TITLELABEL;
 
-@interface ZPAttachmentCarouselDelegate : NSObject <iCarouselDelegate, iCarouselDataSource, ZPPreviewSource>{
+@interface ZPAttachmentCarouselDelegate : NSObject <iCarouselDelegate, iCarouselDataSource>{
     ZPZoteroItem* _item;
     NSArray* _attachments;
     NSInteger _selectedIndex;

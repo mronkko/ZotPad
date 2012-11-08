@@ -775,7 +775,7 @@ static ZPFileViewerViewController* _instance;
                 y=MAX(y,subView.frame.origin.y+subView.frame.size.height);
             }
             
-            return MAX(y, tableView.rowHeight);
+            return MAX(y+7, tableView.rowHeight);
         }
     }
     else{
@@ -879,7 +879,6 @@ static ZPFileViewerViewController* _instance;
 - (void)tableView:(UITableView *)tableView willDisplayCell:(UITableViewCell *)cell forRowAtIndexPath:(NSIndexPath *)indexPath{
     
     if(indexPath.section<=1){
-        BOOL hasTags;
         
         ZPZoteroAttachment* attachment = (ZPZoteroAttachment*) [_attachments objectAtIndex:_activeAttachmentIndex];
         BOOL isStandaloneAttachment = [attachment.parentKey isEqualToString:attachment.key];
@@ -913,7 +912,11 @@ static ZPFileViewerViewController* _instance;
                     if(tagSource == attachment) _tagButtonsForAttachment = cell.contentView.subviews;
                     else _tagButtonsForParent = cell.contentView.subviews;
                     
-                    [tableView reloadRowsAtIndexPaths:[NSArray arrayWithObject:indexPath] withRowAnimation:UITableViewRowAnimationNone];
+                    [tableView reloadData];
+                    
+                    // This is more efficient, but produces an unnecessary animation
+                    
+                    //[tableView reloadRowsAtIndexPaths:[NSArray arrayWithObject:indexPath] withRowAnimation:UITableViewRowAnimationNone];
                 }
             }
         }

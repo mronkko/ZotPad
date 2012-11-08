@@ -35,6 +35,8 @@
 @interface ZPItemDetailViewController(){
     ZPAttachmentFileInteractionController* _attachmentInteractionController;
     ZPAttachmentCarouselDelegate* _carouselDelegate;
+    NSArray* _tagButtons;
+
 }
 
 - (void) _reconfigureDetailTableView:(BOOL)animated;
@@ -174,6 +176,7 @@
 - (void)_reconfigureDetailTableView:(BOOL)animated{
 
     //Configure the size of the detail view table.
+    _tagButtons = NULL;
     [self.tableView reloadData];
     [self.tableView layoutIfNeeded];
     
@@ -291,9 +294,17 @@
         return textSize.height+margins;
        
     }
-    else if(tableView==self.tableView && [indexPath indexAtPosition:0]==0){
-        return MAX([ZPTagController heightForTagRowForUITableView:tableView withTags:_currentItem.tags],tableView.rowHeight);
+    //Tag cell
+    else if(tableView==self.tableView && indexPath.section==0 && _tagButtons != NULL){
+        //Get the size based on content
+        NSInteger y=0;
+        for(UIView* subView in _tagButtons){
+            y=MAX(y,subView.frame.origin.y+subView.frame.size.height);
+        }
+        //Add a small margin to the bottom of the cell
+        return MAX(y+7, tableView.rowHeight);
     }
+    
     return tableView.rowHeight;
 }
 
@@ -408,7 +419,7 @@
     NSString* CellIdentifier;
     
     //Tags
-    if([indexPath indexAtPosition:0] == 0){
+    if(indexPath.section == 0){
         if([_currentItem.tags count]==0){
             CellIdentifier = @"NoTagsCell";
             cell = [tableView dequeueReusableCellWithIdentifier:CellIdentifier];
@@ -424,8 +435,19 @@
             {
                 cell = [[UITableViewCell alloc] initWithStyle:UITableViewCellStyleDefault reuseIdentifier:CellIdentifier];
             }
-        
-            [ZPTagController addTagButtonsToView:cell.contentView tags:_currentItem.tags];
+       
+            //Clean the cell
+            
+            [ZPTagController addTagButtonsToView:cell.contentView tags:[NSArray array]];
+            
+            
+            if(_tagButtons != NULL){
+                for(UIView* tagButton in _tagButtons){
+                    [cell.contentView addSubview:tagButton];
+                }
+            }
+            
+            _tagButtons = cell.contentView.subviews;
         }
     }
     //Notes
@@ -510,6 +532,28 @@
 }
 
 #pragma mark - UITableViewDelegate
+
+
+// Populate the tags cells after they are displayed
+
+- (void)tableView:(UITableView *)tableView willDisplayCell:(UITableViewCell *)cell forRowAtIndexPath:(NSIndexPath *)indexPath{
+    
+    //If we have a cell that should show tags, but does not, reload
+    if(indexPath.section==0 && [_currentItem.tags count] > 0 && [cell.contentView.subviews count] == 0){
+        
+        //Add tags and reload
+        [ZPTagController addTagButtonsToView:cell.contentView tags:_currentItem.tags];
+        
+        _tagButtons = cell.contentView.subviews;
+        
+        [tableView reloadData];
+        
+        // This is more efficient, but produces an unnecessary animation
+        
+        //[tableView reloadRowsAtIndexPaths:[NSArray arrayWithObject:indexPath] withRowAnimation:UITableViewRowAnimationNone];
+
+    }
+}
 
 - (void)tableView:(UITableView *)aTableView didSelectRowAtIndexPath:(NSIndexPath *)indexPath {
     

@@ -8,10 +8,9 @@
 
 #import <Foundation/Foundation.h>
 #import "ZPCore.h"
-#import "ZPPreviewSource.h"
 #import "ZPTagOwner.h"
 
-@interface ZPItemListViewDataSource : NSObject <UITableViewDataSource, ZPPreviewSource, ZPTagOwner>{
+@interface ZPItemListViewDataSource : NSObject <UITableViewDataSource, ZPTagOwner>{
  
     //This is an array instead of a mutable array because of thread safety
     NSArray* _itemKeysShown;

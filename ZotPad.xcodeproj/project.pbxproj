@@ -2373,7 +2373,6 @@
 		A74FCC9B16414E8B002FEA90 /* AccountSettingsUI_com.apple.Dataclass.Notes.png */ = {isa = PBXFileReference; lastKnownFileType = image.png; name = AccountSettingsUI_com.apple.Dataclass.Notes.png; path = Icons/AccountSettingsUI_com.apple.Dataclass.Notes.png; sourceTree = SOURCE_ROOT; };
 		A74FCCE01641C477002FEA90 /* ZPNoteEditingViewController.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = ZPNoteEditingViewController.h; sourceTree = "<group>"; };
 		A74FCCE11641C477002FEA90 /* ZPNoteEditingViewController.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = ZPNoteEditingViewController.m; sourceTree = "<group>"; };
-		A7513F6E15FE1F1D00E07C79 /* ZPPreviewSource.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = ZPPreviewSource.h; sourceTree = "<group>"; };
 		A758FC501648560E00D431BE /* ZPQLPreviewControllerViewController.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = ZPQLPreviewControllerViewController.h; sourceTree = "<group>"; };
 		A758FC511648560E00D431BE /* ZPQLPreviewControllerViewController.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = ZPQLPreviewControllerViewController.m; sourceTree = "<group>"; };
 		A7592E801637E83600CC4EA9 /* locales-en-US.xml */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = text.xml; name = "locales-en-US.xml"; path = "CSLProcessor/locales/locales-en-US.xml"; sourceTree = SOURCE_ROOT; };
@@ -3723,7 +3722,6 @@
 		A79D60141599DB3000F55C54 /* Attachments */ = {
 			isa = PBXGroup;
 			children = (
-				A7513F6E15FE1F1D00E07C79 /* ZPPreviewSource.h */,
 				A7093C2A15A4241300F7B5CF /* ZPAttachmentIconImageFactory.h */,
 				A7093C2B15A4241300F7B5CF /* ZPAttachmentIconImageFactory.m */,
 				A793153C14B185E800E1ABF0 /* ZPAttachmentFileInteractionController.h */,

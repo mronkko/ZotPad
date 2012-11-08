@@ -104,8 +104,14 @@ static const NSInteger tagBaseWidth = 20;
     }
     
     NSInteger maxWidthOfTags = view.frame.size.width;
+
+    //For some reason cell width is not always correct when displaying item details, so we need to hardcode a maximum width
+    if ([[UIDevice currentDevice] userInterfaceIdiom] == UIUserInterfaceIdiomPad) {
+        maxWidthOfTags = MIN(maxWidthOfTags,600);
+    }
+    
     NSInteger x=10;
-    NSInteger y=10;
+    NSInteger y=7;
     
     
     for(NSString* tag in tags){
@@ -137,19 +143,6 @@ static const NSInteger tagBaseWidth = 20;
 
 }
 
-+(NSInteger) heightForTagRowForUITableView:(UITableView*) tableView withTags:(NSArray*) tags{
-
-    UITableViewCell *cell = [tableView dequeueReusableCellWithIdentifier:@"TagsCell"];
-    
-    if (cell == nil) {
-        cell = [[UITableViewCell alloc] initWithStyle:UITableViewCellStyleDefault reuseIdentifier:@"TagsCell"];
-    }
-    [self addTagButtonsToView:cell.contentView tags:tags];
-    [cell.contentView sizeToFit];
-    [cell sizeToFit];
-    return cell.frame.size.height;
-
-}
 
 #pragma mark - UITableViewDataSource
 

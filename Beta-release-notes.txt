@@ -1,19 +1,43 @@
 This build will install on parallel to the App Store version of ZotPad. 
 
-This build has not been tested extensively and is most likely not stable enough. There are a lot of internal changes, which make the code more robust and efficient, but also could have introduced new bugs.
+This build has not been tested extensively and is most likely not stable enough for every day use. There are a lot of internal changes, which make the code more robust and efficient, but also could have introduced new bugs.
 
-There is no need to report crashes. If you find that something is not working (but does not cause a crash) or is slow, you should report that. See the instructions here:
+There is no need to report crashes. If you find that something is not working (but does not cause a crash) or is slow, you should report that. If you have improvement ideas, report these. See the instructions here:
 
 http://zotpad.uservoice.com/knowledgebase/articles/113113-i-got-and-invitation-to-be-a-beta-tester-how-do-s
 
 If you are installing this over an existing beta, you should reset your data before running the App.
 
-More beta testers can be admitted
 
-http://www.zotpad.com/node/51
+----- Changes since the previous beta build -----
 
+GENERAL: 
 
-New features and notable changes since ZotPad 1.1.2
+Feature: Note viewing and editing
+- Notes are now shown in the item detail view and can be edited by tapping
+- Note edits are not yet saved
+
+Feature: Tag viewing and editing
+- Tags are now shown in the item detail view and can be edited by tapping
+- Tag edits are not yet saved
+
+Feature: New file viewer
+- The file viewer has a collapsible side panel that can be used to view and edit tags and notes for the parent item and the attachment.
+- Fast switching between previously viewed items by using history arrows
+- The top bar is always visible and this cannot be changed. (This is a technical limitation and there is no practical fix for it.)
+
+Feature: Mark items as favorites
+- Added a star button that can be used to mark items as favorites
+- Favorite items are not yet saved, so the star button does not currently do anything
+
+Feature: Added more help popovers to help new users to discover the features of the App
+
+Change: Layered collection navigation 
+- Layered collection navigation is now enabled by default and cannot be disabled. The old navigation by using separate views is now completely disabled
+
+Bug fixes and optimization of the code.
+
+----- Other new features and notable changes since ZotPad 1.1.2 ------
 
 GENERAL:
 
@@ -37,21 +61,17 @@ Change: Citations are now formatted by ZotPad instead of Zotero server
 - Makes item retrieving about twice as fast and reduces time outs
 - The citation processor is still incomplete. Of you notice errors, enable the "Debug citation processor" feature in the advanced settings, view the item that was not formatted correctly, and submit a support request from the App. 
 
-IPAD SPECIFIC:
-
 Feature: Layered navigation
 - Enables navigating libraries and collections "as a stack of cards" instead of as separate view
-- Disabled by default and can be enabled in the advanced settings
+- Replaces the old collection navigation logic
+
+IPAD SPECIFIC:
 
 Feature: Unified navigation
 - Removes the small, blue detail disclosure button from the library and collections list. Tapping a collection will both show the subcollections and items for that collection. (You should probably have layered navigation selected as well)
 - Disabled by default and can be enabled in the advanced settings
 
 IPHONE SPECIFIC:
-
-Feature: Layered navigation
-- Enables navigating libraries and collections "as a stack of cards" instead of as separate view
-- Enabled by default and cannot be disabled.
 
 Feature: Cache status pane
 - The cache status pane that is show below the library and collections list on iPad has been added in the iPhone version.
