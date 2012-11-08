@@ -1,4 +1,4 @@
-This build will install on parallel to the App Store version of ZotPad. 
+This build will install on parallel to the App Store version of ZotPad. You must uninstall any earlier beta build before installing this build.
 
 This build has not been tested extensively and is most likely not stable enough for every day use. There are a lot of internal changes, which make the code more robust and efficient, but also could have introduced new bugs.
 
@@ -68,7 +68,7 @@ Feature: Layered navigation
 IPAD SPECIFIC:
 
 Feature: Unified navigation
-- Removes the small, blue detail disclosure button from the library and collections list. Tapping a collection will both show the subcollections and items for that collection. (You should probably have layered navigation selected as well)
+- Removes the small, blue detail disclosure button from the library and collections list. Tapping a collection will both show the subcollections and items for that collection.
 - Disabled by default and can be enabled in the advanced settings
 
 IPHONE SPECIFIC:
