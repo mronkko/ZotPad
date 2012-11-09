@@ -16,11 +16,11 @@
 #import "ZPFileImportViewController.h"
 #import "ZPFileChannel_Dropbox.h"
 #import "ZPAuthenticationDialog.h"
+#import "TestFlight.h"
 
 //Setting up the logger
 #import "DDTTYLogger.h"
 #import "DDFileLogger.h"
-#import "TestFlightLogger.h"
 #import "CompressingLogFileManager.h"
 
 
@@ -88,11 +88,6 @@ didFinishLaunchingWithOptions:(NSDictionary *)launchOptions
         
     [TestFlight takeOff:@"5e753f234f33fc2bddf4437600037fbf_NjcyMjEyMDEyLTA0LTA5IDE0OjUyOjU0LjE4MDQwMg"];
 
-    // This causes crashes, but provides useful debug info
-    TestFlightLogger* tfLogger = [[TestFlightLogger alloc] initWithTeamToken:@"5e753f234f33fc2bddf4437600037fbf_NjcyMjEyMDEyLTA0LTA5IDE0OjUyOjU0LjE4MDQwMg"];
-    tfLogger.logFormatter = [[ZPFileLogFormatter alloc] initWithLevel:LOG_LEVEL_VERBOSE];
-    [DDLog addLogger:tfLogger];
-    
     //Perform a memory warning every 2 seconds
     //[NSTimer scheduledTimerWithTimeInterval:(NSTimeInterval)2 target:[UIApplication sharedApplication] selector:@selector(_performMemoryWarning) userInfo:NULL repeats:YES];
     
