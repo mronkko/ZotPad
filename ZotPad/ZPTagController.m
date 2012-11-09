@@ -155,7 +155,7 @@ static const NSInteger tagBaseWidth = 20;
 - (UITableViewCell *)tableView:(UITableView *)tableView cellForRowAtIndexPath:(NSIndexPath *)indexPath{
 
     
-    //NSLog(@"Loading row %i",indexPath.row);
+    ////NSLog(@"Loading row %i",indexPath.row);
     
     NSString* identifier;
     BOOL hasTags;
@@ -174,7 +174,7 @@ static const NSInteger tagBaseWidth = 20;
         cell = [[UITableViewCell alloc] initWithStyle:UITableViewCellStyleDefault reuseIdentifier:identifier];
     }
     else{
-        NSLog(@"Recycled cell %@ with %i subvies",cell,[cell.contentView.subviews count]);
+        //NSLog(@"Recycled cell %@ with %i subvies",cell,[cell.contentView.subviews count]);
         
         //Clear existing tags
         for(UIView* view in cell.contentView.subviews){
@@ -223,7 +223,7 @@ static const NSInteger tagBaseWidth = 20;
         cell.contentView.layer.shouldRasterize = YES;
         cell.contentView.layer.rasterizationScale = [UIScreen mainScreen].scale;
 
-        NSLog(@"Configured cell %@ with %i subvies",cell, [cell.contentView.subviews count]);
+        //NSLog(@"Configured cell %@ with %i subvies",cell, [cell.contentView.subviews count]);
 
     }
 

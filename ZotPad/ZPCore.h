@@ -13,6 +13,7 @@
 #import "ZPZoteroItem.h"
 #import "ZPZoteroAttachment.h"
 #import "ZPZoteroNote.h"
+#import "ZPZoteroDataOBject.h"
 
 //Core classes for data and server connection
 
@@ -24,7 +25,7 @@
 
 #import "DDLog.h"
 
-static const int ddLogLevel = LOG_LEVEL_INFO;
+static const int ddLogLevel = LOG_LEVEL_VERBOSE;
 
 //Notifications
 
@@ -54,7 +55,7 @@ static NSString *const ZPKEY_ITEM = @"item";
 static NSString *const ZPKEY_ATTACHMENT = @"attachment";
 
 static NSString *const ZPKEY_TAG = @"tag";
-static NSString *const ZPKEY_SEARCH_STRING = @"searchString";
+static NSString *const ZPKEY_SEARCH_STRING = @"q";
 static NSString *const ZPKEY_SORT_COLUMN = @"order";
 static NSString *const ZPKEY_ORDER_DIRECTION = @"sort";
 

@@ -54,6 +54,7 @@
                                                                                                       return;
                                                                                                   }];
         navi.minimumLayerWidth = 240;
+
         [self setInsetViewController:navi];
     }
     else{
@@ -266,11 +267,11 @@
         [_tagsList setScrollEnabled:TRUE];
         [UIView animateWithDuration:duration animations:^{
 
-            NSLog(NSStringFromCGRect(tagsView.frame));
+            //NSLog(NSStringFromCGRect(tagsView.frame));
 
             tagsView.frame = self.view.frame;
             
-            NSLog(NSStringFromCGRect(tagsView.frame));
+            //NSLog(NSStringFromCGRect(tagsView.frame));
 
             UIImage* image = [UIImage imageNamed:@"icon-down-black"];
             headerArrowLeft.image = image;
@@ -294,18 +295,18 @@
             //NSInteger numberOfRowsToShow = [[[ZPItemListViewDataSource instance] selectedTags] count] >0 ? 3 : 0;
 
 
-            NSLog(NSStringFromCGRect(tagsView.frame));
+            //NSLog(NSStringFromCGRect(tagsView.frame));
 
             tagsView.frame = CGRectMake(0,
                                         self.view.frame.size.height - tagsHeader.frame.size.height + 1 - numberOfRowsToShow * _tagsList.rowHeight - (toolBar!=NULL ? toolBar.frame.size.height : 0),
                                         tagsView.frame.size.width,
                                         tagsHeader.frame.size.height + numberOfRowsToShow * _tagsList.rowHeight);
 
-            NSLog(NSStringFromCGRect(tagsView.frame));
+            //NSLog(NSStringFromCGRect(tagsView.frame));
 
             //Resize the collections view as well so that it scrolls properly
 
-            NSLog(NSStringFromCGRect(self.placeholderView.frame));
+            //NSLog(NSStringFromCGRect(self.placeholderView.frame));
 
             self.placeholderView.frame = CGRectMake( self.placeholderView.frame.origin.x,
                                                 self.placeholderView.frame.origin.y,
@@ -313,7 +314,7 @@
                                                tagsView.frame.origin.y-1);
 
            
-            NSLog(NSStringFromCGRect(self.placeholderView.frame));
+            //NSLog(NSStringFromCGRect(self.placeholderView.frame));
 
             //Anchor to bottom
             tagsView.autoresizingMask = UIViewAutoresizingFlexibleTopMargin | UIViewAutoresizingFlexibleWidth;

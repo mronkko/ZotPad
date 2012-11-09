@@ -148,8 +148,6 @@ static ZPCacheController* _instance = nil;
     [self performSelectorInBackground:@selector(_scanFilesToUpload) withObject:NULL];
     [self performSelectorInBackground:@selector(_cleanUpCache) withObject:NULL];
 	
-    [ZPServerConnectionManager retrieveLibrariesFromServer];
-    
     /*
      Start building cache immediately if the user has chosen to cache all libraries
      */
@@ -659,7 +657,7 @@ static ZPCacheController* _instance = nil;
     
     ZPZoteroLibrary* library = [ZPZoteroLibrary libraryWithID:libraryID];
     [ZPDatabase writeCollections:collections toLibrary:library];
-
+    //NSLog(@"Collections for library %i", libraryID);
     [[NSNotificationCenter defaultCenter] postNotificationName:ZPNOTIFICATION_LIBRARY_WITH_COLLECTIONS_AVAILABLE object:library];
     [self _checkQueues];
 

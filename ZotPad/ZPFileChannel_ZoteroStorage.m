@@ -408,7 +408,7 @@ NSInteger const ZPFILECHANNEL_ZOTEROSTORAGE_UPLOAD_REGISTER = 4;
         
         if (![[UIApplication sharedApplication] openURL:url])
             
-            NSLog(@"%@%@",@"Failed to open url:",[url description]);
+            DDLogError(@"%@%@",@"Failed to open url:",[url description]);
         
     }
     else if(buttonIndex==2){
@@ -416,7 +416,7 @@ NSInteger const ZPFILECHANNEL_ZOTEROSTORAGE_UPLOAD_REGISTER = 4;
         
         if (![[UIApplication sharedApplication] openURL:url])
             
-            NSLog(@"%@%@",@"Failed to open url:",[url description]);
+            DDLogError(@"%@%@",@"Failed to open url:",[url description]);
         
     }
     

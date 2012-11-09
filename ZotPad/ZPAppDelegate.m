@@ -90,6 +90,12 @@ didFinishLaunchingWithOptions:(NSDictionary *)launchOptions
 
     //Perform a memory warning every 2 seconds
     //[NSTimer scheduledTimerWithTimeInterval:(NSTimeInterval)2 target:[UIApplication sharedApplication] selector:@selector(_performMemoryWarning) userInfo:NULL repeats:YES];
+
+    // Log to console
+    
+    [DDTTYLogger sharedInstance].logFormatter = [[ZPFileLogFormatter alloc] initWithLevel:LOG_LEVEL_VERBOSE];
+    [DDLog addLogger:[DDTTYLogger sharedInstance]];
+
     
 #else
     if([ZPPreferences reportErrors]) [TestFlight takeOff:@"5e753f234f33fc2bddf4437600037fbf_NjcyMjEyMDEyLTA0LTA5IDE0OjUyOjU0LjE4MDQwMg"];
@@ -103,10 +109,6 @@ didFinishLaunchingWithOptions:(NSDictionary *)launchOptions
     self.fileLogger.logFormatter = [[ZPFileLogFormatter alloc] initWithLevel:LOG_LEVEL_INFO];
     [DDLog addLogger:self.fileLogger]; 
 
-//    [DDTTYLogger sharedInstance].logFormatter = [[ZPFileLogFormatter alloc] initWithLevel:LOG_LEVEL_VERBOSE];
-//    [DDLog addLogger:[DDTTYLogger sharedInstance]];
-
-  
     DDLogVerbose(@"Verbose logging is enabled");
     
      //Manual override for userID and Key. Useful for running the code in debugger with other people's credentials.

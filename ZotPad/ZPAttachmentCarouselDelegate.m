@@ -15,7 +15,7 @@
 #import <QuartzCore/QuartzCore.h>
 #import <zlib.h>
 #import "ZPFileViewerViewController.h"
-
+#import "ZPFileTransferProgressView.h"
 
 
 NSInteger const ZPATTACHMENTICONGVIEWCONTROLLER_MODE_STATIC = 0;
@@ -60,8 +60,6 @@ NSInteger const ZPATTACHMENTICONGVIEWCONTROLLER_TAG_TITLELABEL = -5;
 -(id) init{
     self = [super init];
 
-    _progressViews = [[NSMutableSet alloc] init];
-
     //Register self as observer for item downloads
     [[NSNotificationCenter defaultCenter] addObserver:self selector:@selector(notifyAttachmentDownloadCompleted:) name:ZPNOTIFICATION_ATTACHMENT_FILE_DOWNLOAD_FINISHED object:nil];
     [[NSNotificationCenter defaultCenter] addObserver:self selector:@selector(notifyAttachmentDownloadFailed:) name:ZPNOTIFICATION_ATTACHMENT_FILE_DOWNLOAD_FAILED object:nil];
@@ -79,12 +77,6 @@ NSInteger const ZPATTACHMENTICONGVIEWCONTROLLER_TAG_TITLELABEL = -5;
 }
 
 -(void) dealloc{
-    // Removes the progress views from FileChannels
-    @synchronized(_progressViews){
-        for(UIProgressView* progressView in _progressViews){
-            
-        }
-    }
     [[NSNotificationCenter defaultCenter] removeObserver:self];
 }
 
@@ -213,15 +205,11 @@ NSInteger const ZPATTACHMENTICONGVIEWCONTROLLER_TAG_TITLELABEL = -5;
 
         [labelBackground addSubview: progressLabel];
         
-        progressView = [[UIProgressView alloc] initWithFrame:CGRectMake(labelSubviewOffset, labelSubviewOffset + labelSubviewHeight*.75, labelSubviewWidth, labelSubviewHeight*.15)];
+        progressView = [[ZPFileTransferProgressView alloc] initWithFrame:CGRectMake(labelSubviewOffset, labelSubviewOffset + labelSubviewHeight*.75, labelSubviewWidth, labelSubviewHeight*.15)];
         progressView.tag = ZPATTACHMENTICONGVIEWCONTROLLER_TAG_PROGRESSVIEW;
         progressView.backgroundColor = [UIColor clearColor];
         
         [labelBackground addSubview: progressView];
-        
-        @synchronized(_progressViews){
-            [_progressViews addObject:progressView];
-        }
         
         errorLabel = [[UILabel alloc] initWithFrame:CGRectMake(labelSubviewOffset, labelSubviewOffset + labelSubviewHeight*.75, labelSubviewWidth, labelSubviewHeight*.25)];
         errorLabel.tag = ZPATTACHMENTICONGVIEWCONTROLLER_TAG_ERRORLABEL;

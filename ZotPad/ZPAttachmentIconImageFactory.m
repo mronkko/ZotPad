@@ -205,8 +205,6 @@ static ZPAttachmentIconImageFactory* _webViewDelegate;
     //IF the cache image is NSNull, this tells us that we are rendering an image currently
     else if(cacheImage == [NSNull null]){
         
-        DDLogVerbose(@"Waiting for cached image %@",cacheKey);
-        
         @synchronized(_viewsWaitingForImage){
             NSMutableArray* array= [_viewsWaitingForImage objectForKey:cacheKey];
             if(array == NULL){
@@ -218,8 +216,6 @@ static ZPAttachmentIconImageFactory* _webViewDelegate;
     }
     //We have a cached image
     else{
-        //        DDLogVerbose(@"Using cached image %@",cacheKey);
-         DDLogVerbose(@"Using cached image %@ for view %@",cacheKey,fileImage);
         fileImage.image = (UIImage*) cacheImage;
     }
 }

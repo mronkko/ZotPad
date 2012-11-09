@@ -7,6 +7,7 @@
 //
 
 #import <Foundation/Foundation.h>
+#import "ZPCore.h"
 
 @interface ZPServerResponseXMLParser : NSObject <NSXMLParserDelegate>{
     NSMutableArray* _resultArray;

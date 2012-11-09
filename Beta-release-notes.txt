@@ -6,12 +6,24 @@ There is no need to report crashes. If you find that something is not working (b
 
 http://zotpad.uservoice.com/knowledgebase/articles/113113-i-got-and-invitation-to-be-a-beta-tester-how-do-s
 
-If you are installing this over an existing beta, you should reset your data before running the App.
+If you are installing this over an existing beta, and are experiencing crashes right after the app launches, you need to uninstall the app and reinstall it.
 
 
 ----- Changes since the previous beta build -----
 
 GENERAL: 
+
+- Added compatibility with iOS 5
+
+- Fixed multiple issues in the citation formatter
+
+- Fixed an issue causing the App sometimes to crash when refreshing the list of collections
+
+- Addressed a request timeout issue that caused item list to never complete loading.  Item requests that timeout are now split into two smaller requests and retried.
+
+----- Other new features and notable changes since ZotPad 1.1.2 ------
+
+GENERAL:
 
 Feature: Note viewing and editing
 - Notes are now shown in the item detail view and can be edited by tapping
@@ -31,15 +43,6 @@ Feature: Mark items as favorites
 - Favorite items are not yet saved, so the star button does not currently do anything
 
 Feature: Added more help popovers to help new users to discover the features of the App
-
-Change: Layered collection navigation 
-- Layered collection navigation is now enabled by default and cannot be disabled. The old navigation by using separate views is now completely disabled
-
-Bug fixes and optimization of the code.
-
------ Other new features and notable changes since ZotPad 1.1.2 ------
-
-GENERAL:
 
 Feature: Recursive collections
 

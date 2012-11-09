@@ -64,6 +64,7 @@ static NSString *dbPath;
     BOOL dbExists = [[NSFileManager defaultManager] fileExistsAtPath:dbPath];
     
     [self _initializeDatabaseConnections];
+    
     if(! dbExists) [self _createDatabase];
     else [self _upgradeDatabase];
 }
@@ -194,6 +195,7 @@ static NSString *dbPath;
             [self _initializeDatabaseConnections];
             
             [self _createDatabase];
+            DDLogWarn(@"Installing database completed");
         }
     }
 }

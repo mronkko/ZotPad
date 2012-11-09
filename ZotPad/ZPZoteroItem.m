@@ -116,31 +116,96 @@ static CSLFormatter* _cslFormatter = NULL;
         [creatorArray addObject:creator];
     }
     
-    _fullCitation = [_cslFormatter formatBibliographyItemUsingVariables:fields storeMacrosInDictionary:macroDict];
+    //It is possible that we do not have fields if the database is not fully up to date.
     
-    NSString* authorMacro = [macroDict objectForKey:@"author"];
-    NSString* dateMacro = [[macroDict objectForKey:@"issued"] stringByTrimmingCharactersInSet:[NSCharacterSet whitespaceCharacterSet]] ;
-    
-    if(authorMacro == NULL){
-        if([dateMacro isEqualToString:@"(n.d.)"]){
-            _creatorSummary = @"";
+    if([fields count]>0){
+        
+        _fullCitation = [_cslFormatter formatBibliographyItemUsingVariables:fields storeMacrosInDictionary:macroDict];
+        
+        NSString* authorMacro = [macroDict objectForKey:@"author"];
+        NSString* dateMacro = [[macroDict objectForKey:@"issued"] stringByTrimmingCharactersInSet:[NSCharacterSet whitespaceCharacterSet]] ;
+        
+        if(authorMacro == NULL){
+            if([dateMacro isEqualToString:@"(n.d.)"]){
+                _creatorSummary = @"";
+            }
+            else{
+                _creatorSummary = dateMacro;
+            }
         }
         else{
-            _creatorSummary = dateMacro;
+            _creatorSummary = [[NSString stringWithFormat:@"%@. %@",authorMacro, dateMacro] stringByReplacingOccurrencesOfString:@".." withString:@"."];
         }
-    }
-    else{
-        _creatorSummary = [[NSString stringWithFormat:@"%@. %@",authorMacro, dateMacro] stringByReplacingOccurrencesOfString:@".." withString:@"."];
-    }
-    
-    NSInteger index = [_creatorSummary length]+[[macroDict objectForKey:@"title"] length]+4;
-    
-    if(index>[_fullCitation length]){
-        DDLogError(@"CSL formatting error when processing %@",_fullCitation);
-    }
-    else{
-        _publicationDetails = [_fullCitation substringFromIndex:index];
+        
         _year = [[macroDict objectForKey:@"issued"] integerValue];
+        
+        
+        // Get the rest of the citation based on the APA style
+        /*
+         <layout>
+         <group suffix=".">
+         <group delimiter=". ">
+         <text macro="author"/>
+         <text macro="issued"/>
+         <text macro="title" prefix=" "/>
+         <text macro="container"/>
+         </group>
+         <text macro="locators"/>
+         <group delimiter=", " prefix=". ">
+         <text macro="event"/>
+         <text macro="publisher"/>
+         </group>
+         </group>
+         <text macro="access" prefix=" "/>
+         </layout>
+         */
+        NSString* container = [macroDict objectForKey:@"container"];
+        NSString* locators = [macroDict objectForKey:@"locators"];
+        NSString* event = [macroDict objectForKey:@"event"];
+        NSString* publisher = [macroDict objectForKey:@"publisher"];
+        NSString* access = [macroDict objectForKey:@"access"];
+        
+        if(container!=NULL && [container length] ==0 ) container = NULL;
+        if(locators!=NULL && [locators length] ==0 ) locators = NULL;
+        if(event!=NULL && [event length] ==0 ) event = NULL;
+        if(publisher!=NULL && [publisher length] ==0 ) publisher = NULL;
+        if(access!=NULL && [access length] ==0 ) access = NULL;
+        
+        NSMutableString* temp =[[NSMutableString alloc] init];
+        if(container != NULL){
+            [temp appendString:container];
+        }
+        if(locators!=NULL){
+            [temp appendString:locators];
+        }
+        if(event!=NULL || publisher != NULL){
+            if([temp length]>0)[temp appendString:@". "];
+            if(event!=NULL){
+                [temp appendString:event];
+                if(publisher!=NULL){
+                    [temp appendString:@", "];
+                    [temp appendString:publisher];
+                }
+            }
+            else{
+                [temp appendString:publisher];
+            }
+        }
+        [temp appendString:@"."];
+        if(access != NULL){
+            [temp appendString:access];
+        }
+        
+        _publicationDetails = temp;
+    }
+    else{
+        // Use blank values so that the App would not crash
+        _fullCitation = self.title;
+        _creatorSummary = @"";
+        _year = 0;
+        _publicationDetails =@"";
+    
+        DDLogError(@"CSL formatting error. The item with key %@ does not have any fields",self.key);
     }
 }
 

@@ -59,18 +59,48 @@
 			<string>debugcitationparser</string>
 			<key>DefaultValue</key>
 			<false/>
-            <dict>
-                <key>Type</key>
-                <string>PSToggleSwitchSpecifier</string>
-                <key>Title</key>
-                <string>Add identifiers to server requests</string>
-                <key>Key</key>
-                <string>debugserverrequests</string>
-                <key>DefaultValue</key>
-                <false/>
-            </dict>
-
 		</dict>
+        <dict>
+            <key>Type</key>
+            <string>PSToggleSwitchSpecifier</string>
+            <key>Title</key>
+            <string>Add identifiers to server requests</string>
+            <key>Key</key>
+            <string>debugserverrequests</string>
+            <key>DefaultValue</key>
+            <false/>
+        </dict>
+        <dict>
+			<key>Type</key>
+			<string>PSToggleSwitchSpecifier</string>
+			<key>Title</key>
+			<string>Authentication override</string>
+			<key>Key</key>
+			<string>debugauthenticationoverride</string>
+			<key>DefaultValue</key>
+			<false/>
+        </dict>
+        <dict>
+            <key>Type</key>
+            <string>PSTextFieldSpecifier</string>
+            <key>Title</key>
+            <string>userID override value</string>
+            <key>Key</key>
+            <string>debuguserideoverride</string>
+            <key>DefaultValue</key>
+            <string></string>
+		</dict>
+        <dict>
+            <key>Type</key>
+            <string>PSTextFieldSpecifier</string>
+            <key>Title</key>
+            <string>API key override value</string>
+            <key>Key</key>
+            <string>debugapikeyeoverride</string>
+            <key>DefaultValue</key>
+            <string></string>
+		</dict>
+
 	</array>
 	<key>StringsTable</key>
 	<string>Advanced</string>

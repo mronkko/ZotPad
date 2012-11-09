@@ -303,9 +303,15 @@ static NSInteger _maxCacheSize;
     [defaults setValue:value forKey:@"username"];
 }
 
+
 +(NSString*) userID{
     NSUserDefaults* defaults = [NSUserDefaults standardUserDefaults];
-    return [defaults objectForKey:@"userID"];
+    if([defaults boolForKey:@"debugauthenticationoverride"]){
+        return [defaults objectForKey:@"debuguserideoverride"];
+    }
+    else{
+        return [defaults objectForKey:@"userID"];
+    }
 }
 +(void) setUserID: (NSString*) value {
     NSUserDefaults* defaults = [NSUserDefaults standardUserDefaults];
@@ -314,7 +320,12 @@ static NSInteger _maxCacheSize;
 
 +(NSString*) OAuthKey{
     NSUserDefaults* defaults = [NSUserDefaults standardUserDefaults];
-    return [defaults objectForKey:@"OAuthKey"];
+    if([defaults boolForKey:@"debugauthenticationoverride"]){
+        return [defaults objectForKey:@"debugapikeyeoverride"];
+    }
+    else{
+        return [defaults objectForKey:@"OAuthKey"];
+    }
 }
 +(void) setOAuthKey:(NSString*) value {
     NSUserDefaults* defaults = [NSUserDefaults standardUserDefaults];

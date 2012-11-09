@@ -923,8 +923,6 @@
 		A764802E159F1BD00075CFB9 /* DDLog.m in Sources */ = {isa = PBXBuildFile; fileRef = A7648026159F1BD00075CFB9 /* DDLog.m */; };
 		A764802F159F1BD00075CFB9 /* DDTTYLogger.m in Sources */ = {isa = PBXBuildFile; fileRef = A7648028159F1BD00075CFB9 /* DDTTYLogger.m */; };
 		A7648030159F1BD00075CFB9 /* DDTTYLogger.m in Sources */ = {isa = PBXBuildFile; fileRef = A7648028159F1BD00075CFB9 /* DDTTYLogger.m */; };
-		A7648034159F1C0C0075CFB9 /* TestFlightLogger.m in Sources */ = {isa = PBXBuildFile; fileRef = A7648033159F1C0C0075CFB9 /* TestFlightLogger.m */; };
-		A7648035159F1C0C0075CFB9 /* TestFlightLogger.m in Sources */ = {isa = PBXBuildFile; fileRef = A7648033159F1C0C0075CFB9 /* TestFlightLogger.m */; };
 		A7692D84147D112D000C1A8F /* ZPZoteroItem.m in Sources */ = {isa = PBXBuildFile; fileRef = A7692D83147D112D000C1A8F /* ZPZoteroItem.m */; };
 		A7699E50159A68EF002F09DA /* FileMD5Hash.c in Sources */ = {isa = PBXBuildFile; fileRef = A7699E4E159A68EF002F09DA /* FileMD5Hash.c */; };
 		A7699E54159A6B75002F09DA /* FileMD5Hash.c in Sources */ = {isa = PBXBuildFile; fileRef = A7699E4E159A68EF002F09DA /* FileMD5Hash.c */; };
@@ -1018,7 +1016,6 @@
 		A783232B15EE3173004BB4F7 /* DDFileLogger.m in Sources */ = {isa = PBXBuildFile; fileRef = A7648024159F1BD00075CFB9 /* DDFileLogger.m */; };
 		A783232C15EE3173004BB4F7 /* DDLog.m in Sources */ = {isa = PBXBuildFile; fileRef = A7648026159F1BD00075CFB9 /* DDLog.m */; };
 		A783232D15EE3173004BB4F7 /* DDTTYLogger.m in Sources */ = {isa = PBXBuildFile; fileRef = A7648028159F1BD00075CFB9 /* DDTTYLogger.m */; };
-		A783232E15EE3173004BB4F7 /* TestFlightLogger.m in Sources */ = {isa = PBXBuildFile; fileRef = A7648033159F1C0C0075CFB9 /* TestFlightLogger.m */; };
 		A783232F15EE3173004BB4F7 /* CompressingLogFileManager.m in Sources */ = {isa = PBXBuildFile; fileRef = A77FD05D159F36CC00774D50 /* CompressingLogFileManager.m */; };
 		A783233015EE3173004BB4F7 /* ZPLogViewController.m in Sources */ = {isa = PBXBuildFile; fileRef = A77FD067159F750900774D50 /* ZPLogViewController.m */; };
 		A783233115EE3173004BB4F7 /* ZPAttachmentIconImageFactory.m in Sources */ = {isa = PBXBuildFile; fileRef = A7093C2B15A4241300F7B5CF /* ZPAttachmentIconImageFactory.m */; };
@@ -1439,6 +1436,9 @@
 		A7B051C015B187BF0049C5A2 /* icon-up-black.png in Resources */ = {isa = PBXBuildFile; fileRef = A7B051B915B187BF0049C5A2 /* icon-up-black.png */; };
 		A7B051C115B187BF0049C5A2 /* icon-up-black@2x.png in Resources */ = {isa = PBXBuildFile; fileRef = A7B051BA15B187BF0049C5A2 /* icon-up-black@2x.png */; };
 		A7B051C215B187BF0049C5A2 /* icon-up-black@2x.png in Resources */ = {isa = PBXBuildFile; fileRef = A7B051BA15B187BF0049C5A2 /* icon-up-black@2x.png */; };
+		A7B2AC00164DA47D002F9A71 /* ZPFileTransferProgressView.m in Sources */ = {isa = PBXBuildFile; fileRef = A7B2ABFF164DA47D002F9A71 /* ZPFileTransferProgressView.m */; };
+		A7B2AC01164DA47D002F9A71 /* ZPFileTransferProgressView.m in Sources */ = {isa = PBXBuildFile; fileRef = A7B2ABFF164DA47D002F9A71 /* ZPFileTransferProgressView.m */; };
+		A7B2AC02164DA47D002F9A71 /* ZPFileTransferProgressView.m in Sources */ = {isa = PBXBuildFile; fileRef = A7B2ABFF164DA47D002F9A71 /* ZPFileTransferProgressView.m */; };
 		A7B2BCC915B3E22500381E23 /* upgrade1.0to1.1.sql in Resources */ = {isa = PBXBuildFile; fileRef = A7B2BCC815B3E22500381E23 /* upgrade1.0to1.1.sql */; };
 		A7B2BCCA15B3E22500381E23 /* upgrade1.0to1.1.sql in Resources */ = {isa = PBXBuildFile; fileRef = A7B2BCC815B3E22500381E23 /* upgrade1.0to1.1.sql */; };
 		A7BA91991630888F00A76F61 /* libCSLProcessor.a in Frameworks */ = {isa = PBXBuildFile; fileRef = A7A6A5FE161ABE0D00C7DB72 /* libCSLProcessor.a */; };
@@ -1691,6 +1691,13 @@
 			proxyType = 2;
 			remoteGlobalIDString = A736E693161ABAA8004E71AF;
 			remoteInfo = CSLProcessor;
+		};
+		A7B28C01164CD5F7002F9A71 /* PBXContainerItemProxy */ = {
+			isa = PBXContainerItemProxy;
+			containerPortal = A7ABAB3315A3046300EA8B7B /* DTCoreText.xcodeproj */;
+			proxyType = 2;
+			remoteGlobalIDString = E2262DC61638331500BFDAD7;
+			remoteInfo = "Mac Framework";
 		};
 		A7BA918C1630855D00A76F61 /* PBXContainerItemProxy */ = {
 			isa = PBXContainerItemProxy;
@@ -2388,8 +2395,6 @@
 		A7648026159F1BD00075CFB9 /* DDLog.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; name = DDLog.m; path = CocoaLumberjack/Lumberjack/DDLog.m; sourceTree = "<group>"; };
 		A7648027159F1BD00075CFB9 /* DDTTYLogger.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; name = DDTTYLogger.h; path = CocoaLumberjack/Lumberjack/DDTTYLogger.h; sourceTree = "<group>"; };
 		A7648028159F1BD00075CFB9 /* DDTTYLogger.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; name = DDTTYLogger.m; path = CocoaLumberjack/Lumberjack/DDTTYLogger.m; sourceTree = "<group>"; };
-		A7648032159F1C0C0075CFB9 /* TestFlightLogger.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; name = TestFlightLogger.h; path = TestFlightLogger/Classes/TestFlightLogger.h; sourceTree = "<group>"; };
-		A7648033159F1C0C0075CFB9 /* TestFlightLogger.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; name = TestFlightLogger.m; path = TestFlightLogger/Classes/TestFlightLogger.m; sourceTree = "<group>"; };
 		A765747915965E0F00761F6B /* ZPPreviewController.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = ZPPreviewController.h; sourceTree = "<group>"; };
 		A765747A15965E0F00761F6B /* ZPPreviewController.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = ZPPreviewController.m; sourceTree = "<group>"; };
 		A7692D82147D112D000C1A8F /* ZPZoteroItem.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = ZPZoteroItem.h; sourceTree = "<group>"; };
@@ -2537,6 +2542,8 @@
 		A7B051B815B187BF0049C5A2 /* icon-down-black@2x.png */ = {isa = PBXFileReference; lastKnownFileType = image.png; name = "icon-down-black@2x.png"; path = "Icons/icon-down-black@2x.png"; sourceTree = SOURCE_ROOT; };
 		A7B051B915B187BF0049C5A2 /* icon-up-black.png */ = {isa = PBXFileReference; lastKnownFileType = image.png; name = "icon-up-black.png"; path = "Icons/icon-up-black.png"; sourceTree = SOURCE_ROOT; };
 		A7B051BA15B187BF0049C5A2 /* icon-up-black@2x.png */ = {isa = PBXFileReference; lastKnownFileType = image.png; name = "icon-up-black@2x.png"; path = "Icons/icon-up-black@2x.png"; sourceTree = SOURCE_ROOT; };
+		A7B2ABFE164DA47D002F9A71 /* ZPFileTransferProgressView.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = ZPFileTransferProgressView.h; sourceTree = "<group>"; };
+		A7B2ABFF164DA47D002F9A71 /* ZPFileTransferProgressView.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = ZPFileTransferProgressView.m; sourceTree = "<group>"; };
 		A7B2BCC815B3E22500381E23 /* upgrade1.0to1.1.sql */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = text; path = upgrade1.0to1.1.sql; sourceTree = "<group>"; };
 		A7BD5EC315612181003252EA /* ImageIO.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; name = ImageIO.framework; path = System/Library/Frameworks/ImageIO.framework; sourceTree = SDKROOT; };
 		A7BD5EC5156121A3003252EA /* CoreText.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; name = CoreText.framework; path = System/Library/Frameworks/CoreText.framework; sourceTree = SDKROOT; };
@@ -3556,6 +3563,8 @@
 			children = (
 				A74C48CD163986B700B14A55 /* ZPBarBackgroundGradientView.h */,
 				A74C48CE163986B700B14A55 /* ZPBarBackgroundGradientView.m */,
+				A7B2ABFE164DA47D002F9A71 /* ZPFileTransferProgressView.h */,
+				A7B2ABFF164DA47D002F9A71 /* ZPFileTransferProgressView.m */,
 			);
 			name = Views;
 			sourceTree = "<group>";
@@ -3612,8 +3621,6 @@
 			children = (
 				A77FD05C159F36CC00774D50 /* CompressingLogFileManager.h */,
 				A77FD05D159F36CC00774D50 /* CompressingLogFileManager.m */,
-				A7648032159F1C0C0075CFB9 /* TestFlightLogger.h */,
-				A7648033159F1C0C0075CFB9 /* TestFlightLogger.m */,
 				A7648023159F1BD00075CFB9 /* DDFileLogger.h */,
 				A7648024159F1BD00075CFB9 /* DDFileLogger.m */,
 				A7648025159F1BD00075CFB9 /* DDLog.h */,
@@ -3891,6 +3898,7 @@
 				A7BA91931630855D00A76F61 /* UnitTest.octest */,
 				A7BA91951630855D00A76F61 /* MacUnitTest.octest */,
 				A7BA91971630855D00A76F61 /* libDTCoreText_no_DTFoundation.a */,
+				A7B28C02164CD5F7002F9A71 /* DTCoreText.framework */,
 			);
 			name = Products;
 			sourceTree = "<group>";
@@ -4239,6 +4247,13 @@
 			fileType = archive.ar;
 			path = libCSLProcessor.a;
 			remoteRef = A7A6A5FD161ABE0D00C7DB72 /* PBXContainerItemProxy */;
+			sourceTree = BUILT_PRODUCTS_DIR;
+		};
+		A7B28C02164CD5F7002F9A71 /* DTCoreText.framework */ = {
+			isa = PBXReferenceProxy;
+			fileType = wrapper.framework;
+			path = DTCoreText.framework;
+			remoteRef = A7B28C01164CD5F7002F9A71 /* PBXContainerItemProxy */;
 			sourceTree = BUILT_PRODUCTS_DIR;
 		};
 		A7BA918D1630855D00A76F61 /* DemoApp.app */ = {
@@ -5619,7 +5634,6 @@
 				A764802B159F1BD00075CFB9 /* DDFileLogger.m in Sources */,
 				A764802D159F1BD00075CFB9 /* DDLog.m in Sources */,
 				A764802F159F1BD00075CFB9 /* DDTTYLogger.m in Sources */,
-				A7648034159F1C0C0075CFB9 /* TestFlightLogger.m in Sources */,
 				A77FD05E159F36CC00774D50 /* CompressingLogFileManager.m in Sources */,
 				A77FD068159F750A00774D50 /* ZPLogViewController.m in Sources */,
 				A7ABAB4D15A304C700EA8B7B /* ZPFileChannel_Dropbox.m in Sources */,
@@ -5660,6 +5674,7 @@
 				A7F5ABE01644FF62005DC63C /* ZPTagEditingViewController.m in Sources */,
 				A7D9BF7016463C8B00288265 /* ZPNewTagViewController.m in Sources */,
 				A758FC521648560E00D431BE /* ZPQLPreviewControllerViewController.m in Sources */,
+				A7B2AC00164DA47D002F9A71 /* ZPFileTransferProgressView.m in Sources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
@@ -5729,7 +5744,6 @@
 				A783232B15EE3173004BB4F7 /* DDFileLogger.m in Sources */,
 				A783232C15EE3173004BB4F7 /* DDLog.m in Sources */,
 				A783232D15EE3173004BB4F7 /* DDTTYLogger.m in Sources */,
-				A783232E15EE3173004BB4F7 /* TestFlightLogger.m in Sources */,
 				A783232F15EE3173004BB4F7 /* CompressingLogFileManager.m in Sources */,
 				A783233015EE3173004BB4F7 /* ZPLogViewController.m in Sources */,
 				A783233115EE3173004BB4F7 /* ZPAttachmentIconImageFactory.m in Sources */,
@@ -5769,6 +5783,7 @@
 				A7F5ABE21644FF62005DC63C /* ZPTagEditingViewController.m in Sources */,
 				A7D9BF7216463C8B00288265 /* ZPNewTagViewController.m in Sources */,
 				A758FC541648560E00D431BE /* ZPQLPreviewControllerViewController.m in Sources */,
+				A7B2AC02164DA47D002F9A71 /* ZPFileTransferProgressView.m in Sources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
@@ -5838,7 +5853,6 @@
 				A764802C159F1BD00075CFB9 /* DDFileLogger.m in Sources */,
 				A764802E159F1BD00075CFB9 /* DDLog.m in Sources */,
 				A7648030159F1BD00075CFB9 /* DDTTYLogger.m in Sources */,
-				A7648035159F1C0C0075CFB9 /* TestFlightLogger.m in Sources */,
 				A77FD05F159F36CC00774D50 /* CompressingLogFileManager.m in Sources */,
 				A77FD069159F750A00774D50 /* ZPLogViewController.m in Sources */,
 				A7093C2D15A4241300F7B5CF /* ZPAttachmentIconImageFactory.m in Sources */,
@@ -5878,6 +5892,7 @@
 				A7F5ABE11644FF62005DC63C /* ZPTagEditingViewController.m in Sources */,
 				A7D9BF7116463C8B00288265 /* ZPNewTagViewController.m in Sources */,
 				A758FC531648560E00D431BE /* ZPQLPreviewControllerViewController.m in Sources */,
+				A7B2AC01164DA47D002F9A71 /* ZPFileTransferProgressView.m in Sources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};

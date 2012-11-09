@@ -53,7 +53,7 @@
 - (void)placeholderViewController:(HLSPlaceholderViewController *)placeholderViewController
       willShowInsetViewController:(UIViewController *)viewController
                          animated:(BOOL)animated{
-    NSLog(@"DEBUG");
+    //NSLog(@"DEBUG");
 }
 /**
  * Called when an inset view controller will be shown, before the transition has ended
@@ -61,7 +61,7 @@
 - (void)placeholderViewController:(HLSPlaceholderViewController *)placeholderViewController
        didShowInsetViewController:(UIViewController *)viewController
                          animated:(BOOL)animated{
-    NSLog(@"DEBUG");
+    //NSLog(@"DEBUG");
 
 }
 @end

@@ -223,11 +223,11 @@
     
     if(self.selectedCollectionIndex != -1){
         if(self.selectedCollectionIndex == self.drilledCollectionIndex){
-            NSLog(@"Graying out cell at row %i",self.drilledCollectionIndex);
+            //NSLog(@"Graying out cell at row %i",self.drilledCollectionIndex);
             [self.tableView cellForRowAtIndexPath:[NSIndexPath indexPathForRow:self.drilledCollectionIndex inSection:0]].selectionStyle = UITableViewCellSelectionStyleGray;
         }
         else{
-            NSLog(@"Deselecting cell at row %i",self.selectedCollectionIndex);
+            //NSLog(@"Deselecting cell at row %i",self.selectedCollectionIndex);
             [self.tableView deselectRowAtIndexPath:[NSIndexPath indexPathForRow:self.selectedCollectionIndex inSection:0] animated:NO];
         }
     }
@@ -458,47 +458,49 @@
                 }
             }
 
-            /*
-
+            
             ZPZoteroDataObject* dataObj;
             
-            DDLogVerbose(@"Libraries / collections before update");
+            //NSLog(@"Libraries / collections before update");
             for(dataObj in _content){
-                DDLogVerbose(@"%@",dataObj.title);
+                //NSLog(@"%@",dataObj.title);
             }
-            */
             
             
-            [self.tableView beginUpdates];
+            if(([insertArray count] !=0) || ([deleteArray count] > 0)){
             
-            if([insertArray count]>0){
-                [self.tableView insertRowsAtIndexPaths:insertArray withRowAnimation:UITableViewRowAnimationAutomatic];
-//                DDLogVerbose(@"Inserting rows into indices");
-                NSIndexPath* temp;
-                for(temp in insertArray){
-                    DDLogVerbose(@"%i",temp.row);
+                [self.tableView beginUpdates];
+                
+                if([insertArray count]>0){
+                    [self.tableView insertRowsAtIndexPaths:insertArray withRowAnimation:UITableViewRowAnimationAutomatic];
+                    //NSLog(@"Inserting rows into indices");
+                    NSIndexPath* temp;
+                    for(temp in insertArray){
+                        DDLogVerbose(@"%i",temp.row);
+                    }
+                    
+                }
+                if([deleteArray count]>0){
+                    [self.tableView deleteRowsAtIndexPaths:deleteArray withRowAnimation:UITableViewRowAnimationAutomatic];
+                    //NSLog(@"Deleting rows from indices");
+                    NSIndexPath* temp;
+                    for(temp in insertArray){
+                        DDLogVerbose(@"%i",temp.row);
+                    }
                 }
                 
-            }
-            if([deleteArray count]>0){
-                [self.tableView deleteRowsAtIndexPaths:deleteArray withRowAnimation:UITableViewRowAnimationAutomatic];
-//                DDLogVerbose(@"Deleting rows from indices");
-                NSIndexPath* temp;
-                for(temp in insertArray){
-                    DDLogVerbose(@"%i",temp.row);
+                _content = shownContent;
+                
+                //NSLog(@"Libraries / collections after update");
+                
+                for(dataObj in _content){
+                    //NSLog(@"%@",dataObj.title);
                 }
+                
+                [self.tableView endUpdates];
             }
-
-            _content = shownContent;
-            
-            [self.tableView endUpdates];
-            
-/*
-            DDLogVerbose(@"Libraries / collections after update");
-            for(dataObj in _content){
-                DDLogVerbose(@"%@",dataObj.title); 
-            }
-  */
+            /*
+             */
             
             //TODO: Figure out a way to keep the activity view spinning until the last library is loaded.
             //[_activityIndicator stopAnimating];

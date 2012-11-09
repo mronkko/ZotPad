@@ -316,7 +316,7 @@ const NSInteger ZPServerConnectionManagerRequestLastModifiedItem = 11;
                 
                 //Device identifiers are available again in iOS 6.
                 if([[[UIDevice currentDevice] systemVersion] floatValue] >= 6.0){
-                    urlString = [urlString stringByAppendingFormat:@"&dt=%@",[[UIDevice currentDevice] identifierForVendor]];
+                    urlString = [urlString stringByAppendingFormat:@"&d=%@",[[[UIDevice currentDevice] identifierForVendor] UUIDString]];
                 }
             }
             DDLogVerbose(@"Staring request %@",urlString);
@@ -336,6 +336,9 @@ const NSInteger ZPServerConnectionManagerRequestLastModifiedItem = 11;
                 
                 DDLogVerbose(@"Request to %@ returned status code %i",request.url,request.responseStatusCode);
                 if(request.responseStatusCode==403){
+                    
+                    DDLogError(@"Connection to Zotero server (%@) resulted in error %i. Full response: %@",urlString,request.responseStatusCode,[[NSString alloc] initWithData:responseData encoding:NSUTF8StringEncoding]);
+
                     
                     if(request.tag == ZPServerConnectionManagerRequestKeys){
                         
@@ -404,6 +407,26 @@ const NSInteger ZPServerConnectionManagerRequestLastModifiedItem = 11;
                              postNotificationName:ZPNOTIFICATION_ITEM_LIST_AVAILABLE
                              object:[NSArray array]
                              userInfo:request.userInfo];
+                        }
+                        //Break the item request into two smaller blocks as long as there are more than one item to retrieve and retry
+                        else if(request.tag == ZPServerConnectionManagerRequestItems){
+                            NSDictionary* params = (NSDictionary*)[request.userInfo objectForKey:ZPKEY_PARAMETERS];
+                            NSString* keys = [params objectForKey:ZPKEY_ITEM_KEY];
+                            NSInteger libraryID = [[params objectForKey:ZPKEY_LIBRARY_ID] integerValue];
+                            NSArray* keyArray = [keys componentsSeparatedByString:@","];
+                            if([keyArray count]>1){
+                                
+                                NSRange range;
+                                
+                                range.location=0;
+                                range.length = [keyArray count]/2;
+                                [self retrieveItemsFromLibrary:libraryID itemKeys:[keyArray subarrayWithRange:range]];
+
+                                range.location = range.length;
+                                range.length= [keyArray count]-range.length;
+                                [self retrieveItemsFromLibrary:libraryID itemKeys:[keyArray subarrayWithRange:range]];
+                            }
+                            
                         }
                     }
                 }
@@ -768,7 +791,7 @@ const NSInteger ZPServerConnectionManagerRequestLastModifiedItem = 11;
 }
 
 +(void) retrieveCollectionsForLibraryFromServer:(NSInteger)libraryID{
-    
+    //NSLog(@"Requesting collections for %i",libraryID);
     NSMutableDictionary* parameters = [NSMutableDictionary dictionaryWithObject:[NSNumber numberWithInt:libraryID] forKey:ZPKEY_LIBRARY_ID];
     [self makeServerRequest:ZPServerConnectionManagerRequestCollections withParameters:parameters userInfo:parameters];
 }
