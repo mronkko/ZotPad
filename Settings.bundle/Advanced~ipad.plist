@@ -1,0 +1,87 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE plist PUBLIC "-//Apple//DTD PLIST 1.0//EN" "http://www.apple.com/DTDs/PropertyList-1.0.dtd">
+<plist version="1.0">
+<dict>
+	<key>PreferenceSpecifiers</key>
+	<array>
+		<dict>
+			<key>Type</key>
+			<string>PSGroupSpecifier</string>
+			<key>Title</key>
+			<string>Collections</string>
+			<key>FooterText</key>
+			<string>Recursive collections mimics Zotero&apos;s hidden recursiveCollections preference (http://www.zotero.org/support/preferences/hidden_preferences). Recursion is implemented only for cached items and collections because Zotero server does not implement this feature. Unified collection navigation removes the blue detail disclosure buttons from the collection list combines navigating the collection hierarchy and choosing a collection into a single action.</string>
+		</dict>
+		<dict>
+			<key>Type</key>
+			<string>PSToggleSwitchSpecifier</string>
+			<key>Title</key>
+			<string>Recursive collections</string>
+			<key>Key</key>
+			<string>recursivecollections</string>
+			<key>DefaultValue</key>
+			<false/>
+		</dict>
+		<dict>
+			<key>Type</key>
+			<string>PSToggleSwitchSpecifier</string>
+			<key>Title</key>
+			<string>Unified collection navigation</string>
+			<key>Key</key>
+			<string>unifiedcollectionsnavigation</string>
+			<key>DefaultValue</key>
+			<false/>
+		</dict>
+		<dict>
+			<key>Type</key>
+			<string>PSGroupSpecifier</string>
+			<key>Title</key>
+			<string>Troubleshooting</string>
+			<key>FooterText</key>
+			<string>These should not be enables unless you are specifically requested to do so after contacting ZotPad support.</string>
+		</dict>
+		<dict>
+			<key>Type</key>
+			<string>PSToggleSwitchSpecifier</string>
+			<key>Title</key>
+			<string>Include database dump in support requests</string>
+			<key>Key</key>
+			<string>supportincludedatabase</string>
+			<key>DefaultValue</key>
+			<false/>
+		</dict>
+		<dict>
+			<key>Type</key>
+			<string>PSToggleSwitchSpecifier</string>
+			<key>Title</key>
+			<string>Include file listing in support requests</string>
+			<key>Key</key>
+			<string>supportincludefilelisting</string>
+			<key>DefaultValue</key>
+			<false/>
+		</dict>
+		<dict>
+			<key>Type</key>
+			<string>PSToggleSwitchSpecifier</string>
+			<key>Title</key>
+			<string>Debug citation parser</string>
+			<key>Key</key>
+			<string>debugcitationparser</string>
+			<key>DefaultValue</key>
+			<false/>
+		</dict>
+        <dict>
+			<key>Type</key>
+			<string>PSToggleSwitchSpecifier</string>
+			<key>Title</key>
+			<string>Add identifiers to server requests</string>
+			<key>Key</key>
+			<string>debugserverrequests</string>
+			<key>DefaultValue</key>
+			<false/>
+		</dict>
+	</array>
+	<key>StringsTable</key>
+	<string>Advanced</string>
+</dict>
+</plist>

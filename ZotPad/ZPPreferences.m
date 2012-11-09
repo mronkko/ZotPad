@@ -364,4 +364,9 @@ static NSInteger _maxCacheSize;
     return [defaults boolForKey:@"debugcitationparser"];
 }
 
++(BOOL) addIdentifiersToAPIRequests{
+    NSUserDefaults* defaults = [NSUserDefaults standardUserDefaults];
+    return [defaults boolForKey:@"debugserverrequests"];
+}
+
 @end

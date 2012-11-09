@@ -299,6 +299,26 @@ const NSInteger ZPServerConnectionManagerRequestLastModifiedItem = 11;
                 }
             }
             
+            //Identifiers
+            if([ZPPreferences addIdentifiersToAPIRequests]){
+                
+                char data[16];
+                for (int x=0;x<16;data[x++] = (char)('A' + (arc4random_uniform(26))));
+                NSString* t = [[NSString alloc] initWithBytes:data length:16 encoding:NSUTF8StringEncoding];
+                
+                if(type==ZPServerConnectionManagerRequestPermissions){
+                    urlString = [urlString stringByAppendingFormat:@"?t=%@",t];
+                }
+                else{
+                    urlString = [urlString stringByAppendingFormat:@"&t=%@",t];
+
+                }
+                
+                //Device identifiers are available again in iOS 6.
+                if([[[UIDevice currentDevice] systemVersion] floatValue] >= 6.0){
+                    urlString = [urlString stringByAppendingFormat:@"&dt=%@",[[UIDevice currentDevice] identifierForVendor]];
+                }
+            }
             DDLogVerbose(@"Staring request %@",urlString);
             
             //TODO: Document why this needs to be weak. (Check the compiler warnign that comes from disabling this)

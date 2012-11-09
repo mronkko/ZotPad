@@ -72,7 +72,7 @@
 +(BOOL) debugCitationParser;
 +(BOOL) layeredCollectionsNavigation;
 +(BOOL) unifiedCollectionsNavigation;
-
++(BOOL) addIdentifiersToAPIRequests;
 
 
 
