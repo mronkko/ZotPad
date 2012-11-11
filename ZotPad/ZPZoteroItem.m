@@ -136,8 +136,9 @@ static CSLFormatter* _cslFormatter = NULL;
         else{
             _creatorSummary = [[NSString stringWithFormat:@"%@. %@",authorMacro, dateMacro] stringByReplacingOccurrencesOfString:@".." withString:@"."];
         }
-        
-        _year = [[macroDict objectForKey:@"issued"] integerValue];
+
+        NSString* issued = [macroDict objectForKey:@"issued"];
+        _year = [[issued substringWithRange:NSMakeRange(2, [issued length]-3)] integerValue];
         
         
         // Get the rest of the citation based on the APA style
