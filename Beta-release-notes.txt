@@ -13,13 +13,9 @@ If you are installing this over an existing beta, and are experiencing crashes r
 
 GENERAL: 
 
-- Added compatibility with iOS 5
+- Switched to a development version of the UserVoice system, which has much less confusing user interface.
 
-- Fixed multiple issues in the citation formatter
-
-- Fixed an issue causing the App sometimes to crash when refreshing the list of collections
-
-- Addressed a request timeout issue that caused item list to never complete loading.  Item requests that timeout are now split into two smaller requests and retried.
+- Added more logging to diagnose the issue of item list not loading
 
 ----- Other new features and notable changes since ZotPad 1.1.2 ------
 

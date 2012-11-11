@@ -298,10 +298,15 @@ static ZPItemListViewDataSource* _instance;
         @synchronized(_itemKeysNotInCache){
             
             for(ZPZoteroItem* item in items){
-                DDLogVerbose(@"Checking if item should be displayed %@, %@",item.key,item.title);
                 if([_itemKeysNotInCache containsObject:item.key]){
                     [_itemKeysNotInCache removeObject:item.key];
                     found=TRUE;
+                }
+                if(found){
+                    DDLogVerbose(@"New data about item %@ will be displayed in current item list (%@)",item.key,item.title);
+                }
+                else{
+                    DDLogVerbose(@"New data about item %@ is available, but the item is not in the current item list (%@)",item.key,item.title);
                 }
                 //DDLogVerbose(@"Item keys not in cache deacreased to %i after removing key %@",[_itemKeysNotInCache count],item.key);
                 

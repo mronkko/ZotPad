@@ -52,7 +52,8 @@
                                                                                                   configuration:^(FRLayeredNavigationItem *item) {
                                                                                                       item.width = 320;
                                                                                                       return;
-                                                                                                  }];
+                                                                                                    }];
+        navi.bounces = FALSE;
         navi.minimumLayerWidth = 240;
 
         [self setInsetViewController:navi];

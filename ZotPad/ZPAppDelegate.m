@@ -75,7 +75,13 @@
 - (BOOL)application:(UIApplication *)application
 didFinishLaunchingWithOptions:(NSDictionary *)launchOptions
 {
-    
+
+    CompressingLogFileManager* logFileManager = [[CompressingLogFileManager alloc] initWithLogsDirectory:[NSSearchPathForDirectoriesInDomains(NSDocumentDirectory, NSUserDomainMask, YES) objectAtIndex:0]];
+
+    self.fileLogger = [[DDFileLogger alloc] initWithLogFileManager:logFileManager];
+    self.fileLogger.rollingFrequency = 60 * 60 *24; // 24 hour rolling
+    self.fileLogger.logFileManager.maximumNumberOfLogFiles = 7; // one week of logs
+
 
 #ifdef ZPDEBUG
 
@@ -96,18 +102,16 @@ didFinishLaunchingWithOptions:(NSDictionary *)launchOptions
     [DDTTYLogger sharedInstance].logFormatter = [[ZPFileLogFormatter alloc] initWithLevel:LOG_LEVEL_VERBOSE];
     [DDLog addLogger:[DDTTYLogger sharedInstance]];
 
+    self.fileLogger.logFormatter = [[ZPFileLogFormatter alloc] initWithLevel:LOG_LEVEL_VERBOSE];
+
     
 #else
     if([ZPPreferences reportErrors]) [TestFlight takeOff:@"5e753f234f33fc2bddf4437600037fbf_NjcyMjEyMDEyLTA0LTA5IDE0OjUyOjU0LjE4MDQwMg"];
+    self.fileLogger.logFormatter = [[ZPFileLogFormatter alloc] initWithLevel:LOG_LEVEL_INFO];
 
 #endif
     
-    CompressingLogFileManager* logFileManager = [[CompressingLogFileManager alloc] initWithLogsDirectory:[NSSearchPathForDirectoriesInDomains(NSDocumentDirectory, NSUserDomainMask, YES) objectAtIndex:0]];
-    self.fileLogger = [[DDFileLogger alloc] initWithLogFileManager:logFileManager];
-    self.fileLogger.rollingFrequency = 60 * 60 *24; // 24 hour rolling
-    self.fileLogger.logFileManager.maximumNumberOfLogFiles = 7; // one week of logs
-    self.fileLogger.logFormatter = [[ZPFileLogFormatter alloc] initWithLevel:LOG_LEVEL_INFO];
-    [DDLog addLogger:self.fileLogger]; 
+    [DDLog addLogger:self.fileLogger];
 
     DDLogVerbose(@"Verbose logging is enabled");
     

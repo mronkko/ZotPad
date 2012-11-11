@@ -122,7 +122,6 @@ static ZPAttachmentIconImageFactory* _webViewDelegate;
         
 
         if([[NSFileManager defaultManager] fileExistsAtPath:[cachePath stringByAppendingPathComponent:[cacheKey stringByAppendingString:@".png"]]]){
-            DDLogVerbose(@"Loading image from disk %@",cacheKey);
             UIImage* image = [UIImage imageWithContentsOfFile:[cachePath stringByAppendingPathComponent:[cacheKey stringByAppendingString:@".png"]]];
             @synchronized(_fileIconCache){
                 [_fileIconCache setObject:image forKey:cacheKey];
@@ -358,7 +357,7 @@ static ZPAttachmentIconImageFactory* _webViewDelegate;
                 if(array != NULL){
                     [_viewsWaitingForImage removeObjectForKey:cacheKey];
                     for(UIImageView* view in array){
-                        DDLogVerbose(@"Redrawing with cached image %@",cacheKey);
+                        
                         
                         view.image = image;
                     }

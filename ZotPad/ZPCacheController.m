@@ -244,13 +244,19 @@ static ZPCacheController* _instance = nil;
 
 -(void) _checkMetadataQueue{
     
+    DDLogVerbose(@"Checking item data retrieval queue");
+    
     BOOL continueRetrieving;
     while([ZPServerConnectionManager numberOfActiveMetadataRequests]<= NUMBER_OF_PARALLEL_REQUESTS && continueRetrieving){
-        
+
+        DDLogVerbose(@"Number of active requests is %i, starting a new request",[ZPServerConnectionManager numberOfActiveMetadataRequests]);
+
         continueRetrieving = FALSE;
         @synchronized(_librariesToCache){
             if([_librariesToCache count]>0){
-                
+
+                DDLogVerbose(@"Retrieving keys for library %i",[(ZPZoteroLibrary*)[_librariesToCache lastObject] libraryID]);
+
                 [self _doContainerRetrieval:[_librariesToCache lastObject]];
                 [_librariesToCache removeLastObject];
                 continueRetrieving = TRUE;
@@ -260,11 +266,14 @@ static ZPCacheController* _instance = nil;
         //Choose the queue the active library or choose a first non-empty queue
         
         @synchronized(_itemKeysToRetrieve){
+
+            DDLogVerbose(@"Acquired lock to items that need to be retrieved");
             
             NSInteger itemsToDownload=0;
             for(NSObject* key in _itemKeysToRetrieve){
                 itemsToDownload += [(NSArray*)[_itemKeysToRetrieve objectForKey:key] count];
             }
+            DDLogVerbose(@"Number of items that need retrieving is %i", itemsToDownload);
             
             [_statusView setItemDownloads:itemsToDownload];
             
