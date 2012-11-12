@@ -181,8 +181,10 @@ static ZPCacheController* _instance = nil;
 /*
  
  Checks if there are things to cache and starts processing these if there is something to retrieve.
- 
+
 */
+
+//TODO: Be smarter about when this is called. 
 
 -(void) _checkQueues{
 
