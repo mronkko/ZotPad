@@ -207,13 +207,24 @@ NSInteger const ZPFILECHANNEL_ZOTEROSTORAGE_UPLOAD_REGISTER = 4;
     ZPZoteroAttachment* attachment = [request.userInfo objectForKey:ZPKEY_ATTACHMENT];
     
     if(request.tag == ZPFILECHANNEL_ZOTEROSTORAGE_DOWNLOAD){
-        DDLogInfo(@"Downloading %@ from Zotero succesfully finished",attachment.filename);
-        
-        NSString* versionIdentifier = [[[request responseHeaders] objectForKey:@"Etag"] stringByReplacingOccurrencesOfString:@"\"" withString:@""];
-        
-        [ZPServerConnectionManager finishedDownloadingAttachment:attachment toFileAtPath:[request downloadDestinationPath] withVersionIdentifier:versionIdentifier usingFileChannel:self];
-        
-        [self cleanupAfterFinishingAttachment:attachment];
+        if(request.responseStatusCode == 200){
+            DDLogInfo(@"Downloading %@ from Zotero succesfully finished",attachment.filename);
+
+            NSString* versionIdentifier = [[[request responseHeaders] objectForKey:@"Etag"] stringByReplacingOccurrencesOfString:@"\"" withString:@""];
+
+            [ZPServerConnectionManager finishedDownloadingAttachment:attachment toFileAtPath:[request downloadDestinationPath] withVersionIdentifier:versionIdentifier usingFileChannel:self];
+
+            [self cleanupAfterFinishingAttachment:attachment];
+        }
+        else{
+
+            NSError* error =[NSError errorWithDomain:@"zotero.org" code:request.responseStatusCode userInfo:NULL];
+            DDLogError(@"Downloading %@ from Zotero server failed with error: %@",attachment.filename,request.responseStatusMessage);
+
+            [self cleanupAfterFinishingAttachment:attachment];
+
+            [ZPServerConnectionManager failedDownloadingAttachment:attachment withError:error usingFileChannel:self fromURL:[request.url absoluteString]];
+        }
     }
     else{
                 
@@ -225,9 +236,12 @@ NSInteger const ZPFILECHANNEL_ZOTEROSTORAGE_UPLOAD_REGISTER = 4;
                 //Finish uploading the attachment
 
                 DDLogWarn(@"Upload of file %@ was declined by Zotero server because the file exists already on the Zotero server",attachment.filename);
-                
+
                 [ZPServerConnectionManager finishedUploadingAttachment:attachment withVersionIdentifier:attachment.versionIdentifier_local];
                 //TODO: Should there be some kind of notification that the file was not uploaded because it already exists?
+
+                [self cleanupAfterFinishingAttachment:attachment];
+
             }
             else{
                 
@@ -314,6 +328,7 @@ NSInteger const ZPFILECHANNEL_ZOTEROSTORAGE_UPLOAD_REGISTER = 4;
             }
             [attachment purge_original:@"File is outdated (Zotero storage conflict)"];
             [self presentConflictViewForAttachment:attachment reason:reason];
+            [self cleanupAfterFinishingAttachment:attachment];
         }
         else if(request.responseStatusCode == 413){
             
@@ -332,14 +347,17 @@ NSInteger const ZPFILECHANNEL_ZOTEROSTORAGE_UPLOAD_REGISTER = 4;
             }
             
             [ZPServerConnectionManager failedUploadingAttachment:attachment withError:error usingFileChannel:self toURL:[request.url absoluteString]];
+            [self cleanupAfterFinishingAttachment:attachment];
+
         }
 
         else {
             NSError* error =[NSError errorWithDomain:@"zotero.org" code:request.responseStatusCode userInfo:NULL];
             DDLogError(@"Uploading file %@ to Zotero server failed with error: %@",attachment.filename,request.responseStatusMessage);
             
-            [self cleanupAfterFinishingAttachment:attachment];
             [ZPServerConnectionManager failedUploadingAttachment:attachment withError:error usingFileChannel:self toURL:[request.url absoluteString]];
+            [self cleanupAfterFinishingAttachment:attachment];
+
         }
     }
 }
