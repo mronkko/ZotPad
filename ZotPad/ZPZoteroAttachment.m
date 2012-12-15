@@ -282,6 +282,7 @@ static NSString* _documentsDirectory = NULL;
         NSDictionary* fileAttributes = [[NSFileManager defaultManager] attributesOfItemAtPath:self.fileSystemPath_original error:NULL];
         [[NSFileManager defaultManager] removeItemAtPath:self.fileSystemPath_original error:NULL];
         [[NSNotificationCenter defaultCenter] postNotificationName:ZPNOTIFICATION_ATTACHMENT_FILE_DELETED object:self userInfo:fileAttributes];
+        //TODO: Write cache usage in this log entry
         DDLogWarn(@"File %@ (version from server) was deleted: %@",self.filename,reason);
     }
 }
@@ -290,6 +291,7 @@ static NSString* _documentsDirectory = NULL;
         NSDictionary* fileAttributes = [[NSFileManager defaultManager] attributesOfItemAtPath:self.fileSystemPath_modified error:NULL];
         [[NSFileManager defaultManager] removeItemAtPath:self.fileSystemPath_modified error:NULL];
         [[NSNotificationCenter defaultCenter] postNotificationName:ZPNOTIFICATION_ATTACHMENT_FILE_DELETED object:self userInfo:fileAttributes];
+        //TODO: Write cache usage in this log entry
         DDLogWarn(@"File %@ (locally modified) was deleted: %@",self.filename,reason);
     }
 }

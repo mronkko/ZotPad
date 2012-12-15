@@ -419,19 +419,8 @@ static ZPItemListViewDataSource* _instance;
             
             UILabel *authorsLabel = (UILabel *)[cell viewWithTag:2];
             
-            //Show different things depending on what data we have
-            if(item.creatorSummary!=NULL){
-                if(item.year != 0){
-                    authorsLabel.text = [NSString stringWithFormat:@"%@ (%i)",item.creatorSummary,item.year];
-                }
-                else{
-                    authorsLabel.text = [NSString stringWithFormat:@"%@",item.creatorSummary];
-                }
-            }    
-            else if(item.year!= 0){
-                authorsLabel.text = [NSString stringWithFormat:@"No author (%i)",item.year];
-            }
-            
+            authorsLabel.text = item.creatorSummary;
+
             //Publication as a formatted label
             
             OHAttributedLabel* publishedInLabel = (OHAttributedLabel*)[cell viewWithTag:3];

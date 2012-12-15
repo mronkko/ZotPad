@@ -138,7 +138,12 @@ static CSLFormatter* _cslFormatter = NULL;
         }
 
         NSString* issued = [macroDict objectForKey:@"issued"];
-        _year = [[issued substringWithRange:NSMakeRange(2, [issued length]-3)] integerValue];
+        if(issued == NULL || issued.length <= 3){
+            DDLogError(@"CSL formatting error. The item with key %@ has issued macro %@",self.key,issued);
+        }
+        else{
+            _year = [[issued substringWithRange:NSMakeRange(2, [issued length]-3)] integerValue];
+        }
         
         
         // Get the rest of the citation based on the APA style
