@@ -1436,9 +1436,6 @@
 		A7B051C015B187BF0049C5A2 /* icon-up-black.png in Resources */ = {isa = PBXBuildFile; fileRef = A7B051B915B187BF0049C5A2 /* icon-up-black.png */; };
 		A7B051C115B187BF0049C5A2 /* icon-up-black@2x.png in Resources */ = {isa = PBXBuildFile; fileRef = A7B051BA15B187BF0049C5A2 /* icon-up-black@2x.png */; };
 		A7B051C215B187BF0049C5A2 /* icon-up-black@2x.png in Resources */ = {isa = PBXBuildFile; fileRef = A7B051BA15B187BF0049C5A2 /* icon-up-black@2x.png */; };
-		A7B2AC00164DA47D002F9A71 /* ZPFileTransferProgressView.m in Sources */ = {isa = PBXBuildFile; fileRef = A7B2ABFF164DA47D002F9A71 /* ZPFileTransferProgressView.m */; };
-		A7B2AC01164DA47D002F9A71 /* ZPFileTransferProgressView.m in Sources */ = {isa = PBXBuildFile; fileRef = A7B2ABFF164DA47D002F9A71 /* ZPFileTransferProgressView.m */; };
-		A7B2AC02164DA47D002F9A71 /* ZPFileTransferProgressView.m in Sources */ = {isa = PBXBuildFile; fileRef = A7B2ABFF164DA47D002F9A71 /* ZPFileTransferProgressView.m */; };
 		A7B2BCC915B3E22500381E23 /* upgrade1.0to1.1.sql in Resources */ = {isa = PBXBuildFile; fileRef = A7B2BCC815B3E22500381E23 /* upgrade1.0to1.1.sql */; };
 		A7B2BCCA15B3E22500381E23 /* upgrade1.0to1.1.sql in Resources */ = {isa = PBXBuildFile; fileRef = A7B2BCC815B3E22500381E23 /* upgrade1.0to1.1.sql */; };
 		A7BA91991630888F00A76F61 /* libCSLProcessor.a in Frameworks */ = {isa = PBXBuildFile; fileRef = A7A6A5FE161ABE0D00C7DB72 /* libCSLProcessor.a */; };
@@ -2542,8 +2539,6 @@
 		A7B051B815B187BF0049C5A2 /* icon-down-black@2x.png */ = {isa = PBXFileReference; lastKnownFileType = image.png; name = "icon-down-black@2x.png"; path = "Icons/icon-down-black@2x.png"; sourceTree = SOURCE_ROOT; };
 		A7B051B915B187BF0049C5A2 /* icon-up-black.png */ = {isa = PBXFileReference; lastKnownFileType = image.png; name = "icon-up-black.png"; path = "Icons/icon-up-black.png"; sourceTree = SOURCE_ROOT; };
 		A7B051BA15B187BF0049C5A2 /* icon-up-black@2x.png */ = {isa = PBXFileReference; lastKnownFileType = image.png; name = "icon-up-black@2x.png"; path = "Icons/icon-up-black@2x.png"; sourceTree = SOURCE_ROOT; };
-		A7B2ABFE164DA47D002F9A71 /* ZPFileTransferProgressView.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = ZPFileTransferProgressView.h; sourceTree = "<group>"; };
-		A7B2ABFF164DA47D002F9A71 /* ZPFileTransferProgressView.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = ZPFileTransferProgressView.m; sourceTree = "<group>"; };
 		A7B2BCC815B3E22500381E23 /* upgrade1.0to1.1.sql */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = text; path = upgrade1.0to1.1.sql; sourceTree = "<group>"; };
 		A7BD5EC315612181003252EA /* ImageIO.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; name = ImageIO.framework; path = System/Library/Frameworks/ImageIO.framework; sourceTree = SDKROOT; };
 		A7BD5EC5156121A3003252EA /* CoreText.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; name = CoreText.framework; path = System/Library/Frameworks/CoreText.framework; sourceTree = SDKROOT; };
@@ -3563,8 +3558,6 @@
 			children = (
 				A74C48CD163986B700B14A55 /* ZPBarBackgroundGradientView.h */,
 				A74C48CE163986B700B14A55 /* ZPBarBackgroundGradientView.m */,
-				A7B2ABFE164DA47D002F9A71 /* ZPFileTransferProgressView.h */,
-				A7B2ABFF164DA47D002F9A71 /* ZPFileTransferProgressView.m */,
 			);
 			name = Views;
 			sourceTree = "<group>";
@@ -5674,7 +5667,6 @@
 				A7F5ABE01644FF62005DC63C /* ZPTagEditingViewController.m in Sources */,
 				A7D9BF7016463C8B00288265 /* ZPNewTagViewController.m in Sources */,
 				A758FC521648560E00D431BE /* ZPQLPreviewControllerViewController.m in Sources */,
-				A7B2AC00164DA47D002F9A71 /* ZPFileTransferProgressView.m in Sources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
@@ -5783,7 +5775,6 @@
 				A7F5ABE21644FF62005DC63C /* ZPTagEditingViewController.m in Sources */,
 				A7D9BF7216463C8B00288265 /* ZPNewTagViewController.m in Sources */,
 				A758FC541648560E00D431BE /* ZPQLPreviewControllerViewController.m in Sources */,
-				A7B2AC02164DA47D002F9A71 /* ZPFileTransferProgressView.m in Sources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
@@ -5892,7 +5883,6 @@
 				A7F5ABE11644FF62005DC63C /* ZPTagEditingViewController.m in Sources */,
 				A7D9BF7116463C8B00288265 /* ZPNewTagViewController.m in Sources */,
 				A758FC531648560E00D431BE /* ZPQLPreviewControllerViewController.m in Sources */,
-				A7B2AC01164DA47D002F9A71 /* ZPFileTransferProgressView.m in Sources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};

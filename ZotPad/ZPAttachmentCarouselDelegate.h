@@ -41,5 +41,6 @@ extern NSInteger const ZPATTACHMENTICONGVIEWCONTROLLER_TAG_TITLELABEL;
 
 -(void) configureWithAttachmentArray:(NSArray*) attachments;
 -(void) configureWithZoteroItem:(ZPZoteroItem*) item;
+-(void) unregisterProgressViewsBeforeUnloading;
 
 @end

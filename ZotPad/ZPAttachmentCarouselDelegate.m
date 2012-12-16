@@ -15,7 +15,6 @@
 #import <QuartzCore/QuartzCore.h>
 #import <zlib.h>
 #import "ZPFileViewerViewController.h"
-#import "ZPFileTransferProgressView.h"
 
 
 NSInteger const ZPATTACHMENTICONGVIEWCONTROLLER_MODE_STATIC = 0;
@@ -73,6 +72,8 @@ NSInteger const ZPATTACHMENTICONGVIEWCONTROLLER_TAG_TITLELABEL = -5;
 
     [[NSNotificationCenter defaultCenter] addObserver:self selector:@selector(notifyItemsAvailable:) name:ZPNOTIFICATION_ITEMS_AVAILABLE object:nil];
     
+    _progressViews = [[NSMutableSet alloc] init];
+    
     return self;
 }
 
@@ -89,6 +90,12 @@ NSInteger const ZPATTACHMENTICONGVIEWCONTROLLER_TAG_TITLELABEL = -5;
 -(void) configureWithZoteroItem:(ZPZoteroItem*) item{
     _item = item;
     _attachments = item.attachments;
+}
+
+-(void) unregisterProgressViewsBeforeUnloading{
+    for(UIProgressView* progressView in _progressViews){
+         [ZPServerConnectionManager removeProgressView:progressView];
+    }
 }
 
 /*
@@ -205,7 +212,11 @@ NSInteger const ZPATTACHMENTICONGVIEWCONTROLLER_TAG_TITLELABEL = -5;
 
         [labelBackground addSubview: progressLabel];
         
-        progressView = [[ZPFileTransferProgressView alloc] initWithFrame:CGRectMake(labelSubviewOffset, labelSubviewOffset + labelSubviewHeight*.75, labelSubviewWidth, labelSubviewHeight*.15)];
+        progressView = [[UIProgressView alloc] initWithFrame:CGRectMake(labelSubviewOffset, labelSubviewOffset + labelSubviewHeight*.75, labelSubviewWidth, labelSubviewHeight*.15)];
+
+        //Store the view so that we can unregister them later
+        [_progressViews addObject:progressView];
+        
         progressView.tag = ZPATTACHMENTICONGVIEWCONTROLLER_TAG_PROGRESSVIEW;
         progressView.backgroundColor = [UIColor clearColor];
         

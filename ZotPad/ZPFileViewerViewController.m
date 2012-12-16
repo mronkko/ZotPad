@@ -839,22 +839,18 @@ static ZPFileViewerViewController* _instance;
         if(tagSource == attachment){
             if(_tagButtonsForAttachment != NULL){
                 for(UIView* tagButton in _tagButtonsForAttachment){
-                    [cell addSubview:tagButton];
+                    [cell.contentView addSubview:tagButton];
                 }
             }
         }
         else{
-            if(_tagButtonsForAttachment != NULL){
-                for(UIView* tagButton in _tagButtonsForAttachment){
-                    [cell addSubview:tagButton];
+            if(_tagButtonsForParent != NULL){
+                for(UIView* tagButton in _tagButtonsForParent){
+                    [cell.contentView addSubview:tagButton];
                 }
             }
         }
         
-        //Store the cell so that we know to reload it
-        if(tagSource == attachment) _tagButtonsForAttachment = cell.contentView.subviews;
-        else _tagButtonsForParent = cell.contentView.subviews;
-
     }
     else if([CellIdentifier isEqualToString:@"NoteCell"]){
         UILabel* noteText = (UILabel*) [cell viewWithTag:1];
@@ -864,7 +860,7 @@ static ZPFileViewerViewController* _instance;
             note = attachment.note;
         }
         else{
-            note = [parent.notes objectAtIndex:indexPath.row];
+            note = [(ZPZoteroNote*)[parent.notes objectAtIndex:indexPath.row] note];
         }
         noteText.text = [[note stripHtml] stringByReplacingOccurrencesOfString:@"\n" withString:@" "];
     }
@@ -901,23 +897,18 @@ static ZPFileViewerViewController* _instance;
         
         if(tagSource != NULL && [tagSource.tags count]>0){
             
-            //If the cell is empty, reload the content
-            if([cell.contentView.subviews count] == 0){
+            if((tagSource == attachment && _tagButtonsForAttachment == NULL) ||
+               (tagSource != attachment && _tagButtonsForParent == NULL)){
+                [ZPTagController addTagButtonsToView:cell.contentView tags:tagSource.tags];
                 
-                //Add tags and reload
+                if(tagSource == attachment) _tagButtonsForAttachment = cell.contentView.subviews;
+                else _tagButtonsForParent = cell.contentView.subviews;
                 
-                if([tagSource.tags count]>0){
-                    [ZPTagController addTagButtonsToView:cell.contentView tags:tagSource.tags];
-                    
-                    if(tagSource == attachment) _tagButtonsForAttachment = cell.contentView.subviews;
-                    else _tagButtonsForParent = cell.contentView.subviews;
-                    
-                    [tableView reloadData];
-                    
-                    // This is more efficient, but produces an unnecessary animation
-                    
+                [tableView reloadData];
+                
+                // This is more efficient, but produces an unnecessary animation
+                
                     //[tableView reloadRowsAtIndexPaths:[NSArray arrayWithObject:indexPath] withRowAnimation:UITableViewRowAnimationNone];
-                }
             }
         }
     }

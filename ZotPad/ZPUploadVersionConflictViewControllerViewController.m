@@ -83,6 +83,20 @@
     label.text = [NSString stringWithFormat:@"File '%@' has changed on server",attachment.filename];    
 }
 
+-(void) dealloc{
+    [_carouselDelegate unregisterProgressViewsBeforeUnloading];
+    if(_secondaryCarouselDelegate != NULL){
+        [_secondaryCarouselDelegate unregisterProgressViewsBeforeUnloading];
+    }
+}
+- (void) viewWillUnload{
+    [super viewWillUnload];
+    [_carouselDelegate unregisterProgressViewsBeforeUnloading];
+    if(_secondaryCarouselDelegate != NULL){
+        [_secondaryCarouselDelegate unregisterProgressViewsBeforeUnloading];
+    }
+}
+
 - (void)viewDidUnload
 {
     [super viewDidUnload];

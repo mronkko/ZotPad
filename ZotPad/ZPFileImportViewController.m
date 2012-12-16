@@ -54,6 +54,14 @@
     [super viewDidAppear:animated];
     isFullyPresented = TRUE;
 }
+-(void) dealloc{
+    [_carouselDelegate unregisterProgressViewsBeforeUnloading];
+}
+- (void) viewWillUnload{
+    [super viewWillUnload];
+    [_carouselDelegate unregisterProgressViewsBeforeUnloading];
+}
+
 - (void)viewDidUnload
 {
     [super viewDidUnload];

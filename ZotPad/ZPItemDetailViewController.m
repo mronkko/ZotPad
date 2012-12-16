@@ -140,6 +140,11 @@
 
 -(void) dealloc{
    [[NSNotificationCenter defaultCenter] removeObserver:self];
+    [_carouselDelegate unregisterProgressViewsBeforeUnloading];
+}
+- (void) viewWillUnload{
+    [super viewWillUnload];
+    [_carouselDelegate unregisterProgressViewsBeforeUnloading];
 }
 -(void)viewDidUnload{
     _activityIndicator = NULL;

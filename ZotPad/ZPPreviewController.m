@@ -10,7 +10,6 @@
 
 #import "ZPPreviewController.h"
 #import "ZPAttachmentFileInteractionController.h"
-#import "ZPAttachmentCarouselDelegate.h"
 #import "ZPPreviewSource.h"
 
 //Unzipping and base64 decoding
