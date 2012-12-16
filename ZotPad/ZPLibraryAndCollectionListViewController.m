@@ -18,8 +18,7 @@
 #import "ZPItemListViewDataSource.h"
 #import "CMPopTipView.h"
 #import "ZPMasterItemListViewController.h"
-#import "FRLayeredNavigationController.h"
-#import "FRLayeredNavigationItem.h"
+#import "FRLayeredNavigationController/FRLayeredNavigation.h"
 #import "UIViewController+FRLayeredNavigationController.h"
 
 @interface ZPLibraryAndCollectionListViewController()

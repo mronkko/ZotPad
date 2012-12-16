@@ -22,7 +22,6 @@
 		A7025075149C8F9A004F2AAB /* ZPServerResponseXMLParserCollection.m in Sources */ = {isa = PBXBuildFile; fileRef = A7025074149C8F9A004F2AAB /* ZPServerResponseXMLParserCollection.m */; };
 		A7025078149C91A1004F2AAB /* ZPServerResponseXMLParserItem.m in Sources */ = {isa = PBXBuildFile; fileRef = A7025077149C91A1004F2AAB /* ZPServerResponseXMLParserItem.m */; };
 		A702844D163BE1D1003A0192 /* libSDropboxSDK.a in Frameworks */ = {isa = PBXBuildFile; fileRef = A7028445163BE166003A0192 /* libSDropboxSDK.a */; };
-		A702845D163BE36E003A0192 /* libFMDB.a in Frameworks */ = {isa = PBXBuildFile; fileRef = A702845A163BE32F003A0192 /* libFMDB.a */; };
 		A702847A163BE3B7003A0192 /* libCoconutKit.a in Frameworks */ = {isa = PBXBuildFile; fileRef = A733F7C815F8B66A00E8A2D6 /* libCoconutKit.a */; };
 		A702847B163BE3B7003A0192 /* libCSLProcessor.a in Frameworks */ = {isa = PBXBuildFile; fileRef = A7A6A5FE161ABE0D00C7DB72 /* libCSLProcessor.a */; };
 		A702847C163BE3B7003A0192 /* libDTCoreText.a in Frameworks */ = {isa = PBXBuildFile; fileRef = A7BA91911630855D00A76F61 /* libDTCoreText.a */; };
@@ -899,6 +898,7 @@
 		A74FCCE21641C477002FEA90 /* ZPNoteEditingViewController.m in Sources */ = {isa = PBXBuildFile; fileRef = A74FCCE11641C477002FEA90 /* ZPNoteEditingViewController.m */; };
 		A74FCCE31641C477002FEA90 /* ZPNoteEditingViewController.m in Sources */ = {isa = PBXBuildFile; fileRef = A74FCCE11641C477002FEA90 /* ZPNoteEditingViewController.m */; };
 		A74FCCE41641C477002FEA90 /* ZPNoteEditingViewController.m in Sources */ = {isa = PBXBuildFile; fileRef = A74FCCE11641C477002FEA90 /* ZPNoteEditingViewController.m */; };
+		A756F9BF167E328C008E3514 /* libFMDB.a in Frameworks */ = {isa = PBXBuildFile; fileRef = A702845A163BE32F003A0192 /* libFMDB.a */; };
 		A758FC521648560E00D431BE /* ZPQLPreviewControllerViewController.m in Sources */ = {isa = PBXBuildFile; fileRef = A758FC511648560E00D431BE /* ZPQLPreviewControllerViewController.m */; };
 		A758FC531648560E00D431BE /* ZPQLPreviewControllerViewController.m in Sources */ = {isa = PBXBuildFile; fileRef = A758FC511648560E00D431BE /* ZPQLPreviewControllerViewController.m */; };
 		A758FC541648560E00D431BE /* ZPQLPreviewControllerViewController.m in Sources */ = {isa = PBXBuildFile; fileRef = A758FC511648560E00D431BE /* ZPQLPreviewControllerViewController.m */; };
@@ -1640,13 +1640,6 @@
 			remoteGlobalIDString = DA4FACC515591AB300D85A7E;
 			remoteInfo = FRLayeredNavigationController;
 		};
-		A7231AEB1649A391004ABB78 /* PBXContainerItemProxy */ = {
-			isa = PBXContainerItemProxy;
-			containerPortal = A702844E163BE32F003A0192 /* fmdb.xcodeproj */;
-			proxyType = 1;
-			remoteGlobalIDString = EE4290EE12B42F870088BD94;
-			remoteInfo = FMDB;
-		};
 		A7231AED1649A391004ABB78 /* PBXContainerItemProxy */ = {
 			isa = PBXContainerItemProxy;
 			containerPortal = A77E0DC415D65FAB00134D35 /* UserVoice.xcodeproj */;
@@ -1667,6 +1660,13 @@
 			proxyType = 2;
 			remoteGlobalIDString = D2AAC07E0554694100DB518D;
 			remoteInfo = CoconutKit;
+		};
+		A756F9C0167E3402008E3514 /* PBXContainerItemProxy */ = {
+			isa = PBXContainerItemProxy;
+			containerPortal = A702844E163BE32F003A0192 /* fmdb.xcodeproj */;
+			proxyType = 1;
+			remoteGlobalIDString = EE4290EE12B42F870088BD94;
+			remoteInfo = FMDB;
 		};
 		A77E0DCB15D65FAB00134D35 /* PBXContainerItemProxy */ = {
 			isa = PBXContainerItemProxy;
@@ -2666,8 +2666,8 @@
 			isa = PBXFrameworksBuildPhase;
 			buildActionMask = 2147483647;
 			files = (
+				A756F9BF167E328C008E3514 /* libFMDB.a in Frameworks */,
 				A74FCC931641011F002FEA90 /* libz.dylib in Frameworks */,
-				A702845D163BE36E003A0192 /* libFMDB.a in Frameworks */,
 				A702844D163BE1D1003A0192 /* libSDropboxSDK.a in Frameworks */,
 				A7592E921637F30400CC4EA9 /* libDTCoreText.a in Frameworks */,
 				A7592E911637F22400CC4EA9 /* libOHAttributedLabel.a in Frameworks */,
@@ -4093,11 +4093,11 @@
 			buildRules = (
 			);
 			dependencies = (
+				A756F9C1167E3402008E3514 /* PBXTargetDependency */,
 				A7231AE41649A391004ABB78 /* PBXTargetDependency */,
 				A7231AE61649A391004ABB78 /* PBXTargetDependency */,
 				A7231AE81649A391004ABB78 /* PBXTargetDependency */,
 				A7231AEA1649A391004ABB78 /* PBXTargetDependency */,
-				A7231AEC1649A391004ABB78 /* PBXTargetDependency */,
 				A7231AEE1649A391004ABB78 /* PBXTargetDependency */,
 				A7231AF01649A391004ABB78 /* PBXTargetDependency */,
 				A7231AE21649A37F004ABB78 /* PBXTargetDependency */,
@@ -5914,11 +5914,6 @@
 			name = FRLayeredNavigationController;
 			targetProxy = A7231AE91649A391004ABB78 /* PBXContainerItemProxy */;
 		};
-		A7231AEC1649A391004ABB78 /* PBXTargetDependency */ = {
-			isa = PBXTargetDependency;
-			name = FMDB;
-			targetProxy = A7231AEB1649A391004ABB78 /* PBXContainerItemProxy */;
-		};
 		A7231AEE1649A391004ABB78 /* PBXTargetDependency */ = {
 			isa = PBXTargetDependency;
 			name = UserVoice;
@@ -5928,6 +5923,11 @@
 			isa = PBXTargetDependency;
 			name = OHAttributedLabel;
 			targetProxy = A7231AEF1649A391004ABB78 /* PBXContainerItemProxy */;
+		};
+		A756F9C1167E3402008E3514 /* PBXTargetDependency */ = {
+			isa = PBXTargetDependency;
+			name = FMDB;
+			targetProxy = A756F9C0167E3402008E3514 /* PBXContainerItemProxy */;
 		};
 /* End PBXTargetDependency section */
 
@@ -6184,7 +6184,7 @@
 		A7CD077315161555007A8E1D /* Debug */ = {
 			isa = XCBuildConfiguration;
 			buildSettings = {
-				ALTERNATE_GROUP = 70000;
+				ALTERNATE_GROUP = "";
 				ALWAYS_SEARCH_USER_PATHS = YES;
 				CODE_SIGN_IDENTITY = "iPhone Developer";
 				"CODE_SIGN_IDENTITY[sdk=iphoneos*]" = "iPhone Developer";
@@ -6202,7 +6202,7 @@
 				GCC_PREPROCESSOR_DEFINITIONS_NOT_USED_IN_PRECOMPS = "";
 				HEADER_SEARCH_PATHS = /usr/include/libxml2;
 				INFOPLIST_FILE = "ZotPad beta-Info.plist";
-				INSTALL_GROUP = 70000;
+				INSTALL_GROUP = "";
 				LIBRARY_SEARCH_PATHS = (
 					"$(inherited)",
 					"\"$(SRCROOT)\"",
@@ -6224,7 +6224,7 @@
 		A7CD077415161555007A8E1D /* Release */ = {
 			isa = XCBuildConfiguration;
 			buildSettings = {
-				ALTERNATE_GROUP = 70000;
+				ALTERNATE_GROUP = "";
 				ALWAYS_SEARCH_USER_PATHS = YES;
 				CODE_SIGN_IDENTITY = "iPhone Distribution: Mikko Ronkko";
 				"CODE_SIGN_IDENTITY[sdk=iphoneos*]" = "iPhone Distribution: Mikko Ronkko";
@@ -6243,7 +6243,7 @@
 				GCC_PREPROCESSOR_DEFINITIONS_NOT_USED_IN_PRECOMPS = "";
 				HEADER_SEARCH_PATHS = /usr/include/libxml2;
 				INFOPLIST_FILE = "ZotPad beta-Info.plist";
-				INSTALL_GROUP = 70000;
+				INSTALL_GROUP = "";
 				LIBRARY_SEARCH_PATHS = (
 					"$(inherited)",
 					"\"$(SRCROOT)\"",
