@@ -269,7 +269,7 @@ static ZPCacheController* _instance = nil;
         
         @synchronized(_itemKeysToRetrieve){
 
-            DDLogVerbose(@"Acquired lock to items that need to be retrieved");
+//            DDLogVerbose(@"Acquired lock to items that need to be retrieved");
             
             NSInteger itemsToDownload=0;
             for(NSObject* key in _itemKeysToRetrieve){
@@ -668,7 +668,7 @@ static ZPCacheController* _instance = nil;
     
     ZPZoteroLibrary* library = [ZPZoteroLibrary libraryWithID:libraryID];
     [ZPDatabase writeCollections:collections toLibrary:library];
-    //NSLog(@"Collections for library %i", libraryID);
+    DDLogCVerbose(@"Collections available for library %i", libraryID);
     [[NSNotificationCenter defaultCenter] postNotificationName:ZPNOTIFICATION_LIBRARY_WITH_COLLECTIONS_AVAILABLE object:library];
     [self _checkQueues];
 
