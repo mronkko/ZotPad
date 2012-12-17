@@ -65,7 +65,9 @@ NSInteger const ZPFILECHANNEL_WEBDAV_UPLOAD_REGISTER = 5;
     
     if([request responseStatusCode] == 200){
         float progress = (float)received/length;
-        [self.progressView setProgress:progress];
+        if(self.progressView != NULL){
+            [self.progressView setProgress:progress];
+        }
     }
 }
 - (void)request:(ASIHTTPRequest *)request incrementDownloadSizeBy:(long long)newLength{
@@ -86,7 +88,7 @@ NSInteger const ZPFILECHANNEL_WEBDAV_UPLOAD_REGISTER = 5;
 
 - (id) init{
     self= [super init];
-    downloadProgressDelegates = [[NSMutableDictionary alloc] init];
+    progressDelegates = [[NSMutableDictionary alloc] init];
     return self;
 }
 
@@ -144,12 +146,12 @@ NSInteger const ZPFILECHANNEL_WEBDAV_UPLOAD_REGISTER = 5;
     
     if(request != NULL){
         ZPFileChannel_WebDAV_ProgressDelegate* progressDelegate;
-        @synchronized(downloadProgressDelegates){
-            progressDelegate = [downloadProgressDelegates objectForKey:attachment.key];
+        @synchronized(progressDelegates){
+            progressDelegate = [progressDelegates objectForKey:attachment.key];
             
             if(progressDelegate == NULL){
                 progressDelegate  = [[ZPFileChannel_WebDAV_ProgressDelegate alloc] initWithUIProgressView:progressView];
-                [downloadProgressDelegates setObject:progressDelegate forKey:attachment.key];
+                [progressDelegates setObject:progressDelegate forKey:attachment.key];
             }
             else{
                 progressDelegate.progressView = progressView;
@@ -319,15 +321,10 @@ NSInteger const ZPFILECHANNEL_WEBDAV_UPLOAD_REGISTER = 5;
 
 -(void) removeProgressView:(UIProgressView*) progressView{
 
-    for(ASIHTTPRequest* request in [self allRequests]){
-        if(request.uploadProgressDelegate==progressView){
-            request.uploadProgressDelegate = NULL;
-        }
-        else if(request.downloadProgressDelegate!= NULL){
-            ZPFileChannel_WebDAV_ProgressDelegate* delegate = (ZPFileChannel_WebDAV_ProgressDelegate*) request.downloadProgressDelegate;
-            if(delegate.progressView == progressView){
-                request.downloadProgressDelegate = NULL;
-            }
+    for(NSObject* key in progressDelegates){
+        ZPFileChannel_WebDAV_ProgressDelegate* requestDelegate = [progressDelegates objectForKey:key];
+        if(requestDelegate.progressView==progressView){
+            requestDelegate.progressView = NULL;
         }
     }
 }
@@ -523,8 +520,8 @@ NSInteger const ZPFILECHANNEL_WEBDAV_UPLOAD_REGISTER = 5;
 }
 
 -(void) cleanupAfterFinishingAttachment:(ZPZoteroAttachment *)attachment{
-    @synchronized(downloadProgressDelegates){
-        [downloadProgressDelegates removeObjectForKey:attachment.key];
+    @synchronized(progressDelegates){
+        [progressDelegates removeObjectForKey:attachment.key];
     }
 
 }
