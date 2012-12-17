@@ -111,8 +111,7 @@
         self->_content = [ZPDatabase collectionsForLibrary:self->_currentlibraryID withParentCollection:self->_currentCollectionKey];
     }
 
-    // This is probably unnecessary now.
-   // [self.tableView reloadData];
+   [self.tableView reloadData];
     
     
 }
