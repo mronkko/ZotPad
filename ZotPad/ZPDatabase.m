@@ -220,7 +220,7 @@ static NSString *dbPath;
             if(! [[sqlString stringByTrimmingCharactersInSet:
                    [NSCharacterSet whitespaceAndNewlineCharacterSet]] isEqualToString:@""]){
                 if(![dbObject executeUpdate:sqlString]){
-                    [NSException raise:@"Database error" format:@"Error executing query %@",sqlString];
+                    [NSException raise:@"Database error" format:@"Error executing query %@. %@",sqlString, [dbObject lastError]];
                 }
             }
         }
@@ -296,13 +296,13 @@ static NSString *dbPath;
                         //                        DDLogError(@"Error executing query %@ with arguments %@. Server response from which the data object was created is %@",insertSQLBase,arguments,[(ZPZoteroDataObject*)object responseDataFromWhichThisItemWasCreated]);
                         //                        [NSException raise:@"Database error" format:@"Error executing query %@ with arguments %@. Server response from which the data object was created is %@",insertSQLBase,arguments,[(ZPZoteroDataObject*)object responseDataFromWhichThisItemWasCreated]];//
                         //#else
-                        [NSException raise:@"Database error" format:@"Error executing query %@ with arguments %@",insertSQLBase,arguments];
+                        [NSException raise:@"Database error" format:@"Error executing query %@ with arguments %@. %@",insertSQLBase,arguments,[dbObject lastError]];
                         //#endif
                     }
                     
                 }
                 //Finally raise an exception for the whole query if it failed
-                [NSException raise:@"Database error" format:@"Error executing query %@ with arguments %@",insertSQL,insertArguments];
+                [NSException raise:@"Database error" format:@"Error executing query %@ with arguments %@. %@",insertSQL,insertArguments, [dbObject lastError]];
             }
             
         }
@@ -353,7 +353,7 @@ static NSString *dbPath;
                      }
                      #else
                      */
-                    [NSException raise:@"Database error" format:@"Error executing query %@ with arguments %@",updateSQL,args];
+                    [NSException raise:@"Database error" format:@"Error executing query %@ with arguments %@. %@",updateSQL,args, [dbObject lastError]];
                     //#endif
                 }
             }
@@ -1025,7 +1025,7 @@ static NSString *dbPath;
         FMDatabase* dbObject = [self _dbObject];
         @synchronized(dbObject){
             if(![dbObject executeUpdate:deleteSQL]){
-                [NSException raise:@"Database error" format:@"Error executing query %@",deleteSQL];
+                [NSException raise:@"Database error" format:@"Error executing query %@. %@",deleteSQL, [dbObject lastError]];
             }
         }
     }
