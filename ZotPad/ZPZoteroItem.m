@@ -120,7 +120,17 @@ static CSLFormatter* _cslFormatter = NULL;
     
     if([fields count]>0){
         
-        _fullCitation = [_cslFormatter formatBibliographyItemUsingVariables:fields storeMacrosInDictionary:macroDict];
+        @try {
+            _fullCitation = [_cslFormatter formatBibliographyItemUsingVariables:fields storeMacrosInDictionary:macroDict];
+        }
+        @catch (NSException * e) {
+            DDLogError(@"CSL formatting exception. Item %@ could not be formatted. %@",self.key,e);
+
+            //Fill in some values to prevent a crash
+            _fullCitation = @"CSL formatting resulted in an error";
+            _creatorSummary = @"";
+            _publicationDetails = @"";
+        }
         
         NSString* authorMacro = [macroDict objectForKey:@"author"];
         NSString* dateMacro = [[macroDict objectForKey:@"issued"] stringByTrimmingCharactersInSet:[NSCharacterSet whitespaceCharacterSet]] ;
