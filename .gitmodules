@@ -1,6 +1,3 @@
-[submodule "FMDB"]
-	path = FMDB
-	url = https://github.com/ccgus/fmdb.git
 [submodule "OAuthConsumer"]
 	path = OAuthConsumer
 	url = https://github.com/jdg/oauthconsumer.git
@@ -25,9 +22,6 @@
 [submodule "FileMD5Hash"]
 	path = FileMD5Hash
 	url = https://github.com/JoeKun/FileMD5Hash
-[submodule "TestFlightLogger"]
-	path = TestFlightLogger
-	url = https://github.com/quellish/TestFlightLogger
 [submodule "CocoaLumberjack"]
 	path = CocoaLumberjack
 	url = https://github.com/robbiehanson/CocoaLumberjack
@@ -55,3 +49,6 @@
 [submodule "CMPopTipView"]
 	path = CMPopTipView
 	url = https://github.com/chrismiles/CMPopTipView.git
+[submodule "fmdb"]
+	path = fmdb
+	url = git@github.com:mronkko/fmdb.git
