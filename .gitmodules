@@ -51,4 +51,4 @@
 	url = https://github.com/chrismiles/CMPopTipView.git
 [submodule "fmdb"]
 	path = fmdb
-	url = https://github.com/mronkko/uservoice-iphone-sdk.git
+	url = https://github.com/mronkko/fmdb.git
