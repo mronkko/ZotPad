@@ -4,9 +4,11 @@
 //
 //  This file contains the secrets and keys that ZotPad uses to authenticate
 //  with third party web services. The public GitHub repository contains the
-//  Zotero secret and key used in the ZotPad beta app. If you want to
+//  secrets and keys used in the ZotPad beta app. If you want to
 //  compile a production version of the app, you need to obtain a separate key.
-//  (Or you can copy the beta key as the production key
+//  (Or you can copy the beta key as the production key)
+//
+//  TestFlight and UserVoice keys are not included in the public repository.
 //
 //  Created by Mikko Rönkkö on 7/15/12.
 //  Copyright (c) 2012 Helsiki University of Technology. All rights reserved.
