@@ -19,9 +19,6 @@
 [submodule "DTCoreText"]
 	path = DTCoreText
 	url = https://github.com/Cocoanetics/DTCoreText.git
-[submodule "DTFoundation"]
-	path = DTCoreText/Core/Externals/DTFoundation
-	url = git://github.com/Cocoanetics/DTFoundation.git
 [submodule "FileMD5Hash"]
 	path = FileMD5Hash
 	url = https://github.com/JoeKun/FileMD5Hash
