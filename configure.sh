@@ -6,6 +6,8 @@
 #  Created by Mikko Rönkkö on 12/23/12.
 #
 
+git submodule init
+
 git pull FMDB
 
 git pull OAuthConsumer
