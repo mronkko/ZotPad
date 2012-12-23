@@ -14,6 +14,7 @@
 #import "UserVoice.h"
 #import "UVSession.h"
 #import "UVClientConfig.h"
+#import "ZPSecrets.h"
 
 @interface ZPLogViewController (){
     MFMailComposeViewController *mailController;
@@ -72,56 +73,53 @@
     [self presentModalViewController:ql animated:YES];
 }
 
-#if 0
-
--(IBAction)knowledgeBase:(id)sender{
-    [[[UIAlertView alloc] initWithTitle:@"Not implemented"
-                                message:@"Feedback and knowledge base are not available in beta builds."
-                               delegate:nil
-                      cancelButtonTitle:@"Cancel"
-                      otherButtonTitles:nil]show];
-}
-
-#else
-
-#import "ZPSecrets.h"
-
 -(IBAction)contactSupport:(id)sender{
-    UVConfig *config = [UVConfig configWithSite:@"zotpad.uservoice.com"
-                                         andKey:USERVOICE_API_KEY
-                                      andSecret:USERVOICE_SECRET];
     
+    if(USERVOICE_API_KEY == nil || USERVOICE_SECRET == nil){
+        [[[UIAlertView alloc] initWithTitle:@"Not implemented"
+                                    message:@"Feedback and knowledge base are not available in this build because UserVoice key or secret is missing."
+                                   delegate:nil
+                          cancelButtonTitle:@"Cancel"
+                          otherButtonTitles:nil]show];
 
-    NSString* technicalInfo = [NSString stringWithFormat:@"\n\n --- Technical info ---\n\n%@ %@ (build %@)\n%@ (iOS %@)\nuserID: %@\nAPI key: %@\n\n --- Application log ----\n\n%@",
-                               [[NSBundle mainBundle] objectForInfoDictionaryKey:@"CFBundleDisplayName"],
-                               [[NSBundle mainBundle] objectForInfoDictionaryKey:@"CFBundleShortVersionString"],
-                               [[NSBundle mainBundle] objectForInfoDictionaryKey:@"CFBundleVersion"],
-                               [[UIDevice currentDevice] model],
-                               [[UIDevice currentDevice] systemVersion],
-                               [ZPPreferences userID],
-                               [ZPPreferences OAuthKey],
-                               logView.text];
-
-    //Do we want to include a database dump
-    if([ZPPreferences includeDatabaseWithSupportRequest]){
-        //Read the database file and append it as base64 encoded string
-        technicalInfo = [technicalInfo stringByAppendingFormat:@"\n\n --- Database file ---\n\n%@",[ZPDatabase base64encodedDBfile]];
     }
-    if([ZPPreferences includeFileListWithSupportRequest]){
-        technicalInfo = [technicalInfo stringByAppendingString:@"\n\n --- Files in documents folder ---\n\n"];
+    else{
+        UVConfig *config = [UVConfig configWithSite:@"zotpad.uservoice.com"
+                                             andKey:(NSString*)USERVOICE_API_KEY
+                                          andSecret:(NSString*)USERVOICE_SECRET];
         
-        NSString* documentsDirectory = [NSSearchPathForDirectoriesInDomains(NSDocumentDirectory, NSUserDomainMask, YES)  objectAtIndex:0];
-        NSArray *directoryContent = [[NSFileManager defaultManager] contentsOfDirectoryAtPath:documentsDirectory error:NULL];
-        technicalInfo = [technicalInfo stringByAppendingString:[directoryContent componentsJoinedByString:@"\n"]];
+        
+        NSString* technicalInfo = [NSString stringWithFormat:@"\n\n --- Technical info ---\n\n%@ %@ (build %@)\n%@ (iOS %@)\nuserID: %@\nAPI key: %@\n\n --- Application log ----\n\n%@",
+                                   [[NSBundle mainBundle] objectForInfoDictionaryKey:@"CFBundleDisplayName"],
+                                   [[NSBundle mainBundle] objectForInfoDictionaryKey:@"CFBundleShortVersionString"],
+                                   [[NSBundle mainBundle] objectForInfoDictionaryKey:@"CFBundleVersion"],
+                                   [[UIDevice currentDevice] model],
+                                   [[UIDevice currentDevice] systemVersion],
+                                   [ZPPreferences userID],
+                                   [ZPPreferences OAuthKey],
+                                   logView.text];
+        
+        //Do we want to include a database dump
+        if([ZPPreferences includeDatabaseWithSupportRequest]){
+            //Read the database file and append it as base64 encoded string
+            technicalInfo = [technicalInfo stringByAppendingFormat:@"\n\n --- Database file ---\n\n%@",[ZPDatabase base64encodedDBfile]];
+        }
+        if([ZPPreferences includeFileListWithSupportRequest]){
+            technicalInfo = [technicalInfo stringByAppendingString:@"\n\n --- Files in documents folder ---\n\n"];
+            
+            NSString* documentsDirectory = [NSSearchPathForDirectoriesInDomains(NSDocumentDirectory, NSUserDomainMask, YES)  objectAtIndex:0];
+            NSArray *directoryContent = [[NSFileManager defaultManager] contentsOfDirectoryAtPath:documentsDirectory error:NULL];
+            technicalInfo = [technicalInfo stringByAppendingString:[directoryContent componentsJoinedByString:@"\n"]];
+        }
+        
+        //Do we want to include a file list
+        
+        
+        config.customFields =  [NSDictionary dictionaryWithObject:technicalInfo
+                                                           forKey:@"Technical Information"];
+        
+        [UserVoice presentUserVoiceInterfaceForParentViewController:self andConfig:config];
     }
-    
-    //Do we want to include a file list
-    
-    
-    config.customFields =  [NSDictionary dictionaryWithObject:technicalInfo
-                                                       forKey:@"Technical Information"];
-    
-    [UserVoice presentUserVoiceInterfaceForParentViewController:self andConfig:config];
 }
 
 #endif

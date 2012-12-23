@@ -2668,6 +2668,7 @@
 		A7F5ABE516450223005DC63C /* ZPTagOwner.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = ZPTagOwner.h; sourceTree = "<group>"; };
 		A7F6225B1686F3550038E27B /* Beta-release-notes.txt */ = {isa = PBXFileReference; lastKnownFileType = text; path = "Beta-release-notes.txt"; sourceTree = "<group>"; };
 		A7F6225C1686F3550038E27B /* README.md */ = {isa = PBXFileReference; lastKnownFileType = text; path = README.md; sourceTree = "<group>"; };
+		A7F6225D16871AC80038E27B /* configure.sh */ = {isa = PBXFileReference; lastKnownFileType = text.script.sh; path = configure.sh; sourceTree = "<group>"; };
 		A7FC2ECB15AE12B400CF4A5B /* link_zotero_mac_unix.sh */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = text.script.sh; path = link_zotero_mac_unix.sh; sourceTree = "<group>"; };
 		A7FC2ECE15AE1AEE00CF4A5B /* link_zotero_windows.vbs */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = text.script.sh; path = link_zotero_windows.vbs; sourceTree = "<group>"; };
 		A7FC2ED115AE1B1A00CF4A5B /* Dropbox_instructions.txt */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = text; path = Dropbox_instructions.txt; sourceTree = "<group>"; };
@@ -3469,6 +3470,7 @@
 		A7200DC514718DBF004347C9 = {
 			isa = PBXGroup;
 			children = (
+				A7F6225D16871AC80038E27B /* configure.sh */,
 				A7F6225B1686F3550038E27B /* Beta-release-notes.txt */,
 				A7F6225C1686F3550038E27B /* README.md */,
 				A7200DDA14718DC0004347C9 /* ZotPad */,

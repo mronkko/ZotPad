@@ -17,6 +17,7 @@
 #import "ZPFileChannel_Dropbox.h"
 #import "ZPAuthenticationDialog.h"
 #import "TestFlight.h"
+#import "ZPSecrets.h"
 
 //Setting up the logger
 #import "DDTTYLogger.h"
@@ -82,18 +83,20 @@ didFinishLaunchingWithOptions:(NSDictionary *)launchOptions
     self.fileLogger.rollingFrequency = 60 * 60 *24; // 24 hour rolling
     self.fileLogger.logFileManager.maximumNumberOfLogFiles = 7; // one week of logs
 
-
 #ifdef ZPDEBUG
+    
 
-    //We know that this is deprecated, so suppress warnings
+    if(TESTFLIGHT_KEY != nil){
+        //We know that this is deprecated, so suppress warnings
 #pragma clang diagnostic push
 #pragma clang diagnostic ignored "-Wdeprecated-declarations"
-    [TestFlight setDeviceIdentifier:[[UIDevice currentDevice] uniqueIdentifier]];
+        [TestFlight setDeviceIdentifier:[[UIDevice currentDevice] uniqueIdentifier]];
 #pragma clang diagnostic pop
-    
         
-    [TestFlight takeOff:@"5e753f234f33fc2bddf4437600037fbf_NjcyMjEyMDEyLTA0LTA5IDE0OjUyOjU0LjE4MDQwMg"];
-
+        
+        [TestFlight takeOff:@"5e753f234f33fc2bddf4437600037fbf_NjcyMjEyMDEyLTA0LTA5IDE0OjUyOjU0LjE4MDQwMg"];
+    }
+    
     //Perform a memory warning every 2 seconds
     //[NSTimer scheduledTimerWithTimeInterval:(NSTimeInterval)2 target:[UIApplication sharedApplication] selector:@selector(_performMemoryWarning) userInfo:NULL repeats:YES];
 
@@ -106,7 +109,7 @@ didFinishLaunchingWithOptions:(NSDictionary *)launchOptions
 
     
 #else
-    if([ZPPreferences reportErrors]) [TestFlight takeOff:@"5e753f234f33fc2bddf4437600037fbf_NjcyMjEyMDEyLTA0LTA5IDE0OjUyOjU0LjE4MDQwMg"];
+    if([ZPPreferences reportErrors] && TESTFLIGHT_KEY != nil) [TestFlight takeOff:@"5e753f234f33fc2bddf4437600037fbf_NjcyMjEyMDEyLTA0LTA5IDE0OjUyOjU0LjE4MDQwMg"];
     self.fileLogger.logFormatter = [[ZPFileLogFormatter alloc] initWithLevel:LOG_LEVEL_INFO];
 
 #endif
@@ -114,20 +117,6 @@ didFinishLaunchingWithOptions:(NSDictionary *)launchOptions
     [DDLog addLogger:self.fileLogger];
 
     DDLogVerbose(@"Verbose logging is enabled");
-    
-     //Manual override for userID and Key. Useful for running the code in debugger with other people's credentials.
-    
-    /*
-    NSUserDefaults* defaults = [NSUserDefaults standardUserDefaults];
-    [defaults setObject:@"" forKey:@"userID"];
-    [defaults setObject:@"" forKey:@"OAuthKey"];
-    */
-    //Uncomment these to always reset the app after launch
-    /*
-    [ZPDatabase resetDatabase];
-    [[ZPCacheController instance] performSelectorInBackground:@selector(purgeAllAttachmentFilesFromCache) withObject:NULL];
-     */
-    
     
     
     [ZPPreferences checkAndProcessApplicationResetPreferences];

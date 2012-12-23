@@ -8,14 +8,11 @@
 
 #import "ZPCore.h"
 
-
 #import "ZPAuthenticationDialog.h"
-
 #import "OAToken.h"
-
 #import "DSActivityView.h"
 #import "ZPCacheController.h"
-
+#import "ZPSecrets.h"
 
 @implementation ZPAuthenticationDialog
 
@@ -145,9 +142,12 @@
 }
 
 - (void) makeOAuthRequest:(OAToken *) token {
-    //TODO: move these to secrets
-    OAConsumer *consumer = [[OAConsumer alloc] initWithKey:@"4cb573ead72e5d84eab4"
-                                                    secret:@"605a2a699d22dc4cce7f"];
+
+    //Check that the keys are installed and crash if not
+    if(ZOTERO_KEY == nil || ZOTERO_SECRET == nil) [NSException raise:@"Missing credentials exception" format:@"Authentication key or secret for Zotero is missing. Please see the file ZotPad/Secrets.h for details"];
+    
+    OAConsumer *consumer = [[OAConsumer alloc] initWithKey:ZOTERO_KEY
+                                        secret:ZOTERO_SECRET];
     
     NSURL *url;
     

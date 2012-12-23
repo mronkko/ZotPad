@@ -17,7 +17,6 @@
 #import <MobileCoreServices/MobileCoreServices.h>
 #import <QuartzCore/QuartzCore.h>
 #import "ZPItemDetailViewController.h"
-#import "ZPItemLookup.h"
 
 
 @interface ZPAttachmentFileInteractionController(){

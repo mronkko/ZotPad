@@ -14,6 +14,7 @@
 #import "DBSession+iOS.h"
 
 #import "ZPLocalization.h"
+#import "ZPSecrets.h"
 
 
 
@@ -21,28 +22,9 @@
 #import "ZipArchive.h"
 
 
-// https://www.dropbox.com/account#applications
-
 
 const NSInteger ZPFILECHANNEL_DROPBOX_UPLOAD = 1;
 const NSInteger ZPFILECHANNEL_DROPBOX_DOWNLOAD = 2;
-
-#ifdef BETA
-
-static NSString* const  DROPBOX_KEY_FULL_ACCESS = @"w1nps3e4js2va7z";
-static NSString* const DROPBOX_SECRET_FULL_ACCESS = @"vvk17pjqx0ngjs3";
-
-static NSString* const DROPBOX_KEY = @"or7xa2bxhzit1ws";
-static NSString* const DROPBOX_SECRET = @"6azju842azhs5oz";
-
-#else
-
-#import "ZPSecrets.h"
-
-static const NSString* DROPBOX_KEY_FULL_ACCESS = @"6tpvh0msumv6plh";
-static const NSString* DROPBOX_KEY = @"nn6res38igpo4ec";
-
-#endif
 
 @interface ZPDBSession : DBSession {
     BOOL _ZPisLinking;
@@ -98,23 +80,31 @@ static const NSString* DROPBOX_KEY = @"nn6res38igpo4ec";
 
 +(void) linkDroboxIfNeeded{
     if([ZPPreferences useDropbox]){
+        
         if([ZPDBSession sharedSession]==NULL){
             DDLogInfo(@"Starting Dropbox");
             
             if([ZPPreferences dropboxHasFullControl]){
+
+                if(DROPBOX_KEY_FULL_ACCESS == nil || DROPBOX_SECRET_FULL_ACCESS == nil) [NSException raise:@"Missing credentials exception" format:@"Authentication key or secret for Dropbox (full access) is missing. Please see the file ZotPad/Secrets.h for details"];
+                
+
                 ZPDBSession* dbSession =
                 [[ZPDBSession alloc]
-                 initWithAppKey:DROPBOX_KEY_FULL_ACCESS
-                 appSecret:DROPBOX_SECRET_FULL_ACCESS
+                 initWithAppKey:(NSString*)DROPBOX_KEY_FULL_ACCESS
+                 appSecret:(NSString*)DROPBOX_SECRET_FULL_ACCESS
                  root:kDBRootDropbox];
                 [ZPDBSession setSharedSession:dbSession];
                 
             }
             else{
+
+                if(DROPBOX_KEY == nil || DROPBOX_SECRET == nil) [NSException raise:@"Missing credentials exception" format:@"Authentication key or secret for Dropbox is missing. Please see the file ZotPad/Secrets.h for details"];
+
                 ZPDBSession* dbSession =
                 [[ZPDBSession alloc]
-                 initWithAppKey:DROPBOX_KEY
-                 appSecret:DROPBOX_SECRET
+                 initWithAppKey:(NSString*)DROPBOX_KEY
+                 appSecret:(NSString*)DROPBOX_SECRET
                  root:kDBRootAppFolder];
                 [ZPDBSession setSharedSession:dbSession];
             }
