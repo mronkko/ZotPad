@@ -46,7 +46,7 @@ static const NSString* DROPBOX_SECRET = nil;
 static const NSString* DROPBOX_KEY_FULL_ACCESS = nil;
 static const NSString* DROPBOX_SECRET_FULL_ACCESS = nil;
 
-static const NSString* TESTFLIGHT_KEY = @"5e753f234f33fc2bddf4437600037fbf_NjcyMjEyMDEyLTA0LTA5IDE0OjUyOjU0LjE4MDQwMg";
+static const NSString* TESTFLIGHT_KEY = nil;
 
 #endif
 
