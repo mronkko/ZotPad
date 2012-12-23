@@ -19,10 +19,13 @@
 //For showing file thumbnails
 #import <QuickLook/QuickLook.h>
 
-@interface ZPAttachmentFileInteractionController: NSObject <UIActionSheetDelegate, UIDocumentInteractionControllerDelegate, MFMailComposeViewControllerDelegate>{
+@interface ZPAttachmentFileInteractionController: NSObject <UIActionSheetDelegate, UIDocumentInteractionControllerDelegate, MFMailComposeViewControllerDelegate, UIPrintInteractionControllerDelegate>{
 }
+
+@property (retain, nonatomic) ZPZoteroItem* item;
 
 -(void) setAttachment:(ZPZoteroAttachment*)attachment;
 -(void) presentOptionsMenuFromBarButtonItem:(UIBarButtonItem*)button;
+-(void) presentLookupMenuFromBarButtonItem:(UIBarButtonItem*)button;
 
 @end

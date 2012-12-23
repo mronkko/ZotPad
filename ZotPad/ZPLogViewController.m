@@ -121,7 +121,7 @@
     config.customFields =  [NSDictionary dictionaryWithObject:technicalInfo
                                                        forKey:@"Technical Information"];
     
-    [UserVoice presentUserVoiceContactUsFormForParentViewController:self andConfig:config];
+    [UserVoice presentUserVoiceInterfaceForParentViewController:self andConfig:config];
 }
 
 #endif
