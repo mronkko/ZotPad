@@ -122,7 +122,6 @@
     }
 }
 
-#endif
 
 -(IBAction)manageKey:(id)sender{
     [[UIApplication sharedApplication] openURL:[NSURL URLWithString:[@"https://www.zotero.org/settings/keys/edit/" stringByAppendingString:[ZPPreferences OAuthKey]]]];
