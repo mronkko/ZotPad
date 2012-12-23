@@ -80,7 +80,10 @@ these are configured with the following commands
     git submodule init
     git submodule update
 
+Finally, the ZPSecrets file needs to be untracked so that any keys that you might add will
+not be shared with the world.
 
+    git update-index --assume-unchanged ZotPad/ZPSecrets.h
 
 
 
