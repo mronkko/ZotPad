@@ -73,7 +73,12 @@ Or if you are using ssh key based authentication, use this command instead
 
     git clone --recursive git@github.com:mronkko/ZotPad.git .
 
+ZotPad has dependencies that have their own dependencies that are not pulled automatically
+these are configured with the following commands
 
+    cd DTCoreText
+    git submodule init
+    git submodule update
 
 
 
