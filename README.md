@@ -67,25 +67,12 @@ obtained at http://www.branchfire.com/download/demo/.
 
 ZotPad can be cloned with the following command
 
-    git clone https://github.com/mronkko/ZotPad.git .
+    git clone --recursive  https://github.com/mronkko/ZotPad.git .
 
 Or if you are using ssh key based authentication, use this command instead
 
-    git clone git@github.com:mronkko/ZotPad.git .
+    git clone --recursive git@github.com:mronkko/ZotPad.git .
 
-
-3) Configuring the project dependencies
---------------------------------------------------------------------------------
-
-ZotPad contains a large number of dependencies that need to be pulled. Some of
-these dependencies must be a certain version or need to be patched to work with
-ZotPad. The dependencies are configured by running the included configure
-script.
-
-    ./configure.sh
-
-See the comments in the script for more details on configuring the project
-dependencies.
 
 
 
