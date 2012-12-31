@@ -12,12 +12,12 @@
 
 #import "ZPAttachmentFileInteractionController.h"
 
-
-
 #import <MobileCoreServices/MobileCoreServices.h>
 #import <QuartzCore/QuartzCore.h>
-#import "ZPItemDetailViewController.h"
 
+#import "ZPOpenURL.h"
+#import "ZPItemDetailViewController.h"
+#import "NSString+URLEncoding.h"
 
 @interface ZPAttachmentFileInteractionController(){
     ZPZoteroAttachment* _activeAttachment;
@@ -114,13 +114,23 @@
     _showsMainActionSheet = TRUE;
 
     if([self _shouldShowActionSheet]){
-        NSURL* url= [NSURL fileURLWithPath:_activeAttachment.fileSystemPath];
         
-        UIDocumentInteractionController* docController = [UIDocumentInteractionController interactionControllerWithURL:url];
-        docController.delegate = self;
+        // HTML files cannot be sent to other apps because images would not be
+        // transfered
         
-        _fileCanBeOpened = [docController presentOpenInMenuFromBarButtonItem:button animated: NO];
-        [docController dismissMenuAnimated:NO];
+        if([_activeAttachment.contentType isEqualToString:@"text/html"] ||
+           [_activeAttachment.contentType isEqualToString:@"application/xhtml+xml"]){
+            _fileCanBeOpened = FALSE;
+        }
+        else{
+            NSURL* url= [NSURL fileURLWithPath:_activeAttachment.fileSystemPath];
+            
+            UIDocumentInteractionController* docController = [UIDocumentInteractionController interactionControllerWithURL:url];
+            docController.delegate = self;
+            
+            _fileCanBeOpened = [docController presentOpenInMenuFromBarButtonItem:button animated: NO];
+            [docController dismissMenuAnimated:NO];
+        }
         
         NSString* cancel;
         
@@ -143,8 +153,9 @@
                 [_actionSheet addButtonWithTitle:@"Print"];
         
         // Options for the item
-        [_actionSheet addButtonWithTitle:@"Lookup"];
-        
+        if(self.item != nil){
+            [_actionSheet addButtonWithTitle:@"Lookup"];
+        }
         // Options for the attachment file
 
         [_actionSheet showFromBarButtonItem:button animated:YES];
@@ -154,12 +165,13 @@
 
 - (void)actionSheet:(UIActionSheet *)actionSheet clickedButtonAtIndex:(NSInteger)buttonIndex{
     
-    //Add "empty indices" if the open buttons are not in use
-    
-    if(UI_USER_INTERFACE_IDIOM() == UIUserInterfaceIdiomPad && buttonIndex > 0) buttonIndex++;
     
     if(_showsMainActionSheet){
+
+        //Add "empty indices" if some buttons are not in use
         
+        if(UI_USER_INTERFACE_IDIOM() == UIUserInterfaceIdiomPad && buttonIndex > 0) buttonIndex++;
+
         if( ! _fileCanBeOpened && buttonIndex > 1 ) buttonIndex++;
         if((![UIPrintInteractionController isPrintingAvailable] ||
             ! [UIPrintInteractionController canPrintURL:[NSURL fileURLWithPath:[_activeAttachment fileSystemPath]]]) && buttonIndex > 3)
@@ -190,11 +202,8 @@
             ZPZoteroItem* parentItem = [ZPZoteroItem itemWithKey:_activeAttachment.parentKey];
             _mailController = [[MFMailComposeViewController alloc] init];
             [_mailController setSubject:parentItem.shortCitation];
-            [_mailController setMessageBody:[NSString stringWithFormat:@"<body>Please find the following file attached:<br>%@<br><br></body>",parentItem.fullCitation] isHTML:YES];
-            
-            //In the future, possibly include this small "advertisement"
-            //<small>Shared using <a href=\"http://www.zotpad.com\">ZotPad</a>, an iPad/iPhone client for Zotero</small>
-            
+            [_mailController setMessageBody:[NSString stringWithFormat:@"<body>Please find the following file attached:<br>%@<br><br><small>Shared using <a href=\"http://www.zotpad.com\">ZotPad</a>, an iPad/iPhone client for Zotero</small></body>",parentItem.fullCitation] isHTML:YES];
+                        
             [_mailController addAttachmentData:[NSData dataWithContentsOfFile:_activeAttachment.fileSystemPath ] mimeType:_activeAttachment.contentType fileName:_activeAttachment.filename];
             _mailController.mailComposeDelegate = self;
             
@@ -226,62 +235,78 @@
     
     //Lookup sheet
     else{
-        if(buttonIndex==1){
-            //Cancel
-            _actionSheet = NULL;
-        }
-
-        /*
-         
-         [
-         {
-         "name": "CrossRef Lookup",
-         "alias": "CrossRef",
-         "icon": "file:///Users/mronkko/Documents/Zotero/locate/CrossRef%20Lookup.gif",
-         "_urlTemplate": "http://crossref.org/openurl?{z:openURL}&pid=zter:zter321",
-         "description": "CrossRef Search Engine",
-         "hidden": false,
-         "_urlParams": [],
-         "_urlNamespaces": {
-         "z": "http://www.zotero.org/namespaces/openSearch#",
-         "": "http://a9.com/-/spec/opensearch/1.1/"
-         },
-         "_iconSourceURI": "http://crossref.org/favicon.ico"
-         },
-         {
-         "name": "Google Scholar Search",
-         "alias": "Google Scholar",
-         "icon": "file:///Users/mronkko/Documents/Zotero/locate/Google%20Scholar%20Search.ico",
-         "_urlTemplate": "http://scholar.google.com/scholar?as_q=&as_epq={z:title}&as_occt=title&as_sauthors={rft:aufirst?}+{rft:aulast?}&as_ylo={z:year?}&as_yhi={z:year?}&as_sdt=1.&as_sdtp=on&as_sdtf=&as_sdts=22&",
-         "description": "Google Scholar Search",
-         "hidden": false,
-         "_urlParams": [],
-         "_urlNamespaces": {
-         "rft": "info:ofi/fmt:kev:mtx:journal",
-         "z": "http://www.zotero.org/namespaces/openSearch#",
-         "": "http://a9.com/-/spec/opensearch/1.1/"
-         },
-         "_iconSourceURI": "http://scholar.google.com/favicon.ico"
-         },
-         {
-         "name": "Pubget Lookup",
-         "alias": "Pubget",
-         "icon": "file:///Users/mronkko/Documents/Zotero/locate/Pubget%20Lookup.ico",
-         "_urlTemplate": "http://pubget.com/openurl?rft.title={rft:title}&rft.issue={rft:issue?}&rft.spage={rft:spage?}&rft.epage={rft:epage?}&rft.issn={rft:issn?}&rft.jtitle={rft:stitle?}&doi={z:DOI?}",
-         "description": "Pubget Article Lookup",
-         "hidden": false,
-         "_urlParams": [],
-         "_urlNamespaces": {
-         "rft": "info:ofi/fmt:kev:mtx:journal",
-         "z": "http://www.zotero.org/namespaces/openSearch#",
-         "": "http://a9.com/-/spec/opensearch/1.1/"
-         },
-         "_iconSourceURI": "http://pubget.com/favicon.ico"
-         }
-         ]
-         
-         */
+        //Add "empty indices" if some buttons are not in use
         
+        if(UI_USER_INTERFACE_IDIOM() == UIUserInterfaceIdiomPad) buttonIndex++;
+
+        if(buttonIndex==1){
+            //Zotero online library
+           [[UIApplication sharedApplication] openURL:[NSURL URLWithString:
+                                                       [NSString stringWithFormat:@"https://www.zotero.org/%@/items/itemKey/%@",
+                                                                                   (self.item.libraryID == LIBRARY_ID_MY_LIBRARY?
+                                                                                    [NSString stringWithFormat:@"users/%@",[ZPPreferences userID]]:
+                                                                                    [NSString stringWithFormat:@"groups/%i",self.item.libraryID]),
+                                                                                   item.key]]];
+        }
+        else if(buttonIndex==2){
+            //CrossRef Lookup
+            NSString* urlString = [NSString stringWithFormat:@"http://crossref.org/openurl?%@&pid=zter:zter321",[[[ZPOpenURL alloc] initWithZoteroItem:self.item] URLString]];
+            [[UIApplication sharedApplication] openURL:[NSURL URLWithString: urlString]];
+        }
+        else if(buttonIndex==3){
+            //Google Scholar search
+            NSString* title = [item.title encodedURLString];
+            NSMutableArray* authorsArray = [[NSMutableArray alloc] init];
+            for(NSDictionary* author in item.creators){
+                NSString* lastName = [author objectForKey:@"lastName"];
+                if(lastName != NULL) [authorsArray addObject:lastName];
+            }
+            NSString* authors = [[authorsArray componentsJoinedByString:@" "] encodedURLString];
+            NSString* year = item.year != 0 ? [NSString stringWithFormat:@"%i",item.year]: @"";
+            
+            NSString* urlString = [NSString stringWithFormat:@"http://scholar.google.com/scholar?as_q=&as_epq=%@&as_oq=&as_eq=&as_occt=title&as_sauthors=%@&as_publication=&as_ylo=%@&as_yhi=%@&btnG=&hl=en&as_sdt=0%%2C5",title, authors, year, year];
+                                   
+            [[UIApplication sharedApplication] openURL:[NSURL URLWithString:
+                                                        urlString]];
+        }
+        else if(buttonIndex==4){
+            //Pubget lookup
+            ZPOpenURL* openURL = [[ZPOpenURL alloc] initWithZoteroItem:self.item];
+            NSDictionary* fields = openURL.fields;
+
+            NSString* title = [[fields objectForKey:@"title"] encodedURLString];
+            if(title == NULL) title = @"";
+            
+            NSString* issue = [[fields objectForKey:@"issue"] encodedURLString];
+            if(issue == NULL) issue = @"";
+            
+            NSString* spage = [[fields objectForKey:@"spage"] encodedURLString];
+            if(spage == NULL) spage = @"";
+
+            NSString* epage = [[fields objectForKey:@"epage"] encodedURLString];
+            if(epage == NULL) epage = @"";
+
+            NSString* issn = [[fields objectForKey:@"issn"] encodedURLString];
+            if(issn == NULL) issn = @"";
+            
+            NSString* stitle = [[fields objectForKey:@"stitle"] encodedURLString];
+            if(stitle == NULL) stitle = @"";
+
+            NSString* doi = [[item.fields objectForKey:@"DOI"] encodedURLString];
+            if(doi == NULL) doi = @"";
+
+            
+            NSString* urlString = [NSString stringWithFormat:@"http://pubget.com/openurl?rft.title=%@&rft.issue=%@&rft.spage=%@&rft.epage=%@&rft.issn=%@&rft.jtitle=%@&doi=%@",title,issue,spage,epage,issn,stitle,doi];
+           
+            [[UIApplication sharedApplication] openURL:[NSURL URLWithString: urlString]];
+
+                    }
+        
+        else if(buttonIndex == 5){
+            //Library lookup
+            NSString* urlString = [NSString stringWithFormat:@"http://worldcatlibraries.org/registry/gateway?%@",[[[ZPOpenURL alloc] initWithZoteroItem:self.item] URLString]];
+            [[UIApplication sharedApplication] openURL:[NSURL URLWithString: urlString]];
+        }
         _actionSheet = NULL;
     }
 }
