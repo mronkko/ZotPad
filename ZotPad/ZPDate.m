@@ -34,62 +34,79 @@ static NSRegularExpression* _yearRe;
     dateString = [filteredArray componentsJoinedByString:@" "];
     
     // first, directly inspect the string
-    NSArray* m = [_slashRe matchesInString:dateString
+    NSArray* matches = [_slashRe matchesInString:dateString
                                    options:0
                                      range:NSMakeRange(0, [dateString length])];
-    
-    if(m &&
-       ((![m objectAtIndex:5] || ![m objectAtIndex:3]) ||
-        [[m objectAtIndex:3] isEqualToString: [m objectAtIndex:5]] ||
-        ([[m objectAtIndex:3] isEqualToString: @"\u5e74"] && [[m objectAtIndex:5] isEqualToString: @"\u6708"])) &&	// require sane separators
-       (([m objectAtIndex:2] && [m objectAtIndex:4] && [m objectAtIndex:6]) || (![m objectAtIndex:1] && ![m objectAtIndex:7]))) {						// require that either all parts are found,
-        // or else this is the entire date field
-        // figure out date based on parts
-        if([(NSString*)[m objectAtIndex:2] length] == 3 || [(NSString*)[m objectAtIndex:2] length] == 4 || [[m objectAtIndex:3] isEqualToString: @"\u5e74"]) {
-            // ISO 8601 style date (big endian)
-            date.year = [[m objectAtIndex:2] integerValue];
-            date.month = [[m objectAtIndex:4] integerValue];
-            date.day = [[m objectAtIndex:6] integerValue];
-        } else if([m objectAtIndex:2] && ![m objectAtIndex:4] && [m objectAtIndex:6]) {
-            date.month = [[m objectAtIndex:2] integerValue];
-            date.year = [[m objectAtIndex:6] integerValue];
-        } else {
-            //TODO: Implement date locales if needed
-            date.month = [[m objectAtIndex:4] integerValue];
-            date.day = [[m objectAtIndex:2] integerValue];
-        }
+    if(matches.count > 0){
         
-        if(date.month) {
-            if(date.month > 12) {
-                // swap day and month
-                NSInteger tmp = date.day;
-                date.day = date.month;
-                date.month = tmp;
+        NSTextCheckingResult* results = [matches objectAtIndex:0];
+        
+        NSMutableArray* m = [[NSMutableArray alloc] init];
+        
+        for(NSInteger i=0;i<[results numberOfRanges];i++){
+            NSRange matchRange = [results rangeAtIndex:i];
+            NSString* rangeString;
+            if(matchRange.location == NSNotFound){
+                rangeString = @"";
             }
+            else{
+                rangeString = [dateString substringWithRange:matchRange];
+            }
+            [m addObject:rangeString];
         }
         
-        if((!date.month || date.month <= 12) && (!date.day || date.day <= 31)) {
-            if(date.year && date.year < 100) {	// for two digit years, determine proper
-                // four digit year
-                NSInteger year = [[[NSCalendar currentCalendar]
-                                   components:NSYearCalendarUnit fromDate:[NSDate date]]
-                                  year];
-                NSInteger twoDigitYear = year % 100;
-                NSInteger century = year - twoDigitYear;
-                
-                if(date.year <= twoDigitYear) {
-                    // assume this date is from our century
-                    date.year = century + date.year;
-                }
-                else {
-                    // assume this date is from the previous century
-                    date.year = century - 100 + date.year;
+        if((([(NSString*)[m objectAtIndex:(5)] length] == 0 || [(NSString*)[m objectAtIndex:(3)] length] == 0) ||
+            [[m objectAtIndex:3] isEqualToString: [m objectAtIndex:5]] ||
+            ([[m objectAtIndex:3] isEqualToString: @"\u5e74"] && [[m objectAtIndex:5] isEqualToString: @"\u6708"])) &&	// require sane separators
+           (([(NSString*)[m objectAtIndex:(2)] length] > 0 && [(NSString*)[m objectAtIndex:(4)] length] > 0 && [(NSString*)[m objectAtIndex:(6)] length] > 0) || ([(NSString*)[m objectAtIndex:(1)] length] == 0 && [(NSString*)[m objectAtIndex:(7)] length] == 0))) {						// require that either all parts are found,
+            // or else this is the entire date field
+            // figure out date based on parts
+            if([(NSString*)[m objectAtIndex:2] length] == 3 || [(NSString*)[m objectAtIndex:2] length] == 4 || [[m objectAtIndex:3] isEqualToString: @"\u5e74"]) {
+                // ISO 8601 style date (big endian)
+                date.year = [[m objectAtIndex:2] integerValue];
+                date.month = [[m objectAtIndex:4] integerValue];
+                date.day = [[m objectAtIndex:6] integerValue];
+            } else if([m objectAtIndex:2] && [(NSString*)[m objectAtIndex:(4)] length] == 0 && [(NSString*)[m objectAtIndex:(6)] length] > 0) {
+                date.month = [[m objectAtIndex:2] integerValue];
+                date.year = [[m objectAtIndex:6] integerValue];
+            } else {
+                //TODO: Implement date locales if needed
+                date.month = [[m objectAtIndex:4] integerValue];
+                date.day = [[m objectAtIndex:2] integerValue];
+            }
+            
+            if(date.month) {
+                if(date.month > 12) {
+                    // swap day and month
+                    NSInteger tmp = date.day;
+                    date.day = date.month;
+                    date.month = tmp;
                 }
             }
             
-        } else {
-            // give up; we failed the sanity check
-            DDLogVerbose(@"DATE: algorithms failed sanity check (%@)",dateString);
+            if((!date.month || date.month <= 12) && (!date.day || date.day <= 31)) {
+                if(date.year && date.year < 100) {	// for two digit years, determine proper
+                    // four digit year
+                    NSInteger year = [[[NSCalendar currentCalendar]
+                                       components:NSYearCalendarUnit fromDate:[NSDate date]]
+                                      year];
+                    NSInteger twoDigitYear = year % 100;
+                    NSInteger century = year - twoDigitYear;
+                    
+                    if(date.year <= twoDigitYear) {
+                        // assume this date is from our century
+                        date.year = century + date.year;
+                    }
+                    else {
+                        // assume this date is from the previous century
+                        date.year = century - 100 + date.year;
+                    }
+                }
+                
+            } else {
+                // give up; we failed the sanity check
+                DDLogVerbose(@"DATE: algorithms failed sanity check (%@)",dateString);
+            }
         }
     }
     else {

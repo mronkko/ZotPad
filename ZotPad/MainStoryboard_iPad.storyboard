@@ -325,7 +325,7 @@
                         </connections>
                     </tableView>
                     <navigationItem key="navigationItem" title="Item details" id="clQ-lV-4y4">
-                        <barButtonItem key="rightBarButtonItem" enabled="NO" systemItem="action" id="ptY-bC-Aae">
+                        <barButtonItem key="rightBarButtonItem" systemItem="action" id="ptY-bC-Aae">
                             <connections>
                                 <action selector="actionButtonPressed:" destination="0zt-cp-Ihx" id="Zdu-XA-huL"/>
                             </connections>

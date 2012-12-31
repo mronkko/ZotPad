@@ -274,8 +274,8 @@
             ZPOpenURL* openURL = [[ZPOpenURL alloc] initWithZoteroItem:self.item];
             NSDictionary* fields = openURL.fields;
 
-            NSString* title = [[fields objectForKey:@"title"] encodedURLString];
-            if(title == NULL) title = @"";
+            NSString* jtitle = [[fields objectForKey:@"jtitle"] encodedURLString];
+            if(jtitle == NULL) jtitle = @"";
             
             NSString* issue = [[fields objectForKey:@"issue"] encodedURLString];
             if(issue == NULL) issue = @"";
@@ -296,11 +296,11 @@
             if(doi == NULL) doi = @"";
 
             
-            NSString* urlString = [NSString stringWithFormat:@"http://pubget.com/openurl?rft.title=%@&rft.issue=%@&rft.spage=%@&rft.epage=%@&rft.issn=%@&rft.jtitle=%@&doi=%@",title,issue,spage,epage,issn,stitle,doi];
+            NSString* urlString = [NSString stringWithFormat:@"http://pubget.com/openurl?rft.title=%@&rft.issue=%@&rft.spage=%@&rft.epage=%@&rft.issn=%@&rft.jtitle=%@&doi=%@",jtitle,issue,spage,epage,issn,stitle,doi];
            
             [[UIApplication sharedApplication] openURL:[NSURL URLWithString: urlString]];
 
-                    }
+        }
         
         else if(buttonIndex == 5){
             //Library lookup

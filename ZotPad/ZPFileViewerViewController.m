@@ -497,6 +497,8 @@ static ZPFileViewerViewController* _instance;
     
     ZPZoteroAttachment* currentAttachment = [_attachments objectAtIndex:_activeAttachmentIndex];
     if(_attachmentInteractionController == NULL)  _attachmentInteractionController = [[ZPAttachmentFileInteractionController alloc] init];
+    
+    [_attachmentInteractionController setItem:nil];
     [_attachmentInteractionController setAttachment:currentAttachment];
     
     [_attachmentInteractionController presentOptionsMenuFromBarButtonItem:sender];

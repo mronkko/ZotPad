@@ -40,7 +40,6 @@ NSInteger const ZPATTACHMENTICONGVIEWCONTROLLER_TAG_TITLELABEL = -5;
     NSMutableSet* _progressViews;
 }
 
--(void) _toggleActionButtonState;
 -(BOOL) _fileExistsForAttachment:(ZPZoteroAttachment*) attachment;
 -(void) _configureFileImageView:(UIImageView*) imageView withAttachment:(ZPZoteroAttachment*)attachment;
 -(void) _configureProgressLabel:(UILabel*) label withAttachment:(ZPZoteroAttachment*)attachment;
@@ -98,27 +97,6 @@ NSInteger const ZPATTACHMENTICONGVIEWCONTROLLER_TAG_TITLELABEL = -5;
     }
 }
 
-/*
- 
- Checks if the currently selected attachment has a file and enables or disables the activity buttone
- 
- */
-
-
-- (void) _toggleActionButtonState{
-    if(actionButton != NULL){
-        NSInteger currentIndex = attachmentCarousel.currentItemIndex;
-        if(currentIndex >= [_attachments count]){
-            self.actionButton.enabled = FALSE;
-        }
-        else{
-            ZPZoteroAttachment* attachment = [_attachments objectAtIndex:currentIndex];
-            self.actionButton.enabled = [self _fileExistsForAttachment:attachment]  &! 
-            [attachment.contentType isEqualToString:@"text/html"] &!
-            [attachment.contentType isEqualToString:@"application/xhtml+xml"];
-        }
-    }
-}
 
 /*
  
@@ -257,10 +235,6 @@ NSInteger const ZPATTACHMENTICONGVIEWCONTROLLER_TAG_TITLELABEL = -5;
     
     //TODO: Recycle progressviews better using notifications
     progressView.hidden=TRUE;
-    
-    //Set the status
-    //TODO: Refactor: This is not the right place for this call
-    [self _toggleActionButtonState];
     
     return view;
 }
@@ -499,7 +473,6 @@ NSInteger const ZPATTACHMENTICONGVIEWCONTROLLER_TAG_TITLELABEL = -5;
     NSInteger index = [_attachments indexOfObject:attachment];
     if(index !=NSNotFound){
         [self performSelectorOnMainThread:@selector(_reloadCarouselItemAtIndex:) withObject:[NSNumber numberWithInt:index] waitUntilDone:YES];
-        [self _toggleActionButtonState];
     }
 }
 
@@ -517,7 +490,6 @@ NSInteger const ZPATTACHMENTICONGVIEWCONTROLLER_TAG_TITLELABEL = -5;
     if(mode ==ZPATTACHMENTICONGVIEWCONTROLLER_MODE_DOWNLOAD || 
        (ZPATTACHMENTICONGVIEWCONTROLLER_MODE_FIRST_STATIC_SECOND_DOWNLOAD && [_attachments indexOfObject:attachment]==2)){
         
-        [self _toggleActionButtonState];
         [self _setLabelsForAttachment:attachment progressText:NULL errorText:NULL mode:ZPATTACHMENTICONGVIEWCONTROLLER_MODE_STATIC reconfigureIcon:TRUE];
     }
 }
@@ -545,7 +517,6 @@ NSInteger const ZPATTACHMENTICONGVIEWCONTROLLER_TAG_TITLELABEL = -5;
     
     ZPZoteroAttachment* attachment = notification.object;
 
-    [self _toggleActionButtonState];
     [self _setLabelsForAttachment:attachment progressText:@"File deleted" errorText:NULL mode:ZPATTACHMENTICONGVIEWCONTROLLER_MODE_STATIC reconfigureIcon:FALSE];
 
 }

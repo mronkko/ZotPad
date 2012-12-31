@@ -189,16 +189,32 @@
 #pragma mark - Viewing and emailing
 
 - (IBAction) actionButtonPressed:(id)sender{
+
+    if(_attachmentInteractionController == NULL)  _attachmentInteractionController = [[ZPAttachmentFileInteractionController alloc] init];
     
-    // This if is needed to protect agains a crash where the _carousel currentItemIndex is MAXINT and there are no attachments.
+    [_attachmentInteractionController setItem:_currentItem];
+                                                                                      
+    // If there are no attachments show the lookup menu
     
-    if(_carousel.currentItemIndex < [_currentItem.attachments count]){
-        ZPZoteroAttachment* currentAttachment = [_currentItem.attachments objectAtIndex:[_carousel currentItemIndex]];
-        if(_attachmentInteractionController == NULL)  _attachmentInteractionController = [[ZPAttachmentFileInteractionController alloc] init];
-        [_attachmentInteractionController setAttachment:currentAttachment];
-        [_attachmentInteractionController presentOptionsMenuFromBarButtonItem:sender];
+    if([_currentItem.attachments count] == 0){
+        [_attachmentInteractionController setAttachment:nil];
+        [_attachmentInteractionController presentLookupMenuFromBarButtonItem:sender];
     }
     
+    // This is needed to protect agains a crash where the _carousel currentItemIndex is MAXINT and there are no attachments.
+    
+    else if(_carousel.currentItemIndex < [_currentItem.attachments count]){
+        ZPZoteroAttachment* currentAttachment = [_currentItem.attachments objectAtIndex:[_carousel currentItemIndex]];
+        if([currentAttachment fileExists]){
+            [_attachmentInteractionController setAttachment:currentAttachment];
+            [_attachmentInteractionController presentOptionsMenuFromBarButtonItem:sender];
+        }
+        else{
+            [_attachmentInteractionController setAttachment:nil];
+            [_attachmentInteractionController presentLookupMenuFromBarButtonItem:sender];
+        }
+
+    }
     // And this else for diagnosing the crash. Once the root cause is identified, these can be removed
     else{
         DDLogError(@"Attempting to open action menu for attachment in index %i for an item with %i attachments. The item key is %@ and full citation is %@",
