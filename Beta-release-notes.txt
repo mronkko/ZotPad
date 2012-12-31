@@ -1,21 +1,22 @@
-This build will install on parallel to the App Store version of ZotPad. You must uninstall any earlier beta build before installing this build.
+This build will install on parallel to the App Store version of ZotPad.
 
-This build has not been tested extensively and is most likely not stable enough for every day use. There are a lot of internal changes, which make the code more robust and efficient, but also could have introduced new bugs.
+This build has not been tested extensively and may not be stable enough for every day use.
 
-There is no need to report crashes. If you find that something is not working (but does not cause a crash) or is slow, you should report that. If you have improvement ideas, report these. See the instructions here:
+There is no need to report crashes. If you find that something is not working (but does not cause a crash) or is slow, you should report that. If you see an incorrectly rendered citation in the item list, you should report that. If you have improvement ideas, report these. See the instructions here:
 
 http://zotpad.uservoice.com/knowledgebase/articles/113113-i-got-and-invitation-to-be-a-beta-tester-how-do-s
 
 If you are installing this over an existing beta, and are experiencing crashes right after the app launches, you need to uninstall the app and reinstall it.
 
+Saving tags and notes has not been implemented yet. This will be added in the next build.
 
 ----- Changes since the previous beta build -----
 
 GENERAL: 
 
-- Switched to a development version of the UserVoice system, which has much less confusing user interface.
-
-- Added more logging to diagnose the issue of item list not loading
+- Added lookup features (crossref, library, pubget, google scholar, zotero online). Accessible from the action menu.
+- Added ability to print articles
+- Bug fixes
 
 ----- Other new features and notable changes since ZotPad 1.1.2 ------
 
