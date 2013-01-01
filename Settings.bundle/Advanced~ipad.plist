@@ -14,6 +14,16 @@
 		</dict>
 		<dict>
 			<key>Type</key>
+			<string>PSTextFieldSpecifier</string>
+			<key>Title</key>
+			<string>Favorites collection title</string>
+			<key>Key</key>
+			<string>favoritescollectiontitle</string>
+			<key>ZotPad favorites</key>
+			<string></string>
+		</dict>
+		<dict>
+			<key>Type</key>
 			<string>PSToggleSwitchSpecifier</string>
 			<key>Title</key>
 			<string>Recursive collections</string>
@@ -70,7 +80,7 @@
 			<key>DefaultValue</key>
 			<false/>
 		</dict>
-        <dict>
+		<dict>
 			<key>Type</key>
 			<string>PSToggleSwitchSpecifier</string>
 			<key>Title</key>
@@ -80,7 +90,7 @@
 			<key>DefaultValue</key>
 			<false/>
 		</dict>
-        <dict>
+		<dict>
 			<key>Type</key>
 			<string>PSToggleSwitchSpecifier</string>
 			<key>Title</key>
@@ -89,26 +99,26 @@
 			<string>debugauthenticationoverride</string>
 			<key>DefaultValue</key>
 			<false/>
-        </dict>
-        <dict>
-            <key>Type</key>
-            <string>PSTextFieldSpecifier</string>
-            <key>Title</key>
-            <string>userID override value</string>
-            <key>Key</key>
-            <string>debuguserideoverride</string>
-            <key>DefaultValue</key>
-            <string></string>
 		</dict>
-        <dict>
-            <key>Type</key>
-            <string>PSTextFieldSpecifier</string>
-            <key>Title</key>
-            <string>API key override value</string>
-            <key>Key</key>
-            <string>debugapikeyeoverride</string>
-            <key>DefaultValue</key>
-            <string></string>
+		<dict>
+			<key>Type</key>
+			<string>PSTextFieldSpecifier</string>
+			<key>Title</key>
+			<string>userID override value</string>
+			<key>Key</key>
+			<string>debuguserideoverride</string>
+			<key>DefaultValue</key>
+			<string></string>
+		</dict>
+		<dict>
+			<key>Type</key>
+			<string>PSTextFieldSpecifier</string>
+			<key>Title</key>
+			<string>API key override value</string>
+			<key>Key</key>
+			<string>debugapikeyeoverride</string>
+			<key>DefaultValue</key>
+			<string></string>
 		</dict>
 	</array>
 	<key>StringsTable</key>

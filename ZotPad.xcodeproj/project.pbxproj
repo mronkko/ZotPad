@@ -1351,6 +1351,9 @@
 		A78324A315EE3173004BB4F7 /* icon-up-black@2x.png in Resources */ = {isa = PBXBuildFile; fileRef = A7B051BA15B187BF0049C5A2 /* icon-up-black@2x.png */; };
 		A78324A415EE3173004BB4F7 /* upgrade1.0to1.1.sql in Resources */ = {isa = PBXBuildFile; fileRef = A7B2BCC815B3E22500381E23 /* upgrade1.0to1.1.sql */; };
 		A786F7781476A56200B35B92 /* MainStoryboard_iPhone.storyboard in Resources */ = {isa = PBXBuildFile; fileRef = A786F7771476A56200B35B92 /* MainStoryboard_iPhone.storyboard */; };
+		A78D46A41692E31A00BA5C29 /* ZPUtils.m in Sources */ = {isa = PBXBuildFile; fileRef = A78D46A31692E31A00BA5C29 /* ZPUtils.m */; };
+		A78D46A51692E31A00BA5C29 /* ZPUtils.m in Sources */ = {isa = PBXBuildFile; fileRef = A78D46A31692E31A00BA5C29 /* ZPUtils.m */; };
+		A78D46A61692E31A00BA5C29 /* ZPUtils.m in Sources */ = {isa = PBXBuildFile; fileRef = A78D46A31692E31A00BA5C29 /* ZPUtils.m */; };
 		A79299C3149E0CFE000F8B42 /* ZPZoteroDataObject.m in Sources */ = {isa = PBXBuildFile; fileRef = A79299C2149E0CFE000F8B42 /* ZPZoteroDataObject.m */; };
 		A793153E14B185E800E1ABF0 /* ZPAttachmentFileInteractionController.m in Sources */ = {isa = PBXBuildFile; fileRef = A793153D14B185E800E1ABF0 /* ZPAttachmentFileInteractionController.m */; };
 		A793BB5E1601AAA9001CBEED /* ZPTagController.m in Sources */ = {isa = PBXBuildFile; fileRef = A793BB5D1601AAA9001CBEED /* ZPTagController.m */; };
@@ -2498,6 +2501,8 @@
 		A77FD067159F750900774D50 /* ZPLogViewController.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = ZPLogViewController.m; sourceTree = "<group>"; };
 		A78324A915EE3174004BB4F7 /* ZotPad alpha.app */ = {isa = PBXFileReference; explicitFileType = wrapper.application; includeInIndex = 0; path = "ZotPad alpha.app"; sourceTree = BUILT_PRODUCTS_DIR; };
 		A786F7771476A56200B35B92 /* MainStoryboard_iPhone.storyboard */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = file.storyboard; path = MainStoryboard_iPhone.storyboard; sourceTree = "<group>"; };
+		A78D46A21692E31A00BA5C29 /* ZPUtils.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = ZPUtils.h; sourceTree = "<group>"; };
+		A78D46A31692E31A00BA5C29 /* ZPUtils.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = ZPUtils.m; sourceTree = "<group>"; };
 		A79299C1149E0CFE000F8B42 /* ZPZoteroDataObject.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = ZPZoteroDataObject.h; sourceTree = "<group>"; };
 		A79299C2149E0CFE000F8B42 /* ZPZoteroDataObject.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = ZPZoteroDataObject.m; sourceTree = "<group>"; };
 		A793153C14B185E800E1ABF0 /* ZPAttachmentFileInteractionController.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = ZPAttachmentFileInteractionController.h; sourceTree = "<group>"; };
@@ -3775,6 +3780,8 @@
 			children = (
 				A7747D5F1690857A00504A07 /* ZPDate.h */,
 				A7747D601690857A00504A07 /* ZPDate.m */,
+				A78D46A21692E31A00BA5C29 /* ZPUtils.h */,
+				A78D46A31692E31A00BA5C29 /* ZPUtils.m */,
 			);
 			name = Utilities;
 			sourceTree = "<group>";
@@ -5899,6 +5906,7 @@
 				A758FC521648560E00D431BE /* ZPQLPreviewControllerViewController.m in Sources */,
 				A7747D5B168F8A0B00504A07 /* ZPOpenURL.m in Sources */,
 				A7747D611690857A00504A07 /* ZPDate.m in Sources */,
+				A78D46A41692E31A00BA5C29 /* ZPUtils.m in Sources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
@@ -6009,6 +6017,7 @@
 				A758FC541648560E00D431BE /* ZPQLPreviewControllerViewController.m in Sources */,
 				A7747D5D168F8A0B00504A07 /* ZPOpenURL.m in Sources */,
 				A7747D631690857A00504A07 /* ZPDate.m in Sources */,
+				A78D46A61692E31A00BA5C29 /* ZPUtils.m in Sources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
@@ -6119,6 +6128,7 @@
 				A758FC531648560E00D431BE /* ZPQLPreviewControllerViewController.m in Sources */,
 				A7747D5C168F8A0B00504A07 /* ZPOpenURL.m in Sources */,
 				A7747D621690857A00504A07 /* ZPDate.m in Sources */,
+				A78D46A51692E31A00BA5C29 /* ZPUtils.m in Sources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
@@ -6502,8 +6512,8 @@
 			buildSettings = {
 				ALTERNATE_GROUP = "";
 				ALWAYS_SEARCH_USER_PATHS = YES;
-				CODE_SIGN_IDENTITY = "iPhone Distribution: Mikko Ronkko";
-				"CODE_SIGN_IDENTITY[sdk=iphoneos*]" = "iPhone Distribution: Mikko Ronkko";
+				CODE_SIGN_IDENTITY = "iPhone Distribution";
+				"CODE_SIGN_IDENTITY[sdk=iphoneos*]" = "iPhone Distribution";
 				COPY_PHASE_STRIP = NO;
 				FRAMEWORK_SEARCH_PATHS = (
 					"$(inherited)",
@@ -6528,6 +6538,8 @@
 					"\"$(SRCROOT)/iAnnotate/lib\"",
 				);
 				PRODUCT_NAME = "ZotPad beta";
+				PROVISIONING_PROFILE = "";
+				"PROVISIONING_PROFILE[sdk=iphoneos*]" = "";
 				PUBLIC_HEADERS_FOLDER_PATH = "$(CONTENTS_FOLDER_PATH)/PrivateHeaders";
 				SKIP_INSTALL = NO;
 				TARGETED_DEVICE_FAMILY = "1,2";

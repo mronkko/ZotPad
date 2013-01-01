@@ -380,4 +380,11 @@ static NSInteger _maxCacheSize;
     return [defaults boolForKey:@"debugserverrequests"];
 }
 
++(NSString*) favoritesCollectionTitle{
+    NSUserDefaults* defaults = [NSUserDefaults standardUserDefaults];
+    return [defaults stringForKey:@"favoritescollectiontitle"];
+    
+}
+
+
 @end

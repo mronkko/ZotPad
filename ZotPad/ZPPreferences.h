@@ -73,6 +73,6 @@
 +(BOOL) layeredCollectionsNavigation;
 +(BOOL) unifiedCollectionsNavigation;
 +(BOOL) addIdentifiersToAPIRequests;
-
++(NSString*) favoritesCollectionTitle;
 
 @end

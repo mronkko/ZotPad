@@ -13,6 +13,7 @@
 #import "ZPCore.h"
 #import "ZPCacheController.h"
 #import "ZPAppDelegate.h"
+#import "ZPUtils.h"
 
 #import "ZPAuthenticationDialog.h"
 #import "ZPServerResponseXMLParser.h"
@@ -23,14 +24,8 @@
 
 
 
-
-
-
-
 #import "ASIHTTPRequest.h"
 #import "Reachability.h"
-
-
 
 #import "ZPFileChannel.h"
 #import "ZPFileChannel_Dropbox.h"
@@ -302,9 +297,7 @@ const NSInteger ZPServerConnectionManagerRequestLastModifiedItem = 11;
             //Identifiers
             if([ZPPreferences addIdentifiersToAPIRequests]){
                 
-                char data[16];
-                for (int x=0;x<16;data[x++] = (char)('A' + (arc4random_uniform(26))));
-                NSString* t = [[NSString alloc] initWithBytes:data length:16 encoding:NSUTF8StringEncoding];
+                NSString* t = [ZPUtils randomString];
                 
                 if(type==ZPServerConnectionManagerRequestPermissions){
                     urlString = [urlString stringByAppendingFormat:@"?t=%@",t];

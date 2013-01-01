@@ -10,6 +10,7 @@
 #import "ZPAttachmentFileInteractionController.h"
 #import "ZPCore.h"
 #import "HLSPlaceholderViewController.h"
+#import "ZPStarBarButtonItem.h"
 
 @interface ZPFileViewerViewController : HLSPlaceholderViewController <QLPreviewControllerDataSource, UITableViewDataSource, UITableViewDelegate>{
     ZPAttachmentFileInteractionController* _attachmentInteractionController;
@@ -29,8 +30,12 @@
 @property (retain, nonatomic) IBOutlet UIView* leftPullPane;
 @property (retain, nonatomic) IBOutlet UIView* rightPullTab;
 @property (retain, nonatomic) IBOutlet UIView* rightPullPane;
-@property (retain, nonatomic) IBOutlet UISegmentedControl* navigationArrows;
 @property (retain, nonatomic) IBOutlet UITableView* notesAndTagsTable;
+
+// These are created programmatically, so are not IBOutlets
+
+@property (retain, nonatomic) ZPStarBarButtonItem* starButton;
+@property (retain, nonatomic) UISegmentedControl* navigationArrows;
 
 - (IBAction) dismiss:(id)sender;
 - (IBAction) actionButtonPressed:(id)sender;

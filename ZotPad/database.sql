@@ -34,6 +34,7 @@ CREATE TABLE IF NOT EXISTS collections (
     parentKey TEXT DEFAULT NULL,
     cacheTimestamp TEXT DEFAULT NULL,
     libraryID INT,
+    locallyAdded INT DEFAULT 0,
     collectionKey TEXT PRIMARY KEY
 );
 
@@ -47,7 +48,11 @@ CREATE TABLE IF NOT EXISTS items (
     year INT DEFAULT NULL,
     itemType TEXT NOT NULL,
     cacheTimestamp TEXT DEFAULT NULL,
-    dateAdded TEXT DEFAULT NULL
+    dateAdded TEXT DEFAULT NULL,
+    locallyAdded INT DEFAULT 0,
+    locallyModified INT DEFAULT 0,
+    locallyDeleted INT DEFAULT 0
+
 );
 
 CREATE INDEX items_libraryID ON items (libraryID);
@@ -63,7 +68,10 @@ CREATE TABLE IF NOT EXISTS notes (
     parentKey TEXT NOT NULL,
     itemKey TEXT PRIMARY KEY,
     note TEXT DEFAULT NULL,
-    cacheTimestamp TEXT NOT NULL
+    cacheTimestamp TEXT NOT NULL,
+    locallyAdded INT DEFAULT 0,
+    locallyModified INT DEFAULT 0,
+    locallyDeleted INT DEFAULT 0
 );
 
 CREATE INDEX notes_parentKey ON notes (parentKey);
@@ -85,7 +93,10 @@ CREATE TABLE IF NOT EXISTS attachments (
     md5 TEXT DEFAULT NULL, 
     versionSource INT DEFAULT NULL,
     versionIdentifier_server TEXT DEFAULT NULL, 
-    versionIdentifier_local TEXT DEFAULT NULL
+    versionIdentifier_local TEXT DEFAULT NULL,
+    locallyAdded INT DEFAULT 0,
+    locallyModified INT DEFAULT 0,
+    locallyDeleted INT DEFAULT 0
 );
 
 CREATE INDEX attachments_parentKey ON attachments (parentKey);
@@ -95,6 +106,8 @@ CREATE INDEX attachments_parentKey ON attachments (parentKey);
 CREATE TABLE IF NOT EXISTS collectionItems (
     collectionKey TEXT,
     itemKey TEXT,
+    locallyAdded INT DEFAULT 0,
+    locallyDeleted INT DEFAULT 0,
     PRIMARY KEY (collectionKey, itemKey),
     FOREIGN KEY (collectionKey) REFERENCES collections(collectionKey),
     FOREIGN KEY (itemKey) REFERENCES items(itemKey)
@@ -122,6 +135,8 @@ CREATE TABLE  IF NOT EXISTS  fields (
 CREATE TABLE  IF NOT EXISTS  tags (
     itemKey TEXT NOT NULL,
     tagName TEXT NOT NULL,
+    locallyAdded INT DEFAULT 0,
+    locallyDeleted INT DEFAULT 0,
     PRIMARY KEY (itemKey, tagName)
 );
 

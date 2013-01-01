@@ -9,7 +9,6 @@
 #import "ZPFileViewerViewController.h"
 
 //User interface
-#import "ZPStarBarButtonItem.h"
 #import <QuartzCore/QuartzCore.h>
 #import "CMPopTipView.h"
 #import "ZPFileViewerNavigationViewController.h"
@@ -34,7 +33,7 @@
 -(NSInteger) _xCoordinateForView:(UIView*) view isVisible:(BOOL) visible;
 -(void) _segmentChanged:(UISegmentedControl*) source;
 -(void) _toggleArrows;
--(void) _updateTitle;
+-(void) _updateTitleAndStarButton;
 -(void) _updateLeftPullPane;
 
 @end
@@ -132,7 +131,7 @@ static ZPFileViewerViewController* _instance;
     
     self.navigationItem.leftBarButtonItems = [NSArray arrayWithObjects:doneButton, spacer, forwardAndBackButtons,presentAllFilesButton, nil];
     
-    UIBarButtonItem* starButton = [[ZPStarBarButtonItem alloc] init];
+    starButton = [[ZPStarBarButtonItem alloc] init];
     
     //Show tool tip about stars
     
@@ -302,7 +301,7 @@ static ZPFileViewerViewController* _instance;
     //Configure arrows and title
     
     [self _toggleArrows];
-    [self _updateTitle];
+    [self _updateTitleAndStarButton];
     [self _updateLeftPullPane];
 }
 
@@ -450,9 +449,10 @@ static ZPFileViewerViewController* _instance;
     
 }
 
--(void) _updateTitle{
+-(void) _updateTitleAndStarButton{
     ZPZoteroItem* parent = [ZPZoteroItem itemWithKey:[(ZPZoteroAttachment*) [_attachments objectAtIndex:_activeAttachmentIndex] parentKey]];
     self.navigationBar.topItem.title = parent.shortCitation;
+    self.starButton.targetItem = parent;
 }
 
 -(void) _updateLeftPullPane{
@@ -514,7 +514,7 @@ static ZPFileViewerViewController* _instance;
 - (IBAction) next:(id)sender{
     _activeAttachmentIndex++;
     [self _toggleArrows];
-    [self _updateTitle];
+    [self _updateTitleAndStarButton];
     [self _updateLeftPullPane];
     [_itemViewers pushViewController:[_previewControllers objectAtIndex:_activeAttachmentIndex] animated:YES];
 }
@@ -522,7 +522,7 @@ static ZPFileViewerViewController* _instance;
 - (IBAction) previous:(id)sender{
     _activeAttachmentIndex--;
     [self _toggleArrows];
-    [self _updateTitle];
+    [self _updateTitleAndStarButton];
     [self _updateLeftPullPane];
     [_itemViewers popViewControllerAnimated:YES];
 }

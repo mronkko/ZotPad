@@ -7,6 +7,11 @@
 //
 
 #import "ZPStarBarButtonItem.h"
+#import "ZPUtils.h"
+
+@interface ZPStarBarButtonItem ()
+- (void) _setImageWithState:(BOOL) active;
+@end
 
 @implementation ZPStarBarButtonItem
 
@@ -22,12 +27,40 @@
 }
 
 - (void) toggleStar:(id)sender{
-    if(self.image == [UIImage imageNamed:@"ActiveStar"]){
-        self.image = [UIImage imageNamed:@"InactiveStar"];
+    
+    BOOL shouldAddToFavourites = self.image == [UIImage imageNamed:@"InactiveStar"];
+
+    [self _setImageWithState:shouldAddToFavourites];
+    
+    // Write the favourites collection membership in the DB
+    
+    NSString* favouritesCollectionKey = [ZPDatabase collectionKeyForFavoritesCollectionInLibrary:_targetItem.libraryID];
+    if(favouritesCollectionKey == NULL){
+        [[[UIAlertView alloc] initWithTitle:@"Favourites collection created"
+                                   message:[NSString stringWithFormat:@"Collection '%@' has been created in '%@'",
+                                            [ZPPreferences favoritesCollectionTitle],
+                                            [ZPZoteroLibrary libraryWithID:_targetItem.libraryID].title]
+                                  delegate:nil
+                         cancelButtonTitle:@"OK"
+                          otherButtonTitles:nil] show];
+
+        favouritesCollectionKey = [ZPUtils randomString];
+        [ZPDatabase w]
     }
-    else{
+}
+
+- (void) _setImageWithState:(BOOL) active{
+    if(active){
         self.image = [UIImage imageNamed:@"ActiveStar"];
     }
+    else{
+        self.image = [UIImage imageNamed:@"InactiveStar"];
+    }
+    
+}
+
+-(void) configureWithItem:(ZPZoteroItem*)item{
+    _targetItem = item;
 }
 
 @end

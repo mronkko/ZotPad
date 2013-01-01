@@ -36,7 +36,7 @@
 +(NSArray*) libraries;
 +(NSArray*) collectionsForLibrary : (NSInteger)currentlibraryID withParentCollection:(NSString*)currentCollectionKey;
 +(NSArray*) collectionsForLibrary : (NSInteger)currentlibraryID;
-
++(NSString*) collectionKeyForFavoritesCollectionInLibrary: (NSInteger)libraryID;
 
 // Methods for retrieving item keys
 +(NSArray*) getItemKeysForLibrary:(NSInteger)libraryID collectionKey:(NSString*)collectionKey
@@ -93,6 +93,7 @@
 +(void) writeLibraries:(NSArray*)libraries;
 +(void) removeLibrariesNotInArray:(NSArray*)libraries;
 +(void) writeCollections:(NSArray*)collections toLibrary:(ZPZoteroLibrary*)library;
++(void) addCollectionWithTitle:(NSString*) title collectionKey:(NSString*) collectionKey toLibrary:(ZPZoteroLibrary*)library;
 
 // This method returns an array containing the items that were actually modified in the DB. This can be used to determine if fields and attachments
 // need to be modified
@@ -103,8 +104,8 @@
 
 +(void) writeVersionInfoForAttachment:(ZPZoteroAttachment*)attachment;
 
-+(void) writeItems:(NSArray*)items toCollection:(NSString*)collectionKey;
-+(void) addItemKeys:(NSArray*)keys toCollection:(NSString*)collectionKey;
++(void) writeItems:(NSArray*)items toCollection:(NSString*)collectionKey isLocalModification:(BOOL)isLocalModification;
++(void) addItemKeys:(NSArray*)keys toCollection:(NSString*)collectionKey isLocalModification:(BOOL)isLocalModification;
 
 +(void) writeItemsCreators:(NSArray*)items;
 +(void) writeItemsFields:(NSArray*)items;
