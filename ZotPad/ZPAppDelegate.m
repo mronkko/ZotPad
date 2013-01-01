@@ -128,8 +128,8 @@ didFinishLaunchingWithOptions:(NSDictionary *)launchOptions
 
         if ([splitViewController respondsToSelector:@selector(setPresentsWithGesture:)]) {
             [splitViewController setPresentsWithGesture:NO];
-
         }
+        
         UINavigationController *navigationController = [splitViewController.viewControllers lastObject];
         splitViewController.delegate = (id)navigationController.topViewController;
     }

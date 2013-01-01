@@ -74,5 +74,8 @@
 +(BOOL) unifiedCollectionsNavigation;
 +(BOOL) addIdentifiersToAPIRequests;
 
++(BOOL) prioritizePDFsInAttachmentLists;
++(BOOL) displayItemKeys;
+
 
 @end

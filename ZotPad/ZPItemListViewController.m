@@ -318,6 +318,9 @@
     NSDictionary* userInfo =notification.userInfo;
     
     if(_waitingForData){
+
+        DDLogVerbose(@"The user interface was waiting for data, processing the received items");
+
         NSInteger libraryID = [[userInfo objectForKey:ZPKEY_LIBRARY_ID] integerValue];
         NSString* collectionKey = [userInfo objectForKey:ZPKEY_COLLECTION_KEY];
         NSString* searchString = [userInfo objectForKey:ZPKEY_SEARCH_STRING];
@@ -337,11 +340,14 @@
            [orderField isEqualToString:_dataSource.orderField] &&
            ((tags == NULL && [_dataSource.tags count] == 0) || [_dataSource.tags isEqualToArray:tags])  &&
            sortDescending == _dataSource.sortDescending){
-        
+
             NSArray* itemKeys = notification.object;
             [_dataSource configureServerKeys:itemKeys];
             [self makeAvailable];
         }
+    }
+    else{
+        DDLogVerbose(@"The user interface was not waiting for data, ignored the received items");
     }
 }
 
@@ -415,8 +421,6 @@
                                              selector:@selector(processItemListAvailableNotification:)
                                                  name:ZPNOTIFICATION_ITEM_LIST_AVAILABLE
                                                object:nil];
-
-    DDLogInfo(@"Loading item list in the content area");
 
     [super viewDidLoad];
     

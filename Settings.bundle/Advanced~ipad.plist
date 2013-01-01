@@ -32,6 +32,22 @@
 			<key>DefaultValue</key>
 			<false/>
 		</dict>
+        <dict>
+			<key>Type</key>
+			<string>PSGroupSpecifier</string>
+			<key>Title</key>
+			<string>Items</string>
+		</dict>
+		<dict>
+			<key>Type</key>
+			<string>PSToggleSwitchSpecifier</string>
+			<key>Title</key>
+			<string>Put PDFs on top of attachment list</string>
+			<key>Key</key>
+			<string>prioritizepdfs</string>
+			<key>DefaultValue</key>
+			<true/>
+		</dict>
 		<dict>
 			<key>Type</key>
 			<string>PSGroupSpecifier</string>
@@ -57,6 +73,16 @@
 			<string>Include file listing in support requests</string>
 			<key>Key</key>
 			<string>supportincludefilelisting</string>
+			<key>DefaultValue</key>
+			<false/>
+		</dict>
+        <dict>
+			<key>Type</key>
+			<string>PSToggleSwitchSpecifier</string>
+			<key>Title</key>
+			<string>Display item keys</string>
+			<key>Key</key>
+			<string>displayitemkeys</string>
 			<key>DefaultValue</key>
 			<false/>
 		</dict>

@@ -1169,7 +1169,17 @@ static NSString *dbPath;
         
         FMDatabase* dbObject = [self _dbObject];
         @synchronized(dbObject){
-            FMResultSet* resultSet = [dbObject executeQuery: @"SELECT * FROM attachments WHERE parentKey = ? ORDER BY title COLLATE NOCASE ASC",item.key];
+
+            NSString* sqlString;
+            
+            if([ZPPreferences prioritizePDFsInAttachmentLists]) {
+                sqlString = @"SELECT * FROM attachments WHERE parentKey = ? ORDER BY contentType <> 'application/pdf', title COLLATE NOCASE ASC";
+            }
+            else{
+                sqlString = @"SELECT * FROM attachments WHERE parentKey = ? ORDER BY title COLLATE NOCASE ASC";
+            }
+            
+            FMResultSet* resultSet = [dbObject executeQuery: sqlString,item.key];
             
             NSMutableArray* attachments = [[NSMutableArray alloc] init];
             while([resultSet next]) {

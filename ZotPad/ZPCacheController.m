@@ -248,7 +248,7 @@ static ZPCacheController* _instance = nil;
     
     DDLogVerbose(@"Checking item data retrieval queue");
     
-    BOOL continueRetrieving;
+    BOOL continueRetrieving = TRUE;
     while([ZPServerConnectionManager numberOfActiveMetadataRequests]<= NUMBER_OF_PARALLEL_REQUESTS && continueRetrieving){
 
         DDLogVerbose(@"Number of active requests is %i, starting a new request",[ZPServerConnectionManager numberOfActiveMetadataRequests]);
@@ -710,7 +710,7 @@ static ZPCacheController* _instance = nil;
         [nonExistingKeys removeObjectsInArray:cacheKeys];
         if([nonExistingKeys count]>0){
             [self addToItemQueue:nonExistingKeys libraryID:libraryID priority:FALSE];
-            DDLogVerbose(@"Added %i non-existing keys that need data",[nonExistingKeys count]);
+            DDLogVerbose(@"Added %i non-existing keys from library %i that need data",[nonExistingKeys count],libraryID);
         }
         
         // Then add the rest of the items
@@ -718,7 +718,7 @@ static ZPCacheController* _instance = nil;
         [existingKeys removeObjectsInArray:nonExistingKeys];
         if([existingKeys count]>0){
             [self addToItemQueue:existingKeys libraryID:libraryID priority:FALSE];
-            DDLogVerbose(@"Added %i existing keys that might need new data",[existingKeys count]);
+            DDLogVerbose(@"Added %i existing keys from library %i that might need new data",[existingKeys count],libraryID);
         }
         
     }
@@ -730,7 +730,9 @@ static ZPCacheController* _instance = nil;
 
     NSString* collectionKey = [parameters objectForKey:ZPKEY_COLLECTION_KEY];
     NSInteger libraryID = [[parameters objectForKey:ZPKEY_LIBRARY_ID] integerValue];
-    
+
+    DDLogVerbose(@"Received %i item keys for library %i and collection %@",[itemKeys count],libraryID,collectionKey);
+
     //Update collection memberships
     if(collectionKey!=NULL && [parameters objectForKey: ZPKEY_SEARCH_STRING] == NULL){
         NSArray* cachedKeys = [ZPDatabase getItemKeysForLibrary:libraryID collectionKey:collectionKey searchString:NULL tags:NULL orderField:NULL sortDescending:FALSE];

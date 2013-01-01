@@ -93,11 +93,20 @@ static NSInteger _maxCacheSize;
         NSString* webdavUrl = [self webDAVURL];
         
         if(![webdavUrl hasPrefix:@"http"] || ! [webdavUrl hasSuffix:@"/zotero"]){
+            
+            NSString* newWebDAVURL = webdavUrl;
+            if(! [webdavUrl hasPrefix:@"http"]) newWebDAVURL = [NSString stringWithFormat:@"http://%@",newWebDAVURL];
+            if(! [webdavUrl hasSuffix:@"/zotero"]) newWebDAVURL = [NSString stringWithFormat:@"%@/zotero",newWebDAVURL];
+            
             [[[UIAlertView alloc] initWithTitle:@"WebDAV configuration error"
-                                       message:[NSString stringWithFormat:@"WebDAV is enabled, but the WebDAV address is not specified correctly. Please check that the WebDAV address starts with 'http://' or 'https://' and ends with '/zotero'. The current value is '%@'",webdavUrl]
+                                       message:[NSString stringWithFormat:@"WebDAV is enabled, but the WebDAV address was not specified correctly. The WebDAV address must start with 'http://' or 'https://' and end with '/zotero'. The WebDAV url was '%@' and has been automaticall changed to '%@'",webdavUrl,newWebDAVURL]
                                       delegate:NULL
                              cancelButtonTitle:@"OK"
                               otherButtonTitles: nil] show];
+            
+            NSUserDefaults* defaults = [NSUserDefaults standardUserDefaults];
+            [defaults setObject:newWebDAVURL forKey:@"webdavurl"];
+
         }
 
     }
@@ -290,7 +299,7 @@ static NSInteger _maxCacheSize;
     if([ret hasSuffix:@"/"]){
         ret = [ret substringToIndex:[ret length] - 1];
     }
-    
+
     return ret;
 }
 
@@ -378,6 +387,17 @@ static NSInteger _maxCacheSize;
 +(BOOL) addIdentifiersToAPIRequests{
     NSUserDefaults* defaults = [NSUserDefaults standardUserDefaults];
     return [defaults boolForKey:@"debugserverrequests"];
+}
+
++(BOOL) prioritizePDFsInAttachmentLists{
+    NSUserDefaults* defaults = [NSUserDefaults standardUserDefaults];
+    return [defaults boolForKey:@"prioritizepdfs"];
+}
+
++(BOOL) displayItemKeys
+{
+    NSUserDefaults* defaults = [NSUserDefaults standardUserDefaults];
+    return [defaults boolForKey:@"displayitemkeys"];
 }
 
 @end

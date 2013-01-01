@@ -443,6 +443,16 @@ static ZPItemListViewDataSource* _instance;
                 [publishedInLabel setFont:[UIFont systemFontOfSize:[UIFont smallSystemFontSize]]];
                 [publishedInLabel setAttributedText:text];
             }
+
+            //The item key for troubleshooting
+            UILabel* keyLabel = (UILabel*) [cell viewWithTag:5];
+            if([ZPPreferences displayItemKeys]){
+                keyLabel.hidden = FALSE;
+                keyLabel.text = item.key;
+            }
+            else{
+                keyLabel.hidden = TRUE;
+            }
             
             //Attachment icon
             

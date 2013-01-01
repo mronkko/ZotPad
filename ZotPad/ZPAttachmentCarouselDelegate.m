@@ -85,10 +85,12 @@ NSInteger const ZPATTACHMENTICONGVIEWCONTROLLER_TAG_TITLELABEL = -5;
 -(void) configureWithAttachmentArray:(NSArray*) attachments{
     _item = NULL;
     _attachments = attachments;
+    _latestManuallyTriggeredAttachment = NULL;
 }
 -(void) configureWithZoteroItem:(ZPZoteroItem*) item{
     _item = item;
     _attachments = item.attachments;
+    _latestManuallyTriggeredAttachment = NULL;
 }
 
 -(void) unregisterProgressViewsBeforeUnloading{
@@ -412,7 +414,8 @@ NSInteger const ZPATTACHMENTICONGVIEWCONTROLLER_TAG_TITLELABEL = -5;
             
             
             if([ZPServerConnectionManager hasInternetConnection] && ! [ZPServerConnectionManager isAttachmentDownloading:attachment]){
-                [ZPServerConnectionManager checkIfCanBeDownloadedAndStartDownloadingAttachment:attachment];   
+                [ZPServerConnectionManager checkIfCanBeDownloadedAndStartDownloadingAttachment:attachment];
+                _latestManuallyTriggeredAttachment = attachment;
             }
             
         }
@@ -422,21 +425,9 @@ NSInteger const ZPATTACHMENTICONGVIEWCONTROLLER_TAG_TITLELABEL = -5;
 
 - (void)carouselCurrentItemIndexUpdated:(iCarousel *)carousel{
     NSAssert(carousel==self.attachmentCarousel,@"ZPAttachmentCarouselDelegate can only be used with the iCarousel set in the carousel property");
-    
-    if(actionButton != NULL){
-        if([_attachments count]==0){
-            actionButton.enabled = FALSE;
-        }
-        else{
-            _selectedIndex = carousel.currentItemIndex;
-            // Initially the iCarousel can return a negative index. This is probably a bug in iCarousel.
-            if(_selectedIndex <0) _selectedIndex = 0;
-            ZPZoteroAttachment* attachment = [_attachments objectAtIndex:_selectedIndex];
-            actionButton.enabled = [self _fileExistsForAttachment:attachment] &!
-            [attachment.contentType isEqualToString:@"text/html"] &!
-            [attachment.contentType isEqualToString:@"application/xhtml+xml"];
-        }
-    }
+
+    // Prevent automatically opening an attachment if the active attachment has changed
+    _latestManuallyTriggeredAttachment = NULL;
 }
 
 #pragma mark - Item observer methods
@@ -491,6 +482,12 @@ NSInteger const ZPATTACHMENTICONGVIEWCONTROLLER_TAG_TITLELABEL = -5;
        (ZPATTACHMENTICONGVIEWCONTROLLER_MODE_FIRST_STATIC_SECOND_DOWNLOAD && [_attachments indexOfObject:attachment]==2)){
         
         [self _setLabelsForAttachment:attachment progressText:NULL errorText:NULL mode:ZPATTACHMENTICONGVIEWCONTROLLER_MODE_STATIC reconfigureIcon:TRUE];
+
+        
+        // If this is manually triggered, open it
+        
+        if(_latestManuallyTriggeredAttachment == attachment) [ZPFileViewerViewController presentWithAttachment:attachment];
+
     }
 }
 -(void) notifyAttachmentDownloadFailed:(NSNotification *) notification{

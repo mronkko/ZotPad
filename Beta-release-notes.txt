@@ -14,13 +14,20 @@ Saving tags and notes has not been implemented yet. This will be added in the ne
 
 GENERAL: 
 
-- Added lookup features (crossref, library, pubget, google scholar, zotero online). Accessible from the action menu.
-- Added ability to print articles
-- Bug fixes
+- Fixes a bug that caused the item list fail to load in some instances
+- Several minor user interface improvements
 
 ----- Other new features and notable changes since ZotPad 1.1.2 ------
 
 GENERAL:
+
+Feature: Printing articles
+- Accessed through the action menu in item detail view or item viewer
+
+Feature: Lookup
+- Accessed through the action menu in item detail view
+- Supports the same lookup engines that come with Zotero: crossref, library lookup, pubget, google scholar
+- View items in the online Zotero library (Can be useful for troubleshooting.)
 
 Feature: Note viewing and editing
 - Notes are now shown in the item detail view and can be edited by tapping

@@ -30,6 +30,7 @@ extern NSInteger const ZPATTACHMENTICONGVIEWCONTROLLER_TAG_TITLELABEL;
     ZPZoteroItem* _item;
     NSArray* _attachments;
     NSInteger _selectedIndex;
+    ZPZoteroAttachment* _latestManuallyTriggeredAttachment;
 }
 
 @property (weak) IBOutlet UIBarButtonItem* actionButton;
