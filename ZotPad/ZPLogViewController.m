@@ -88,8 +88,23 @@
                                              andKey:(NSString*)USERVOICE_API_KEY
                                           andSecret:(NSString*)USERVOICE_SECRET];
         
+        NSArray* logLines = [self.logView.text componentsSeparatedByString:@"\n"];
+        NSInteger logLineCount = logLines.count;
+        NSString* logText;
+        if(logLineCount> 300){
+            logLines = [logLines subarrayWithRange:NSMakeRange(logLines.count-300, 300)];
+        }
         
-        NSString* technicalInfo = [NSString stringWithFormat:@"\n\n --- Technical info ---\n\n%@ %@ (build %@)\n%@ (iOS %@)\nuserID: %@\nAPI key: %@\n\n --- Application log ----\n\n%@",
+        logText =[logLines componentsJoinedByString:@"\n"];
+        
+        if(logLineCount>300){
+            logText = [NSString stringWithFormat:@"%i lines of log (omitting lines 1-%i)\n\n%@",logLineCount,logLineCount-300,logText];
+        }
+        else{
+            logText = [NSString stringWithFormat:@"%i lines of log\n\n%@",logLineCount,logText];
+        }
+        
+        NSString* technicalInfo = [NSString stringWithFormat:@"\n\n --- Technical info ---\n\n%@ %@ (build %@)\n%@ (iOS %@)\nuserID: %@\nAPI key: %@\n\n --- Settings ----\n\n%@\n\n --- Application log ----\n\n%@",
                                    [[NSBundle mainBundle] objectForInfoDictionaryKey:@"CFBundleDisplayName"],
                                    [[NSBundle mainBundle] objectForInfoDictionaryKey:@"CFBundleShortVersionString"],
                                    [[NSBundle mainBundle] objectForInfoDictionaryKey:@"CFBundleVersion"],
@@ -97,13 +112,20 @@
                                    [[UIDevice currentDevice] systemVersion],
                                    [ZPPreferences userID],
                                    [ZPPreferences OAuthKey],
-                                   logView.text];
+                                   [ZPPreferences preferencesAsDescriptiveString],
+                                   logText];
         
-        //Do we want to include a database dump
+        
+        // These are disabled because the log file lenght is limited
+        
+        // Do we want to include a database dump
+        /*
         if([ZPPreferences includeDatabaseWithSupportRequest]){
             //Read the database file and append it as base64 encoded string
             technicalInfo = [technicalInfo stringByAppendingFormat:@"\n\n --- Database file ---\n\n%@",[ZPDatabase base64encodedDBfile]];
         }
+        // Do we want to include a file list
+
         if([ZPPreferences includeFileListWithSupportRequest]){
             technicalInfo = [technicalInfo stringByAppendingString:@"\n\n --- Files in documents folder ---\n\n"];
             
@@ -111,8 +133,8 @@
             NSArray *directoryContent = [[NSFileManager defaultManager] contentsOfDirectoryAtPath:documentsDirectory error:NULL];
             technicalInfo = [technicalInfo stringByAppendingString:[directoryContent componentsJoinedByString:@"\n"]];
         }
+        */
         
-        //Do we want to include a file list
         
         
         config.customFields =  [NSDictionary dictionaryWithObject:technicalInfo

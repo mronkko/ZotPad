@@ -33,8 +33,6 @@ static NSInteger _maxCacheSize;
     
     NSUserDefaults* defaults = [NSUserDefaults standardUserDefaults];
 
-    
-    
     //Read the defaults preferences and set these if no preferences are set.
     
     NSString *settingsBundle = [[NSBundle mainBundle] pathForResource:@"Settings" ofType:@"bundle"];
@@ -69,24 +67,6 @@ static NSInteger _maxCacheSize;
     float rawmax = [defaults floatForKey:@"cachesizemax"];
     _maxCacheSize = rawmax*1024*1024;
     
-    //Dump the preferences into log
-  
-    for(NSString* file in [NSArray arrayWithObjects:@"Root", @"Dropbox", nil]){
-        IASKSettingsReader* reader = [[IASKSettingsReader alloc] initWithFile:file];
-        for(NSInteger section =0 ; section < [reader numberOfSections]; section++){
-            for(NSInteger row =0 ; row < [reader numberOfRowsForSection:section]; row++){
-                IASKSpecifier* prefItem = [reader specifierForIndexPath:[NSIndexPath indexPathForRow:row inSection:section]];
-                if(! [prefItem.type isEqualToString:@"PSChildPaneSpecifier"]){
-                    NSObject* valueObject = [defaults objectForKey:prefItem.key];
-                    NSString* valueTitle= [prefItem titleForCurrentValue:valueObject];
-                    NSString* title = [prefItem title];
-                    if([@"" isEqualToString:valueTitle]) DDLogInfo(@"%@: %@",title, valueObject);
-                    else DDLogInfo(@"%@: %@",title, valueTitle);
-                }
-            }
-            
-        }
-    }
     // Alert if webdav is misconfigured
     
     if ([self useWebDAV]) {
@@ -110,6 +90,38 @@ static NSInteger _maxCacheSize;
         }
 
     }
+
+}
+
++(NSString*) preferencesAsDescriptiveString{
+
+    //Dump the preferences into a string
+    
+    NSMutableString* preferenceString = [[NSMutableString alloc] init];
+    
+    NSUserDefaults* defaults = [NSUserDefaults standardUserDefaults];
+
+    for(NSString* file in [NSArray arrayWithObjects:@"Root", @"Dropbox", nil]){
+        IASKSettingsReader* reader = [[IASKSettingsReader alloc] initWithFile:file];
+        for(NSInteger section =0 ; section < [reader numberOfSections]; section++){
+            for(NSInteger row =0 ; row < [reader numberOfRowsForSection:section]; row++){
+                IASKSpecifier* prefItem = [reader specifierForIndexPath:[NSIndexPath indexPathForRow:row inSection:section]];
+                if(! [prefItem.type isEqualToString:@"PSChildPaneSpecifier"]){
+                    NSObject* valueObject = [defaults objectForKey:prefItem.key];
+                    NSString* valueTitle= [prefItem titleForCurrentValue:valueObject];
+                    NSString* title = [prefItem title];
+                    if([@"" isEqualToString:valueTitle]){
+                        [preferenceString appendFormat:@"%@: %@\n",title, valueObject];
+                    }
+                    else{
+                        [preferenceString appendFormat:@"%@: %@\n",title, valueTitle];
+                    }
+                }
+            }
+            
+        }
+    }
+    return preferenceString;
 
 }
 

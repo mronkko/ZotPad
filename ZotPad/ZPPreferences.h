@@ -46,6 +46,8 @@
 +(void) reload;
 +(void) checkAndProcessApplicationResetPreferences;
 
++(NSString*) preferencesAsDescriptiveString;
+
 //Dropbox spesific settings
 +(BOOL) useDropbox;
 +(BOOL) dropboxHasFullControl;
