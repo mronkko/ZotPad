@@ -16,8 +16,11 @@
 #import "ZPFileImportViewController.h"
 #import "ZPFileChannel_Dropbox.h"
 #import "ZPAuthenticationDialog.h"
-#import "TestFlight.h"
+
 #import "ZPSecrets.h"
+
+#import "TestFlight.h"
+#import "Crittercism.h"
 
 //Setting up the logger
 #import "DDTTYLogger.h"
@@ -82,11 +85,13 @@ didFinishLaunchingWithOptions:(NSDictionary *)launchOptions
     self.fileLogger = [[DDFileLogger alloc] initWithLogFileManager:logFileManager];
     self.fileLogger.rollingFrequency = 60 * 60 *24; // 24 hour rolling
     self.fileLogger.logFileManager.maximumNumberOfLogFiles = 7; // one week of logs
-
-#ifdef ZPDEBUG
     
+#ifdef ZPDEBUG
+
+    if(CRITTERCISM_KEY != nil) [Crittercism enableWithAppID:CRITTERCISM_KEY];
 
     if(TESTFLIGHT_KEY != nil){
+        
         //We know that this is deprecated, so suppress warnings
 #pragma clang diagnostic push
 #pragma clang diagnostic ignored "-Wdeprecated-declarations"
@@ -94,7 +99,7 @@ didFinishLaunchingWithOptions:(NSDictionary *)launchOptions
 #pragma clang diagnostic pop
         
         
-        [TestFlight takeOff:@"5e753f234f33fc2bddf4437600037fbf_NjcyMjEyMDEyLTA0LTA5IDE0OjUyOjU0LjE4MDQwMg"];
+        [TestFlight takeOff:TESTFLIGHT_KEY];
     }
     
     //Perform a memory warning every 2 seconds
@@ -109,7 +114,10 @@ didFinishLaunchingWithOptions:(NSDictionary *)launchOptions
 
     
 #else
-    if([ZPPreferences reportErrors] && TESTFLIGHT_KEY != nil) [TestFlight takeOff:@"5e753f234f33fc2bddf4437600037fbf_NjcyMjEyMDEyLTA0LTA5IDE0OjUyOjU0LjE4MDQwMg"];
+    if([ZPPreferences reportErrors]){
+        if(CRITTERCISM_KEY != nil) [Crittercism enableWithAppID:CRITTERCISM_KEY];
+//        if(TESTFLIGHT_KEY != nil) [TestFlight takeOff:TESTFLIGHT_KEY];
+    }
     self.fileLogger.logFormatter = [[ZPFileLogFormatter alloc] initWithLevel:LOG_LEVEL_INFO];
 
 #endif
