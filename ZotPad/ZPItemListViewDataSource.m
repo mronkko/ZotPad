@@ -302,12 +302,6 @@ static ZPItemListViewDataSource* _instance;
                     [_itemKeysNotInCache removeObject:item.key];
                     found=TRUE;
                 }
-                if(found){
-                    DDLogVerbose(@"New data about item %@ will be displayed in current item list (%@)",item.key,item.title);
-                }
-                else{
-                    DDLogVerbose(@"New data about item %@ is available, but the item is not in the current item list (%@)",item.key,item.title);
-                }
                 //DDLogVerbose(@"Item keys not in cache deacreased to %i after removing key %@",[_itemKeysNotInCache count],item.key);
                 
                 //Update the view if we have received sufficient number of new items

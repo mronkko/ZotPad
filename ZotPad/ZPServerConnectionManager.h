@@ -65,5 +65,4 @@
 
 +(void) removeProgressView:(UIProgressView*) progressView;
 
-
 @end

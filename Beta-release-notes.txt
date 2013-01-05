@@ -1,8 +1,12 @@
+IMPORTANT: The testflight service is having some problems in recording crash logs. If you encounter a crash, please email crash logs to mikko.ronkko@zotpad.com. See the instructions here:
+
+http://zotpad.uservoice.com/knowledgebase/articles/147992-sending-crash-logs
+
 This build will install on parallel to the App Store version of ZotPad.
 
 This build has not been tested extensively and may not be stable enough for every day use.
 
-There is no need to report crashes. If you find that something is not working (but does not cause a crash) or is slow, you should report that. If you see an incorrectly rendered citation in the item list, you should report that. If you have improvement ideas, report these. See the instructions here:
+If you find that something is not working (but does not cause a crash) or is slow, you should report that. If you see an incorrectly rendered citation in the item list, you should report that. If you have improvement ideas, report these. See the instructions here:
 
 http://zotpad.uservoice.com/knowledgebase/articles/113113-i-got-and-invitation-to-be-a-beta-tester-how-do-s
 
@@ -14,8 +18,9 @@ Saving tags and notes has not been implemented yet. This will be added in the ne
 
 GENERAL: 
 
-- Fixes a bug that caused the item list fail to load in some instances
-- Several minor user interface improvements
+- Fixes a bug that prevented opening linked URLs in mobile safari
+- Adds additional preference for troubleshooting file uploads
+- Added Crittercism 
 
 ----- Other new features and notable changes since ZotPad 1.1.2 ------
 

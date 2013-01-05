@@ -1010,7 +1010,6 @@ static ZPCacheController* _instance = nil;
 }
 
 -(void) addAttachmentToUploadQueue:(ZPZoteroAttachment*) attachment withNewFile:(NSURL*)urlToFile{
-
     
     //Move the file to right place and increment cache size
     [attachment moveFileFromPathAsNewModifiedFile:[urlToFile path]];
@@ -1023,6 +1022,8 @@ static ZPCacheController* _instance = nil;
     @synchronized(_attachmentsToUpload){
         
         NSString* statusString;
+
+        //TODO: A file should not be added if it is already in the queue.
         
         if([_attachmentsToUpload count]==0){
             statusString = @"Upload queue was empty";

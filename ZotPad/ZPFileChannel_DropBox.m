@@ -536,6 +536,8 @@ const NSInteger ZPFILECHANNEL_DROPBOX_DOWNLOAD = 2;
 
 -(void) startUploadingAttachment:(ZPZoteroAttachment*)attachment overWriteConflictingServerVersion:(BOOL)overwriteConflicting{
 
+    [self logVersionInformationForAttachment: attachment];
+
     DDLogInfo(@"Start uploading attachment %@ to Dropbox, overwrite: %i",attachment.filename,overwriteConflicting);
 
     //Link with dropBox account if not already linked

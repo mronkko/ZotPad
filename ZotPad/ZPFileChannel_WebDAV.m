@@ -163,10 +163,11 @@ NSInteger const ZPFILECHANNEL_WEBDAV_UPLOAD_REGISTER = 5;
 
 #pragma mark - Uploading
 
+//TODO: Test what happens if the uploaded file is overwritten during the upload. (i.e. a user has a large file that he send again to zotpad)
 
 -(void) startUploadingAttachment:(ZPZoteroAttachment*)attachment overWriteConflictingServerVersion:(BOOL)overwriteConflicting{
 
-    
+    [self logVersionInformationForAttachment: attachment];
     
     //Store data about the file in the user info so that it is always available
     
@@ -432,8 +433,7 @@ NSInteger const ZPFILECHANNEL_WEBDAV_UPLOAD_REGISTER = 5;
     // Uploads 
     
     else {
-        
-        
+                
         if(request.tag == ZPFILECHANNEL_WEBDAV_UPLOAD_FILE && (request.responseStatusCode == 204 || request.responseStatusCode == 201)){
             [self _performWebDAVUploadForAttachment:attachment tag:ZPFILECHANNEL_WEBDAV_UPLOAD_UPDATE_PROP userInfo:request.userInfo];
         }        
@@ -454,6 +454,8 @@ NSInteger const ZPFILECHANNEL_WEBDAV_UPLOAD_REGISTER = 5;
         }
         else if(request.tag == ZPFILECHANNEL_WEBDAV_UPLOAD_REGISTER && request.responseStatusCode == 412){
            
+            if([ZPPreferences debugFileUploads]) DDLogInfo([self requestDumpAsString:request]);
+
             [attachment purge_original:@"File is outdated (WebDAV conflict)"];
             [self presentConflictViewForAttachment:attachment reason:@"Zotero server reported a version conflict when registering a file after WebDAV upload"];
         }

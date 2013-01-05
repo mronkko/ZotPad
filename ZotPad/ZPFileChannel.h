@@ -38,6 +38,8 @@
 
 -(void) presentConflictViewForAttachment:(ZPZoteroAttachment*) attachment reason:(NSString*) reason;
 
+-(void) logVersionInformationForAttachment:(ZPZoteroAttachment*) attachment;
+
 /*
  Returns the content of a request and response as string. Useful for logging.
  */

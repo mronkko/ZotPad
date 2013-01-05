@@ -23,6 +23,7 @@
 #import "ZPTagController.h"
 #import "CMPopTipView.h"
 #import "ZPTagEditingViewController.h"
+#import "ZPCacheController.h"
 
 #import <UIKit/UIKit.h>
 
@@ -175,6 +176,11 @@
     
     self.navigationItem.title=_currentItem.shortCitation;
     
+    //Add the attachments for this item in the beginning of the download queue
+    
+    for(ZPZoteroAttachment* attachment in [_currentItem.attachments reverseObjectEnumerator]){
+        [[ZPCacheController instance] addAttachmentToDowloadQueue:attachment];
+    }
 
 }
 
@@ -390,7 +396,7 @@
         if(isTitle) returnString =  [ZPLocalization getLocalizationStringWithKey:[creator objectForKey:@"creatorType"] type:@"creatorType" ];
         else{
             NSString* lastName = [creator objectForKey:@"lastName"];
-            if(lastName==NULL || [lastName isEqualToString:@""]){
+            if(lastName==NULL || lastName == [NSNull null] ||  [lastName isEqualToString:@""]){
                 returnString =  [creator objectForKey:@"shortName"];
             }
             else{

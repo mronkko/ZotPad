@@ -949,6 +949,9 @@
 		A7747D611690857A00504A07 /* ZPDate.m in Sources */ = {isa = PBXBuildFile; fileRef = A7747D601690857A00504A07 /* ZPDate.m */; };
 		A7747D621690857A00504A07 /* ZPDate.m in Sources */ = {isa = PBXBuildFile; fileRef = A7747D601690857A00504A07 /* ZPDate.m */; };
 		A7747D631690857A00504A07 /* ZPDate.m in Sources */ = {isa = PBXBuildFile; fileRef = A7747D601690857A00504A07 /* ZPDate.m */; };
+		A77B270A16971E0E009CF9A0 /* libCrittercism_v3_4_8.a in Frameworks */ = {isa = PBXBuildFile; fileRef = A77B270916971E0E009CF9A0 /* libCrittercism_v3_4_8.a */; };
+		A77B270B16971E0E009CF9A0 /* libCrittercism_v3_4_8.a in Frameworks */ = {isa = PBXBuildFile; fileRef = A77B270916971E0E009CF9A0 /* libCrittercism_v3_4_8.a */; };
+		A77B270C16971E0E009CF9A0 /* libCrittercism_v3_4_8.a in Frameworks */ = {isa = PBXBuildFile; fileRef = A77B270916971E0E009CF9A0 /* libCrittercism_v3_4_8.a */; };
 		A77B98DF14DE5CDB00132E9B /* ZPItemListViewController.m in Sources */ = {isa = PBXBuildFile; fileRef = A77B98DE14DE5CDB00132E9B /* ZPItemListViewController.m */; };
 		A77E0DCD15D6603200134D35 /* libUserVoice.a in Frameworks */ = {isa = PBXBuildFile; fileRef = A77E0DCC15D65FAB00134D35 /* libUserVoice.a */; };
 		A77E0DD615D660CF00134D35 /* libUserVoice.a in Frameworks */ = {isa = PBXBuildFile; fileRef = A77E0DCC15D65FAB00134D35 /* libUserVoice.a */; };
@@ -2487,6 +2490,9 @@
 		A7747D5A168F8A0B00504A07 /* ZPOpenURL.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = ZPOpenURL.m; sourceTree = "<group>"; };
 		A7747D5F1690857A00504A07 /* ZPDate.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = ZPDate.h; sourceTree = "<group>"; };
 		A7747D601690857A00504A07 /* ZPDate.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = ZPDate.m; sourceTree = "<group>"; };
+		A77B270716971E0E009CF9A0 /* Crittercism.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = Crittercism.h; sourceTree = "<group>"; };
+		A77B270816971E0E009CF9A0 /* CrittercismDelegate.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = CrittercismDelegate.h; sourceTree = "<group>"; };
+		A77B270916971E0E009CF9A0 /* libCrittercism_v3_4_8.a */ = {isa = PBXFileReference; lastKnownFileType = archive.ar; path = libCrittercism_v3_4_8.a; sourceTree = "<group>"; };
 		A77B98DD14DE5CDB00132E9B /* ZPItemListViewController.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = ZPItemListViewController.h; sourceTree = "<group>"; };
 		A77B98DE14DE5CDB00132E9B /* ZPItemListViewController.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = ZPItemListViewController.m; sourceTree = "<group>"; };
 		A77E0DC415D65FAB00134D35 /* UserVoice.xcodeproj */ = {isa = PBXFileReference; lastKnownFileType = "wrapper.pb-project"; name = UserVoice.xcodeproj; path = "uservoice-iphone-sdk/UserVoice.xcodeproj"; sourceTree = "<group>"; };
@@ -2711,6 +2717,7 @@
 				A7200DD514718DC0004347C9 /* UIKit.framework in Frameworks */,
 				A7200DD714718DC0004347C9 /* Foundation.framework in Frameworks */,
 				A73D1BFD1560E234002D4A2D /* libTestFlight.a in Frameworks */,
+				A77B270A16971E0E009CF9A0 /* libCrittercism_v3_4_8.a in Frameworks */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
@@ -2746,6 +2753,7 @@
 				A783237D15EE3173004BB4F7 /* Foundation.framework in Frameworks */,
 				A783237E15EE3173004BB4F7 /* libTestFlight.a in Frameworks */,
 				A70288BA163BF3AF003A0192 /* libAjiPDFLib.a in Frameworks */,
+				A77B270C16971E0E009CF9A0 /* libCrittercism_v3_4_8.a in Frameworks */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
@@ -2779,6 +2787,7 @@
 				A7CD076115161555007A8E1D /* UIKit.framework in Frameworks */,
 				A7CD076215161555007A8E1D /* Foundation.framework in Frameworks */,
 				A73D1BFE1560E234002D4A2D /* libTestFlight.a in Frameworks */,
+				A77B270B16971E0E009CF9A0 /* libCrittercism_v3_4_8.a in Frameworks */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
@@ -3498,6 +3507,7 @@
 		A7200DD314718DC0004347C9 /* Frameworks */ = {
 			isa = PBXGroup;
 			children = (
+				A77B270616971E0E009CF9A0 /* CrittercismSDK */,
 				A707A7D6163C015400775E88 /* AVFoundation.framework */,
 				A7699E56159A6C44002F09DA /* CoreFoundation.framework */,
 				A70399B015979EC1002F4293 /* MessageUI.framework */,
@@ -3777,6 +3787,16 @@
 				A7747D601690857A00504A07 /* ZPDate.m */,
 			);
 			name = Utilities;
+			sourceTree = "<group>";
+		};
+		A77B270616971E0E009CF9A0 /* CrittercismSDK */ = {
+			isa = PBXGroup;
+			children = (
+				A77B270716971E0E009CF9A0 /* Crittercism.h */,
+				A77B270816971E0E009CF9A0 /* CrittercismDelegate.h */,
+				A77B270916971E0E009CF9A0 /* libCrittercism_v3_4_8.a */,
+			);
+			path = CrittercismSDK;
 			sourceTree = "<group>";
 		};
 		A77E0DC515D65FAB00134D35 /* Products */ = {
@@ -6318,6 +6338,7 @@
 					"\"$(SRCROOT)\"",
 					"\"$(SRCROOT)/TestFlightSDK1\"",
 					"\"$(SRCROOT)/iAnnotate/lib\"",
+					"\"$(SRCROOT)/CrittercismSDK\"",
 				);
 				PRODUCT_NAME = "$(TARGET_NAME)";
 				PROVISIONING_PROFILE = "";
@@ -6351,6 +6372,7 @@
 					"\"$(SRCROOT)\"",
 					"\"$(SRCROOT)/TestFlightSDK1\"",
 					"\"$(SRCROOT)/iAnnotate/lib\"",
+					"\"$(SRCROOT)/CrittercismSDK\"",
 				);
 				PRODUCT_NAME = "$(TARGET_NAME)";
 				PROVISIONING_PROFILE = "AE9438C2-FEB3-4CFE-8857-34811EBD85A4";
@@ -6390,6 +6412,7 @@
 					"\"$(SRCROOT)/TestFlightSDK1\"",
 					"\"$(SDKROOT)/usr/lib/system\"",
 					"\"$(SRCROOT)/iAnnotate/lib\"",
+					"\"$(SRCROOT)/CrittercismSDK\"",
 				);
 				OTHER_LDFLAGS = (
 					"-lz",
@@ -6438,6 +6461,7 @@
 					"\"$(SRCROOT)/TestFlightSDK1\"",
 					"\"$(SDKROOT)/usr/lib/system\"",
 					"\"$(SRCROOT)/iAnnotate/lib\"",
+					"\"$(SRCROOT)/CrittercismSDK\"",
 				);
 				OTHER_LDFLAGS = (
 					"-lz",
@@ -6485,6 +6509,7 @@
 					"\"$(SRCROOT)/TestFlightSDK1\"",
 					"\"$(SDKROOT)/usr/lib/system\"",
 					"\"$(SRCROOT)/iAnnotate/lib\"",
+					"\"$(SRCROOT)/CrittercismSDK\"",
 				);
 				PRODUCT_NAME = "ZotPad beta";
 				PROVISIONING_PROFILE = "";
@@ -6526,6 +6551,7 @@
 					"\"$(SRCROOT)/TestFlightSDK1\"",
 					"\"$(SDKROOT)/usr/lib/system\"",
 					"\"$(SRCROOT)/iAnnotate/lib\"",
+					"\"$(SRCROOT)/CrittercismSDK\"",
 				);
 				PRODUCT_NAME = "ZotPad beta";
 				PUBLIC_HEADERS_FOLDER_PATH = "$(CONTENTS_FOLDER_PATH)/PrivateHeaders";

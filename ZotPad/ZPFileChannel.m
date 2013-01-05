@@ -137,7 +137,23 @@
     return dump;
 }
 
+-(void) logVersionInformationForAttachment:(ZPZoteroAttachment *)attachment{
 
+    //Do some extra logging if we have a prefence set for this
+    if([ZPPreferences debugFileUploads]){
+        NSString* newMD5 = [ZPZoteroAttachment md5ForFileAtPath:attachment.fileSystemPath_modified];
+        NSString* oldMD5 = NULL;
+        if(attachment.fileExists_original){
+            oldMD5 = [ZPZoteroAttachment md5ForFileAtPath:attachment.fileSystemPath_original];
+        }
+        DDLogInfo(@"Additional version information for file %@:",attachment.filename);
+        DDLogInfo(@"MD5 sum for old version:   %@", oldMD5);
+        DDLogInfo(@"MD5 sum for new version:   %@", newMD5);
+        DDLogInfo(@"MD5 from current metadata: %@", attachment.md5);
+        DDLogInfo(@"Local version identifier:  %@", attachment.versionIdentifier_local);
+        DDLogInfo(@"Server version identifier:  %@", attachment.versionIdentifier_server);
+    }
 
+}
 
 @end

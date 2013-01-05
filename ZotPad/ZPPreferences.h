@@ -72,6 +72,7 @@
 +(BOOL) includeFileListWithSupportRequest;
 +(BOOL) recursiveCollections;
 +(BOOL) debugCitationParser;
++(BOOL) debugFileUploads;
 +(BOOL) layeredCollectionsNavigation;
 +(BOOL) unifiedCollectionsNavigation;
 +(BOOL) addIdentifiersToAPIRequests;

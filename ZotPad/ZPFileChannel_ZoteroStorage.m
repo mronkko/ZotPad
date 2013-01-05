@@ -49,7 +49,7 @@ NSInteger const ZPFILECHANNEL_ZOTEROSTORAGE_UPLOAD_REGISTER = 4;
     NSString* urlString;
     NSInteger libraryID= attachment.libraryID;
     
-    if(libraryID==1 || libraryID == 0){
+    if( libraryID== LIBRARY_ID_MY_LIBRARY ){
         urlString = [NSString stringWithFormat:@"https://api.zotero.org/users/%@",[ZPPreferences userID]];
     }
     else{
@@ -131,6 +131,8 @@ NSInteger const ZPFILECHANNEL_ZOTEROSTORAGE_UPLOAD_REGISTER = 4;
 
 -(void) startUploadingAttachment:(ZPZoteroAttachment*)attachment overWriteConflictingServerVersion:(BOOL)overwriteConflicting{
     
+    [self logVersionInformationForAttachment: attachment];
+
     ASIHTTPRequest* request = [self _baseRequestForAttachment:attachment type:ZPFILECHANNEL_ZOTEROSTORAGE_UPLOAD_AUTHORIZATION overWriteConflictingServerVersion:YES];
 
     // Get info about the file to be uploaded

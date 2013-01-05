@@ -320,7 +320,7 @@ NSInteger const ZPATTACHMENTICONGVIEWCONTROLLER_TAG_TITLELABEL = -5;
                     //TODO: Check if already downloading.
                     
                     if ([ZPPreferences useDropbox]) label.text = @"Download from Dropbox";
-                    else if([ZPPreferences useWebDAV] && attachment.libraryID == 1) label.text = @"Download from WebDAV";
+                    else if([ZPPreferences useWebDAV] && attachment.libraryID == LIBRARY_ID_MY_LIBRARY) label.text = @"Download from WebDAV";
                     else{
                         
                         if (attachment.existsOnZoteroServer){

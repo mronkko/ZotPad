@@ -108,6 +108,7 @@ static ZPAutenticationErrorAlertViewDelegate* alertViewDelegate;
 
 static NSMutableSet* _activeDownloads;
 static NSMutableSet* _activeUploads;
+static NSMutableSet* _uploadsPendingMetadata;
 
 static ZPFileChannel* _fileChannel_WebDAV;
 static ZPFileChannel* _fileChannel_Dropbox;
@@ -141,6 +142,7 @@ const NSInteger ZPServerConnectionManagerRequestLastModifiedItem = 11;
                                                object:nil];
     [_reach startNotifier];
 
+    //We need to listen to new metadata notifications because uploads are pending these
     
     _fileChannel_WebDAV= [[ZPFileChannel_WebDAV alloc] init];
     _fileChannel_Zotero = [[ZPFileChannel_ZoteroStorage alloc] init];
@@ -148,6 +150,7 @@ const NSInteger ZPServerConnectionManagerRequestLastModifiedItem = 11;
     
     _activeDownloads= [[NSMutableSet alloc] init];
     _activeUploads= [[NSMutableSet alloc] init];
+    _uploadsPendingMetadata= [[NSMutableSet alloc] init];
     
     _addHocKeyRetrievals = [[NSOperationQueue alloc] init];
     [_addHocKeyRetrievals setMaxConcurrentOperationCount:3];
@@ -384,6 +387,8 @@ const NSInteger ZPServerConnectionManagerRequestLastModifiedItem = 11;
             }];
             [request setFailedBlock:^{
 
+                //TODO: Consider what happens when a query that was receiving metadata for an attachment that is pending uploading
+                
                 if([ZPPreferences online]){
                     /*
                      
@@ -643,6 +648,23 @@ const NSInteger ZPServerConnectionManagerRequestLastModifiedItem = 11;
             }
                 
             case ZPServerConnectionManagerRequestItems:
+                //TODO: Refactor this code. The idea here is to check if we are receiving data for a file that is pending upload.
+                //This is the wrong place for this code. Also consider the use case where a new file is uploaded to the server by someone else while the user is looking at the conflict dialog.
+                //Do the upload
+                
+                if(allResults.count == 1){
+                    ZPZoteroAttachment* attachment = [allResults objectAtIndex:0];
+                    @synchronized(_uploadsPendingMetadata){
+                        if([_uploadsPendingMetadata containsObject:attachment]){
+                            ZPFileChannel* uploadChannel = [self _fileChannelForAttachment:attachment];
+                            [uploadChannel startUploadingAttachment:attachment overWriteConflictingServerVersion:FALSE];
+                            [_uploadsPendingMetadata removeObject:attachment];
+                            [[NSNotificationCenter defaultCenter] postNotificationName:ZPNOTIFICATION_ATTACHMENT_FILE_UPLOAD_STARTED object:attachment];
+                        }
+                    }
+                }
+                
+                //End of what needs to be refactored
             case ZPServerConnectionManagerRequestItemsAndChildren:
             case ZPServerConnectionManagerRequestSingleItem:
                 
@@ -1062,19 +1084,23 @@ const NSInteger ZPServerConnectionManagerRequestLastModifiedItem = 11;
     }
     //Check if the file can be uploaded
     
-    ZPFileChannel* uploadChannel = [self _fileChannelForAttachment:attachment];
-    
-    
     @synchronized(_activeUploads){
-        //Do not download item if it is already being downloaded
-        if([_activeUploads containsObject:attachment]) return;
+        //Do not upload item if it is already being downloaded
+        if([_activeUploads containsObject:attachment]){
+            DDLogWarn(@"Uploading of file %@ was canceled because it is already uploading.",attachment.filename);
+            return;
+        }
         [_activeUploads addObject:attachment];
+        
+    }
+
+    DDLogVerbose(@"Retrieving new metadata for file %@.",attachment.filename);
+
+    @synchronized(_uploadsPendingMetadata){
+        [_uploadsPendingMetadata addObject:attachment];
     }
     
-    //Use the first channel
-    [uploadChannel startUploadingAttachment:attachment overWriteConflictingServerVersion:FALSE];
-    
-    [[NSNotificationCenter defaultCenter] postNotificationName:ZPNOTIFICATION_ATTACHMENT_FILE_UPLOAD_STARTED object:attachment];
+    [self retrieveItemsFromLibrary:attachment.libraryID itemKeys:[NSArray arrayWithObject:attachment.key]];
 
 }
 +(void) finishedUploadingAttachment:(ZPZoteroAttachment*)attachment withVersionIdentifier:(NSString*)identifier{

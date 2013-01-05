@@ -395,6 +395,10 @@ static NSInteger _maxCacheSize;
     NSUserDefaults* defaults = [NSUserDefaults standardUserDefaults];
     return [defaults boolForKey:@"debugcitationparser"];
 }
++(BOOL) debugFileUploads{
+    NSUserDefaults* defaults = [NSUserDefaults standardUserDefaults];
+    return [defaults boolForKey:@"debugfileuploads"];
+}
 
 +(BOOL) addIdentifiersToAPIRequests{
     NSUserDefaults* defaults = [NSUserDefaults standardUserDefaults];
