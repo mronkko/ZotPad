@@ -11,8 +11,8 @@
 
 
 
-#import "ZPCacheController.h"
-#import "ASIHTTPRequest.h"
+#import "ZPFileCacheManager.h"
+
 #import "../InAppSettingsKit/InAppSettingsKit/Models/IASKSettingsReader.h"
 #import "../InAppSettingsKit/InAppSettingsKit/Models/IASKSpecifier.h"
 
@@ -136,7 +136,7 @@ static NSInteger _maxCacheSize;
         //Also reset the data
 
         [ZPDatabase resetDatabase];
-        [[ZPCacheController instance] performSelectorInBackground:@selector(purgeAllAttachmentFilesFromCache) withObject:NULL];
+        [ZPFileCacheManager performSelectorInBackground:@selector(purgeAllAttachmentFilesFromCache) withObject:NULL];
         
         [defaults removeObjectForKey:@"resetusername"];
         [defaults removeObjectForKey:@"resetdata"];
@@ -147,7 +147,7 @@ static NSInteger _maxCacheSize;
         DDLogWarn(@"Reseting itemdata and deleting cached attachments");
         [defaults removeObjectForKey:@"resetdata"];
         [ZPDatabase resetDatabase];
-        [[ZPCacheController instance] performSelectorInBackground:@selector(purgeAllAttachmentFilesFromCache) withObject:NULL];
+        [ZPFileCacheManager performSelectorInBackground:@selector(purgeAllAttachmentFilesFromCache) withObject:NULL];
     }
 }
 +(void) resetUserCredentials{

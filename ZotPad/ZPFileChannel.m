@@ -10,12 +10,72 @@
 
 #import "ZPFileChannel.h"
 
+//Implementations
+
+#import "ZPFileChannel_Dropbox.h"
+#import "ZPFileChannel_WebDAV.h"
+#import "ZPFileChannel_ZoteroStorage.h"
+
 
 #import "ZPUploadVersionConflictViewControllerViewController.h"
 #import "ZPFileImportViewController.h"
 #import "ZPAppDelegate.h"
 
 @implementation ZPFileChannel
+
+
+static ZPFileChannel_WebDAV* _fileChannel_WebDAV;
+static ZPFileChannel_Dropbox* _fileChannel_Dropbox;
+static ZPFileChannel_ZoteroStorage* _fileChannel_Zotero;
+
++(void) initialize{
+    _fileChannel_Dropbox = [[ZPFileChannel_Dropbox alloc] init];
+    _fileChannel_WebDAV = [[ZPFileChannel_WebDAV alloc] init];
+    _fileChannel_Zotero = [[ZPFileChannel_ZoteroStorage alloc] init];
+}
++(ZPFileChannel*) fileChannelForAttachment:(ZPZoteroAttachment*) attachment{
+    if([ZPPreferences useDropbox]){
+        return _fileChannel_Dropbox;
+    }
+    else if(attachment.libraryID == LIBRARY_ID_MY_LIBRARY && [ZPPreferences useWebDAV]){
+        return _fileChannel_WebDAV;
+    }
+    else {
+        return _fileChannel_Zotero;
+    }
+}
+
++(NSInteger) activeUploads{
+    if([ZPPreferences useDropbox]){
+        return [ZPFileChannel_Dropbox activeUploads];
+    }
+    else if([ZPPreferences useWebDAV]){
+        return [ZPFileChannel_ZoteroStorage activeUploads] + [ZPFileChannel_WebDAV activeUploads];
+    }
+    else{
+        return [ZPFileChannel_ZoteroStorage activeUploads];
+    }
+}
+
++(NSInteger) activeDownloads{
+    if([ZPPreferences useDropbox]){
+        return [ZPFileChannel_Dropbox activeDownloads];
+    }
+    else if([ZPPreferences useWebDAV]){
+        return [ZPFileChannel_ZoteroStorage activeDownloads] + [ZPFileChannel_WebDAV activeDownloads];
+    }
+    else{
+        return [ZPFileChannel_ZoteroStorage activeDownloads];
+    }
+}
+
+#pragma marK - Cleaning up progress views
+
++(void) removeProgressView:(UIProgressView*) progressView{
+    [_fileChannel_Dropbox removeProgressView:progressView];
+    [_fileChannel_WebDAV removeProgressView:progressView];
+    [_fileChannel_Zotero removeProgressView:progressView];
+}
 
 -(id) init{
     self = [super init];
@@ -84,10 +144,18 @@
 
 -(void) presentConflictViewForAttachment:(ZPZoteroAttachment*) attachment reason:(NSString*) reason{
     
-    DDLogWarn(@"Version conflict for file %@ (%@): %@",attachment.key, attachment.filename, reason);
+    DDLogWarn(@"Version conflict for file %@: %@", attachment.filename, reason);
+    
+    //If we do not have the new version, start downloading it now
+    
     
     if(![NSThread isMainThread]){
-        [self performSelectorOnMainThread:@selector(presentConflictViewForAttachment:) withObject:attachment waitUntilDone:YES];
+        dispatch_async(dispatch_get_main_queue(), ^{
+            if(! [attachment fileExists_original]){
+                [self startDownloadingAttachment:attachment];
+            }
+            [self presentConflictViewForAttachment:attachment reason:reason];
+        });
     }
     else{
         [attachment logFileRevisions];
@@ -118,8 +186,9 @@
         [dump appendFormat:@"%@: %@\n",key,[request.requestHeaders objectForKey:key]];
     }
     
-    if(request.postBody){
+    if(request.postBody && ! [request.requestMethod isEqualToString:@"PUT"]){
         [dump appendString:@"\n"];
+        
         [dump appendString:[[NSString alloc] initWithData:request.postBody
                                                  encoding:NSUTF8StringEncoding]];
     }
@@ -147,8 +216,9 @@
             oldMD5 = [ZPZoteroAttachment md5ForFileAtPath:attachment.fileSystemPath_original];
         }
         DDLogInfo(@"Additional version information for file %@:",attachment.filename);
-        DDLogInfo(@"MD5 sum for old version:   %@", oldMD5);
-        DDLogInfo(@"MD5 sum for new version:   %@", newMD5);
+        DDLogInfo(@"MD5 sum for old file:   %@", oldMD5);
+        DDLogInfo(@"MD5 sum for new file:   %@", newMD5);
+        DDLogInfo(@"Etag from current metadata: %@", attachment.etag);
         DDLogInfo(@"MD5 from current metadata: %@", attachment.md5);
         DDLogInfo(@"Local version identifier:  %@", attachment.versionIdentifier_local);
         DDLogInfo(@"Server version identifier:  %@", attachment.versionIdentifier_server);

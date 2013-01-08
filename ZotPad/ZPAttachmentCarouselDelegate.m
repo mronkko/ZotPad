@@ -15,7 +15,9 @@
 #import <QuartzCore/QuartzCore.h>
 #import <zlib.h>
 #import "ZPFileViewerViewController.h"
-
+#import "ZPFileChannel.h"
+#import "ZPFileDownloadManager.h"
+#import "ZPReachability.h"
 
 NSInteger const ZPATTACHMENTICONGVIEWCONTROLLER_MODE_STATIC = 0;
 NSInteger const ZPATTACHMENTICONGVIEWCONTROLLER_MODE_UPLOAD = 1;
@@ -95,7 +97,7 @@ NSInteger const ZPATTACHMENTICONGVIEWCONTROLLER_TAG_TITLELABEL = -5;
 
 -(void) unregisterProgressViewsBeforeUnloading{
     for(UIProgressView* progressView in _progressViews){
-         [ZPServerConnectionManager removeProgressView:progressView];
+         [ZPFileChannel removeProgressView:progressView];
     }
 }
 
@@ -296,7 +298,7 @@ NSInteger const ZPATTACHMENTICONGVIEWCONTROLLER_TAG_TITLELABEL = -5;
                           
     if(thisMode == ZPATTACHMENTICONGVIEWCONTROLLER_MODE_DOWNLOAD){
 
-        if([ZPServerConnectionManager isAttachmentDownloading:attachment]){
+        if([ZPFileDownloadManager isAttachmentDownloading:attachment]){
             [self notifyAttachmentDownloadStarted:[NSNotification notificationWithName:ZPNOTIFICATION_ATTACHMENT_FILE_DOWNLOAD_STARTED object:attachment]];
         }
         else{
@@ -364,7 +366,7 @@ NSInteger const ZPATTACHMENTICONGVIEWCONTROLLER_TAG_TITLELABEL = -5;
     else if(self.mode == ZPATTACHMENTICONGVIEWCONTROLLER_MODE_UPLOAD){
         label.hidden = FALSE;
         
-        if([ZPServerConnectionManager isAttachmentDownloading:attachment]){
+        if([ZPFileDownloadManager isAttachmentDownloading:attachment]){
             [self notifyAttachmentDownloadStarted:[NSNotification notificationWithName:ZPNOTIFICATION_ATTACHMENT_FILE_DOWNLOAD_STARTED object:attachment]];
         }
         else{
@@ -404,7 +406,7 @@ NSInteger const ZPATTACHMENTICONGVIEWCONTROLLER_TAG_TITLELABEL = -5;
             [ZPFileViewerViewController presentWithAttachment:attachment];
            
         }
-        else if(attachment.linkMode == LINK_MODE_LINKED_URL && [ZPServerConnectionManager hasInternetConnection]){
+        else if(attachment.linkMode == LINK_MODE_LINKED_URL && [ZPReachability hasInternetConnection]){
             [[UIApplication sharedApplication] openURL:[NSURL URLWithString:attachment.url]];
         }
         else if(self.mode == ZPATTACHMENTICONGVIEWCONTROLLER_MODE_DOWNLOAD && ( attachment.linkMode == LINK_MODE_IMPORTED_FILE || 
@@ -413,8 +415,8 @@ NSInteger const ZPATTACHMENTICONGVIEWCONTROLLER_TAG_TITLELABEL = -5;
 
             
             
-            if([ZPServerConnectionManager hasInternetConnection] && ! [ZPServerConnectionManager isAttachmentDownloading:attachment]){
-                [ZPServerConnectionManager checkIfCanBeDownloadedAndStartDownloadingAttachment:attachment];
+            if([ZPReachability hasInternetConnection] && ! [ZPFileDownloadManager isAttachmentDownloading:attachment]){
+                [ZPFileDownloadManager checkIfCanBeDownloadedAndStartDownloadingAttachment:attachment];
                 _latestManuallyTriggeredAttachment = attachment;
             }
             
@@ -594,13 +596,13 @@ NSInteger const ZPATTACHMENTICONGVIEWCONTROLLER_TAG_TITLELABEL = -5;
                 else if (aMode==ZPATTACHMENTICONGVIEWCONTROLLER_MODE_UPLOAD){
                     progressView.hidden = FALSE;
                     progressView.progress = 0.0f;
-                    [ZPServerConnectionManager useProgressView:progressView forUploadingAttachment:attachment];
+                    [ZPFileUploadManager useProgressView:progressView forUploadingAttachment:attachment];
                     view.userInteractionEnabled = TRUE;
                 }
                 else if (aMode==ZPATTACHMENTICONGVIEWCONTROLLER_MODE_DOWNLOAD){
                     progressView.hidden = FALSE;
                     progressView.progress = 0.0f;
-                    [ZPServerConnectionManager useProgressView:progressView forDownloadingAttachment:attachment];
+                    [ZPFileDownloadManager useProgressView:progressView forDownloadingAttachment:attachment];
                     view.userInteractionEnabled = FALSE;
                 }
                 

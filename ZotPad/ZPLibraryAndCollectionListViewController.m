@@ -13,7 +13,7 @@
 
 #import "ZPAuthenticationDialog.h"
 #import "ZPAppDelegate.h"
-#import "ZPCacheController.h"
+#import "ZPItemDataDownloadManager.h"
 #import "ZPCacheStatusToolbarController.h"
 #import "ZPItemListViewDataSource.h"
 #import "CMPopTipView.h"
@@ -65,7 +65,6 @@
 - (void)viewDidLoad
 {
     
-    DDLogInfo(@"Loading library and collection list in navigator");
 
     [super viewDidLoad];
 
@@ -98,16 +97,10 @@
     
     //If the current library is not defined, show a list of libraries
     if(self->_currentlibraryID == LIBRARY_ID_NOT_SET){
-        dispatch_async(dispatch_get_global_queue(DISPATCH_QUEUE_PRIORITY_BACKGROUND,0), ^{
-            [ZPServerConnectionManager retrieveLibrariesFromServer];
-        });
         self->_content = [ZPDatabase libraries];
     }
     //If a library is chosen, show collections level collections for that library
     else{
-        dispatch_async(dispatch_get_global_queue(DISPATCH_QUEUE_PRIORITY_BACKGROUND,0), ^{
-            [ZPServerConnectionManager retrieveCollectionsForLibraryFromServer:_currentlibraryID];
-        });
         self->_content = [ZPDatabase collectionsForLibrary:self->_currentlibraryID withParentCollection:self->_currentCollectionKey];
     }
 
@@ -241,8 +234,21 @@
      When a row is selected, set the detail view controller's library and collection and refresh
      */
     ZPZoteroDataObject* node = [self->_content objectAtIndex: indexPath.row];
+    
+    if(node.libraryID != [ZPItemListViewDataSource instance].libraryID){
+        [[NSNotificationCenter defaultCenter] postNotificationName:ZPNOTIFICATION_ACTIVE_LIBRARY_CHANGED
+                                                            object:[NSNumber numberWithInt:node.libraryID]];
+    }
+        
     [ZPItemListViewDataSource instance].libraryID = [node libraryID];
+    
+    
+    [[NSNotificationCenter defaultCenter] postNotificationName:ZPNOTIFICATION_ACTIVE_COLLECTION_CHANGED
+                                                            object:node.key];
+
     [ZPItemListViewDataSource instance].collectionKey = [node key];
+    
+    
     
     if (self.detailViewController != NULL) {
 

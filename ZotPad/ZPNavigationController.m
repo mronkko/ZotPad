@@ -28,6 +28,11 @@
     }
 }
 
+-(void)viewDidAppear:(BOOL)animated{
+    [super viewDidAppear:animated];
+    [[NSNotificationCenter defaultCenter] postNotificationName:ZPNOTIFICATION_USER_INTERFACE_AVAILABLE object:nil];
+}
+
 -(IBAction)showLogView:(id)sender{
     [self performSegueWithIdentifier:@"ShowLogView" sender:NULL];
 }

@@ -18,9 +18,10 @@ Saving tags and notes has not been implemented yet. This will be added in the ne
 
 GENERAL: 
 
-- Fixes a bug that prevented opening linked URLs in mobile safari
+- Major changes in file uploading, which should fix most of the problems
 - Adds additional preference for troubleshooting file uploads
-- Added Crittercism 
+- Fixes a bug that prevented opening linked URLs in mobile safari
+- Added Crittercism for crash monitoring (http://www.crittercism.com)
 
 ----- Other new features and notable changes since ZotPad 1.1.2 ------
 

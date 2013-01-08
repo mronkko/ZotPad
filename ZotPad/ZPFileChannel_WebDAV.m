@@ -18,7 +18,10 @@
 
 
 #import "SBJson.h"
+#import "ZPFileCacheManager.h"
 
+//For refreshing metadata
+#import "ZPServerConnection.h"
 
 //Unzipping and base64 decoding
 #import "ZipArchive.h"
@@ -45,6 +48,7 @@ NSInteger const ZPFILECHANNEL_WEBDAV_UPLOAD_REGISTER = 5;
 @implementation ZPFileChannel_WebDAV_ProgressDelegate
 
 @synthesize progressView;
+
 
 -(id) initWithUIProgressView:(UIProgressView*)view{
     self = [super init];
@@ -84,6 +88,22 @@ NSInteger const ZPFILECHANNEL_WEBDAV_UPLOAD_REGISTER = 5;
 @end
     
 @implementation ZPFileChannel_WebDAV
+
+
+static NSOperationQueue* _downloadQueue;
+static NSOperationQueue* _uploadQueue;
+
++(void) initialize{
+    _downloadQueue = [[NSOperationQueue alloc] init];
+    _uploadQueue = [[NSOperationQueue alloc] init];
+}
+
++(NSInteger) activeDownloads{
+    return [_downloadQueue operationCount];
+}
++(NSInteger) activeUploads{
+    return [_uploadQueue operationCount];
+}
 
 
 - (id) init{
@@ -128,7 +148,7 @@ NSInteger const ZPFILECHANNEL_WEBDAV_UPLOAD_REGISTER = 5;
     request.userInfo = [NSDictionary dictionaryWithObject:attachment forKey:ZPKEY_ATTACHMENT];
     request.tag = ZPFILECHANNEL_WEBDAV_DOWNLOAD;
     
-    [request startAsynchronous];
+    [_downloadQueue addOperation:request];
 
 }
 -(void) cancelDownloadingAttachment:(ZPZoteroAttachment*)attachment{
@@ -192,8 +212,8 @@ NSInteger const ZPFILECHANNEL_WEBDAV_UPLOAD_REGISTER = 5;
         if(! [attachment.md5 isEqualToString:attachment.versionIdentifier_server]){
             
             DDLogWarn(@"Removing cached copy of file %@ because the local (%@) and server (%@) version identifiers differ.",attachment.filename,attachment.versionIdentifier_server,attachment.md5);
-            
-            [attachment purge_original:@"File is outdated (WebDAV pre-check)"];
+
+            [ZPFileCacheManager deleteOriginalFileForAttachment:attachment reason:@"File is outdated (WebDAV pre-check)"];
             
         }
         [self presentConflictViewForAttachment:attachment reason:[NSString stringWithFormat:@"MD5 sums differ. Local metadata: %@, Local file: %@, Server file: %@",
@@ -269,7 +289,7 @@ NSInteger const ZPFILECHANNEL_WEBDAV_UPLOAD_REGISTER = 5;
     
     [uploadRequest setRequestMethod:@"PUT"];
     
-    [uploadRequest startAsynchronous];
+    [_uploadQueue addOperation:uploadRequest];
     
 }
 
@@ -304,7 +324,7 @@ NSInteger const ZPFILECHANNEL_WEBDAV_UPLOAD_REGISTER = 5;
     
     DDLogInfo(@"Uploading metadata about new version (%@) of file %@ to Zotero ",[userInfo objectForKey:@"md5"],attachment.filename);
     
-    [request startAsynchronous];
+    [_uploadQueue addOperation:request];
 }
 
 -(void) useProgressView:(UIProgressView*) progressView forUploadingAttachment:(ZPZoteroAttachment*)attachment{
@@ -347,7 +367,7 @@ NSInteger const ZPFILECHANNEL_WEBDAV_UPLOAD_REGISTER = 5;
                 NSString* tempFile = [request downloadDestinationPath];
                 NSString* md5 = [ZPZoteroAttachment md5ForFileAtPath:tempFile];
                 DDLogVerbose(@"The MD5 sum of the file received from server is %@", md5);
-                [ZPServerConnectionManager finishedDownloadingAttachment:attachment toFileAtPath:tempFile withVersionIdentifier:md5 usingFileChannel:self];
+                [ZPFileDownloadManager finishedDownloadingAttachment:attachment toFileAtPath:tempFile withVersionIdentifier:md5 ];
             }
             
             else {
@@ -388,7 +408,7 @@ NSInteger const ZPFILECHANNEL_WEBDAV_UPLOAD_REGISTER = 5;
                     
                     NSString* md5 = [ZPZoteroAttachment md5ForFileAtPath:tempFile];
                     DDLogVerbose(@"The MD5 sum of the file received from server is %@", md5);
-                    [ZPServerConnectionManager finishedDownloadingAttachment:attachment toFileAtPath:tempFile withVersionIdentifier:md5 usingFileChannel:self];
+                    [ZPFileDownloadManager finishedDownloadingAttachment:attachment toFileAtPath:tempFile withVersionIdentifier:md5 ];
                 }
                 else if([fileArray count]==0){
                     NSString* errorMessage = [NSString stringWithFormat:@"Zip file downloaded from WebDAV URL %@ did not contain any files (%@)",[request.url absoluteString], attachment.filename];
@@ -396,7 +416,7 @@ NSInteger const ZPFILECHANNEL_WEBDAV_UPLOAD_REGISTER = 5;
                     DDLogError(errorMessage);
                     
                     NSError* error = [[NSError alloc] initWithDomain:[request.url host] code:request.responseStatusCode userInfo:[NSDictionary dictionaryWithObject:errorMessage forKey:NSLocalizedDescriptionKey]];
-                    [ZPServerConnectionManager failedDownloadingAttachment:attachment withError:error usingFileChannel:self fromURL:[request.url absoluteString]];
+                    [ZPFileDownloadManager failedDownloadingAttachment:attachment withError:error fromURL:[request.url absoluteString]];
                 }
                 else{
                     //Check that the file that we wanted exits
@@ -409,12 +429,12 @@ NSInteger const ZPFILECHANNEL_WEBDAV_UPLOAD_REGISTER = 5;
                         DDLogError(errorMessage);
                         
                         NSError* error = [[NSError alloc] initWithDomain:[request.url host] code:request.responseStatusCode userInfo:[NSDictionary dictionaryWithObject:errorMessage forKey:NSLocalizedDescriptionKey]];
-                        [ZPServerConnectionManager failedDownloadingAttachment:attachment withError:error usingFileChannel:self fromURL:[request.url absoluteString]];
+                        [ZPFileDownloadManager failedDownloadingAttachment:attachment withError:error fromURL:[request.url absoluteString]];
                     }
                     else{
                         NSString* md5 = [ZPZoteroAttachment md5ForFileAtPath:tempFile];
                         DDLogVerbose(@"The MD5 sum of the file received from server is %@", md5);
-                        [ZPServerConnectionManager finishedDownloadingAttachment:attachment toFileAtPath:tempFile withVersionIdentifier:md5 usingFileChannel:self];
+                        [ZPFileDownloadManager finishedDownloadingAttachment:attachment toFileAtPath:tempFile withVersionIdentifier:md5 ];
                     }
                 }
             }
@@ -422,7 +442,7 @@ NSInteger const ZPFILECHANNEL_WEBDAV_UPLOAD_REGISTER = 5;
         
         else{
             NSError* error = [[NSError alloc] initWithDomain:[request.url host] code:request.responseStatusCode userInfo:[NSDictionary dictionaryWithObject:[NSString stringWithFormat:@"WebDAV request to %@ returned %@",request.url,request.responseStatusMessage] forKey:NSLocalizedDescriptionKey]];
-            [ZPServerConnectionManager failedDownloadingAttachment:attachment withError:error usingFileChannel:self fromURL:[request.url absoluteString]];
+            [ZPFileDownloadManager failedDownloadingAttachment:attachment withError:error fromURL:[request.url absoluteString]];
         }        
         
 
@@ -433,7 +453,14 @@ NSInteger const ZPFILECHANNEL_WEBDAV_UPLOAD_REGISTER = 5;
     // Uploads 
     
     else {
-                
+        
+        // Additional troubleshooting info
+        
+        if([ZPPreferences debugFileUploads]){
+            NSString* dump =[self requestDumpAsString:request];
+            DDLogInfo(dump);
+        }
+
         if(request.tag == ZPFILECHANNEL_WEBDAV_UPLOAD_FILE && (request.responseStatusCode == 204 || request.responseStatusCode == 201)){
             [self _performWebDAVUploadForAttachment:attachment tag:ZPFILECHANNEL_WEBDAV_UPLOAD_UPDATE_PROP userInfo:request.userInfo];
         }        
@@ -448,7 +475,7 @@ NSInteger const ZPFILECHANNEL_WEBDAV_UPLOAD_REGISTER = 5;
             
             //DDLogVerbose([self requestDumpAsString:request]);
             //All done
-            [ZPServerConnectionManager finishedUploadingAttachment:attachment withVersionIdentifier:[request.userInfo objectForKey:@"md5"]];
+            [ZPFileUploadManager finishedUploadingAttachment:attachment withVersionIdentifier:[request.userInfo objectForKey:@"md5"]];
             [self cleanupAfterFinishingAttachment:attachment];
             
         }
@@ -456,13 +483,27 @@ NSInteger const ZPFILECHANNEL_WEBDAV_UPLOAD_REGISTER = 5;
            
             if([ZPPreferences debugFileUploads]) DDLogInfo([self requestDumpAsString:request]);
 
-            [attachment purge_original:@"File is outdated (WebDAV conflict)"];
-            [self presentConflictViewForAttachment:attachment reason:@"Zotero server reported a version conflict when registering a file after WebDAV upload"];
+            [ZPFileCacheManager deleteOriginalFileForAttachment:attachment reason:@"File is outdated (WebDAV conflict)"];
+            
+            [ZPServerConnection retrieveSingleItem:attachment completion:^(NSArray* parsedResults) {
+                if(parsedResults == NULL || [parsedResults count]==0){
+                    [ZPFileUploadManager failedUploadingAttachment:attachment
+                                                         withError:[NSError errorWithDomain:@"Zotero.org"
+                                                                                       code:-1
+                                                                                   userInfo:[NSDictionary dictionaryWithObject:@"Error retrieving metadata" forKey:NSLocalizedDescriptionKey]]
+                                                             toURL:[request.url absoluteString]];
+                }
+                else{
+                    [self presentConflictViewForAttachment:attachment reason:@"Zotero server reported a version conflict when registering a file after WebDAV upload"];
+                    
+                }
+            }];
+            [self cleanupAfterFinishingAttachment:attachment];
         }
         else{
             NSError* error =[NSError errorWithDomain:request.url.host code:request.responseStatusCode userInfo:[NSDictionary dictionaryWithObject:request.responseStatusMessage forKey:NSLocalizedDescriptionKey]];
             [self cleanupAfterFinishingAttachment:attachment];
-            [ZPServerConnectionManager failedUploadingAttachment:attachment withError:error usingFileChannel:self toURL:[request.url absoluteString]];
+            [ZPFileUploadManager failedUploadingAttachment:attachment withError:error toURL:[request.url absoluteString]];
         }
     }
 }
@@ -512,10 +553,10 @@ NSInteger const ZPFILECHANNEL_WEBDAV_UPLOAD_REGISTER = 5;
     }
     
     if(request.tag == ZPFILECHANNEL_WEBDAV_DOWNLOAD){
-        [ZPServerConnectionManager failedDownloadingAttachment:attachment withError:error usingFileChannel:self fromURL:[request.url absoluteString]];
+        [ZPFileDownloadManager failedDownloadingAttachment:attachment withError:error fromURL:[request.url absoluteString]];
     }
     else{
-        [ZPServerConnectionManager failedUploadingAttachment:attachment withError:error usingFileChannel:self toURL:[request.url absoluteString]];
+        [ZPFileUploadManager failedUploadingAttachment:attachment withError:error toURL:[request.url absoluteString]];
     }
     
     [self cleanupAfterFinishingAttachment:attachment];

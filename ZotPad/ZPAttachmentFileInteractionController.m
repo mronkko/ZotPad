@@ -19,6 +19,9 @@
 #import "ZPItemDetailViewController.h"
 #import "NSString+URLEncoding.h"
 
+// Needed for purging files
+#import "ZPFileCacheManager.h"
+
 @interface ZPAttachmentFileInteractionController(){
     ZPZoteroAttachment* _activeAttachment;
     BOOL _fileCanBeOpened;
@@ -182,9 +185,10 @@
         if(buttonIndex == 0){
             
             //Purge
-            
-            [_activeAttachment purge:@"Purged using action menu"];
-            _actionSheet = NULL;
+            if(_activeAttachment.fileExists_modified) [ZPFileCacheManager deleteModifiedFileForAttachment:_activeAttachment reason:@"Purged using action menu"];
+            if(_activeAttachment.fileExists_original) [ZPFileCacheManager deleteOriginalFileForAttachment:_activeAttachment reason:@"Purged using action menu"];
+
+                _actionSheet = NULL;
         }
         else if(buttonIndex==1){
             //Cancel

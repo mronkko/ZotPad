@@ -8,6 +8,8 @@
 
 #import "ZPCore.h"
 
+//TODO: Clean headers that are not needed
+
 #import "ZPItemDetailViewController.h"
 #import "ZPLibraryAndCollectionListViewController.h"
 #import "ZPItemListViewDataSource.h"
@@ -23,8 +25,8 @@
 #import "ZPTagController.h"
 #import "CMPopTipView.h"
 #import "ZPTagEditingViewController.h"
-#import "ZPCacheController.h"
-
+#import "ZPItemDataDownloadManager.h"
+#import "ZPReachability.h"
 #import <UIKit/UIKit.h>
 
 //Define 
@@ -165,23 +167,18 @@
 
 -(void) configure{
     
-    if([ZPServerConnectionManager hasInternetConnection]){
+    if([ZPReachability hasInternetConnection]){
+        //Animate until we get fresh data
         [_activityIndicator startAnimating];
-        [ZPServerConnectionManager retrieveSingleItemDetailsFromServer:_currentItem];
     }
-        
+    [[NSNotificationCenter defaultCenter] postNotificationName:ZPNOTIFICATION_ACTIVE_ITEM_CHANGED object:_currentItem];
+    
     [self _reconfigureDetailTableView:FALSE];
     [_carouselDelegate configureWithZoteroItem:_currentItem];
     [_carousel reloadData];
     
     self.navigationItem.title=_currentItem.shortCitation;
     
-    //Add the attachments for this item in the beginning of the download queue
-    
-    for(ZPZoteroAttachment* attachment in [_currentItem.attachments reverseObjectEnumerator]){
-        [[ZPCacheController instance] addAttachmentToDowloadQueue:attachment];
-    }
-
 }
 
 - (void)_reconfigureDetailTableView:(BOOL)animated{
@@ -395,8 +392,8 @@
         NSDictionary* creator=[_currentItem.creators objectAtIndex:indexPath.row];
         if(isTitle) returnString =  [ZPLocalization getLocalizationStringWithKey:[creator objectForKey:@"creatorType"] type:@"creatorType" ];
         else{
-            NSString* lastName = [creator objectForKey:@"lastName"];
-            if(lastName==NULL || lastName == [NSNull null] ||  [lastName isEqualToString:@""]){
+            NSObject* lastName = [creator objectForKey:@"lastName"];
+            if(! [lastName isKindOfClass:[NSString class]] ||  [(NSString*)lastName isEqualToString:@""]){
                 returnString =  [creator objectForKey:@"shortName"];
             }
             else{

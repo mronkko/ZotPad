@@ -1061,7 +1061,7 @@
             <objects>
                 <viewController storyboardIdentifier="" title="Version conflict" modalPresentationStyle="pageSheet" id="htM-EZ-pFH" customClass="ZPUploadVersionConflictViewControllerViewController" sceneMemberID="viewController">
                     <view key="view" contentMode="scaleToFill" id="tzC-ae-egO">
-                        <rect key="frame" x="0.0" y="20" width="768" height="748"/>
+                        <rect key="frame" x="0.0" y="0.0" width="768" height="768"/>
                         <autoresizingMask key="autoresizingMask" flexibleMaxX="YES" flexibleMaxY="YES"/>
                         <subviews>
                             <navigationBar contentMode="scaleToFill" id="g4v-7I-ScY">
@@ -1072,7 +1072,7 @@
                                 </items>
                             </navigationBar>
                             <button opaque="NO" contentMode="scaleToFill" contentHorizontalAlignment="center" contentVerticalAlignment="center" buttonType="roundedRect" lineBreakMode="middleTruncation" id="WTL-gR-2yA">
-                                <rect key="frame" x="42" y="675" width="300" height="37"/>
+                                <rect key="frame" x="41" y="694" width="300" height="37"/>
                                 <autoresizingMask key="autoresizingMask" flexibleMinX="YES" flexibleMaxX="YES" flexibleMinY="YES" flexibleMaxY="YES"/>
                                 <fontDescription key="fontDescription" type="boldSystem" pointSize="15"/>
                                 <state key="normal" title="Use my version">
@@ -1087,7 +1087,7 @@
                                 </connections>
                             </button>
                             <button opaque="NO" contentMode="scaleToFill" contentHorizontalAlignment="center" contentVerticalAlignment="center" buttonType="roundedRect" lineBreakMode="middleTruncation" id="52t-gZ-FLk">
-                                <rect key="frame" x="425" y="675" width="300" height="37"/>
+                                <rect key="frame" x="425" y="694" width="300" height="37"/>
                                 <autoresizingMask key="autoresizingMask" flexibleMinX="YES" flexibleMaxX="YES" flexibleMinY="YES" flexibleMaxY="YES"/>
                                 <fontDescription key="fontDescription" type="boldSystem" pointSize="15"/>
                                 <state key="normal" title="Use server version">
@@ -1102,19 +1102,19 @@
                                 </connections>
                             </button>
                             <label opaque="NO" clipsSubviews="YES" userInteractionEnabled="NO" contentMode="left" text="The following file has changed on the server" lineBreakMode="tailTruncation" numberOfLines="2" baselineAdjustment="alignBaselines" minimumFontSize="10" id="LNC-vG-Hyq">
-                                <rect key="frame" x="20" y="48" width="728" height="59"/>
+                                <rect key="frame" x="20" y="50" width="728" height="59"/>
                                 <autoresizingMask key="autoresizingMask" widthSizable="YES" flexibleMinY="YES" flexibleMaxY="YES"/>
                                 <fontDescription key="fontDescription" type="system" pointSize="17"/>
                                 <color key="textColor" cocoaTouchSystemColor="darkTextColor"/>
                                 <nil key="highlightedColor"/>
                             </label>
                             <view contentMode="scaleToFill" id="JcT-DL-d1h" customClass="iCarousel">
-                                <rect key="frame" x="403" y="181" width="345" height="386"/>
+                                <rect key="frame" x="403" y="181" width="344" height="404"/>
                                 <autoresizingMask key="autoresizingMask" widthSizable="YES" heightSizable="YES"/>
                                 <color key="backgroundColor" white="1" alpha="1" colorSpace="custom" customColorSpace="calibratedWhite"/>
                             </view>
                             <view contentMode="scaleToFill" id="yWo-77-JOF" customClass="iCarousel">
-                                <rect key="frame" x="20" y="181" width="345" height="386"/>
+                                <rect key="frame" x="20" y="181" width="344" height="404"/>
                                 <autoresizingMask key="autoresizingMask" widthSizable="YES" heightSizable="YES"/>
                                 <color key="backgroundColor" white="1" alpha="1" colorSpace="custom" customColorSpace="calibratedWhite"/>
                             </view>
@@ -1228,6 +1228,6 @@
         <simulatedScreenMetrics key="destination"/>
     </simulatedMetricsContainer>
     <inferredMetricsTieBreakers>
-        <segue reference="bAm-Ev-B5H"/>
+        <segue reference="GHg-CO-l1D"/>
     </inferredMetricsTieBreakers>
 </document>

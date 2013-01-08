@@ -8,21 +8,26 @@
 
 #import "ZPCore.h"
 #import "ZPAppDelegate.h"
-#import "ZPCacheController.h"
 
-#import "ZPLocalization.h"
+// Needed for receiving files from other apps
+
+#import "ZPFileUploadManager.h"
+
+// Needed for Dropbox authentication
+
 #import <DropboxSDK/DropboxSDK.h>
 
+// User interface
+
+#import "ZPLocalization.h"
 #import "ZPFileImportViewController.h"
-#import "ZPFileChannel_Dropbox.h"
 #import "ZPAuthenticationDialog.h"
 
-#import "ZPSecrets.h"
+// Logging and crash reporting
 
+#import "ZPSecrets.h"
 #import "TestFlight.h"
 #import "Crittercism.h"
-
-//Setting up the logger
 #import "DDTTYLogger.h"
 #import "DDFileLogger.h"
 #import "CompressingLogFileManager.h"
@@ -88,7 +93,7 @@ didFinishLaunchingWithOptions:(NSDictionary *)launchOptions
     
 #ifdef ZPDEBUG
 
-    if(CRITTERCISM_KEY != nil) [Crittercism enableWithAppID:CRITTERCISM_KEY];
+    if(CRITTERCISM_KEY != nil) [Crittercism enableWithAppID:(NSString*)CRITTERCISM_KEY];
 
     if(TESTFLIGHT_KEY != nil){
         
@@ -99,7 +104,7 @@ didFinishLaunchingWithOptions:(NSDictionary *)launchOptions
 #pragma clang diagnostic pop
         
         
-        [TestFlight takeOff:TESTFLIGHT_KEY];
+        [TestFlight takeOff:(NSString*)TESTFLIGHT_KEY];
     }
     
     //Perform a memory warning every 2 seconds
@@ -115,7 +120,7 @@ didFinishLaunchingWithOptions:(NSDictionary *)launchOptions
     
 #else
     if([ZPPreferences reportErrors]){
-        if(CRITTERCISM_KEY != nil) [Crittercism enableWithAppID:CRITTERCISM_KEY];
+        if(CRITTERCISM_KEY != nil) [Crittercism enableWithAppID:(NSString*) CRITTERCISM_KEY];
 //        if(TESTFLIGHT_KEY != nil) [TestFlight takeOff:TESTFLIGHT_KEY];
     }
     self.fileLogger.logFormatter = [[ZPFileLogFormatter alloc] initWithLevel:LOG_LEVEL_INFO];
@@ -128,7 +133,8 @@ didFinishLaunchingWithOptions:(NSDictionary *)launchOptions
     
     
     [ZPPreferences checkAndProcessApplicationResetPreferences];
-     
+    
+    // Initialize the cache managers
     
     // Override point for customization after application launch.
     if ([[UIDevice currentDevice] userInterfaceIdiom] == UIUserInterfaceIdiomPad) {
@@ -253,7 +259,7 @@ didFinishLaunchingWithOptions:(NSDictionary *)launchOptions
             
             [self dismissViewControllerHierarchy];
             [self.window.rootViewController performSegueWithIdentifier:@"Import" sender:url];
-            [[ZPCacheController instance] addAttachmentToUploadQueue:attachment withNewFile:url];
+            [ZPFileUploadManager addAttachmentToUploadQueue:attachment withNewFile:url];
         }
                                                                 
         

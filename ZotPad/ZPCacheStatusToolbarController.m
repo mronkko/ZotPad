@@ -8,7 +8,12 @@
 
 #import "ZPCore.h"
 #import "ZPCacheStatusToolbarController.h"
-#import "ZPCacheController.h"
+
+#import "ZPItemDataDownloadManager.h"
+#import "ZPItemDataUploadManager.h"
+#import "ZPFileDownloadManager.h"
+#import "ZPFileUploadManager.h"
+#import "ZPFileCacheManager.h"
 
 @implementation ZPCacheStatusToolbarController
 
@@ -63,7 +68,11 @@
 
     }
     
-    [[ZPCacheController instance] setStatusView:self];
+    [ZPItemDataDownloadManager setStatusView:self];
+    [ZPItemDataUploadManager setStatusView:self];
+    [ZPFileDownloadManager setStatusView:self];
+    [ZPFileUploadManager setStatusView:self];
+    [ZPFileCacheManager setStatusView:self];
     
     return self;
 
