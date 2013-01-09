@@ -394,7 +394,7 @@
         else{
             NSObject* lastName = [creator objectForKey:@"lastName"];
             if(! [lastName isKindOfClass:[NSString class]] ||  [(NSString*)lastName isEqualToString:@""]){
-                returnString =  [creator objectForKey:@"shortName"];
+                returnString =  [creator objectForKey:@"name"];
             }
             else{
                 returnString =  [NSString stringWithFormat:@"%@ %@",[creator objectForKey:@"firstName"],lastName];

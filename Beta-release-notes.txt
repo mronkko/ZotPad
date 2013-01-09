@@ -18,10 +18,7 @@ Saving tags and notes has not been implemented yet. This will be added in the ne
 
 GENERAL: 
 
-- Major changes in file uploading, which should fix most of the problems
-- Adds additional preference for troubleshooting file uploads
-- Fixes a bug that prevented opening linked URLs in mobile safari
-- Added Crittercism for crash monitoring (http://www.crittercism.com)
+- Fixes a problem that caused institutional authors names to not display in the item detail view.
 
 ----- Other new features and notable changes since ZotPad 1.1.2 ------
 
