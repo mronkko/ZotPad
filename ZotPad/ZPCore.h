@@ -24,7 +24,7 @@
 
 #import "DDLog.h"
 
-static const int ddLogLevel = LOG_LEVEL_OFF;
+static const int ddLogLevel = LOG_LEVEL_INFO;
 
 // Notifications about data available from server
 

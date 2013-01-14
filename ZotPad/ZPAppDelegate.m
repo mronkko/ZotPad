@@ -123,14 +123,16 @@ didFinishLaunchingWithOptions:(NSDictionary *)launchOptions
     
 #else
     if([ZPPreferences reportErrors]){
-        if(CRITTERCISM_KEY != nil) [Crittercism enableWithAppID:(NSString*) CRITTERCISM_KEY];
+        if(CRITTERCISM_KEY != nil){
+            [Crittercism enableWithAppID:(NSString*) CRITTERCISM_KEY];
+        }
     }
     self.fileLogger.logFormatter = [[ZPFileLogFormatter alloc] initWithLevel:LOG_LEVEL_INFO];
 
 #endif
     
     [DDLog addLogger:self.fileLogger];
-
+    DDLogInfo(@"ZotPad is starting");
     DDLogVerbose(@"Verbose logging is enabled");
     
     
