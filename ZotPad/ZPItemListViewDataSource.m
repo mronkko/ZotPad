@@ -389,7 +389,8 @@ static ZPItemListViewDataSource* _instance;
         
         if(item==NULL){
             cell = [aTableView dequeueReusableCellWithIdentifier:@"LoadingCell"];
-            //DDLogVerbose(@"Cell identifier is LoadingCell");
+            //Togle the actiity view on
+            [(UIActivityIndicatorView*) [cell viewWithTag:1] startAnimating];
         }
         else{
             NSLog(@"Loading cell for row %i",indexPath.row);
