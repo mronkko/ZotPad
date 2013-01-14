@@ -11,8 +11,8 @@
 
 
 
-#import "ZPCacheController.h"
-#import "ASIHTTPRequest.h"
+#import "ZPFileCacheManager.h"
+
 #import "../InAppSettingsKit/InAppSettingsKit/Models/IASKSettingsReader.h"
 #import "../InAppSettingsKit/InAppSettingsKit/Models/IASKSpecifier.h"
 
@@ -33,8 +33,6 @@ static NSInteger _maxCacheSize;
     
     NSUserDefaults* defaults = [NSUserDefaults standardUserDefaults];
 
-    
-    
     //Read the defaults preferences and set these if no preferences are set.
     
     NSString *settingsBundle = [[NSBundle mainBundle] pathForResource:@"Settings" ofType:@"bundle"];
@@ -69,8 +67,40 @@ static NSInteger _maxCacheSize;
     float rawmax = [defaults floatForKey:@"cachesizemax"];
     _maxCacheSize = rawmax*1024*1024;
     
-    //Dump the preferences into log
-  
+    // Alert if webdav is misconfigured
+    
+    if ([self useWebDAV]) {
+        NSString* webdavUrl = [self webDAVURL];
+        
+        if(![webdavUrl hasPrefix:@"http"] || ! [webdavUrl hasSuffix:@"/zotero"]){
+            
+            NSString* newWebDAVURL = webdavUrl;
+            if(! [webdavUrl hasPrefix:@"http"]) newWebDAVURL = [NSString stringWithFormat:@"http://%@",newWebDAVURL];
+            if(! [webdavUrl hasSuffix:@"/zotero"]) newWebDAVURL = [NSString stringWithFormat:@"%@/zotero",newWebDAVURL];
+            
+            [[[UIAlertView alloc] initWithTitle:@"WebDAV configuration error"
+                                       message:[NSString stringWithFormat:@"WebDAV is enabled, but the WebDAV address was not specified correctly. The WebDAV address must start with 'http://' or 'https://' and end with '/zotero'. The WebDAV url was '%@' and has been automaticall changed to '%@'",webdavUrl,newWebDAVURL]
+                                      delegate:NULL
+                             cancelButtonTitle:@"OK"
+                              otherButtonTitles: nil] show];
+            
+            NSUserDefaults* defaults = [NSUserDefaults standardUserDefaults];
+            [defaults setObject:newWebDAVURL forKey:@"webdavurl"];
+
+        }
+
+    }
+
+}
+
++(NSString*) preferencesAsDescriptiveString{
+
+    //Dump the preferences into a string
+    
+    NSMutableString* preferenceString = [[NSMutableString alloc] init];
+    
+    NSUserDefaults* defaults = [NSUserDefaults standardUserDefaults];
+
     for(NSString* file in [NSArray arrayWithObjects:@"Root", @"Dropbox", nil]){
         IASKSettingsReader* reader = [[IASKSettingsReader alloc] initWithFile:file];
         for(NSInteger section =0 ; section < [reader numberOfSections]; section++){
@@ -80,27 +110,18 @@ static NSInteger _maxCacheSize;
                     NSObject* valueObject = [defaults objectForKey:prefItem.key];
                     NSString* valueTitle= [prefItem titleForCurrentValue:valueObject];
                     NSString* title = [prefItem title];
-                    if([@"" isEqualToString:valueTitle]) DDLogInfo(@"%@: %@",title, valueObject);
-                    else DDLogInfo(@"%@: %@",title, valueTitle);
+                    if([@"" isEqualToString:valueTitle]){
+                        [preferenceString appendFormat:@"%@: %@\n",title, valueObject];
+                    }
+                    else{
+                        [preferenceString appendFormat:@"%@: %@\n",title, valueTitle];
+                    }
                 }
             }
             
         }
     }
-    // Alert if webdav is misconfigured
-    
-    if ([self useWebDAV]) {
-        NSString* webdavUrl = [self webDAVURL];
-        
-        if(![webdavUrl hasPrefix:@"http"] || ! [webdavUrl hasSuffix:@"/zotero"]){
-            [[[UIAlertView alloc] initWithTitle:@"WebDAV configuration error"
-                                       message:[NSString stringWithFormat:@"WebDAV is enabled, but the WebDAV address is not specified correctly. Please check that the WebDAV address starts with 'http://' or 'https://' and ends with '/zotero'. The current value is '%@'",webdavUrl]
-                                      delegate:NULL
-                             cancelButtonTitle:@"OK"
-                              otherButtonTitles: nil] show];
-        }
-
-    }
+    return preferenceString;
 
 }
 
@@ -115,7 +136,7 @@ static NSInteger _maxCacheSize;
         //Also reset the data
 
         [ZPDatabase resetDatabase];
-        [[ZPCacheController instance] performSelectorInBackground:@selector(purgeAllAttachmentFilesFromCache) withObject:NULL];
+        [ZPFileCacheManager performSelectorInBackground:@selector(purgeAllAttachmentFilesFromCache) withObject:NULL];
         
         [defaults removeObjectForKey:@"resetusername"];
         [defaults removeObjectForKey:@"resetdata"];
@@ -126,7 +147,7 @@ static NSInteger _maxCacheSize;
         DDLogWarn(@"Reseting itemdata and deleting cached attachments");
         [defaults removeObjectForKey:@"resetdata"];
         [ZPDatabase resetDatabase];
-        [[ZPCacheController instance] performSelectorInBackground:@selector(purgeAllAttachmentFilesFromCache) withObject:NULL];
+        [ZPFileCacheManager performSelectorInBackground:@selector(purgeAllAttachmentFilesFromCache) withObject:NULL];
     }
 }
 +(void) resetUserCredentials{
@@ -290,7 +311,7 @@ static NSInteger _maxCacheSize;
     if([ret hasSuffix:@"/"]){
         ret = [ret substringToIndex:[ret length] - 1];
     }
-    
+
     return ret;
 }
 
@@ -374,6 +395,10 @@ static NSInteger _maxCacheSize;
     NSUserDefaults* defaults = [NSUserDefaults standardUserDefaults];
     return [defaults boolForKey:@"debugcitationparser"];
 }
++(BOOL) debugFileUploads{
+    NSUserDefaults* defaults = [NSUserDefaults standardUserDefaults];
+    return [defaults boolForKey:@"debugfileuploads"];
+}
 
 +(BOOL) addIdentifiersToAPIRequests{
     NSUserDefaults* defaults = [NSUserDefaults standardUserDefaults];
@@ -382,9 +407,23 @@ static NSInteger _maxCacheSize;
 
 +(NSString*) favoritesCollectionTitle{
     NSUserDefaults* defaults = [NSUserDefaults standardUserDefaults];
-    return [defaults stringForKey:@"favoritescollectiontitle"];
+    NSString* value = [defaults stringForKey:@"favoritescollectiontitle"];
+    if(value == NULL || [value isEqualToString:@""]){
+        value = @"ZotPad favourites";
+    }
+    return value;
     
 }
 
++(BOOL) prioritizePDFsInAttachmentLists{
+    NSUserDefaults* defaults = [NSUserDefaults standardUserDefaults];
+    return [defaults boolForKey:@"prioritizepdfs"];
+}
+
++(BOOL) displayItemKeys
+{
+    NSUserDefaults* defaults = [NSUserDefaults standardUserDefaults];
+    return [defaults boolForKey:@"displayitemkeys"];
+}
 
 @end

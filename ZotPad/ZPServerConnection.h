@@ -1,0 +1,47 @@
+//
+//  ZPServerConnection.h
+//  ZotPad
+//
+//  Handles communication with Zotero server.
+//
+//  Created by Rönkkö Mikko on 11/21/11.
+//  Copyright (c) 2011 Mikko Rönkkö. All rights reserved.
+//
+
+#import <Foundation/Foundation.h>
+#import "ZPAuthenticationDialog.h"
+#import "ZPServerResponseXMLParser.h"
+
+
+
+
+#import "ZPFileChannel.h"
+
+
+@interface ZPServerConnection : NSObject{
+}
+
+// Check if the connection is already authenticated
++(BOOL) authenticated;
+
+// Methods to get data from the server
++(void) retrieveLibrariesFromServer;
++(void) retrieveCollectionsForLibraryFromServer:(NSInteger)libraryID;
+
++(void) retrieveItemsFromLibrary:(NSInteger)libraryID itemKeys:(NSArray*)keys;
+
++(void) retrieveKeysInLibrary:(NSInteger)libraryID collection:(NSString*)key;
++(void) retrieveKeysInLibrary:(NSInteger)libraryID collection:(NSString*)collectionKey searchString:(NSString*)searchString tags:(NSArray*)tags orderField:(NSString*)orderField sortDescending:(BOOL)sortDescending;
+    
++(void) retrieveTimestampForLibrary:(NSInteger)libraryID collection:(NSString*)key;
++(void) retrieveAllItemKeysFromLibrary:(NSInteger)libraryID;
+
+//This retrieves single item details and notes and attachments associated with that item
++(void) retrieveSingleItemAndChildrenFromServer:(ZPZoteroItem*)item;
+
+//This retrieves a single attachment and processes it with a block
++(void) retrieveSingleItem:(ZPZoteroAttachment*)item completion:(void(^)(NSArray*))completionBlock;
+
++(NSInteger) numberOfActiveMetadataRequests;
+
+@end

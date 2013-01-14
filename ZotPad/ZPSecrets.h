@@ -28,10 +28,12 @@ static const NSString* DROPBOX_SECRET = @"6azju842azhs5oz";
 static const NSString* DROPBOX_KEY_FULL_ACCESS = @"w1nps3e4js2va7z";
 static const NSString* DROPBOX_SECRET_FULL_ACCESS = @"vvk17pjqx0ngjs3";
 
-static const NSString* USERVOICE_API_KEY = nil;
-static const NSString* USERVOICE_SECRET = nil;
+static const NSString* USERVOICE_API_KEY = @"7Dxx3D5IB1fvrc3X42KBTg";
+static const NSString* USERVOICE_SECRET = @"hfThpmD59PwAtNf1aT9aK5RjrUZnvqg15aENZQxav8";
 
-static const NSString* TESTFLIGHT_KEY = nil;
+static const NSString* TESTFLIGHT_KEY = @"5e753f234f33fc2bddf4437600037fbf_NjcyMjEyMDEyLTA0LTA5IDE0OjUyOjU0LjE4MDQwMg";
+
+static const NSString* CRITTERCISM_KEY = @"50e6e44a89ea7410f4000023";
 
 #else
 
@@ -47,6 +49,8 @@ static const NSString* DROPBOX_KEY_FULL_ACCESS = nil;
 static const NSString* DROPBOX_SECRET_FULL_ACCESS = nil;
 
 static const NSString* TESTFLIGHT_KEY = nil;
+
+static const NSString* CRITTERCISM_KEY = @"50e6e3f6f716964fbb000021";
 
 #endif
 

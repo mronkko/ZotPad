@@ -14,125 +14,8 @@
 #import "ZPLocalization.h"
 
 #import "ZPAppDelegate.h"
-
-//TODO: Refactor so that these would not be needed
-
-
-#import "ZPCacheController.h"
-
-
-//A small helper class for performing configuration of uncanched items list in itemlistview
-
-//TODO: Refactor this away
-
-#pragma mark - Helper class for requesting item data from the server
-
-/*
-@interface ZPUncachedItemsOperation : NSOperation {
-@private
-    NSString*_searchString;
-    NSString*_collectionKey;
-    NSInteger _libraryID;
-    NSString* _orderField;
-    BOOL _sortDescending;
-    ZPItemListViewDataSource* _itemListDataSource;
-    ZPItemListViewController* _itemListController;
-}
-
--(id) initWithItemListController:(ZPItemListViewController*)itemListController dataSource:(ZPItemListViewDataSource*) dataSource ;
-
-@end
-
-@implementation ZPUncachedItemsOperation;
-
--(id) initWithItemListController:(ZPItemListViewController*)itemListController dataSource:(ZPItemListViewDataSource *)dataSource{
-    self = [super init];
-    _itemListDataSource = dataSource;
-    _itemListController=itemListController;
-    _searchString = dataSource.searchString;
-    _collectionKey = dataSource.key;
-    _libraryID = dataSource.libraryID;
-    _orderField = dataSource.orderField;
-    _sortDescending = dataSource.sortDescending;
-    
-    return self;
-}
-
--(void)main {
-    
-    if ( self.isCancelled ) return;
-    //DDLogVerbose(@"Clearing table");
-    
-    [_itemListDataSource clearTable];
-    //DDLogVerbose(@"Retrieving cached keys");
-    NSArray* cacheKeys= [ZPDatabase getItemKeysFromCacheForLibrary:_libraryID collection:_collectionKey
-                                                                  searchString:_searchString orderField:_orderField sortDescending:_sortDescending];
-    //DDLogVerbose(@"Got cached keys");
-    if ( self.isCancelled ) return;
-    
-    if([cacheKeys count]>0){
-        //DDLogVerbose(@"Configuring cached keys");
-        
-        [_itemListDataSource configureCachedKeys:cacheKeys];
-    }
-    
-    if(![ZPPreferences online]){
-        [_itemListDataSource configureUncachedKeys:[NSArray array]];
-    }
-    else{
-        if ( self.isCancelled ) return;
-        //DDLogVerbose(@"Retrieving server keys");
-        
-        if([cacheKeys count]==0){
-            //DDLogVerbose(@"Making view busy");
-            [_itemListController performSelectorOnMainThread:@selector(makeBusy) withObject:NULL waitUntilDone:FALSE];        
-        }
-        NSArray* serverKeys =[ZPServerConnectionManager retrieveKeysInLibrary:_libraryID collection:_collectionKey searchString:_searchString orderField:_orderField sortDescending:_sortDescending];
-        
-        NSMutableArray* uncachedItems = [NSMutableArray arrayWithArray:serverKeys];
-        [uncachedItems removeObjectsInArray:cacheKeys];
-        
-        //Check if the collection memberships are still valid in the cache
-        if(_searchString == NULL || [_searchString isEqualToString:@""]){
-            if([serverKeys count]!=[cacheKeys count] || [uncachedItems count] > 0){
-                if(_collectionKey == NULL){
-                    [ZPDatabase deleteItemKeysNotInArray:serverKeys fromLibrary:_libraryID];
-                    //DDLogVerbose(@"Deleted old items from library");
-                    
-                }
-                else{
-                    [ZPDatabase removeItemKeysNotInArray:serverKeys fromCollection:_collectionKey];
-                    [ZPDatabase addItemKeys:uncachedItems toCollection:_collectionKey];
-                    //DDLogVerbose(@"Refreshed collection memberships in cache");
-                    
-                }
-                
-            }
-        }
-        
-        if ( self.isCancelled ) return;
-        
-        //Add this into the queue if there are any uncached items
-        if([uncachedItems count]>0){
-            [[ZPCacheController instance] addToItemQueue:uncachedItems libraryID:_libraryID priority:YES];
-            
-            if(![_searchString isEqualToString:@""]){
-                if(_collectionKey!=NULL && ! [_searchString isEqualToString:@""]) [[ZPCacheController instance] addToCollectionsQueue:(ZPZoteroCollection*)[ZPZoteroCollection collectionWithKey:_collectionKey]  priority:YES];
-                else [[ZPCacheController instance] addToLibrariesQueue:(ZPZoteroLibrary*)[ZPZoteroLibrary libraryWithID: _libraryID] priority:YES];
-            }
-        }
-        
-        if ( self.isCancelled ) return;
-        //DDLogVerbose(@"Setting server keys");
-        
-        [_itemListDataSource configureUncachedKeys:uncachedItems];
-        [_itemListController performSelectorOnMainThread:@selector(makeAvailable) withObject:NULL waitUntilDone:FALSE];        
-    }
-    
-}
-@end
-
-*/
+#import "ZPReachability.h"
+#import "ZPServerConnection.h"
 
 //A helped class for setting sort buttons
 
@@ -276,11 +159,11 @@
         // Configuring the item list content starts here.
          
         
-        if([ZPServerConnectionManager hasInternetConnection]){
+        if([ZPReachability hasInternetConnection]){
 
             [_activityIndicator startAnimating];
             
-            [ZPServerConnectionManager retrieveKeysInLibrary:_dataSource.libraryID
+            [ZPServerConnection retrieveKeysInLibrary:_dataSource.libraryID
                                                   collection:_dataSource.collectionKey
                                                 searchString:_dataSource.searchString
                                                         tags:_dataSource.tags
@@ -307,7 +190,7 @@
         
         //If there is nothing to display, make the view busy until we receive something from the server.
         
-        if([ZPServerConnectionManager hasInternetConnection] && [cacheKeys count]==0) [self makeBusy];
+        if([ZPReachability hasInternetConnection] && [cacheKeys count]==0) [self makeBusy];
         else [self makeAvailable];
         
     }
@@ -318,6 +201,9 @@
     NSDictionary* userInfo =notification.userInfo;
     
     if(_waitingForData){
+
+        DDLogVerbose(@"The user interface was waiting for data, processing the received items");
+
         NSInteger libraryID = [[userInfo objectForKey:ZPKEY_LIBRARY_ID] integerValue];
         NSString* collectionKey = [userInfo objectForKey:ZPKEY_COLLECTION_KEY];
         NSString* searchString = [userInfo objectForKey:ZPKEY_SEARCH_STRING];
@@ -337,11 +223,14 @@
            [orderField isEqualToString:_dataSource.orderField] &&
            ((tags == NULL && [_dataSource.tags count] == 0) || [_dataSource.tags isEqualToArray:tags])  &&
            sortDescending == _dataSource.sortDescending){
-        
+
             NSArray* itemKeys = notification.object;
             [_dataSource configureServerKeys:itemKeys];
             [self makeAvailable];
         }
+    }
+    else{
+        DDLogVerbose(@"The user interface was not waiting for data, ignored the received items");
     }
 }
 
@@ -415,8 +304,6 @@
                                              selector:@selector(processItemListAvailableNotification:)
                                                  name:ZPNOTIFICATION_ITEM_LIST_AVAILABLE
                                                object:nil];
-
-    DDLogInfo(@"Loading item list in the content area");
 
     [super viewDidLoad];
     

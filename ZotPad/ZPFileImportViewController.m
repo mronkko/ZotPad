@@ -12,7 +12,7 @@
 #include <QuartzCore/QuartzCore.h>
 
 
-#import "ZPCacheController.h"
+#import "ZPItemDataDownloadManager.h"
 #import "ZPAttachmentCarouselDelegate.h"
 #import "ZPUploadVersionConflictViewControllerViewController.h"
 
@@ -35,6 +35,8 @@
 - (void)viewWillAppear:(BOOL)animated{
     [super viewWillAppear:animated];
 
+    ZPZoteroAttachment* attachment = [ZPZoteroAttachment dataObjectForAttachedFile:url.absoluteString];
+
     //The carousel needs to be configured here so that we know the dimensions
     
     if(_carouselDelegate == NULL){
@@ -43,17 +45,21 @@
         _carouselDelegate.mode = ZPATTACHMENTICONGVIEWCONTROLLER_MODE_UPLOAD;
         _carouselDelegate.show = ZPATTACHMENTICONGVIEWCONTROLLER_SHOW_MODIFIED;
         _carouselDelegate.attachmentCarousel = carousel;
-        ZPZoteroAttachment* attachment = [ZPZoteroAttachment dataObjectForAttachedFile:url.absoluteString];
         [_carouselDelegate configureWithAttachmentArray:[NSArray arrayWithObject:attachment]];
         carousel.dataSource = _carouselDelegate;
         carousel.delegate = self;
     }
+    
 }
-
 - (void)viewDidAppear:(BOOL)animated{
     [super viewDidAppear:animated];
     isFullyPresented = TRUE;
 }
+- (void)viewWillDisappear:(BOOL)animated{
+    [super viewWillDisappear:animated];
+    [[NSNotificationCenter defaultCenter] removeObserver:self];
+}
+
 -(void) dealloc{
     [_carouselDelegate unregisterProgressViewsBeforeUnloading];
 }

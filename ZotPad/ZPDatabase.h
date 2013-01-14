@@ -104,8 +104,18 @@
 
 +(void) writeVersionInfoForAttachment:(ZPZoteroAttachment*)attachment;
 
-+(void) writeItems:(NSArray*)items toCollection:(NSString*)collectionKey isLocalModification:(BOOL)isLocalModification;
-+(void) addItemKeys:(NSArray*)keys toCollection:(NSString*)collectionKey isLocalModification:(BOOL)isLocalModification;
++(void) writeItems:(NSArray*)items toCollection:(NSString*)collectionKey;
++(void) addItemKeys:(NSArray*)keys toCollection:(NSString*)collectionKey;
+
+// Locally modified collection memberships
++(void) addItemLocally:(ZPZoteroItem*)item toCollection:(NSString*)collectionKey;
++(void) removeItemLocally:(ZPZoteroItem*)item fromCollection:(NSString*)collectionKey;
+
+// Locally modifying notes
++(void) createLocallyModifiedNoteWithContent:(NSString*) noteText asChildForItem:(ZPZoteroItem*)item;
+
+
+// Locally modifying tags
 
 +(void) writeItemsCreators:(NSArray*)items;
 +(void) writeItemsFields:(NSArray*)items;

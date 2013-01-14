@@ -8,6 +8,7 @@
 
 #import "ZPOpenURL.h"
 #import "ZPDate.h"
+#import "NSString+URLEncoding.h"
 
 @interface ZPOpenURL(){
     NSMutableDictionary* _fields;

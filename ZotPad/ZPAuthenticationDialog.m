@@ -11,7 +11,6 @@
 #import "ZPAuthenticationDialog.h"
 #import "OAToken.h"
 #import "DSActivityView.h"
-#import "ZPCacheController.h"
 #import "ZPSecrets.h"
 
 @implementation ZPAuthenticationDialog
@@ -237,8 +236,8 @@
         _username = username;
         
         //Tell the application to start updating libraries and collections from server
-        //TODO: Refactor to use notifications
-        [ZPServerConnectionManager retrieveLibrariesFromServer];
+        [[NSNotificationCenter defaultCenter] postNotificationName:ZPNOTIFICATION_ZOTERO_AUTHENTICATION_SUCCESSFUL object:nil];
+ 
         
     }
     

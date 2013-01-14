@@ -12,9 +12,11 @@
 #import "OHAttributedLabel.h"
 #import "ZPAttachmentIconImageFactory.h"
 
-#import "ZPCacheController.h"
+#import "ZPItemDataDownloadManager.h"
 #import "ZPItemListViewController.h"
 #import "ZPFileViewerViewController.h"
+
+#import "ZPReachability.h"
 
 #define SIZE_OF_TABLEVIEW_UPDATE_BATCH 25
 #define SIZE_OF_DATABASE_UPDATE_BATCH 50
@@ -43,7 +45,7 @@ static ZPItemListViewDataSource* _instance;
 
 -(id)init{
     self= [super init];
-
+    
     [[NSNotificationCenter defaultCenter] addObserver:self
                                              selector:@selector(notifyItemsAvailable:)
                                                  name:ZPNOTIFICATION_ITEMS_AVAILABLE
@@ -76,9 +78,7 @@ static ZPItemListViewDataSource* _instance;
         
         _itemKeysNotInCache = [NSMutableArray array];
         _itemKeysShown = [NSArray array];
-                
-        //TODO: Investigate why a relaodsection call a bit below causes a crash. Then uncomment these both.
-        //[_tableView reloadSections:[NSIndexSet indexSetWithIndex:0] withRowAnimation:UITableViewRowAnimationAutomatic];
+        
         if(needsReload){
             [_tableView performSelectorOnMainThread:@selector(reloadData) withObject:NULL waitUntilDone:YES];
             //DDLogVerbose(@"Reloaded data (1). Number of rows now %i",[self tableView:_tableView  numberOfRowsInSection:0]);
@@ -104,6 +104,7 @@ static ZPItemListViewDataSource* _instance;
     _itemKeysNotInCache = [NSMutableArray arrayWithArray:uncachedItems];
     [_itemKeysNotInCache removeObjectsInArray:_itemKeysShown];
     _invalidated = FALSE;
+    
     [self _performTableUpdates:FALSE];
     //DDLogVerbose(@"Configured uncached keys");
     
@@ -120,164 +121,157 @@ static ZPItemListViewDataSource* _instance;
 
 -(void) _performTableUpdates:(BOOL)animated{
     
-    //DDLogVerbose(@"Start table updates");
-    //Only one thread at a time
-    @synchronized(self){
-        //Get a pointer to an array to know if another thread has changed this in the background
-        NSArray* thisItemKeys = _itemKeysShown;
-        
-        //Copy the array to be safe from accessing it using multiple threads
-        NSMutableArray* newItemKeysShown = [NSMutableArray arrayWithArray:_itemKeysShown];
-        
-        NSArray* newKeys = [ZPDatabase getItemKeysForLibrary:self.libraryID collectionKey:self.collectionKey
-                                                searchString:[self.searchString stringByTrimmingCharactersInSet:[NSCharacterSet whitespaceAndNewlineCharacterSet]]
-                                                        tags:_selectedTags
-                                                  orderField:self.orderField
-                                              sortDescending:self.sortDescending];
-        
-        
-        //If there is a new set of items loaded, return without performing any updates. 
-        if(thisItemKeys != _itemKeysShown || _invalidated) return;
-        
-        //DDLogVerbose(@"Beging updating the table rows: Known keys befor update %i. Unknown keys %i. New keys %i",[_itemKeysShown count],[_itemKeysNotInCache count],[newKeys count]);
-        
-        @synchronized(_itemKeysNotInCache){
-            [_itemKeysNotInCache removeObjectsInArray:newKeys];
-        }
-        
-        NSInteger index=0;
-        NSMutableArray* reloadIndices = [NSMutableArray array];
-        NSMutableArray* insertIndices = [NSMutableArray array];
-        
-        for(NSString* newKey in newKeys){
-            //If there is a new set of items loaded, return without performing any updates. 
-            if(thisItemKeys != _itemKeysShown || _invalidated ) return;
+    //This can be performance intensive, so execute it in background
+    if([NSThread isMainThread]){
+        [self performSelectorInBackground:@selector(_performTableUpdates:) withObject:[NSNumber numberWithBool:animated]];
+    }
+    else{
+        //Only one thread at a time can make changes in the table
+        @synchronized(self){
+            //Get a pointer to an array to know if another thread has changed this in the background
+            NSArray* thisItemKeys = _itemKeysShown;
             
-            //First index contains a placeholder cell
+            //Copy the array to be safe from accessing it using multiple threads
+            NSMutableArray* newItemKeysShown = [NSMutableArray arrayWithArray:_itemKeysShown];
             
-            if([newItemKeysShown count] == index){
-                // //DDLogVerbose(@"Adding item %@ at %i",newKey,index);
-                [newItemKeysShown addObject:newKey];
-                if(index==0) [reloadIndices addObject:[NSIndexPath indexPathForRow:index inSection:0]];
-                else [insertIndices addObject:[NSIndexPath indexPathForRow:index inSection:0]];
-            }
-            else if([newItemKeysShown objectAtIndex:index] == [NSNull null]){
-                // //DDLogVerbose(@"Replacing NULL with %@ at %i",newKey,index);
-                [newItemKeysShown replaceObjectAtIndex:index withObject:newKey];
-                [reloadIndices addObject:[NSIndexPath indexPathForRow:index inSection:0]];
-            }
+            NSArray* newKeys = [ZPDatabase getItemKeysForLibrary:self.libraryID collectionKey:self.collectionKey
+                                                    searchString:[self.searchString stringByTrimmingCharactersInSet:[NSCharacterSet whitespaceAndNewlineCharacterSet]]
+                                                            tags:_selectedTags
+                                                      orderField:self.orderField
+                                                  sortDescending:self.sortDescending];
             
-            //There is something in the way, so we need to either insert or move
-            else if(![newKey isEqualToString:[newItemKeysShown objectAtIndex:index]]){
-                
-                //We found that a shown key does not match the data on server
-                
-                NSInteger oldIndex = [newItemKeysShown indexOfObject:newKey];
-                
-                //If the new data cannot be found in the view, insert it
-                if(oldIndex==NSNotFound){
-                    //   //DDLogVerbose(@"Inserting %@ at %i",newKey,index);
-                    [newItemKeysShown insertObject:newKey atIndex:index];
-                    [insertIndices addObject:[NSIndexPath indexPathForRow:index inSection:0]];
-                }
-                //Else move it
-                else{
-                    // //DDLogVerbose(@"Moving %@ from %i to %i",newKey,oldIndex,index);
-                    
-                    //Instead of performing a move operation, we are just replacing the old location with null. This because of thread safety.
-                    
-                    [newItemKeysShown replaceObjectAtIndex:oldIndex withObject:[NSNull null]];
-                    [newItemKeysShown insertObject:newKey atIndex:index];
-                    [insertIndices addObject:[NSIndexPath indexPathForRow:index inSection:0]];
-                    [reloadIndices addObject:[NSIndexPath indexPathForRow:oldIndex inSection:0]];
-                }
-            }
-            index++;
-        }
-        
-        //Add empty rows to the end if there are still unknown rows
-        @synchronized(_itemKeysNotInCache){
-            while([newItemKeysShown count]<([_itemKeysNotInCache count] + [newKeys count])){
-                //            //DDLogVerbose(@"Padding with null %i (Unknown keys: %i, Known keys: %i)",[newItemKeysShown count],[_itemKeysNotInCache count],[newKeys count]);
-                if([newItemKeysShown count]==0)
-                    [reloadIndices addObject:[NSIndexPath indexPathForRow:0 inSection:0]];
-                else{
-                    [insertIndices addObject:[NSIndexPath indexPathForRow:[newItemKeysShown count] inSection:0]];
-                }
-                [newItemKeysShown addObject:[NSNull null]];
-            }
-        }
-        
-        @synchronized(_tableView){
             
+            //If there is a new set of items loaded, return without performing any updates.
             if(thisItemKeys != _itemKeysShown || _invalidated) return;
+                        
+            @synchronized(_itemKeysNotInCache){
+                [_itemKeysNotInCache removeObjectsInArray:newKeys];
+            }
             
-            _itemKeysShown = newItemKeysShown;
+            // If we are loading the new keys with animations, we need to determine which rows to insert, reload, and delete
             
-            NSNumber* tableLength = [NSNumber numberWithInt:[_itemKeysNotInCache count] + [newKeys count]];
-            //DDLogVerbose(@"Items found from DB %i, items that are still uncached %i",[newKeys count],[_itemKeysNotInCache count]);
+            NSMutableArray* reloadIndices;
+            NSMutableArray* insertIndices;
+            
             if(animated){
-                SEL selector = @selector(_performRowInsertions:reloads:tableLength:);
-                NSMethodSignature* signature = [[self class] instanceMethodSignatureForSelector:selector];
-                NSInvocation* invocation  = [NSInvocation invocationWithMethodSignature:signature];
-                [invocation setTarget:self];
-                [invocation setSelector:selector];
+                NSInteger index=0;
+                reloadIndices = [NSMutableArray array];
+                insertIndices = [NSMutableArray array];
                 
-                //Set arguments
-                [invocation setArgument:&insertIndices atIndex:2];
-                [invocation setArgument:&reloadIndices atIndex:3];
-                [invocation setArgument:&tableLength atIndex:4];
-                
-                
-                [invocation performSelectorOnMainThread:@selector(invoke) withObject:NULL waitUntilDone:YES];
-            }
-            else{
-                if([tableLength intValue]>[_itemKeysShown count]){
-                    _itemKeysShown = [_itemKeysShown subarrayWithRange:NSMakeRange(0,[tableLength intValue])];
+                for(NSString* newKey in newKeys){
+                    //If there is a new set of items loaded, return without performing any updates.
+                    if(thisItemKeys != _itemKeysShown || _invalidated ) return;
+                    
+                    //First index contains a placeholder cell
+                    
+                    if([newItemKeysShown count] == index){
+                        // //DDLogVerbose(@"Adding item %@ at %i",newKey,index);
+                        [newItemKeysShown addObject:newKey];
+                        if(index==0) [reloadIndices addObject:[NSIndexPath indexPathForRow:index inSection:0]];
+                        else [insertIndices addObject:[NSIndexPath indexPathForRow:index inSection:0]];
+                    }
+                    else if([newItemKeysShown objectAtIndex:index] == [NSNull null]){
+                        // //DDLogVerbose(@"Replacing NULL with %@ at %i",newKey,index);
+                        [newItemKeysShown replaceObjectAtIndex:index withObject:newKey];
+                        [reloadIndices addObject:[NSIndexPath indexPathForRow:index inSection:0]];
+                    }
+                    
+                    //There is something in the way, so we need to either insert or move
+                    else if(![newKey isEqualToString:[newItemKeysShown objectAtIndex:index]]){
+                        
+                        //We found that a shown key does not match the data on server
+                        
+                        NSInteger oldIndex = [newItemKeysShown indexOfObject:newKey];
+                        
+                        //If the new data cannot be found in the view, insert it
+                        if(oldIndex==NSNotFound){
+                            //   //DDLogVerbose(@"Inserting %@ at %i",newKey,index);
+                            [newItemKeysShown insertObject:newKey atIndex:index];
+                            [insertIndices addObject:[NSIndexPath indexPathForRow:index inSection:0]];
+                        }
+                        //Else move it
+                        else{
+                            // //DDLogVerbose(@"Moving %@ from %i to %i",newKey,oldIndex,index);
+                            
+                            //Instead of performing a move operation, we are just replacing the old location with null. This because of thread safety.
+                            
+                            [newItemKeysShown replaceObjectAtIndex:oldIndex withObject:[NSNull null]];
+                            [newItemKeysShown insertObject:newKey atIndex:index];
+                            [insertIndices addObject:[NSIndexPath indexPathForRow:index inSection:0]];
+                            [reloadIndices addObject:[NSIndexPath indexPathForRow:oldIndex inSection:0]];
+                        }
+                    }
+                    index++;
                 }
-                [_tableView performSelectorOnMainThread:@selector(reloadData) withObject:NULL waitUntilDone:YES];
             }
-            //DDLogVerbose(@"End updating the table rows");
-            /*
-            if([_itemKeysNotInCache count] == 0){
-                [_activityIndicator stopAnimating];   
+
+            //Add empty rows to the end if there are still unknown rows
+            @synchronized(_itemKeysNotInCache){
+                NSInteger neededLenght = [_itemKeysNotInCache count] + [newKeys count];
+                while([newItemKeysShown count]<neededLenght){
+                    //            //DDLogVerbose(@"Padding with null %i (Unknown keys: %i, Known keys: %i)",[newItemKeysShown count],[_itemKeysNotInCache count],[newKeys count]);
+                    if([newItemKeysShown count]==0)
+                        [reloadIndices addObject:[NSIndexPath indexPathForRow:0 inSection:0]];
+                    else{
+                        [insertIndices addObject:[NSIndexPath indexPathForRow:[newItemKeysShown count] inSection:0]];
+                    }
+                    [newItemKeysShown addObject:[NSNull null]];
+                }
+
+                //This is the lenght of the table that we need to have
+                NSInteger tableLength = [_itemKeysNotInCache count] + [newKeys count];
+
+                //Trim placeholders from the end
+
+                if(tableLength<[newItemKeysShown count]){
+                    [newItemKeysShown subarrayWithRange:NSMakeRange(0,tableLength)];
+                }
             }
-            */
             
+            dispatch_async(dispatch_get_main_queue(), ^{
+                
+                if(thisItemKeys != _itemKeysShown || _invalidated) return;
+                
+                //DDLogVerbose(@"Items found from DB %i, items that are still uncached %i",[newKeys count],[_itemKeysNotInCache count]);
+                if(animated){
+                    
+                    NSInteger lengthAfterInsertingRows = [_tableView numberOfRowsInSection:0]+[insertIndices count];
+
+                    [_tableView beginUpdates];
+                    if([insertIndices count]>0){
+                        [_tableView insertRowsAtIndexPaths:insertIndices withRowAnimation:_animations];
+                    }
+                    if([reloadIndices count]>0){
+                        [_tableView reloadRowsAtIndexPaths:reloadIndices withRowAnimation:_animations];
+                    }
+                    
+                    NSInteger tableLength = [newItemKeysShown count];
+                    
+                    if(tableLength<lengthAfterInsertingRows){
+                        NSMutableArray* deleteIndexPaths = [NSMutableArray array];
+                        
+                        for(NSInteger i=tableLength;i<lengthAfterInsertingRows;i++){
+                            [deleteIndexPaths addObject:[NSIndexPath indexPathForRow:i inSection:0]];
+                        }
+                        
+                        [_tableView deleteRowsAtIndexPaths:deleteIndexPaths withRowAnimation:_animations];
+                        
+                    }
+
+                    _itemKeysShown = newItemKeysShown;
+                    [_tableView endUpdates];
+                    
+
+                }
+                else{
+                    _itemKeysShown = newItemKeysShown;
+                    [_tableView reloadData];
+                }
+            });
         }
     }
 }
 
-
--(void) _performRowInsertions:(NSArray*)insertIndexPaths reloads:(NSArray*)reloadIndexPaths tableLength:(NSInteger)tableLength{
-    //DDLogVerbose(@"Modifying the table. Inserts %i Reloads %i, Max length %@, Item key array length %i",[insertIndexPaths count],[reloadIndexPaths count],tableLength,[_itemKeysShown count]);
-    //    [_tableView beginUpdates];
-    //DDLogVerbose(@"Insert index paths %@",insertIndexPaths);
-    if([insertIndexPaths count]>0){
-        [_tableView insertRowsAtIndexPaths:insertIndexPaths withRowAnimation:_animations];   
-    }
-    //DDLogVerbose(@"Reload index paths %@",reloadIndexPaths);
-    if([reloadIndexPaths count]>0){
-        [_tableView reloadRowsAtIndexPaths:reloadIndexPaths withRowAnimation:_animations];   
-    }
-    
-    if(tableLength<[_itemKeysShown count]){
-        NSMutableArray* deleteIndexPaths = [NSMutableArray array];
-        
-        NSInteger max = [_itemKeysShown count];
-        for(NSInteger i=tableLength;i<max;i++){
-            [deleteIndexPaths addObject:[NSIndexPath indexPathForRow:i inSection:0]];
-        }
-        
-        _itemKeysShown = [_itemKeysShown subarrayWithRange:NSMakeRange(0,tableLength)];
-        //DDLogVerbose(@"Delete index paths %@",deleteIndexPaths);
-        //DDLogVerbose(@"Deletes %i",[deleteIndexPaths count]);
-        
-        [_tableView deleteRowsAtIndexPaths:deleteIndexPaths withRowAnimation:_animations];
-    }
-    
-    //    [_tableView endUpdates];
-}
 
 -(void) _updateRowForItem:(ZPZoteroItem*)item{
     NSIndexPath* indexPath = [NSIndexPath indexPathForRow:[_itemKeysShown indexOfObject:item.key] inSection:0];
@@ -289,7 +283,6 @@ static ZPItemListViewDataSource* _instance;
 -(void) notifyItemsAvailable:(NSNotification*)notification{
     
     NSArray* items = notification.object;
-    //DDLogVerbose(@"Received item %@",item.fullCitation);
     
     @synchronized(self){
         
@@ -302,18 +295,12 @@ static ZPItemListViewDataSource* _instance;
                     [_itemKeysNotInCache removeObject:item.key];
                     found=TRUE;
                 }
-                if(found){
-                    DDLogVerbose(@"New data about item %@ will be displayed in current item list (%@)",item.key,item.title);
-                }
-                else{
-                    DDLogVerbose(@"New data about item %@ is available, but the item is not in the current item list (%@)",item.key,item.title);
-                }
                 //DDLogVerbose(@"Item keys not in cache deacreased to %i after removing key %@",[_itemKeysNotInCache count],item.key);
                 
                 //Update the view if we have received sufficient number of new items
                 update = update || ([_itemKeysNotInCache count] % SIZE_OF_DATABASE_UPDATE_BATCH ==0 ||
-                          [_itemKeysShown count] == 0 ||
-                          [_itemKeysShown lastObject]!=[NSNull null]);
+                                    [_itemKeysShown count] == 0 ||
+                                    [_itemKeysShown lastObject]!=[NSNull null]);
                 
             }
         }
@@ -321,20 +308,20 @@ static ZPItemListViewDataSource* _instance;
         
         if(found){
             
-            if(update){  
+            if(update){
                 _animations = UITableViewRowAnimationAutomatic;
                 [self _performTableUpdates:TRUE];
             }
         }
         /*
-        else if([_itemKeysShown containsObject:item.key]){
-            //Update the row only if the full citation for this item has changed 
-            @synchronized(_tableView){
-                [self performSelectorOnMainThread:@selector(_updateRowForItem:) withObject:item waitUntilDone:YES];
-            }
-        }
-        */
-    }    
+         else if([_itemKeysShown containsObject:item.key]){
+         //Update the row only if the full citation for this item has changed
+         @synchronized(_tableView){
+         [self performSelectorOnMainThread:@selector(_updateRowForItem:) withObject:item waitUntilDone:YES];
+         }
+         }
+         */
+    }
 }
 /*
  - (void) _refreshCellAtIndexPaths:(NSArray*)indexPaths{
@@ -359,18 +346,18 @@ static ZPItemListViewDataSource* _instance;
 
 - (UITableViewCell *)tableView:(UITableView *)aTableView cellForRowAtIndexPath:(NSIndexPath *)indexPath {
     _tableView = aTableView;
-
+    
     //DDLogVerbose(@"Getting cell for row %i",indexPath.row);
     
     
-    //If the data has become invalid, return a cell 
+    //If the data has become invalid, return a cell
     
     UITableViewCell* cell;
     
     if(indexPath.row>=[_itemKeysShown count]){
         NSString* identifier;
         if(_libraryID==0){
-            identifier = @"ChooseLibraryCell";   
+            identifier = @"ChooseLibraryCell";
         }
         else if(_invalidated){
             identifier = @"BlankCell";
@@ -392,24 +379,20 @@ static ZPItemListViewDataSource* _instance;
         NSString* key;
         if(keyObj==[NSNull null] || keyObj==NULL){
             key=@"";
-        }    
+        }
         else{
             key= (NSString*) keyObj;
-        }    
-            
+        }
+        
         ZPZoteroItem* item=NULL;
         if(![key isEqualToString:@""]) item = (ZPZoteroItem*) [ZPZoteroItem itemWithKey:key];
         
         if(item==NULL){
-            cell = [aTableView dequeueReusableCellWithIdentifier:@"LoadingCell"]; 
+            cell = [aTableView dequeueReusableCellWithIdentifier:@"LoadingCell"];
             //DDLogVerbose(@"Cell identifier is LoadingCell");
-            
-            //Row number
-            UILabel* rowNumber = (UILabel *) [cell viewWithTag:5];
-            if(rowNumber != NULL) rowNumber.text=[NSString stringWithFormat:@"%i",indexPath.row+1];
         }
         else{
-            
+            NSLog(@"Loading cell for row %i",indexPath.row);
             cell = [aTableView dequeueReusableCellWithIdentifier:@"ZoteroItemCell"];
             //DDLogVerbose(@"Cell identifier is ZoteroItemCell");
             //DDLogVerbose(@"Item with key %@ has full citation %@",item.key,item.fullCitation);
@@ -420,7 +403,7 @@ static ZPItemListViewDataSource* _instance;
             UILabel *authorsLabel = (UILabel *)[cell viewWithTag:2];
             
             authorsLabel.text = item.creatorSummary;
-
+            
             //Publication as a formatted label
             
             OHAttributedLabel* publishedInLabel = (OHAttributedLabel*)[cell viewWithTag:3];
@@ -434,7 +417,7 @@ static ZPItemListViewDataSource* _instance;
                 NSString* publishedIn = item.publicationDetails;
                 
                 if(publishedIn == NULL){
-                    publishedIn=@"";   
+                    publishedIn=@"";
                 }
                 
                 NSAttributedString* text = [[NSAttributedString alloc] initWithHTMLData:[publishedIn dataUsingEncoding:NSUTF8StringEncoding]  documentAttributes:NULL];
@@ -442,6 +425,16 @@ static ZPItemListViewDataSource* _instance;
                 //Font size of TTStyledTextLabel cannot be set in interface builder, so must be done here
                 [publishedInLabel setFont:[UIFont systemFontOfSize:[UIFont smallSystemFontSize]]];
                 [publishedInLabel setAttributedText:text];
+            }
+            
+            //The item key for troubleshooting
+            UILabel* keyLabel = (UILabel*) [cell viewWithTag:5];
+            if([ZPPreferences displayItemKeys]){
+                keyLabel.hidden = FALSE;
+                keyLabel.text = item.key;
+            }
+            else{
+                keyLabel.hidden = TRUE;
             }
             
             //Attachment icon
@@ -466,7 +459,7 @@ static ZPItemListViewDataSource* _instance;
                     [ZPAttachmentIconImageFactory renderFileTypeIconForAttachment:attachment intoImageView:articleThumbnail];
                     // Enable or disable depending whether file is available or not
                     
-                    if(attachment.fileExists || (attachment.linkMode == LINK_MODE_LINKED_URL && [ZPServerConnectionManager hasInternetConnection])){
+                    if(attachment.fileExists || (attachment.linkMode == LINK_MODE_LINKED_URL && [ZPReachability hasInternetConnection])){
                         articleThumbnail.alpha = 1;
                         articleThumbnail.userInteractionEnabled = TRUE;
                         
@@ -485,15 +478,12 @@ static ZPItemListViewDataSource* _instance;
                 }
             }
             
-            //Row number
-            UILabel* rowNumber = (UILabel *) [cell viewWithTag:5];
-            if(rowNumber != NULL) rowNumber.text=[NSString stringWithFormat:@"%i",indexPath.row+1];
         }
-    }    
+    }
     if(cell == NULL || ! [cell isKindOfClass:[UITableViewCell class]]){
         [NSException raise:@"Invalid cell" format:@""];
     }
-
+    
     return cell;
 }
 
@@ -512,7 +502,7 @@ static ZPItemListViewDataSource* _instance;
     
     ZPZoteroAttachment* attachment = [item.attachments objectAtIndex:0];
     
-    if(attachment.linkMode == LINK_MODE_LINKED_URL && [ZPServerConnectionManager hasInternetConnection]){
+    if(attachment.linkMode == LINK_MODE_LINKED_URL && [ZPReachability hasInternetConnection]){
         [[UIApplication sharedApplication] openURL:[NSURL URLWithString:attachment.url]];
     }
     else{
@@ -577,7 +567,7 @@ static ZPItemListViewDataSource* _instance;
         UISplitViewController* root =  (UISplitViewController*) [UIApplication sharedApplication].delegate.window.rootViewController;
         [(ZPItemListViewController *)[[root.viewControllers lastObject] topViewController] configureView];
     }
-
+    
 }
 
 -(NSArray*) tags{

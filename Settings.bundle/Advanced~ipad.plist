@@ -42,6 +42,22 @@
 			<key>DefaultValue</key>
 			<false/>
 		</dict>
+        <dict>
+			<key>Type</key>
+			<string>PSGroupSpecifier</string>
+			<key>Title</key>
+			<string>Items</string>
+		</dict>
+		<dict>
+			<key>Type</key>
+			<string>PSToggleSwitchSpecifier</string>
+			<key>Title</key>
+			<string>Put PDFs on top of attachment list</string>
+			<key>Key</key>
+			<string>prioritizepdfs</string>
+			<key>DefaultValue</key>
+			<true/>
+		</dict>
 		<dict>
 			<key>Type</key>
 			<string>PSGroupSpecifier</string>
@@ -50,7 +66,7 @@
 			<key>FooterText</key>
 			<string>These should not be enables unless you are specifically requested to do so after contacting ZotPad support.</string>
 		</dict>
-		<dict>
+<!-- 		<dict>
 			<key>Type</key>
 			<string>PSToggleSwitchSpecifier</string>
 			<key>Title</key>
@@ -70,6 +86,17 @@
 			<key>DefaultValue</key>
 			<false/>
 		</dict>
+-->
+        <dict>
+			<key>Type</key>
+			<string>PSToggleSwitchSpecifier</string>
+			<key>Title</key>
+			<string>Display item keys</string>
+			<key>Key</key>
+			<string>displayitemkeys</string>
+			<key>DefaultValue</key>
+			<false/>
+		</dict>
 		<dict>
 			<key>Type</key>
 			<string>PSToggleSwitchSpecifier</string>
@@ -81,6 +108,16 @@
 			<false/>
 		</dict>
 		<dict>
+			<key>Type</key>
+			<string>PSToggleSwitchSpecifier</string>
+			<key>Title</key>
+			<string>Debug file uploads</string>
+			<key>Key</key>
+			<string>debugfileuploads</string>
+			<key>DefaultValue</key>
+			<false/>
+		</dict>
+        <dict>
 			<key>Type</key>
 			<string>PSToggleSwitchSpecifier</string>
 			<key>Title</key>

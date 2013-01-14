@@ -30,23 +30,38 @@
     
     BOOL shouldAddToFavourites = self.image == [UIImage imageNamed:@"InactiveStar"];
 
+
     [self _setImageWithState:shouldAddToFavourites];
-    
+
+
     // Write the favourites collection membership in the DB
     
     NSString* favouritesCollectionKey = [ZPDatabase collectionKeyForFavoritesCollectionInLibrary:_targetItem.libraryID];
     if(favouritesCollectionKey == NULL){
+        NSString* favoritesCollectionTitle = [ZPPreferences favoritesCollectionTitle];
+        ZPZoteroLibrary* library = [ZPZoteroLibrary libraryWithID:_targetItem.libraryID];
         [[[UIAlertView alloc] initWithTitle:@"Favourites collection created"
-                                   message:[NSString stringWithFormat:@"Collection '%@' has been created in '%@'",
-                                            [ZPPreferences favoritesCollectionTitle],
-                                            [ZPZoteroLibrary libraryWithID:_targetItem.libraryID].title]
-                                  delegate:nil
-                         cancelButtonTitle:@"OK"
+                                    message:[NSString stringWithFormat:@"Collection '%@' has been created in '%@'",
+                                             favoritesCollectionTitle,
+                                             library.title]
+                                   delegate:nil
+                          cancelButtonTitle:@"OK"
                           otherButtonTitles:nil] show];
-
+        
         favouritesCollectionKey = [ZPUtils randomString];
-        [ZPDatabase w]
+        [ZPDatabase addCollectionWithTitle:favoritesCollectionTitle
+                             collectionKey:favouritesCollectionKey
+                                 toLibrary:library];
     }
+
+
+    if(shouldAddToFavourites){
+        [ZPDatabase addItemLocally:_targetItem toCollection:favouritesCollectionKey];
+    }
+    else{
+        [ZPDatabase removeItemLocally:_targetItem fromCollection:favouritesCollectionKey];
+    }
+
 }
 
 - (void) _setImageWithState:(BOOL) active{
@@ -61,6 +76,20 @@
 
 -(void) configureWithItem:(ZPZoteroItem*)item{
     _targetItem = item;
+    
+    //If the favourites collection is defined, check if this item is included in the favourites
+    NSString* favouritesCollectionKey = [ZPDatabase collectionKeyForFavoritesCollectionInLibrary:_targetItem.libraryID];
+    
+    BOOL isFavourite = false;
+    if(favouritesCollectionKey!=NULL){
+        for(ZPZoteroCollection* collection in item.collections){
+            if([collection.collectionKey isEqualToString:favouritesCollectionKey ]){
+                isFavourite = TRUE;
+                break;
+            }
+        }
+    }
+    [self _setImageWithState:isFavourite];
 }
 
 @end

@@ -53,6 +53,9 @@ static NSMutableDictionary* dbFieldsByTables;
 static NSMutableDictionary* dbPrimaryKeysByTables;
 static NSString *dbPath;
 
+//Used for locking when writing a large batch of data from the server to DB
+static NSObject* writeLock;
+
 +(void)initialize
 {
     
@@ -67,6 +70,8 @@ static NSString *dbPath;
     
     if(! dbExists) [self _createDatabase];
     else [self _upgradeDatabase];
+    
+    writeLock = [[NSObject alloc] init];
 }
 
 +(void) _createDatabase{
@@ -379,156 +384,159 @@ static NSString *dbPath;
     
     //Because it is possible that the same item is received multiple times, it is important to use synchronized for almost the entire function to avoid inserting the same object twice
     
-    //TODO: Is it really necessary to read the timestamps from DB? Would it be possible to use the cacheTimestamp instance variable from the data objects themselves.
-    
-    NSMutableArray* insertObjects = [NSMutableArray array];
-    NSMutableArray* updateObjects = [NSMutableArray array];
-    
-    //Retrieve keys and timestamps from the DB
-    if([primaryKeyFieldNames count]==1){
-        NSMutableArray* keys = [NSMutableArray array];
-        for(NSObject* object in objects){
-            [keys addObject:[[self dbFieldValuesForObject:object fieldsNames:primaryKeyFieldNames] objectAtIndex:0]];
-        }
+    @synchronized(writeLock){
         
-        BOOL keysAreString = [[keys objectAtIndex:0] isKindOfClass:[NSString class]];
         
-        if(checkTimestamp){
-            //Check if the keys are string
-            NSString* selectSQL;
-            if(keysAreString){
-                selectSQL= [NSString stringWithFormat:@"SELECT %@, cacheTimestamp FROM %@ WHERE %@ IN ('%@')",
-                            [primaryKeyFieldNames objectAtIndex:0],
-                            table,
-                            [primaryKeyFieldNames objectAtIndex:0],
-                            [keys componentsJoinedByString:@"', '"]];
-            }
-            else{
-                selectSQL= [NSString stringWithFormat:@"SELECT %@, cacheTimestamp FROM %@ WHERE %@ IN (%@)",
-                            [primaryKeyFieldNames objectAtIndex:0],
-                            table,
-                            [primaryKeyFieldNames objectAtIndex:0],
-                            [keys componentsJoinedByString:@", "]];
+        //TODO: Is it really necessary to read the timestamps from DB? Would it be possible to use the cacheTimestamp instance variable from the data objects themselves.
+        
+        NSMutableArray* insertObjects = [NSMutableArray array];
+        NSMutableArray* updateObjects = [NSMutableArray array];
+        
+        //Retrieve keys and timestamps from the DB
+        if([primaryKeyFieldNames count]==1){
+            NSMutableArray* keys = [NSMutableArray array];
+            for(NSObject* object in objects){
+                [keys addObject:[[self dbFieldValuesForObject:object fieldsNames:primaryKeyFieldNames] objectAtIndex:0]];
             }
             
+            BOOL keysAreString = [[keys objectAtIndex:0] isKindOfClass:[NSString class]];
             
-            NSMutableDictionary* timestamps = [NSMutableDictionary dictionary];
-            
-            //Retrieve timestamps
-            FMDatabase* dbObject = [self _dbObject];
-            @synchronized(dbObject){
-                FMResultSet* resultSet = [dbObject executeQuery:selectSQL];
-                
-                while([resultSet next]){
-                    [timestamps setObject:[resultSet stringForColumnIndex:1] forKey:[resultSet stringForColumnIndex:0]];
-                }
-                [resultSet close];
-            }
-            
-            NSMutableArray* returnArray=[NSMutableArray array];
-            
-            
-            NSArray* keyArrayFieldName = [NSArray
-                                          arrayWithObject:[primaryKeyFieldNames objectAtIndex:0]];
-            
-            for (NSObject* object in objects){
-                
-                //Check the timestamp
-                NSString* timestamp = [timestamps objectForKey:[[self dbFieldValuesForObject:object fieldsNames:keyArrayFieldName] objectAtIndex:0]];
-                
-                //Insert if timestamp is not found
-                if(timestamp == NULL){
-                    [insertObjects addObject:object];
-                    [returnArray addObject:object];
-                    
-                }
-                //Update if timestamps differ
-                else if(! [[[self dbFieldValuesForObject:object fieldsNames:[NSArray arrayWithObject: @"cacheTimestamp"]] objectAtIndex:0] isEqual: timestamp]){
-                    [updateObjects addObject:object];
-                    [returnArray addObject:object];
-                }
-                [(ZPZoteroDataObject*) object setCacheTimestamp:[(ZPZoteroDataObject*) object serverTimestamp]];
-                
-            }
-            [self updateObjects:updateObjects intoTable:table];
-            [self insertObjects:insertObjects intoTable:table];
-            return returnArray;
-        }
-        //No checking of timestamp
-        else{
-            NSString* selectSQL;
-            if(keysAreString){
-                selectSQL= [NSString stringWithFormat:@"SELECT %@ FROM %@ WHERE %@ IN ('%@')",
-                            [primaryKeyFieldNames objectAtIndex:0],
-                            table,
-                            [primaryKeyFieldNames objectAtIndex:0],
-                            [keys componentsJoinedByString:@"', '"]];
-            }
-            else{
-                selectSQL= [NSString stringWithFormat:@"SELECT %@ FROM %@ WHERE %@ IN (%@)",
-                            [primaryKeyFieldNames objectAtIndex:0],
-                            table,
-                            [primaryKeyFieldNames objectAtIndex:0],
-                            [keys componentsJoinedByString:@", "]];
-            }
-            
-            
-            NSMutableSet* keys = [NSMutableSet set];
-            
-            //Retrieve keys
-            FMDatabase* dbObject = [self _dbObject];
-            @synchronized(dbObject){
-                FMResultSet* resultSet = [dbObject executeQuery:selectSQL];
-                
-                while([resultSet next]){
-                    if(keysAreString) [keys addObject:[resultSet stringForColumnIndex:0]];
-                    else [keys addObject:[NSNumber numberWithInt:[resultSet intForColumnIndex:0]]];
-                }
-                [resultSet close];
-            }
-            
-            for (NSObject* object in objects){
-                
-                //Insert if key is not found
-                if( ! [keys containsObject:[[self dbFieldValuesForObject:object fieldsNames:primaryKeyFieldNames] objectAtIndex:0]]){
-                    [insertObjects addObject:object];
+            if(checkTimestamp){
+                //Check if the keys are string
+                NSString* selectSQL;
+                if(keysAreString){
+                    selectSQL= [NSString stringWithFormat:@"SELECT %@, cacheTimestamp FROM %@ WHERE %@ IN ('%@')",
+                                [primaryKeyFieldNames objectAtIndex:0],
+                                table,
+                                [primaryKeyFieldNames objectAtIndex:0],
+                                [keys componentsJoinedByString:@"', '"]];
                 }
                 else{
-                    [updateObjects addObject:object];
+                    selectSQL= [NSString stringWithFormat:@"SELECT %@, cacheTimestamp FROM %@ WHERE %@ IN (%@)",
+                                [primaryKeyFieldNames objectAtIndex:0],
+                                table,
+                                [primaryKeyFieldNames objectAtIndex:0],
+                                [keys componentsJoinedByString:@", "]];
+                }
+                
+                
+                NSMutableDictionary* timestamps = [NSMutableDictionary dictionary];
+                
+                //Retrieve timestamps
+                FMDatabase* dbObject = [self _dbObject];
+                @synchronized(dbObject){
+                    FMResultSet* resultSet = [dbObject executeQuery:selectSQL];
+                    
+                    while([resultSet next]){
+                        [timestamps setObject:[resultSet stringForColumnIndex:1] forKey:[resultSet stringForColumnIndex:0]];
+                    }
+                    [resultSet close];
+                }
+                
+                NSMutableArray* returnArray=[NSMutableArray array];
+                
+                
+                NSArray* keyArrayFieldName = [NSArray
+                                              arrayWithObject:[primaryKeyFieldNames objectAtIndex:0]];
+                
+                for (NSObject* object in objects){
+                    
+                    //Check the timestamp
+                    NSString* timestamp = [timestamps objectForKey:[[self dbFieldValuesForObject:object fieldsNames:keyArrayFieldName] objectAtIndex:0]];
+                    
+                    //Insert if timestamp is not found
+                    if(timestamp == NULL){
+                        [insertObjects addObject:object];
+                        [returnArray addObject:object];
+                        
+                    }
+                    //Update if timestamps differ
+                    else if(! [[[self dbFieldValuesForObject:object fieldsNames:[NSArray arrayWithObject: @"cacheTimestamp"]] objectAtIndex:0] isEqual: timestamp]){
+                        [updateObjects addObject:object];
+                        [returnArray addObject:object];
+                    }
+                    [(ZPZoteroDataObject*) object setCacheTimestamp:[(ZPZoteroDataObject*) object serverTimestamp]];
+                    
+                }
+                [self updateObjects:updateObjects intoTable:table];
+                [self insertObjects:insertObjects intoTable:table];
+                return returnArray;
+            }
+            //No checking of timestamp
+            else{
+                NSString* selectSQL;
+                if(keysAreString){
+                    selectSQL= [NSString stringWithFormat:@"SELECT %@ FROM %@ WHERE %@ IN ('%@')",
+                                [primaryKeyFieldNames objectAtIndex:0],
+                                table,
+                                [primaryKeyFieldNames objectAtIndex:0],
+                                [keys componentsJoinedByString:@"', '"]];
+                }
+                else{
+                    selectSQL= [NSString stringWithFormat:@"SELECT %@ FROM %@ WHERE %@ IN (%@)",
+                                [primaryKeyFieldNames objectAtIndex:0],
+                                table,
+                                [primaryKeyFieldNames objectAtIndex:0],
+                                [keys componentsJoinedByString:@", "]];
+                }
+                
+                
+                NSMutableSet* keys = [NSMutableSet set];
+                
+                //Retrieve keys
+                FMDatabase* dbObject = [self _dbObject];
+                @synchronized(dbObject){
+                    FMResultSet* resultSet = [dbObject executeQuery:selectSQL];
+                    
+                    while([resultSet next]){
+                        if(keysAreString) [keys addObject:[resultSet stringForColumnIndex:0]];
+                        else [keys addObject:[NSNumber numberWithInt:[resultSet intForColumnIndex:0]]];
+                    }
+                    [resultSet close];
+                }
+                
+                for (NSObject* object in objects){
+                    
+                    //Insert if key is not found
+                    if( ! [keys containsObject:[[self dbFieldValuesForObject:object fieldsNames:primaryKeyFieldNames] objectAtIndex:0]]){
+                        [insertObjects addObject:object];
+                    }
+                    else{
+                        [updateObjects addObject:object];
+                    }
+                }
+                [self updateObjects:updateObjects intoTable:table];
+                [self insertObjects:insertObjects intoTable:table];
+                
+                return objects;
+                
+            }
+        }
+        //Multiple colums in primary key
+        else{
+            NSString* selectSQL= [NSString stringWithFormat:@"SELECT %@ FROM %@ WHERE %@ = ?",
+                                  [primaryKeyFieldNames objectAtIndex:0],
+                                  table,
+                                  [primaryKeyFieldNames componentsJoinedByString:@" = ? AND "]];
+            
+            
+            //Check if things exist with these primary keys
+            
+            for(NSObject* object in objects){
+                FMDatabase* dbObject = [self _dbObject];
+                @synchronized(dbObject){
+                    FMResultSet* resultSet = [dbObject executeQuery:selectSQL withArgumentsInArray:[self dbFieldValuesForObject:object fieldsNames:primaryKeyFieldNames]];
+                    
+                    if([resultSet next]) [updateObjects addObject:object];
+                    else [insertObjects addObject:object];
+                    [resultSet close];
                 }
             }
             [self updateObjects:updateObjects intoTable:table];
             [self insertObjects:insertObjects intoTable:table];
-            
             return objects;
-            
         }
     }
-    //Multiple colums in primary key
-    else{
-        NSString* selectSQL= [NSString stringWithFormat:@"SELECT %@ FROM %@ WHERE %@ = ?",
-                              [primaryKeyFieldNames objectAtIndex:0],
-                              table,
-                              [primaryKeyFieldNames componentsJoinedByString:@" = ? AND "]];
-        
-        
-        //Check if things exist with these primary keys
-        
-        for(NSObject* object in objects){
-            FMDatabase* dbObject = [self _dbObject];
-            @synchronized(dbObject){
-                FMResultSet* resultSet = [dbObject executeQuery:selectSQL withArgumentsInArray:[self dbFieldValuesForObject:object fieldsNames:primaryKeyFieldNames]];
-                
-                if([resultSet next]) [updateObjects addObject:object];
-                else [insertObjects addObject:object];
-                [resultSet close];
-            }
-        }
-        [self updateObjects:updateObjects intoTable:table];
-        [self insertObjects:insertObjects intoTable:table];
-        return objects;
-    }
-    //    }
 }
 
 
@@ -711,14 +719,6 @@ static NSString *dbPath;
     [ZPZoteroCollection dropCache];
 }
 
-
-+(void) addCollectionWithTitle:(NSString*) title collectionKey:(NSString*) collectionKey toLibraryID:(ZPZoteroLibrary*)library{
-    ZPZoteroCollection* collection = [ZPZoteroCollection collectionWithDictionary:
-                                      [NSDictionary dictionaryWithObjects:title,collectionKey,[NSNumber numberWithInt:library.libraryID],[NSNumber numberWithInt:1],nil
-                                                                  forKeys:@"title","collectionKey","libraryID","locallyAdded",nil];
-                                      [self writeObjects:[NSArray arrayWithObject:collection] intoTable:@"collections" checkTimestamp:NO];
-}
-
 // These remove items from the collection
 +(void) removeItemKeysNotInArray:(NSArray*)itemKeys fromCollection:(NSString*)collectionKey{
     
@@ -792,8 +792,25 @@ static NSString *dbPath;
     
 }
 
-+(NSString*) collectionKeyForFavoritesCollectionInLibrary: (NSInteger)libraryID{
 
++(void) addAttributesToCollection:(ZPZoteroCollection*) collection{
+    
+    
+    FMDatabase* dbObject = [self _dbObject];
+    @synchronized(dbObject){
+        FMResultSet* resultSet = [dbObject executeQuery:@"SELECT *, collectionKey IN (SELECT DISTINCT parentKey FROM collections) AS hasChildren FROM collections WHERE collectionKey=? LIMIT 1",collection.key];
+        
+        
+        if([resultSet next]){
+            [collection configureWithDictionary:[resultSet resultDictionary]];
+        }
+        
+        [resultSet close];
+    }
+}
+
++(NSString*) collectionKeyForFavoritesCollectionInLibrary: (NSInteger)libraryID{
+    
     FMDatabase* dbObject = [self _dbObject];
     
     NSString* collectionKey = nil;
@@ -814,23 +831,15 @@ static NSString *dbPath;
     return collectionKey;
 }
 
-
-
-+(void) addAttributesToCollection:(ZPZoteroCollection*) collection{
++(void) addCollectionWithTitle:(NSString*) title collectionKey:(NSString*) collectionKey toLibrary:(ZPZoteroLibrary*)library {
+    NSNumber* libraryNumber = [NSNumber numberWithInt:library.libraryID];
+    NSNumber* numberOne = [NSNumber numberWithInt:1];
+    NSDictionary* dict = [NSDictionary dictionaryWithObjectsAndKeys: title, @"title", collectionKey, ZPKEY_COLLECTION_KEY, libraryNumber, ZPKEY_LIBRARY_ID, numberOne, @"locallyAdded", nil];
     
-    
-    FMDatabase* dbObject = [self _dbObject];
-    @synchronized(dbObject){
-        FMResultSet* resultSet = [dbObject executeQuery:@"SELECT *, collectionKey IN (SELECT DISTINCT parentKey FROM collections) AS hasChildren FROM collections WHERE collectionKey=? LIMIT 1",collection.key];
-        
-        
-        if([resultSet next]){
-            [collection configureWithDictionary:[resultSet resultDictionary]];
-        }
-        
-        [resultSet close];
-    }
+    ZPZoteroCollection* collection = [ZPZoteroCollection collectionWithDictionary:dict];
+    [self writeObjects:[NSArray arrayWithObject:collection] intoTable:@"collections" checkTimestamp:NO];
 }
+
 
 #pragma mark - Tags methods
 
@@ -945,18 +954,18 @@ static NSString *dbPath;
 
 // Records a new collection membership
 
-+(void) writeItems:(NSArray*)items toCollection:(NSString*)collectionKey isLocalModification:(BOOL)isLocalModification{
++(void) writeItems:(NSArray*)items toCollection:(NSString*)collectionKey{
     
     ZPZoteroItem* item;
     NSMutableArray* itemKeys = [NSMutableArray array];
     for(item in items){
         [itemKeys addObject:item.key];
     }
-    [self writeItems:itemKeys toCollection:collectionKey isLocalModification:isLocalModification];
+    [self addItemKeys:itemKeys toCollection:collectionKey];
 }
 
 
-+(void) addItemKeys:(NSArray*)keys toCollection:(NSString*)collectionKey isLocalModification:(BOOL)isLocalModification{
++(void) addItemKeys:(NSArray*)keys toCollection:(NSString*)collectionKey{
     
     NSMutableArray* relationships= [NSMutableArray arrayWithCapacity:[keys count]];
     
@@ -967,6 +976,36 @@ static NSString *dbPath;
     [self writeObjects:relationships intoTable:@"collectionItems" checkTimestamp:NO];
 }
 
+
+//Local modifications
+
+
++(void) addItemLocally:(ZPZoteroItem*)item toCollection:(NSString*)collectionKey{
+    FMDatabase* dbObject = [self _dbObject];
+    @synchronized(dbObject){
+        //Has the item been deleted from this collection earlier?
+        FMResultSet* resultSet = [dbObject executeQuery:@"SELECT itemKey FROM collectionItems WHERE collectionKey = ? AND itemKey = ? AND locallyDeleted = 1",collectionKey, item.itemKey];
+        
+        BOOL deletedEarlier = [resultSet next];
+        [resultSet close];
+
+        if(! deletedEarlier){
+            [dbObject executeUpdate:@"INSERT INTO collectionItems (collectionKey, itemKey, locallyAdded) VALUES (?, ?, 1)",collectionKey, item.itemKey];
+        }
+        else{
+            //The item was previously deleted locally
+            [dbObject executeUpdate:@"UPDATE collectionItems SET locallyDeleted = 0, locallyAdded = 1 WHERE collectionKey = ? AND itemKey = ?",collectionKey, item.itemKey];
+        }
+    }
+}
+
++(void) removeItemLocally:(ZPZoteroItem*)item fromCollection:(NSString*)collectionKey{
+    FMDatabase* dbObject = [self _dbObject];
+    @synchronized(dbObject){
+        [dbObject executeUpdate:@"UPDATE collectionItems SET locallyDeleted = 1 WHERE collectionKey = ? AND itemKey = ?",collectionKey, item.itemKey];
+        
+    }
+}
 
 
 
@@ -1200,7 +1239,17 @@ static NSString *dbPath;
     
     FMDatabase* dbObject = [self _dbObject];
     @synchronized(dbObject){
-        FMResultSet* resultSet = [dbObject executeQuery: @"SELECT * FROM attachments WHERE parentKey = ? ORDER BY title COLLATE NOCASE ASC",item.key];
+        
+        NSString* sqlString;
+        
+        if([ZPPreferences prioritizePDFsInAttachmentLists]) {
+            sqlString = @"SELECT * FROM attachments WHERE parentKey = ? ORDER BY contentType <> 'application/pdf', title COLLATE NOCASE ASC";
+        }
+        else{
+            sqlString = @"SELECT * FROM attachments WHERE parentKey = ? ORDER BY title COLLATE NOCASE ASC";
+        }
+        
+        FMResultSet* resultSet = [dbObject executeQuery: sqlString,item.key];
         
         NSMutableArray* attachments = [[NSMutableArray alloc] init];
         while([resultSet next]) {

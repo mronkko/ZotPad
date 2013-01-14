@@ -11,10 +11,10 @@
 #import "ZPCore.h"
 
 #import "FileMD5Hash.h"
-#import "ZPCacheController.h"
+#import "ZPItemDataDownloadManager.h"
 #import "NSString+Base64.h"
-#include <sys/xattr.h>
 
+#import "ZPFileCacheManager.h"
 
 NSInteger const LINK_MODE_IMPORTED_FILE = 0;
 NSInteger const LINK_MODE_IMPORTED_URL = 1;
@@ -26,7 +26,6 @@ NSInteger const VERSION_SOURCE_WEBDAV =2;
 NSInteger const VERSION_SOURCE_DROPBOX =3;
 
 @interface ZPZoteroAttachment(){
-    NSString* _md5;
 }
 
 - (NSString*) _fileSystemPathWithSuffix:(NSString*)suffix;
@@ -39,7 +38,7 @@ NSInteger const VERSION_SOURCE_DROPBOX =3;
 static NSCache* _objectCache = NULL;
 static NSString* _documentsDirectory = NULL;
 
-@synthesize lastViewed, attachmentSize, existsOnZoteroServer, filename, url, versionSource,  charset, note;
+@synthesize lastViewed, attachmentSize, existsOnZoteroServer, filename, url, versionSource,  charset, note, md5;
 @synthesize versionIdentifier_server;
 @synthesize versionIdentifier_local;
 @synthesize contentType;
@@ -193,13 +192,14 @@ static NSString* _documentsDirectory = NULL;
 }
 
 //If an attachment is updated, delete the old attachment file
+
 - (void) setServerTimestamp:(NSString*)timestamp{
     [super setServerTimestamp:timestamp];
     if(![self.serverTimestamp isEqual:self.cacheTimestamp] && [self fileExists_original]){
         //If the file MD5 does not match the server MD5, delete it.
         NSString* fileMD5 = [ZPZoteroAttachment md5ForFileAtPath:self.fileSystemPath_original];
         if(self.md5 == NULL || ! [self.md5 isEqualToString:fileMD5]){
-            [[NSFileManager defaultManager] removeItemAtPath: [self fileSystemPath_original] error:NULL];   
+            [ZPFileCacheManager deleteOriginalFileForAttachment:self reason:@"Server version has changed"];
         }
     }
     
@@ -258,93 +258,7 @@ static NSString* _documentsDirectory = NULL;
         return ([[NSFileManager defaultManager] fileExistsAtPath:fsPath]);
 }
 
--(void) setMd5:(NSString *)md5{
-    if(md5!= NULL){
-        if(_md5!= NULL && ! [_md5 isEqualToString:md5]){
-            //The file has changed on the server, so we will queue a download for it
-            [[ZPCacheController instance] addAttachmentToDowloadQueue:self];
-        }
-    }
-    _md5 = md5;
-}
--(NSString*) md5{
-    return _md5;
-}
 //The reason for purging a file will be logged 
-
--(void) purge:(NSString*) reason{
-    [self purge_modified:reason];
-    [self purge_original:reason];
-}
-
--(void) purge_original:(NSString*) reason{
-    if([self fileExists_original]){
-        NSDictionary* fileAttributes = [[NSFileManager defaultManager] attributesOfItemAtPath:self.fileSystemPath_original error:NULL];
-        [[NSFileManager defaultManager] removeItemAtPath:self.fileSystemPath_original error:NULL];
-        [[NSNotificationCenter defaultCenter] postNotificationName:ZPNOTIFICATION_ATTACHMENT_FILE_DELETED object:self userInfo:fileAttributes];
-        //TODO: Write cache usage in this log entry
-        DDLogWarn(@"File %@ (version from server) was deleted: %@",self.filename,reason);
-    }
-}
--(void) purge_modified:(NSString*) reason{
-    if([self fileExists_modified]){
-        NSDictionary* fileAttributes = [[NSFileManager defaultManager] attributesOfItemAtPath:self.fileSystemPath_modified error:NULL];
-        [[NSFileManager defaultManager] removeItemAtPath:self.fileSystemPath_modified error:NULL];
-        [[NSNotificationCenter defaultCenter] postNotificationName:ZPNOTIFICATION_ATTACHMENT_FILE_DELETED object:self userInfo:fileAttributes];
-        //TODO: Write cache usage in this log entry
-        DDLogWarn(@"File %@ (locally modified) was deleted: %@",self.filename,reason);
-    }
-}
-
-//TODO: These should update the cache size. This is a minor issue, implement after implementing NSNotification
-
--(void) moveFileFromPathAsNewOriginalFile:(NSString*) path{
-    
-    NSString* originalPath = self.fileSystemPath_original;
-    
-    if(originalPath == NULL){
-        DDLogError(@"File operation was attempted on attachment with null filesystem path (key: %@)", self.key);
-        return;
-    }
-
-    NSAssert2([[NSFileManager defaultManager] fileExistsAtPath:path],@"Attempted to associate non-existing file from %@ with attachment %@", path,self.key);
-    
-    DDLogInfo(@"Moving file from %@ as a new server file %@ for item %@",path,self.fileSystemPath_original,self.key);
-    
-    [[NSFileManager defaultManager] removeItemAtPath:originalPath error:NULL];
-    [[NSFileManager defaultManager] moveItemAtPath:path toPath:originalPath error:NULL];
-
-    //Set this file as not cached
-    const char* filePath = [originalPath fileSystemRepresentation];
-    const char* attrName = "com.apple.MobileBackup";
-    u_int8_t attrValue = 1;
-    setxattr(filePath, attrName, &attrValue, sizeof(attrValue), 0, 0);
-
-}
-
--(void) moveFileFromPathAsNewModifiedFile:(NSString*) path{
-    
-    NSString* modifiedPath = self.fileSystemPath_modified;
-    
-    if(modifiedPath == NULL){
-        DDLogError(@"File operation was attempted on attachment with null filesystem path (key: %@)", self.key);
-        return;
-    }
-    
-    NSAssert2([[NSFileManager defaultManager] fileExistsAtPath:path],@"Attempted to associate non-existing file from %@ with attachment %@", path,self.key);
-    [[NSFileManager defaultManager] removeItemAtPath:modifiedPath error:NULL];
-    [[NSFileManager defaultManager] moveItemAtPath:path toPath:modifiedPath error:NULL];
-
-    //Set this file as not cached
-    const char* filePath = [modifiedPath fileSystemRepresentation];
-    const char* attrName = "com.apple.MobileBackup";
-    u_int8_t attrValue = 1;
-    setxattr(filePath, attrName, &attrValue, sizeof(attrValue), 0, 0);
-}
-
--(void) moveModifiedFileAsOriginalFile{
-    [self moveFileFromPathAsNewOriginalFile:self.fileSystemPath_modified];
-}
 
 
 #pragma mark - QLPreviewItem protocol

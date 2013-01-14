@@ -15,7 +15,9 @@
 #import <QuartzCore/QuartzCore.h>
 #import <zlib.h>
 #import "ZPFileViewerViewController.h"
-
+#import "ZPFileChannel.h"
+#import "ZPFileDownloadManager.h"
+#import "ZPReachability.h"
 
 NSInteger const ZPATTACHMENTICONGVIEWCONTROLLER_MODE_STATIC = 0;
 NSInteger const ZPATTACHMENTICONGVIEWCONTROLLER_MODE_UPLOAD = 1;
@@ -85,15 +87,17 @@ NSInteger const ZPATTACHMENTICONGVIEWCONTROLLER_TAG_TITLELABEL = -5;
 -(void) configureWithAttachmentArray:(NSArray*) attachments{
     _item = NULL;
     _attachments = attachments;
+    _latestManuallyTriggeredAttachment = NULL;
 }
 -(void) configureWithZoteroItem:(ZPZoteroItem*) item{
     _item = item;
     _attachments = item.attachments;
+    _latestManuallyTriggeredAttachment = NULL;
 }
 
 -(void) unregisterProgressViewsBeforeUnloading{
     for(UIProgressView* progressView in _progressViews){
-         [ZPServerConnectionManager removeProgressView:progressView];
+         [ZPFileChannel removeProgressView:progressView];
     }
 }
 
@@ -294,7 +298,7 @@ NSInteger const ZPATTACHMENTICONGVIEWCONTROLLER_TAG_TITLELABEL = -5;
                           
     if(thisMode == ZPATTACHMENTICONGVIEWCONTROLLER_MODE_DOWNLOAD){
 
-        if([ZPServerConnectionManager isAttachmentDownloading:attachment]){
+        if([ZPFileDownloadManager isAttachmentDownloading:attachment]){
             [self notifyAttachmentDownloadStarted:[NSNotification notificationWithName:ZPNOTIFICATION_ATTACHMENT_FILE_DOWNLOAD_STARTED object:attachment]];
         }
         else{
@@ -318,7 +322,7 @@ NSInteger const ZPATTACHMENTICONGVIEWCONTROLLER_TAG_TITLELABEL = -5;
                     //TODO: Check if already downloading.
                     
                     if ([ZPPreferences useDropbox]) label.text = @"Download from Dropbox";
-                    else if([ZPPreferences useWebDAV] && attachment.libraryID == 1) label.text = @"Download from WebDAV";
+                    else if([ZPPreferences useWebDAV] && attachment.libraryID == LIBRARY_ID_MY_LIBRARY) label.text = @"Download from WebDAV";
                     else{
                         
                         if (attachment.existsOnZoteroServer){
@@ -362,7 +366,7 @@ NSInteger const ZPATTACHMENTICONGVIEWCONTROLLER_TAG_TITLELABEL = -5;
     else if(self.mode == ZPATTACHMENTICONGVIEWCONTROLLER_MODE_UPLOAD){
         label.hidden = FALSE;
         
-        if([ZPServerConnectionManager isAttachmentDownloading:attachment]){
+        if([ZPFileDownloadManager isAttachmentDownloading:attachment]){
             [self notifyAttachmentDownloadStarted:[NSNotification notificationWithName:ZPNOTIFICATION_ATTACHMENT_FILE_DOWNLOAD_STARTED object:attachment]];
         }
         else{
@@ -402,7 +406,7 @@ NSInteger const ZPATTACHMENTICONGVIEWCONTROLLER_TAG_TITLELABEL = -5;
             [ZPFileViewerViewController presentWithAttachment:attachment];
            
         }
-        else if(attachment.linkMode == LINK_MODE_LINKED_URL && [ZPServerConnectionManager hasInternetConnection]){
+        else if(attachment.linkMode == LINK_MODE_LINKED_URL && [ZPReachability hasInternetConnection]){
             [[UIApplication sharedApplication] openURL:[NSURL URLWithString:attachment.url]];
         }
         else if(self.mode == ZPATTACHMENTICONGVIEWCONTROLLER_MODE_DOWNLOAD && ( attachment.linkMode == LINK_MODE_IMPORTED_FILE || 
@@ -411,8 +415,9 @@ NSInteger const ZPATTACHMENTICONGVIEWCONTROLLER_TAG_TITLELABEL = -5;
 
             
             
-            if([ZPServerConnectionManager hasInternetConnection] && ! [ZPServerConnectionManager isAttachmentDownloading:attachment]){
-                [ZPServerConnectionManager checkIfCanBeDownloadedAndStartDownloadingAttachment:attachment];   
+            if([ZPReachability hasInternetConnection] && ! [ZPFileDownloadManager isAttachmentDownloading:attachment]){
+                [ZPFileDownloadManager checkIfCanBeDownloadedAndStartDownloadingAttachment:attachment];
+                _latestManuallyTriggeredAttachment = attachment;
             }
             
         }
@@ -422,21 +427,9 @@ NSInteger const ZPATTACHMENTICONGVIEWCONTROLLER_TAG_TITLELABEL = -5;
 
 - (void)carouselCurrentItemIndexUpdated:(iCarousel *)carousel{
     NSAssert(carousel==self.attachmentCarousel,@"ZPAttachmentCarouselDelegate can only be used with the iCarousel set in the carousel property");
-    
-    if(actionButton != NULL){
-        if([_attachments count]==0){
-            actionButton.enabled = FALSE;
-        }
-        else{
-            _selectedIndex = carousel.currentItemIndex;
-            // Initially the iCarousel can return a negative index. This is probably a bug in iCarousel.
-            if(_selectedIndex <0) _selectedIndex = 0;
-            ZPZoteroAttachment* attachment = [_attachments objectAtIndex:_selectedIndex];
-            actionButton.enabled = [self _fileExistsForAttachment:attachment] &!
-            [attachment.contentType isEqualToString:@"text/html"] &!
-            [attachment.contentType isEqualToString:@"application/xhtml+xml"];
-        }
-    }
+
+    // Prevent automatically opening an attachment if the active attachment has changed
+    _latestManuallyTriggeredAttachment = NULL;
 }
 
 #pragma mark - Item observer methods
@@ -491,6 +484,14 @@ NSInteger const ZPATTACHMENTICONGVIEWCONTROLLER_TAG_TITLELABEL = -5;
        (ZPATTACHMENTICONGVIEWCONTROLLER_MODE_FIRST_STATIC_SECOND_DOWNLOAD && [_attachments indexOfObject:attachment]==2)){
         
         [self _setLabelsForAttachment:attachment progressText:NULL errorText:NULL mode:ZPATTACHMENTICONGVIEWCONTROLLER_MODE_STATIC reconfigureIcon:TRUE];
+
+        
+        // If this is manually triggered, open it
+        
+        if(_latestManuallyTriggeredAttachment == attachment){
+            [ZPFileViewerViewController  presentWithAttachment:attachment];
+        }
+
     }
 }
 -(void) notifyAttachmentDownloadFailed:(NSNotification *) notification{
@@ -597,13 +598,13 @@ NSInteger const ZPATTACHMENTICONGVIEWCONTROLLER_TAG_TITLELABEL = -5;
                 else if (aMode==ZPATTACHMENTICONGVIEWCONTROLLER_MODE_UPLOAD){
                     progressView.hidden = FALSE;
                     progressView.progress = 0.0f;
-                    [ZPServerConnectionManager useProgressView:progressView forUploadingAttachment:attachment];
+                    [ZPFileUploadManager useProgressView:progressView forUploadingAttachment:attachment];
                     view.userInteractionEnabled = TRUE;
                 }
                 else if (aMode==ZPATTACHMENTICONGVIEWCONTROLLER_MODE_DOWNLOAD){
                     progressView.hidden = FALSE;
                     progressView.progress = 0.0f;
-                    [ZPServerConnectionManager useProgressView:progressView forDownloadingAttachment:attachment];
+                    [ZPFileDownloadManager useProgressView:progressView forDownloadingAttachment:attachment];
                     view.userInteractionEnabled = FALSE;
                 }
                 

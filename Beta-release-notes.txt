@@ -1,26 +1,39 @@
+IMPORTANT: You need to uninstall the previous beta or delete your data before installing this version.
+
+IMPORTANT: The testflight service is having some problems in recording crash logs. If you encounter a crash, please email crash logs to mikko.ronkko@zotpad.com. See the instructions here:
+
+http://zotpad.uservoice.com/knowledgebase/articles/147992-sending-crash-logs
+
 This build will install on parallel to the App Store version of ZotPad.
 
 This build has not been tested extensively and may not be stable enough for every day use.
 
-There is no need to report crashes. If you find that something is not working (but does not cause a crash) or is slow, you should report that. If you see an incorrectly rendered citation in the item list, you should report that. If you have improvement ideas, report these. See the instructions here:
+If you find that something is not working (but does not cause a crash) or is slow, you should report that. If you see an incorrectly rendered citation in the item list, you should report that. If you have improvement ideas, report these. See the instructions here:
 
 http://zotpad.uservoice.com/knowledgebase/articles/113113-i-got-and-invitation-to-be-a-beta-tester-how-do-s
 
 If you are installing this over an existing beta, and are experiencing crashes right after the app launches, you need to uninstall the app and reinstall it.
 
-Saving tags and notes has not been implemented yet. This will be added in the next build.
+Saving tags and notes has not been implemented yet. This will be added in a later build.
 
 ----- Changes since the previous beta build -----
 
 GENERAL: 
 
-- Added lookup features (crossref, library, pubget, google scholar, zotero online). Accessible from the action menu.
-- Added ability to print articles
-- Bug fixes
+- Fixes several problems that caused the app to crash
+- Fixes a problem that caused institutional authors names to not display in the item detail view.
 
 ----- Other new features and notable changes since ZotPad 1.1.2 ------
 
 GENERAL:
+
+Feature: Printing articles
+- Accessed through the action menu in item detail view or item viewer
+
+Feature: Lookup
+- Accessed through the action menu in item detail view
+- Supports the same lookup engines that come with Zotero: crossref, library lookup, pubget, google scholar
+- View items in the online Zotero library (Can be useful for troubleshooting.)
 
 Feature: Note viewing and editing
 - Notes are now shown in the item detail view and can be edited by tapping

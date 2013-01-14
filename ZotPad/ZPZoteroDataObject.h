@@ -33,6 +33,10 @@
 @property (assign) NSInteger numChildren;
 @property (assign, readonly) BOOL hasChildren;
 
+@property (assign) BOOL locallyAdded;
+@property (assign) BOOL locallyModified;
+@property (assign) BOOL locallyDeleted;
+
 @property (retain) NSString* cacheTimestamp;
 @property (retain) NSString* serverTimestamp;
 @property (retain) NSArray* tags;

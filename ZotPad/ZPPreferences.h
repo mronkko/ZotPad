@@ -46,6 +46,8 @@
 +(void) reload;
 +(void) checkAndProcessApplicationResetPreferences;
 
++(NSString*) preferencesAsDescriptiveString;
+
 //Dropbox spesific settings
 +(BOOL) useDropbox;
 +(BOOL) dropboxHasFullControl;
@@ -70,9 +72,15 @@
 +(BOOL) includeFileListWithSupportRequest;
 +(BOOL) recursiveCollections;
 +(BOOL) debugCitationParser;
++(BOOL) debugFileUploads;
 +(BOOL) layeredCollectionsNavigation;
 +(BOOL) unifiedCollectionsNavigation;
 +(BOOL) addIdentifiersToAPIRequests;
+
 +(NSString*) favoritesCollectionTitle;
+
++(BOOL) prioritizePDFsInAttachmentLists;
++(BOOL) displayItemKeys;
+
 
 @end

@@ -42,6 +42,12 @@
     // Release any retained subviews of the main view.
 }
 
+-(void)viewDidAppear:(BOOL)animated{
+    [super viewDidAppear:animated];
+    [[NSNotificationCenter defaultCenter] postNotificationName:ZPNOTIFICATION_USER_INTERFACE_AVAILABLE object:nil];
+}
+
+
 - (BOOL)shouldAutorotateToInterfaceOrientation:(UIInterfaceOrientation)interfaceOrientation
 {
 	return YES;

@@ -77,6 +77,16 @@ const NSInteger ZPFILECHANNEL_DROPBOX_DOWNLOAD = 2;
 
 @implementation ZPFileChannel_Dropbox
 
+static NSInteger _downloadCounter = 0;
+static NSInteger _uploadCounter = 0;
+
++(NSInteger) activeDownloads{
+    return _downloadCounter;
+}
++(NSInteger) activeUploads{
+    return _uploadCounter;
+}
+
 
 +(void) linkDroboxIfNeeded{
     if([ZPPreferences useDropbox]){
@@ -489,6 +499,8 @@ const NSInteger ZPFILECHANNEL_DROPBOX_DOWNLOAD = 2;
 
 -(void) startDownloadingAttachment:(ZPZoteroAttachment*)attachment{
 
+    _downloadCounter++;
+    
     DDLogInfo(@"Start downloading attachment %@ from Dropbox",attachment.filename);
 
     //Link with dropBox account if not already linked
@@ -535,6 +547,10 @@ const NSInteger ZPFILECHANNEL_DROPBOX_DOWNLOAD = 2;
 #pragma mark - Uploads
 
 -(void) startUploadingAttachment:(ZPZoteroAttachment*)attachment overWriteConflictingServerVersion:(BOOL)overwriteConflicting{
+
+    _uploadCounter++;
+    
+    [self logVersionInformationForAttachment: attachment];
 
     DDLogInfo(@"Start uploading attachment %@ to Dropbox, overwrite: %i",attachment.filename,overwriteConflicting);
 
@@ -607,15 +623,40 @@ const NSInteger ZPFILECHANNEL_DROPBOX_DOWNLOAD = 2;
     // Uploading
     else if(client.tag == ZPFILECHANNEL_DROPBOX_UPLOAD){
         NSString* path = [self _pathForAttachment:attachment];
-        NSString* targetPath = [path stringByDeletingLastPathComponent];        
+        NSString* targetPath = [path stringByDeletingLastPathComponent];
+        
+        if([ZPPreferences debugFileUploads]){
+            DDLogInfo(@"DropBox metadata");
+            DDLogInfo(@"lastModifiedDate: %@",metadata.lastModifiedDate);
+            DDLogInfo(@"clientMtime: %@",metadata.clientMtime);
+            DDLogInfo(@"path: %@",metadata.path);
+            DDLogInfo(@"isDirectory: %i",metadata.isDirectory);
+            DDLogInfo(@"hash: %@",metadata.hash);
+            DDLogInfo(@"humanReadableSize: %@",metadata.humanReadableSize);
+            DDLogInfo(@"root: %@",metadata.root);
+            DDLogInfo(@"icon: %@",metadata.icon);
+            DDLogInfo(@"rev: %@",metadata.rev);
+            DDLogInfo(@"isDeleted: %i",metadata.isDeleted);
+        }
+        
         if(client.overwriteConflicting){
             [client uploadFile:[[path lastPathComponent] precomposedStringWithCanonicalMapping] toPath:[targetPath precomposedStringWithCanonicalMapping] withParentRev:metadata.rev fromPath:attachment.fileSystemPath_modified];
         }
-        else if(! [attachment.versionIdentifier_local isEqualToString:metadata.rev]){
+        
+        //If rev is null, we assume that the file has been deleted. Fail 
+        else if(metadata.rev == NULL){
+            [ZPFileDownloadManager failedDownloadingAttachment:attachment
+                                                     withError:[NSError errorWithDomain:@"Dropbox"
+                                                                                   code:-1
+                                                                               userInfo:[NSDictionary dictionaryWithObject:@"The original file does not exist in Dropbox" forKey:NSLocalizedDescriptionKey]]
+                                                       fromURL:[self _URLForAttachment:attachment]];
+            [self cleanupAfterFinishingAttachment:attachment];
+        }
+        else if([attachment.versionIdentifier_local isEqualToString:metadata.rev]){
             [self presentConflictViewForAttachment:attachment reason:[NSString stringWithFormat:@"Version identifiers differ. Local file: %@, Dropbox server file: %@", attachment.versionIdentifier_local, metadata.rev]];
         }
         else{
-            [client uploadFile:[[path lastPathComponent] precomposedStringWithCanonicalMapping] toPath:[targetPath precomposedStringWithCanonicalMapping] withParentRev:attachment.versionIdentifier_local fromPath:attachment.fileSystemPath_modified];
+            [client uploadFile:[[path lastPathComponent] precomposedStringWithCanonicalMapping] toPath:[targetPath precomposedStringWithCanonicalMapping] withParentRev:metadata.rev fromPath:attachment.fileSystemPath_modified];
         }
     }
 }
@@ -628,7 +669,8 @@ const NSInteger ZPFILECHANNEL_DROPBOX_DOWNLOAD = 2;
     [self _restClient:client processError:error];
     
     ZPZoteroAttachment* attachment = client.attachment;
-    [ZPServerConnectionManager failedDownloadingAttachment:attachment withError:error usingFileChannel:self fromURL:[self _URLForAttachment:attachment]];    
+    _downloadCounter--;
+    [ZPFileDownloadManager failedDownloadingAttachment:attachment withError:error fromURL:[self _URLForAttachment:attachment]];    
     [self cleanupAfterFinishingAttachment:attachment];
 
 }
@@ -708,13 +750,14 @@ const NSInteger ZPFILECHANNEL_DROPBOX_DOWNLOAD = 2;
             localPath = zipFilePath;
             
             //Website snapshots do not use revision info in Dropbox
-            
-            [ZPServerConnectionManager finishedDownloadingAttachment:attachment toFileAtPath:localPath withVersionIdentifier:@"" usingFileChannel:self];
+            _downloadCounter--;
+            [ZPFileDownloadManager finishedDownloadingAttachment:attachment toFileAtPath:localPath withVersionIdentifier:@"" ];
             [self cleanupAfterFinishingAttachment:attachment];
         }
     }
     else{
-        [ZPServerConnectionManager finishedDownloadingAttachment:attachment toFileAtPath:localPath withVersionIdentifier:client.revision usingFileChannel:self];
+        _downloadCounter--;
+        [ZPFileDownloadManager finishedDownloadingAttachment:attachment toFileAtPath:localPath withVersionIdentifier:client.revision ];
         [self cleanupAfterFinishingAttachment:attachment];
     }
 }
@@ -725,7 +768,8 @@ const NSInteger ZPFILECHANNEL_DROPBOX_DOWNLOAD = 2;
     [self _restClient:client processError:error];
     
     ZPZoteroAttachment* attachment = client.attachment;
-    [ZPServerConnectionManager failedDownloadingAttachment:attachment withError:error usingFileChannel:self fromURL:[self _URLForAttachment:attachment]];
+    _downloadCounter--;
+    [ZPFileDownloadManager failedDownloadingAttachment:attachment withError:error fromURL:[self _URLForAttachment:attachment]];
     [self cleanupAfterFinishingAttachment:attachment];
 
 }
@@ -736,8 +780,8 @@ const NSInteger ZPFILECHANNEL_DROPBOX_DOWNLOAD = 2;
     DDLogVerbose(@"Dropbox uploaded file");
 
     ZPZoteroAttachment* attachment = client.attachment;
-    
-    [ZPServerConnectionManager finishedUploadingAttachment:attachment withVersionIdentifier:metadata.rev];
+    _uploadCounter--;
+    [ZPFileUploadManager finishedUploadingAttachment:attachment withVersionIdentifier:metadata.rev];
     [self cleanupAfterFinishingAttachment:attachment];
 
 }
@@ -755,7 +799,8 @@ const NSInteger ZPFILECHANNEL_DROPBOX_DOWNLOAD = 2;
     [self _restClient:client processError:error];
     
     ZPZoteroAttachment* attachment = [(ZPDBRestClient* )client attachment];
-    [ZPServerConnectionManager failedUploadingAttachment:attachment withError:error usingFileChannel:self toURL:[self _URLForAttachment:attachment]];
+    _uploadCounter--;
+    [ZPFileUploadManager failedUploadingAttachment:attachment withError:error toURL:[self _URLForAttachment:attachment]];
     [self cleanupAfterFinishingAttachment:attachment];
 }
 

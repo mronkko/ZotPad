@@ -8,6 +8,8 @@
 
 #import "ZPCore.h"
 
+//TODO: Clean headers that are not needed
+
 #import "ZPItemDetailViewController.h"
 #import "ZPLibraryAndCollectionListViewController.h"
 #import "ZPItemListViewDataSource.h"
@@ -23,7 +25,8 @@
 #import "ZPTagController.h"
 #import "CMPopTipView.h"
 #import "ZPTagEditingViewController.h"
-
+#import "ZPItemDataDownloadManager.h"
+#import "ZPReachability.h"
 #import <UIKit/UIKit.h>
 
 //Define 
@@ -51,7 +54,7 @@
 
 
 @synthesize selectedItem = _currentItem;
-@synthesize actionButton;
+@synthesize actionButton, starButton;
 
 #pragma mark - View lifecycle
 
@@ -94,7 +97,7 @@
     _activityIndicator = [[UIActivityIndicatorView alloc] initWithFrame:CGRectMake(0,0,20, 20)];
     [_activityIndicator hidesWhenStopped];
     UIBarButtonItem* activityIndicator = [[UIBarButtonItem alloc] initWithCustomView:_activityIndicator];
-    UIBarButtonItem* starButton = [[ZPStarBarButtonItem alloc] init];
+    self.starButton = [[ZPStarBarButtonItem alloc] init];
     
     //Show tool tip about stars
     
@@ -105,7 +108,7 @@
     }
 
     
-    self.navigationItem.rightBarButtonItems = [NSArray arrayWithObjects:self.actionButton, starButton, activityIndicator, nil];
+    self.navigationItem.rightBarButtonItems = [NSArray arrayWithObjects:self.actionButton, self.starButton, activityIndicator, nil];
     
     [[NSNotificationCenter defaultCenter] addObserver:self
                                              selector:@selector(notifyItemAvailable:) 
@@ -164,18 +167,18 @@
 
 -(void) configure{
     
-    if([ZPServerConnectionManager hasInternetConnection]){
+    if([ZPReachability hasInternetConnection]){
+        //Animate until we get fresh data
         [_activityIndicator startAnimating];
-        [ZPServerConnectionManager retrieveSingleItemDetailsFromServer:_currentItem];
     }
-        
+    [[NSNotificationCenter defaultCenter] postNotificationName:ZPNOTIFICATION_ACTIVE_ITEM_CHANGED object:_currentItem];
+    
     [self _reconfigureDetailTableView:FALSE];
     [_carouselDelegate configureWithZoteroItem:_currentItem];
     [_carousel reloadData];
-    
+    [self.starButton configureWithItem:_currentItem];
     self.navigationItem.title=_currentItem.shortCitation;
     
-
 }
 
 - (void)_reconfigureDetailTableView:(BOOL)animated{
@@ -389,9 +392,9 @@
         NSDictionary* creator=[_currentItem.creators objectAtIndex:indexPath.row];
         if(isTitle) returnString =  [ZPLocalization getLocalizationStringWithKey:[creator objectForKey:@"creatorType"] type:@"creatorType" ];
         else{
-            NSString* lastName = [creator objectForKey:@"lastName"];
-            if(lastName==NULL || [lastName isEqualToString:@""]){
-                returnString =  [creator objectForKey:@"shortName"];
+            NSObject* lastName = [creator objectForKey:@"lastName"];
+            if(! [lastName isKindOfClass:[NSString class]] ||  [(NSString*)lastName isEqualToString:@""]){
+                returnString =  [creator objectForKey:@"name"];
             }
             else{
                 returnString =  [NSString stringWithFormat:@"%@ %@",[creator objectForKey:@"firstName"],lastName];

@@ -1,0 +1,66 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE plist PUBLIC "-//Apple//DTD PLIST 1.0//EN" "http://www.apple.com/DTDs/PropertyList-1.0.dtd">
+<plist version="1.0">
+<dict>
+	<key>SchemeUserState</key>
+	<dict>
+		<key>ZotPad beta.xcscheme</key>
+		<dict>
+			<key>isShown</key>
+			<true/>
+			<key>orderHint</key>
+			<integer>3</integer>
+		</dict>
+		<key>ZotPad iAnnotate alpha.xcscheme</key>
+		<dict>
+			<key>orderHint</key>
+			<integer>7</integer>
+		</dict>
+		<key>ZotPad.xcscheme</key>
+		<dict>
+			<key>isShown</key>
+			<true/>
+			<key>orderHint</key>
+			<integer>1</integer>
+		</dict>
+	</dict>
+	<key>SuppressBuildableAutocreation</key>
+	<dict>
+		<key>A7200DCF14718DC0004347C9</key>
+		<dict>
+			<key>primary</key>
+			<true/>
+		</dict>
+		<key>A77898A015147209000B3617</key>
+		<dict>
+			<key>primary</key>
+			<true/>
+		</dict>
+		<key>A78322D215EE3173004BB4F7</key>
+		<dict>
+			<key>primary</key>
+			<true/>
+		</dict>
+		<key>A7CD067E151614EB007A8E1D</key>
+		<dict>
+			<key>primary</key>
+			<true/>
+		</dict>
+		<key>A7CD06FB15161555007A8E1D</key>
+		<dict>
+			<key>primary</key>
+			<true/>
+		</dict>
+		<key>A7D3C03C14AEC96E00DB975D</key>
+		<dict>
+			<key>primary</key>
+			<true/>
+		</dict>
+		<key>A7D3C05D14AECC9800DB975D</key>
+		<dict>
+			<key>primary</key>
+			<true/>
+		</dict>
+	</dict>
+</dict>
+</plist>

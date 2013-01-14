@@ -16,7 +16,7 @@
 		A700CA38163BD3F8005D4115 /* AppIcon144x144-alpha.png in Resources */ = {isa = PBXBuildFile; fileRef = A700CA37163BD3F8005D4115 /* AppIcon144x144-alpha.png */; };
 		A700CA3A163BDAF2005D4115 /* ZotPad alpha-Info.plist in Resources */ = {isa = PBXBuildFile; fileRef = A700CA39163BDAF1005D4115 /* ZotPad alpha-Info.plist */; };
 		A7025019149B0BB1004F2AAB /* ZPDatabase.m in Sources */ = {isa = PBXBuildFile; fileRef = A7025018149B0BB1004F2AAB /* ZPDatabase.m */; };
-		A702501D149B33E1004F2AAB /* ZPCacheController.m in Sources */ = {isa = PBXBuildFile; fileRef = A702501C149B33E1004F2AAB /* ZPCacheController.m */; };
+		A702501D149B33E1004F2AAB /* ZPItemDataDownloadManager.m in Sources */ = {isa = PBXBuildFile; fileRef = A702501C149B33E1004F2AAB /* ZPItemDataDownloadManager.m */; };
 		A7025020149C6C3E004F2AAB /* ZPPreferences.m in Sources */ = {isa = PBXBuildFile; fileRef = A702501F149C6C3D004F2AAB /* ZPPreferences.m */; };
 		A7025072149C8D8F004F2AAB /* ZPServerResponseXMLParserLibrary.m in Sources */ = {isa = PBXBuildFile; fileRef = A7025071149C8D8F004F2AAB /* ZPServerResponseXMLParserLibrary.m */; };
 		A7025075149C8F9A004F2AAB /* ZPServerResponseXMLParserCollection.m in Sources */ = {isa = PBXBuildFile; fileRef = A7025074149C8F9A004F2AAB /* ZPServerResponseXMLParserCollection.m */; };
@@ -949,6 +949,21 @@
 		A7747D611690857A00504A07 /* ZPDate.m in Sources */ = {isa = PBXBuildFile; fileRef = A7747D601690857A00504A07 /* ZPDate.m */; };
 		A7747D621690857A00504A07 /* ZPDate.m in Sources */ = {isa = PBXBuildFile; fileRef = A7747D601690857A00504A07 /* ZPDate.m */; };
 		A7747D631690857A00504A07 /* ZPDate.m in Sources */ = {isa = PBXBuildFile; fileRef = A7747D601690857A00504A07 /* ZPDate.m */; };
+		A77B270A16971E0E009CF9A0 /* libCrittercism_v3_4_8.a in Frameworks */ = {isa = PBXBuildFile; fileRef = A77B270916971E0E009CF9A0 /* libCrittercism_v3_4_8.a */; };
+		A77B270B16971E0E009CF9A0 /* libCrittercism_v3_4_8.a in Frameworks */ = {isa = PBXBuildFile; fileRef = A77B270916971E0E009CF9A0 /* libCrittercism_v3_4_8.a */; };
+		A77B270C16971E0E009CF9A0 /* libCrittercism_v3_4_8.a in Frameworks */ = {isa = PBXBuildFile; fileRef = A77B270916971E0E009CF9A0 /* libCrittercism_v3_4_8.a */; };
+		A77B271116980BB5009CF9A0 /* ZPItemDataUploadManager.m in Sources */ = {isa = PBXBuildFile; fileRef = A77B271016980BB5009CF9A0 /* ZPItemDataUploadManager.m */; };
+		A77B271216980BB5009CF9A0 /* ZPItemDataUploadManager.m in Sources */ = {isa = PBXBuildFile; fileRef = A77B271016980BB5009CF9A0 /* ZPItemDataUploadManager.m */; };
+		A77B271316980BB5009CF9A0 /* ZPItemDataUploadManager.m in Sources */ = {isa = PBXBuildFile; fileRef = A77B271016980BB5009CF9A0 /* ZPItemDataUploadManager.m */; };
+		A77B271616980BCE009CF9A0 /* ZPFileDownloadManager.m in Sources */ = {isa = PBXBuildFile; fileRef = A77B271516980BCE009CF9A0 /* ZPFileDownloadManager.m */; };
+		A77B271716980BCE009CF9A0 /* ZPFileDownloadManager.m in Sources */ = {isa = PBXBuildFile; fileRef = A77B271516980BCE009CF9A0 /* ZPFileDownloadManager.m */; };
+		A77B271816980BCE009CF9A0 /* ZPFileDownloadManager.m in Sources */ = {isa = PBXBuildFile; fileRef = A77B271516980BCE009CF9A0 /* ZPFileDownloadManager.m */; };
+		A77B271B16980BD8009CF9A0 /* ZPFileUploadManager.m in Sources */ = {isa = PBXBuildFile; fileRef = A77B271A16980BD8009CF9A0 /* ZPFileUploadManager.m */; };
+		A77B271C16980BD8009CF9A0 /* ZPFileUploadManager.m in Sources */ = {isa = PBXBuildFile; fileRef = A77B271A16980BD8009CF9A0 /* ZPFileUploadManager.m */; };
+		A77B271D16980BD8009CF9A0 /* ZPFileUploadManager.m in Sources */ = {isa = PBXBuildFile; fileRef = A77B271A16980BD8009CF9A0 /* ZPFileUploadManager.m */; };
+		A77B272016980C16009CF9A0 /* ZPFileCacheManager.m in Sources */ = {isa = PBXBuildFile; fileRef = A77B271F16980C16009CF9A0 /* ZPFileCacheManager.m */; };
+		A77B272116980C16009CF9A0 /* ZPFileCacheManager.m in Sources */ = {isa = PBXBuildFile; fileRef = A77B271F16980C16009CF9A0 /* ZPFileCacheManager.m */; };
+		A77B272216980C16009CF9A0 /* ZPFileCacheManager.m in Sources */ = {isa = PBXBuildFile; fileRef = A77B271F16980C16009CF9A0 /* ZPFileCacheManager.m */; };
 		A77B98DF14DE5CDB00132E9B /* ZPItemListViewController.m in Sources */ = {isa = PBXBuildFile; fileRef = A77B98DE14DE5CDB00132E9B /* ZPItemListViewController.m */; };
 		A77E0DCD15D6603200134D35 /* libUserVoice.a in Frameworks */ = {isa = PBXBuildFile; fileRef = A77E0DCC15D65FAB00134D35 /* libUserVoice.a */; };
 		A77E0DD615D660CF00134D35 /* libUserVoice.a in Frameworks */ = {isa = PBXBuildFile; fileRef = A77E0DCC15D65FAB00134D35 /* libUserVoice.a */; };
@@ -963,7 +978,7 @@
 		A78322D815EE3173004BB4F7 /* main.m in Sources */ = {isa = PBXBuildFile; fileRef = A7200DE014718DC0004347C9 /* main.m */; };
 		A78322D915EE3173004BB4F7 /* ZPAppDelegate.m in Sources */ = {isa = PBXBuildFile; fileRef = A7200DE414718DC0004347C9 /* ZPAppDelegate.m */; };
 		A78322DA15EE3173004BB4F7 /* ZPLibraryAndCollectionListViewController.m in Sources */ = {isa = PBXBuildFile; fileRef = A7200DEA14718DC1004347C9 /* ZPLibraryAndCollectionListViewController.m */; };
-		A78322DC15EE3173004BB4F7 /* ZPServerConnectionManager.m in Sources */ = {isa = PBXBuildFile; fileRef = A7A7C9B0147A8144004D8756 /* ZPServerConnectionManager.m */; };
+		A78322DC15EE3173004BB4F7 /* ZPServerConnection.m in Sources */ = {isa = PBXBuildFile; fileRef = A7A7C9B0147A8144004D8756 /* ZPServerConnection.m */; };
 		A78322DD15EE3173004BB4F7 /* NSMutableURLRequest+Parameters.m in Sources */ = {isa = PBXBuildFile; fileRef = A7A7C9D0147AA2EE004D8756 /* NSMutableURLRequest+Parameters.m */; settings = {COMPILER_FLAGS = "-fno-objc-arc"; }; };
 		A78322DE15EE3173004BB4F7 /* NSString+URLEncoding.m in Sources */ = {isa = PBXBuildFile; fileRef = A7A7C9D2147AA2EE004D8756 /* NSString+URLEncoding.m */; settings = {COMPILER_FLAGS = "-fno-objc-arc"; }; };
 		A78322DF15EE3173004BB4F7 /* NSURL+Base.m in Sources */ = {isa = PBXBuildFile; fileRef = A7A7C9D4147AA2EE004D8756 /* NSURL+Base.m */; settings = {COMPILER_FLAGS = "-fno-objc-arc"; }; };
@@ -991,7 +1006,7 @@
 		A78322F815EE3173004BB4F7 /* iCarousel.m in Sources */ = {isa = PBXBuildFile; fileRef = A7CC252C1493E14D00FDEAF4 /* iCarousel.m */; };
 		A78322F915EE3173004BB4F7 /* ZPZoteroAttachment.m in Sources */ = {isa = PBXBuildFile; fileRef = A716C0361494E9DE00BD6025 /* ZPZoteroAttachment.m */; };
 		A783230615EE3173004BB4F7 /* ZPDatabase.m in Sources */ = {isa = PBXBuildFile; fileRef = A7025018149B0BB1004F2AAB /* ZPDatabase.m */; };
-		A783230715EE3173004BB4F7 /* ZPCacheController.m in Sources */ = {isa = PBXBuildFile; fileRef = A702501C149B33E1004F2AAB /* ZPCacheController.m */; };
+		A783230715EE3173004BB4F7 /* ZPItemDataDownloadManager.m in Sources */ = {isa = PBXBuildFile; fileRef = A702501C149B33E1004F2AAB /* ZPItemDataDownloadManager.m */; };
 		A783230815EE3173004BB4F7 /* ZPPreferences.m in Sources */ = {isa = PBXBuildFile; fileRef = A702501F149C6C3D004F2AAB /* ZPPreferences.m */; };
 		A783230915EE3173004BB4F7 /* ZPServerResponseXMLParserLibrary.m in Sources */ = {isa = PBXBuildFile; fileRef = A7025071149C8D8F004F2AAB /* ZPServerResponseXMLParserLibrary.m */; };
 		A783230A15EE3173004BB4F7 /* ZPServerResponseXMLParserCollection.m in Sources */ = {isa = PBXBuildFile; fileRef = A7025074149C8F9A004F2AAB /* ZPServerResponseXMLParserCollection.m */; };
@@ -1461,7 +1476,7 @@
 		A7A4432C155FE5ED005FF5B4 /* ZPServerResponseXMLParserKeyPermissions.m in Sources */ = {isa = PBXBuildFile; fileRef = A7A4432B155FE5ED005FF5B4 /* ZPServerResponseXMLParserKeyPermissions.m */; };
 		A7A4432D155FE5ED005FF5B4 /* ZPServerResponseXMLParserKeyPermissions.m in Sources */ = {isa = PBXBuildFile; fileRef = A7A4432B155FE5ED005FF5B4 /* ZPServerResponseXMLParserKeyPermissions.m */; };
 		A7A54B1114878EE000EBAD80 /* DSActivityView.m in Sources */ = {isa = PBXBuildFile; fileRef = A7A54B1014878EE000EBAD80 /* DSActivityView.m */; };
-		A7A7C9B1147A8144004D8756 /* ZPServerConnectionManager.m in Sources */ = {isa = PBXBuildFile; fileRef = A7A7C9B0147A8144004D8756 /* ZPServerConnectionManager.m */; };
+		A7A7C9B1147A8144004D8756 /* ZPServerConnection.m in Sources */ = {isa = PBXBuildFile; fileRef = A7A7C9B0147A8144004D8756 /* ZPServerConnection.m */; };
 		A7A7C9F8147AA2EE004D8756 /* NSMutableURLRequest+Parameters.m in Sources */ = {isa = PBXBuildFile; fileRef = A7A7C9D0147AA2EE004D8756 /* NSMutableURLRequest+Parameters.m */; settings = {COMPILER_FLAGS = "-fno-objc-arc"; }; };
 		A7A7C9F9147AA2EE004D8756 /* NSString+URLEncoding.m in Sources */ = {isa = PBXBuildFile; fileRef = A7A7C9D2147AA2EE004D8756 /* NSString+URLEncoding.m */; settings = {COMPILER_FLAGS = "-fno-objc-arc"; }; };
 		A7A7C9FA147AA2EE004D8756 /* NSURL+Base.m in Sources */ = {isa = PBXBuildFile; fileRef = A7A7C9D4147AA2EE004D8756 /* NSURL+Base.m */; settings = {COMPILER_FLAGS = "-fno-objc-arc"; }; };
@@ -1494,6 +1509,9 @@
 		A7ABAB6715A3071000EA8B7B /* Default-Portrait@2x~ipad.png in Resources */ = {isa = PBXBuildFile; fileRef = A7F249E5153311BC00537B54 /* Default-Portrait@2x~ipad.png */; };
 		A7ABAB6815A3071F00EA8B7B /* Default-Landscape@2x~ipad.png in Resources */ = {isa = PBXBuildFile; fileRef = A7F249F11533175E00537B54 /* Default-Landscape@2x~ipad.png */; };
 		A7ABAB6915A3072300EA8B7B /* Default-Landscape~ipad.png in Resources */ = {isa = PBXBuildFile; fileRef = A7F249D71533072300537B54 /* Default-Landscape~ipad.png */; };
+		A7AF1CBD16996DAD008DCE16 /* ZPReachability.m in Sources */ = {isa = PBXBuildFile; fileRef = A7AF1CBC16996DAD008DCE16 /* ZPReachability.m */; };
+		A7AF1CBE16996DAD008DCE16 /* ZPReachability.m in Sources */ = {isa = PBXBuildFile; fileRef = A7AF1CBC16996DAD008DCE16 /* ZPReachability.m */; };
+		A7AF1CBF16996DAD008DCE16 /* ZPReachability.m in Sources */ = {isa = PBXBuildFile; fileRef = A7AF1CBC16996DAD008DCE16 /* ZPReachability.m */; };
 		A7B051BB15B187BF0049C5A2 /* icon-down-black.png in Resources */ = {isa = PBXBuildFile; fileRef = A7B051B715B187BF0049C5A2 /* icon-down-black.png */; };
 		A7B051BC15B187BF0049C5A2 /* icon-down-black.png in Resources */ = {isa = PBXBuildFile; fileRef = A7B051B715B187BF0049C5A2 /* icon-down-black.png */; };
 		A7B051BD15B187BF0049C5A2 /* icon-down-black@2x.png in Resources */ = {isa = PBXBuildFile; fileRef = A7B051B815B187BF0049C5A2 /* icon-down-black@2x.png */; };
@@ -1514,7 +1532,7 @@
 		A7CD070B15161555007A8E1D /* main.m in Sources */ = {isa = PBXBuildFile; fileRef = A7200DE014718DC0004347C9 /* main.m */; };
 		A7CD070C15161555007A8E1D /* ZPAppDelegate.m in Sources */ = {isa = PBXBuildFile; fileRef = A7200DE414718DC0004347C9 /* ZPAppDelegate.m */; };
 		A7CD070D15161555007A8E1D /* ZPLibraryAndCollectionListViewController.m in Sources */ = {isa = PBXBuildFile; fileRef = A7200DEA14718DC1004347C9 /* ZPLibraryAndCollectionListViewController.m */; };
-		A7CD070F15161555007A8E1D /* ZPServerConnectionManager.m in Sources */ = {isa = PBXBuildFile; fileRef = A7A7C9B0147A8144004D8756 /* ZPServerConnectionManager.m */; };
+		A7CD070F15161555007A8E1D /* ZPServerConnection.m in Sources */ = {isa = PBXBuildFile; fileRef = A7A7C9B0147A8144004D8756 /* ZPServerConnection.m */; };
 		A7CD071015161555007A8E1D /* NSMutableURLRequest+Parameters.m in Sources */ = {isa = PBXBuildFile; fileRef = A7A7C9D0147AA2EE004D8756 /* NSMutableURLRequest+Parameters.m */; settings = {COMPILER_FLAGS = "-fno-objc-arc"; }; };
 		A7CD071115161555007A8E1D /* NSString+URLEncoding.m in Sources */ = {isa = PBXBuildFile; fileRef = A7A7C9D2147AA2EE004D8756 /* NSString+URLEncoding.m */; settings = {COMPILER_FLAGS = "-fno-objc-arc"; }; };
 		A7CD071215161555007A8E1D /* NSURL+Base.m in Sources */ = {isa = PBXBuildFile; fileRef = A7A7C9D4147AA2EE004D8756 /* NSURL+Base.m */; settings = {COMPILER_FLAGS = "-fno-objc-arc"; }; };
@@ -1542,7 +1560,7 @@
 		A7CD072D15161555007A8E1D /* iCarousel.m in Sources */ = {isa = PBXBuildFile; fileRef = A7CC252C1493E14D00FDEAF4 /* iCarousel.m */; };
 		A7CD072E15161555007A8E1D /* ZPZoteroAttachment.m in Sources */ = {isa = PBXBuildFile; fileRef = A716C0361494E9DE00BD6025 /* ZPZoteroAttachment.m */; };
 		A7CD073B15161555007A8E1D /* ZPDatabase.m in Sources */ = {isa = PBXBuildFile; fileRef = A7025018149B0BB1004F2AAB /* ZPDatabase.m */; };
-		A7CD073C15161555007A8E1D /* ZPCacheController.m in Sources */ = {isa = PBXBuildFile; fileRef = A702501C149B33E1004F2AAB /* ZPCacheController.m */; };
+		A7CD073C15161555007A8E1D /* ZPItemDataDownloadManager.m in Sources */ = {isa = PBXBuildFile; fileRef = A702501C149B33E1004F2AAB /* ZPItemDataDownloadManager.m */; };
 		A7CD073D15161555007A8E1D /* ZPPreferences.m in Sources */ = {isa = PBXBuildFile; fileRef = A702501F149C6C3D004F2AAB /* ZPPreferences.m */; };
 		A7CD073E15161555007A8E1D /* ZPServerResponseXMLParserLibrary.m in Sources */ = {isa = PBXBuildFile; fileRef = A7025071149C8D8F004F2AAB /* ZPServerResponseXMLParserLibrary.m */; };
 		A7CD073F15161555007A8E1D /* ZPServerResponseXMLParserCollection.m in Sources */ = {isa = PBXBuildFile; fileRef = A7025074149C8F9A004F2AAB /* ZPServerResponseXMLParserCollection.m */; };
@@ -1836,8 +1854,8 @@
 		A700CA39163BDAF1005D4115 /* ZotPad alpha-Info.plist */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = text.plist.xml; path = "ZotPad alpha-Info.plist"; sourceTree = SOURCE_ROOT; };
 		A7025017149B0BB1004F2AAB /* ZPDatabase.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = ZPDatabase.h; sourceTree = "<group>"; };
 		A7025018149B0BB1004F2AAB /* ZPDatabase.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = ZPDatabase.m; sourceTree = "<group>"; };
-		A702501B149B33E1004F2AAB /* ZPCacheController.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = ZPCacheController.h; sourceTree = "<group>"; };
-		A702501C149B33E1004F2AAB /* ZPCacheController.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = ZPCacheController.m; sourceTree = "<group>"; };
+		A702501B149B33E1004F2AAB /* ZPItemDataDownloadManager.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = ZPItemDataDownloadManager.h; sourceTree = "<group>"; };
+		A702501C149B33E1004F2AAB /* ZPItemDataDownloadManager.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = ZPItemDataDownloadManager.m; sourceTree = "<group>"; };
 		A702501E149C6C3C004F2AAB /* ZPPreferences.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = ZPPreferences.h; sourceTree = "<group>"; };
 		A702501F149C6C3D004F2AAB /* ZPPreferences.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = ZPPreferences.m; sourceTree = "<group>"; };
 		A7025070149C8D8F004F2AAB /* ZPServerResponseXMLParserLibrary.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = ZPServerResponseXMLParserLibrary.h; sourceTree = "<group>"; };
@@ -2490,6 +2508,17 @@
 		A7747D5A168F8A0B00504A07 /* ZPOpenURL.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = ZPOpenURL.m; sourceTree = "<group>"; };
 		A7747D5F1690857A00504A07 /* ZPDate.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = ZPDate.h; sourceTree = "<group>"; };
 		A7747D601690857A00504A07 /* ZPDate.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = ZPDate.m; sourceTree = "<group>"; };
+		A77B270716971E0E009CF9A0 /* Crittercism.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = Crittercism.h; sourceTree = "<group>"; };
+		A77B270816971E0E009CF9A0 /* CrittercismDelegate.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = CrittercismDelegate.h; sourceTree = "<group>"; };
+		A77B270916971E0E009CF9A0 /* libCrittercism_v3_4_8.a */ = {isa = PBXFileReference; lastKnownFileType = archive.ar; path = libCrittercism_v3_4_8.a; sourceTree = "<group>"; };
+		A77B270F16980BB5009CF9A0 /* ZPItemDataUploadManager.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = ZPItemDataUploadManager.h; sourceTree = "<group>"; };
+		A77B271016980BB5009CF9A0 /* ZPItemDataUploadManager.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = ZPItemDataUploadManager.m; sourceTree = "<group>"; };
+		A77B271416980BCE009CF9A0 /* ZPFileDownloadManager.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = ZPFileDownloadManager.h; sourceTree = "<group>"; };
+		A77B271516980BCE009CF9A0 /* ZPFileDownloadManager.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = ZPFileDownloadManager.m; sourceTree = "<group>"; };
+		A77B271916980BD8009CF9A0 /* ZPFileUploadManager.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = ZPFileUploadManager.h; sourceTree = "<group>"; };
+		A77B271A16980BD8009CF9A0 /* ZPFileUploadManager.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = ZPFileUploadManager.m; sourceTree = "<group>"; };
+		A77B271E16980C16009CF9A0 /* ZPFileCacheManager.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = ZPFileCacheManager.h; sourceTree = "<group>"; };
+		A77B271F16980C16009CF9A0 /* ZPFileCacheManager.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = ZPFileCacheManager.m; sourceTree = "<group>"; };
 		A77B98DD14DE5CDB00132E9B /* ZPItemListViewController.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = ZPItemListViewController.h; sourceTree = "<group>"; };
 		A77B98DE14DE5CDB00132E9B /* ZPItemListViewController.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = ZPItemListViewController.m; sourceTree = "<group>"; };
 		A77E0DC415D65FAB00134D35 /* UserVoice.xcodeproj */ = {isa = PBXFileReference; lastKnownFileType = "wrapper.pb-project"; name = UserVoice.xcodeproj; path = "uservoice-iphone-sdk/UserVoice.xcodeproj"; sourceTree = "<group>"; };
@@ -2579,8 +2608,8 @@
 		A7A54B0F14878EE000EBAD80 /* DSActivityView.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; name = DSActivityView.h; path = DSActivityView/Sources/DSActivityView.h; sourceTree = "<group>"; };
 		A7A54B1014878EE000EBAD80 /* DSActivityView.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; name = DSActivityView.m; path = DSActivityView/Sources/DSActivityView.m; sourceTree = "<group>"; };
 		A7A6A5F2161ABE0C00C7DB72 /* CSLProcessor.xcodeproj */ = {isa = PBXFileReference; lastKnownFileType = "wrapper.pb-project"; name = CSLProcessor.xcodeproj; path = CSLProcessor/CSLProcessor.xcodeproj; sourceTree = "<group>"; };
-		A7A7C9AF147A8144004D8756 /* ZPServerConnectionManager.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = ZPServerConnectionManager.h; sourceTree = "<group>"; };
-		A7A7C9B0147A8144004D8756 /* ZPServerConnectionManager.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = ZPServerConnectionManager.m; sourceTree = "<group>"; };
+		A7A7C9AF147A8144004D8756 /* ZPServerConnection.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = ZPServerConnection.h; sourceTree = "<group>"; };
+		A7A7C9B0147A8144004D8756 /* ZPServerConnection.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = ZPServerConnection.m; sourceTree = "<group>"; };
 		A7A7C9CF147AA2EE004D8756 /* NSMutableURLRequest+Parameters.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = "NSMutableURLRequest+Parameters.h"; sourceTree = "<group>"; };
 		A7A7C9D0147AA2EE004D8756 /* NSMutableURLRequest+Parameters.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = "NSMutableURLRequest+Parameters.m"; sourceTree = "<group>"; };
 		A7A7C9D1147AA2EE004D8756 /* NSString+URLEncoding.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = "NSString+URLEncoding.h"; sourceTree = "<group>"; };
@@ -2624,6 +2653,8 @@
 		A7ABAB3315A3046300EA8B7B /* DTCoreText.xcodeproj */ = {isa = PBXFileReference; lastKnownFileType = "wrapper.pb-project"; name = DTCoreText.xcodeproj; path = DTCoreText/DTCoreText.xcodeproj; sourceTree = "<group>"; };
 		A7ABAB6015A306A600EA8B7B /* AppIcon57x57.png */ = {isa = PBXFileReference; lastKnownFileType = image.png; name = AppIcon57x57.png; path = ../Icons/AppIcon57x57.png; sourceTree = "<group>"; };
 		A7ABAB6215A306C600EA8B7B /* AppIcon114x114.png */ = {isa = PBXFileReference; lastKnownFileType = image.png; name = AppIcon114x114.png; path = ../Icons/AppIcon114x114.png; sourceTree = "<group>"; };
+		A7AF1CBB16996DAC008DCE16 /* ZPReachability.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = ZPReachability.h; sourceTree = "<group>"; };
+		A7AF1CBC16996DAD008DCE16 /* ZPReachability.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = ZPReachability.m; sourceTree = "<group>"; };
 		A7B051B715B187BF0049C5A2 /* icon-down-black.png */ = {isa = PBXFileReference; lastKnownFileType = image.png; name = "icon-down-black.png"; path = "Icons/icon-down-black.png"; sourceTree = SOURCE_ROOT; };
 		A7B051B815B187BF0049C5A2 /* icon-down-black@2x.png */ = {isa = PBXFileReference; lastKnownFileType = image.png; name = "icon-down-black@2x.png"; path = "Icons/icon-down-black@2x.png"; sourceTree = SOURCE_ROOT; };
 		A7B051B915B187BF0049C5A2 /* icon-up-black.png */ = {isa = PBXFileReference; lastKnownFileType = image.png; name = "icon-up-black.png"; path = "Icons/icon-up-black.png"; sourceTree = SOURCE_ROOT; };
@@ -2681,7 +2712,6 @@
 		A7F5ABE516450223005DC63C /* ZPTagOwner.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = ZPTagOwner.h; sourceTree = "<group>"; };
 		A7F6225B1686F3550038E27B /* Beta-release-notes.txt */ = {isa = PBXFileReference; lastKnownFileType = text; path = "Beta-release-notes.txt"; sourceTree = "<group>"; };
 		A7F6225C1686F3550038E27B /* README.md */ = {isa = PBXFileReference; lastKnownFileType = text; path = README.md; sourceTree = "<group>"; };
-		A7F6225D16871AC80038E27B /* configure.sh */ = {isa = PBXFileReference; lastKnownFileType = text.script.sh; path = configure.sh; sourceTree = "<group>"; };
 		A7FC2ECB15AE12B400CF4A5B /* link_zotero_mac_unix.sh */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = text.script.sh; path = link_zotero_mac_unix.sh; sourceTree = "<group>"; };
 		A7FC2ECE15AE1AEE00CF4A5B /* link_zotero_windows.vbs */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = text.script.sh; path = link_zotero_windows.vbs; sourceTree = "<group>"; };
 		A7FC2ED115AE1B1A00CF4A5B /* Dropbox_instructions.txt */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = text; path = Dropbox_instructions.txt; sourceTree = "<group>"; };
@@ -2716,6 +2746,7 @@
 				A7200DD514718DC0004347C9 /* UIKit.framework in Frameworks */,
 				A7200DD714718DC0004347C9 /* Foundation.framework in Frameworks */,
 				A73D1BFD1560E234002D4A2D /* libTestFlight.a in Frameworks */,
+				A77B270A16971E0E009CF9A0 /* libCrittercism_v3_4_8.a in Frameworks */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
@@ -2751,6 +2782,7 @@
 				A783237D15EE3173004BB4F7 /* Foundation.framework in Frameworks */,
 				A783237E15EE3173004BB4F7 /* libTestFlight.a in Frameworks */,
 				A70288BA163BF3AF003A0192 /* libAjiPDFLib.a in Frameworks */,
+				A77B270C16971E0E009CF9A0 /* libCrittercism_v3_4_8.a in Frameworks */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
@@ -2784,6 +2816,7 @@
 				A7CD076115161555007A8E1D /* UIKit.framework in Frameworks */,
 				A7CD076215161555007A8E1D /* Foundation.framework in Frameworks */,
 				A73D1BFE1560E234002D4A2D /* libTestFlight.a in Frameworks */,
+				A77B270B16971E0E009CF9A0 /* libCrittercism_v3_4_8.a in Frameworks */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
@@ -2793,10 +2826,13 @@
 		A702506E149C8BE8004F2AAB /* Server connection */ = {
 			isa = PBXGroup;
 			children = (
+				A77B270E16980AEC009CF9A0 /* DownloadAndUploadManagers */,
 				A7CD078615164DFA007A8E1D /* File channels */,
 				A702506F149C8D3D004F2AAB /* Response parsers */,
-				A7A7C9AF147A8144004D8756 /* ZPServerConnectionManager.h */,
-				A7A7C9B0147A8144004D8756 /* ZPServerConnectionManager.m */,
+				A7A7C9AF147A8144004D8756 /* ZPServerConnection.h */,
+				A7A7C9B0147A8144004D8756 /* ZPServerConnection.m */,
+				A7AF1CBB16996DAC008DCE16 /* ZPReachability.h */,
+				A7AF1CBC16996DAD008DCE16 /* ZPReachability.m */,
 			);
 			name = "Server connection";
 			sourceTree = "<group>";
@@ -3481,7 +3517,6 @@
 		A7200DC514718DBF004347C9 = {
 			isa = PBXGroup;
 			children = (
-				A7F6225D16871AC80038E27B /* configure.sh */,
 				A7F6225B1686F3550038E27B /* Beta-release-notes.txt */,
 				A7F6225C1686F3550038E27B /* README.md */,
 				A7200DDA14718DC0004347C9 /* ZotPad */,
@@ -3503,6 +3538,7 @@
 		A7200DD314718DC0004347C9 /* Frameworks */ = {
 			isa = PBXGroup;
 			children = (
+				A77B270616971E0E009CF9A0 /* CrittercismSDK */,
 				A707A7D6163C015400775E88 /* AVFoundation.framework */,
 				A7699E56159A6C44002F09DA /* CoreFoundation.framework */,
 				A70399B015979EC1002F4293 /* MessageUI.framework */,
@@ -3600,12 +3636,12 @@
 			isa = PBXGroup;
 			children = (
 				A7B2BCC715B3E1D600381E23 /* SQL */,
-				A702501B149B33E1004F2AAB /* ZPCacheController.h */,
-				A702501C149B33E1004F2AAB /* ZPCacheController.m */,
 				A702501E149C6C3C004F2AAB /* ZPPreferences.h */,
 				A702501F149C6C3D004F2AAB /* ZPPreferences.m */,
 				A7025017149B0BB1004F2AAB /* ZPDatabase.h */,
 				A7025018149B0BB1004F2AAB /* ZPDatabase.m */,
+				A77B271E16980C16009CF9A0 /* ZPFileCacheManager.h */,
+				A77B271F16980C16009CF9A0 /* ZPFileCacheManager.m */,
 			);
 			name = "Data layer";
 			sourceTree = "<group>";
@@ -3784,6 +3820,31 @@
 				A78D46A31692E31A00BA5C29 /* ZPUtils.m */,
 			);
 			name = Utilities;
+			sourceTree = "<group>";
+		};
+		A77B270616971E0E009CF9A0 /* CrittercismSDK */ = {
+			isa = PBXGroup;
+			children = (
+				A77B270716971E0E009CF9A0 /* Crittercism.h */,
+				A77B270816971E0E009CF9A0 /* CrittercismDelegate.h */,
+				A77B270916971E0E009CF9A0 /* libCrittercism_v3_4_8.a */,
+			);
+			path = CrittercismSDK;
+			sourceTree = "<group>";
+		};
+		A77B270E16980AEC009CF9A0 /* DownloadAndUploadManagers */ = {
+			isa = PBXGroup;
+			children = (
+				A702501B149B33E1004F2AAB /* ZPItemDataDownloadManager.h */,
+				A702501C149B33E1004F2AAB /* ZPItemDataDownloadManager.m */,
+				A77B270F16980BB5009CF9A0 /* ZPItemDataUploadManager.h */,
+				A77B271016980BB5009CF9A0 /* ZPItemDataUploadManager.m */,
+				A77B271416980BCE009CF9A0 /* ZPFileDownloadManager.h */,
+				A77B271516980BCE009CF9A0 /* ZPFileDownloadManager.m */,
+				A77B271916980BD8009CF9A0 /* ZPFileUploadManager.h */,
+				A77B271A16980BD8009CF9A0 /* ZPFileUploadManager.m */,
+			);
+			name = DownloadAndUploadManagers;
 			sourceTree = "<group>";
 		};
 		A77E0DC515D65FAB00134D35 /* Products */ = {
@@ -5806,7 +5867,7 @@
 				A7200DE114718DC0004347C9 /* main.m in Sources */,
 				A7200DE514718DC0004347C9 /* ZPAppDelegate.m in Sources */,
 				A7200DEB14718DC1004347C9 /* ZPLibraryAndCollectionListViewController.m in Sources */,
-				A7A7C9B1147A8144004D8756 /* ZPServerConnectionManager.m in Sources */,
+				A7A7C9B1147A8144004D8756 /* ZPServerConnection.m in Sources */,
 				A7A7C9F8147AA2EE004D8756 /* NSMutableURLRequest+Parameters.m in Sources */,
 				A7A7C9F9147AA2EE004D8756 /* NSString+URLEncoding.m in Sources */,
 				A7A7C9FA147AA2EE004D8756 /* NSURL+Base.m in Sources */,
@@ -5834,7 +5895,7 @@
 				A7CC252F1493E14E00FDEAF4 /* iCarousel.m in Sources */,
 				A716C0371494E9DF00BD6025 /* ZPZoteroAttachment.m in Sources */,
 				A7025019149B0BB1004F2AAB /* ZPDatabase.m in Sources */,
-				A702501D149B33E1004F2AAB /* ZPCacheController.m in Sources */,
+				A702501D149B33E1004F2AAB /* ZPItemDataDownloadManager.m in Sources */,
 				A7025020149C6C3E004F2AAB /* ZPPreferences.m in Sources */,
 				A7025072149C8D8F004F2AAB /* ZPServerResponseXMLParserLibrary.m in Sources */,
 				A7025075149C8F9A004F2AAB /* ZPServerResponseXMLParserCollection.m in Sources */,
@@ -5907,6 +5968,11 @@
 				A7747D5B168F8A0B00504A07 /* ZPOpenURL.m in Sources */,
 				A7747D611690857A00504A07 /* ZPDate.m in Sources */,
 				A78D46A41692E31A00BA5C29 /* ZPUtils.m in Sources */,
+				A77B271116980BB5009CF9A0 /* ZPItemDataUploadManager.m in Sources */,
+				A77B271616980BCE009CF9A0 /* ZPFileDownloadManager.m in Sources */,
+				A77B271B16980BD8009CF9A0 /* ZPFileUploadManager.m in Sources */,
+				A77B272016980C16009CF9A0 /* ZPFileCacheManager.m in Sources */,
+				A7AF1CBD16996DAD008DCE16 /* ZPReachability.m in Sources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
@@ -5917,7 +5983,7 @@
 				A78322D815EE3173004BB4F7 /* main.m in Sources */,
 				A78322D915EE3173004BB4F7 /* ZPAppDelegate.m in Sources */,
 				A78322DA15EE3173004BB4F7 /* ZPLibraryAndCollectionListViewController.m in Sources */,
-				A78322DC15EE3173004BB4F7 /* ZPServerConnectionManager.m in Sources */,
+				A78322DC15EE3173004BB4F7 /* ZPServerConnection.m in Sources */,
 				A78322DD15EE3173004BB4F7 /* NSMutableURLRequest+Parameters.m in Sources */,
 				A78322DE15EE3173004BB4F7 /* NSString+URLEncoding.m in Sources */,
 				A78322DF15EE3173004BB4F7 /* NSURL+Base.m in Sources */,
@@ -5945,7 +6011,7 @@
 				A78322F815EE3173004BB4F7 /* iCarousel.m in Sources */,
 				A78322F915EE3173004BB4F7 /* ZPZoteroAttachment.m in Sources */,
 				A783230615EE3173004BB4F7 /* ZPDatabase.m in Sources */,
-				A783230715EE3173004BB4F7 /* ZPCacheController.m in Sources */,
+				A783230715EE3173004BB4F7 /* ZPItemDataDownloadManager.m in Sources */,
 				A783230815EE3173004BB4F7 /* ZPPreferences.m in Sources */,
 				A783230915EE3173004BB4F7 /* ZPServerResponseXMLParserLibrary.m in Sources */,
 				A783230A15EE3173004BB4F7 /* ZPServerResponseXMLParserCollection.m in Sources */,
@@ -6018,6 +6084,11 @@
 				A7747D5D168F8A0B00504A07 /* ZPOpenURL.m in Sources */,
 				A7747D631690857A00504A07 /* ZPDate.m in Sources */,
 				A78D46A61692E31A00BA5C29 /* ZPUtils.m in Sources */,
+				A77B271316980BB5009CF9A0 /* ZPItemDataUploadManager.m in Sources */,
+				A77B271816980BCE009CF9A0 /* ZPFileDownloadManager.m in Sources */,
+				A77B271D16980BD8009CF9A0 /* ZPFileUploadManager.m in Sources */,
+				A77B272216980C16009CF9A0 /* ZPFileCacheManager.m in Sources */,
+				A7AF1CBF16996DAD008DCE16 /* ZPReachability.m in Sources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
@@ -6028,7 +6099,7 @@
 				A7CD070B15161555007A8E1D /* main.m in Sources */,
 				A7CD070C15161555007A8E1D /* ZPAppDelegate.m in Sources */,
 				A7CD070D15161555007A8E1D /* ZPLibraryAndCollectionListViewController.m in Sources */,
-				A7CD070F15161555007A8E1D /* ZPServerConnectionManager.m in Sources */,
+				A7CD070F15161555007A8E1D /* ZPServerConnection.m in Sources */,
 				A7CD071015161555007A8E1D /* NSMutableURLRequest+Parameters.m in Sources */,
 				A7CD071115161555007A8E1D /* NSString+URLEncoding.m in Sources */,
 				A7CD071215161555007A8E1D /* NSURL+Base.m in Sources */,
@@ -6056,7 +6127,7 @@
 				A7CD072D15161555007A8E1D /* iCarousel.m in Sources */,
 				A7CD072E15161555007A8E1D /* ZPZoteroAttachment.m in Sources */,
 				A7CD073B15161555007A8E1D /* ZPDatabase.m in Sources */,
-				A7CD073C15161555007A8E1D /* ZPCacheController.m in Sources */,
+				A7CD073C15161555007A8E1D /* ZPItemDataDownloadManager.m in Sources */,
 				A7CD073D15161555007A8E1D /* ZPPreferences.m in Sources */,
 				A7CD073E15161555007A8E1D /* ZPServerResponseXMLParserLibrary.m in Sources */,
 				A7CD073F15161555007A8E1D /* ZPServerResponseXMLParserCollection.m in Sources */,
@@ -6129,6 +6200,11 @@
 				A7747D5C168F8A0B00504A07 /* ZPOpenURL.m in Sources */,
 				A7747D621690857A00504A07 /* ZPDate.m in Sources */,
 				A78D46A51692E31A00BA5C29 /* ZPUtils.m in Sources */,
+				A77B271216980BB5009CF9A0 /* ZPItemDataUploadManager.m in Sources */,
+				A77B271716980BCE009CF9A0 /* ZPFileDownloadManager.m in Sources */,
+				A77B271C16980BD8009CF9A0 /* ZPFileUploadManager.m in Sources */,
+				A77B272116980C16009CF9A0 /* ZPFileCacheManager.m in Sources */,
+				A7AF1CBE16996DAD008DCE16 /* ZPReachability.m in Sources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
@@ -6328,6 +6404,7 @@
 					"\"$(SRCROOT)\"",
 					"\"$(SRCROOT)/TestFlightSDK1\"",
 					"\"$(SRCROOT)/iAnnotate/lib\"",
+					"\"$(SRCROOT)/CrittercismSDK\"",
 				);
 				PRODUCT_NAME = "$(TARGET_NAME)";
 				PROVISIONING_PROFILE = "";
@@ -6361,6 +6438,7 @@
 					"\"$(SRCROOT)\"",
 					"\"$(SRCROOT)/TestFlightSDK1\"",
 					"\"$(SRCROOT)/iAnnotate/lib\"",
+					"\"$(SRCROOT)/CrittercismSDK\"",
 				);
 				PRODUCT_NAME = "$(TARGET_NAME)";
 				PROVISIONING_PROFILE = "AE9438C2-FEB3-4CFE-8857-34811EBD85A4";
@@ -6400,6 +6478,7 @@
 					"\"$(SRCROOT)/TestFlightSDK1\"",
 					"\"$(SDKROOT)/usr/lib/system\"",
 					"\"$(SRCROOT)/iAnnotate/lib\"",
+					"\"$(SRCROOT)/CrittercismSDK\"",
 				);
 				OTHER_LDFLAGS = (
 					"-lz",
@@ -6448,6 +6527,7 @@
 					"\"$(SRCROOT)/TestFlightSDK1\"",
 					"\"$(SDKROOT)/usr/lib/system\"",
 					"\"$(SRCROOT)/iAnnotate/lib\"",
+					"\"$(SRCROOT)/CrittercismSDK\"",
 				);
 				OTHER_LDFLAGS = (
 					"-lz",
@@ -6495,6 +6575,7 @@
 					"\"$(SRCROOT)/TestFlightSDK1\"",
 					"\"$(SDKROOT)/usr/lib/system\"",
 					"\"$(SRCROOT)/iAnnotate/lib\"",
+					"\"$(SRCROOT)/CrittercismSDK\"",
 				);
 				PRODUCT_NAME = "ZotPad beta";
 				PROVISIONING_PROFILE = "";
@@ -6536,6 +6617,7 @@
 					"\"$(SRCROOT)/TestFlightSDK1\"",
 					"\"$(SDKROOT)/usr/lib/system\"",
 					"\"$(SRCROOT)/iAnnotate/lib\"",
+					"\"$(SRCROOT)/CrittercismSDK\"",
 				);
 				PRODUCT_NAME = "ZotPad beta";
 				PROVISIONING_PROFILE = "";

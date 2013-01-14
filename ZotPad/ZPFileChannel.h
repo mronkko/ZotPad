@@ -8,6 +8,8 @@
 
 #import <Foundation/Foundation.h>
 
+#import "ZPFileUploadManager.h"
+#import "ZPFileDownloadManager.h"
 #import "ASIHTTPRequest.h"
 
 
@@ -15,6 +17,11 @@
 @interface ZPFileChannel : NSObject {
     NSMutableDictionary* _requestsByAttachment;
 }
+
++(ZPFileChannel*) fileChannelForAttachment:(ZPZoteroAttachment*) attachment;
++(NSInteger) activeUploads;
++(NSInteger) activeDownloads;
++(void) removeProgressView:(UIProgressView*) progressView;
 
 -(void) startDownloadingAttachment:(ZPZoteroAttachment*)attachment;
 -(void) cancelDownloadingAttachment:(ZPZoteroAttachment*)attachment;
@@ -37,6 +44,8 @@
 -(id) requestWithAttachment:(ZPZoteroAttachment*)attachment;
 
 -(void) presentConflictViewForAttachment:(ZPZoteroAttachment*) attachment reason:(NSString*) reason;
+
+-(void) logVersionInformationForAttachment:(ZPZoteroAttachment*) attachment;
 
 /*
  Returns the content of a request and response as string. Useful for logging.

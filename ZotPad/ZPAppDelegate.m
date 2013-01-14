@@ -8,18 +8,26 @@
 
 #import "ZPCore.h"
 #import "ZPAppDelegate.h"
-#import "ZPCacheController.h"
 
-#import "ZPLocalization.h"
+// Needed for receiving files from other apps
+
+#import "ZPFileUploadManager.h"
+
+// Needed for Dropbox authentication
+
 #import <DropboxSDK/DropboxSDK.h>
 
-#import "ZPFileImportViewController.h"
-#import "ZPFileChannel_Dropbox.h"
-#import "ZPAuthenticationDialog.h"
-#import "TestFlight.h"
-#import "ZPSecrets.h"
+// User interface
 
-//Setting up the logger
+#import "ZPLocalization.h"
+#import "ZPFileImportViewController.h"
+#import "ZPAuthenticationDialog.h"
+
+// Logging and crash reporting
+
+#import "ZPSecrets.h"
+#import "TestFlight.h"
+#import "Crittercism.h"
 #import "DDTTYLogger.h"
 #import "DDFileLogger.h"
 #import "CompressingLogFileManager.h"
@@ -82,11 +90,16 @@ didFinishLaunchingWithOptions:(NSDictionary *)launchOptions
     self.fileLogger = [[DDFileLogger alloc] initWithLogFileManager:logFileManager];
     self.fileLogger.rollingFrequency = 60 * 60 *24; // 24 hour rolling
     self.fileLogger.logFileManager.maximumNumberOfLogFiles = 7; // one week of logs
-
-#ifdef ZPDEBUG
     
+#ifdef ZPDEBUG
 
-    if(TESTFLIGHT_KEY != nil){
+    if(CRITTERCISM_KEY != nil) [Crittercism enableWithAppID:(NSString*)CRITTERCISM_KEY];
+
+    
+    //Disable TestFlight
+    
+    if(TESTFLIGHT_KEY != nil && FALSE){
+        
         //We know that this is deprecated, so suppress warnings
 #pragma clang diagnostic push
 #pragma clang diagnostic ignored "-Wdeprecated-declarations"
@@ -94,7 +107,7 @@ didFinishLaunchingWithOptions:(NSDictionary *)launchOptions
 #pragma clang diagnostic pop
         
         
-        [TestFlight takeOff:@"5e753f234f33fc2bddf4437600037fbf_NjcyMjEyMDEyLTA0LTA5IDE0OjUyOjU0LjE4MDQwMg"];
+        [TestFlight takeOff:(NSString*)TESTFLIGHT_KEY];
     }
     
     //Perform a memory warning every 2 seconds
@@ -109,7 +122,9 @@ didFinishLaunchingWithOptions:(NSDictionary *)launchOptions
 
     
 #else
-    if([ZPPreferences reportErrors] && TESTFLIGHT_KEY != nil) [TestFlight takeOff:@"5e753f234f33fc2bddf4437600037fbf_NjcyMjEyMDEyLTA0LTA5IDE0OjUyOjU0LjE4MDQwMg"];
+    if([ZPPreferences reportErrors]){
+        if(CRITTERCISM_KEY != nil) [Crittercism enableWithAppID:(NSString*) CRITTERCISM_KEY];
+    }
     self.fileLogger.logFormatter = [[ZPFileLogFormatter alloc] initWithLevel:LOG_LEVEL_INFO];
 
 #endif
@@ -120,7 +135,8 @@ didFinishLaunchingWithOptions:(NSDictionary *)launchOptions
     
     
     [ZPPreferences checkAndProcessApplicationResetPreferences];
-     
+    
+    // Initialize the cache managers
     
     // Override point for customization after application launch.
     if ([[UIDevice currentDevice] userInterfaceIdiom] == UIUserInterfaceIdiomPad) {
@@ -128,8 +144,8 @@ didFinishLaunchingWithOptions:(NSDictionary *)launchOptions
 
         if ([splitViewController respondsToSelector:@selector(setPresentsWithGesture:)]) {
             [splitViewController setPresentsWithGesture:NO];
-
         }
+        
         UINavigationController *navigationController = [splitViewController.viewControllers lastObject];
         splitViewController.delegate = (id)navigationController.topViewController;
     }
@@ -245,7 +261,7 @@ didFinishLaunchingWithOptions:(NSDictionary *)launchOptions
             
             [self dismissViewControllerHierarchy];
             [self.window.rootViewController performSegueWithIdentifier:@"Import" sender:url];
-            [[ZPCacheController instance] addAttachmentToUploadQueue:attachment withNewFile:url];
+            [ZPFileUploadManager addAttachmentToUploadQueue:attachment withNewFile:url];
         }
                                                                 
         

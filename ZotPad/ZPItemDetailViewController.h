@@ -14,6 +14,7 @@
 #import "ZPAttachmentFileInteractionController.h"
 #import "ZPTagEditingViewController.h"
 #import "ZPNoteEditingViewController.h"
+#import "ZPStarBarButtonItem.h"
 
 @interface ZPItemDetailViewController : UITableViewController <UINavigationControllerDelegate >{
     ZPZoteroItem* _currentItem;
@@ -30,5 +31,6 @@
 
 @property (nonatomic, retain) IBOutlet UIBarButtonItem* actionButton;
 @property (nonatomic, retain) ZPZoteroItem* selectedItem;
+@property (nonatomic, retain) IBOutlet ZPStarBarButtonItem* starButton;
 
 @end

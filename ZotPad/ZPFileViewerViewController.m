@@ -52,9 +52,16 @@ static ZPFileViewerViewController* _instance;
 }
 
 +(void) presentWithAttachment:(ZPZoteroAttachment*)attachment{
-    ZPFileViewerViewController* vc = [self instance];
-    [vc addAttachmentToViewer:attachment];
-    [[UIApplication sharedApplication].delegate.window.rootViewController presentModalViewController:vc animated:YES];
+    if ([NSThread isMainThread]){
+        ZPFileViewerViewController* vc = [self instance];
+        [vc addAttachmentToViewer:attachment];
+        [[UIApplication sharedApplication].delegate.window.rootViewController presentModalViewController:vc animated:YES];
+    }
+    else{
+        dispatch_async(dispatch_get_main_queue(), ^{
+            [self presentWithAttachment:attachment];
+        });
+    }
 }
 @synthesize navigationBar, leftPullPane, leftPullTab, rightPullPane, rightPullTab, navigationArrows, notesAndTagsTable;
 
@@ -131,19 +138,19 @@ static ZPFileViewerViewController* _instance;
     
     self.navigationItem.leftBarButtonItems = [NSArray arrayWithObjects:doneButton, spacer, forwardAndBackButtons,presentAllFilesButton, nil];
     
-    starButton = [[ZPStarBarButtonItem alloc] init];
+    _starButton = [[ZPStarBarButtonItem alloc] init];
     
     //Show tool tip about stars
     
     if([[NSUserDefaults standardUserDefaults] objectForKey:@"hasPresentedStarButtonHelpPopover"]==NULL){
         CMPopTipView* helpPopUp = [[CMPopTipView alloc] initWithMessage:@"Use the star button to add an item to favourites"];
-        [helpPopUp presentPointingAtBarButtonItem:starButton animated:YES];
+        [helpPopUp presentPointingAtBarButtonItem:_starButton animated:YES];
         [[NSUserDefaults standardUserDefaults] setObject:@"1" forKey:@"hasPresentedStarButtonHelpPopover"];
     }
     
     UIBarButtonItem* actionButton = [[UIBarButtonItem alloc] initWithBarButtonSystemItem:UIBarButtonSystemItemAction target:self action:@selector(actionButtonPressed:)];
     
-    self.navigationItem.rightBarButtonItems = [NSArray arrayWithObjects:actionButton, starButton, nil];
+    self.navigationItem.rightBarButtonItems = [NSArray arrayWithObjects:actionButton, _starButton, nil];
     self.navigationItem.title = @"File viewer";
     
     [self.navigationBar pushNavigationItem:self.navigationItem animated:NO];
@@ -452,7 +459,7 @@ static ZPFileViewerViewController* _instance;
 -(void) _updateTitleAndStarButton{
     ZPZoteroItem* parent = [ZPZoteroItem itemWithKey:[(ZPZoteroAttachment*) [_attachments objectAtIndex:_activeAttachmentIndex] parentKey]];
     self.navigationBar.topItem.title = parent.shortCitation;
-    self.starButton.targetItem = parent;
+    [self.starButton configureWithItem:parent];
 }
 
 -(void) _updateLeftPullPane{

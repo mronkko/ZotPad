@@ -12,6 +12,8 @@
 
 @synthesize key, title, libraryID, cacheTimestamp, serverTimestamp, dateAdded, etag,jsonFromServer,parentKey;
 @synthesize numChildren;
+@synthesize locallyAdded, locallyDeleted, locallyModified;
+
 
 // This is very useful for troubleshooting, but because of memory issues, is only used for debug builds
 #ifdef ZPDEBUG

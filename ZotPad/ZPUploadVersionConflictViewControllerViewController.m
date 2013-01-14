@@ -9,6 +9,7 @@
 #import "ZPUploadVersionConflictViewControllerViewController.h"
 
 #import "ZPAttachmentIconImageFactory.h"
+#import "ZPFileCacheManager.h"
 
 // A helper class for showing an original version of the attachment
 
@@ -118,7 +119,7 @@
 }
 -(IBAction)useRemoteVersion:(id)sender{
     attachment.versionIdentifier_local = NULL;
-    [attachment purge_modified:@"User chose server file during conflict"];
+    [ZPFileCacheManager deleteModifiedFileForAttachment:attachment reason:@"User chose server file during conflict"];
     [ZPDatabase writeVersionInfoForAttachment:attachment];
     [fileChannel cancelUploadingAttachment:attachment];
     [self dismissModalViewControllerAnimated:YES];

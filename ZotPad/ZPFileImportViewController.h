@@ -17,4 +17,6 @@
 @property (retain) IBOutlet iCarousel* carousel;
 @property (retain) NSURL* url;
 
+-(void) notifyFileUploadCompleted:(NSNotification*)notification;
+
 @end
