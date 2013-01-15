@@ -32,8 +32,10 @@
 +(void) notifyActiveItemChanged:(NSNotification *) notification;
 +(void) notifyActiveCollectionChanged:(NSNotification *) notification;
 +(void) notifyActiveLibraryChanged:(NSNotification *) notification;
-+(void) notifyItemsAvailable:(NSNotification *) notification;
++(void) notifyAttachmentsAvailable:(NSNotification *) notification;
 +(void) notifyUserInterfaceAvailable:(NSNotification*)notification;
++(void) notifyAttachmentDownloadFinished:(NSNotification*)notification;
++(void) notifyAttachmentDownloadFailed:(NSNotification*)notification;
 
 
 

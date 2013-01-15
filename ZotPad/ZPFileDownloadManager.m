@@ -70,6 +70,25 @@ static ZPCacheStatusToolbarController* _statusView;
                                                  name:ZPNOTIFICATION_USER_INTERFACE_AVAILABLE
                                                object:nil];
 
+    // Listen for new items so that we know to start downloading
+    
+    [[NSNotificationCenter defaultCenter] addObserver:[self class]
+                                             selector:@selector(notifyAttachmentsAvailable:)
+                                                 name:ZPNOTIFICATION_ATTACHMENTS_AVAILABLE
+                                               object:nil];
+    
+    // Listen for completed downloads so that we know to start next download
+    
+    [[NSNotificationCenter defaultCenter] addObserver:[self class]
+                                             selector:@selector(notifyAttachmentDownloadFinished:)
+                                                 name:ZPNOTIFICATION_ATTACHMENT_FILE_DOWNLOAD_FINISHED
+                                               object:nil];
+
+    [[NSNotificationCenter defaultCenter] addObserver:[self class]
+                                             selector:@selector(notifyAttachmentDownloadFailed:)
+                                                 name:ZPNOTIFICATION_ATTACHMENT_FILE_DOWNLOAD_FAILED
+                                               object:nil];
+
 }
 
 +(void) addAttachmentToDowloadQueue:(ZPZoteroAttachment *)attachment{
@@ -280,12 +299,11 @@ static ZPCacheStatusToolbarController* _statusView;
 
 #pragma mark - Notifications
 
-+(void) notifyItemsAvailable:(NSNotification *) notification{
++(void) notifyAttachmentsAvailable:(NSNotification *) notification{
     //Apply the rules to see if we want to download this
-    for(NSObject* item in (NSArray*) notification.object){
-        if([item isKindOfClass:[ZPZoteroAttachment class]]){
-            [self _checkIfAttachmentExistsAndQueueForDownload:(ZPZoteroAttachment*) item];
-        }
+    NSArray* items = notification.object;
+    for(ZPZoteroAttachment* item in items){
+        [self _checkIfAttachmentExistsAndQueueForDownload:(ZPZoteroAttachment*) item];
     }
 
 }
@@ -336,7 +354,7 @@ static ZPCacheStatusToolbarController* _statusView;
         dispatch_async(dispatch_get_global_queue(DISPATCH_QUEUE_PRIORITY_BACKGROUND,0), ^{
             NSArray* itemKeysToCheck = [ZPDatabase getItemKeysForLibrary:_activelibraryID collectionKey:_activeCollectionKey searchString:NULL tags:NULL orderField:NULL sortDescending:FALSE];
             [self _checkIfAttachmentsExistWithParentKeysAndQueueForDownload:itemKeysToCheck];
-            
+            [self _checkDownloadQueue];
         });
     }
     
@@ -375,9 +393,19 @@ static ZPCacheStatusToolbarController* _statusView;
             for(ZPZoteroLibrary* library in [ZPDatabase libraries]){
                 NSArray* itemKeysToCheck = [ZPDatabase getItemKeysForLibrary:library.libraryID collectionKey:NULL searchString:NULL tags:NULL orderField:NULL sortDescending:FALSE];
                 [self _checkIfAttachmentsExistWithParentKeysAndQueueForDownload:itemKeysToCheck];
+                [self _checkDownloadQueue];
             }
         });
     }
 }
+
++(void) notifyAttachmentDownloadFinished:(NSNotification*)notification{
+    [self _checkDownloadQueue];
+}
+
++(void) notifyAttachmentDownloadFailed:(NSNotification*)notification{
+    [self _checkDownloadQueue];
+}
+
 
 @end

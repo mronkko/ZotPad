@@ -458,13 +458,18 @@ static ZPCacheStatusToolbarController* _statusView;
     // If the items list did not result in any new data, we know that the library is now fully cached.
     
     if([allItems count] == 0){
-        DDLogInfo(@"Item data for library %@ is now fully cached",[ZPZoteroLibrary libraryWithID:libraryID].title);
+//        DDLogInfo(@"Item data for library %@ is now fully cached",[ZPZoteroLibrary libraryWithID:libraryID].title);
         [self _markLibraryAsFullyCachedAndCleanUp:libraryID];
     }
     
     [[NSNotificationCenter defaultCenter]
      postNotificationName:ZPNOTIFICATION_ITEMS_AVAILABLE
      object:allItems];
+
+    [[NSNotificationCenter defaultCenter]
+     postNotificationName:ZPNOTIFICATION_ATTACHMENTS_AVAILABLE
+     object:attachments];
+
     
     [self _checkMetadataQueue];
     
