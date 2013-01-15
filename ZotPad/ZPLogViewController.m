@@ -41,9 +41,9 @@
 	// Do any additional setup after loading the view.
     
     ZPAppDelegate* appDelegate = (ZPAppDelegate*) [[UIApplication sharedApplication] delegate];
-    NSArray* logFiles = [appDelegate.fileLogger.logFileManager.sortedLogFilePaths objectAtIndex:0];
+    NSArray* logFiles = appDelegate.fileLogger.logFileManager.sortedLogFilePaths;
     if(logFiles.count>0){
-        NSString* logPath = [appDelegate.fileLogger.logFileManager.sortedLogFilePaths objectAtIndex:0];
+        NSString* logPath = [logFiles objectAtIndex:0];
 
         logView.text = [[NSString alloc] initWithContentsOfFile:logPath encoding:NSUTF8StringEncoding error:NULL];
     }

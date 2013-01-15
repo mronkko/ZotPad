@@ -46,7 +46,7 @@ static ZPCacheStatusToolbarController* _statusView;
 }
 
 +(BOOL) isCacheLimitReached{
-    return _sizeOfDocumentsFolder < 0.95*[ZPPreferences maxCacheSize];
+    return _sizeOfDocumentsFolder > 0.95*[ZPPreferences maxCacheSize];
 }
 
 

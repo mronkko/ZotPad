@@ -21,7 +21,8 @@ Saving tags and notes has not been implemented yet. This will be added in a late
 GENERAL: 
 
 - Fixes several problems that caused the app to crash
-- Fixes a problem that caused institutional authors names to not display in the item detail view.
+- Fixes a problem that prevented the log view from displaying
+- Fixes an issue that prevented background downloads
 
 ----- Other new features and notable changes since ZotPad 1.1.2 ------
 

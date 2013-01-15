@@ -393,7 +393,6 @@ static ZPItemListViewDataSource* _instance;
             [(UIActivityIndicatorView*) [cell viewWithTag:1] startAnimating];
         }
         else{
-            NSLog(@"Loading cell for row %i",indexPath.row);
             cell = [aTableView dequeueReusableCellWithIdentifier:@"ZoteroItemCell"];
             //DDLogVerbose(@"Cell identifier is ZoteroItemCell");
             //DDLogVerbose(@"Item with key %@ has full citation %@",item.key,item.fullCitation);

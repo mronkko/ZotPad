@@ -28,7 +28,10 @@ static const int ddLogLevel = LOG_LEVEL_INFO;
 
 // Notifications about data available from server
 
+//Top level items
 static NSString *const ZPNOTIFICATION_ITEMS_AVAILABLE = @"ItemsAvailable";
+//Attachment items
+static NSString *const ZPNOTIFICATION_ATTACHMENTS_AVAILABLE = @"AttachmentsAvailable";
 static NSString *const ZPNOTIFICATION_ITEM_LIST_AVAILABLE = @"ItemListAvailable";
 static NSString *const ZPNOTIFICATION_LIBRARY_WITH_COLLECTIONS_AVAILABLE  = @"LibraryAndCollectionsAvailable";
 
