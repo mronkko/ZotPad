@@ -119,6 +119,8 @@ static ZPItemListViewDataSource* _instance;
 
 #pragma mark - Receiving data and updating the table view
 
+//TODO:refactor this as a separate class
+
 -(void) _performTableUpdates:(BOOL)animated{
     
     //This can be performance intensive, so execute it in background
@@ -127,7 +129,7 @@ static ZPItemListViewDataSource* _instance;
     }
     else{
         //Only one thread at a time can make changes in the table
-        @synchronized(self){
+        @synchronized(_tableView){
             //Get a pointer to an array to know if another thread has changed this in the background
             NSArray* thisItemKeys = _itemKeysShown;
             
@@ -143,7 +145,7 @@ static ZPItemListViewDataSource* _instance;
             
             //If there is a new set of items loaded, return without performing any updates.
             if(thisItemKeys != _itemKeysShown || _invalidated) return;
-                        
+            
             @synchronized(_itemKeysNotInCache){
                 [_itemKeysNotInCache removeObjectsInArray:newKeys];
             }
@@ -204,7 +206,7 @@ static ZPItemListViewDataSource* _instance;
                     index++;
                 }
             }
-
+            
             //Add empty rows to the end if there are still unknown rows
             @synchronized(_itemKeysNotInCache){
                 NSInteger neededLenght = [_itemKeysNotInCache count] + [newKeys count];
@@ -217,55 +219,63 @@ static ZPItemListViewDataSource* _instance;
                     }
                     [newItemKeysShown addObject:[NSNull null]];
                 }
-
+                
                 //This is the lenght of the table that we need to have
                 NSInteger tableLength = [_itemKeysNotInCache count] + [newKeys count];
-
+                
                 //Trim placeholders from the end
-
+                
                 if(tableLength<[newItemKeysShown count]){
                     [newItemKeysShown subarrayWithRange:NSMakeRange(0,tableLength)];
                 }
             }
             
+            
+            /*
+             This is the only place where we are allowed to edit the table
+             */
+            
             dispatch_async(dispatch_get_main_queue(), ^{
                 
-                if(thisItemKeys != _itemKeysShown || _invalidated) return;
-                
-                //DDLogVerbose(@"Items found from DB %i, items that are still uncached %i",[newKeys count],[_itemKeysNotInCache count]);
-                if(animated){
+                @synchronized(_tableView){
                     
-                    NSInteger lengthAfterInsertingRows = [_tableView numberOfRowsInSection:0]+[insertIndices count];
-
-                    [_tableView beginUpdates];
-                    if([insertIndices count]>0){
-                        [_tableView insertRowsAtIndexPaths:insertIndices withRowAnimation:_animations];
-                    }
-                    if([reloadIndices count]>0){
-                        [_tableView reloadRowsAtIndexPaths:reloadIndices withRowAnimation:_animations];
-                    }
+                    if(thisItemKeys != _itemKeysShown || _invalidated) return;
                     
-                    NSInteger tableLength = [newItemKeysShown count];
-                    
-                    if(tableLength<lengthAfterInsertingRows){
-                        NSMutableArray* deleteIndexPaths = [NSMutableArray array];
+                    //DDLogVerbose(@"Items found from DB %i, items that are still uncached %i",[newKeys count],[_itemKeysNotInCache count]);
+                    if(animated){
                         
-                        for(NSInteger i=tableLength;i<lengthAfterInsertingRows;i++){
-                            [deleteIndexPaths addObject:[NSIndexPath indexPathForRow:i inSection:0]];
+                        NSInteger lengthAfterInsertingRows = [_tableView numberOfRowsInSection:0]+[insertIndices count];
+                        
+                        [_tableView beginUpdates];
+                        if([insertIndices count]>0){
+                            [_tableView insertRowsAtIndexPaths:insertIndices withRowAnimation:_animations];
+                        }
+                        if([reloadIndices count]>0){
+                            [_tableView reloadRowsAtIndexPaths:reloadIndices withRowAnimation:_animations];
                         }
                         
-                        [_tableView deleteRowsAtIndexPaths:deleteIndexPaths withRowAnimation:_animations];
+                        NSInteger tableLength = [newItemKeysShown count];
+                        
+                        if(tableLength<lengthAfterInsertingRows){
+                            NSMutableArray* deleteIndexPaths = [NSMutableArray array];
+                            
+                            for(NSInteger i=tableLength;i<lengthAfterInsertingRows;i++){
+                                [deleteIndexPaths addObject:[NSIndexPath indexPathForRow:i inSection:0]];
+                            }
+                            
+                            [_tableView deleteRowsAtIndexPaths:deleteIndexPaths withRowAnimation:_animations];
+                            
+                        }
+                        
+                        _itemKeysShown = newItemKeysShown;
+                        [_tableView endUpdates];
+                        
                         
                     }
-
-                    _itemKeysShown = newItemKeysShown;
-                    [_tableView endUpdates];
-                    
-
-                }
-                else{
-                    _itemKeysShown = newItemKeysShown;
-                    [_tableView reloadData];
+                    else{
+                        _itemKeysShown = newItemKeysShown;
+                        [_tableView reloadData];
+                    }
                 }
             });
         }

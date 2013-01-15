@@ -53,9 +53,16 @@ static ZPFileViewerViewController* _instance;
 
 +(void) presentWithAttachment:(ZPZoteroAttachment*)attachment{
     if ([NSThread isMainThread]){
-        ZPFileViewerViewController* vc = [self instance];
-        [vc addAttachmentToViewer:attachment];
-        [[UIApplication sharedApplication].delegate.window.rootViewController presentModalViewController:vc animated:YES];
+
+        UIViewController* root =[UIApplication sharedApplication].delegate.window.rootViewController;
+        
+        
+        // Only show the viewer if there is no modal view controller visible
+        if(root.presentedViewController == nil){
+            ZPFileViewerViewController* vc = [self instance];
+            [vc addAttachmentToViewer:attachment];
+            [root presentModalViewController:vc animated:YES];
+        }
     }
     else{
         dispatch_async(dispatch_get_main_queue(), ^{

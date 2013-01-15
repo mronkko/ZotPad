@@ -485,10 +485,10 @@ NSInteger const ZPATTACHMENTICONGVIEWCONTROLLER_TAG_TITLELABEL = -5;
         
         [self _setLabelsForAttachment:attachment progressText:NULL errorText:NULL mode:ZPATTACHMENTICONGVIEWCONTROLLER_MODE_STATIC reconfigureIcon:TRUE];
 
-        
         // If this is manually triggered, open it
         
         if(_latestManuallyTriggeredAttachment == attachment){
+            _latestManuallyTriggeredAttachment = NULL;
             [ZPFileViewerViewController  presentWithAttachment:attachment];
         }
 
