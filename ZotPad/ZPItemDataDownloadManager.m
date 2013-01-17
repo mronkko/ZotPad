@@ -263,11 +263,16 @@ static ZPCacheStatusToolbarController* _statusView;
     NSNumber* keyObject = [NSNumber numberWithInt:libraryID];
     NSString* timestamp = [_libraryTimestamps objectForKey:keyObject];
     if(timestamp!=NULL){
+        
+        ZPZoteroLibrary* library = [ZPZoteroLibrary libraryWithID:libraryID];
+        
         //Update both the DB and the in-memory cache.
-        [ZPDatabase setUpdatedTimestampForLibrary:libraryID toValue:timestamp];
-        [[ZPZoteroLibrary libraryWithID:libraryID] setCacheTimestamp:timestamp];
-        DDLogVerbose(@"Library %i is now fully cached", libraryID);
-        [_libraryTimestamps removeObjectForKey:keyObject];
+        if(library.cacheTimestamp == NULL || ![library.cacheTimestamp isEqualToString:timestamp]){
+            [ZPDatabase setUpdatedTimestampForLibrary:libraryID toValue:timestamp];
+            [library setCacheTimestamp:timestamp];
+            DDLogInfo(@"%@ is now fully cached", library.title);
+            [_libraryTimestamps removeObjectForKey:keyObject];
+        }
     }
     
     //Remove the library from the item retrieval queue
@@ -455,11 +460,16 @@ static ZPCacheStatusToolbarController* _statusView;
     
     NSArray* allItems = [[topLevelItemsThatWereWrittenToCache arrayByAddingObjectsFromArray:parentItemsForNotes]arrayByAddingObjectsFromArray:parentItemsForAttachments];
     
-    // If the items list did not result in any new data, we know that the library is now fully cached.
+    // If the items list did not result in any new data and the time stamp of the last item is less than the
+    // library timestamp, we know that the library is fully cached
     
     if([allItems count] == 0){
-//        DDLogInfo(@"Item data for library %@ is now fully cached",[ZPZoteroLibrary libraryWithID:libraryID].title);
-        [self _markLibraryAsFullyCachedAndCleanUp:libraryID];
+        ZPZoteroDataObject* lastItem =  [items lastObject];
+        ZPZoteroLibrary* library = [ZPZoteroLibrary libraryWithID:lastItem.libraryID];
+        
+        if(library.serverTimestamp != NULL && [library.serverTimestamp compare: library.serverTimestamp] == NSOrderedAscending){
+            [self _markLibraryAsFullyCachedAndCleanUp:libraryID];
+        }
     }
     
     [[NSNotificationCenter defaultCenter]
@@ -568,7 +578,10 @@ static ZPCacheStatusToolbarController* _statusView;
     DDLogVerbose(@"Received %i item keys for library %i and collection %@",[itemKeys count],libraryID,collectionKey);
 
     //Update collection memberships
-    if(collectionKey!=NULL && [parameters objectForKey: ZPKEY_SEARCH_STRING] == NULL){
+    NSArray* tags = [parameters objectForKey:ZPKEY_TAG];
+    NSString* searchString = [parameters objectForKey: ZPKEY_SEARCH_STRING];
+    
+    if(collectionKey!=NULL && searchString == NULL && (tags == NULL || [tags count]==0)){
         NSArray* cachedKeys = [ZPDatabase getItemKeysForLibrary:libraryID collectionKey:collectionKey searchString:NULL tags:NULL orderField:NULL sortDescending:FALSE];
         
         NSMutableArray* uncachedItems = [NSMutableArray arrayWithArray:itemKeys];
@@ -578,15 +591,24 @@ static ZPCacheStatusToolbarController* _statusView;
         if([itemKeys count] >0) [ZPDatabase removeItemKeysNotInArray:itemKeys fromCollection:collectionKey];
     }
 
+    // Do all the items exist in the cache?
+    
+    NSArray* cachedKeys = [ZPDatabase getItemKeysForLibrary:libraryID collectionKey:collectionKey searchString:searchString tags:tags orderField:NULL sortDescending:FALSE];
+    NSMutableArray* uncachedItems = [NSMutableArray arrayWithArray:itemKeys];
+    [uncachedItems removeObjectsInArray:cachedKeys];
+
+    //If we have some of the items are in the cache but others are not, it is possible that the library cache is not up to date
+    if([uncachedItems count]>0){
+//        DDLogInfo(@"Zotero server returned item keys that are not in cache. Starting to refresh %@",[ZPZoteroLibrary libraryWithID:libraryID].title);
+        [self _checkIfLibraryNeedsCacheRefreshAndQueue:libraryID];
+    }
+
     [[NSNotificationCenter defaultCenter]
      postNotificationName:ZPNOTIFICATION_ITEM_LIST_AVAILABLE
      object:itemKeys
      userInfo:parameters];
     
-    //Queue these items for retrieval
-    [self _addToItemQueue:itemKeys libraryID:libraryID priority:YES];
     [self _checkMetadataQueue];
-
 }
 
 /*

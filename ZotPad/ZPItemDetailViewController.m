@@ -12,7 +12,7 @@
 
 #import "ZPItemDetailViewController.h"
 #import "ZPLibraryAndCollectionListViewController.h"
-#import "ZPItemListViewDataSource.h"
+#import "ZPItemList.h"
 #import "ZPLocalization.h"
 #import "ZPAttachmentFileInteractionController.h"
 #import "ZPNoteEditingViewController.h"
@@ -491,7 +491,7 @@
             {
                 cell = [[UITableViewCell alloc] initWithStyle:UITableViewCellStyleDefault reuseIdentifier:CellIdentifier];
             }
-            UILabel* noteText = [cell viewWithTag:1];
+            UILabel* noteText = (UILabel*)[cell viewWithTag:1];
             noteText.text = [[[(ZPZoteroNote*) [_currentItem.notes objectAtIndex:[indexPath indexAtPosition:1]] note] stripHtml] stringByReplacingOccurrencesOfString:@"\n" withString:@" "];
         }
     }
@@ -617,7 +617,7 @@
     // Navigator
     else{
         // Get the key for the selected item 
-        NSArray* itemArray =[(ZPItemListViewDataSource*) aTableView.dataSource itemKeysShown];
+        NSArray* itemArray =[(ZPItemListDataSource*) aTableView.dataSource contentArray];
         if(indexPath.row<[itemArray count]){                    
             NSString* currentItemKey = [itemArray objectAtIndex: indexPath.row]; 
             

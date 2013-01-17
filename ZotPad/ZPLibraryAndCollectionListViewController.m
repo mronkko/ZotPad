@@ -15,7 +15,7 @@
 #import "ZPAppDelegate.h"
 #import "ZPItemDataDownloadManager.h"
 #import "ZPCacheStatusToolbarController.h"
-#import "ZPItemListViewDataSource.h"
+#import "ZPItemList.h"
 #import "CMPopTipView.h"
 #import "ZPMasterItemListViewController.h"
 #import "FRLayeredNavigationController/FRLayeredNavigation.h"
@@ -36,6 +36,10 @@
     self = [super initWithCoder:aDecoder];
     self.drilledCollectionIndex = -1;
     self.selectedCollectionIndex = -1;
+    
+    
+    [[NSNotificationCenter defaultCenter] addObserver:self selector:@selector(notifyLibraryWithCollectionsAvailable:) name:ZPNOTIFICATION_LIBRARY_WITH_COLLECTIONS_AVAILABLE object:nil];
+
     return self;
 }
 
@@ -95,24 +99,30 @@
 {
     [super viewWillAppear:animated];
     
+    self.detailViewController = (ZPItemListViewController *)[[self.splitViewController.viewControllers lastObject] topViewController];
+
     //If the current library is not defined, show a list of libraries
     if(self->_currentlibraryID == LIBRARY_ID_NOT_SET){
         self->_content = [ZPDatabase libraries];
+        [self.tableView reloadData];
+        //Select the first library
+        if([self.tableView numberOfRowsInSection:0]>0){
+            [self.tableView selectRowAtIndexPath:[NSIndexPath indexPathForRow:0 inSection:0] animated:NO scrollPosition:UITableViewScrollPositionTop];
+//            [self tableView:self.tableView didSelectRowAtIndexPath:[NSIndexPath indexPathForRow:0 inSection:0]];
+        }
     }
     //If a library is chosen, show collections level collections for that library
     else{
         self->_content = [ZPDatabase collectionsForLibrary:self->_currentlibraryID withParentCollection:self->_currentCollectionKey];
+        [self.tableView reloadData];
     }
 
-   [self.tableView reloadData];
-    
+
     
 }
 
 - (void)viewDidAppear:(BOOL)animated
 {
-    [[NSNotificationCenter defaultCenter] addObserver:self selector:@selector(notifyLibraryWithCollectionsAvailable:) name:ZPNOTIFICATION_LIBRARY_WITH_COLLECTIONS_AVAILABLE object:nil];
-    self.detailViewController = (ZPItemListViewController *)[[self.splitViewController.viewControllers lastObject] topViewController];
     [super viewDidAppear:animated];
     
     //Show tool tip for collections navigation
@@ -235,18 +245,18 @@
      */
     ZPZoteroDataObject* node = [self->_content objectAtIndex: indexPath.row];
     
-    if(node.libraryID != [ZPItemListViewDataSource instance].libraryID){
+    if(node.libraryID != [ZPItemList instance].libraryID){
         [[NSNotificationCenter defaultCenter] postNotificationName:ZPNOTIFICATION_ACTIVE_LIBRARY_CHANGED
                                                             object:[NSNumber numberWithInt:node.libraryID]];
     }
         
-    [ZPItemListViewDataSource instance].libraryID = [node libraryID];
+    [ZPItemList instance].libraryID = [node libraryID];
     
     
     [[NSNotificationCenter defaultCenter] postNotificationName:ZPNOTIFICATION_ACTIVE_COLLECTION_CHANGED
                                                             object:node.key];
 
-    [ZPItemListViewDataSource instance].collectionKey = [node key];
+    [ZPItemList instance].collectionKey = [node key];
     
     
     
@@ -502,6 +512,13 @@
                 }
                 
                 [self.tableView endUpdates];
+                
+                if(_currentlibraryID == LIBRARY_ID_NOT_SET){
+                    if([self.tableView numberOfRowsInSection:0]>0){
+                        [self.tableView selectRowAtIndexPath:[NSIndexPath indexPathForRow:0 inSection:0] animated:NO scrollPosition:UITableViewScrollPositionTop];
+//                        [self tableView:self.tableView didSelectRowAtIndexPath:[NSIndexPath indexPathForRow:0 inSection:0]];
+                    }
+                }
             }
             /*
              */

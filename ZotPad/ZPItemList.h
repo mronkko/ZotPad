@@ -9,8 +9,9 @@
 #import <Foundation/Foundation.h>
 #import "ZPCore.h"
 #import "ZPTagOwner.h"
+#import "ZPItemListDataSource.h"
 
-@interface ZPItemListViewDataSource : NSObject <UITableViewDataSource, ZPTagOwner>{
+@interface ZPItemList : NSObject <UITableViewDataSource, ZPTagOwner>{
  
     //This is an array instead of a mutable array because of thread safety
     NSArray* _itemKeysShown;
@@ -33,7 +34,7 @@
     NSArray* _selectedTags;
 }
 
-+ (ZPItemListViewDataSource*) instance;
++ (ZPItemList*) instance;
 
 //This is the tableview that the datasource targets.
 @property (nonatomic, retain) UITableView* targetTableView;
@@ -54,8 +55,7 @@
 
 -(void) _updateRowForItem:(ZPZoteroItem*)item;
 -(void) _performRowInsertions:(NSArray*)insertIndexPaths reloads:(NSArray*)reloadIndexPaths tableLength:(NSInteger)tableLength;
--(void) _performTableUpdates:(BOOL)animated;
-//-(void) _refreshCellAtIndexPaths:(NSArray*)indexPath;
+-(void) updateItemList:(BOOL)animated;
 
 -(BOOL) isTagSelected:(NSString*)tag;
 

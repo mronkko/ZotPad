@@ -7,12 +7,13 @@
 //
 
 #import <UIKit/UIKit.h>
-#import "ZPItemListViewDataSource.h"
+#import "ZPItemList.h"
 #import "ZPItemDetailViewController.h"
+#import "ZPItemListDataSource.h"
 
 @interface ZPMasterItemListViewController : UITableViewController{
-    ZPItemListViewDataSource* _dataSource;
-    
+    ZPItemListDataSource* _dataSource;
+
 }
 
 @property (retain) ZPItemDetailViewController* detailViewController;

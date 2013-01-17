@@ -10,13 +10,12 @@
 #import "../DSActivityView/Sources/DSActivityView.h"
 #import "ZPItemListViewController.h"
 #import "ZPItemDetailViewController.h"
-#import "ZPItemListViewDataSource.h"
+#import "ZPItemListDataSource.h"
 
-@class ZPItemListViewDataSource;
+@class ZPItemList;
 
 @interface ZPItemListViewController : UIViewController <UISplitViewControllerDelegate, UISearchBarDelegate>{
 
-    ZPItemListViewDataSource* _dataSource;
     DSBezelActivityView* _activityView;
     UITableView* _tableView;
     UIToolbar* _toolBar;
@@ -24,6 +23,8 @@
     UIActivityIndicatorView* _activityIndicator;
     UIImageView* _sortDirectionArrow;
     CGPoint _offset;
+    
+    ZPItemListDataSource* _dataSource;
 }
 
 @property (nonatomic, retain) IBOutlet UISearchBar* searchBar;
@@ -35,13 +36,18 @@
 
 -(void)configureView;
 -(void)processItemListAvailableNotification:(NSDictionary*)content;
-- (void)makeBusy;
-- (void)makeAvailable;
+-(void)makeBusy;
+-(void)makeAvailable;
 
 -(void)clearSearch;
 -(void)doneSearchingClicked:(id) source;
 -(IBAction) sortButtonPressed:(id)sender;
 -(void) sortButtonLongPressed:(id)sender;
-//-(IBAction) attachmentThumbnailPressed:(id)sender;
+
+// Notifications
+-(void) notifyLibraryWithCollectionsAvailable:(NSNotification*) notification;
+-(void) notifyAttachmentAvailable:(NSNotification*) notification;
+-(void) notifyAttachmentDownloadFinished:(NSNotification*) notification;
+-(void) notifyAttachmentDeleted:(NSNotification*) notification;
 
 @end

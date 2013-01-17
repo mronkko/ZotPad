@@ -7,7 +7,7 @@
 //
 
 #import "ZPMasterItemListViewController.h"
-#import "ZPItemListViewDataSource.h"
+#import "ZPItemList.h"
 
 @interface ZPMasterItemListViewController ()
 
@@ -40,7 +40,8 @@
 
     //TODO: Set the selected item
     self.tableView.delegate = detailViewController;
-    self.tableView.dataSource = [ZPItemListViewDataSource instance];
+    _dataSource = [[ZPItemListDataSource alloc] init];
+    self.tableView.dataSource = _dataSource;
 }
 
 - (void)viewDidUnload

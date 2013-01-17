@@ -1,12 +1,7 @@
-IMPORTANT: You need to uninstall the previous beta or delete your data before installing this version.
+IMPORTANT: It is no longer necessary to submit crashlogs. These are now processed automatically.
 
-IMPORTANT: The testflight service is having some problems in recording crash logs. If you encounter a crash, please email crash logs to mikko.ronkko@zotpad.com. See the instructions here:
 
-http://zotpad.uservoice.com/knowledgebase/articles/147992-sending-crash-logs
-
-This build will install on parallel to the App Store version of ZotPad.
-
-This build has not been tested extensively and may not be stable enough for every day use.
+This build will install on parallel to the App Store version of ZotPad and may be stable enough for every day use.
 
 If you find that something is not working (but does not cause a crash) or is slow, you should report that. If you see an incorrectly rendered citation in the item list, you should report that. If you have improvement ideas, report these. See the instructions here:
 
@@ -21,8 +16,8 @@ Saving tags and notes has not been implemented yet. This will be added in a late
 GENERAL: 
 
 - Fixes several problems that caused the app to crash
-- Fixes a problem that prevented the log view from displaying
-- Fixes an issue that prevented background downloads
+- Attachment icons are now updated dynamically when attachments are downloaded
+- Fixes to cache logic
 
 ----- Other new features and notable changes since ZotPad 1.1.2 ------
 

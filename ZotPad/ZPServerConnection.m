@@ -363,7 +363,7 @@ const NSInteger ZPServerConnectionRequestLastModifiedItem = 11;
                                  userInfo:request.userInfo];
                             }
                             //Break the item request into two smaller blocks as long as there are more than one item to retrieve and retry
-                            else if(request.tag == ZPServerConnectionRequestItems){
+                            else if(request.tag == ZPServerConnectionRequestItemsAndChildren){
                                 NSDictionary* params = (NSDictionary*)[request.userInfo objectForKey:ZPKEY_PARAMETERS];
                                 NSString* keys = [params objectForKey:ZPKEY_ITEM_KEY];
                                 NSInteger libraryID = [[params objectForKey:ZPKEY_LIBRARY_ID] integerValue];

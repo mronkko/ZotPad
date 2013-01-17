@@ -93,6 +93,9 @@ didFinishLaunchingWithOptions:(NSDictionary *)launchOptions
     
 #ifdef ZPDEBUG
 
+    //No Critercism or TestFligth when running in debugger.
+    
+    #ifndef DEBUG
     if(CRITTERCISM_KEY != nil) [Crittercism enableWithAppID:(NSString*)CRITTERCISM_KEY];
 
     
@@ -109,6 +112,7 @@ didFinishLaunchingWithOptions:(NSDictionary *)launchOptions
         
         [TestFlight takeOff:(NSString*)TESTFLIGHT_KEY];
     }
+    #endif
     
     //Perform a memory warning every 2 seconds
     //[NSTimer scheduledTimerWithTimeInterval:(NSTimeInterval)2 target:[UIApplication sharedApplication] selector:@selector(_performMemoryWarning) userInfo:NULL repeats:YES];

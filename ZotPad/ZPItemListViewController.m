@@ -17,6 +17,8 @@
 #import "ZPReachability.h"
 #import "ZPServerConnection.h"
 
+#import "ZPItemList.h"
+
 //A helped class for setting sort buttons
 
 #pragma mark - Helper class for configuring sort buttons
@@ -47,7 +49,7 @@
     }
     
     _fieldTitles = [fieldTitles sortedArrayUsingSelector:@selector(localizedCaseInsensitiveCompare:)];
-
+    
     NSMutableArray* sortedFieldValues = [NSMutableArray array];
     
     for(NSString* title in _fieldTitles){
@@ -59,14 +61,14 @@
     self.navigationItem.title = @"Choose sort field";
     self.tableView.delegate =self;
     self.tableView.dataSource =self;
-
+    
     return self;
 }
 
 - (UITableViewCell *)tableView:(UITableView *)tableView cellForRowAtIndexPath:(NSIndexPath *)indexPath{
     UITableViewCell* cell = [[UITableViewCell alloc] init];
     cell.textLabel.text = [_fieldTitles objectAtIndex:indexPath.row];
-
+    
     return cell;
 }
 
@@ -80,7 +82,7 @@
     //Because this preference is not used anywhere else, it is accessed directly.
     NSUserDefaults* defaults = [NSUserDefaults standardUserDefaults];
     [defaults setObject:orderField forKey:[NSString stringWithFormat: @"itemListView_sortButton%i",self.targetButton.tag]];
-
+    
     UILabel* label = (UILabel*)[self.targetButton.subviews lastObject];
     
     [label setText:[ZPLocalization getLocalizationStringWithKey:orderField type:@"field"]];
@@ -119,6 +121,38 @@
 @synthesize searchBar = _searchBar;
 @synthesize toolBar = _toolBar;
 
+- (id) initWithCoder:(NSCoder *)aDecoder{
+    self = [super initWithCoder:aDecoder];
+    
+    //Register notifications
+    
+    
+    [[NSNotificationCenter defaultCenter] addObserver:self
+                                             selector:@selector(processItemListAvailableNotification:)
+                                                 name:ZPNOTIFICATION_ITEM_LIST_AVAILABLE
+                                               object:nil];
+    
+    
+    [[NSNotificationCenter defaultCenter] addObserver:self
+                                             selector:@selector(notifyAttachmentAvailable:)
+                                                 name:ZPNOTIFICATION_ATTACHMENTS_AVAILABLE
+                                               object:nil];
+    
+    
+    [[NSNotificationCenter defaultCenter] addObserver:self
+                                             selector:@selector(notifyAttachmentDownloadFinished:)
+                                                 name:ZPNOTIFICATION_ATTACHMENT_FILE_DOWNLOAD_FINISHED
+                                               object:nil];
+    
+    
+    [[NSNotificationCenter defaultCenter] addObserver:self
+                                             selector:@selector(notifyAttachmentDeleted:)
+                                                 name:ZPNOTIFICATION_ATTACHMENT_FILE_DELETED
+                                               object:nil];
+    
+    return self;
+    
+}
 - (void)didReceiveMemoryWarning
 {
     [super didReceiveMemoryWarning];
@@ -131,22 +165,35 @@
 {
     if(! [NSThread isMainThread]) [NSException raise:@"configureView must be called in main thread" format:@"configureView must be called in main thread"];
     
+    //If the library ID is not set, set it to the first library
+    if([ZPItemList instance].libraryID==LIBRARY_ID_NOT_SET){
+        NSArray* libraries = [ZPDatabase libraries];
+        if([libraries count]>0){
+            NSInteger libraryID = [(ZPZoteroLibrary*) [libraries objectAtIndex:0] libraryID];
+            [ZPItemList instance].libraryID = libraryID;
+            
+            [[NSNotificationCenter defaultCenter] postNotificationName:ZPNOTIFICATION_ACTIVE_LIBRARY_CHANGED
+                                                                object:[NSNumber numberWithInt:libraryID]];
+            
+        }
+    }
+    
     //Clear item keys shown so that UI knows to stop drawing the old items
-
-    if(_dataSource.libraryID!=LIBRARY_ID_NOT_SET){
+    
+    if([ZPItemList instance].libraryID!=LIBRARY_ID_NOT_SET){
         
         //Set the data source to target this view
         
-        _dataSource.targetTableView = self.tableView;
+        [ZPItemList instance].targetTableView = self.tableView;
         
         //Set the navigation item
         
-        if(_dataSource.collectionKey != NULL){
-            ZPZoteroCollection* currentCollection = [ZPZoteroCollection collectionWithKey:_dataSource.collectionKey];
+        if([ZPItemList instance].collectionKey != NULL){
+            ZPZoteroCollection* currentCollection = [ZPZoteroCollection collectionWithKey:[ZPItemList instance].collectionKey];
             self.navigationItem.title = currentCollection.title;
         }
         else {
-            ZPZoteroLibrary* currentLibrary = [ZPZoteroLibrary libraryWithID:_dataSource.libraryID];
+            ZPZoteroLibrary* currentLibrary = [ZPZoteroLibrary libraryWithID:[ZPItemList instance].libraryID];
             self.navigationItem.title = currentLibrary.title;
         }
         
@@ -155,37 +202,37 @@
         if (self.masterPopoverController != nil) {
             [self.masterPopoverController dismissPopoverAnimated:YES];
         }
-            
+        
         // Configuring the item list content starts here.
-         
+        
         
         if([ZPReachability hasInternetConnection]){
-
+            
             [_activityIndicator startAnimating];
             
-            [ZPServerConnection retrieveKeysInLibrary:_dataSource.libraryID
-                                                  collection:_dataSource.collectionKey
-                                                searchString:_dataSource.searchString
-                                                        tags:_dataSource.tags
-                                                  orderField:_dataSource.orderField
-                                              sortDescending:_dataSource.sortDescending];
-
-            [_dataSource configureServerKeys:[NSArray array]];
+            [ZPServerConnection retrieveKeysInLibrary:[ZPItemList instance].libraryID
+                                           collection:[ZPItemList instance].collectionKey
+                                         searchString:[ZPItemList instance].searchString
+                                                 tags:[ZPItemList instance].tags
+                                           orderField:[ZPItemList instance].orderField
+                                       sortDescending:[ZPItemList instance].sortDescending];
+            
+            [[ZPItemList instance] configureServerKeys:[NSArray array]];
             _waitingForData = TRUE;
         }
         
         // Configure the data source with content from the cache
         
-        [_dataSource clearTable];
-        NSArray* cacheKeys= [ZPDatabase getItemKeysForLibrary:_dataSource.libraryID
-                                                collectionKey:_dataSource.collectionKey
-                                                 searchString:_dataSource.searchString
-                                                         tags:_dataSource.tags
-                                                   orderField:_dataSource.orderField
-                                               sortDescending:_dataSource.sortDescending];
+        [[ZPItemList instance] clearTable];
+        NSArray* cacheKeys= [ZPDatabase getItemKeysForLibrary:[ZPItemList instance].libraryID
+                                                collectionKey:[ZPItemList instance].collectionKey
+                                                 searchString:[ZPItemList instance].searchString
+                                                         tags:[ZPItemList instance].tags
+                                                   orderField:[ZPItemList instance].orderField
+                                               sortDescending:[ZPItemList instance].sortDescending];
         
-
-        [_dataSource configureCachedKeys:cacheKeys];
+        
+        [[ZPItemList instance] configureCachedKeys:cacheKeys];
         
         
         //If there is nothing to display, make the view busy until we receive something from the server.
@@ -201,31 +248,31 @@
     NSDictionary* userInfo =notification.userInfo;
     
     if(_waitingForData){
-
+        
         DDLogVerbose(@"The user interface was waiting for data, processing the received items");
-
+        
         NSInteger libraryID = [[userInfo objectForKey:ZPKEY_LIBRARY_ID] integerValue];
         NSString* collectionKey = [userInfo objectForKey:ZPKEY_COLLECTION_KEY];
         NSString* searchString = [userInfo objectForKey:ZPKEY_SEARCH_STRING];
         NSString* orderField = [userInfo objectForKey:ZPKEY_SORT_COLUMN];
         NSArray* tags = [userInfo objectForKey:ZPKEY_TAG];
         BOOL sortDescending = [[userInfo objectForKey:ZPKEY_ORDER_DIRECTION] boolValue];
-                    
+        
         //Check if this item list is the one that we are waiting for
         
         if(tags!= NULL && ! [tags isKindOfClass:[NSArray class]]){
             [NSException raise:@"Internal consistency exception" format:@"Internal consistency exception"];
         }
         
-        if(_dataSource.libraryID == libraryID &&
-           ((_dataSource.collectionKey == NULL && collectionKey == NULL) || [collectionKey isEqualToString:_dataSource.collectionKey]) &&
-           ((_dataSource.searchString == NULL && searchString == NULL) || [searchString isEqualToString:_dataSource.searchString]) &&
-           [orderField isEqualToString:_dataSource.orderField] &&
-           ((tags == NULL && [_dataSource.tags count] == 0) || [_dataSource.tags isEqualToArray:tags])  &&
-           sortDescending == _dataSource.sortDescending){
-
+        if([ZPItemList instance].libraryID == libraryID &&
+           (([ZPItemList instance].collectionKey == NULL && collectionKey == NULL) || [collectionKey isEqualToString:[ZPItemList instance].collectionKey]) &&
+           (([ZPItemList instance].searchString == NULL && searchString == NULL) || [searchString isEqualToString:[ZPItemList instance].searchString]) &&
+           [orderField isEqualToString:[ZPItemList instance].orderField] &&
+           ((tags == NULL && [[ZPItemList instance].tags count] == 0) || [[ZPItemList instance].tags isEqualToArray:tags])  &&
+           sortDescending == [ZPItemList instance].sortDescending){
+            
             NSArray* itemKeys = notification.object;
-            [_dataSource configureServerKeys:itemKeys];
+            [[ZPItemList instance] configureServerKeys:itemKeys];
             [self makeAvailable];
         }
     }
@@ -245,7 +292,7 @@
         }
         else{
             [self performSelectorOnMainThread:@selector(makeBusy) withObject:nil waitUntilDone:NO];
-        }   
+        }
     }
 }
 
@@ -259,7 +306,7 @@
         }
         else{
             [self performSelectorOnMainThread:@selector(makeAvailable) withObject:nil waitUntilDone:NO];
-        }   
+        }
     }
     
 }
@@ -273,21 +320,21 @@
         // Get the selected row from the item list
         NSIndexPath* indexPath = [_tableView indexPathForSelectedRow];
         
-        // Get the key for the selected item 
-        NSString* currentItemKey = [_dataSource.itemKeysShown objectAtIndex: indexPath.row]; 
+        // Get the key for the selected item
+        NSString* currentItemKey = [[(ZPItemListDataSource*)_tableView.dataSource contentArray] objectAtIndex: indexPath.row];
         [itemDetailViewController setSelectedItem:(ZPZoteroItem*)[ZPZoteroItem itemWithKey:currentItemKey]];
         [itemDetailViewController configure];
         
         // Set the navigation controller in iPad
         
         if ([[UIDevice currentDevice] userInterfaceIdiom] == UIUserInterfaceIdiomPad) {
-             
+            
             ZPAppDelegate* appDelegate = (ZPAppDelegate*)[[UIApplication sharedApplication] delegate];
             
             UINavigationController* navigationController = [[(UISplitViewController*)appDelegate.window.rootViewController viewControllers] objectAtIndex:0];
             
             [navigationController.topViewController performSegueWithIdentifier:@"PushItemsToNavigator" sender:itemDetailViewController];
-
+            
         }
         
     }
@@ -299,36 +346,30 @@
 
 - (void)viewDidLoad
 {
-
-    [[NSNotificationCenter defaultCenter] addObserver:self
-                                             selector:@selector(processItemListAvailableNotification:)
-                                                 name:ZPNOTIFICATION_ITEM_LIST_AVAILABLE
-                                               object:nil];
-
-    [super viewDidLoad];
     
-    _dataSource = [ZPItemListViewDataSource instance];
+    [super viewDidLoad];
+    _dataSource = [[ZPItemListDataSource alloc] init];
     _tableView.dataSource = _dataSource;
     
     // Do any additional setup after loading the view, typically from a nib.
     
-    //Set up activity indicator. 
-
+    //Set up activity indicator.
+    
     _activityIndicator = [[UIActivityIndicatorView alloc] initWithFrame:CGRectMake(0,0,20, 20)];
     [_activityIndicator hidesWhenStopped];
     UIBarButtonItem* barButton = [[UIBarButtonItem alloc] initWithCustomView:_activityIndicator];
     self.navigationItem.rightBarButtonItem = barButton;
     
-
+    
     //Configure the sort buttons based on preferences
     
     NSUserDefaults* defaults = [NSUserDefaults standardUserDefaults];
-
-    UIBarButtonItem* spacer = [[UIBarButtonItem alloc] initWithBarButtonSystemItem:UIBarButtonSystemItemFlexibleSpace target:nil action:nil];  
+    
+    UIBarButtonItem* spacer = [[UIBarButtonItem alloc] initWithBarButtonSystemItem:UIBarButtonSystemItemFlexibleSpace target:nil action:nil];
     NSMutableArray* toobarItems=[NSMutableArray arrayWithObject:spacer];
-
+    
     NSInteger buttonCount;
-
+    
     if ([[UIDevice currentDevice] userInterfaceIdiom] == UIUserInterfaceIdiomPad) buttonCount = 6;
     else buttonCount = 3;
     
@@ -347,7 +388,7 @@
             
             [defaults setObject:orderField forKey:[NSString stringWithFormat: @"itemListView_sortButton%i",i]];
             title = [ZPLocalization getLocalizationStringWithKey:orderField type:@"field"];
-
+            
         }
         else{
             title = @"Tap and hold to set";
@@ -357,7 +398,7 @@
         button.frame = CGRectMake(0,0, 101, 30);
         [button setImage:[UIImage imageNamed:@"barbutton_image_up_state.png"] forState:UIControlStateNormal];
         [button setImage:[UIImage imageNamed:@"barbutton_image_down_state.png"] forState:UIControlStateHighlighted];
-
+        
         
         UILabel* label = [[UILabel alloc] initWithFrame:CGRectMake(0,0, 90, 30)];
         
@@ -375,15 +416,15 @@
         button.tag = i;
         
         UILongPressGestureRecognizer* longPressRecognizer = [[UILongPressGestureRecognizer alloc] initWithTarget:self action:@selector(sortButtonLongPressed:)];
-        [button addGestureRecognizer:longPressRecognizer]; 
-
+        [button addGestureRecognizer:longPressRecognizer];
+        
         UIBarButtonItem* barButton = [[UIBarButtonItem alloc] initWithCustomView:button];
         barButton.tag=i;
-
+        
         [toobarItems addObject:barButton];
         [toobarItems addObject:spacer];
-
-
+        
+        
     }
     [_toolBar setItems:toobarItems];
     
@@ -406,30 +447,34 @@
 {
     [super viewWillAppear:animated];
     //Set the data source to serve this view
-    [ZPItemListViewDataSource instance].targetTableView = self.tableView;
+    [ZPItemList instance].targetTableView = self.tableView;
 }
 
 - (void)viewDidAppear:(BOOL)animated
 {
-    _dataSource.owner = self;
+    
+    //TODO: test that this does not add the object multiple times.
+    [[NSNotificationCenter defaultCenter] addObserver:self selector:@selector(notifyLibraryWithCollectionsAvailable:) name:ZPNOTIFICATION_LIBRARY_WITH_COLLECTIONS_AVAILABLE object:nil];
+    
+    [ZPItemList instance].owner = self;
     [_tableView setContentOffset:_offset animated:NO];
     //Is the current item visible? If not, scroll to it
     
     [super viewDidAppear:animated];
-
+    
     /*
      
-    TODO:
+     TODO:
      
-    @synchronized(_itemKeysNotInCache){
-        //If there are more items coming, make this active
-        if([_itemKeysNotInCache count] >0){
-            [_activityIndicator startAnimating];
-        }
-        else{
-            [_activityIndicator stopAnimating];
-        }
-    }
+     @synchronized(_itemKeysNotInCache){
+     //If there are more items coming, make this active
+     if([_itemKeysNotInCache count] >0){
+     [_activityIndicator startAnimating];
+     }
+     else{
+     [_activityIndicator stopAnimating];
+     }
+     }
      */
 }
 
@@ -437,7 +482,7 @@
 {
     //Store scroll position
     _offset = _tableView.contentOffset;
-
+    
 	[super viewWillDisappear:animated];
 }
 
@@ -478,7 +523,7 @@
 #pragma mark - Actions
 
 -(IBAction) sortButtonPressed:(id)sender{
-
+    
     
     if(_sortHelper!=NULL && [_sortHelper.popover isPopoverVisible]) [_sortHelper.popover dismissPopoverAnimated:YES];
     
@@ -488,22 +533,22 @@
     if(orderField == NULL){
         [self _configureSortButton:sender];
     }
-        
+    
     else{
         NSInteger tag = [(UIView*)sender tag];
         if(_tagForActiveSortButton == tag){
-            _dataSource.sortDescending  = ! _dataSource.sortDescending;
+            [ZPItemList instance].sortDescending  = ! [ZPItemList instance].sortDescending;
         }
         else{
             _tagForActiveSortButton = tag;
-            _dataSource.orderField = orderField;
-            _dataSource.sortDescending = FALSE;
+            [ZPItemList instance].orderField = orderField;
+            [ZPItemList instance].sortDescending = FALSE;
         }
-
+        
         [self _configureSortArrow];
         [self configureView];
     }
-
+    
 }
 
 
@@ -534,8 +579,8 @@
         
     }
     //OPTIMIZATION: consider storing the images
-    _sortDirectionArrow.image = [UIImage imageNamed:(_dataSource.sortDescending ? @"icon-down-black.png":@"icon-up-black.png")];
-
+    _sortDirectionArrow.image = [UIImage imageNamed:([ZPItemList instance].sortDescending ? @"icon-down-black.png":@"icon-up-black.png")];
+    
 }
 
 -(void) sortButtonLongPressed:(UILongPressGestureRecognizer*)sender{
@@ -554,19 +599,19 @@
     }
     
     if(_sortHelper == NULL){
-        _sortHelper = [[ZPItemListViewController_sortHelper alloc] init]; 
+        _sortHelper = [[ZPItemListViewController_sortHelper alloc] init];
         
         if ([[UIDevice currentDevice] userInterfaceIdiom] == UIUserInterfaceIdiomPad) {
             _sortHelper.popover = [[UIPopoverController alloc] initWithContentViewController:_sortHelper];
         }
-            
+        
     }
     
     if ([[UIDevice currentDevice] userInterfaceIdiom] == UIUserInterfaceIdiomPad) {
         if([_sortHelper.popover isPopoverVisible]) [_sortHelper.popover dismissPopoverAnimated:YES];
     }
     _sortHelper.targetButton = (UIButton*) button.customView;
-
+    
     if ([[UIDevice currentDevice] userInterfaceIdiom] == UIUserInterfaceIdiomPad) {
         [_sortHelper.popover presentPopoverFromBarButtonItem:button permittedArrowDirections: UIPopoverArrowDirectionAny animated:YES];
     }
@@ -580,7 +625,7 @@
 
 
 -(void) clearSearch{
-    _dataSource.searchString = NULL;
+    [ZPItemList instance].searchString = NULL;
     [_searchBar setText:@""];
 }
 
@@ -588,27 +633,27 @@
     
     [self doneSearchingClicked:NULL];
     
-    if(![[sourceSearchBar text] isEqualToString:_dataSource.searchString]){
-        _dataSource.searchString = [sourceSearchBar text];
+    if(![[sourceSearchBar text] isEqualToString:[ZPItemList instance].searchString]){
+        [ZPItemList instance].searchString = [sourceSearchBar text];
         [self configureView];
     }
 }
 
 - (void) searchBarTextDidBeginEditing:(UISearchBar *)theSearchBar {
-
+    
     CGRect frame = _tableView.bounds;
     _overlay = [[UIView alloc] initWithFrame:frame];
     _overlay.backgroundColor = [UIColor grayColor];
     _overlay.alpha = 0.5;
     _overlay.autoresizingMask = UIViewAutoresizingFlexibleWidth|UIViewAutoresizingFlexibleHeight;
     _tableView.scrollEnabled = NO;
-
+    
     [_tableView addSubview:_overlay];
-
+    
     //Add the done button.
     self.navigationItem.rightBarButtonItem = [[UIBarButtonItem alloc]
-                                               initWithBarButtonSystemItem:UIBarButtonSystemItemDone
-                                               target:self action:@selector(doneSearchingClicked:)];
+                                              initWithBarButtonSystemItem:UIBarButtonSystemItemDone
+                                              target:self action:@selector(doneSearchingClicked:)];
 }
 - (void) doneSearchingClicked:(id) source{
     self.navigationItem.rightBarButtonItem = NULL;
@@ -616,4 +661,166 @@
     [_overlay removeFromSuperview];
     _tableView.scrollEnabled = TRUE;
 }
+
+#pragma mark Notified methods
+
+-(void) notifyLibraryWithCollectionsAvailable:(NSNotification*) notification{
+    
+    //If we are not showing any library, choose the first library
+    
+    if([ZPItemList instance].libraryID == LIBRARY_ID_NOT_SET ){
+        if([NSThread isMainThread]){
+            [self configureView];
+        }
+        else{
+            [self performSelectorOnMainThread:@selector( notifyLibraryWithCollectionsAvailable:) withObject:notification waitUntilDone:YES];
+        }
+    }
+}
+
+// Update the item list when attachments become available
+
+-(void) notifyAttachmentAvailable:(NSNotification*) notification{
+    NSArray* attachments = notification.object;
+    
+    NSMutableArray* reloadIndices = [[NSMutableArray alloc] init];
+    
+    //Reload the cells containing the parent items if they do not have attachments showing.
+    
+    for(ZPZoteroAttachment* attachment in attachments){
+        
+        //Skip standalone attachments
+        
+        if(![attachment.key isEqual:attachment.parentKey ]){
+            
+            //Only process items that are in the active library
+            
+            if(attachment.libraryID == [ZPItemList instance].libraryID){
+                ZPZoteroItem* parent = [ZPZoteroItem itemWithKey:attachment.parentKey];
+                
+                //Is the parent shown in the tableview?
+                
+                NSUInteger index = [_dataSource.contentArray indexOfObject:parent.itemKey];
+                
+                if(index != NSNotFound){
+                    
+                    // Is the parent visible?
+                    
+                    NSIndexPath *indexPath = [NSIndexPath indexPathForRow:index inSection:0];
+                    if ([self.tableView.indexPathsForVisibleRows containsObject:indexPath]) {
+                        
+                        //Is this the first attachment for the parent?
+                        
+                        if([[parent.attachments objectAtIndex:0] isEqual:attachment]){
+                            
+                            // Does the cell currently have a visible thumbnail ?
+                            
+                            UITableViewCell* cell = [self.tableView cellForRowAtIndexPath: indexPath];
+                            
+                            if(cell != NULL && [cell viewWithTag:4].hidden){
+                                //If not, reload the cell
+                                [reloadIndices addObject:indexPath];
+                            }
+                        }
+                    }
+                }
+            }
+        }
+    }
+    
+    if([reloadIndices count]>0){
+        
+        dispatch_async(dispatch_get_main_queue(), ^{
+            
+            @synchronized(self.tableView){
+                [self.tableView reloadRowsAtIndexPaths:reloadIndices withRowAnimation:UITableViewRowAnimationNone];
+            }
+        });
+    }
+}
+
+//TODO: Refactor these away by making the thumbnail listen to notifications
+
+-(void) notifyAttachmentDownloadFinished:(NSNotification*) notification{
+    
+    ZPZoteroAttachment* attachment = notification.object;
+    
+    //Skip standalone attachments
+    
+    if(![attachment.key isEqual:attachment.parentKey ]){
+        
+        //Only process items that are in the active library
+        
+        if(attachment.libraryID == [ZPItemList instance].libraryID){
+            ZPZoteroItem* parent = [ZPZoteroItem itemWithKey:attachment.parentKey];
+            
+            //Is the parent shown in the tableview?
+            
+            NSUInteger index = [_dataSource.contentArray indexOfObject:parent.itemKey];
+            
+            if(index != NSNotFound){
+                
+                // Is the parent visible?
+                
+                NSIndexPath *indexPath = [NSIndexPath indexPathForRow:index inSection:0];
+                if ([self.tableView.indexPathsForVisibleRows containsObject:indexPath]) {
+                    
+                    //Is this the first attachment for the parent?
+                    
+                    if([[parent.attachments objectAtIndex:0] isEqual:attachment]){
+                        
+                        dispatch_async(dispatch_get_main_queue(), ^{
+                            
+                            @synchronized(self.tableView){
+                                [self.tableView reloadRowsAtIndexPaths:[NSArray arrayWithObject:indexPath] withRowAnimation:UITableViewRowAnimationNone];
+                            }
+                        });
+                    }
+                }
+            }
+        }
+    }
+}
+
+-(void) notifyAttachmentDeleted:(NSNotification*) notification{
+    ZPZoteroAttachment* attachment = notification.object;
+    
+    //Skip standalone attachments
+    
+    if(![attachment.key isEqual:attachment.parentKey ]){
+        
+        //Only process items that are in the active library
+        
+        if(attachment.libraryID == [ZPItemList instance].libraryID){
+            ZPZoteroItem* parent = [ZPZoteroItem itemWithKey:attachment.parentKey];
+            
+            //Is the parent shown in the tableview?
+            
+            NSUInteger index = [_dataSource.contentArray indexOfObject:parent.itemKey];
+            
+            if(index != NSNotFound){
+                
+                // Is the parent visible?
+                
+                NSIndexPath *indexPath = [NSIndexPath indexPathForRow:index inSection:0];
+                if ([self.tableView.indexPathsForVisibleRows containsObject:indexPath]) {
+                    
+                    //Is this the first attachment for the parent?
+                    
+                    if([[parent.attachments objectAtIndex:0] isEqual:attachment]){
+                        
+                        dispatch_async(dispatch_get_main_queue(), ^{
+                            
+                            @synchronized(self.tableView){
+                                [self.tableView reloadRowsAtIndexPaths:[NSArray arrayWithObject:indexPath] withRowAnimation:UITableViewRowAnimationNone];
+                            }
+                        });
+                    }
+                }
+            }
+        }
+    }
+    
+}
+
 @end

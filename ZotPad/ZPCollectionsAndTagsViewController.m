@@ -16,7 +16,7 @@
 #import "ZPMasterItemListViewController.h"
 #import <QuartzCore/QuartzCore.h>
 #import "ZPTagController.h"
-#import "ZPItemListViewDataSource.h"
+#import "ZPItemList.h"
 
 @interface ZPCollectionsAndTagsViewController()
 
@@ -119,7 +119,7 @@
 
         UISplitViewController* root =  (UISplitViewController*) [UIApplication sharedApplication].delegate.window.rootViewController;
 
-        _tagController.tagOwner = [ZPItemListViewDataSource instance];
+        _tagController.tagOwner = [ZPItemList instance];
         
     }
 
@@ -177,6 +177,10 @@
         target.detailViewController = sender;
         target.tableView.delegate = sender;
         
+        //Set the tableview to be the active view that will receive updates
+        [ZPItemList instance].targetTableView = target.tableView;
+        [[ZPItemList instance] updateItemList:NO];
+        
         target.navigationItem.hidesBackButton = YES;
         target.clearsSelectionOnViewWillAppear = NO;
         
@@ -186,7 +190,7 @@
         
         // Get the selected row from the item list
         ZPZoteroItem* selectedItem = [(ZPItemDetailViewController*)sender selectedItem];
-        NSInteger index = [[[ZPItemListViewDataSource instance] itemKeysShown] indexOfObject:selectedItem.key];
+        NSInteger index = [[[ZPItemList instance] itemKeysShown] indexOfObject:selectedItem.key];
         NSIndexPath* indexPath = [NSIndexPath indexPathForRow:index inSection:0];
         [target.tableView selectRowAtIndexPath:indexPath animated:NO scrollPosition:UITableViewScrollPositionMiddle];
     }
