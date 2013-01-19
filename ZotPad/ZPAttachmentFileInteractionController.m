@@ -98,10 +98,16 @@
                         otherButtonTitles:nil];
         
         [_actionSheet addButtonWithTitle:@"Zotero Online Library"];
-        [_actionSheet addButtonWithTitle:@"CrossRef Lookup"];
-        [_actionSheet addButtonWithTitle:@"Google Scholar Search"];
-        [_actionSheet addButtonWithTitle:@"Pubget Lookup"];
-        [_actionSheet addButtonWithTitle:@"Library Lookup"];
+        
+        //These are not valid for webpages, attachments or notes
+        if(! [self.item.itemType isEqualToString:@"note"] &&
+           ! [self.item.itemType isEqualToString:@"attachment"] &&
+           ! [self.item.itemType isEqualToString:@"webpage"]){
+            [_actionSheet addButtonWithTitle:@"CrossRef Lookup"];
+            [_actionSheet addButtonWithTitle:@"Google Scholar Search"];
+            [_actionSheet addButtonWithTitle:@"Pubget Lookup"];
+            [_actionSheet addButtonWithTitle:@"Library Lookup"];
+        }
         [_actionSheet showFromBarButtonItem:button animated:YES];
 
         _actionSheet.delegate = self;
