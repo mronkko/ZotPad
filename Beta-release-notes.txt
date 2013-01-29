@@ -17,6 +17,7 @@ GENERAL:
 
 - Fixes several problems that caused the app to crash
 - Attachment icons are now updated dynamically when attachments are downloaded
+- Automatically opens the first library on the library list
 - Fixes to cache logic
 
 ----- Other new features and notable changes since ZotPad 1.1.2 ------

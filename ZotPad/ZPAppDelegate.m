@@ -96,12 +96,12 @@ didFinishLaunchingWithOptions:(NSDictionary *)launchOptions
     //No Critercism or TestFligth when running in debugger.
     
     #ifndef DEBUG
-    if(CRITTERCISM_KEY != nil) [Crittercism enableWithAppID:(NSString*)CRITTERCISM_KEY];
+//    if(CRITTERCISM_KEY != nil) [Crittercism enableWithAppID:(NSString*)CRITTERCISM_KEY];
 
     
     //Disable TestFlight
     
-    if(TESTFLIGHT_KEY != nil && FALSE){
+    if(TESTFLIGHT_KEY != nil){
         
         //We know that this is deprecated, so suppress warnings
 #pragma clang diagnostic push

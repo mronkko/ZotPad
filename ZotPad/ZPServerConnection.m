@@ -323,9 +323,22 @@ const NSInteger ZPServerConnectionRequestLastModifiedItem = 11;
                         // Parsing the response takes time, so do this in the background
                         ASIHTTPRequest* retainedRequest = request;
                         void (^responseProcessingBlock)() = ^{
-                            ZPServerResponseXMLParser* parserResponse = [self _parseResponse:retainedRequest];
-                            [self _processParsedResponse:parserResponse forRequest:retainedRequest];
+                            
+                            ZPServerResponseXMLParser* parserResponse;
+                            
+                            // This needs exception handling because sometimes we get garbage from the server
+                            @try {
+                                parserResponse = [self _parseResponse:retainedRequest];
+                                [self _processParsedResponse:parserResponse forRequest:retainedRequest];
+                            }
+                            @catch (NSException* exception) {
 
+                                DDLogError(@"Parsing response from %@ resulted in an exception.\n\n%@\n%@\n%@\n\nResponse from server was:\n%@",request.url,exception.name, exception.reason, exception.callStackSymbols ,request.responseString);
+#ifdef ZPDEBUG
+                                [NSException raise:exception.name format:@"Parsing response from %@ resulted in an exception.\n\n%@\n%@\n%@\n\nResponse from server was:\n%@",request.url,exception.name, exception.reason, exception.callStackSymbols ,request.responseString];
+#endif
+                            }
+                            
                             if(completionBlock != NULL){
                                 completionBlock(parserResponse.parsedElements);
                             }

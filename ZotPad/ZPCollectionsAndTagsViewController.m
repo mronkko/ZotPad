@@ -178,9 +178,11 @@
         target.tableView.delegate = sender;
         
         //Set the tableview to be the active view that will receive updates
+        
         [ZPItemList instance].targetTableView = target.tableView;
         [[ZPItemList instance] updateItemList:NO];
         
+        // Set up the navigation bar
         target.navigationItem.hidesBackButton = YES;
         target.clearsSelectionOnViewWillAppear = NO;
         
@@ -191,8 +193,15 @@
         // Get the selected row from the item list
         ZPZoteroItem* selectedItem = [(ZPItemDetailViewController*)sender selectedItem];
         NSInteger index = [[[ZPItemList instance] itemKeysShown] indexOfObject:selectedItem.key];
-        NSIndexPath* indexPath = [NSIndexPath indexPathForRow:index inSection:0];
-        [target.tableView selectRowAtIndexPath:indexPath animated:NO scrollPosition:UITableViewScrollPositionMiddle];
+        
+        // TODO: This if statement avoids a rare crash. The root cause needs to be identified
+        if(index<[target.tableView numberOfRowsInSection:0]){
+            NSIndexPath* indexPath = [NSIndexPath indexPathForRow:index inSection:0];
+            [target.tableView selectRowAtIndexPath:indexPath animated:NO scrollPosition:UITableViewScrollPositionMiddle];
+        }
+        else{
+            DDLogError(@"Could not set the selected item in the navigator item list.");
+        }
     }
 }
 

@@ -71,6 +71,24 @@
     
 
     [super viewDidLoad];
+        
+    //If the current library is not defined, show a list of libraries
+    if(self->_currentlibraryID == LIBRARY_ID_NOT_SET){
+        self->_content = [ZPDatabase libraries];
+        [self.tableView reloadData];
+        //Select the first library if nothing else is selected
+        if([self.tableView numberOfRowsInSection:0]>0 && self.tableView.indexPathForSelectedRow == nil){
+            self.selectedCollectionIndex = 0;
+            [self.tableView selectRowAtIndexPath:[NSIndexPath indexPathForRow:0 inSection:0] animated:NO scrollPosition:UITableViewScrollPositionTop];
+            //            [self tableView:self.tableView didSelectRowAtIndexPath:[NSIndexPath indexPathForRow:0 inSection:0]];
+        }
+    }
+    //If a library is chosen, show collections level collections for that library
+    else{
+        self->_content = [ZPDatabase collectionsForLibrary:self->_currentlibraryID withParentCollection:self->_currentCollectionKey];
+        [self.tableView reloadData];
+    }
+
 
     //TODO: Fix this activity indicator. There should be a reliable way to know when the
     //view is receiving new data and when it has received all data. This is complicated
@@ -98,25 +116,7 @@
 - (void)viewWillAppear:(BOOL)animated
 {
     [super viewWillAppear:animated];
-    
     self.detailViewController = (ZPItemListViewController *)[[self.splitViewController.viewControllers lastObject] topViewController];
-
-    //If the current library is not defined, show a list of libraries
-    if(self->_currentlibraryID == LIBRARY_ID_NOT_SET){
-        self->_content = [ZPDatabase libraries];
-        [self.tableView reloadData];
-        //Select the first library
-        if([self.tableView numberOfRowsInSection:0]>0){
-            [self.tableView selectRowAtIndexPath:[NSIndexPath indexPathForRow:0 inSection:0] animated:NO scrollPosition:UITableViewScrollPositionTop];
-//            [self tableView:self.tableView didSelectRowAtIndexPath:[NSIndexPath indexPathForRow:0 inSection:0]];
-        }
-    }
-    //If a library is chosen, show collections level collections for that library
-    else{
-        self->_content = [ZPDatabase collectionsForLibrary:self->_currentlibraryID withParentCollection:self->_currentCollectionKey];
-        [self.tableView reloadData];
-    }
-
 
     
 }
@@ -345,6 +345,7 @@
     //For some reason the view lifecycle methods are not called
     if([ZPPreferences layeredCollectionsNavigation]){
         [subController loadView];
+        [subController viewDidLoad];
         [subController viewWillAppear:NO];
         [subController viewDidAppear:NO];
     }

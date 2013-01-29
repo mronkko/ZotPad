@@ -184,7 +184,11 @@ static const NSInteger tagBaseWidth = 20;
 
     }
 
-    if(hasTags){
+    // The second part of this if clause is needed because sometimes the _indexOfFirstTagForEachRow is empty
+    // This is a bug that I have not been able to reproduce, so the idea here would be to prevent a crash
+    // and then wait until someone reports a problem with steps to reproduce
+    
+    if(hasTags && _indexOfFirstTagForEachRow.count > indexPath.row){
         
 
         

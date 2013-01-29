@@ -21,7 +21,7 @@
          ignoreCount = "0"
          continueAfterRunningActions = "No"
          filePath = "ZotPad/ZPLibraryAndCollectionListViewController.m"
-         timestampString = "380104846.147752"
+         timestampString = "381174098.5899"
          startingColumnNumber = "9223372036854775807"
          endingColumnNumber = "9223372036854775807"
          startingLineNumber = "246"
@@ -112,11 +112,11 @@
          ignoreCount = "0"
          continueAfterRunningActions = "No"
          filePath = "ZotPad/ZPServerConnection.m"
-         timestampString = "380146551.705723"
+         timestampString = "381172176.605581"
          startingColumnNumber = "9223372036854775807"
          endingColumnNumber = "9223372036854775807"
-         startingLineNumber = "367"
-         endingLineNumber = "367"
+         startingLineNumber = "380"
+         endingLineNumber = "380"
          landmarkName = "+_makeServerRequest:withParameters:userInfo:usingOperationQueue:completion:"
          landmarkType = "5">
       </FileBreakpoint>
@@ -125,11 +125,11 @@
          ignoreCount = "0"
          continueAfterRunningActions = "No"
          filePath = "ZotPad/ZPServerConnection.m"
-         timestampString = "380146906.312921"
+         timestampString = "381172176.605581"
          startingColumnNumber = "9223372036854775807"
          endingColumnNumber = "9223372036854775807"
-         startingLineNumber = "346"
-         endingLineNumber = "346"
+         startingLineNumber = "359"
+         endingLineNumber = "359"
          landmarkName = "+_makeServerRequest:withParameters:userInfo:usingOperationQueue:completion:"
          landmarkType = "5">
       </FileBreakpoint>
@@ -138,11 +138,11 @@
          ignoreCount = "0"
          continueAfterRunningActions = "No"
          filePath = "ZotPad/ZPServerConnection.m"
-         timestampString = "380146953.524932"
+         timestampString = "381172176.605581"
          startingColumnNumber = "9223372036854775807"
          endingColumnNumber = "9223372036854775807"
-         startingLineNumber = "356"
-         endingLineNumber = "356"
+         startingLineNumber = "369"
+         endingLineNumber = "369"
          landmarkName = "+_makeServerRequest:withParameters:userInfo:usingOperationQueue:completion:"
          landmarkType = "5">
       </FileBreakpoint>
@@ -183,6 +183,58 @@
          startingLineNumber = "577"
          endingLineNumber = "577"
          landmarkName = "+processNewTopLevelItemKeyListFromServer:userInfo:"
+         landmarkType = "5">
+      </FileBreakpoint>
+      <FileBreakpoint
+         shouldBeEnabled = "No"
+         ignoreCount = "0"
+         continueAfterRunningActions = "No"
+         filePath = "uservoice-iphone-sdk/Classes/UVResponseDelegate.m"
+         timestampString = "380218693.762523"
+         startingColumnNumber = "9223372036854775807"
+         endingColumnNumber = "9223372036854775807"
+         startingLineNumber = "74"
+         endingLineNumber = "74"
+         landmarkName = "-restConnection:didReturnResource:object:"
+         landmarkType = "5">
+      </FileBreakpoint>
+      <FileBreakpoint
+         shouldBeEnabled = "No"
+         ignoreCount = "0"
+         continueAfterRunningActions = "No"
+         filePath = "uservoice-iphone-sdk/Classes/UVResponseDelegate.m"
+         timestampString = "380218760.095107"
+         startingColumnNumber = "9223372036854775807"
+         endingColumnNumber = "9223372036854775807"
+         startingLineNumber = "81"
+         endingLineNumber = "81"
+         landmarkName = "-restConnection:didReturnResource:object:"
+         landmarkType = "5">
+      </FileBreakpoint>
+      <FileBreakpoint
+         shouldBeEnabled = "No"
+         ignoreCount = "0"
+         continueAfterRunningActions = "No"
+         filePath = "ZotPad/ZPLibraryAndCollectionListViewController.m"
+         timestampString = "381173792.982729"
+         startingColumnNumber = "9223372036854775807"
+         endingColumnNumber = "9223372036854775807"
+         startingLineNumber = "73"
+         endingLineNumber = "73"
+         landmarkName = "-viewDidLoad"
+         landmarkType = "5">
+      </FileBreakpoint>
+      <FileBreakpoint
+         shouldBeEnabled = "No"
+         ignoreCount = "0"
+         continueAfterRunningActions = "No"
+         filePath = "ZotPad/ZPLibraryAndCollectionListViewController.m"
+         timestampString = "381174098.5899"
+         startingColumnNumber = "9223372036854775807"
+         endingColumnNumber = "9223372036854775807"
+         startingLineNumber = "118"
+         endingLineNumber = "118"
+         landmarkName = "-viewWillAppear:"
          landmarkType = "5">
       </FileBreakpoint>
    </FileBreakpoints>
