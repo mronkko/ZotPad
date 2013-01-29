@@ -192,7 +192,7 @@ static NSOperationQueue* _uploadQueue;
     //Store data about the file in the user info so that it is always available
     
     NSString* path = attachment.fileSystemPath_modified;
-    NSDictionary* documentFileAttributes = [[NSFileManager defaultManager] attributesOfFileSystemForPath:path error:NULL];
+    NSDictionary* documentFileAttributes = [[NSFileManager defaultManager] attributesOfItemAtPath:path error:NULL];
     NSTimeInterval timeModified = [[documentFileAttributes fileModificationDate] timeIntervalSince1970];
     long long timeModifiedMilliseconds = (long long) trunc(timeModified * 1000.0f);
     NSString* md5 = [ZPZoteroAttachment md5ForFileAtPath:path];

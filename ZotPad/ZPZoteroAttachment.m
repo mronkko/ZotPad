@@ -217,7 +217,7 @@ static NSString* _documentsDirectory = NULL;
      
      */
 
-    return [ZPZoteroAttachment zoteroBase64Decode:filename];
+    return [ZPZoteroAttachment zoteroBase64Encode:filename];
 }
 
 #pragma mark - File operations
