@@ -44,4 +44,12 @@
 
 +(NSInteger) numberOfActiveMetadataRequests;
 
+//Write API requests
+
++(void) createCollection:(ZPZoteroCollection*)collection completion:(void(^)(ZPZoteroCollection*))completionBlock;
++(void) addItems:(NSArray*)itemKeys toCollection:(ZPZoteroCollection*)collection completion:(void(^)(void))completionBlock;
++(void) removeItem:(NSString*)itemKey fromCollection:(ZPZoteroCollection*)collection completion:(void(^)(void))completionBlock;
+
++(NSInteger) numberOfActiveMetadataWriteRequests;
+
 @end

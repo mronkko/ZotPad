@@ -122,7 +122,7 @@ CREATE TABLE  IF NOT EXISTS creators (
     authorOrder INT NOT NULL,
     firstName TEXT,
     lastName TEXT,
-    shortName TEXT,
+    name TEXT,
     creatorType TEXT NOT NULL,
     PRIMARY KEY (itemKey, authorOrder)
 );

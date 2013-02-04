@@ -8,6 +8,7 @@
 
 #import "ZPStarBarButtonItem.h"
 #import "ZPUtils.h"
+#import "ZPItemDataUploadManager.h"
 
 @interface ZPStarBarButtonItem ()
 - (void) _setImageWithState:(BOOL) active;
@@ -52,6 +53,9 @@
         [ZPDatabase addCollectionWithTitle:favoritesCollectionTitle
                              collectionKey:favouritesCollectionKey
                                  toLibrary:library];
+        
+        //Notify that the collections have been updated
+        [[NSNotificationCenter defaultCenter] postNotificationName:ZPNOTIFICATION_LIBRARY_WITH_COLLECTIONS_AVAILABLE object:library];
     }
 
 
@@ -62,6 +66,10 @@
         [ZPDatabase removeItemLocally:_targetItem fromCollection:favouritesCollectionKey];
     }
 
+    [_targetItem setInFavourites:shouldAddToFavourites];
+    
+    // Update the changes to the server
+    [ZPItemDataUploadManager uploadMetadata];
 }
 
 - (void) _setImageWithState:(BOOL) active{
@@ -78,18 +86,7 @@
     _targetItem = item;
     
     //If the favourites collection is defined, check if this item is included in the favourites
-    NSString* favouritesCollectionKey = [ZPDatabase collectionKeyForFavoritesCollectionInLibrary:_targetItem.libraryID];
-    
-    BOOL isFavourite = false;
-    if(favouritesCollectionKey!=NULL){
-        for(ZPZoteroCollection* collection in item.collections){
-            if([collection.collectionKey isEqualToString:favouritesCollectionKey ]){
-                isFavourite = TRUE;
-                break;
-            }
-        }
-    }
-    [self _setImageWithState:isFavourite];
+    [self _setImageWithState:item.isInFavourites];
 }
 
 @end

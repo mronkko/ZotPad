@@ -86,9 +86,13 @@
 +(void) _makeServerRequest:(NSInteger)type withParameters:(NSDictionary*) parameters userInfo:(NSDictionary*)userInfo usingOperationQueue:(NSOperationQueue*)queue;
 +(void) _makeServerRequest:(NSInteger)type withParameters:(NSDictionary*) parameters userInfo:(NSDictionary*)userInfo;
 
++(NSString*) _baseURLWithLibraryID:(NSInteger)libraryID;
 
-+(ZPServerResponseXMLParser*) _parseResponse:(ASIHTTPRequest*)request;
-+(void) _processParsedResponse:(ZPServerResponseXMLParser*)parserResults forRequest:(ASIHTTPRequest*)request;
++(void) _performRequest:(ASIHTTPRequest*)request usingOperationQueue:(NSOperationQueue*)queue completion:(void(^)(NSData*))completionBlock;
+
++(ZPServerResponseXMLParser*) _parseXMLResponseData:(NSData*)responseData requestType:(NSInteger) type;
+
++(void) _processParsedResponse:(ZPServerResponseXMLParser*)parserDelegate requestType:(NSInteger) type userInfo:(NSDictionary*) userInfo;
 
 @end
 
@@ -97,6 +101,7 @@
 
 static ZPAutenticationErrorAlertViewDelegate* alertViewDelegate;
 static NSOperationQueue* _addHocKeyRetrievals;
+static NSOperationQueue* _writeRequestQueue;
 
 const NSInteger ZPServerConnectionRequestGroups = 1;
 const NSInteger ZPServerConnectionRequestCollections = 2;
@@ -115,6 +120,11 @@ const NSInteger ZPServerConnectionRequestLastModifiedItem = 11;
     _addHocKeyRetrievals = [[NSOperationQueue alloc] init];
     [_addHocKeyRetrievals setMaxConcurrentOperationCount:3];
 
+    _writeRequestQueue = [[NSOperationQueue alloc] init];
+    [_writeRequestQueue setMaxConcurrentOperationCount:1];
+    
+    
+
 }
 
 /*
@@ -131,519 +141,7 @@ const NSInteger ZPServerConnectionRequestLastModifiedItem = 11;
     return [[ASIHTTPRequest sharedQueue] operationCount];
 }
 
-+(void) _makeServerRequest:(NSInteger)type withParameters:(NSDictionary*) parameters userInfo:(NSDictionary*)userInfo{
-    [self _makeServerRequest:type withParameters:parameters userInfo:userInfo usingOperationQueue:NULL completion:NULL];
-}
-
-+(void) _makeServerRequest:(NSInteger)type withParameters:(NSDictionary*) parameters userInfo:(NSDictionary*)userInfo completion:(void(^)(NSArray*))completionBlock{
-    [self _makeServerRequest:type withParameters:parameters userInfo:userInfo usingOperationQueue:NULL completion:completionBlock];
-}
-+(void) _makeServerRequest:(NSInteger)type withParameters:(NSDictionary*) parameters userInfo:(NSDictionary*)userInfo usingOperationQueue:(NSOperationQueue*)queue{
-    [self _makeServerRequest:type withParameters:parameters userInfo:userInfo usingOperationQueue:queue completion:NULL];
-}
-+(void) _makeServerRequest:(NSInteger)type withParameters:(NSDictionary*) parameters userInfo:(NSDictionary*)userInfo usingOperationQueue:(NSOperationQueue*)queue completion:(void(^)(NSArray*))completionBlock{
- 
-    //All http connections must be done in the main thread
-    
-    if(! [NSThread isMainThread]){
-        dispatch_async(dispatch_get_main_queue(), ^{
-            [self _makeServerRequest:type withParameters:parameters userInfo:userInfo usingOperationQueue:queue completion:completionBlock];
-        });
-    }
-    else{
-        if([ZPReachability hasInternetConnection]){
-            NSData* responseData = NULL;
-            NSString* urlString;
-            
-            NSString* oauthkey =  [ZPPreferences OAuthKey];
-            
-            if(oauthkey!=NULL){
-                
-                NSInteger libraryID = LIBRARY_ID_NOT_SET;
-                
-                if(parameters != NULL){
-                    libraryID = [[parameters objectForKey:ZPKEY_LIBRARY_ID] integerValue];
-                }
-                
-                if(libraryID== LIBRARY_ID_MY_LIBRARY || libraryID == LIBRARY_ID_NOT_SET){
-                    urlString = [NSString stringWithFormat:@"https://api.zotero.org/users/%@/",[ZPPreferences userID]];
-                }
-                else{
-                    urlString = [NSString stringWithFormat:@"https://api.zotero.org/groups/%i/",libraryID];
-                }
-                // Groups and collections
-                if(type==ZPServerConnectionRequestPermissions){
-                    urlString = [NSString stringWithFormat:@"%@keys/%@",urlString,oauthkey];
-                }
-                else if(type==ZPServerConnectionRequestGroups){
-                    urlString = [NSString stringWithFormat:@"%@groups?key=%@&content=none",urlString,oauthkey];
-                }
-                else if (type==ZPServerConnectionRequestCollections){
-                    urlString = [NSString stringWithFormat:@"%@collections?key=%@",urlString,oauthkey];
-                }
-                else if (type==ZPServerConnectionRequestSingleCollection){
-                    urlString = [NSString stringWithFormat:@"%@collections/%@?key=%@",urlString,[parameters objectForKey:ZPKEY_COLLECTION_KEY],oauthkey];
-                }
-                
-                // items
-                
-                else if (type==ZPServerConnectionRequestItems || type == ZPServerConnectionRequestTopLevelKeys){
-                    NSString* collectionKey = [parameters objectForKey:ZPKEY_COLLECTION_KEY];
-                    NSString* format =NULL;
-                    if(type==ZPServerConnectionRequestItems){
-                        format = @"atom";
-                    }
-                    else{
-                        format = @"keys";
-                    }
-                    if(collectionKey!=NULL){
-                        urlString = [NSString stringWithFormat:@"%@collections/%@/items?key=%@&format=%@",urlString,collectionKey,oauthkey,format];
-                    }
-                    else{
-                        urlString = [NSString stringWithFormat:@"%@items/top?key=%@&format=%@",urlString,oauthkey,format];
-                    }
-                }
-                else if (type==ZPServerConnectionRequestItemsAndChildren){
-                    //            NSString* collectionKey = [parameters objectForKey:ZPKEY_COLLECTION_KEY];
-                    //            NSAssert(collectionKey==NULL,@"Cannot request child items for collection");
-                    urlString = [NSString stringWithFormat:@"%@items?key=%@&format=atom",urlString,oauthkey];
-                }
-                
-                else if( type == ZPServerConnectionRequestSingleItem){
-                    NSString* itemKey = [parameters objectForKey:ZPKEY_ITEM_KEY];
-                    
-                    urlString = [NSString stringWithFormat:@"%@items/%@?key=%@&format=atom",urlString,itemKey,oauthkey];
-                }
-                else if( type == ZPServerConnectionRequestSingleItemChildren){
-                    NSString* itemKey = [parameters objectForKey:ZPKEY_ITEM_KEY];
-                    
-                    urlString = [NSString stringWithFormat:@"%@items/%@/children?key=%@&format=atom",urlString,itemKey,oauthkey];
-                }
-                else if( type == ZPServerConnectionRequestKeys){
-                    urlString = [NSString stringWithFormat:@"%@items?key=%@&format=keys",urlString,oauthkey];
-                }
-                else if( type ==ZPServerConnectionRequestLastModifiedItem){
-                    
-                    NSString* collectionKey = [parameters objectForKey:ZPKEY_COLLECTION_KEY];
-                    
-                    if(collectionKey!=NULL){
-                        urlString = [NSString stringWithFormat:@"%@collections/%@/items?key=%@&content=none&order=dateModified&sort=desc&start=0&limit=1",urlString,collectionKey,oauthkey];
-                    }
-                    else{
-                        urlString = [NSString stringWithFormat:@"%@items/top?key=%@&content=none&order=dateModified&sort=desc&start=0&limit=1",urlString,oauthkey];
-                    }
-                    
-                }
-                if(parameters!=NULL){
-                    for(id key in parameters){
-                        if(! [ZPKEY_COLLECTION_KEY isEqualToString: key] &&
-                           ! [ZPKEY_LIBRARY_ID isEqualToString: key] &&
-                           ! ((type == ZPServerConnectionRequestSingleItemChildren || type == ZPServerConnectionRequestSingleItem) && [ZPKEY_ITEM_KEY isEqualToString:key])) {
-                            urlString = [NSString stringWithFormat:@"%@&%@=%@",urlString,key,[[parameters objectForKey:key] stringByAddingPercentEscapesUsingEncoding:
-                                                                                              NSUTF8StringEncoding]];
-                            
-                        }
-                    }
-                }
-                
-                //Identifiers
-                if([ZPPreferences addIdentifiersToAPIRequests]){
-                    
-                    char data[16];
-                    for (int x=0;x<16;data[x++] = (char)('A' + (arc4random_uniform(26))));
-                    NSString* t = [[NSString alloc] initWithBytes:data length:16 encoding:NSUTF8StringEncoding];
-                    
-                    if(type==ZPServerConnectionRequestPermissions){
-                        urlString = [urlString stringByAppendingFormat:@"?t=%@",t];
-                    }
-                    else{
-                        urlString = [urlString stringByAppendingFormat:@"&t=%@",t];
-                        
-                    }
-                    
-                    //Device identifiers are available again in iOS 6.
-                    if([[[UIDevice currentDevice] systemVersion] floatValue] >= 6.0){
-                        urlString = [urlString stringByAppendingFormat:@"&d=%@",[[[UIDevice currentDevice] identifierForVendor] UUIDString]];
-                    }
-                }
-                DDLogVerbose(@"Staring request %@",urlString);
-                
-                //TODO: Document why this needs to be weak. (Check the compiler warnign that comes from disabling this)
-                
-                __weak ASIHTTPRequest* request = [ASIHTTPRequest requestWithURL:[NSURL URLWithString:urlString]];
-                request.tag = type;
-                
-                NSMutableDictionary* newUserInfo = [NSMutableDictionary dictionaryWithDictionary:userInfo];
-                if(parameters != NULL) [newUserInfo setObject:parameters forKey:ZPKEY_PARAMETERS];
-                request.userInfo = newUserInfo;
-                
-                [request setCompletionBlock:^{
-                    //If we receive a 403 (forbidden) error, delete the authorization key because we know that it is
-                    //no longer valid.
-                    
-                    DDLogVerbose(@"Request to %@ returned status code %i",request.url,request.responseStatusCode);
-                    if(request.responseStatusCode==403){
-                      
-                        if(completionBlock != NULL){
-                            completionBlock(NULL);
-                        }
-
-                        DDLogError(@"Connection to Zotero server (%@) resulted in error %i. Full response: %@",urlString,request.responseStatusCode,[[NSString alloc] initWithData:responseData encoding:NSUTF8StringEncoding]);
-                        
-                        
-                        if(request.tag == ZPServerConnectionRequestKeys){
-                            
-                            NSArray* librariesThatCanBeAccessed = [[self _parseResponse:request] parsedElements];
-                            
-                            if(librariesThatCanBeAccessed == NULL || [librariesThatCanBeAccessed count]==0){
-                                DDLogError(@"The authorization key is no longer valid.");
-                                
-                                //Set ZotPad offline and ask the user what to do
-                                [ZPPreferences setOnline:FALSE];
-                                
-                                if(alertViewDelegate == NULL) alertViewDelegate = [[ZPAutenticationErrorAlertViewDelegate alloc] init];
-                                
-                                [[[UIAlertView alloc] initWithTitle:@"Authentication error"
-                                                            message:@"ZotPad is not authorized to access any of your libraries on the Zotero server and is now in offline mode. This can occur if your access key has been revoked or communications to Zotero server is blocked."
-                                                           delegate:alertViewDelegate cancelButtonTitle:@"Stay offline" otherButtonTitles:@"Check key", @"New key",nil] show];
-                            }
-                            else {
-                                [[[UIAlertView alloc] initWithTitle:@"Authorization error"
-                                                            message:@"ZotPad is not authorized to access the library you are attempting to load. This can occur if the privileges of your access key have been changed, but ZotPad cache has not yet been updated to reflect these changes."
-                                                           delegate:nil cancelButtonTitle:@"Cancel" otherButtonTitles:nil] show];
-                            }
-                            
-                        }
-                        else{
-                            [self _makeServerRequest:ZPServerConnectionRequestKeys withParameters:NULL userInfo:NULL];
-                        }
-                    }
-                    else if(request.responseStatusCode == 200){
-                        
-                        // Parsing the response takes time, so do this in the background
-                        ASIHTTPRequest* retainedRequest = request;
-                        void (^responseProcessingBlock)() = ^{
-                            
-                            ZPServerResponseXMLParser* parserResponse;
-                            
-                            // This needs exception handling because sometimes we get garbage from the server
-                            @try {
-                                parserResponse = [self _parseResponse:retainedRequest];
-                                [self _processParsedResponse:parserResponse forRequest:retainedRequest];
-                            }
-                            @catch (NSException* exception) {
-
-                                DDLogError(@"Parsing response from %@ resulted in an exception.\n\n%@\n%@\n%@\n\nResponse from server was:\n%@",request.url,exception.name, exception.reason, exception.callStackSymbols ,request.responseString);
-#ifdef ZPDEBUG
-                                [NSException raise:exception.name format:@"Parsing response from %@ resulted in an exception.\n\n%@\n%@\n%@\n\nResponse from server was:\n%@",request.url,exception.name, exception.reason, exception.callStackSymbols ,request.responseString];
-#endif
-                            }
-                            
-                            if(completionBlock != NULL){
-                                completionBlock(parserResponse.parsedElements);
-                            }
-
-                        };
-                        dispatch_async(dispatch_get_global_queue(DISPATCH_QUEUE_PRIORITY_BACKGROUND,0),responseProcessingBlock);
-                    }
-                    else{
-                        DDLogError(@"Connection to Zotero server (%@) resulted in error %i. Full response: %@",urlString,request.responseStatusCode,[[NSString alloc] initWithData:responseData encoding:NSUTF8StringEncoding]);
-                        if(completionBlock != NULL){
-                            completionBlock(NULL);
-                        }
-                    }
-                    
-                }];
-                [request setFailedBlock:^{
-
-                    if(completionBlock != NULL){
-                        completionBlock(NULL);
-                    }
-                    
-                    [[NSNotificationCenter defaultCenter] postNotificationName:ZPNOTIFICATION_SERVER_CONNECTION_FAILED
-                                                                        object:request
-                                                                      userInfo:request.userInfo];
-                    
-                    if([ZPPreferences online]){
-                        if(!request.isCancelled){
-                            DDLogError(@"Connection to Zotero server (%@) failed %@",urlString,request.error.localizedDescription);
-                            
-                            //We need to notify that an empty item list is available so that the user interface knows to remove the busy overlay
-                            if(request.tag == ZPServerConnectionRequestTopLevelKeys){
-                                [[NSNotificationCenter defaultCenter]
-                                 postNotificationName:ZPNOTIFICATION_ITEM_LIST_AVAILABLE
-                                 object:[NSArray array]
-                                 userInfo:request.userInfo];
-                            }
-                            //Break the item request into two smaller blocks as long as there are more than one item to retrieve and retry
-                            else if(request.tag == ZPServerConnectionRequestItemsAndChildren){
-                                NSDictionary* params = (NSDictionary*)[request.userInfo objectForKey:ZPKEY_PARAMETERS];
-                                NSString* keys = [params objectForKey:ZPKEY_ITEM_KEY];
-                                NSInteger libraryID = [[params objectForKey:ZPKEY_LIBRARY_ID] integerValue];
-                                NSArray* keyArray = [keys componentsSeparatedByString:@","];
-                                if([keyArray count]>1){
-                                    
-                                    NSRange range;
-                                    
-                                    range.location=0;
-                                    range.length = [keyArray count]/2;
-                                    [self retrieveItemsFromLibrary:libraryID itemKeys:[keyArray subarrayWithRange:range]];
-                                    
-                                    range.location = range.length;
-                                    range.length= [keyArray count]-range.length;
-                                    [self retrieveItemsFromLibrary:libraryID itemKeys:[keyArray subarrayWithRange:range]];
-                                }
-                                
-                            }
-                        }
-                    }
-                }];
-                
-                if(queue == NULL){
-                    [request startAsynchronous];
-                }
-                else{
-                    [queue addOperation:request];
-                }
-            }
-            else{
-                if(completionBlock != NULL){
-                    completionBlock(NULL);
-                }
-                [(ZPAppDelegate*) [UIApplication sharedApplication].delegate startAuthenticationSequence];
-            }
-        }
-    }
-}
-
-+(ZPServerResponseXMLParser*) _parseResponse:(ASIHTTPRequest*)request{
-
-    NSData* responseData = request.responseData;
-    NSInteger type = request.tag;
-    
-    
-
-    ZPServerResponseXMLParser* parserDelegate = NULL;
-    
-    if(type == ZPServerConnectionRequestKeys || type == ZPServerConnectionRequestTopLevelKeys){
-        //We do not use a parser for item keys because it is not XML. The itemkey format is kind of afterthough, so we will just parse it differentlys
-        
-        NSString* stringData = [[NSString alloc] initWithData:responseData
-                                                     encoding:NSUTF8StringEncoding];
-        parserDelegate = [[ZPServerResponseXMLParser alloc] init];
-        NSMutableArray* itemKeys = [NSMutableArray arrayWithArray:[stringData componentsSeparatedByCharactersInSet:[NSCharacterSet whitespaceAndNewlineCharacterSet]]];
-        
-        //It is possible that we get empty keys at the end
-        while([[itemKeys lastObject] isEqualToString:@""]) [itemKeys removeLastObject];
-        
-        [parserDelegate setParsedElements:itemKeys];
-    }
-    //TODO refactor parsers to use the same superclass
-    else if(type == ZPServerConnectionRequestPermissions){
-        ZPServerResponseXMLParserKeyPermissions* keyParser = [[ZPServerResponseXMLParserKeyPermissions alloc] init];
-        
-        NSXMLParser* parser = [[NSXMLParser alloc] initWithData:responseData];
-        [parser setDelegate:keyParser];
-        [parser parse];
-        
-        parserDelegate = [[ZPServerResponseXMLParser alloc] init];
-        [parserDelegate setParsedElements:[keyParser results]];
-    }
-    else{
-        NSXMLParser* parser = [[NSXMLParser alloc] initWithData:responseData];
-        
-        //Choose the parser based on what we expect to receive
-        
-        if(type==ZPServerConnectionRequestGroups){
-            parserDelegate =  [[ZPServerResponseXMLParserLibrary alloc] init];
-        }
-        else if (type==ZPServerConnectionRequestCollections || type == ZPServerConnectionRequestSingleCollection){
-            parserDelegate =  [[ZPServerResponseXMLParserCollection alloc] init];
-        }
-        else if (type==ZPServerConnectionRequestItems || type == ZPServerConnectionRequestSingleItem || type== ZPServerConnectionRequestItemsAndChildren || type== ZPServerConnectionRequestSingleItemChildren || type == ZPServerConnectionRequestLastModifiedItem){
-            parserDelegate =  [[ZPServerResponseXMLParserItem alloc] init];
-        }
-        
-        [parser setDelegate: parserDelegate];
-        [parser parse];
-        
-        /*
-         #ifdef ZPDEBUG
-         NSString* responseString = [[NSString alloc] initWithData:responseData  encoding:NSUTF8StringEncoding];
-         parserDelegate.fullResponse = responseString;
-         //Check that we got time stamps for all objects
-         for(ZPZoteroDataObject* dataObject in parserDelegate.parsedElements){
-         dataObject.responseDataFromWhichThisItemWasCreated = responseString;
-         if(dataObject.serverTimestamp == NULL){
-         [NSException raise:@"Missing timestamp from Zotero server" format:@"Object with key %@ has a missing timestamp. Dump of full response %@",dataObject.key,[[NSString alloc] initWithData:responseData  encoding:NSUTF8StringEncoding]];
-         }
-         }
-         #endif
-         */
-    }
-    
-    /*
-     //Iy is OK to get 1/0 here because queries that return a single results do not have totalResults
-     DDLogVerbose(@"Request returned %i/%i results: %@ Active queries: %i",[[parserDelegate parsedElements] count],[parserDelegate totalResults], urlString,_activeRequestCount);
-     
-     //If there are no results, dump the entire response so that we see what the problem was
-     if([[parserDelegate parsedElements] count] == 0){
-     DDLogVerbose(@"%@",[[NSString alloc] initWithData:responseData encoding:NSUTF8StringEncoding]);
-     }
-     */
-    
-    return parserDelegate;
-
-}
-
-+(void) _processParsedResponse:(ZPServerResponseXMLParser*)parserDelegate forRequest:(ASIHTTPRequest*)request{
-    
-
-    NSDictionary* userInfo = request.userInfo;
-    NSDictionary* parameters = [userInfo objectForKey:ZPKEY_PARAMETERS];
-    NSArray* parsedArray = [parserDelegate parsedElements];
-    NSArray* allResults = [userInfo objectForKey:ZPKEY_ALL_RESULTS];
-    NSInteger tag = request.tag;
- 
-    if(allResults != NULL){
-        allResults = [allResults arrayByAddingObjectsFromArray:parsedArray];
-    }
-    else{
-        allResults = parsedArray;
-    }
-    
-    if([allResults count] < parserDelegate.totalResults && tag != ZPServerConnectionRequestLastModifiedItem){
-        NSMutableDictionary* newUserInfo;
-        NSMutableDictionary* newParams = [NSMutableDictionary dictionaryWithDictionary:parameters];
-        if(userInfo == NULL){
-            newUserInfo = [[NSMutableDictionary alloc] init];
-        }
-        else{
-            newUserInfo = [NSMutableDictionary dictionaryWithDictionary: userInfo];
-        }
-        
-        [newUserInfo setObject:allResults forKey:ZPKEY_ALL_RESULTS];
-        [newParams setObject:[NSString stringWithFormat:@"%i",[allResults count]] forKey:@"start"];
-        [self _makeServerRequest:tag withParameters:newParams userInfo:newUserInfo];
-    }
-    
-    //Process data
-    
-    else {
-        switch(request.tag){
-                
-            case ZPServerConnectionRequestPermissions:
-                
-                //Are group specifid permissions in use
-            {
-                if([allResults count] == 0){
-                     
-                     //Set ZotPad offline and ask the user what to do
-                     [ZPPreferences setOnline:FALSE];
-                     
-                     if(alertViewDelegate == NULL) alertViewDelegate = [[ZPAutenticationErrorAlertViewDelegate alloc] init];
-                     
-                     [[[UIAlertView alloc] initWithTitle:@"Authorization error"
-                     message:@"ZotPad is not authorized to access any of your libraries on the Zotero server and is now in offline mode. This can occur if your access key has been revoked or communications to Zotero server is blocked."
-                     delegate:alertViewDelegate cancelButtonTitle:@"Stay offline" otherButtonTitles:@"Check key", @"New key",nil] show];
-                     
-                    
-                }
-                else{
-                    
-                    NSMutableArray* returnArray = [[NSMutableArray alloc] init];
-                    
-                    for(NSString* libraryString in allResults){
-                        //All groups
-                        if([libraryString isEqualToString:@"all"]){
-
-                            //enumerate through the permissions and build list of libraries
-                            
-                            NSArray* groups =[request.userInfo objectForKey:@"groups"];
-                            
-                            [returnArray addObjectsFromArray:groups];
-                        }
-                        //My library
-//                        else if(libraryString isEqualToString:[NSString stringWithFormat:@"%i",LIBRARY_ID_MY_LIBRARY]]){
-//                            [returnArray addObject:[ZPZoteroLibrary libraryWithID:LIBRARY_ID_MY_LIBRARY]];
-//                        }
-                        //Group
-                        else{
-                            [returnArray addObject:[ZPZoteroLibrary libraryWithID:[libraryString integerValue]]];
-                        }
-                    }
-                    [ZPItemDataDownloadManager processNewLibrariesFromServer:returnArray];
-                }
-            }
-                break;
-
-            case ZPServerConnectionRequestGroups:
-                
-                [self _makeServerRequest:ZPServerConnectionRequestPermissions withParameters:NULL userInfo:[NSDictionary dictionaryWithObject:allResults forKey:@"groups"]];
-
-                break;
-                
-            case ZPServerConnectionRequestCollections:
-            case ZPServerConnectionRequestSingleCollection:
-                [ZPItemDataDownloadManager processNewCollectionsFromServer:allResults forLibraryID:[[userInfo objectForKey:ZPKEY_LIBRARY_ID] integerValue]];
-                break;
-                
-                
-            case ZPServerConnectionRequestSingleItemChildren:
-            {
-                NSString* itemKey = [parameters objectForKey:ZPKEY_ITEM_KEY];
-                ZPZoteroItem* item = [ZPZoteroItem itemWithKey:itemKey];
-
-                NSMutableArray* notes= [[NSMutableArray alloc] initWithCapacity:[allResults count]];
-                NSMutableArray* attachments = [[NSMutableArray alloc] initWithCapacity:[allResults count]];
-
-                for(NSObject* child in allResults){
-                    if([child isKindOfClass:[ZPZoteroAttachment class]]){
-                        [attachments addObject:child];
-                    }
-                    else{
-                        [notes addObject:child];
-                    }
-                }
-                
-                [attachments sortUsingDescriptors:[NSArray arrayWithObject:[[NSSortDescriptor alloc] initWithKey:@"title" ascending:TRUE]]];
-                item.attachments = attachments;
-                
-                [notes sortUsingDescriptors:[NSArray arrayWithObject:[[NSSortDescriptor alloc] initWithKey:@"title" ascending:TRUE]]];
-                item.notes = notes;
-            }
-                
-            case ZPServerConnectionRequestItems:
-            case ZPServerConnectionRequestItemsAndChildren:
-            case ZPServerConnectionRequestSingleItem:
-                
-                [ZPItemDataDownloadManager processNewItemsFromServer:allResults forLibraryID:[[parameters objectForKey:ZPKEY_LIBRARY_ID] integerValue]];
-                break;
-                
-            case ZPServerConnectionRequestLastModifiedItem:
-
-                //If we have a limit=1, then we are interested in the time stamponly
-                
-                [ZPItemDataDownloadManager processNewTimeStampForLibrary:[[parameters objectForKey:ZPKEY_LIBRARY_ID] integerValue] collection:[parameters objectForKey:ZPKEY_COLLECTION_KEY] timestampValue:parserDelegate.updateTimestamp];
-                
-                break;
-                //All keys for a library
-            case ZPServerConnectionRequestKeys:
-                [ZPItemDataDownloadManager processNewItemKeyListFromServer:allResults forLibraryID:[(NSNumber*)[parameters objectForKey:ZPKEY_LIBRARY_ID] integerValue]];
-                break;
-                
-                //Keys for an item list
-            case ZPServerConnectionRequestTopLevelKeys:
-                if([@"1" isEqualToString:[parameters objectForKey:@"limit"]])
-                    [ZPItemDataDownloadManager processNewTimeStampForLibrary:[[parameters objectForKey:ZPKEY_LIBRARY_ID] integerValue]
-                                                                     collection:[parameters objectForKey:ZPKEY_COLLECTION_KEY]
-                                                                 timestampValue:parserDelegate.updateTimestamp];
-                else
-                    [ZPItemDataDownloadManager processNewTopLevelItemKeyListFromServer:allResults userInfo:userInfo];
-                break;
-        }
-    }
-}
+#pragma mark - Read API calls
 
 +(void) retrieveSingleItem:(ZPZoteroAttachment*)item completion:(void(^)(NSArray*))completionBlock{
     
@@ -888,9 +386,545 @@ const NSInteger ZPServerConnectionRequestLastModifiedItem = 11;
     [self _makeServerRequest:ZPServerConnectionRequestLastModifiedItem withParameters:parameters userInfo:userInfo];
 }
 
+#pragma mark - Write API calls
+
+//Write API requests
 
 
++(void) createCollection:(ZPZoteroCollection*)collection completion:(void(^)(ZPZoteroCollection*))completionBlock{
 
+
+    NSString* urlString = [[self _baseURLWithLibraryID:collection.libraryID] stringByAppendingFormat:@"collections?key=%@",[ZPPreferences OAuthKey]];
+    
+    ASIHTTPRequest* postRequest = [[ASIHTTPRequest alloc] initWithURL:[NSURL URLWithString:urlString]];
+    postRequest.requestMethod = @"POST";
+    
+    [postRequest addRequestHeader:@"Content-Type" value:@"application/json"];
+    [postRequest addRequestHeader:@"X-Zotero-Write-Token" value:collection.collectionKey];
+
+    NSString* parentString;
+    if(collection.parentKey == nil){
+        parentString = @"false";
+    }
+    else{
+        parentString = [NSString stringWithFormat:@"\"%@\"",collection.parentKey];
+    }
+    [postRequest appendPostData:[[NSString stringWithFormat:@"{\"name\":\"%@\",\"parent\":%@}",collection.title,parentString] dataUsingEncoding:NSUTF8StringEncoding]];
+    
+    [self _performRequest:postRequest usingOperationQueue:_writeRequestQueue completion:^(NSData* responseData){
+       
+        NSXMLParser* parser = [[NSXMLParser alloc] initWithData:responseData];
+        ZPServerResponseXMLParser* parserDelegate =  [[ZPServerResponseXMLParserCollection alloc] init];
+        parser.delegate = parserDelegate;
+        [parser parse];
+        completionBlock([parserDelegate.parsedElements objectAtIndex:0]);
+    }];
+}
+
++(void) addItems:(NSArray*)itemKeys toCollection:(ZPZoteroCollection*)collection completion:(void(^)(void))completionBlock{
+
+    NSString* urlString = [[self _baseURLWithLibraryID:collection.libraryID] stringByAppendingFormat:@"collections/%@/items?key=%@", collection.key,[ZPPreferences OAuthKey]];
+    
+    ASIHTTPRequest* postRequest = [[ASIHTTPRequest alloc] initWithURL:[NSURL URLWithString:urlString]];
+    postRequest.requestMethod = @"POST";
+
+    [postRequest appendPostData:[[itemKeys componentsJoinedByString:@" "]dataUsingEncoding: NSUTF8StringEncoding]];
+    
+    [self _performRequest:postRequest usingOperationQueue:_writeRequestQueue completion:^(NSData* responseData){
+        completionBlock();
+    }];
+    
+}
+
+
++(void) removeItem:(NSString*)itemKey fromCollection:(ZPZoteroCollection*)collection completion:(void(^)(void))completionBlock{
+
+    NSString* urlString = [[self _baseURLWithLibraryID:collection.libraryID] stringByAppendingFormat:@"collections/%@/items/%@?key=%@", collection.key,itemKey, [ZPPreferences OAuthKey]];
+    
+    ASIHTTPRequest* deleteRequest = [[ASIHTTPRequest alloc] initWithURL:[NSURL URLWithString:urlString]];
+    deleteRequest.requestMethod = @"DELETE";
+    
+    [self _performRequest:deleteRequest usingOperationQueue:_writeRequestQueue completion:^(NSData* responseData){
+        completionBlock();
+    }];
+    
+}
+
++(NSInteger) numberOfActiveMetadataWriteRequests{
+    return [_writeRequestQueue operationCount];
+}
+
+# pragma mark - Internal methods
+
++(NSString*) _baseURLWithLibraryID:(NSInteger)libraryID{
+ 
+    if(libraryID== LIBRARY_ID_MY_LIBRARY || libraryID == LIBRARY_ID_NOT_SET){
+        return [NSString stringWithFormat:@"https://api.zotero.org/users/%@/",[ZPPreferences userID]];
+    }
+    else{
+        return [NSString stringWithFormat:@"https://api.zotero.org/groups/%i/",libraryID];
+    }
+
+}
+
++(void) _makeServerRequest:(NSInteger)type withParameters:(NSDictionary*) parameters userInfo:(NSDictionary*)userInfo{
+    [self _makeServerRequest:type withParameters:parameters userInfo:userInfo usingOperationQueue:NULL completion:NULL];
+}
+
++(void) _makeServerRequest:(NSInteger)type withParameters:(NSDictionary*) parameters userInfo:(NSDictionary*)userInfo completion:(void(^)(NSArray*))completionBlock{
+    [self _makeServerRequest:type withParameters:parameters userInfo:userInfo usingOperationQueue:NULL completion:completionBlock];
+}
++(void) _makeServerRequest:(NSInteger)type withParameters:(NSDictionary*) parameters userInfo:(NSDictionary*)userInfo usingOperationQueue:(NSOperationQueue*)queue{
+    [self _makeServerRequest:type withParameters:parameters userInfo:userInfo usingOperationQueue:queue completion:NULL];
+}
++(void) _makeServerRequest:(NSInteger)type withParameters:(NSDictionary*) parameters userInfo:(NSDictionary*)userInfo usingOperationQueue:(NSOperationQueue*)queue completion:(void(^)(NSArray*))completionBlock{
+    
+    //All http connections must be done in the main thread
+    
+    if(! [NSThread isMainThread]){
+        dispatch_async(dispatch_get_main_queue(), ^{
+            [self _makeServerRequest:type withParameters:parameters userInfo:userInfo usingOperationQueue:queue completion:completionBlock];
+        });
+    }
+    else{
+        if([ZPReachability hasInternetConnection]){
+            NSData* responseData = NULL;
+            NSString* urlString;
+            
+            NSString* oauthkey =  [ZPPreferences OAuthKey];
+            
+            if(oauthkey!=NULL){
+                
+                NSInteger libraryID = LIBRARY_ID_NOT_SET;
+                
+                if(parameters != NULL){
+                    libraryID = [[parameters objectForKey:ZPKEY_LIBRARY_ID] integerValue];
+                }
+                
+                urlString = [self _baseURLWithLibraryID:libraryID];
+                
+                // Groups and collections
+                if(type==ZPServerConnectionRequestPermissions){
+                    urlString = [NSString stringWithFormat:@"%@keys/%@",urlString,oauthkey];
+                }
+                else if(type==ZPServerConnectionRequestGroups){
+                    urlString = [NSString stringWithFormat:@"%@groups?key=%@&content=none",urlString,oauthkey];
+                }
+                else if (type==ZPServerConnectionRequestCollections){
+                    urlString = [NSString stringWithFormat:@"%@collections?key=%@",urlString,oauthkey];
+                }
+                else if (type==ZPServerConnectionRequestSingleCollection){
+                    urlString = [NSString stringWithFormat:@"%@collections/%@?key=%@",urlString,[parameters objectForKey:ZPKEY_COLLECTION_KEY],oauthkey];
+                }
+                
+                // items
+                
+                else if (type==ZPServerConnectionRequestItems || type == ZPServerConnectionRequestTopLevelKeys){
+                    NSString* collectionKey = [parameters objectForKey:ZPKEY_COLLECTION_KEY];
+                    NSString* format =NULL;
+                    if(type==ZPServerConnectionRequestItems){
+                        format = @"atom";
+                    }
+                    else{
+                        format = @"keys";
+                    }
+                    if(collectionKey!=NULL){
+                        urlString = [NSString stringWithFormat:@"%@collections/%@/items?key=%@&format=%@",urlString,collectionKey,oauthkey,format];
+                    }
+                    else{
+                        urlString = [NSString stringWithFormat:@"%@items/top?key=%@&format=%@",urlString,oauthkey,format];
+                    }
+                }
+                else if (type==ZPServerConnectionRequestItemsAndChildren){
+                    //            NSString* collectionKey = [parameters objectForKey:ZPKEY_COLLECTION_KEY];
+                    //            NSAssert(collectionKey==NULL,@"Cannot request child items for collection");
+                    urlString = [NSString stringWithFormat:@"%@items?key=%@&format=atom",urlString,oauthkey];
+                }
+                
+                else if( type == ZPServerConnectionRequestSingleItem){
+                    NSString* itemKey = [parameters objectForKey:ZPKEY_ITEM_KEY];
+                    
+                    urlString = [NSString stringWithFormat:@"%@items/%@?key=%@&format=atom",urlString,itemKey,oauthkey];
+                }
+                else if( type == ZPServerConnectionRequestSingleItemChildren){
+                    NSString* itemKey = [parameters objectForKey:ZPKEY_ITEM_KEY];
+                    
+                    urlString = [NSString stringWithFormat:@"%@items/%@/children?key=%@&format=atom",urlString,itemKey,oauthkey];
+                }
+                else if( type == ZPServerConnectionRequestKeys){
+                    urlString = [NSString stringWithFormat:@"%@items?key=%@&format=keys",urlString,oauthkey];
+                }
+                else if( type ==ZPServerConnectionRequestLastModifiedItem){
+                    
+                    NSString* collectionKey = [parameters objectForKey:ZPKEY_COLLECTION_KEY];
+                    
+                    if(collectionKey!=NULL){
+                        urlString = [NSString stringWithFormat:@"%@collections/%@/items?key=%@&content=none&order=dateModified&sort=desc&start=0&limit=1",urlString,collectionKey,oauthkey];
+                    }
+                    else{
+                        urlString = [NSString stringWithFormat:@"%@items/top?key=%@&content=none&order=dateModified&sort=desc&start=0&limit=1",urlString,oauthkey];
+                    }
+                    
+                }
+                if(parameters!=NULL){
+                    for(id key in parameters){
+                        if(! [ZPKEY_COLLECTION_KEY isEqualToString: key] &&
+                           ! [ZPKEY_LIBRARY_ID isEqualToString: key] &&
+                           ! ((type == ZPServerConnectionRequestSingleItemChildren || type == ZPServerConnectionRequestSingleItem) && [ZPKEY_ITEM_KEY isEqualToString:key])) {
+                            urlString = [NSString stringWithFormat:@"%@&%@=%@",urlString,key,[[parameters objectForKey:key] stringByAddingPercentEscapesUsingEncoding:
+                                                                                              NSUTF8StringEncoding]];
+                            
+                        }
+                    }
+                }
+                                
+                
+                __weak ASIHTTPRequest* request = [ASIHTTPRequest requestWithURL:[NSURL URLWithString:urlString]];
+                request.tag = type;
+                
+                NSMutableDictionary* newUserInfo = [NSMutableDictionary dictionaryWithDictionary:userInfo];
+                if(parameters != NULL) [newUserInfo setObject:parameters forKey:ZPKEY_PARAMETERS];
+                request.userInfo = newUserInfo;
+
+            
+                [self _performRequest:request usingOperationQueue:queue completion:^(NSData* responseData){
+                    
+                    ZPServerResponseXMLParser* parserResponse;
+                    
+                    // This needs exception handling because sometimes we get garbage from the server
+                    @try {
+                        parserResponse = [self _parseXMLResponseData:responseData requestType:type];
+                        [self _processParsedResponse:parserResponse requestType:type userInfo:newUserInfo];
+                    }
+                    @catch (NSException* exception) {
+                        
+                        NSString* description = [NSString stringWithFormat:@"Parsing response resulted in an exception. Type: %i \n%@\n\n%@\n%@\n%@\n\nResponse from server was:\n%@",
+                                                 type, newUserInfo, exception.name, exception.reason, exception.callStackSymbols,
+                                                 [[NSString alloc] initWithData:responseData encoding:NSUTF8StringEncoding]];
+                        DDLogError(description);
+#ifdef ZPDEBUG
+                        [NSException raise:exception.name format:@"%@",description];
+#endif
+                    }
+                    
+                    if(completionBlock != NULL){
+                        completionBlock(parserResponse.parsedElements);
+                    }
+
+                }];
+            
+            
+            }
+            else{
+                [(ZPAppDelegate*) [UIApplication sharedApplication].delegate startAuthenticationSequence];
+            }
+        }
+    }
+}
+
++(void) _performRequest:(ASIHTTPRequest*)request usingOperationQueue:(NSOperationQueue*)queue completion:(void(^)(NSData*))completionBlock{
+
+    __weak ASIHTTPRequest* weakRequest = request;
+    
+    [request setCompletionBlock:^{
+        
+        // Succesful requests
+        
+        if(weakRequest.responseStatusCode >= 200 && weakRequest.responseStatusCode < 300){
+            
+            // Parsing the response takes time, so do this in the background
+
+            NSData* data = weakRequest.responseData;
+            
+            dispatch_async(dispatch_get_global_queue(DISPATCH_QUEUE_PRIORITY_BACKGROUND,0),^{completionBlock(data);});
+        }
+        
+        else{
+            DDLogError(@"Connection to Zotero server (%@) resulted in error %i. Full response: %@",
+                       weakRequest.url, weakRequest.responseStatusCode,
+                       [[NSString alloc] initWithData:weakRequest.responseData encoding:NSUTF8StringEncoding]);
+
+            //If we receive a 403 (forbidden) error, delete the authorization key because we know that it is
+            //no longer valid.
+            
+            if(weakRequest.responseStatusCode==403){
+            
+                DDLogError(@"The authorization key is no longer valid.");
+
+                // Start a request for new keys
+                [self _makeServerRequest:ZPServerConnectionRequestKeys withParameters:NULL userInfo:NULL];
+
+                //Set ZotPad offline and ask the user what to do
+                [ZPPreferences setOnline:FALSE];
+                
+                if(alertViewDelegate == NULL) alertViewDelegate = [[ZPAutenticationErrorAlertViewDelegate alloc] init];
+                
+                [[[UIAlertView alloc] initWithTitle:@"Authentication error"
+                                            message:@"ZotPad is not authorized to access the library you are attempting to load and is now in offline mode. This can occur if your access key has been revoked or communications to Zotero server is blocked."
+                                           delegate:alertViewDelegate cancelButtonTitle:@"Stay offline" otherButtonTitles:@"Check key", @"New key",nil] show];
+            }
+        }
+
+        
+    }];
+    
+    [request setFailedBlock:^{
+        
+        if(completionBlock != NULL){
+            completionBlock(NULL);
+        }
+        
+        [[NSNotificationCenter defaultCenter] postNotificationName:ZPNOTIFICATION_SERVER_CONNECTION_FAILED
+                                                            object:weakRequest
+                                                          userInfo:weakRequest.userInfo];
+        
+        if([ZPPreferences online]){
+            if(!weakRequest.isCancelled){
+                DDLogError(@"Connection to Zotero server (%@) failed %@",weakRequest.url,weakRequest.error.localizedDescription);
+                
+                //TODO: Refactor these somewhere else
+                
+                //We need to notify that an empty item list is available so that the user interface knows to remove the busy overlay
+                if(weakRequest.tag == ZPServerConnectionRequestTopLevelKeys){
+                    [[NSNotificationCenter defaultCenter]
+                     postNotificationName:ZPNOTIFICATION_ITEM_LIST_AVAILABLE
+                     object:[NSArray array]
+                     userInfo:weakRequest.userInfo];
+                }
+                //Break the item request into two smaller blocks as long as there are more than one item to retrieve and retry
+                else if(weakRequest.tag == ZPServerConnectionRequestItemsAndChildren){
+                    NSDictionary* params = (NSDictionary*)[weakRequest.userInfo objectForKey:ZPKEY_PARAMETERS];
+                    NSString* keys = [params objectForKey:ZPKEY_ITEM_KEY];
+                    NSInteger libraryID = [[params objectForKey:ZPKEY_LIBRARY_ID] integerValue];
+                    NSArray* keyArray = [keys componentsSeparatedByString:@","];
+                    if([keyArray count]>1){
+                        
+                        NSRange range;
+                        
+                        range.location=0;
+                        range.length = [keyArray count]/2;
+                        [self retrieveItemsFromLibrary:libraryID itemKeys:[keyArray subarrayWithRange:range]];
+                        
+                        range.location = range.length;
+                        range.length= [keyArray count]-range.length;
+                        [self retrieveItemsFromLibrary:libraryID itemKeys:[keyArray subarrayWithRange:range]];
+                    }
+                    
+                }
+            }
+        }
+    }];
+    
+    if(queue == NULL){
+        //Requests must be started on the main tread
+        [request performSelectorOnMainThread:@selector(startAsynchronous) withObject:nil waitUntilDone:NO];
+    }
+    else{
+        [queue addOperation:request];
+    }
+    
+}
+
++(ZPServerResponseXMLParser*) _parseXMLResponseData:(NSData*)responseData requestType:(NSInteger)type{
+    
+    
+    ZPServerResponseXMLParser* parserDelegate = NULL;
+    
+    if(type == ZPServerConnectionRequestKeys || type == ZPServerConnectionRequestTopLevelKeys){
+        //We do not use a parser for item keys because it is not XML. The itemkey format is kind of afterthough, so we will just parse it differentlys
+        
+        NSString* stringData = [[NSString alloc] initWithData:responseData
+                                                     encoding:NSUTF8StringEncoding];
+        parserDelegate = [[ZPServerResponseXMLParser alloc] init];
+        NSMutableArray* itemKeys = [NSMutableArray arrayWithArray:[stringData componentsSeparatedByCharactersInSet:[NSCharacterSet whitespaceAndNewlineCharacterSet]]];
+        
+        //It is possible that we get empty keys at the end
+        while([[itemKeys lastObject] isEqualToString:@""]) [itemKeys removeLastObject];
+        
+        [parserDelegate setParsedElements:itemKeys];
+    }
+    //TODO refactor parsers to use the same superclass
+    else if(type == ZPServerConnectionRequestPermissions){
+        ZPServerResponseXMLParserKeyPermissions* keyParser = [[ZPServerResponseXMLParserKeyPermissions alloc] init];
+        
+        NSXMLParser* parser = [[NSXMLParser alloc] initWithData:responseData];
+        [parser setDelegate:keyParser];
+        [parser parse];
+        
+        parserDelegate = [[ZPServerResponseXMLParser alloc] init];
+        [parserDelegate setParsedElements:[keyParser results]];
+    }
+    else{
+        NSXMLParser* parser = [[NSXMLParser alloc] initWithData:responseData];
+        
+        //Choose the parser based on what we expect to receive
+        
+        if(type==ZPServerConnectionRequestGroups){
+            parserDelegate =  [[ZPServerResponseXMLParserLibrary alloc] init];
+        }
+        else if (type==ZPServerConnectionRequestCollections || type == ZPServerConnectionRequestSingleCollection){
+            parserDelegate =  [[ZPServerResponseXMLParserCollection alloc] init];
+        }
+        else if (type==ZPServerConnectionRequestItems || type == ZPServerConnectionRequestSingleItem || type== ZPServerConnectionRequestItemsAndChildren || type== ZPServerConnectionRequestSingleItemChildren || type == ZPServerConnectionRequestLastModifiedItem){
+            parserDelegate =  [[ZPServerResponseXMLParserItem alloc] init];
+        }
+        
+        [parser setDelegate: parserDelegate];
+        [parser parse];
+        
+    }
+    
+    
+    return parserDelegate;
+    
+}
+
++(void) _processParsedResponse:(ZPServerResponseXMLParser*)parserDelegate requestType:(NSInteger) type userInfo:(NSDictionary*) userInfo{
+    
+    
+    NSDictionary* parameters = [userInfo objectForKey:ZPKEY_PARAMETERS];
+    NSArray* parsedArray = [parserDelegate parsedElements];
+    NSArray* allResults = [userInfo objectForKey:ZPKEY_ALL_RESULTS];
+    
+    if(allResults != NULL){
+        allResults = [allResults arrayByAddingObjectsFromArray:parsedArray];
+    }
+    else{
+        allResults = parsedArray;
+    }
+    
+    if([allResults count] < parserDelegate.totalResults && type != ZPServerConnectionRequestLastModifiedItem){
+        NSMutableDictionary* newUserInfo;
+        NSMutableDictionary* newParams = [NSMutableDictionary dictionaryWithDictionary:parameters];
+        if(userInfo == NULL){
+            newUserInfo = [[NSMutableDictionary alloc] init];
+        }
+        else{
+            newUserInfo = [NSMutableDictionary dictionaryWithDictionary: userInfo];
+        }
+        
+        [newUserInfo setObject:allResults forKey:ZPKEY_ALL_RESULTS];
+        [newParams setObject:[NSString stringWithFormat:@"%i",[allResults count]] forKey:@"start"];
+        [self _makeServerRequest:type withParameters:newParams userInfo:newUserInfo];
+    }
+    
+    //Process data
+    
+    else {
+        switch(type){
+                
+            case ZPServerConnectionRequestPermissions:
+                
+                //Are group specifid permissions in use
+            {
+                if([allResults count] == 0){
+                    
+                    //Set ZotPad offline and ask the user what to do
+                    [ZPPreferences setOnline:FALSE];
+                    
+                    if(alertViewDelegate == NULL) alertViewDelegate = [[ZPAutenticationErrorAlertViewDelegate alloc] init];
+                    
+                    [[[UIAlertView alloc] initWithTitle:@"Authorization error"
+                                                message:@"ZotPad is not authorized to access any of your libraries on the Zotero server and is now in offline mode. This can occur if your access key has been revoked or communications to Zotero server is blocked."
+                                               delegate:alertViewDelegate cancelButtonTitle:@"Stay offline" otherButtonTitles:@"Check key", @"New key",nil] show];
+                    
+                    
+                }
+                else{
+                    
+                    NSMutableArray* returnArray = [[NSMutableArray alloc] init];
+                    
+                    for(NSString* libraryString in allResults){
+                        //All groups
+                        if([libraryString isEqualToString:@"all"]){
+                            
+                            //enumerate through the permissions and build list of libraries
+                            
+                            NSArray* groups =[userInfo objectForKey:@"groups"];
+                            
+                            [returnArray addObjectsFromArray:groups];
+                        }
+                        //My library
+                        //                        else if(libraryString isEqualToString:[NSString stringWithFormat:@"%i",LIBRARY_ID_MY_LIBRARY]]){
+                        //                            [returnArray addObject:[ZPZoteroLibrary libraryWithID:LIBRARY_ID_MY_LIBRARY]];
+                        //                        }
+                        //Group
+                        else{
+                            [returnArray addObject:[ZPZoteroLibrary libraryWithID:[libraryString integerValue]]];
+                        }
+                    }
+                    [ZPItemDataDownloadManager processNewLibrariesFromServer:returnArray];
+                }
+            }
+                break;
+                
+            case ZPServerConnectionRequestGroups:
+                
+                [self _makeServerRequest:ZPServerConnectionRequestPermissions withParameters:NULL userInfo:[NSDictionary dictionaryWithObject:allResults forKey:@"groups"]];
+                
+                break;
+                
+            case ZPServerConnectionRequestCollections:
+            case ZPServerConnectionRequestSingleCollection:
+                [ZPItemDataDownloadManager processNewCollectionsFromServer:allResults forLibraryID:[[userInfo objectForKey:ZPKEY_LIBRARY_ID] integerValue]];
+                break;
+                
+                
+            case ZPServerConnectionRequestSingleItemChildren:
+            {
+                NSString* itemKey = [parameters objectForKey:ZPKEY_ITEM_KEY];
+                ZPZoteroItem* item = [ZPZoteroItem itemWithKey:itemKey];
+                
+                NSMutableArray* notes= [[NSMutableArray alloc] initWithCapacity:[allResults count]];
+                NSMutableArray* attachments = [[NSMutableArray alloc] initWithCapacity:[allResults count]];
+                
+                for(NSObject* child in allResults){
+                    if([child isKindOfClass:[ZPZoteroAttachment class]]){
+                        [attachments addObject:child];
+                    }
+                    else{
+                        [notes addObject:child];
+                    }
+                }
+                
+                [attachments sortUsingDescriptors:[NSArray arrayWithObject:[[NSSortDescriptor alloc] initWithKey:@"title" ascending:TRUE]]];
+                item.attachments = attachments;
+                
+                [notes sortUsingDescriptors:[NSArray arrayWithObject:[[NSSortDescriptor alloc] initWithKey:@"title" ascending:TRUE]]];
+                item.notes = notes;
+            }
+                
+            case ZPServerConnectionRequestItems:
+            case ZPServerConnectionRequestItemsAndChildren:
+            case ZPServerConnectionRequestSingleItem:
+                
+                [ZPItemDataDownloadManager processNewItemsFromServer:allResults forLibraryID:[[parameters objectForKey:ZPKEY_LIBRARY_ID] integerValue]];
+                break;
+                
+            case ZPServerConnectionRequestLastModifiedItem:
+                
+                //If we have a limit=1, then we are interested in the time stamponly
+                
+                [ZPItemDataDownloadManager processNewTimeStampForLibrary:[[parameters objectForKey:ZPKEY_LIBRARY_ID] integerValue] collection:[parameters objectForKey:ZPKEY_COLLECTION_KEY] timestampValue:parserDelegate.updateTimestamp];
+                
+                break;
+                //All keys for a library
+            case ZPServerConnectionRequestKeys:
+                [ZPItemDataDownloadManager processNewItemKeyListFromServer:allResults forLibraryID:[(NSNumber*)[parameters objectForKey:ZPKEY_LIBRARY_ID] integerValue]];
+                break;
+                
+                //Keys for an item list
+            case ZPServerConnectionRequestTopLevelKeys:
+                if([@"1" isEqualToString:[parameters objectForKey:@"limit"]])
+                    [ZPItemDataDownloadManager processNewTimeStampForLibrary:[[parameters objectForKey:ZPKEY_LIBRARY_ID] integerValue]
+                                                                  collection:[parameters objectForKey:ZPKEY_COLLECTION_KEY]
+                                                              timestampValue:parserDelegate.updateTimestamp];
+                else
+                    [ZPItemDataDownloadManager processNewTopLevelItemKeyListFromServer:allResults userInfo:userInfo];
+                break;
+        }
+    }
+}
 
 
 @end

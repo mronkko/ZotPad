@@ -12,6 +12,7 @@
 @interface ZPItemDataUploadManager : NSObject
 
 +(void) setStatusView:(ZPCacheStatusToolbarController*)statusView;
++(void) uploadMetadata;
 
 //Notifications
 +(void)notifyUserInterfaceAvailable:(NSNotification*)notification;

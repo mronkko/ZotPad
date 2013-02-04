@@ -38,6 +38,12 @@ static ZPCacheStatusToolbarController* _statusView;
                                                  name:ZPNOTIFICATION_USER_INTERFACE_AVAILABLE
                                                object:nil];
 
+    [[NSNotificationCenter defaultCenter] addObserver:[self class]
+                                             selector:@selector(notifyUserInterfaceAvailable:)
+                                                 name:ZPNOTIFICATION_INTERNET_CONNECTION_AVAILABLE
+                                               object:nil];
+
+    
     
 }
 

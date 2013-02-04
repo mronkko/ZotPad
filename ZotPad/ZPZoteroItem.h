@@ -49,4 +49,7 @@
 
 - (NSString*) shortCitation;
 
+- (BOOL) isInFavourites;
+- (void) setInFavourites:(BOOL) favourite;
+
 @end

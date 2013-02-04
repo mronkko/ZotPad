@@ -734,8 +734,19 @@ static NSObject* writeLock;
     
 }
 
-+(void) setUpdatedTimestampForCollection:(NSString*)collectionKey toValue:(NSString*)updatedTimestamp{
++(void) removeItemKey:(NSString*)itemKey fromCollection:(NSString*)collectionKey{
+    
     FMDatabase* dbObject = [self _dbObject];
+
+    @synchronized(dbObject){
+        [dbObject executeUpdate:@"DELETE FROM collectionItems WHERE collectionKey = ? AND itemKey ", collectionKey, itemKey];
+    }
+}
+
++(void) setUpdatedTimestampForCollection:(NSString*)collectionKey toValue:(NSString*)updatedTimestamp{
+
+    FMDatabase* dbObject = [self _dbObject];
+    
     @synchronized(dbObject){
         [dbObject executeUpdate:@"UPDATE collections SET cacheTimestamp = ? WHERE collectionKey = ?",updatedTimestamp,collectionKey];
     }
@@ -809,6 +820,8 @@ static NSObject* writeLock;
     }
 }
 
+//TODO: Consider cacheing this result
+
 +(NSString*) collectionKeyForFavoritesCollectionInLibrary: (NSInteger)libraryID{
     
     FMDatabase* dbObject = [self _dbObject];
@@ -838,6 +851,45 @@ static NSObject* writeLock;
     
     ZPZoteroCollection* collection = [ZPZoteroCollection collectionWithDictionary:dict];
     [self writeObjects:[NSArray arrayWithObject:collection] intoTable:@"collections" checkTimestamp:NO];
+}
+
++(NSArray*) locallyAddedCollections{
+
+    FMDatabase* dbObject = [self _dbObject];
+    
+    NSMutableArray* returnArray = [[NSMutableArray alloc] init];
+    
+    @synchronized(dbObject){
+        
+        FMResultSet* resultSet;
+        resultSet= [dbObject executeQuery:@"SELECT * FROM collections WHERE locallyAdded =1 " ];
+
+        while([resultSet next]) {
+            [returnArray addObject:[ZPZoteroCollection collectionWithDictionary:resultSet.resultDictionary]];
+        }
+        [resultSet close];
+        
+    }
+    return returnArray;
+    
+}
+
+
++(void) replaceLocallyAddedCollection:(ZPZoteroCollection*) localCollection withServerVersion:(ZPZoteroCollection*) serverCollection{
+
+    FMDatabase* dbObject = [self _dbObject];
+
+    @synchronized(dbObject){
+        [dbObject executeUpdate:@"UPDATE collections SET collectionKey = ?, cacheTimestamp = ?, locallyAdded = 0 WHERE collectionKey = ?",
+         serverCollection.collectionKey, serverCollection.serverTimestamp, localCollection.collectionKey];
+        
+        serverCollection.cacheTimestamp = serverCollection.serverTimestamp;
+        
+        [dbObject executeUpdate:@"UPDATE collectionItems SET collectionKey = ?, locallyAdded = 0 WHERE collectionKey = ?",
+         serverCollection.collectionKey, localCollection.collectionKey];
+
+    }
+
 }
 
 
@@ -1005,6 +1057,57 @@ static NSObject* writeLock;
         [dbObject executeUpdate:@"UPDATE collectionItems SET locallyDeleted = 1 WHERE collectionKey = ? AND itemKey = ?",collectionKey, item.itemKey];
         
     }
+}
+
++(NSDictionary*) locallyAddedCollectionMemberships{
+
+    NSMutableDictionary* returnDict = [[NSMutableDictionary alloc] init];
+    
+    FMDatabase* dbObject = [self _dbObject];
+    @synchronized(dbObject){
+        
+        NSMutableArray* array;
+        NSString* key;
+
+        FMResultSet* resultSet = [dbObject executeQuery:@"SELECT collectionKey, itemKey FROM collectionItems WHERE locallyAdded = 1 ORDER BY collectionKey"];
+        while([resultSet next]){
+            if(key == nil || ! [key isEqualToString:[resultSet stringForColumnIndex:0]]){
+                key = [resultSet stringForColumnIndex:0];
+                array = [[NSMutableArray alloc] init];
+                [returnDict setObject:array forKey:key];
+            }
+            [array addObject:[resultSet objectForColumnIndex:1]];
+        }
+        
+        [resultSet close];
+    }
+    return returnDict;
+}
+
++(NSDictionary*) locallyDeletedCollectionMemberships{
+
+    NSMutableDictionary* returnDict = [[NSMutableDictionary alloc] init];
+    
+    FMDatabase* dbObject = [self _dbObject];
+    @synchronized(dbObject){
+        
+        NSMutableArray* array;
+        NSString* key;
+        
+        FMResultSet* resultSet = [dbObject executeQuery:@"SELECT collectionKey, itemKey FROM collectionItems WHERE locallyDeleted = 1 ORDER BY collectionKey"];
+        while([resultSet next]){
+            if(key == nil || ! [key isEqualToString:[resultSet stringForColumnIndex:0]]){
+                key = [resultSet stringForColumnIndex:0];
+                array = [[NSMutableArray alloc] init];
+                [returnDict setObject:array forKey:key];
+            }
+            [array addObject:[resultSet objectForColumnIndex:1]];
+        }
+        
+        [resultSet close];
+    }
+    return returnDict;
+    
 }
 
 
@@ -1499,7 +1602,7 @@ static NSObject* writeLock;
         [newSql appendString:sql];
         [newParameters addObjectsFromArray:parameters];
         
-        [newSql appendString:@" ) UNION SELECT itemKey FROM creators WHERE (firstName LIKE '%' || ? || '%' OR lastName LIKE '%' || ? || '%' OR shortName LIKE '%' || ? || '%') AND itemKey IN ("];
+        [newSql appendString:@" ) UNION SELECT itemKey FROM creators WHERE (firstName LIKE '%' || ? || '%' OR lastName LIKE '%' || ? || '%' OR name LIKE '%' || ? || '%') AND itemKey IN ("];
         [newParameters addObject:searchString];
         [newParameters addObject:searchString];
         [newParameters addObject:searchString];
@@ -1542,7 +1645,7 @@ static NSObject* writeLock;
             [sql appendString:@" ORDER BY fieldValue"];
         }
         else if([orderField isEqualToString:@"creator"]){
-            [sql appendFormat:@" ORDER BY (SELECT coalesce(lastName,shortName) FROM creators WHERE authorOrder=0 AND creators.itemKey = items.itemKey)"];
+            [sql appendFormat:@" ORDER BY (SELECT coalesce(lastName,name) FROM creators WHERE authorOrder=0 AND creators.itemKey = items.itemKey)"];
         }
         else if([orderField isEqualToString:@"dateModified"]){
             [sql appendString:@" ORDER BY cacheTimestamp"];
@@ -1635,17 +1738,6 @@ static NSObject* writeLock;
         return ret;
     }
     
-}
-
-#pragma mark - Troubleshooting
-
-+(NSString*) base64encodedDBfile{
-    FMDatabase* dbObject = [self _dbObject];
-    @synchronized(dbObject){
-        NSString *dbPath = [[NSSearchPathForDirectoriesInDomains(NSDocumentDirectory, NSUserDomainMask, YES) objectAtIndex:0] stringByAppendingPathComponent:@"zotpad.sqlite"];
-        NSData* dbData = [NSData dataWithContentsOfFile:dbPath];
-        return [dbData base64EncodedString];
-    }
 }
 
 # pragma mark - Utility methods

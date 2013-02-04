@@ -42,6 +42,8 @@
 +(NSArray*) getItemKeysForLibrary:(NSInteger)libraryID collectionKey:(NSString*)collectionKey
                      searchString:(NSString*)searchString tags:(NSArray*)tags orderField:(NSString*)orderField sortDescending:(BOOL)sortDescending;
 
++(NSArray*) getItemKeysForLibrary:(NSInteger)libraryID collectionKey:(NSString*)collectionKey;
+
 
 //These are hard coded for now.
 + (NSArray*) fieldsThatCanBeUsedForSorting;
@@ -83,7 +85,7 @@
 
 /*
  
- Methods for writing to DB
+ Methods for writing server data to DB
 
  */
 
@@ -93,7 +95,6 @@
 +(void) writeLibraries:(NSArray*)libraries;
 +(void) removeLibrariesNotInArray:(NSArray*)libraries;
 +(void) writeCollections:(NSArray*)collections toLibrary:(ZPZoteroLibrary*)library;
-+(void) addCollectionWithTitle:(NSString*) title collectionKey:(NSString*) collectionKey toLibrary:(ZPZoteroLibrary*)library;
 
 // This method returns an array containing the items that were actually modified in the DB. This can be used to determine if fields and attachments
 // need to be modified
@@ -107,6 +108,31 @@
 +(void) writeItems:(NSArray*)items toCollection:(NSString*)collectionKey;
 +(void) addItemKeys:(NSArray*)keys toCollection:(NSString*)collectionKey;
 
+
++(void) writeItemsCreators:(NSArray*)items;
++(void) writeItemsFields:(NSArray*)items;
++(void) writeDataObjectsTags:(NSArray*)dataObjects;
+
+
+// These remove items from the cache
++(void) removeItemKeysNotInArray:(NSArray*)itemKeys fromCollection:(NSString*)collectionKey;
++(void) removeItemKey:(NSString*)itemKey fromCollection:(NSString*)collectionKey;
++(void) deleteItemKeysNotInArray:(NSArray*)itemKeys fromLibrary:(NSInteger)libraryID;
+
++(void) updateViewedTimestamp:(ZPZoteroAttachment*)attachment;
++(void) setUpdatedTimestampForCollection:(NSString*)collectionKey toValue:(NSString*)updatedTimestamp;
++(void) setUpdatedTimestampForLibrary:(NSInteger)libraryID toValue:(NSString*)updatedTimestamp;
+
+
+/*
+
+ Methods for writing locally edited data to DB
+ 
+ */
+
++(void) addCollectionWithTitle:(NSString*) title collectionKey:(NSString*) collectionKey toLibrary:(ZPZoteroLibrary*)library;
++(void) replaceLocallyAddedCollection:(ZPZoteroCollection*) localCollection withServerVersion:(ZPZoteroCollection*) serverCollection;
+
 // Locally modified collection memberships
 +(void) addItemLocally:(ZPZoteroItem*)item toCollection:(NSString*)collectionKey;
 +(void) removeItemLocally:(ZPZoteroItem*)item fromCollection:(NSString*)collectionKey;
@@ -117,18 +143,13 @@
 
 // Locally modifying tags
 
-+(void) writeItemsCreators:(NSArray*)items;
-+(void) writeItemsFields:(NSArray*)items;
-+(void) writeDataObjectsTags:(NSArray*)dataObjects;
+// Methods for retrieving locally modified objects
++(NSArray*) locallyAddedCollections;
 
+// Return a dictionary where the keys are collection keys and the objects are arrays of item keys
 
-// These remove items from the cache
-+(void) removeItemKeysNotInArray:(NSArray*)itemKeys fromCollection:(NSString*)collectionKey;
-+(void) deleteItemKeysNotInArray:(NSArray*)itemKeys fromLibrary:(NSInteger)libraryID;
-
-+(void) updateViewedTimestamp:(ZPZoteroAttachment*)attachment;
-+(void) setUpdatedTimestampForCollection:(NSString*)collectionKey toValue:(NSString*)updatedTimestamp;
-+(void) setUpdatedTimestampForLibrary:(NSInteger)libraryID toValue:(NSString*)updatedTimestamp;
++(NSDictionary*) locallyAddedCollectionMemberships;
++(NSDictionary*) locallyDeletedCollectionMemberships;
 
 // Troubleshooting
 +(NSString*) base64encodedDBfile;

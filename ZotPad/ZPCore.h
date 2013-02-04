@@ -24,7 +24,7 @@
 
 #import "DDLog.h"
 
-static const int ddLogLevel = LOG_LEVEL_INFO;
+static const int ddLogLevel = LOG_LEVEL_VERBOSE;
 
 // Notifications about data available from server
 
@@ -62,6 +62,11 @@ static NSString *const ZPNOTIFICATION_ACTIVE_LIBRARY_CHANGED = @"ActiveLibraryCh
 static NSString *const ZPNOTIFICATION_ACTIVE_COLLECTION_CHANGED = @"ActiveCollectionChanged";
 static NSString *const ZPNOTIFICATION_ACTIVE_ITEM_CHANGED = @"ActiveItemChanged";
 static NSString *const ZPNOTIFICATION_USER_INTERFACE_AVAILABLE = @"UserInterfaceAvailable";
+
+// Notifications about state
+
+static NSString *const ZPNOTIFICATION_INTERNET_CONNECTION_AVAILABLE= @"InternetConnectionAvailable";
+
 
 //Dictionary keys for data objects and item list retrievals
 //TODO: Check the entire project and makes sure that all dictionaries use these static keys

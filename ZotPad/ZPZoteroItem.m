@@ -209,6 +209,7 @@ static CSLFormatter* _cslFormatter = NULL;
         }
         if([temp length]>0) [temp appendString:@"."];
         if(access != NULL){
+            [temp appendString:@" "];
             [temp appendString:access];
         }
         
@@ -345,6 +346,38 @@ static CSLFormatter* _cslFormatter = NULL;
     else{
         return self.title;
     }
+}
+
+- (BOOL) isInFavourites{
+    
+    NSString* favouritesCollectionKey = [ZPDatabase collectionKeyForFavoritesCollectionInLibrary:self.libraryID];
+    
+    BOOL isFavourite = false;
+    if(favouritesCollectionKey!=NULL){
+        for(ZPZoteroCollection* collection in self.collections){
+            if([collection.collectionKey isEqualToString:favouritesCollectionKey ]){
+                isFavourite = TRUE;
+                break;
+            }
+        }
+    }
+    
+    return isFavourite;
+}
+- (void) setInFavourites:(BOOL) favourite{
+
+    NSString* favouritesCollectionKey = [ZPDatabase collectionKeyForFavoritesCollectionInLibrary:self.libraryID];
+    ZPZoteroCollection* favouritesCollection = [ZPZoteroCollection collectionWithKey:favouritesCollectionKey];
+    
+    if(favourite && ! [self isInFavourites]){
+        _collections = [_collections arrayByAddingObject:favouritesCollection];
+    }
+    else if(! favourite && [self isInFavourites]){
+        NSMutableArray* mutableArray = [NSMutableArray arrayWithArray:_collections];
+        [mutableArray removeObject:favouritesCollection];
+        _collections = mutableArray;
+    }
+    
 }
 
 @end

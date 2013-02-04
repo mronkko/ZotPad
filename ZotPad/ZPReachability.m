@@ -33,6 +33,7 @@ static BOOL _zoteroReachability;
     _zoteroReachability = [localReachability isReachable];
     if (_zoteroReachability){
         DDLogWarn(@"Connected to Zotero server");
+        [[NSNotificationCenter defaultCenter] postNotificationName:ZPNOTIFICATION_INTERNET_CONNECTION_AVAILABLE object:NULL];
     }
     else{
         DDLogWarn(@"Lost connection to Zotero server");
