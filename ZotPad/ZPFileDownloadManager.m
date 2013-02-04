@@ -125,6 +125,7 @@ static ZPCacheStatusToolbarController* _statusView;
                         DDLogWarn(@"File %@ (key: %@) belonging to item %@ (key: %@)  could not be found for download",attachment.filename,attachment.key,[(ZPZoteroItem*)[ZPZoteroItem itemWithKey:attachment.parentKey] fullCitation],attachment.parentKey);
                         attachment = [_filesToDownload objectAtIndex:0];
                         [_filesToDownload removeObjectAtIndex:0];
+                        [_statusView setFileDownloads:[_filesToDownload count]];
                     }
                 }
             }
