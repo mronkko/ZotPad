@@ -63,6 +63,10 @@ static NSString *const ZPNOTIFICATION_ACTIVE_COLLECTION_CHANGED = @"ActiveCollec
 static NSString *const ZPNOTIFICATION_ACTIVE_ITEM_CHANGED = @"ActiveItemChanged";
 static NSString *const ZPNOTIFICATION_USER_INTERFACE_AVAILABLE = @"UserInterfaceAvailable";
 
+// Notifications about user interface
+
+static NSString *const ZPNOTIFICATION_ITEM_LIST_FULLY_LOADED = @"ItemListFullyLoaded";
+
 // Notifications about state
 
 static NSString *const ZPNOTIFICATION_INTERNET_CONNECTION_AVAILABLE= @"InternetConnectionAvailable";

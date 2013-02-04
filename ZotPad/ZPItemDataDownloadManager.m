@@ -385,6 +385,7 @@ static ZPCacheStatusToolbarController* _statusView;
 //Called by server connections to process new data
 +(void) processNewItemsFromServer:(NSArray*)items forLibraryID:(NSInteger)libraryID{
         
+    if([items count] ==0 ) return;
     
     DDLogVerbose(@"Writing %i items to cache",[items count]);
     

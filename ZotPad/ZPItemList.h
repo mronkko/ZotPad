@@ -58,5 +58,6 @@
 -(void) updateItemList:(BOOL)animated;
 
 -(BOOL) isTagSelected:(NSString*)tag;
+-(BOOL) isFullyCached;
 
 @end

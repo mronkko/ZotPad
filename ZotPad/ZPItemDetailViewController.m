@@ -25,8 +25,9 @@
 #import "ZPTagController.h"
 #import "CMPopTipView.h"
 #import "ZPTagEditingViewController.h"
-#import "ZPItemDataDownloadManager.h"
+#import "ZPServerConnection.h"
 #import "ZPReachability.h"
+
 #import <UIKit/UIKit.h>
 
 //Define 
@@ -96,6 +97,10 @@
     //Configure activity indicator.
     _activityIndicator = [[UIActivityIndicatorView alloc] initWithFrame:CGRectMake(0,0,20, 20)];
     [_activityIndicator hidesWhenStopped];
+    
+    //TODO: Preserve state and use that
+    [_activityIndicator startAnimating];
+    
     UIBarButtonItem* activityIndicator = [[UIBarButtonItem alloc] initWithCustomView:_activityIndicator];
     self.starButton = [[ZPStarBarButtonItem alloc] init];
     
@@ -170,6 +175,7 @@
     if([ZPReachability hasInternetConnection]){
         //Animate until we get fresh data
         [_activityIndicator startAnimating];
+        [ZPServerConnection retrieveSingleItemAndChildrenFromServer:_currentItem];
     }
     [[NSNotificationCenter defaultCenter] postNotificationName:ZPNOTIFICATION_ACTIVE_ITEM_CHANGED object:_currentItem];
     
@@ -641,15 +647,24 @@
 
 -(void) notifyItemAvailable:(NSNotification*) notification{
     
-    ZPZoteroItem* item = [notification.userInfo objectForKey:ZPKEY_ITEM];
-    
-    if([item.key isEqualToString:_currentItem.key]){
-        _currentItem = item;
-        [self performSelectorOnMainThread:@selector(_reconfigureDetailTableView:) withObject:[NSNumber numberWithBool:TRUE] waitUntilDone:NO];
+    NSArray* items = notification.object;
 
-        //If we had the activity indicator animating, stop it now because we are no longer waiting for data
-        [_activityIndicator stopAnimating];
-        
+    //TODO: Refactor or document.
+    
+    if(items.count == 0) [_activityIndicator performSelectorOnMainThread:@selector(stopAnimating) withObject:nil waitUntilDone:NO];
+    
+    else{
+        for(ZPZoteroItem* item in items){
+            if([item.key isEqualToString:_currentItem.key]){
+                _currentItem = item;
+                [self performSelectorOnMainThread:@selector(_reconfigureDetailTableView:) withObject:[NSNumber numberWithBool:TRUE] waitUntilDone:NO];
+                
+                //If we had the activity indicator animating, stop it now because we are no longer waiting for data
+                [_activityIndicator performSelectorOnMainThread:@selector(stopAnimating) withObject:nil waitUntilDone:NO];
+                
+            }
+        }
+   
     }
 }
 

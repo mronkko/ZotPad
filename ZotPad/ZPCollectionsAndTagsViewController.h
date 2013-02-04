@@ -20,10 +20,18 @@
 @property (retain) IBOutlet UIBarButtonItem* gearButton;
 @property (retain) IBOutlet UIBarButtonItem* cacheControllerPlaceHolder;
 
+@property (retain) UIActivityIndicatorView* librariesAndCollectionsLoadingActivityView;
+
 //Toolbar, iPhone only
 @property (retain) IBOutlet UIToolbar* toolBar;
 
 -(IBAction)toggleTagSelector:(id)sender;
 -(IBAction)handlePanGesture:(UIPanGestureRecognizer *)gestureRecognizer;
+
+
+// Notifications, used for controlling the activity indicator
+
+-(void) notifyActiveLibraryChanged:(NSNotification *) notification;
+-(void) notifyLibraryWithCollectionsAvailable:(NSNotification*) notification;
 
 @end

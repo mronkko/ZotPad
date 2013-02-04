@@ -90,15 +90,6 @@
     }
 
 
-    //TODO: Fix this activity indicator. There should be a reliable way to know when the
-    //view is receiving new data and when it has received all data. This is complicated
-    //by the fact that each item in the navigation stack is a separate view.
-    //_activityIndicator = [[UIActivityIndicatorView alloc] initWithFrame:CGRectMake(0,0,20, 20)];
-    //[_activityIndicator hidesWhenStopped];
-
-    //UIBarButtonItem* barButton = [[UIBarButtonItem alloc] initWithCustomView:_activityIndicator];
-    //self.navigationItem.rightBarButtonItem = barButton;
-
     self.clearsSelectionOnViewWillAppear = NO;
     
 	// Do any additional setup after loading the view, typically from a nib.

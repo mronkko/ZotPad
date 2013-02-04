@@ -15,7 +15,7 @@
     ZPItemListDataSource* _dataSource;
 
 }
-
+@property (retain) UIActivityIndicatorView* itemListLoadingActivityView;
 @property (retain) ZPItemDetailViewController* detailViewController;
 
 @end

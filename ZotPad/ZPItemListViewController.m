@@ -120,6 +120,8 @@
 @synthesize tableView = _tableView;
 @synthesize searchBar = _searchBar;
 @synthesize toolBar = _toolBar;
+@synthesize itemListLoadingActivityView;
+
 
 - (id) initWithCoder:(NSCoder *)aDecoder{
     self = [super initWithCoder:aDecoder];
@@ -150,6 +152,11 @@
                                                  name:ZPNOTIFICATION_ATTACHMENT_FILE_DELETED
                                                object:nil];
     
+    [[NSNotificationCenter defaultCenter] addObserver:self
+                                             selector:@selector(notifyItemListFullyLoaded:)
+                                                 name:ZPNOTIFICATION_ITEM_LIST_FULLY_LOADED
+                                               object:nil];
+
     return self;
     
 }
@@ -208,7 +215,7 @@
         
         if([ZPReachability hasInternetConnection]){
             
-            [_activityIndicator startAnimating];
+            [itemListLoadingActivityView startAnimating];
             
             [ZPServerConnection retrieveKeysInLibrary:[ZPItemList instance].libraryID
                                            collection:[ZPItemList instance].collectionKey
@@ -355,9 +362,9 @@
     
     //Set up activity indicator.
     
-    _activityIndicator = [[UIActivityIndicatorView alloc] initWithFrame:CGRectMake(0,0,20, 20)];
-    [_activityIndicator hidesWhenStopped];
-    UIBarButtonItem* barButton = [[UIBarButtonItem alloc] initWithCustomView:_activityIndicator];
+    itemListLoadingActivityView = [[UIActivityIndicatorView alloc] initWithActivityIndicatorStyle:UIActivityIndicatorViewStyleWhite];
+    [itemListLoadingActivityView hidesWhenStopped];
+    UIBarButtonItem* barButton = [[UIBarButtonItem alloc] initWithCustomView:itemListLoadingActivityView];
     self.navigationItem.rightBarButtonItem = barButton;
     
     
@@ -457,25 +464,13 @@
     [[NSNotificationCenter defaultCenter] addObserver:self selector:@selector(notifyLibraryWithCollectionsAvailable:) name:ZPNOTIFICATION_LIBRARY_WITH_COLLECTIONS_AVAILABLE object:nil];
     
     [ZPItemList instance].owner = self;
-    [_tableView setContentOffset:_offset animated:NO];
+
     //Is the current item visible? If not, scroll to it
     
+    [_tableView setContentOffset:_offset animated:NO];
+
     [super viewDidAppear:animated];
     
-    /*
-     
-     TODO:
-     
-     @synchronized(_itemKeysNotInCache){
-     //If there are more items coming, make this active
-     if([_itemKeysNotInCache count] >0){
-     [_activityIndicator startAnimating];
-     }
-     else{
-     [_activityIndicator stopAnimating];
-     }
-     }
-     */
 }
 
 - (void)viewWillDisappear:(BOOL)animated
@@ -822,5 +817,10 @@
     }
     
 }
+
+-(void) notifyItemListFullyLoaded:(NSNotification*) notification{
+    [itemListLoadingActivityView stopAnimating];
+}
+
 
 @end

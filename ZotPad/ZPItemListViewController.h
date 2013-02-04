@@ -20,7 +20,6 @@
     UITableView* _tableView;
     UIToolbar* _toolBar;
     NSInteger _tagForActiveSortButton;
-    UIActivityIndicatorView* _activityIndicator;
     UIImageView* _sortDirectionArrow;
     CGPoint _offset;
     
@@ -30,6 +29,7 @@
 @property (nonatomic, retain) IBOutlet UISearchBar* searchBar;
 @property (nonatomic, retain) IBOutlet UIToolbar* toolBar;
 @property (nonatomic, retain) IBOutlet UITableView* tableView;
+@property (retain) UIActivityIndicatorView* itemListLoadingActivityView;
 
 
 @property (strong, nonatomic) UIPopoverController *masterPopoverController;

@@ -15,45 +15,46 @@
 
 @implementation ZPMasterItemListViewController
 
-@synthesize detailViewController;
+@synthesize detailViewController, itemListLoadingActivityView;
 
-- (id)initWithStyle:(UITableViewStyle)style
+- (id)initWithCoder:(NSCoder *)aDecoder
 {
-    self = [super initWithStyle:style];
-    if (self) {
-        // Custom initialization
-    }
+    self = [super initWithCoder:aDecoder];
+    
+    [[NSNotificationCenter defaultCenter] addObserver:self
+                                             selector:@selector(notifyItemListFullyLoaded:)
+                                                 name:ZPNOTIFICATION_ITEM_LIST_FULLY_LOADED
+                                               object:nil];
     return self;
 }
 
 - (void)viewDidLoad
 {
-    DDLogInfo(@"Loading item list in the navigator");
-
     [super viewDidLoad];
 
-    // Uncomment the following line to preserve selection between presentations.
-    // self.clearsSelectionOnViewWillAppear = NO;
- 
-    // Uncomment the following line to display an Edit button in the navigation bar for this view controller.
-    // self.navigationItem.rightBarButtonItem = self.editButtonItem;
+    itemListLoadingActivityView = [[UIActivityIndicatorView alloc] initWithActivityIndicatorStyle:UIActivityIndicatorViewStyleWhite];
+    itemListLoadingActivityView.hidesWhenStopped = TRUE;
+    [itemListLoadingActivityView stopAnimating];
+    
+    UIBarButtonItem* barButton = [[UIBarButtonItem alloc] initWithCustomView:itemListLoadingActivityView];
+    self.navigationItem.rightBarButtonItem = barButton;
 
-    //TODO: Set the selected item
+    
     self.tableView.delegate = detailViewController;
     _dataSource = [[ZPItemListDataSource alloc] init];
     self.tableView.dataSource = _dataSource;
 }
 
-- (void)viewDidUnload
-{
-    [super viewDidUnload];
-    // Release any retained subviews of the main view.
-    // e.g. self.myOutlet = nil;
-}
 
 - (BOOL)shouldAutorotateToInterfaceOrientation:(UIInterfaceOrientation)interfaceOrientation
 {
     return YES;
+}
+
+#pragma mark - notifications
+
+-(void) notifyItemListFullyLoaded:(NSNotification*) notification{
+    [itemListLoadingActivityView stopAnimating];
 }
 
 @end

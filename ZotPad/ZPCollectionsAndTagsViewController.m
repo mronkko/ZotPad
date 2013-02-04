@@ -18,7 +18,9 @@
 #import "ZPTagController.h"
 #import "ZPItemList.h"
 
-@interface ZPCollectionsAndTagsViewController()
+@interface ZPCollectionsAndTagsViewController(){
+    BOOL _librariesAndCollectionsLoadingActivityViewAnimating;
+}
 
 -(void)_configureTagsList;
 -(void)_toggleTagSelectionWithAnimationDuration:(float) duration toVisible:(BOOL) visible;
@@ -35,7 +37,29 @@
 @synthesize collectionsView, tagsView, tagsHeader;
 @synthesize gearButton, cacheControllerPlaceHolder;
 @synthesize headerArrowLeft, headerArrowRight, toolBar;
+@synthesize librariesAndCollectionsLoadingActivityView;
 
+-(id) initWithCoder:(NSCoder *)aDecoder{
+
+    self = [super initWithCoder:aDecoder];
+    
+    // Notifications to control the state of the loading indicator
+    
+    [[NSNotificationCenter defaultCenter] addObserver:self
+                                             selector:@selector(notifyLibraryWithCollectionsAvailable:)
+                                                 name:ZPNOTIFICATION_LIBRARY_WITH_COLLECTIONS_AVAILABLE
+                                               object:nil];
+    
+    [[NSNotificationCenter defaultCenter] addObserver:self
+                                             selector:@selector(notifyActiveLibraryChanged:)
+                                                 name:ZPNOTIFICATION_ACTIVE_LIBRARY_CHANGED
+                                               object:nil];
+
+    _librariesAndCollectionsLoadingActivityViewAnimating = TRUE;
+    
+    return self;
+    
+}
 -(void) viewDidLoad{
 
     [super viewDidLoad];
@@ -65,7 +89,23 @@
         
     }
     
-    //Show Cache controller status
+    // The libraries loading indicator
+    
+    librariesAndCollectionsLoadingActivityView = [[UIActivityIndicatorView alloc] initWithActivityIndicatorStyle:UIActivityIndicatorViewStyleWhite];
+    librariesAndCollectionsLoadingActivityView.hidesWhenStopped = TRUE;
+    
+    if(_librariesAndCollectionsLoadingActivityViewAnimating){
+        [librariesAndCollectionsLoadingActivityView startAnimating];
+    }
+    else{
+        [librariesAndCollectionsLoadingActivityView stopAnimating];
+    }
+    
+    UIBarButtonItem* barButton = [[UIBarButtonItem alloc] initWithCustomView:librariesAndCollectionsLoadingActivityView];
+    self.navigationItem.rightBarButtonItem = barButton;
+    
+    
+    // Show Cache controller status
     ZPCacheStatusToolbarController* statusController = [[ZPCacheStatusToolbarController alloc] init];
     cacheControllerPlaceHolder.customView = statusController.view;
     
@@ -145,29 +185,6 @@
 
 -(void) prepareForSegue:(UIStoryboardSegue *)segue sender:(id)sender{
     
-    /*
-     
-     //This is potentially abandoned code, but keep it here for now just in case
-
-     //iPhone only
-
-    if([segue.identifier isEqualToString:@"PushItemList"]){
-        
-        
-        ZPItemListViewController* target = (ZPItemListViewController*) segue.destinationViewController;
-        ZPZoteroDataObject* node = [self->_content objectAtIndex: self.tableView.indexPathForSelectedRow.row];
-        
-        [ZPItemListViewDataSource instance].libraryID = [node libraryID];
-        [ZPItemListViewDataSource instance].collectionKey = [node key];
-        
-        //Clear search when changing collection. This is how Zotero behaves
-        [target clearSearch];
-        [target configureView];
-     
-    }
-
-     */
-
     //iPad only
 
     if([segue.identifier isEqualToString:@"PushItemsToNavigator"]){
@@ -181,6 +198,12 @@
         
         [ZPItemList instance].targetTableView = target.tableView;
         [[ZPItemList instance] updateItemList:NO];
+        if([ZPItemList instance].isFullyCached){
+            [target.itemListLoadingActivityView stopAnimating];
+        }
+        else{
+            [target.itemListLoadingActivityView startAnimating];
+        }
         
         // Set up the navigation bar
         target.navigationItem.hidesBackButton = YES;
@@ -342,6 +365,17 @@
     
 }
 
+#pragma mark - Notifications
+
+-(void) notifyActiveLibraryChanged:(NSNotification *) notification{
+    _librariesAndCollectionsLoadingActivityViewAnimating = TRUE;
+    [self.librariesAndCollectionsLoadingActivityView performSelectorOnMainThread:@selector(startAnimating) withObject:nil waitUntilDone:NO];
+}
+
+-(void) notifyLibraryWithCollectionsAvailable:(NSNotification*) notification{
+    _librariesAndCollectionsLoadingActivityViewAnimating = FALSE;
+    [self.librariesAndCollectionsLoadingActivityView performSelectorOnMainThread:@selector(stopAnimating) withObject:nil waitUntilDone:NO];
+}
 
 
 @end

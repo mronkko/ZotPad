@@ -93,12 +93,25 @@ static ZPItemList* _instance;
     }
 }
 
+-(BOOL) isFullyCached{
+
+    @synchronized(_itemKeysNotInCache){
+        return [_itemKeysNotInCache count] == 0;
+    }
+    
+}
+
 
 - (void) configureServerKeys:(NSArray*)uncachedItems{
     
     //Only update the uncached keys if we are still showing the same item key list
     _itemKeysNotInCache = [NSMutableArray arrayWithArray:uncachedItems];
     [_itemKeysNotInCache removeObjectsInArray:_itemKeysShown];
+    
+    if([_itemKeysNotInCache count]==0){
+        [[NSNotificationCenter defaultCenter] postNotificationName:ZPNOTIFICATION_ITEM_LIST_FULLY_LOADED object:NULL];
+    }
+    
     _invalidated = FALSE;
     
     [self updateItemList:FALSE];
@@ -173,19 +186,24 @@ static ZPItemList* _instance;
         BOOL found = FALSE;
         BOOL update = FALSE;
         @synchronized(_itemKeysNotInCache){
-            
-            for(ZPZoteroItem* item in items){
-                if([_itemKeysNotInCache containsObject:item.key]){
-                    [_itemKeysNotInCache removeObject:item.key];
-                    found=TRUE;
+            if([_itemKeysNotInCache count]>0){
+                for(ZPZoteroItem* item in items){
+                    if([_itemKeysNotInCache containsObject:item.key]){
+                        [_itemKeysNotInCache removeObject:item.key];
+                        found=TRUE;
+                        if([_itemKeysNotInCache count]==0){
+                            [[NSNotificationCenter defaultCenter] postNotificationName:ZPNOTIFICATION_ITEM_LIST_FULLY_LOADED object:NULL];
+                            break;
+                        }
+                    }
+                    
+                    
+                    //Update the view if we have received sufficient number of new items
+                    update = update || ([_itemKeysNotInCache count] % SIZE_OF_DATABASE_UPDATE_BATCH ==0 ||
+                                        [_itemKeysShown count] == 0 ||
+                                        [_itemKeysShown lastObject]!=[NSNull null]);
+                    
                 }
-                //DDLogVerbose(@"Item keys not in cache deacreased to %i after removing key %@",[_itemKeysNotInCache count],item.key);
-                
-                //Update the view if we have received sufficient number of new items
-                update = update || ([_itemKeysNotInCache count] % SIZE_OF_DATABASE_UPDATE_BATCH ==0 ||
-                                    [_itemKeysShown count] == 0 ||
-                                    [_itemKeysShown lastObject]!=[NSNull null]);
-                
             }
         }
         
