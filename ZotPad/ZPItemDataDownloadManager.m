@@ -622,8 +622,9 @@ static ZPCacheStatusToolbarController* _statusView;
         //Check that we are not already cacheing this item.
 
         NSNumber* keyObj = [NSNumber numberWithInt:libraryID];
+        NSString* currentTimestamp = [_libraryTimestamps objectForKey:keyObj];
         
-        if([_libraryTimestamps objectForKey:keyObj]==NULL){
+        if(currentTimestamp == NULL || ! [currentTimestamp isEqualToString:newTimestamp]){
         
             [_libraryTimestamps setObject:newTimestamp forKey:keyObj];
    
