@@ -207,7 +207,7 @@ static CSLFormatter* _cslFormatter = NULL;
                 [temp appendString:publisher];
             }
         }
-        [temp appendString:@"."];
+        if([temp length]>0) [temp appendString:@"."];
         if(access != NULL){
             [temp appendString:access];
         }
