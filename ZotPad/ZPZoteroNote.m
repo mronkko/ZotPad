@@ -60,5 +60,9 @@ static NSCache* _objectCache = NULL;
     return [super key];
 }
 
+-(BOOL)locallyAdded{ return FALSE;}
+-(BOOL)locallyModified{ return FALSE;}
+-(BOOL)locallyDeleted{ return FALSE;}
+
 
 @end

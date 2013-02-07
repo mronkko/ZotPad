@@ -439,10 +439,10 @@ static ZPCacheStatusToolbarController* _statusView;
         }
     }
     
-    [ZPDatabase writeAttachments:attachments];
-    [ZPDatabase writeNotes:notes];
+    [ZPDatabase writeAttachments:attachments checkTimestamp:YES];
+    [ZPDatabase writeNotes:notes checkTimestamp:YES];
     
-    NSArray* topLevelItemsThatWereWrittenToCache = [ZPDatabase writeItems:normalItems];
+    NSArray* topLevelItemsThatWereWrittenToCache = [ZPDatabase writeItems:normalItems checkTimestamp:YES];
     NSMutableArray* itemsThatNeedCreatorsAndFields = [NSMutableArray arrayWithArray:topLevelItemsThatWereWrittenToCache];
     
     [ZPDatabase writeItemsFields:itemsThatNeedCreatorsAndFields];
@@ -617,7 +617,10 @@ static ZPCacheStatusToolbarController* _statusView;
  */
 +(void) processNewTimeStampForLibrary:(NSInteger)libraryID collection:(NSString*)collectionKey timestampValue:(NSString*)newTimestamp{
 
-    //Library timestamp
+    // Sanity checking
+    if(newTimestamp == nil) return;
+    
+    // Library timestamp
     
     if(collectionKey==NULL){
         //Check that we are not already cacheing this item.

@@ -7,14 +7,17 @@
 //
 
 #import "ZPNoteEditingViewController.h"
+#import "ZPFileViewerViewController.h"
+#import "ZPItemDataUploadManager.h"
 
 @interface ZPNoteEditingViewController ()
+
 
 @end
 
 @implementation ZPNoteEditingViewController
 
-@synthesize note, webView;
+@synthesize note, webView, isNewNote, navigationItem;
 
 static ZPNoteEditingViewController* _instance;
 
@@ -53,6 +56,41 @@ static ZPNoteEditingViewController* _instance;
 -(void) viewWillAppear:(BOOL)animated{
     [super viewWillAppear:animated];
     
+    if([note isKindOfClass:[ZPZoteroAttachment class]] || isNewNote){
+        
+        if(isNewNote){
+            self.navigationItem.title = @"New note";
+        }
+        else{
+            self.navigationItem.title = @"Edit note";
+        }
+        
+        if(self.navigationItem.leftBarButtonItems.count == 2){
+
+            UIBarButtonItem* cancelButton = [self.navigationItem.leftBarButtonItems objectAtIndex:0];
+            self.navigationItem.leftBarButtonItems = nil;
+            self.navigationItem.leftBarButtonItem = cancelButton;
+        }
+    }
+    else{
+        self.navigationItem.title = @"Edit note";
+        
+        if(self.navigationItem.leftBarButtonItems.count != 2){
+            UIBarButtonItem* deleteButton = [[UIBarButtonItem alloc] initWithTitle:@"Delete"
+                                                                             style:UIBarButtonItemStylePlain
+                                                                            target:self
+                                                                            action:@selector(deleteNote:)];
+            [deleteButton setTintColor:[UIColor redColor]];
+            
+            UIBarButtonItem* cancelButton = self.navigationItem.leftBarButtonItem;
+            
+            NSArray* leftBarButtonItems = [NSArray arrayWithObjects: cancelButton, deleteButton, nil];
+            self.navigationItem.leftBarButtonItems = leftBarButtonItems;
+            
+        }
+    }
+
+    
     NSString* noteString = note.note;
     if(noteString == NULL) noteString = @"";
     
@@ -67,10 +105,54 @@ static ZPNoteEditingViewController* _instance;
 }
 
 -(IBAction)cancel:(id)sender{
+    [webView loadHTMLString:@"" baseURL:NULL];
     [self dismissModalViewControllerAnimated:YES];
 }
 -(IBAction)save:(id)sender{
+
+    NSString* noteText = [webView stringByEvaluatingJavaScriptFromString:
+                          @"document.getElementById('content').innerHTML"];
+    note.note = noteText;
+
+    [webView loadHTMLString:@"" baseURL:NULL];
     [self dismissModalViewControllerAnimated:YES];
+
+    if(isNewNote){
+        [ZPDatabase createNoteLocally:(ZPZoteroNote*) self.note];
+        ZPZoteroItem* item = [ZPZoteroItem itemWithKey:note.parentKey];
+        item.notes = [item.notes arrayByAddingObject:note];
+    }
+    else if([note isKindOfClass:[ZPZoteroAttachment class]]){
+        [ZPDatabase saveLocallyEditedAttachmentNote:(ZPZoteroAttachment*)note];
+    }
+    else{
+        [ZPDatabase saveLocallyEditedNote:(ZPZoteroNote*) self.note];
+    }
+    
+    [ZPItemDataUploadManager uploadMetadata];
+    [_targetViewController refreshNotesFor:self.note];
+
+}
+
+-(IBAction)deleteNote:(id)sender{
+
+    [webView loadHTMLString:@"" baseURL:NULL];
+    [self dismissModalViewControllerAnimated:YES];
+
+    ZPZoteroItem* item = [ZPZoteroItem itemWithKey:note.parentKey];
+    
+    NSMutableArray* newNotes = [NSMutableArray arrayWithArray:item.notes];
+    [newNotes removeObject:note];
+    item.notes = newNotes;
+    
+    [ZPDatabase deleteNoteLocally:(ZPZoteroNote*)note];
+    [ZPItemDataUploadManager uploadMetadata];
+
+    [_targetViewController refreshNotesFor:self.note];
+
+}
+
+-(void) _refreshParent{
 }
 
 @end

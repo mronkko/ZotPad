@@ -47,6 +47,7 @@ CREATE TABLE IF NOT EXISTS items (
     title TEXT,
     year INT DEFAULT NULL,
     itemType TEXT NOT NULL,
+    etag TEXT DEFAULT NULL,
     cacheTimestamp TEXT DEFAULT NULL,
     dateAdded TEXT DEFAULT NULL,
     locallyAdded INT DEFAULT 0,
@@ -68,7 +69,8 @@ CREATE TABLE IF NOT EXISTS notes (
     parentKey TEXT NOT NULL,
     itemKey TEXT PRIMARY KEY,
     note TEXT DEFAULT NULL,
-    cacheTimestamp TEXT NOT NULL,
+    etag TEXT DEFAULT NULL,
+    cacheTimestamp TEXT DEFAULT NULL,
     locallyAdded INT DEFAULT 0,
     locallyModified INT DEFAULT 0,
     locallyDeleted INT DEFAULT 0
@@ -86,12 +88,14 @@ CREATE TABLE IF NOT EXISTS attachments (
     linkMode INT NOT NULL,
     filename TEXT DEFAULT NULL,
     url TEXT DEFAULT NULL,
+    accessDate TEXT DEFAULT NULL,
     contentType TEXT DEFAULT NULL,
     charset TEXT DEFAULT NULL,
     existsOnZoteroServer INT NOT NULL,
     attachmentSize INT DEFAULT NULL,
     lastViewed TIMESTAMP DEFAULT NULL,
     md5 TEXT DEFAULT NULL, 
+    mtime INT DEFAULT 0,
     etag TEXT DEFAULT NULL,
     versionSource INT DEFAULT NULL,
     versionIdentifier_server TEXT DEFAULT NULL, 
@@ -115,7 +119,7 @@ CREATE TABLE IF NOT EXISTS collectionItems (
     FOREIGN KEY (itemKey) REFERENCES items(itemKey)
 );
 
-/*    fieldMode INT  -  This is used by Zotero, but it is probably not needed by ZotPad. Leaving this comment here if storign field mode becomes relevant */
+/*    fieldMode INT  -  This is used by Zotero, but it is probably not needed by ZotPad. Leaving this comment here if storing field mode becomes relevant */
 
 CREATE TABLE  IF NOT EXISTS creators (
     itemKey TEXT NOT NULL,

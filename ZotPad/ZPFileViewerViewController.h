@@ -11,8 +11,10 @@
 #import "ZPCore.h"
 #import "HLSPlaceholderViewController.h"
 #import "ZPStarBarButtonItem.h"
+#import "ZPTagDisplay.h"
+#import "ZPNoteDisplay.h"
 
-@interface ZPFileViewerViewController : HLSPlaceholderViewController <QLPreviewControllerDataSource, UITableViewDataSource, UITableViewDelegate>{
+@interface ZPFileViewerViewController : HLSPlaceholderViewController <QLPreviewControllerDataSource, UITableViewDataSource, UITableViewDelegate , ZPTagDisplay, ZPNoteDisplay>{
     ZPAttachmentFileInteractionController* _attachmentInteractionController;
     NSMutableArray* _attachments;
     NSInteger _activeAttachmentIndex;

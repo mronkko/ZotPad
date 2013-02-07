@@ -18,7 +18,7 @@
     __strong NSDictionary* _fields;
     
     NSString* _fullCitation;
-    NSString* _creatorSummary;
+    NSString* _creatorSummaryXXX;
     NSString* _publicationDetails;
     NSInteger _year;
     

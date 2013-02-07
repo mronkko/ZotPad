@@ -128,7 +128,7 @@ static CSLFormatter* _cslFormatter = NULL;
 
             //Fill in some values to prevent a crash
             _fullCitation = @"CSL formatting resulted in an error";
-            _creatorSummary = @"";
+            _creatorSummaryXXX = @"";
             _publicationDetails = @"";
         }
         
@@ -137,14 +137,14 @@ static CSLFormatter* _cslFormatter = NULL;
         
         if(authorMacro == NULL){
             if([dateMacro isEqualToString:@"(n.d.)"]){
-                _creatorSummary = @"";
+                _creatorSummaryXXX = @"";
             }
             else{
-                _creatorSummary = dateMacro;
+                _creatorSummaryXXX = dateMacro;
             }
         }
         else{
-            _creatorSummary = [[NSString stringWithFormat:@"%@. %@",authorMacro, dateMacro] stringByReplacingOccurrencesOfString:@".." withString:@"."];
+            _creatorSummaryXXX = [[NSString stringWithFormat:@"%@. %@",authorMacro, dateMacro] stringByReplacingOccurrencesOfString:@".." withString:@"."];
         }
 
         NSString* issued = [macroDict objectForKey:@"issued"];
@@ -218,7 +218,7 @@ static CSLFormatter* _cslFormatter = NULL;
     else{
         // Use blank values so that the App would not crash
         _fullCitation = self.title;
-        _creatorSummary = @"";
+        _creatorSummaryXXX = @"";
         _year = 0;
         _publicationDetails =@"";
     
@@ -236,8 +236,10 @@ static CSLFormatter* _cslFormatter = NULL;
 }
 
 -(NSString*) creatorSummary{
-    if(_fullCitation == NULL) [self _configureFieldsDependingOnFullCitation];
-    return _creatorSummary;
+    if(_fullCitation == NULL){
+        [self _configureFieldsDependingOnFullCitation];
+    }
+    return _creatorSummaryXXX;
 }
 
 -(NSInteger) year{

@@ -352,7 +352,7 @@
             </objects>
             <point key="canvasLocation" x="1346" y="686"/>
         </scene>
-        <!--Note Editing View Controller - Edit note-->
+        <!--Note Editing View Controller-->
         <scene sceneID="uQT-6f-9Qf">
             <objects>
                 <viewController storyboardIdentifier="NoteEditingViewController" modalPresentationStyle="pageSheet" id="dy6-Ck-E0l" customClass="ZPNoteEditingViewController" sceneMemberID="viewController">
@@ -387,9 +387,9 @@
                         <color key="backgroundColor" white="1" alpha="1" colorSpace="custom" customColorSpace="calibratedWhite"/>
                         <simulatedOrientationMetrics key="simulatedOrientationMetrics" orientation="landscapeRight"/>
                     </view>
-                    <navigationItem key="navigationItem" title="Edit note" id="sn9-5i-VPg"/>
                     <modalPageSheetSimulatedSizeMetrics key="simulatedDestinationMetrics"/>
                     <connections>
+                        <outlet property="navigationItem" destination="FNI-Eb-AGX" id="h9D-nM-PFP"/>
                         <outlet property="webView" destination="hcT-tl-ulW" id="fL5-Nm-lng"/>
                     </connections>
                 </viewController>
@@ -471,13 +471,13 @@
                                 <color key="textColor" cocoaTouchSystemColor="darkTextColor"/>
                                 <nil key="highlightedColor"/>
                             </label>
-                            <textField opaque="NO" clipsSubviews="YES" contentMode="scaleToFill" contentHorizontalAlignment="left" contentVerticalAlignment="center" borderStyle="roundedRect" minimumFontSize="17" id="9HZ-G3-QXX">
+                            <textField opaque="NO" clipsSubviews="YES" tag="1" contentMode="scaleToFill" contentHorizontalAlignment="left" contentVerticalAlignment="center" borderStyle="roundedRect" minimumFontSize="17" id="9HZ-G3-QXX">
                                 <rect key="frame" x="104" y="15" width="333" height="30"/>
                                 <autoresizingMask key="autoresizingMask" flexibleMaxX="YES" flexibleMaxY="YES"/>
                                 <fontDescription key="fontDescription" type="system" pointSize="14"/>
                                 <textInputTraits key="textInputTraits"/>
                             </textField>
-                            <button opaque="NO" contentMode="scaleToFill" contentHorizontalAlignment="center" contentVerticalAlignment="center" buttonType="roundedRect" lineBreakMode="middleTruncation" id="CAS-ce-fQB">
+                            <button opaque="NO" tag="2" contentMode="scaleToFill" contentHorizontalAlignment="center" contentVerticalAlignment="center" buttonType="roundedRect" lineBreakMode="middleTruncation" id="CAS-ce-fQB">
                                 <rect key="frame" x="449" y="14" width="71" height="31"/>
                                 <autoresizingMask key="autoresizingMask" flexibleMaxX="YES" flexibleMaxY="YES"/>
                                 <fontDescription key="fontDescription" type="boldSystem" pointSize="15"/>
@@ -839,7 +839,7 @@
                                                             <autoresizingMask key="autoresizingMask" flexibleMaxX="YES" flexibleMaxY="YES"/>
                                                         </imageView>
                                                         <imageView userInteractionEnabled="NO" contentMode="scaleToFill" image="AddSmall.png" id="zhZ-c7-cpS">
-                                                            <rect key="frame" x="18" y="4" width="15" height="15"/>
+                                                            <rect key="frame" x="30" y="4" width="15" height="15"/>
                                                             <autoresizingMask key="autoresizingMask" flexibleMaxX="YES" flexibleMaxY="YES"/>
                                                         </imageView>
                                                         <label opaque="NO" clipsSubviews="YES" userInteractionEnabled="NO" tag="1" contentMode="left" text="New note ..." lineBreakMode="wordWrap" minimumFontSize="10" adjustsFontSizeToFit="NO" id="fOg-d4-KOT">

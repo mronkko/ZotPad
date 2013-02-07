@@ -15,8 +15,10 @@
 #import "ZPTagEditingViewController.h"
 #import "ZPNoteEditingViewController.h"
 #import "ZPStarBarButtonItem.h"
+#import "ZPTagDisplay.h"
+#import "ZPNoteDisplay.h"
 
-@interface ZPItemDetailViewController : UITableViewController <UINavigationControllerDelegate >{
+@interface ZPItemDetailViewController : UITableViewController <UINavigationControllerDelegate, ZPTagDisplay, ZPNoteDisplay>{
     ZPZoteroItem* _currentItem;
     iCarousel* _carousel;
     UIActivityIndicatorView* _activityIndicator;

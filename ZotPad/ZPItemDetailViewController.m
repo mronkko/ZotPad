@@ -27,6 +27,7 @@
 #import "ZPTagEditingViewController.h"
 #import "ZPServerConnection.h"
 #import "ZPReachability.h"
+#import "ZPUtils.h"
 
 #import <UIKit/UIKit.h>
 
@@ -596,24 +597,31 @@
                 _tagEditingViewController = [self.storyboard instantiateViewControllerWithIdentifier:@"TagEditingViewController"];
             }
             _tagEditingViewController.item = _currentItem;
+            _tagEditingViewController.targetViewController = self;
+            
             [self presentModalViewController:_tagEditingViewController animated:YES];
         }
         //Notes
         else if([indexPath indexAtPosition:0]==1){
             ZPZoteroNote* note;
+            BOOL newNote;
             if([indexPath indexAtPosition:1]>=[_currentItem.notes count]){
-                note = [ZPZoteroNote noteWithKey:[NSString stringWithFormat:@"LOCAL_%@",[NSDate date]]];
+                note = [ZPZoteroNote noteWithKey:[NSString stringWithFormat:[ZPUtils randomString]]];
                 note.parentKey = _currentItem.key;
+                newNote = TRUE;
             }
             else{
                 note = [_currentItem.notes objectAtIndex:[indexPath indexAtPosition:1]];
+                newNote = FALSE;
             }
 
             if(_noteEditingViewController == NULL){
                 _noteEditingViewController = [self.storyboard instantiateViewControllerWithIdentifier:@"NoteEditingViewController"];
             }
             _noteEditingViewController.note = note;
-
+            _noteEditingViewController.isNewNote = newNote;
+            _noteEditingViewController.targetViewController = self;
+            
             [self presentModalViewController:_noteEditingViewController animated:YES];
 
         }
@@ -636,8 +644,15 @@
     }
 }
 
+#pragma mark - ZPNoteDisplay and ZPTagDisplay
 
+-(void) refreshNotesFor:(ZPZoteroDataObject *)item{
+    [self.tableView reloadSections:[NSIndexSet indexSetWithIndex:1] withRowAnimation:UITableViewRowAnimationAutomatic];
+}
 
+-(void) refreshTagsFor:(ZPZoteroDataObject *)item{
+    [self.tableView reloadSections:[NSIndexSet indexSetWithIndex:0] withRowAnimation:UITableViewRowAnimationAutomatic];
+}
 
 #pragma mark - Observer methods
 

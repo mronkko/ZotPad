@@ -428,7 +428,13 @@ static NSObject* writeLock;
                     FMResultSet* resultSet = [dbObject executeQuery:selectSQL];
                     
                     while([resultSet next]){
-                        [timestamps setObject:[resultSet stringForColumnIndex:1] forKey:[resultSet stringForColumnIndex:0]];
+                        NSString* cacheTimeStamp = [resultSet stringForColumnIndex:1];
+                        if(cacheTimeStamp != NULL){
+                            [timestamps setObject:cacheTimeStamp forKey:[resultSet stringForColumnIndex:0]];
+                        }
+                        else{
+                            [timestamps setObject:[NSNull null] forKey:[resultSet stringForColumnIndex:0]];
+                        }
                     }
                     [resultSet close];
                 }
@@ -439,9 +445,9 @@ static NSObject* writeLock;
                 NSArray* keyArrayFieldName = [NSArray
                                               arrayWithObject:[primaryKeyFieldNames objectAtIndex:0]];
                 
-                for (NSObject* object in objects){
+                for (ZPZoteroDataObject* object in objects){
                     
-                    //Check the timestamp
+                    //Check the timestamp. This is the cacheTimestamp
                     NSString* timestamp = [timestamps objectForKey:[[self dbFieldValuesForObject:object fieldsNames:keyArrayFieldName] objectAtIndex:0]];
                     
                     //Insert if timestamp is not found
@@ -450,8 +456,8 @@ static NSObject* writeLock;
                         [returnArray addObject:object];
                         
                     }
-                    //Update if timestamps differ
-                    else if(! [[[self dbFieldValuesForObject:object fieldsNames:[NSArray arrayWithObject: @"cacheTimestamp"]] objectAtIndex:0] isEqual: timestamp]){
+                    //Update if the server and cache timestamps differ
+                    else if(! [object.serverTimestamp isEqual: timestamp]){
                         [updateObjects addObject:object];
                         [returnArray addObject:object];
                     }
@@ -938,6 +944,159 @@ static NSObject* writeLock;
     return returnArray;
 }
 
++(NSArray*) attachmentsWithLocallyEditedTags{
+
+    NSMutableArray* returnArray = [[NSMutableArray alloc] init];
+    
+    FMDatabase* dbObject = [self _dbObject];
+    @synchronized(dbObject){
+        
+        FMResultSet* resultSet;
+        resultSet= [dbObject executeQuery:@"SELECT DISTINCT tags.itemKey FROM tags, attachments WHERE tags.itemKey = attachments.itemKey AND (tags.locallyAdded = 1 OR tags.locallyDeleted = 1)"];
+        
+        while([resultSet next]) {
+            [returnArray addObject:[ZPZoteroAttachment attachmentWithKey:[resultSet stringForColumnIndex:0]]];
+            
+        }
+        [resultSet close];
+        
+    }
+    
+    return returnArray;
+    
+}
+
++(NSArray*) itemsWithLocallyEditedTags{
+    
+    NSMutableArray* returnArray = [[NSMutableArray alloc] init];
+    
+    FMDatabase* dbObject = [self _dbObject];
+    @synchronized(dbObject){
+        
+        FMResultSet* resultSet;
+        resultSet= [dbObject executeQuery:@"SELECT DISTINCT tags.itemKey FROM tags, items WHERE tags.itemKey = items.itemKey AND (tags.locallyAdded = 1 OR tags.locallyDeleted = 1)"];
+        
+        while([resultSet next]) {
+            [returnArray addObject:[ZPZoteroItem itemWithKey:[resultSet stringForColumnIndex:0]]];
+            
+        }
+        [resultSet close];
+        
+    }
+    
+    return returnArray;
+    
+}
+
++(void) writeDataObjectsTags:(NSArray*)dataObjects{
+    
+    if([dataObjects count]==0) return;
+    
+    NSMutableArray* tags= [NSMutableArray array];
+    NSMutableString* deleteSQL;
+    NSMutableArray* deleteParameterArray = [NSMutableArray array];
+    
+    for(ZPZoteroDataObject* dataObject in dataObjects){
+        
+        for(NSString* tag in dataObject.tags){
+            [tags addObject:[NSDictionary dictionaryWithObjects:[NSArray arrayWithObjects:tag, dataObject.key, nil]
+                                                        forKeys:[NSArray arrayWithObjects:@"tagName",ZPKEY_ITEM_KEY,nil]]];
+        }
+        if(deleteSQL == NULL){
+            deleteSQL = [NSMutableString stringWithString:@"DELETE FROM tags WHERE (itemKey = ?"];
+        }
+        else{
+            [deleteSQL appendFormat:@" OR (itemKey = ?"];
+        }
+        
+        [deleteParameterArray addObject:dataObject.key];
+        
+        if([dataObject.tags count]==0){
+            [deleteSQL appendFormat:@")"];
+        }
+        else{
+            [deleteSQL appendString:@" AND tagName NOT IN (" ];
+            [deleteSQL appendString:[self _questionMarkStringForParameterArray:dataObject.tags]];
+            [deleteSQL appendString:@"))"];
+            [deleteParameterArray addObjectsFromArray:dataObject.tags];
+        }
+    }
+    
+    [self writeObjects:tags intoTable:@"tags" checkTimestamp:FALSE];
+    
+    FMDatabase* dbObject = [self _dbObject];
+    @synchronized(dbObject){
+        [dbObject executeUpdate:deleteSQL withArgumentsInArray:deleteParameterArray];
+    }
+}
+
++(void) clearLocalEditFlagsForTagsWithItemKey:(NSString*)itemKey{
+    
+    FMDatabase* dbObject = [self _dbObject];
+    @synchronized(dbObject){
+        [dbObject executeUpdate:@"UPDATE tags SET locallyAdded = 0, locallyDeleted = 0 WHERE itemKey = ?", itemKey];
+    }
+    
+}
+
++(void) addTagsLocally:(NSArray*)tags toItemWithKey:(NSString*)itemKey{
+    
+    //Add only those tags that do not already exist
+    
+    
+    NSMutableString* sql = [NSMutableString stringWithString:@"SELECT tagName FROM tags WHERE tagName IN ("];
+    
+    BOOL first = TRUE;
+    for(NSString* tag in tags){
+        if(! first){
+            [sql appendString:@", "];
+        }
+        [sql appendString:@"?"];
+        first = FALSE;
+    }
+    
+    [sql appendString:@")  AND itemKey = ?"];
+    
+    NSMutableArray* tagsToBeAdded = [NSMutableArray arrayWithArray:tags];
+    
+    FMDatabase* dbObject = [self _dbObject];
+    @synchronized(dbObject){
+        FMResultSet* rs =[dbObject executeQuery:sql
+                           withArgumentsInArray:[tags arrayByAddingObject:itemKey]];
+        
+        while([rs next]){
+            [tagsToBeAdded removeObject:[rs stringForColumn:0]];
+        }
+    }
+
+    for(NSString* tag in tagsToBeAdded){
+        [dbObject executeUpdate:@"INSERT INTO tags (tagName, itemKey, locallyAdded) VALUES (?, ?, 1)", tag, itemKey];
+    }
+    
+}
+
++(void) removeTagsLocally:(NSArray*)tags toItemWithKey:(NSString*)itemKey{
+    
+    NSMutableString* sql = [NSMutableString stringWithString:@"UPDATE tags SET locallyDeleted = 1 WHERE tagName IN ("];
+    
+    BOOL first = TRUE;
+    for(NSString* tag in tags){
+        if(! first){
+            [sql appendString:@", "];
+        }
+        [sql appendString:@"?"];
+        first = FALSE;
+    }
+    
+    [sql appendString:@")  AND itemKey = ?"];
+    
+    FMDatabase* dbObject = [self _dbObject];
+    @synchronized(dbObject){
+        [dbObject executeUpdate:sql
+           withArgumentsInArray:[tags arrayByAddingObject:itemKey]];
+    }
+    
+}
 
 #pragma mark -
 #pragma mark Item methods
@@ -963,7 +1122,7 @@ static NSObject* writeLock;
         [dbObject executeUpdate:[NSString stringWithFormat:@"DELETE FROM attachments WHERE itemKey NOT IN ('%@') AND parentKey NOT IN ('%@') AND parentKey IN (SELECT itemKey FROM items WHERE libraryID = ?)",
                                  keyString,keyString],[NSNumber numberWithInt:libraryID]];
         
-        [dbObject executeUpdate:[NSString stringWithFormat:@"DELETE FROM notes WHERE itemKey NOT IN ('%@') AND parentKey NOT IN ('%@') AND parentKey in (SELECT itemKey FROM items WHERE libraryID = ?)",
+        [dbObject executeUpdate:[NSString stringWithFormat:@"DELETE FROM notes WHERE itemKey NOT IN ('%@') AND parentKey NOT IN ('%@') AND parentKey in (SELECT itemKey FROM items WHERE libraryID = ?) AND locallyAdded = 0",
                                  keyString,keyString],[NSNumber numberWithInt:libraryID]];
         
         
@@ -977,7 +1136,7 @@ static NSObject* writeLock;
  
  */
 
-+(NSArray*) writeItems:(NSArray*)items {
++(NSArray*) writeItems:(NSArray*)items checkTimestamp:(BOOL) checkTimestamp{
     /*
      Check that all items have keys and item types defined
      */
@@ -991,16 +1150,16 @@ static NSObject* writeLock;
         }
         
     }
-    return [self writeObjects:items intoTable:@"items" checkTimestamp:YES];
+    return [self writeObjects:items intoTable:@"items" checkTimestamp:checkTimestamp];
     
 }
 
-+(NSArray*) writeNotes:(NSArray*)notes{
-    return [self writeObjects:notes intoTable:@"notes" checkTimestamp:YES];
++(NSArray*) writeNotes:(NSArray*)notes checkTimestamp:(BOOL) checkTimestamp{
+    return [self writeObjects:notes intoTable:@"notes" checkTimestamp:checkTimestamp];
 }
 
-+(NSArray*) writeAttachments:(NSArray*)attachments{
-    return [self writeObjects:attachments intoTable:@"attachments" checkTimestamp:YES];
++(NSArray*) writeAttachments:(NSArray*)attachments checkTimestamp:(BOOL) checkTimestamp{
+    return [self writeObjects:attachments intoTable:@"attachments" checkTimestamp:checkTimestamp];
 }
 
 
@@ -1236,47 +1395,7 @@ static NSObject* writeLock;
     
 }
 
-+(void) writeDataObjectsTags:(NSArray*)dataObjects{
-    
-    if([dataObjects count]==0) return;
-    
-    NSMutableArray* tags= [NSMutableArray array];
-    NSMutableString* deleteSQL;
-    NSMutableArray* deleteParameterArray = [NSMutableArray array];
-    
-    for(ZPZoteroDataObject* dataObject in dataObjects){
-        
-        for(NSString* tag in dataObject.tags){
-            [tags addObject:[NSDictionary dictionaryWithObjects:[NSArray arrayWithObjects:tag, dataObject.key, nil]
-                                                        forKeys:[NSArray arrayWithObjects:@"tagName",ZPKEY_ITEM_KEY,nil]]];
-        }
-        if(deleteSQL == NULL){
-            deleteSQL = [NSMutableString stringWithString:@"DELETE FROM tags WHERE (itemKey = ?"];
-        }
-        else{
-            [deleteSQL appendFormat:@" OR (itemKey = ?"];
-        }
-        
-        [deleteParameterArray addObject:dataObject.key];
-        
-        if([dataObject.tags count]==0){
-            [deleteSQL appendFormat:@")"];
-        }
-        else{
-            [deleteSQL appendString:@" AND tagName NOT IN (" ];
-            [deleteSQL appendString:[self _questionMarkStringForParameterArray:dataObject.tags]];
-            [deleteSQL appendString:@"))"];
-            [deleteParameterArray addObjectsFromArray:dataObject.tags];
-        }
-    }
-    
-    [self writeObjects:tags intoTable:@"tags" checkTimestamp:FALSE];
-    
-    FMDatabase* dbObject = [self _dbObject];
-    @synchronized(dbObject){
-        [dbObject executeUpdate:deleteSQL withArgumentsInArray:deleteParameterArray];
-    }
-}
+
 +(NSDictionary*) fieldsForItem:(ZPZoteroItem*)item{
     NSMutableDictionary* fields=[[NSMutableDictionary alloc] init];
     
@@ -1722,6 +1841,165 @@ static NSObject* writeLock;
     //These are available through the API, but not used: @"addedBy" @"numItems"
 }
 
++(void) createNoteLocally:(ZPZoteroNote*) note{
+
+    FMDatabase* dbObject = [self _dbObject];
+    
+    [dbObject executeUpdate:@"INSERT INTO notes (parentKey, itemKey, note, locallyAdded) VALUES (?, ?, ?, 1)", note.parentKey, note.itemKey, note.note];
+        
+    
+}
+
++(void) replaceLocallyAddedNote:(ZPZoteroNote*) localNote withServerVersion:(ZPZoteroNote*) serverNote{
+
+    FMDatabase* dbObject = [self _dbObject];
+    
+    @synchronized(dbObject){
+        [dbObject executeUpdate:@"UPDATE notes SET itemKey = ?, cacheTimestamp = ?, locallyAdded = 0 WHERE itemKey = ?",
+         localNote.itemKey, serverNote.serverTimestamp, serverNote.itemKey];
+        
+        serverNote.cacheTimestamp = serverNote.serverTimestamp;
+        
+    }
+
+}
+
++(void) deleteNoteLocally:(ZPZoteroNote*) note{
+
+    FMDatabase* dbObject = [self _dbObject];
+    
+    @synchronized(dbObject){
+        FMResultSet* rs = [dbObject executeQuery:@"SELECT locallyAdded FROM notes WHERE itemKey = ? LIMIT 1", note.itemKey];
+        
+        BOOL locallyAdded = [rs intForColumnIndex:0];
+
+        [rs close];
+        
+        if(locallyAdded){
+            [dbObject executeUpdate:@"DELETE FROM notes WHERE itemKey = ?", note.itemKey];
+        }
+        else{
+            [dbObject executeUpdate:@"UPDATE notes SET locallyDeleted = 1 WHERE itemKey = ?", note.itemKey];
+
+        }
+    }
+    
+}
+
++(void) deleteNote:(ZPZoteroNote*) note{
+    
+    FMDatabase* dbObject = [self _dbObject];
+    
+    @synchronized(dbObject){
+        [dbObject executeUpdate:@"DELETE FROM notes WHERE itemKey = ?", note.itemKey];
+    }
+    
+}
+
++(void) saveLocallyEditedNote:(ZPZoteroNote*) note{
+
+    FMDatabase* dbObject = [self _dbObject];
+    
+    @synchronized(dbObject){
+        [dbObject executeUpdate:@"UPDATE notes SET note = ?, locallyModified = 1 WHERE itemKey = ?", note.note, note.itemKey];
+    }
+    
+}
+
++(void) saveLocallyEditedAttachmentNote:(ZPZoteroAttachment*) attachment{
+    FMDatabase* dbObject = [self _dbObject];
+    
+    @synchronized(dbObject){
+        [dbObject executeUpdate:@"UPDATE attachments SET note = ?, locallyModified = 1 WHERE itemKey = ?", attachment.note, attachment.itemKey];
+    }
+    
+}
+
+// Returns an array of attachments whose metadata has been edited locally
++(NSArray*) locallyEditedAttachments{
+    
+    FMDatabase* dbObject = [self _dbObject];
+    
+    NSMutableArray* returnArray = [[NSMutableArray alloc] init];
+    
+    @synchronized(dbObject){
+        
+        FMResultSet* resultSet;
+        resultSet= [dbObject executeQuery:@"SELECT * FROM attachments WHERE locallyModified =1 " ];
+        
+        while([resultSet next]) {
+            [returnArray addObject:[ZPZoteroAttachment attachmentWithDictionary:resultSet.resultDictionary]];
+        }
+        [resultSet close];
+        
+    }
+    return returnArray;
+
+}
+
++(NSArray*) locallyEditedNotes{
+    FMDatabase* dbObject = [self _dbObject];
+    
+    NSMutableArray* returnArray = [[NSMutableArray alloc] init];
+    
+    @synchronized(dbObject){
+        
+        FMResultSet* resultSet;
+        resultSet= [dbObject executeQuery:@"SELECT * FROM notes WHERE locallyModified =1 " ];
+        
+        while([resultSet next]) {
+            [returnArray addObject:[ZPZoteroNote noteWithDictionary:resultSet.resultDictionary]];
+        }
+        [resultSet close];
+        
+    }
+    return returnArray;
+
+}
+
++(NSArray*) locallyAddedNotes{
+    FMDatabase* dbObject = [self _dbObject];
+    
+    NSMutableArray* returnArray = [[NSMutableArray alloc] init];
+    
+    @synchronized(dbObject){
+        
+        FMResultSet* resultSet;
+        resultSet= [dbObject executeQuery:@"SELECT * FROM notes WHERE locallyAdded =1 " ];
+        
+        while([resultSet next]) {
+            [returnArray addObject:[ZPZoteroNote noteWithDictionary:resultSet.resultDictionary]];
+        }
+        [resultSet close];
+        
+    }
+    return returnArray;
+    
+}
+
+
++(NSArray*) locallyDeletedNotes{
+    FMDatabase* dbObject = [self _dbObject];
+    
+    NSMutableArray* returnArray = [[NSMutableArray alloc] init];
+    
+    @synchronized(dbObject){
+        
+        FMResultSet* resultSet;
+        resultSet= [dbObject executeQuery:@"SELECT * FROM notes WHERE locallyDeleted =1 " ];
+        
+        while([resultSet next]) {
+            [returnArray addObject:[ZPZoteroNote noteWithDictionary:resultSet.resultDictionary]];
+        }
+        [resultSet close];
+        
+    }
+    return returnArray;
+    
+}
+
+
+#pragma mark - Other DB access
 
 +(NSString*) getLocalizationStringWithKey:(NSString*) key type:(NSString*) type locale:(NSString*) locale{
     
@@ -1739,6 +2017,7 @@ static NSObject* writeLock;
     }
     
 }
+
 
 # pragma mark - Utility methods
 

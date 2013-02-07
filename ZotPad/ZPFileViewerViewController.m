@@ -18,9 +18,12 @@
 #import "ZPTagEditingViewController.h"
 #import "ZPNoteEditingViewController.h"
 
+#import "ZPUtils.h"
+
 //Unzipping and base64 decoding
 #import "ZipArchive.h"
 #import "NSString+Base64.h"
+
 
 @interface ZPFileViewerViewController (){
     //An ugly way to load table view cells for tags twice so that they are sized correctly
@@ -937,6 +940,7 @@ static ZPFileViewerViewController* _instance;
     //Parent tags
     if(indexPath.section == 0 && ! isStandaloneAttachment){
         ZPTagEditingViewController* tagController = [ZPTagEditingViewController instance];
+        tagController.targetViewController = self;
         tagController.item = [ZPZoteroItem itemWithKey:attachment.parentKey];
         [self presentModalViewController:tagController animated:YES];
     }
@@ -945,6 +949,7 @@ static ZPFileViewerViewController* _instance;
             (indexPath.section == 1 && ! isStandaloneAttachment)){
 
         ZPTagEditingViewController* tagController = [ZPTagEditingViewController instance];
+        tagController.targetViewController = self;
         tagController.item = attachment;
         [self presentModalViewController:tagController animated:YES];
 
@@ -952,12 +957,17 @@ static ZPFileViewerViewController* _instance;
     //Parent notes
     else if(indexPath.section == 2){
         ZPNoteEditingViewController* noteController = [ZPNoteEditingViewController instance];
+        noteController.targetViewController = self;
         ZPZoteroItem* parent = [ZPZoteroItem itemWithKey:attachment.parentKey];
         if([parent.notes count]>indexPath.row){
             noteController.note = [parent.notes objectAtIndex:indexPath.row];
+            noteController.isNewNote = FALSE;
         }
         else{
-            noteController.note = NULL;
+            ZPZoteroNote* note = [ZPZoteroNote noteWithKey:[NSString stringWithFormat:[ZPUtils randomString]]];
+            note.parentKey = parent.itemKey;
+            noteController.note = note;
+            noteController.isNewNote = TRUE;
         }
         [self presentModalViewController:noteController animated:YES];
 
@@ -968,6 +978,8 @@ static ZPFileViewerViewController* _instance;
 
         ZPNoteEditingViewController* noteController = [ZPNoteEditingViewController instance];
         noteController.note = attachment;
+        noteController.isNewNote = FALSE;
+        noteController.targetViewController = self;
         [self presentModalViewController:noteController animated:YES];
 
     }
@@ -975,6 +987,40 @@ static ZPFileViewerViewController* _instance;
 
 }
 
+#pragma mark - ZPNoteDisplay and ZPTagDisplay
 
+-(void) refreshNotesFor:(ZPZoteroDataObject *)item{
+    
+    ZPZoteroAttachment* attachment = (ZPZoteroAttachment*) [_attachments objectAtIndex:_activeAttachmentIndex];
+    BOOL isStandaloneAttachment = [attachment.parentKey isEqualToString:attachment.key];
+    
+    NSInteger section;
+    if(isStandaloneAttachment){
+        section = 1;
+    }
+    else{
+        if(item == attachment) section = 3;
+        else section = 2;
+    }
+
+    [self.notesAndTagsTable reloadSections:[NSIndexSet indexSetWithIndex:section] withRowAnimation:UITableViewRowAnimationAutomatic];
+}
+
+-(void) refreshTagsFor:(ZPZoteroDataObject *)item{
+    
+    ZPZoteroAttachment* attachment = (ZPZoteroAttachment*) [_attachments objectAtIndex:_activeAttachmentIndex];
+    BOOL isStandaloneAttachment = [attachment.parentKey isEqualToString:attachment.key];
+    
+    NSInteger section;
+    if(isStandaloneAttachment){
+        section = 0;
+    }
+    else{
+        if(item == attachment) section = 1;
+        else section = 0;
+    }
+
+    [self.notesAndTagsTable reloadSections:[NSIndexSet indexSetWithIndex:section] withRowAnimation:UITableViewRowAnimationAutomatic];
+}
 
 @end

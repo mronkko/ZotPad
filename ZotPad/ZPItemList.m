@@ -173,7 +173,9 @@ static ZPItemList* _instance;
 -(void) _updateRowForItem:(ZPZoteroItem*)item{
     NSIndexPath* indexPath = [NSIndexPath indexPathForRow:[_itemKeysShown indexOfObject:item.key] inSection:0];
     //Do not reload cell if it is selected
-    if(! [[_tableView indexPathForSelectedRow] isEqual:indexPath]) [_tableView reloadRowsAtIndexPaths:[NSArray arrayWithObject:indexPath] withRowAnimation:_animations];
+    if(! [[_tableView indexPathForSelectedRow] isEqual:indexPath]){
+        [_tableView reloadRowsAtIndexPaths:[NSArray arrayWithObject:indexPath] withRowAnimation:_animations];
+    }
 }
 
 

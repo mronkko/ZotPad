@@ -96,15 +96,129 @@
 }
 
 +(BOOL) _uploadAttachmentNotes{
-    return FALSE;
+    
+    NSArray* locallyEditedAttachments = [ZPDatabase locallyEditedAttachments];
+    
+    if(locallyEditedAttachments.count >0 ){
+        ZPZoteroAttachment* locallyEditedAttachment = [locallyEditedAttachments objectAtIndex:0];
+        [ZPServerConnection editAttachment:locallyEditedAttachment completion:^(ZPZoteroAttachment* attachment) {
+            
+            DDLogInfo(@"Saved updated attachment note (%@) to Zotero server",attachment.key);
+            
+            [ZPDatabase writeAttachments:[NSArray arrayWithObject:attachment] checkTimestamp:NO];
+            [ZPDatabase clearLocalEditFlagsForTagsWithItemKey:attachment.itemKey];
+            
+            locallyEditedAttachment.etag = attachment.etag;
+            locallyEditedAttachment.serverTimestamp = attachment.serverTimestamp;
+            
+            // Proceed with other uploads
+            [self uploadMetadata];
+        }];
+        return TRUE;
+    }
+    else{
+        return FALSE;
+    }
 }
 
 +(BOOL) _uploadNotes{
-    return FALSE;
+
+    NSArray* locallyAddedNotes = [ZPDatabase locallyAddedNotes];
+    
+    if(locallyAddedNotes.count >0 ){
+        ZPZoteroNote* locallyAddedNote = [locallyAddedNotes objectAtIndex:0];
+        [ZPServerConnection createNote:locallyAddedNote completion:^(ZPZoteroNote* note) {
+
+            DDLogInfo(@"Created a note (%@) on the Zotero server",note.itemKey);
+            
+            //Add the server version in DB and delete the local version
+            [ZPDatabase writeNotes:[NSArray arrayWithObject:note] checkTimestamp:NO];
+            [ZPDatabase deleteNote:locallyAddedNote];
+            
+            //Replace the local version with server version in the parent item notes array
+            ZPZoteroItem* parent = [ZPZoteroItem itemWithKey:locallyAddedNote.parentKey];
+            
+            NSMutableArray* noteArray = [NSMutableArray arrayWithArray:parent.notes];
+            [noteArray replaceObjectAtIndex:[noteArray indexOfObject:locallyAddedNote] withObject:note];
+            
+            // Proceed with other uploads
+            [self uploadMetadata];
+        }];
+        return TRUE;
+    }
+    else{
+        NSArray* locallyEditedNotes = [ZPDatabase locallyEditedNotes];
+        
+        if(locallyEditedNotes.count >0 ){
+            ZPZoteroNote* locallyEditedNote = [locallyEditedNotes objectAtIndex:0];
+            [ZPServerConnection editNote:locallyEditedNote completion:^(ZPZoteroNote* note) {
+
+                DDLogInfo(@"Edited a note (%@) from the Zotero server", note.itemKey);
+                [ZPDatabase writeNotes:[NSArray arrayWithObject:note] checkTimestamp:NO];
+
+                // Proceed with other uploads
+                [self uploadMetadata];
+            }];
+            return TRUE;
+        }
+        else{
+            NSArray* locallyDeletedNotes = [ZPDatabase locallyDeletedNotes];
+            
+            if(locallyDeletedNotes.count >0 ){
+                ZPZoteroNote* locallyDeletedNote = [locallyDeletedNotes objectAtIndex:0];
+                [ZPServerConnection deleteNote:locallyDeletedNote completion:^{
+                    
+                    DDLogInfo(@"Deleted a note (%@) from the Zotero server", locallyDeletedNote.itemKey);
+                    [ZPDatabase deleteNote:locallyDeletedNote];
+
+                    // Proceed with other uploads
+                    [self uploadMetadata];
+                }];
+                return TRUE;
+            }
+            else{
+                return FALSE;
+            }
+        }
+    }
+
 }
 
 +(BOOL) _uploadTags{
-    return FALSE;
+
+    NSArray* itemsWithLocallyEditedTags = [ZPDatabase itemsWithLocallyEditedTags];
+    
+    if(itemsWithLocallyEditedTags.count >0 ){
+        ZPZoteroItem* itemWithLocallyEditedTags = [itemsWithLocallyEditedTags objectAtIndex:0];
+        [ZPServerConnection editItem:itemWithLocallyEditedTags completion:^(ZPZoteroItem* item) {
+            
+            [ZPDatabase writeItems:[NSArray arrayWithObject:item] checkTimestamp:NO];
+            [ZPDatabase clearLocalEditFlagsForTagsWithItemKey:item.itemKey];
+            
+            // Proceed with other uploads
+            [self uploadMetadata];
+        }];
+        return TRUE;
+    }
+    else{
+        NSArray* attachmentsWithLocallyEditedTags = [ZPDatabase attachmentsWithLocallyEditedTags];
+        
+        if(attachmentsWithLocallyEditedTags.count >0 ){
+            ZPZoteroAttachment* attachmentWithLocallyEditedTags = [attachmentsWithLocallyEditedTags objectAtIndex:0];
+            [ZPServerConnection editAttachment:attachmentWithLocallyEditedTags completion:^(ZPZoteroAttachment* attachment) {
+                
+                [ZPDatabase writeAttachments:[NSArray arrayWithObject:attachment] checkTimestamp:NO];
+                [ZPDatabase clearLocalEditFlagsForTagsWithItemKey:attachment.itemKey];
+                
+                // Proceed with other uploads
+                [self uploadMetadata];
+            }];
+            return TRUE;
+        }
+        else{
+            return FALSE;
+        }
+    }
 }
 
 +(BOOL) _uploadAddItemsToCollections{

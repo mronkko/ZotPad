@@ -36,6 +36,8 @@ extern NSInteger const VERSION_SOURCE_WEBDAV;
 @property (retain) NSString* filename;
 @property (retain) NSString* charset;
 @property (retain) NSString* itemKey;
+@property (retain) NSString* accessDate;
+@property (assign) long long mtime;
 
 // Needed for versioning
 
@@ -60,6 +62,12 @@ extern NSInteger const VERSION_SOURCE_WEBDAV;
 
 // returns an object based on file system path
 +(ZPZoteroAttachment*) dataObjectForAttachedFile:(NSString*) filename;
+
+
+//TODO: Refactor these away. This is a quick an dirty way to clean local edit state
+-(BOOL)locallyAdded;
+-(BOOL)locallyModified;
+-(BOOL)locallyDeleted;
 
 // Helper functions
 +(NSString*) md5ForFileAtPath:(NSString*)path;

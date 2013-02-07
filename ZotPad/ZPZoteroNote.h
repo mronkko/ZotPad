@@ -18,4 +18,9 @@
 +(ZPZoteroNote*) noteWithKey:(NSString*) key;
 +(ZPZoteroNote*) noteWithDictionary:(NSDictionary*) fields;
 
+//TODO: Refactor these away. This is a quick an dirty way to clean local edit state
+-(BOOL)locallyAdded;
+-(BOOL)locallyModified;
+-(BOOL)locallyDeleted;
+
 @end

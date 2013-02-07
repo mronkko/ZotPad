@@ -8,13 +8,18 @@
 
 #import "ZPTagEditingViewController.h"
 #import "ZPTagController.h"
+#import "ZPFileViewerViewController.h"
+#import "ZPDatabase.h"
+#import "ZPItemDataUploadManager.h"
 
 @interface ZPTagEditingViewController (){
     NSArray* _selectedTags;
     ZPZoteroDataObject* _item;
     ZPTagController* _tagDataSource;
-    __weak UIPopoverController *myPopover;
+    UIPopoverController* newTagPopover;
+    UIViewController* newTagDialog;
 }
+
 
 @end
 
@@ -71,10 +76,35 @@ static ZPTagEditingViewController* _instance;
     return _item;
 }
 
+
 # pragma mark - IBOutlets
 
 -(IBAction)dismiss:(id)sender{
+    NSMutableArray* removedTags = [[NSMutableArray alloc] init];
+    NSMutableArray* addedTags = [[NSMutableArray alloc] init];
+    
+    for(NSString* tag in _item.tags){
+        if([_selectedTags indexOfObject:tag] == NSNotFound){
+            [removedTags addObject:tag];
+        }
+    }
+    for(NSString* tag in _selectedTags){
+        if([_item.tags indexOfObject:tag] == NSNotFound){
+            [addedTags addObject:tag];
+        }
+    }
+
+    if([removedTags count]>0) [ZPDatabase removeTagsLocally:removedTags toItemWithKey:_item.key];
+    if([addedTags count]>0) [ZPDatabase addTagsLocally:addedTags toItemWithKey:_item.key];
+    
+    if([addedTags count]>0 || [removedTags count]>0){
+        _item.tags = _selectedTags;
+        [_targetViewController refreshTagsFor:_item];
+        [ZPItemDataUploadManager uploadMetadata];
+    }
+    
     [self dismissModalViewControllerAnimated:YES];
+
 }
 
 #pragma mark - ZPTagOwner protocol
@@ -94,28 +124,67 @@ static ZPTagEditingViewController* _instance;
 
 -(NSArray*) availableTags{
     //Get the tags for currently visible items
-    return [ZPDatabase tagsForLibrary:_item.libraryID];
+    NSArray* tags = [ZPDatabase tagsForLibrary:_item.libraryID];
+    
+    for (NSString* tag in [self tags]) {
+        if([tags indexOfObject:tag] == NSNotFound){
+            tags = [tags arrayByAddingObject:tag];
+        }
+    }
+    return tags;
 }
 
 -(BOOL) isTagSelected:(NSString*)tag{
     return [_selectedTags containsObject:tag];
 }
 
--(void)createTag:(NSString*)tag{
-    //Only create the tag if it does not exist
+-(void)createTag:(UIButton*)source{
+    
+    NSString* newTag;
+    if(newTagPopover){
+        newTag = [(UITextField*)[newTagPopover.contentViewController.view viewWithTag:1] text];
+        [newTagPopover dismissPopoverAnimated:YES];
+        newTagPopover = NULL;
+    }
+    else if(newTagDialog){
+        newTag = [(UITextField*)[newTagDialog.view viewWithTag:1] text];
+        [newTagDialog dismissModalViewControllerAnimated:YES];
+        newTagDialog = NULL;
+    }
+    
+    newTag = [newTag stringByTrimmingCharactersInSet:[NSCharacterSet whitespaceAndNewlineCharacterSet]];
+    if(! [newTag isEqualToString:@""]){
+        [self selectTag:newTag];
+        [_tagDataSource prepareToShow];
+        [self.tableView reloadData];
+    }
+    
+    
 }
 
 
 - (void)prepareForSegue:(UIStoryboardSegue *)segue sender:(id)sender {
     // make sure it's the right segue if you have more than one in this VC
+    
+    //iPad
     if([segue.identifier isEqualToString:@"NewTagPopover"]){
-        myPopover = [(UIStoryboardPopoverSegue *)segue popoverController];
+        newTagPopover = [(UIStoryboardPopoverSegue *)segue popoverController];
+        [(UIButton*)[newTagPopover.contentViewController.view viewWithTag:2] addTarget:self action:@selector(createTag:) forControlEvents:UIControlEventTouchUpInside];
+        [[newTagPopover.contentViewController.view viewWithTag:1] becomeFirstResponder];
+    }
+    //iPhone
+    else if([segue.identifier isEqualToString:@"NewTagDialog"]){
+        newTagDialog = [segue destinationViewController];
+        [(UIButton*)[newTagDialog.view viewWithTag:2] addTarget:self action:@selector(createTag:) forControlEvents:UIControlEventTouchUpInside];
+        [[newTagDialog.view viewWithTag:1] becomeFirstResponder];
     }
 }
 
 - (IBAction)showPopover:(id)sender {
-    if (myPopover)
-        [myPopover dismissPopoverAnimated:YES];
+    if (newTagPopover){
+        [newTagPopover dismissPopoverAnimated:YES];
+        newTagPopover = NULL;
+    }
     else
         [self performSegueWithIdentifier:@"NewTagPopover" sender:sender];
 }

@@ -38,10 +38,10 @@ NSInteger const VERSION_SOURCE_DROPBOX =3;
 static NSCache* _objectCache = NULL;
 static NSString* _documentsDirectory = NULL;
 
-@synthesize lastViewed, attachmentSize, existsOnZoteroServer, filename, url, versionSource,  charset, note, md5;
+@synthesize lastViewed, attachmentSize, existsOnZoteroServer, filename, url, versionSource,  charset, note, md5, mtime;
 @synthesize versionIdentifier_server;
 @synthesize versionIdentifier_local;
-@synthesize contentType;
+@synthesize contentType, accessDate;
 
 +(void)initialize{
     _objectCache =  [[NSCache alloc] init];
@@ -258,7 +258,10 @@ static NSString* _documentsDirectory = NULL;
         return ([[NSFileManager defaultManager] fileExistsAtPath:fsPath]);
 }
 
-//The reason for purging a file will be logged 
+
+-(BOOL)locallyAdded{ return FALSE;}
+-(BOOL)locallyModified{ return FALSE;}
+-(BOOL)locallyDeleted{ return FALSE;}
 
 
 #pragma mark - QLPreviewItem protocol

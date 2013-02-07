@@ -28,6 +28,10 @@
 
 #import "ZPItemDataDownloadManager.h"
 
+//Needed for creating JSON items for write API
+#import "ZPZoteroItemTypes.h"
+#import "SBJson.h"
+
 #pragma mark - UIAlertView delegate
 
 @interface ZPAutenticationErrorAlertViewDelegate : NSObject <UIAlertViewDelegate>;
@@ -93,6 +97,9 @@
 +(ZPServerResponseXMLParser*) _parseXMLResponseData:(NSData*)responseData requestType:(NSInteger) type;
 
 +(void) _processParsedResponse:(ZPServerResponseXMLParser*)parserDelegate requestType:(NSInteger) type userInfo:(NSDictionary*) userInfo;
+
++(NSString*) _tagsJSSONForDataObject:(ZPZoteroDataObject*) dataObject;
++(NSString*) _JSONEscapeString:(NSString*) string;
 
 @end
 
@@ -445,6 +452,189 @@ const NSInteger ZPServerConnectionRequestLastModifiedItem = 11;
     deleteRequest.requestMethod = @"DELETE";
     
     [self _performRequest:deleteRequest usingOperationQueue:_writeRequestQueue completion:^(NSData* responseData){
+        completionBlock();
+    }];
+    
+}
+
++(void) editAttachment:(ZPZoteroAttachment*)attachment completion:(void(^)(ZPZoteroAttachment*))completionBlock{
+ 
+    NSString* urlString = [[self _baseURLWithLibraryID:attachment.libraryID] stringByAppendingFormat:@"items/%@?key=%@", attachment.itemKey, [ZPPreferences OAuthKey]];
+    
+    ASIHTTPRequest* postRequest = [[ASIHTTPRequest alloc] initWithURL:[NSURL URLWithString:urlString]];
+    postRequest.requestMethod = @"PUT";
+    
+    [postRequest addRequestHeader:@"Content-Type" value:@"application/json"];
+    [postRequest addRequestHeader:@"If-Match" value:attachment.etag];
+    
+    NSString* linkMode ;
+    
+    if(attachment.linkMode == LINK_MODE_IMPORTED_FILE) linkMode = @"imported_file";
+    else if (attachment.linkMode == LINK_MODE_IMPORTED_URL) linkMode = @"imported_url";
+    else if (attachment.linkMode == LINK_MODE_LINKED_URL) linkMode = @"linked_url";
+    else if (attachment.linkMode == LINK_MODE_LINKED_FILE) linkMode = @"linked_file";
+    
+    NSString* json = [NSString stringWithFormat:@"{\"itemType\":\"attachment\",\"linkMode\":\"%@\",\"title\":\"%@\",\"accessDate\":\"%@\",\"url\":\"%@\",\"note\":\"%@\",\"contentType\":\"%@\",\"charset\":\"%@\",\"filename\":\"%@\",\"md5\":%@,\"mtime\":\%@,\"tags\":%@}", linkMode, [self _JSONEscapeString:attachment.title],
+                      attachment.accessDate == nil ? @"": attachment.accessDate,
+                      attachment.url == nil ? @"": [self _JSONEscapeString:attachment.url],
+                      [self _JSONEscapeString:attachment.note],
+                      attachment.contentType == nil ? @"": attachment.contentType,
+                      attachment.charset == nil ? @"": attachment.charset,
+                      [self _JSONEscapeString:attachment.filename],
+                      attachment.md5 == nil ? @"null": [NSString stringWithFormat:@"\"%@\"",attachment.md5],
+                      attachment.mtime == 0 ? @"null": [NSString stringWithFormat:@"%lli",attachment.mtime],
+                      [self _tagsJSSONForDataObject:attachment]];
+    
+    DDLogVerbose(@"Posting attachment JSON to server. Etag: %@ \n%@", attachment.etag, json);
+
+    [postRequest appendPostData:[json dataUsingEncoding:NSUTF8StringEncoding]];
+    
+    [self _performRequest:postRequest usingOperationQueue:_writeRequestQueue completion:^(NSData* responseData){
+        
+        NSXMLParser* parser = [[NSXMLParser alloc] initWithData:responseData];
+        ZPServerResponseXMLParser* parserDelegate =  [[ZPServerResponseXMLParserItem alloc] init];
+        parser.delegate = parserDelegate;
+        [parser parse];
+        completionBlock([parserDelegate.parsedElements objectAtIndex:0]);
+    }];
+
+}
+
++(void) editItem:(ZPZoteroItem *)item completion:(void (^)(ZPZoteroItem *))completionBlock{
+    
+    NSString* urlString = [[self _baseURLWithLibraryID:item.libraryID] stringByAppendingFormat:@"items/%@?key=%@", item.itemKey, [ZPPreferences OAuthKey]];
+    
+    ASIHTTPRequest* postRequest = [[ASIHTTPRequest alloc] initWithURL:[NSURL URLWithString:urlString]];
+    postRequest.requestMethod = @"PUT";
+    
+    [postRequest addRequestHeader:@"Content-Type" value:@"application/json"];
+    [postRequest addRequestHeader:@"If-Match" value:item.etag];
+    
+    NSMutableString* json = [NSMutableString stringWithFormat:@"{\"itemType\":\"%@\",", item.itemType];
+    
+    for(NSString* field in [ZPZoteroItemTypes fieldsForItemType:item.itemType]){
+        
+        if([field isEqualToString:@"creator"]){
+            [json appendString:@"\"creators\":[" ];
+
+            BOOL firstCreator = TRUE;
+            
+            for(NSDictionary* creator in item.creators){
+                
+                if(! firstCreator) [json appendString:@", "];
+                firstCreator = FALSE;
+                
+                [json appendFormat:@"{\"creatorType\": \"%@\"",[creator objectForKey:@"creatorType"]];
+                
+                NSString* name = [creator objectForKey:@"name"];
+                if(name != [NSNull null]){
+                    [json appendFormat:@", \"name\": \"%@\"",name];
+                }
+                else{
+                    [json appendFormat:@", \"lastName\": \"%@\"",[creator objectForKey:@"lastName"]];
+                    [json appendFormat:@", \"firstName\": \"%@\"",[creator objectForKey:@"firstName"]];
+                }
+                [json appendString:@"}"];
+            }
+            [json appendString:@"]"];
+            
+        }
+        else{
+            NSString* value;
+            if([item respondsToSelector:NSSelectorFromString(field)]){
+                value = [item performSelector:NSSelectorFromString(field)];
+            }
+            else{
+                value = [item.fields objectForKey:field];
+            }
+            [json appendFormat:@"\"%@\": \"%@\"",field,[self _JSONEscapeString:value]];
+            
+            
+        }
+        
+        [json appendString:@", "];
+    }
+    
+    // Tags
+    [json appendString:@"\"tags\":"];
+    [json appendString:[self _tagsJSSONForDataObject:item]];
+
+    [json appendString:@"}"];
+    
+    DDLogVerbose(@"Posting item JSON to server. Etag: %@ \n%@", item.etag, json);
+    
+    [postRequest appendPostData:[json dataUsingEncoding:NSUTF8StringEncoding]];
+    
+    [self _performRequest:postRequest usingOperationQueue:_writeRequestQueue completion:^(NSData* responseData){
+        
+        NSXMLParser* parser = [[NSXMLParser alloc] initWithData:responseData];
+        ZPServerResponseXMLParser* parserDelegate =  [[ZPServerResponseXMLParserItem alloc] init];
+        parser.delegate = parserDelegate;
+        [parser parse];
+        completionBlock([parserDelegate.parsedElements objectAtIndex:0]);
+    }];
+    
+}
+
+
++(void) createNote:(ZPZoteroNote*)note completion:(void(^)(ZPZoteroNote*))completionBlock{
+
+    NSString* urlString = [[self _baseURLWithLibraryID:note.libraryID] stringByAppendingFormat:@"items/%@/children?key=%@", note.parentKey, [ZPPreferences OAuthKey]];
+    
+    ASIHTTPRequest* postRequest = [[ASIHTTPRequest alloc] initWithURL:[NSURL URLWithString:urlString]];
+    postRequest.requestMethod = @"POST";
+    
+    [postRequest addRequestHeader:@"Content-Type" value:@"application/json"];
+    [postRequest addRequestHeader:@"X-Zotero-Write-Token" value:note.itemKey];
+
+    NSString* json = [NSString stringWithFormat:@"{\"items\" : [{  \"itemType\" : \"note\",  \"note\" : \"%@\",  \"tags\" : []}]}",note.note];
+    
+    [postRequest appendPostData:[json dataUsingEncoding:NSUTF8StringEncoding]];
+    
+    [self _performRequest:postRequest usingOperationQueue:_writeRequestQueue completion:^(NSData* responseData){
+        
+        NSXMLParser* parser = [[NSXMLParser alloc] initWithData:responseData];
+        ZPServerResponseXMLParser* parserDelegate =  [[ZPServerResponseXMLParserItem alloc] init];
+        parser.delegate = parserDelegate;
+        [parser parse];
+        completionBlock([parserDelegate.parsedElements objectAtIndex:0]);
+    }];
+
+}
+
++(void) editNote:(ZPZoteroNote*)note completion:(void(^)(ZPZoteroNote*))completionBlock{
+
+    NSString* urlString = [[self _baseURLWithLibraryID:note.libraryID] stringByAppendingFormat:@"items/%@?key=%@", note.itemKey, [ZPPreferences OAuthKey]];
+    
+    ASIHTTPRequest* postRequest = [[ASIHTTPRequest alloc] initWithURL:[NSURL URLWithString:urlString]];
+    postRequest.requestMethod = @"PUT";
+    
+    [postRequest addRequestHeader:@"Content-Type" value:@"application/json"];
+    [postRequest addRequestHeader:@"If-Match" value:note.etag];
+    
+    [postRequest appendPostData:[[NSString stringWithFormat:@"{  \"itemType\" : \"note\",  \"note\" : \"%@\",  \"tags\" : [], \"creators\" : []}",note.note] dataUsingEncoding:NSUTF8StringEncoding]];
+    
+    [self _performRequest:postRequest usingOperationQueue:_writeRequestQueue completion:^(NSData* responseData){
+        
+        NSXMLParser* parser = [[NSXMLParser alloc] initWithData:responseData];
+        ZPServerResponseXMLParser* parserDelegate =  [[ZPServerResponseXMLParserItem alloc] init];
+        parser.delegate = parserDelegate;
+        [parser parse];
+        completionBlock([parserDelegate.parsedElements objectAtIndex:0]);
+    }];
+    
+}
+
++(void) deleteNote:(ZPZoteroNote*)note completion:(void(^)(void))completionBlock{
+
+    NSString* urlString = [[self _baseURLWithLibraryID:note.libraryID] stringByAppendingFormat:@"items/%@?key=%@", note.itemKey, [ZPPreferences OAuthKey]];
+    
+    ASIHTTPRequest* postRequest = [[ASIHTTPRequest alloc] initWithURL:[NSURL URLWithString:urlString]];
+    postRequest.requestMethod = @"DELETE";
+    
+    [postRequest addRequestHeader:@"If-Match" value:note.etag];
+    
+    [self _performRequest:postRequest usingOperationQueue:_writeRequestQueue completion:^(NSData* responseData){
         completionBlock();
     }];
     
@@ -924,6 +1114,23 @@ const NSInteger ZPServerConnectionRequestLastModifiedItem = 11;
                 break;
         }
     }
+}
+
++(NSString*) _tagsJSSONForDataObject:(ZPZoteroDataObject*) dataObject{
+    
+    NSMutableArray* tags= [[NSMutableArray alloc] initWithCapacity:dataObject.tags.count];
+    
+    for(NSString* tag in dataObject.tags){
+        [tags addObject:[NSString stringWithFormat:@"{ \"tag\" : \"%@\" }",[self _JSONEscapeString:tag]]];
+    }
+    
+    return [NSString stringWithFormat:@"[%@]",[tags componentsJoinedByString:@", "]];
+}
+
++(NSString*) _JSONEscapeString:(NSString*) string{
+    
+    if(string == NULL) return @"";
+    else return [[[string stringByReplacingOccurrencesOfString:@"\\" withString:@"\\\\"] stringByReplacingOccurrencesOfString:@"\"" withString:@"\\\""] stringByReplacingOccurrencesOfString:@"\n" withString:@"\\n"];
 }
 
 

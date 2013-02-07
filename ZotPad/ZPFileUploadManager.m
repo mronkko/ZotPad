@@ -18,7 +18,6 @@
 @interface ZPFileUploadManager ()
 
 +(void) _uploadVersionOfAttachment:(ZPZoteroAttachment*)attachment;
-+(void) _checkUploadQueue;
 +(void) _scanFilesToUpload;
 
 @end

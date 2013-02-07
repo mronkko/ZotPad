@@ -99,9 +99,9 @@
 // This method returns an array containing the items that were actually modified in the DB. This can be used to determine if fields and attachments
 // need to be modified
 
-+(NSArray*) writeItems:(NSArray*)items;
-+(NSArray*) writeNotes:(NSArray*)notes;
-+(NSArray*) writeAttachments:(NSArray*)attachments;
++(NSArray*) writeItems:(NSArray*)items checkTimestamp:(BOOL) checkTimestamp;
++(NSArray*) writeNotes:(NSArray*)notesitems checkTimestamp:(BOOL) checkTimestamp;
++(NSArray*) writeAttachments:(NSArray*)attachmentsitems checkTimestamp:(BOOL) checkTimestamp;
 
 +(void) writeVersionInfoForAttachment:(ZPZoteroAttachment*)attachment;
 
@@ -118,6 +118,7 @@
 +(void) removeItemKeysNotInArray:(NSArray*)itemKeys fromCollection:(NSString*)collectionKey;
 +(void) removeItemKey:(NSString*)itemKey fromCollection:(NSString*)collectionKey;
 +(void) deleteItemKeysNotInArray:(NSArray*)itemKeys fromLibrary:(NSInteger)libraryID;
++(void) deleteNote:(ZPZoteroNote*) note;
 
 +(void) updateViewedTimestamp:(ZPZoteroAttachment*)attachment;
 +(void) setUpdatedTimestampForCollection:(NSString*)collectionKey toValue:(NSString*)updatedTimestamp;
@@ -138,13 +139,33 @@
 +(void) removeItemLocally:(ZPZoteroItem*)item fromCollection:(NSString*)collectionKey;
 
 // Locally modifying notes
-+(void) createLocallyModifiedNoteWithContent:(NSString*) noteText asChildForItem:(ZPZoteroItem*)item;
 
++(void) createNoteLocally:(ZPZoteroNote*) note;
++(void) replaceLocallyAddedNote:(ZPZoteroNote*) localNote withServerVersion:(ZPZoteroNote*) serverNote;
++(void) deleteNoteLocally:(ZPZoteroNote*) note;
++(void) saveLocallyEditedNote:(ZPZoteroNote*) note;
+
++(void) saveLocallyEditedAttachmentNote:(ZPZoteroAttachment*) attachment;
 
 // Locally modifying tags
 
 // Methods for retrieving locally modified objects
 +(NSArray*) locallyAddedCollections;
+
+// Returns an array of attachments whose metadata has been edited locally
++(NSArray*) locallyEditedAttachments;
+
++(NSArray*) locallyEditedNotes;
++(NSArray*) locallyAddedNotes;
++(NSArray*) locallyDeletedNotes;
+
++(void) addTagsLocally:(NSArray*)tags toItemWithKey:(NSString*)key;
++(void) removeTagsLocally:(NSArray*)tags toItemWithKey:(NSString*)key;
+
++(NSArray*) attachmentsWithLocallyEditedTags;
++(NSArray*) itemsWithLocallyEditedTags;
+
++(void) clearLocalEditFlagsForTagsWithItemKey:(NSString*)itemKey;
 
 // Return a dictionary where the keys are collection keys and the objects are arrays of item keys
 

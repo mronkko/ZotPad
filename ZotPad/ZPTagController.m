@@ -210,6 +210,7 @@ static const NSInteger tagBaseWidth = 20;
                           action:@selector(toggleTag:)
                 forControlEvents:UIControlEventTouchUpInside];
 
+            tagButton.userInteractionEnabled = TRUE;
             tagButton.selected = [tagOwner isTagSelected:tag];
 
             //Position the tag

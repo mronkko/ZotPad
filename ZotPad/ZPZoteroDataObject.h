@@ -44,4 +44,5 @@
 -(void) configureWithDictionary:(NSDictionary*) dictionary;
 -(BOOL) needsToBeWrittenToCache;
 
+
 @end
