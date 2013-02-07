@@ -527,7 +527,7 @@ const NSInteger ZPServerConnectionRequestLastModifiedItem = 11;
                 [json appendFormat:@"{\"creatorType\": \"%@\"",[creator objectForKey:@"creatorType"]];
                 
                 NSString* name = [creator objectForKey:@"name"];
-                if(name != [NSNull null]){
+                if(name != nil && name != [NSNull null]){
                     [json appendFormat:@", \"name\": \"%@\"",name];
                 }
                 else{

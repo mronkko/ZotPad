@@ -7,6 +7,7 @@
 //
 
 #import "ZPTagController.h"
+#import "ZPCore.H"
 #import <QuartzCore/QuartzCore.h>
 
 @interface ZPTagController()
@@ -61,6 +62,8 @@ static const NSInteger tagBaseWidth = 20;
 
 +(UIButton*) _tagButtonForTag:(NSString*)tag{
     
+    DDLogVerbose(@"Getting tag: %@, buttons in cache: %i", tag, [buttonCache count]);
+    
     UIButton* tagButton;
     if([buttonCache count]==0){
         tagButton = [UIButton buttonWithType:UIButtonTypeCustom];
@@ -98,9 +101,10 @@ static const NSInteger tagBaseWidth = 20;
     
     //Recycle the existig tag buttons
     
-    for(UIView* tagButton in view.subviews){
+    for(UIButton* tagButton in view.subviews){
         [tagButton removeFromSuperview];
         [buttonCache addObject:tagButton];
+        DDLogVerbose(@"Recycling tagbutton %@, buttons in cache: %i",tagButton.currentTitle,[buttonCache count]);
     }
     
     NSInteger maxWidthOfTags = view.frame.size.width;

@@ -593,11 +593,11 @@
          ignoreCount = "0"
          continueAfterRunningActions = "No"
          filePath = "ZotPad/ZPTagController.m"
-         timestampString = "381941072.057845"
+         timestampString = "381950888.363937"
          startingColumnNumber = "9223372036854775807"
          endingColumnNumber = "9223372036854775807"
-         startingLineNumber = "206"
-         endingLineNumber = "206"
+         startingLineNumber = "210"
+         endingLineNumber = "210"
          landmarkName = "-tableView:cellForRowAtIndexPath:"
          landmarkType = "5">
       </FileBreakpoint>
@@ -606,11 +606,11 @@
          ignoreCount = "0"
          continueAfterRunningActions = "No"
          filePath = "ZotPad/ZPTagController.m"
-         timestampString = "381941213.164443"
+         timestampString = "381950888.363937"
          startingColumnNumber = "9223372036854775807"
          endingColumnNumber = "9223372036854775807"
-         startingLineNumber = "280"
-         endingLineNumber = "280"
+         startingLineNumber = "284"
+         endingLineNumber = "284"
          landmarkName = "-toggleTag:"
          landmarkType = "5">
       </FileBreakpoint>
@@ -619,12 +619,25 @@
          ignoreCount = "0"
          continueAfterRunningActions = "No"
          filePath = "ZotPad/ZPFileViewerViewController.m"
-         timestampString = "381946130.008545"
+         timestampString = "381951700.371393"
          startingColumnNumber = "9223372036854775807"
          endingColumnNumber = "9223372036854775807"
-         startingLineNumber = "1011"
-         endingLineNumber = "1011"
+         startingLineNumber = "1015"
+         endingLineNumber = "1015"
          landmarkName = "-refreshTagsFor:"
+         landmarkType = "5">
+      </FileBreakpoint>
+      <FileBreakpoint
+         shouldBeEnabled = "No"
+         ignoreCount = "0"
+         continueAfterRunningActions = "No"
+         filePath = "ZotPad/ZPServerConnection.m"
+         timestampString = "381952063.62274"
+         startingColumnNumber = "9223372036854775807"
+         endingColumnNumber = "9223372036854775807"
+         startingLineNumber = "530"
+         endingLineNumber = "530"
+         landmarkName = "+editItem:completion:"
          landmarkType = "5">
       </FileBreakpoint>
    </FileBreakpoints>

@@ -804,6 +804,9 @@ static ZPFileViewerViewController* _instance;
 
 
 -(UITableViewCell*) tableView:(UITableView *)tableView cellForRowAtIndexPath:(NSIndexPath *)indexPath{
+
+    DDLogVerbose(@"%@",indexPath);
+    
     UITableViewCell *cell;
     NSString* CellIdentifier;
     
@@ -852,8 +855,9 @@ static ZPFileViewerViewController* _instance;
     if([CellIdentifier isEqualToString:@"TagsCell"]){
 
         //Clean the cell
-
-        [ZPTagController addTagButtonsToView:cell.contentView tags:[NSArray array]];
+        for(UIView* view in cell.contentView.subviews ){
+            [view removeFromSuperview];
+        }
 
         if(tagSource == attachment){
             if(_tagButtonsForAttachment != NULL){
@@ -1013,11 +1017,18 @@ static ZPFileViewerViewController* _instance;
     
     NSInteger section;
     if(isStandaloneAttachment){
+        _tagButtonsForAttachment = NULL;
         section = 0;
     }
     else{
-        if(item == attachment) section = 1;
-        else section = 0;
+        if(item == attachment){
+            section = 1;
+            _tagButtonsForAttachment = NULL;
+        }
+        else{
+            section = 0;
+            _tagButtonsForParent = NULL;
+        }
     }
 
     [self.notesAndTagsTable reloadSections:[NSIndexSet indexSetWithIndex:section] withRowAnimation:UITableViewRowAnimationAutomatic];

@@ -1065,7 +1065,7 @@ static NSObject* writeLock;
                            withArgumentsInArray:[tags arrayByAddingObject:itemKey]];
         
         while([rs next]){
-            [tagsToBeAdded removeObject:[rs stringForColumn:0]];
+            [tagsToBeAdded removeObject:[rs stringForColumnIndex:0]];
         }
     }
 
