@@ -33,19 +33,6 @@
          shouldBeEnabled = "No"
          ignoreCount = "0"
          continueAfterRunningActions = "No"
-         filePath = "ZotPad/ZPCollectionsAndTagsViewController.m"
-         timestampString = "382097565.657332"
-         startingColumnNumber = "9223372036854775807"
-         endingColumnNumber = "9223372036854775807"
-         startingLineNumber = "184"
-         endingLineNumber = "184"
-         landmarkName = "-prepareForSegue:sender:"
-         landmarkType = "5">
-      </FileBreakpoint>
-      <FileBreakpoint
-         shouldBeEnabled = "No"
-         ignoreCount = "0"
-         continueAfterRunningActions = "No"
          filePath = "ZotPad/ZPTableViewUpdater.m"
          timestampString = "380145879.521283"
          startingColumnNumber = "9223372036854775807"
@@ -294,11 +281,11 @@
          ignoreCount = "0"
          continueAfterRunningActions = "No"
          filePath = "ZotPad/ZPDatabase.m"
-         timestampString = "382106770.411442"
+         timestampString = "382113186.353815"
          startingColumnNumber = "9223372036854775807"
          endingColumnNumber = "9223372036854775807"
-         startingLineNumber = "1253"
-         endingLineNumber = "1253"
+         startingLineNumber = "1256"
+         endingLineNumber = "1256"
          landmarkName = "+locallyDeletedCollectionMemberships"
          landmarkType = "5">
       </FileBreakpoint>
@@ -307,11 +294,11 @@
          ignoreCount = "0"
          continueAfterRunningActions = "No"
          filePath = "ZotPad/ZPDatabase.m"
-         timestampString = "382106770.411442"
+         timestampString = "382113186.353815"
          startingColumnNumber = "9223372036854775807"
          endingColumnNumber = "9223372036854775807"
-         startingLineNumber = "1221"
-         endingLineNumber = "1221"
+         startingLineNumber = "1224"
+         endingLineNumber = "1224"
          landmarkName = "+removeItemLocally:fromCollection:"
          landmarkType = "5">
       </FileBreakpoint>
@@ -333,11 +320,11 @@
          ignoreCount = "0"
          continueAfterRunningActions = "No"
          filePath = "ZotPad/ZPDatabase.m"
-         timestampString = "382106770.411442"
+         timestampString = "382113186.353815"
          startingColumnNumber = "9223372036854775807"
          endingColumnNumber = "9223372036854775807"
-         startingLineNumber = "1158"
-         endingLineNumber = "1158"
+         startingLineNumber = "1161"
+         endingLineNumber = "1161"
          landmarkName = "+writeItems:checkTimestamp:"
          landmarkType = "5">
       </FileBreakpoint>
@@ -359,11 +346,11 @@
          ignoreCount = "0"
          continueAfterRunningActions = "No"
          filePath = "ZotPad/ZPDatabase.m"
-         timestampString = "382106770.411442"
+         timestampString = "382113186.353815"
          startingColumnNumber = "9223372036854775807"
          endingColumnNumber = "9223372036854775807"
-         startingLineNumber = "466"
-         endingLineNumber = "466"
+         startingLineNumber = "469"
+         endingLineNumber = "469"
          landmarkName = "+writeObjects:intoTable:checkTimestamp:"
          landmarkType = "5">
       </FileBreakpoint>
@@ -554,11 +541,11 @@
          ignoreCount = "0"
          continueAfterRunningActions = "No"
          filePath = "ZotPad/ZPItemList.m"
-         timestampString = "381876144.689275"
+         timestampString = "382131819.858976"
          startingColumnNumber = "9223372036854775807"
          endingColumnNumber = "9223372036854775807"
-         startingLineNumber = "177"
-         endingLineNumber = "177"
+         startingLineNumber = "174"
+         endingLineNumber = "174"
          landmarkName = "-_updateRowForItem:"
          landmarkType = "5">
       </FileBreakpoint>
@@ -658,11 +645,11 @@
          ignoreCount = "0"
          continueAfterRunningActions = "No"
          filePath = "ZotPad/ZPCollectionsAndTagsViewController.m"
-         timestampString = "382097976.543422"
+         timestampString = "382131602.921214"
          startingColumnNumber = "9223372036854775807"
          endingColumnNumber = "9223372036854775807"
-         startingLineNumber = "319"
-         endingLineNumber = "319"
+         startingLineNumber = "320"
+         endingLineNumber = "320"
          landmarkName = "-_toggleTagSelectionWithAnimationDuration:toVisible:"
          landmarkType = "5">
       </FileBreakpoint>

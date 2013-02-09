@@ -1854,6 +1854,62 @@
 			remoteGlobalIDString = 09E159E8160F573A003025B4;
 			remoteInfo = OHAttributedLabel;
 		};
+		A7F2E1DF16C6836C002FC856 /* PBXContainerItemProxy */ = {
+			isa = PBXContainerItemProxy;
+			containerPortal = A7ABAB3315A3046300EA8B7B /* DTCoreText.xcodeproj */;
+			proxyType = 1;
+			remoteGlobalIDString = A70F11DD148632CD009202BF;
+			remoteInfo = "Static Library";
+		};
+		A7F2E1E116C6836C002FC856 /* PBXContainerItemProxy */ = {
+			isa = PBXContainerItemProxy;
+			containerPortal = A77E0DC415D65FAB00134D35 /* UserVoice.xcodeproj */;
+			proxyType = 1;
+			remoteGlobalIDString = D2AAC07D0554694100DB518D;
+			remoteInfo = UserVoice;
+		};
+		A7F2E1E316C6836C002FC856 /* PBXContainerItemProxy */ = {
+			isa = PBXContainerItemProxy;
+			containerPortal = A702844E163BE32F003A0192 /* fmdb.xcodeproj */;
+			proxyType = 1;
+			remoteGlobalIDString = EE4290EE12B42F870088BD94;
+			remoteInfo = FMDB;
+		};
+		A7F2E1E516C6836C002FC856 /* PBXContainerItemProxy */ = {
+			isa = PBXContainerItemProxy;
+			containerPortal = A7028439163BE165003A0192 /* DropboxSDK.xcodeproj */;
+			proxyType = 1;
+			remoteGlobalIDString = D3933BE4145F12AD00E15FA7;
+			remoteInfo = SDropboxSDK;
+		};
+		A7F2E1E716C6836C002FC856 /* PBXContainerItemProxy */ = {
+			isa = PBXContainerItemProxy;
+			containerPortal = A7EC0626161A33420008B314 /* OHAttributedLabel.xcodeproj */;
+			proxyType = 1;
+			remoteGlobalIDString = 09E159E7160F573A003025B4;
+			remoteInfo = OHAttributedLabel;
+		};
+		A7F2E1E916C6836C002FC856 /* PBXContainerItemProxy */ = {
+			isa = PBXContainerItemProxy;
+			containerPortal = A7A6A5F2161ABE0C00C7DB72 /* CSLProcessor.xcodeproj */;
+			proxyType = 1;
+			remoteGlobalIDString = A736E692161ABAA8004E71AF;
+			remoteInfo = CSLProcessor;
+		};
+		A7F2E1EB16C6836C002FC856 /* PBXContainerItemProxy */ = {
+			isa = PBXContainerItemProxy;
+			containerPortal = A7C19FF715F4D5D100A5AF49 /* FRLayeredNavigationController.xcodeproj */;
+			proxyType = 1;
+			remoteGlobalIDString = DA4FACC515591AB300D85A7E;
+			remoteInfo = FRLayeredNavigationController;
+		};
+		A7F2E1ED16C6836C002FC856 /* PBXContainerItemProxy */ = {
+			isa = PBXContainerItemProxy;
+			containerPortal = A733F7BC15F8B66900E8A2D6 /* CoconutKit.xcodeproj */;
+			proxyType = 1;
+			remoteGlobalIDString = D2AAC07D0554694100DB518D;
+			remoteInfo = CoconutKit;
+		};
 /* End PBXContainerItemProxy section */
 
 /* Begin PBXFileReference section */
@@ -4332,6 +4388,14 @@
 			buildRules = (
 			);
 			dependencies = (
+				A7F2E1E016C6836C002FC856 /* PBXTargetDependency */,
+				A7F2E1E216C6836C002FC856 /* PBXTargetDependency */,
+				A7F2E1E416C6836C002FC856 /* PBXTargetDependency */,
+				A7F2E1E616C6836C002FC856 /* PBXTargetDependency */,
+				A7F2E1E816C6836C002FC856 /* PBXTargetDependency */,
+				A7F2E1EA16C6836C002FC856 /* PBXTargetDependency */,
+				A7F2E1EC16C6836C002FC856 /* PBXTargetDependency */,
+				A7F2E1EE16C6836C002FC856 /* PBXTargetDependency */,
 			);
 			name = ZotPad;
 			productName = ZotPad;
@@ -6295,6 +6359,46 @@
 			name = FMDB;
 			targetProxy = A756F9C0167E3402008E3514 /* PBXContainerItemProxy */;
 		};
+		A7F2E1E016C6836C002FC856 /* PBXTargetDependency */ = {
+			isa = PBXTargetDependency;
+			name = "Static Library";
+			targetProxy = A7F2E1DF16C6836C002FC856 /* PBXContainerItemProxy */;
+		};
+		A7F2E1E216C6836C002FC856 /* PBXTargetDependency */ = {
+			isa = PBXTargetDependency;
+			name = UserVoice;
+			targetProxy = A7F2E1E116C6836C002FC856 /* PBXContainerItemProxy */;
+		};
+		A7F2E1E416C6836C002FC856 /* PBXTargetDependency */ = {
+			isa = PBXTargetDependency;
+			name = FMDB;
+			targetProxy = A7F2E1E316C6836C002FC856 /* PBXContainerItemProxy */;
+		};
+		A7F2E1E616C6836C002FC856 /* PBXTargetDependency */ = {
+			isa = PBXTargetDependency;
+			name = SDropboxSDK;
+			targetProxy = A7F2E1E516C6836C002FC856 /* PBXContainerItemProxy */;
+		};
+		A7F2E1E816C6836C002FC856 /* PBXTargetDependency */ = {
+			isa = PBXTargetDependency;
+			name = OHAttributedLabel;
+			targetProxy = A7F2E1E716C6836C002FC856 /* PBXContainerItemProxy */;
+		};
+		A7F2E1EA16C6836C002FC856 /* PBXTargetDependency */ = {
+			isa = PBXTargetDependency;
+			name = CSLProcessor;
+			targetProxy = A7F2E1E916C6836C002FC856 /* PBXContainerItemProxy */;
+		};
+		A7F2E1EC16C6836C002FC856 /* PBXTargetDependency */ = {
+			isa = PBXTargetDependency;
+			name = FRLayeredNavigationController;
+			targetProxy = A7F2E1EB16C6836C002FC856 /* PBXContainerItemProxy */;
+		};
+		A7F2E1EE16C6836C002FC856 /* PBXTargetDependency */ = {
+			isa = PBXTargetDependency;
+			name = CoconutKit;
+			targetProxy = A7F2E1ED16C6836C002FC856 /* PBXContainerItemProxy */;
+		};
 /* End PBXTargetDependency section */
 
 /* Begin PBXVariantGroup section */
@@ -6426,7 +6530,7 @@
 		A7200DF214718DC1004347C9 /* Debug */ = {
 			isa = XCBuildConfiguration;
 			buildSettings = {
-				ALTERNATE_GROUP = 70000;
+				ALTERNATE_GROUP = "";
 				ALWAYS_SEARCH_USER_PATHS = YES;
 				CODE_SIGN_IDENTITY = "iPhone Developer";
 				FRAMEWORK_SEARCH_PATHS = (
@@ -6442,7 +6546,7 @@
 				);
 				HEADER_SEARCH_PATHS = /usr/include/libxml2;
 				INFOPLIST_FILE = "ZotPad-Info.plist";
-				INSTALL_GROUP = 70000;
+				INSTALL_GROUP = "";
 				LIBRARY_SEARCH_PATHS = (
 					"$(inherited)",
 					"\"$(SRCROOT)\"",
@@ -6462,10 +6566,10 @@
 		A7200DF314718DC1004347C9 /* Release */ = {
 			isa = XCBuildConfiguration;
 			buildSettings = {
-				ALTERNATE_GROUP = 70000;
+				ALTERNATE_GROUP = "";
 				ALWAYS_SEARCH_USER_PATHS = YES;
-				CODE_SIGN_IDENTITY = "iPhone Distribution: Mikko Ronkko";
-				"CODE_SIGN_IDENTITY[sdk=iphoneos*]" = "iPhone Distribution: Mikko Ronkko";
+				CODE_SIGN_IDENTITY = "iPhone Distribution";
+				"CODE_SIGN_IDENTITY[sdk=iphoneos*]" = "iPhone Distribution";
 				FRAMEWORK_SEARCH_PATHS = (
 					"$(inherited)",
 					"\"$(DEVELOPER_FRAMEWORKS_DIR)\"",
@@ -6476,7 +6580,7 @@
 				GCC_PREPROCESSOR_DEFINITIONS = "";
 				HEADER_SEARCH_PATHS = /usr/include/libxml2;
 				INFOPLIST_FILE = "ZotPad-Info.plist";
-				INSTALL_GROUP = 70000;
+				INSTALL_GROUP = "";
 				LIBRARY_SEARCH_PATHS = (
 					"$(inherited)",
 					"\"$(SRCROOT)\"",
@@ -6485,8 +6589,8 @@
 					"\"$(SRCROOT)/CrittercismSDK\"",
 				);
 				PRODUCT_NAME = "$(TARGET_NAME)";
-				PROVISIONING_PROFILE = "AE9438C2-FEB3-4CFE-8857-34811EBD85A4";
-				"PROVISIONING_PROFILE[sdk=iphoneos*]" = "AE9438C2-FEB3-4CFE-8857-34811EBD85A4";
+				PROVISIONING_PROFILE = "";
+				"PROVISIONING_PROFILE[sdk=iphoneos*]" = "";
 				SKIP_INSTALL = NO;
 				TARGETED_DEVICE_FAMILY = "1,2";
 				USER_HEADER_SEARCH_PATHS = "\"$(SRCROOT)\"/**";

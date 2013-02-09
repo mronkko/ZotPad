@@ -25,7 +25,6 @@
     
     NSInteger _animations;
     BOOL _hasContent;
-    BOOL _invalidated;
     
     UITableView* _tableView;
     

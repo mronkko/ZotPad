@@ -17,6 +17,7 @@
 #import <QuartzCore/QuartzCore.h>
 #import "ZPTagController.h"
 #import "ZPItemList.h"
+#import "ZPReachability.h"
 
 @interface ZPCollectionsAndTagsViewController(){
     BOOL _librariesAndCollectionsLoadingActivityViewAnimating;
@@ -94,7 +95,7 @@
     librariesAndCollectionsLoadingActivityView = [[UIActivityIndicatorView alloc] initWithActivityIndicatorStyle:UIActivityIndicatorViewStyleWhite];
     librariesAndCollectionsLoadingActivityView.hidesWhenStopped = TRUE;
     
-    if(_librariesAndCollectionsLoadingActivityViewAnimating){
+    if(_librariesAndCollectionsLoadingActivityViewAnimating && [ZPReachability hasInternetConnection] && [ZPPreferences online]){
         [librariesAndCollectionsLoadingActivityView startAnimating];
     }
     else{
@@ -192,7 +193,7 @@
         
         [ZPItemList instance].targetTableView = target.tableView;
         [[ZPItemList instance] updateItemList:NO];
-        if([ZPItemList instance].isFullyCached){
+        if([ZPItemList instance].isFullyCached || ! [ZPReachability hasInternetConnection]){
             [target.itemListLoadingActivityView stopAnimating];
         }
         else{
@@ -363,7 +364,9 @@
 
 -(void) notifyActiveLibraryChanged:(NSNotification *) notification{
     _librariesAndCollectionsLoadingActivityViewAnimating = TRUE;
-    [self.librariesAndCollectionsLoadingActivityView performSelectorOnMainThread:@selector(startAnimating) withObject:nil waitUntilDone:NO];
+    if([ZPReachability hasInternetConnection]){
+        [self.librariesAndCollectionsLoadingActivityView performSelectorOnMainThread:@selector(startAnimating) withObject:nil waitUntilDone:NO];
+    }
 }
 
 -(void) notifyLibraryWithCollectionsAvailable:(NSNotification*) notification{

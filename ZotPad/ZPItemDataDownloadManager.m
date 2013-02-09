@@ -644,17 +644,13 @@ static ZPCacheStatusToolbarController* _statusView;
                 
                 [self _addToLibrariesQueue:container priority:FALSE];
                 
-                if([ZPPreferences cacheMetadataActiveLibrary]){
-                    
-                    //Retrieve all collections for this library and add them to cache
-                    for(ZPZoteroCollection* collection in [ZPDatabase collectionsForLibrary:container.libraryID]){
-                        [ZPServerConnection retrieveTimestampForLibrary:libraryID collection:collection.key];
-                    }
+                //Retrieve all collections for this library and add them to cache
+                for(ZPZoteroCollection* collection in [ZPDatabase collectionsForLibrary:container.libraryID]){
+                    [ZPServerConnection retrieveTimestampForLibrary:libraryID collection:collection.key];
                 }
             }
 
-        }
-        
+        }        
     }
     
     //Collection timestamp
@@ -688,6 +684,10 @@ static ZPCacheStatusToolbarController* _statusView;
 
     _activelibraryID = [(NSNumber*) notification.object integerValue];
     
+    // Retrieve the collections so that they are refreshed always when a new library is chosen
+    [ZPServerConnection retrieveCollectionsForLibraryFromServer:_activelibraryID];
+
+    // Check if this library needs a cache refresh for the items
     [self _checkIfLibraryNeedsCacheRefreshAndQueue:_activelibraryID];
 }
 

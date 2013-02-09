@@ -68,7 +68,6 @@ static ZPItemList* _instance;
 
 - (void)clearTable{
     
-    _invalidated = TRUE;
     
     @synchronized(_tableView){
         
@@ -112,8 +111,6 @@ static ZPItemList* _instance;
         [[NSNotificationCenter defaultCenter] postNotificationName:ZPNOTIFICATION_ITEM_LIST_FULLY_LOADED object:NULL];
     }
     
-    _invalidated = FALSE;
-    
     [self updateItemList:FALSE];
     //DDLogVerbose(@"Configured uncached keys");
     
@@ -152,7 +149,7 @@ static ZPItemList* _instance;
             
             
             //If there is a new set of items loaded, return without performing any updates.
-            if(thisItemKeys != _itemKeysShown || _invalidated) return;
+            if(thisItemKeys != _itemKeysShown) return;
             
             @synchronized(_itemKeysNotInCache){
                 [_itemKeysNotInCache removeObjectsInArray:newKeys];

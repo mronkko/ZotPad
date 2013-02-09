@@ -100,7 +100,9 @@
     [_activityIndicator hidesWhenStopped];
     
     //TODO: Preserve state and use that
-    [_activityIndicator startAnimating];
+    if([ZPReachability hasInternetConnection]){
+        [_activityIndicator startAnimating];
+    }
     
     UIBarButtonItem* activityIndicator = [[UIBarButtonItem alloc] initWithCustomView:_activityIndicator];
     self.starButton = [[ZPStarBarButtonItem alloc] init];

@@ -1,15 +1,16 @@
-This is a release candidate build with no known bugs or missing features. You must uninstall the previous build before installing this build.
+This is a release candidate build with no known bugs or missing features.
 
-This build will install on parallel to the App Store version of ZotPad and should be stable enough for every day use.
+THIS BUILD WILL INSTALL OVER THE APP STORE VERSION OF ZOTPAD AND UPGRADE IT TO 1.2
+
+If you install this build and want to revert to 1.1 version, you need to uninstall ZotPad and reinstall it from the App Store
 
 ----- Changes since the previous beta build -----
 
 GENERAL: 
 
 - Fixes bug
-- Editing, adding, and deleting notes are saved and syncronized to Zotero server
-- Starred items are now saved and synchronized to Zotero server
-- Tags are now saved and synchronized to Zotero server
+- Updated the user manuals to reflect changes in 1.2
+- Added an upgrade script to upgrade from 1.1 to 1.2
 
 ----- Other new features and notable changes since ZotPad 1.1.2 ------
 

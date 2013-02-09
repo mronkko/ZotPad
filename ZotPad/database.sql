@@ -15,7 +15,7 @@ CREATE TABLE IF NOT EXISTS version (
     version INTEGER PRIMARY KEY
 );
 
-INSERT INTO version VALUES (2);
+INSERT INTO version VALUES (3);
 
 /*
 
