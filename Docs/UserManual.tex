@@ -24,9 +24,9 @@
 	\center
 	\fbox{\includegraphics[scale=.30]{images/iPhone/{#2}}}
 
-	\refstepcounter{figure}
-	\smallskip\noindent\small Figure \thefigure: #1
-	\label{#2}
+%	\refstepcounter{figure}
+	\caption{#1 \label{#2}}
+	\smallskip\noindent\small Figure \ref{#2}: #1
 	}
 %remove footnotes from the iPhone version
 	\newcommand{\ipadfootnote}[1]{}
@@ -66,7 +66,7 @@
 %\iphone{\begin{fullwidth}}
 
 
-ZotPad is an iPad/iPhone client for Zotero reference management software. The purpose of ZotPad is to allow accessing Zotero libraries from mobile devices. Using Zotero can be divided into three tasks, collecting articles and other material from the internet; reading, organizing, and making notes of the collected material; and citing the collected material in one's own writing. The purpose of ZotPad is to allow doing the reading, organizing, and note taking part on a mobile device\ipadfootnote{Zotero provides a bookmarklet that can be used to import items directly from Mobile Safari: \url{http://www.zotero.org/downloadbookmarklet}. Adding items will also be supported in ZotPad 1.3}. \iphone{Zotero provides a bookmarklet that can be used to import items directly from Mobile Safari: \url{http://www.zotero.org/downloadbookmarklet}. Adding items will also be supported in ZotPad 1.3}
+ZotPad is an iPad/iPhone client for Zotero reference management software. The purpose of ZotPad is to allow accessing Zotero libraries from mobile devices. Using Zotero can be divided into three tasks, collecting articles and other material from the internet; reading, organizing, and making notes of the collected material; and citing the collected material in one's own writing. The purpose of ZotPad is to allow doing the reading, organizing, and note taking part on a mobile device\ipadfootnote{Zotero provides a bookmarklet that can be used to import items directly from Mobile Safari: \url{http://www.zotero.org/downloadbookmarklet}. Adding items will also be supported in ZotPad 1.3}. \iphone{Those that are interested in collecting material on the iPhone can use the Zotero bookmarklet that can import items directly from Mobile Safari: \url{http://www.zotero.org/downloadbookmarklet}. Adding items will also be supported in ZotPad 1.3}
 
 ZotPad is focused on working with attachment files. Files can be read with the built-in QuickLook viewer, sent to other apps for annotating, printed, and shared by email. The recommended way to synchronizing files between ZotPad and Zotero is to use Zotero file storage service, but ZotPad also supports WebDAV and Dropbox. ZotPad is designed to be always connected with the Zotero server and does not need to be synchronized in the same way as Zotero. If network connection becomes unavailable, ZotPad will automatically start using the local cache instead.
 
@@ -74,19 +74,19 @@ ZotPad is focused on working with attachment files. Files can be read with the b
 
 ZotPad is designed to be intuitive to use if you have experience with Zotero. When you launch the app for the first time, ZotPad will open a page from the Zotero website prompting for your Zotero username and password, as shown in Figure \ref{Login.png}. If you navigate away from the authentication workflow, you can go back by tapping the \textbf{Back to start} button on the top right.
 
-The username and password are transmitted securely and ZotPad will never see your password. 
-
 \begin{figure}
 \image{Log in to Zotero}{Login.png}
 \end{figure}
 
-\clearpage
+The username and password are transmitted securely and ZotPad will never see your password. 
 
-After you have successfully logged in, you are directed to a page with a title "New Private Key" shown in Figure \ref{CreateKey.png}. This page will create a key that ZotPad uses to access your Zotero library. Tapping  \textbf{Accept Defaults} will give the key read and write access to your personal library and all the groups that you belong to. This is the recommended option. 
+\clearpage
 
 \begin{figure}
 \image{Create access key}{CreateKey.png}
 \end{figure}
+
+After you have successfully logged in, you are directed to a page with a title "New Private Key" shown in Figure \ref{CreateKey.png}. This page will create a key that ZotPad uses to access your Zotero library. Tapping  \textbf{Accept Defaults} will give the key read and write access to your personal library and all the groups that you belong to. This is the recommended option. 
 
 If you are using Zotero file storage, ZotPad is now fully configured and ready for use. Using WebDAV or Dropbox to synchronize your files is described later in the user manual in the section that describes ZotPad settings.
 
@@ -102,9 +102,7 @@ This chapter explains the ZotPad user interface and describes how ZotPad is used
 \image{Main user interface}{ItemList.png}
 \end{figure}
 
-The bottom of the navigator shows cache status bar. This bar shows the number of items that are are queued for retrieval from the Zotero data server, and the number of files that are queud for downloading and uploading, and the amount of cache space used\ipadfootnote{The item downloads shows the number of toplevel items, attachments, and notes. For example, an article with an attachment and two notes is four items in the counter.}. The download count will decrease when downloads finish and can go up or down when ZotPad adds or cancels downloads based on the libraries, collections, and items that you select. Tapping the gear button will show the ZotPad log and support options, which are described later in the section about troubleshooting and getting help.
-
-Initially the navigator displays the list of libraries that you have access to.} \iphone{The first view is a list of libraries. } Tapping a library activates that library and shows the items from the library\ipad{ as a list in the content view}. The blue buttons can be used to navigate the collections in the libraries. The list of collections is reloaded when you start ZotPad or when you open a library. Sometimes the list of collections may fail to load if there is a connection error with Zotero server resulting in a missing blue arrow. This can be resolved by tapping the library, which force the collection list to be reloaded.
+Initially the navigator displays the list of libraries that you have access to.} \iphone{The first view is the list of libraries. } Tapping a library activates that library and shows the items from the library\ipad{ as a list in the content view}. The blue buttons can be used to navigate the collections in the libraries. The list of collections is reloaded when you start ZotPad or when you open a library. Sometimes the list of collections may fail to load if there is a connection error with Zotero server resulting in a missing blue arrow. This can be resolved by tapping the library, which force the collection list to be reloaded.
 
 Figure \ref{Collections.png} shows the list of collections. The last collection "ZotPad favorites" is a special collection created by ZotPad containing items that have been marked as favorites with the star button that will be presented later in this user manual.
 
@@ -112,6 +110,7 @@ Figure \ref{Collections.png} shows the list of collections. The last collection 
 \image{Collections}{Collections.png}
 \end{figure}
 
+The small bar below the library and collection list is the cache status bar. This bar shows the number of items that are are queued for retrieval from the Zotero data server, and the number of files that are queud for downloading and uploading, and the amount of cache space used\ipadfootnote{The item downloads shows the number of toplevel items, attachments, and notes. For example, an article with an attachment and two notes is four items in the counter.}. The download count will decrease when downloads finish and can go up or down when ZotPad adds or cancels downloads based on the libraries, collections, and items that you select. Tapping the gear button will show the ZotPad log and support options, which are described later in the section about troubleshooting and getting help.
 \clearpage
 
 Tapping or dragging the small bar below collections list opens the tag selector. Figure \ref{TagSelector.png} shows the tag selector open. Choosing a tag will limit the item list to only items that have the chosen tag. Closing the tag selector when a tag is selected will leave a small part of the tag selector visible so that the active tags can be quickly toggled without opening the full tag selector. The tag selector will show only the tags that were used in the item list when the tag selector was opened instead of showing all the tags in the library. This is the default setting also in Zotero.
@@ -120,15 +119,20 @@ Tapping or dragging the small bar below collections list opens the tag selector.
 \image{Tag selector}{TagSelector.png}
 \end{figure}
 
-\iphone{Tapping the gear button will show the ZotPad log and support options. The log view is discussed later in the user manual.} 
 
 \FloatBarrier
 
 \section{Item list view}
 
-The item list view shows the list of items in the selected library or collection. The item list shows basic citation information formatted according to the APA style. Tapping an item will open that item in the item detail view. 
+The item list view\iphone{, shown in Figure \ref{ItemList.png}, }shows the list of items in the selected library or collection. The item list shows basic citation information formatted according to the APA style. Tapping an item will open that item in the item detail view. 
 
-Instead of showing icons about item types like Zotero, ZotPad shows the file type icon for the first attachment. These icons are initially disabled (grayed out) and become active once the file for the first attachment has been downloaded. Tapping on an active file icon will open the first attachment in the file viewer.
+\iphone{
+\begin{figure}
+\image{Item list}{ItemList.png}
+\end{figure}
+
+}
+Instead of showing icons about item types like Zotero, ZotPad shows the file type icon for the first attachment. These icons are initially disabled (grayed out) and become active once the file for the first attachment has been downloaded. Tapping on an active icon opens the first attachment.
 
 \clearpage
 
@@ -170,7 +174,7 @@ The navigation bar of the item detail view contains two buttons. The first butto
 \image{Opening the action menu}{ActionMenu.png}
 \end{figure}
 
-The second button is the action button. This button can be used to perform actions on the currently chosen attachment file. The supported actions are shown in Figure \ref{ActionMenu.png}. \textbf{Purge} will delete all the files that are related to the selected attachments from the cache. It is useful if you want to clean up files to save space on the device or if a file is corrupted and needs to be removed. Purging files does not affect the attachment on the Zotero server, and purged files can be restored by simply downloading them again. \textbf{Open in\ldots} will open another menu that presents a list of apps capable of receiving the file. Annotating files with third-party PDF readers is covered in more detail later in the manual. The third option, \textbf{Email}, will open an email template with the citation of the currently selected file in the APA format and the currently selected attachment as attached file. The \textbf{Print} option allows printing supported files with AirPrint compatible printers. The final option, \textbf{Lookup}, opens a new menu that that can be used to look up the item from different online services. It can be useful for example if you are in the university library and want to quickly see if the library has a book that you need \ipadfootnote{The lookup functionality is nearly identical to Zotero's locate functionality \url{http://www.zotero.org/support/locate}}.
+The second button is the action button. This button can be used to perform actions on the currently chosen attachment file. The supported actions are shown in Figure \ref{ActionMenu.png}. \textbf{Purge} will delete all the files that are related to the selected attachments from the cache. It is useful if you want to clean up files to save space on the device or if a file is corrupted and needs to be removed. Purging files does not affect the attachment on the Zotero server, and purged files can be restored by simply downloading them again. \textbf{Open in\ldots} will open another menu that presents a list of apps capable of receiving the file. Annotating files with third-party PDF readers is covered in more detail later in the manual. The third option, \textbf{Email}, will open an email template with the citation of the currently selected file in the APA format and the currently selected attachment as attached file. The \textbf{Print} option allows printing supported files with AirPrint compatible printers. The final option, \textbf{Lookup}, opens a new menu that that can be used to look up the item from different online services. It can be useful for example if you are in the university library and want to quickly see if the library has a book that you need\ipadfootnote{The lookup functionality is nearly identical to Zotero's locate functionality \url{http://www.zotero.org/support/locate}}.
 
 \clearpage
 
@@ -178,38 +182,40 @@ The second button is the action button. This button can be used to perform actio
 \image{Bottom part of item detail view}{ItemDetails_scrolled.png}
 \end{figure}
 
-Scrolling down the item detail view reveals the item data as shown in Figure \ref{ItemDetails_scrolled.png}. 
+Scrolling down the item detail view reveals the item data as shown in Figure \ref{ItemDetails_scrolled.png}. The first two sections show tags and notes for the item and the final section shows the item data. Only those fields that actually have data are displayed. Editing item data is not currently supported, but is planned for ZotPad 1.3.
+
+Tapping on the tags section will open the tag editor, which is shown in Figure \ref{TagEditor.png}. This view will show all tags that are available in the library and you can toggle tags on and off for the item. The plus button in the top left corner can be used to create new tags. New tags will be added to the end of the tag list and they will be selected by default. Tapping on done will save the selected tags. Changes in tags will be uploaded to Zotero server immediately if network connection is available or as soon as network connection becomes available.
 
 \begin{figure}
 \image{Editing tags}{TagEditor.png}
 \end{figure}
 
-Tapping on the tags section will open the tag editor, which is shown in Figure \ref{TagEditor.png}. This view will show all tags that are available in the library and you can toggle tags on and off for the item. The plus button in the top left corner can be used to create new tags. New tags will be added to the end of the tag list and they will be selected by default. Tapping on done will save the selected tags. Changes in tags will be uploaded to Zotero server immediately if network connection is available or as soon as network connection becomes available.
-
-The next section shows a list of notes. Each row contains a preview of the content of the note. Tapping a note will open it in note editor shown in Figure \ref{NoteEditor.png}. The editor can display formatting, tables, and figures if the note includes these. However, adding new formatting is currently not supported. The save button will save the changes and delete button will delete the note. Changes in notes will be uploaded to Zotero server immediately if network connection is available or as soon as network connection becomes available. Notes do not have a conflict resolution system. If a note is edited on ZotPad and Zotero server in the same time, the changes in Zotero server will be overwritten in ZotPad. However, due to the way that ZotPad synchronizes with the Zotero server, conflicts
+Tapping a note will open it in note editor shown in Figure \ref{NoteEditor.png}. The editor can display formatting, tables, and figures if the note includes these. However, adding new formatting is currently not supported. The save button will save the changes and delete button will delete the note. Changes in notes will be uploaded to Zotero server immediately if network connection is available or as soon as network connection becomes available. Notes do not have a conflict resolution system. If a note is edited on ZotPad and Zotero server in the same time, the changes in Zotero server will be overwritten in ZotPad. However, due to the way that ZotPad synchronizes with the Zotero server, conflicts
 in note editing are rare.
 
 \begin{figure}
 \image{Editing a note}{NoteEditor.png}
 \end{figure}
 
-The final section shows the item data. Only those fields that actually have data are displayed. Editing item data is not currently supported, but is planned for ZotPad 1.3.
-
-\FloatBarrier
+\clearpage
 
 \section{File viewer}
 
 Figure \ref{ReadingMode.png} shows the file viewer. The file viewer uses the built-in QuickLook viewer that can open a large number of file types, but has limited features. Most notable, the file viewer cannot search PDF files and cannot display annotations.  These limitations can be avoided by sending the file to a third party PDF reader using the action button.
 
-The file reader has a navigation bar with four buttons and a side panel. The \textbf{Done} button closes the file viewer. The segmented button with left and right arrows can be used to switch between recently viewed files and the star and action button have the same functions as they have in the item detail view.
-
 \begin{figure}
 \image{File viewer}{ReadingMode.png}
 \end{figure}
 
+The file reader has a navigation bar with four buttons and a side panel. The \textbf{Done} button closes the file viewer. The segmented button with left and right arrows can be used to switch between recently viewed files and the star and action button have the same functions as they have in the item detail view. \iphone{The star button is not displayed in portrait mode to save space for the file title.}
 
-The side panel is initially hidden, but can be opened by either tapping or pulling the small pull tab on the left side of the screen. When opened, the side panel shows the tags and notes for the current attachment and the parent item for the attachment. Most people use tags on the parent item only, but this is a personal choice. Tapping either of the two tag lists will open a tag editor for those tags.
+The side panel is initially hidden, but can be opened by either tapping or pulling the small pull tab on the left side of the screen. \iphone{The Figure \ref{ReadingMode_SidePanel.png} shows the side panel. }When opened, the side panel shows the tags and notes for the current attachment and the parent item for the attachment. Most people use tags on the parent item only, but this is a personal choice. Tapping either of the two tag lists will open a tag editor for those tags.
 
+\iphone{
+\begin{figure}
+\image{File viewer with side panel open}{ReadingMode_SidePanel.png}
+\end{figure}
+}
 The parent item notes list shows a list of notes that are attached to the parent item and the attachment note shows the note field for that attachment. Tapping on any of the notes will open a note editor for that note.
 
 Attachment notes are a rarely used feature of Zotero. In Zotero attachment note is displayed in the right side bar below the attachment details when you have selected an attachment in the item list.
@@ -220,11 +226,11 @@ Attachment notes are a rarely used feature of Zotero. In Zotero attachment note 
 
 One of the most important use cases for ZotPad is annotating PDF files on the mobile device. Because ZotPad does not currently have a feature for displaying and making PDF annotations, this must be done with the help of a third party application\ipadfootnote{Support for annotating PDFs inside ZotPad is planned for a future version}. 
 
-The action button can be used to send files to other apps. The \textbf{Open in\ldots} button in the action menu will show a grid of apps that can receive the chosen file. This is shown in Figure \ref{SendTo.png}. Tapping an app will move ZotPad to background and open the other app with the selected attachment file. The attachment file contains a short code in the end of the file name so that ZotPad can recognise which item the file belongs when the file is sent back to ZotPad.
-
 \begin{figure}
 \image{Sending a file to other app}{SendTo.png}
 \end{figure}
+
+The action button can be used to send files to other apps. The \textbf{Open in\ldots} button in the action menu will show a grid of apps that can receive the chosen file. This is shown in Figure \ref{SendTo.png}. Tapping an app will move ZotPad to background and open the other app with the selected attachment file. The attachment file contains a short code in the end of the file name so that ZotPad can recognise which item the file belongs when the file is sent back to ZotPad.
 
 After annotating the file, you need to send it back to ZotPad. Figure \ref{Adobe.png} shows how this is done with Adobe Reader\ipadfootnote{Adobe Reader is a free app that can be used to view and annotate PDF files and is available for both iPad and iPhone.}. After annotating a PDF, the next step is to tap the action button in the Adobe Reader, choose the \textbf{Open in\ldots} action, and choose \textbf{ZotPad} from the menu. This is shown in Figure \ref{Adobe.png}.
 
@@ -256,6 +262,11 @@ ZotPad settings are adjusted using the \ipad{iPad}\iphone{iPhone} Settings app. 
 \image{ZotPad settings}{Settings.png}
 \end{figure}
 
+\iphone{
+\begin{figure}
+\image{ZotPad settings, second part}{Settings_scrolled.png}
+\end{figure}
+}
 \section{Basic settings}
 
 This section starts with the \textbf{Username} that ZotPad is using. This is for informational purposes only and cannot be edited directly. The first user editable setting is \textbf{Mode}, which can be either \textbf{Online} or \textbf{Offline}. Offline mode prevents ZotPad from using the network connection. \textbf{Max cache size} tells how much space ZotPad is allowed to use for downloaded attachments and \textbf{Current cache size} shows an approximation of how much space is used currently. If the size of the cache exceeds the limit, ZotPad will automatically purge older files from the cache to free space.
@@ -347,7 +358,7 @@ If you need personal support, you can start a new support request with the \text
 
 The support request will allow ZotPad support the same access to your Zotero database that ZotPad application currently has. No passwords or usernames are sent. If you do not want to provide these details, you can also request support by emailing \href{mailto:support@zotpad.com}{support@zotpad.com}.
 
-If you are experiencing problems with ZotPad, the first thing to do is to open the log viewer to see if there are any error messages. Sometimes checking the application log is sufficient to diagnose a problem. If the log does not contain any useful, or you do not understand what the log says, the next troubleshooting step is to check the knowledge base in the online support sustem. If this does not answer the problem, you should contact support by using the \textbf{Contact us} feature.
+If you are experiencing problems with ZotPad, the first thing to do is to open the log viewer to see if there are any error messages. Sometimes checking the application log is sufficient to diagnose a problem. If the log does not contain anything useful, or you do not understand what the log says, the next troubleshooting step is to check the knowledge base in the online support sustem. If this does not answer the problem, you should contact support by using the \textbf{Contact us} feature.
 
 
 \chapter{Technical information}
