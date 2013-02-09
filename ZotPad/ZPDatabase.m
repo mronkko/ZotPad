@@ -147,12 +147,15 @@ static NSObject* writeLock;
             
         }
         else{
-            switch ([resultSet intForColumn:0]){
-                case 2:
-                    [self _executeSQLFromFile:@"upgrade1.1to1.2"];
-            }
-            
+            [resultSet next];
+            NSInteger version = [resultSet intForColumnIndex:0];
             [resultSet close];
+            switch (version){
+                case 2:
+                    DDLogWarn(@"Upgrading Database from 1.1 to 1.2");
+                    [self _executeSQLFromFile:@"upgrade1.1to1.2"];
+                    DDLogWarn(@"Database upgrade completed");
+            }
         }
     }
 }
