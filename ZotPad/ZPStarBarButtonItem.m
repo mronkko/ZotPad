@@ -41,7 +41,7 @@
     if(favouritesCollectionKey == NULL){
         NSString* favoritesCollectionTitle = [ZPPreferences favoritesCollectionTitle];
         ZPZoteroLibrary* library = [ZPZoteroLibrary libraryWithID:_targetItem.libraryID];
-        [[[UIAlertView alloc] initWithTitle:@"Favourites collection created"
+        [[[UIAlertView alloc] initWithTitle:@"Favorites collection created"
                                     message:[NSString stringWithFormat:@"Collection '%@' has been created in '%@'",
                                              favoritesCollectionTitle,
                                              library.title]

@@ -153,7 +153,7 @@ static ZPFileViewerViewController* _instance;
     //Show tool tip about stars
     
     if([[NSUserDefaults standardUserDefaults] objectForKey:@"hasPresentedStarButtonHelpPopover"]==NULL){
-        CMPopTipView* helpPopUp = [[CMPopTipView alloc] initWithMessage:@"Use the star button to add an item to favourites"];
+        CMPopTipView* helpPopUp = [[CMPopTipView alloc] initWithMessage:@"Use the star button to add an item to favorites"];
         [helpPopUp presentPointingAtBarButtonItem:_starButton animated:YES];
         [[NSUserDefaults standardUserDefaults] setObject:@"1" forKey:@"hasPresentedStarButtonHelpPopover"];
     }
@@ -196,7 +196,7 @@ static ZPFileViewerViewController* _instance;
                                    leftPullTab.frame.origin.y,
                                    leftPullTab.frame.size.width,
                                    leftPullTab.frame.size.height);
-    
+    leftPullTab.alpha = .30;
     
 }
 -(void) _toggleArrows{
@@ -645,6 +645,13 @@ static ZPFileViewerViewController* _instance;
                                        pullTab.frame.size.width,
                                        pullTab.frame.size.height);
             
+            if(visible){
+                pullTab.alpha = 1;
+            }
+            else{
+                pullTab.alpha = .30;
+            }
+         
             
         } completion:^(BOOL finished) {
             if(pane==leftPullPane && UIInterfaceOrientationIsLandscape([[UIApplication sharedApplication] statusBarOrientation])){

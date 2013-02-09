@@ -212,6 +212,7 @@
         
         // Configuring the item list content starts here.
         
+        [[ZPItemList instance] clearTable];
         
         if([ZPReachability hasInternetConnection]){
             
@@ -230,7 +231,6 @@
         
         // Configure the data source with content from the cache
         
-        [[ZPItemList instance] clearTable];
         NSArray* cacheKeys= [ZPDatabase getItemKeysForLibrary:[ZPItemList instance].libraryID
                                                 collectionKey:[ZPItemList instance].collectionKey
                                                  searchString:[ZPItemList instance].searchString

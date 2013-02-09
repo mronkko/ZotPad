@@ -241,9 +241,10 @@ static const NSInteger tagBaseWidth = 20;
 
 - (NSInteger)tableView:(UITableView *)tableView numberOfRowsInSection:(NSInteger)section{
 
-    NSMutableArray* indices = [[NSMutableArray alloc] init];
     
     if(_indexOfFirstTagForEachRow == NULL){
+
+        NSMutableArray* indices = [[NSMutableArray alloc] init];
         NSInteger x=margin;
         NSInteger index=0;
         BOOL firstInRow = TRUE;
@@ -268,9 +269,10 @@ static const NSInteger tagBaseWidth = 20;
             }
             ++index;
         }
+
+        _indexOfFirstTagForEachRow = indices;
     }
     
-    _indexOfFirstTagForEachRow = indices;
     
     return [_indexOfFirstTagForEachRow count];
 }
@@ -278,7 +280,6 @@ static const NSInteger tagBaseWidth = 20;
 -(NSInteger) numberOfSelectedTagRowsToShow:(UITableView*)tableView{
     return MIN(5,[self tableView:tableView numberOfRowsInSection:0]);
 }
-
 
 -(void) toggleTag:(UIButton*)tagButton{
     if(tagButton.isSelected){

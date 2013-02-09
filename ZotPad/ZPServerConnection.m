@@ -793,7 +793,7 @@ const NSInteger ZPServerConnectionRequestLastModifiedItem = 11;
                                                  [[NSString alloc] initWithData:responseData encoding:NSUTF8StringEncoding]];
                         DDLogError(description);
 #ifdef ZPDEBUG
-                        [NSException raise:exception.name format:@"%@",description];
+//                        [NSException raise:exception.name format:@"%@",description];
 #endif
                     }
                     
@@ -969,6 +969,26 @@ const NSInteger ZPServerConnectionRequestLastModifiedItem = 11;
     
 }
 
+// This is for sorting the attachments
+
+NSInteger sortAttachments(ZPZoteroAttachment* attachment1, ZPZoteroAttachment* attachment2, void *context)
+{
+    //First check if one is a PDF
+    
+    BOOL attachment1isPDF = [@"application/pdf" isEqual:attachment1.contentType];
+    BOOL attachment2isPDF = [@"application/pdf" isEqual:attachment2.contentType];
+    
+    if(attachment1isPDF && ! attachment2isPDF){
+        return NSOrderedAscending;
+    }
+    else if(! attachment1isPDF && attachment2isPDF){
+        return NSOrderedDescending;
+    }
+    else{
+        return [attachment1.title compare:attachment2.title];
+    }
+}
+
 +(void) _processParsedResponse:(ZPServerResponseXMLParser*)parserDelegate requestType:(NSInteger) type userInfo:(NSDictionary*) userInfo{
     
     
@@ -1077,7 +1097,7 @@ const NSInteger ZPServerConnectionRequestLastModifiedItem = 11;
                     }
                 }
                 
-                [attachments sortUsingDescriptors:[NSArray arrayWithObject:[[NSSortDescriptor alloc] initWithKey:@"title" ascending:TRUE]]];
+                [attachments sortUsingFunction:sortAttachments context:NULL];
                 item.attachments = attachments;
                 
                 [notes sortUsingDescriptors:[NSArray arrayWithObject:[[NSSortDescriptor alloc] initWithKey:@"title" ascending:TRUE]]];
@@ -1129,7 +1149,7 @@ const NSInteger ZPServerConnectionRequestLastModifiedItem = 11;
 
 +(NSString*) _JSONEscapeString:(NSString*) string{
     
-    if(string == NULL) return @"";
+    if(string == NULL || string == [NSNull null]) return @"";
     else return [[[string stringByReplacingOccurrencesOfString:@"\\" withString:@"\\\\"] stringByReplacingOccurrencesOfString:@"\"" withString:@"\\\""] stringByReplacingOccurrencesOfString:@"\n" withString:@"\\n"];
 }
 

@@ -74,4 +74,10 @@
     
 }
 
+
+- (NSString *)description{
+    return [NSString stringWithFormat:@"Zotero data object. Class: %@, Key: %@, LibraryID: %i",
+            NSStringFromClass([self class]), self.key, self.libraryID];
+}
+
 @end

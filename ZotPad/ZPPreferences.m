@@ -409,7 +409,7 @@ static NSInteger _maxCacheSize;
     NSUserDefaults* defaults = [NSUserDefaults standardUserDefaults];
     NSString* value = [defaults stringForKey:@"favoritescollectiontitle"];
     if(value == NULL || [value isEqualToString:@""]){
-        value = @"ZotPad favourites";
+        value = @"ZotPad favorites";
     }
     return value;
     

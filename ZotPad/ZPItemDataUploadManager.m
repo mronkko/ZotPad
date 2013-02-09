@@ -139,7 +139,12 @@
             ZPZoteroItem* parent = [ZPZoteroItem itemWithKey:locallyAddedNote.parentKey];
             
             NSMutableArray* noteArray = [NSMutableArray arrayWithArray:parent.notes];
-            [noteArray replaceObjectAtIndex:[noteArray indexOfObject:locallyAddedNote] withObject:note];
+            
+            NSInteger indexOfLocallyAddedNote = [noteArray indexOfObject:locallyAddedNote];
+            if(indexOfLocallyAddedNote != NSNotFound){
+                [noteArray replaceObjectAtIndex:indexOfLocallyAddedNote withObject:note];
+                parent.notes = noteArray;
+            }
             
             // Proceed with other uploads
             [self uploadMetadata];

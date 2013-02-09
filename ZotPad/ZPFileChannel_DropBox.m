@@ -830,7 +830,6 @@ static NSInteger _uploadCounter = 0;
 -(void) _restClient:(ZPDBRestClient*) client processError:(NSError *)error{
     //If we are not linked, link
     if(error.code==401){
-        DDLogInfo(@"Linking Dropbox");
         [ZPFileChannel_Dropbox linkDroboxIfNeeded];
     }
 

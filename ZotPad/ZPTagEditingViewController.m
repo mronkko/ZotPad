@@ -175,7 +175,9 @@ static ZPTagEditingViewController* _instance;
     //iPhone
     else if([segue.identifier isEqualToString:@"NewTagDialog"]){
         newTagDialog = [segue destinationViewController];
-        [(UIButton*)[newTagDialog.view viewWithTag:2] addTarget:self action:@selector(createTag:) forControlEvents:UIControlEventTouchUpInside];
+        UINavigationBar* naviBar = (UINavigationBar*) [newTagDialog.view viewWithTag:3];
+        naviBar.topItem.rightBarButtonItem.target = self;
+        naviBar.topItem.rightBarButtonItem.action = @selector(createTag:);
         [[newTagDialog.view viewWithTag:1] becomeFirstResponder];
     }
 }

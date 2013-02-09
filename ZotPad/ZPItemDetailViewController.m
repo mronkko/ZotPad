@@ -108,7 +108,7 @@
     //Show tool tip about stars
     
     if([[NSUserDefaults standardUserDefaults] objectForKey:@"hasPresentedStarButtonHelpPopover"]==NULL){
-        CMPopTipView* helpPopUp = [[CMPopTipView alloc] initWithMessage:@"Use the star button to add an item to favourites"];
+        CMPopTipView* helpPopUp = [[CMPopTipView alloc] initWithMessage:@"Use the star button to add an item to favorites"];
         [helpPopUp presentPointingAtBarButtonItem:starButton animated:YES];
         [[NSUserDefaults standardUserDefaults] setObject:@"1" forKey:@"hasPresentedStarButtonHelpPopover"];
     }
@@ -469,7 +469,9 @@
        
             //Clean the cell
             
-            [ZPTagController addTagButtonsToView:cell.contentView tags:[NSArray array]];
+            for(UIView* view in cell.contentView.subviews ){
+                [view removeFromSuperview];
+            }
             
             
             if(_tagButtons != NULL){
@@ -651,6 +653,7 @@
 }
 
 -(void) refreshTagsFor:(ZPZoteroDataObject *)item{
+    _tagButtons = NULL;
     [self.tableView reloadSections:[NSIndexSet indexSetWithIndex:0] withRowAnimation:UITableViewRowAnimationAutomatic];
 }
 

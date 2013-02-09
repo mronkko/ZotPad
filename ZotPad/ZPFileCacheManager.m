@@ -130,7 +130,7 @@ static ZPCacheStatusToolbarController* _statusView;
     u_int8_t attrValue = 1;
     setxattr(filePath, attrName, &attrValue, sizeof(attrValue), 0, 0);
 
-    NSDictionary *_documentFileAttributes = [[NSFileManager defaultManager] attributesOfFileSystemForPath:toPath error:NULL];
+    NSDictionary *_documentFileAttributes = [[NSFileManager defaultManager] attributesOfItemAtPath:toPath error:NULL];
     _sizeOfDocumentsFolder += [_documentFileAttributes fileSize]/1024;
     
     if(_sizeOfDocumentsFolder>=[ZPPreferences maxCacheSize]) [self _cleanUpCache];
@@ -140,7 +140,7 @@ static ZPCacheStatusToolbarController* _statusView;
 }
 
 +(void) _deleteFileFromPath:(NSString*)path{
-    NSDictionary *_documentFileAttributes = [[NSFileManager defaultManager] attributesOfFileSystemForPath:path error:NULL];
+    NSDictionary *_documentFileAttributes = [[NSFileManager defaultManager] attributesOfItemAtPath:path error:NULL];
     _sizeOfDocumentsFolder -= [_documentFileAttributes fileSize]/1024;
     [[NSFileManager defaultManager] removeItemAtPath:path error: NULL];
 }
@@ -184,7 +184,7 @@ static ZPCacheStatusToolbarController* _statusView;
     unsigned long long int _documentsFolderSize = 0;
     
     for (NSString* _documentFilePath in directoryContent) {
-        NSDictionary *_documentFileAttributes = [[NSFileManager defaultManager] attributesOfFileSystemForPath:[_documentsDirectory stringByAppendingPathComponent:_documentFilePath] error:NULL];
+        NSDictionary *_documentFileAttributes = [[NSFileManager defaultManager] attributesOfItemAtPath:[_documentsDirectory stringByAppendingPathComponent:_documentFilePath] error:NULL];
         NSInteger thisSize = [_documentFileAttributes fileSize]/1024;
         _documentsFolderSize += thisSize;
         //DDLogVerbose(@"Cache size is %i after including %@ (%i)",(NSInteger) _documentsFolderSize,_documentFilePath,thisSize);
@@ -233,7 +233,7 @@ static ZPCacheStatusToolbarController* _statusView;
             // If the file was not found in DB, delete it
             
             if(! found){
-                NSDictionary *_documentFileAttributes = [[NSFileManager defaultManager] attributesOfFileSystemForPath:path error:NULL];
+                NSDictionary *_documentFileAttributes = [[NSFileManager defaultManager] attributesOfItemAtPath:path error:NULL];
                 _sizeOfDocumentsFolder -= [_documentFileAttributes fileSize]/1024;
                 //                DDLogWarn(@"Deleting orphaned file %@. Cache use is now at %i\%",path,_sizeOfDocumentsFolder*100/[ZPPreferences maxCacheSize]);
                 [[NSFileManager defaultManager] removeItemAtPath:path error: NULL];

@@ -139,6 +139,10 @@
             
             _fileCanBeOpened = [docController presentOpenInMenuFromBarButtonItem:button animated: NO];
             [docController dismissMenuAnimated:NO];
+            
+            if(_fileCanBeOpened){
+                DDLogWarn(@"File in path %@ cannot be opened", _activeAttachment.fileSystemPath);
+            }
         }
         
         NSString* cancel;

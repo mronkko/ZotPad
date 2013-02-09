@@ -479,7 +479,7 @@
                                         </connections>
                                     </barButtonItem>
                                     <barButtonItem style="plain" systemItem="flexibleSpace" id="0Lf-S8-lfW"/>
-                                    <barButtonItem title="Contact support" id="uNB-eo-5wS">
+                                    <barButtonItem title="Support" id="uNB-eo-5wS">
                                         <connections>
                                             <action selector="contactSupport:" destination="AXa-IG-NNW" id="YGk-wF-CAj"/>
                                         </connections>
@@ -722,7 +722,7 @@
             </objects>
             <point key="canvasLocation" x="912" y="426"/>
         </scene>
-        <!--Note Editing View Controller - Edit note-->
+        <!--Note Editing View Controller-->
         <scene sceneID="tLg-qz-jHQ">
             <objects>
                 <viewController storyboardIdentifier="NoteEditingViewController" modalPresentationStyle="pageSheet" id="eKg-IY-e1x" customClass="ZPNoteEditingViewController" sceneMemberID="viewController">
@@ -756,9 +756,9 @@
                         </subviews>
                         <color key="backgroundColor" white="1" alpha="1" colorSpace="custom" customColorSpace="calibratedWhite"/>
                     </view>
-                    <navigationItem key="navigationItem" title="Edit note" id="sK1-so-yZj"/>
                     <simulatedStatusBarMetrics key="simulatedStatusBarMetrics"/>
                     <connections>
+                        <outlet property="navigationItem" destination="57A-cI-7V2" id="Z1d-Ty-eq9"/>
                         <outlet property="webView" destination="vTW-lA-yvS" id="YOB-3E-n9A"/>
                     </connections>
                 </viewController>
@@ -821,10 +821,10 @@
             </objects>
             <point key="canvasLocation" x="2452" y="426"/>
         </scene>
-        <!--New Tag View Controller-->
+        <!--View Controller-->
         <scene sceneID="sc3-0y-4PD">
             <objects>
-                <viewController id="iM6-AI-xbl" customClass="ZPNewTagViewController" sceneMemberID="viewController">
+                <viewController id="iM6-AI-xbl" sceneMemberID="viewController">
                     <view key="view" contentMode="scaleToFill" id="8Ne-tR-Bb9">
                         <rect key="frame" x="0.0" y="20" width="320" height="460"/>
                         <autoresizingMask key="autoresizingMask" flexibleMaxX="YES" flexibleMaxY="YES"/>
@@ -835,16 +835,12 @@
                                 <fontDescription key="fontDescription" type="system" pointSize="14"/>
                                 <textInputTraits key="textInputTraits"/>
                             </textField>
-                            <navigationBar contentMode="scaleToFill" id="Ec6-xJ-JXb">
+                            <navigationBar tag="3" contentMode="scaleToFill" id="Ec6-xJ-JXb">
                                 <rect key="frame" x="0.0" y="0.0" width="320" height="44"/>
                                 <autoresizingMask key="autoresizingMask" widthSizable="YES" flexibleMaxY="YES"/>
                                 <items>
                                     <navigationItem title="New tag" id="ALx-ep-EMI">
-                                        <barButtonItem key="rightBarButtonItem" tag="2" systemItem="save" id="0cW-PM-OxM">
-                                            <connections>
-                                                <action selector="createTag:" destination="iM6-AI-xbl" id="VEa-FH-dhr"/>
-                                            </connections>
-                                        </barButtonItem>
+                                        <barButtonItem key="rightBarButtonItem" tag="2" systemItem="save" id="0cW-PM-OxM"/>
                                     </navigationItem>
                                 </items>
                             </navigationBar>
@@ -1059,6 +1055,151 @@
         <image name="icon-up-black.png" width="23" height="20"/>
         <image name="verticalLines.png" width="6" height="1"/>
     </resources>
+    <classes>
+        <class className="HLSPlaceholderViewController" superclassName="HLSViewController">
+            <source key="sourceIdentifier" type="project" relativePath="./Classes/HLSPlaceholderViewController.h"/>
+            <relationships>
+                <relationship kind="outlet" name="delegate"/>
+                <relationship kind="outlet" name="placeholderView" candidateClass="UIView"/>
+            </relationships>
+        </class>
+        <class className="HLSViewController" superclassName="UIViewController">
+            <source key="sourceIdentifier" type="project" relativePath="./Classes/HLSViewController.h"/>
+        </class>
+        <class className="OHAttributedLabel" superclassName="UILabel">
+            <source key="sourceIdentifier" type="project" relativePath="./Classes/OHAttributedLabel.h"/>
+            <relationships>
+                <relationship kind="outlet" name="delegate"/>
+            </relationships>
+        </class>
+        <class className="ZPAuthenticationDialog" superclassName="UIViewController">
+            <source key="sourceIdentifier" type="project" relativePath="./Classes/ZPAuthenticationDialog.h"/>
+            <relationships>
+                <relationship kind="action" name="loadFirstPage:"/>
+                <relationship kind="outlet" name="webView" candidateClass="UIWebView"/>
+            </relationships>
+        </class>
+        <class className="ZPBarBackgroundGradientView" superclassName="UIView">
+            <source key="sourceIdentifier" type="project" relativePath="./Classes/ZPBarBackgroundGradientView.h"/>
+        </class>
+        <class className="ZPCollectionsAndTagsViewController" superclassName="HLSPlaceholderViewController">
+            <source key="sourceIdentifier" type="project" relativePath="./Classes/ZPCollectionsAndTagsViewController.h"/>
+            <relationships>
+                <relationship kind="action" name="handlePanGesture:" candidateClass="UIPanGestureRecognizer"/>
+                <relationship kind="action" name="toggleTagSelector:"/>
+                <relationship kind="outlet" name="cacheControllerPlaceHolder" candidateClass="UIBarButtonItem"/>
+                <relationship kind="outlet" name="collectionsView" candidateClass="UIView"/>
+                <relationship kind="outlet" name="gearButton" candidateClass="UIBarButtonItem"/>
+                <relationship kind="outlet" name="headerArrowLeft" candidateClass="UIImageView"/>
+                <relationship kind="outlet" name="headerArrowRight" candidateClass="UIImageView"/>
+                <relationship kind="outlet" name="tagsHeader" candidateClass="ZPBarBackgroundGradientView"/>
+                <relationship kind="outlet" name="tagsView" candidateClass="UIView"/>
+                <relationship kind="outlet" name="toolBar" candidateClass="UIToolbar"/>
+            </relationships>
+        </class>
+        <class className="ZPFileImportViewController" superclassName="UIViewController">
+            <source key="sourceIdentifier" type="project" relativePath="./Classes/ZPFileImportViewController.h"/>
+            <relationships>
+                <relationship kind="outlet" name="carousel" candidateClass="iCarousel"/>
+            </relationships>
+        </class>
+        <class className="ZPFileViewerViewController" superclassName="HLSPlaceholderViewController">
+            <source key="sourceIdentifier" type="project" relativePath="./Classes/ZPFileViewerViewController.h"/>
+            <relationships>
+                <relationship kind="action" name="actionButtonPressed:"/>
+                <relationship kind="action" name="dismiss:"/>
+                <relationship kind="action" name="handlePanGestureOnPullPane:" candidateClass="UIPanGestureRecognizer"/>
+                <relationship kind="action" name="next:"/>
+                <relationship kind="action" name="presentAllFiles:"/>
+                <relationship kind="action" name="previous:"/>
+                <relationship kind="action" name="toggleNavigationBar:"/>
+                <relationship kind="action" name="togglePullPane:"/>
+                <relationship kind="action" name="toggleStar:"/>
+                <relationship kind="outlet" name="leftPullPane" candidateClass="UIView"/>
+                <relationship kind="outlet" name="leftPullTab" candidateClass="UIView"/>
+                <relationship kind="outlet" name="navigationBar" candidateClass="UINavigationBar"/>
+                <relationship kind="outlet" name="notesAndTagsTable" candidateClass="UITableView"/>
+                <relationship kind="outlet" name="rightPullPane" candidateClass="UIView"/>
+                <relationship kind="outlet" name="rightPullTab" candidateClass="UIView"/>
+            </relationships>
+        </class>
+        <class className="ZPItemDetailViewController" superclassName="UITableViewController">
+            <source key="sourceIdentifier" type="project" relativePath="./Classes/ZPItemDetailViewController.h"/>
+            <relationships>
+                <relationship kind="action" name="actionButtonPressed:"/>
+                <relationship kind="outlet" name="actionButton" candidateClass="UIBarButtonItem"/>
+                <relationship kind="outlet" name="starButton" candidateClass="ZPStarBarButtonItem"/>
+            </relationships>
+        </class>
+        <class className="ZPItemListViewController" superclassName="UIViewController">
+            <source key="sourceIdentifier" type="project" relativePath="./Classes/ZPItemListViewController.h"/>
+            <relationships>
+                <relationship kind="action" name="sortButtonPressed:"/>
+                <relationship kind="outlet" name="searchBar" candidateClass="UISearchBar"/>
+                <relationship kind="outlet" name="tableView" candidateClass="UITableView"/>
+                <relationship kind="outlet" name="toolBar" candidateClass="UIToolbar"/>
+            </relationships>
+        </class>
+        <class className="ZPLibraryAndCollectionListViewController" superclassName="UITableViewController">
+            <source key="sourceIdentifier" type="project" relativePath="./Classes/ZPLibraryAndCollectionListViewController.h"/>
+        </class>
+        <class className="ZPLogViewController" superclassName="UIViewController">
+            <source key="sourceIdentifier" type="project" relativePath="./Classes/ZPLogViewController.h"/>
+            <relationships>
+                <relationship kind="action" name="contactSupport:"/>
+                <relationship kind="action" name="dismiss:"/>
+                <relationship kind="action" name="manageKey:"/>
+                <relationship kind="action" name="showManual:"/>
+                <relationship kind="outlet" name="logView" candidateClass="UITextView"/>
+                <relationship kind="outlet" name="manualButton" candidateClass="UIBarButtonItem"/>
+            </relationships>
+        </class>
+        <class className="ZPNavigationController" superclassName="UINavigationController">
+            <source key="sourceIdentifier" type="project" relativePath="./Classes/ZPNavigationController.h"/>
+            <relationships>
+                <relationship kind="action" name="showLogView:"/>
+            </relationships>
+        </class>
+        <class className="ZPNoteEditingViewController" superclassName="UIViewController">
+            <source key="sourceIdentifier" type="project" relativePath="./Classes/ZPNoteEditingViewController.h"/>
+            <relationships>
+                <relationship kind="action" name="cancel:"/>
+                <relationship kind="action" name="deleteNote:"/>
+                <relationship kind="action" name="save:"/>
+                <relationship kind="outlet" name="navigationItem" candidateClass="UINavigationItem"/>
+                <relationship kind="outlet" name="webView" candidateClass="UIWebView"/>
+            </relationships>
+        </class>
+        <class className="ZPStarBarButtonItem" superclassName="UIBarButtonItem">
+            <source key="sourceIdentifier" type="project" relativePath="./Classes/ZPStarBarButtonItem.h"/>
+        </class>
+        <class className="ZPTagEditingViewController" superclassName="UIViewController">
+            <source key="sourceIdentifier" type="project" relativePath="./Classes/ZPTagEditingViewController.h"/>
+            <relationships>
+                <relationship kind="action" name="dismiss:"/>
+                <relationship kind="action" name="showPopover:"/>
+                <relationship kind="outlet" name="navigationBar" candidateClass="UINavigationBar"/>
+                <relationship kind="outlet" name="tableView" candidateClass="UITableView"/>
+            </relationships>
+        </class>
+        <class className="ZPUploadVersionConflictViewControllerViewController" superclassName="UIViewController">
+            <source key="sourceIdentifier" type="project" relativePath="./Classes/ZPUploadVersionConflictViewControllerViewController.h"/>
+            <relationships>
+                <relationship kind="action" name="useMyVersion:"/>
+                <relationship kind="action" name="useRemoteVersion:"/>
+                <relationship kind="outlet" name="carousel" candidateClass="iCarousel"/>
+                <relationship kind="outlet" name="label" candidateClass="UILabel"/>
+                <relationship kind="outlet" name="secondaryCarousel" candidateClass="iCarousel"/>
+            </relationships>
+        </class>
+        <class className="iCarousel" superclassName="UIView">
+            <source key="sourceIdentifier" type="project" relativePath="./Classes/iCarousel.h"/>
+            <relationships>
+                <relationship kind="outlet" name="dataSource"/>
+                <relationship kind="outlet" name="delegate"/>
+            </relationships>
+        </class>
+    </classes>
     <simulatedMetricsContainer key="defaultSimulatedMetrics">
         <simulatedStatusBarMetrics key="statusBar"/>
         <simulatedOrientationMetrics key="orientation"/>

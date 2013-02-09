@@ -60,6 +60,23 @@ static NSCache* _objectCache = NULL;
     return [super key];
 }
 
+- (NSInteger) libraryID{
+    //Child notes
+    if(super.libraryID==LIBRARY_ID_NOT_SET){
+        if(self.parentKey != NULL){
+            return [ZPZoteroItem itemWithKey:self.parentKey].libraryID;
+        }
+        else {
+            [NSException raise:@"Internal consistency error" format:@"Standalone items must have library IDs. Standalone note with key %@ had a null library ID",self.key];
+            return LIBRARY_ID_NOT_SET;
+        }
+    }
+    else{
+        //Standalone notes
+        return super.libraryID;
+    }
+}
+
 -(BOOL)locallyAdded{ return FALSE;}
 -(BOOL)locallyModified{ return FALSE;}
 -(BOOL)locallyDeleted{ return FALSE;}

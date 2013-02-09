@@ -134,9 +134,9 @@
     //TODO: Set the selected tags.
     
     _tagsList = [[UITableView alloc] initWithFrame:CGRectMake(0,
-                                                              tagsHeader.frame.size.height+1,
+                                                              tagsHeader.frame.size.height,
                                                               self.view.frame.size.width,
-                                                              self.view.frame.size.height-self.tagsHeader.frame.size.height)
+                                                              self.view.frame.size.height-self.tagsHeader.frame.size.height+1)
                                              style:UITableViewStylePlain];
     _tagsList.rowHeight = 40;
     _tagsList.allowsSelection = FALSE;
@@ -155,13 +155,7 @@
 
     [_contentRoot viewDidAppear:animated];
 
-    if(UI_USER_INTERFACE_IDIOM() == UIUserInterfaceIdiomPad){
-
-        UISplitViewController* root =  (UISplitViewController*) [UIApplication sharedApplication].delegate.window.rootViewController;
-
-        _tagController.tagOwner = [ZPItemList instance];
-        
-    }
+    _tagController.tagOwner = [ZPItemList instance];
 
     if([[NSUserDefaults standardUserDefaults] objectForKey:@"hasPresentedMainHelpPopover"]==NULL){
         CMPopTipView* helpPopUp = [[CMPopTipView alloc] initWithMessage:@"Tap here for help"];
@@ -174,9 +168,9 @@
     [_contentRoot viewWillAppear:animated];
 
     _tagsList.frame = CGRectMake(0,
-                                 tagsHeader.frame.size.height+1,
+                                 tagsHeader.frame.size.height,
                                  self.view.frame.size.width,
-                                 self.view.frame.size.height-self.tagsHeader.frame.size.height);
+                                 self.view.frame.size.height-self.tagsHeader.frame.size.height+1);
 
 
 }
