@@ -147,6 +147,11 @@ static NSObject* writeLock;
             
         }
         else{
+            switch ([resultSet intForColumn:0]){
+                case 2:
+                    [self _executeSQLFromFile:@"upgrade1.1to1.2"];
+            }
+            
             [resultSet close];
         }
     }
@@ -1119,11 +1124,11 @@ static NSObject* writeLock;
         [dbObject executeUpdate:[NSString stringWithFormat:@"DELETE FROM items WHERE libraryID = ? AND itemKey NOT IN ('%@')",
                                  keyString],[NSNumber numberWithInt:libraryID]];
         
-        [dbObject executeUpdate:[NSString stringWithFormat:@"DELETE FROM attachments WHERE itemKey NOT IN ('%@') AND parentKey NOT IN ('%@') AND parentKey IN (SELECT itemKey FROM items WHERE libraryID = ?)",
-                                 keyString,keyString],[NSNumber numberWithInt:libraryID]];
+        [dbObject executeUpdate:[NSString stringWithFormat:@"DELETE FROM attachments WHERE itemKey NOT IN ('%@') AND parentKey IN (SELECT itemKey FROM items WHERE libraryID = ?)",
+                                 keyString],[NSNumber numberWithInt:libraryID]];
         
-        [dbObject executeUpdate:[NSString stringWithFormat:@"DELETE FROM notes WHERE itemKey NOT IN ('%@') AND parentKey NOT IN ('%@') AND parentKey in (SELECT itemKey FROM items WHERE libraryID = ?) AND locallyAdded = 0",
-                                 keyString,keyString],[NSNumber numberWithInt:libraryID]];
+        [dbObject executeUpdate:[NSString stringWithFormat:@"DELETE FROM notes WHERE itemKey NOT IN ('%@') AND parentKey in (SELECT itemKey FROM items WHERE libraryID = ?) AND locallyAdded = 0",
+                                 keyString],[NSNumber numberWithInt:libraryID]];
         
         
     }
