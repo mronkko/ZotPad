@@ -45,7 +45,11 @@ extern NSInteger const VERSION_SOURCE_WEBDAV;
 @property (retain) NSString* md5;
 
 @property (assign) NSInteger versionSource;
+
+// This is the version identifier of the file that we have most recently downloaded from the server
 @property (retain) NSString* versionIdentifier_server;
+
+// This is the version identifier of the file that we have most recently sent to another app from ZotPad
 @property (retain) NSString* versionIdentifier_local;
 
 +(ZPZoteroAttachment*) attachmentWithKey:(NSString*) key;

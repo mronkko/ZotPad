@@ -99,8 +99,6 @@ didFinishLaunchingWithOptions:(NSDictionary *)launchOptions
 //    if(CRITTERCISM_KEY != nil) [Crittercism enableWithAppID:(NSString*)CRITTERCISM_KEY];
 
     
-    //Disable TestFlight
-    
     if(TESTFLIGHT_KEY != nil){
         
         //We know that this is deprecated, so suppress warnings
@@ -127,9 +125,22 @@ didFinishLaunchingWithOptions:(NSDictionary *)launchOptions
     
 #else
     if([ZPPreferences reportErrors]){
-        if(CRITTERCISM_KEY != nil){
-            [Crittercism enableWithAppID:(NSString*) CRITTERCISM_KEY];
+//        if(CRITTERCISM_KEY != nil){
+//            [Crittercism enableWithAppID:(NSString*) CRITTERCISM_KEY];
+//        }
+        
+        if(TESTFLIGHT_KEY != nil){
+            
+            //We know that this is deprecated, so suppress warnings
+#pragma clang diagnostic push
+#pragma clang diagnostic ignored "-Wdeprecated-declarations"
+            [TestFlight setDeviceIdentifier:[[UIDevice currentDevice] uniqueIdentifier]];
+#pragma clang diagnostic pop
+            
+            
+            [TestFlight takeOff:(NSString*)TESTFLIGHT_KEY];
         }
+
     }
     self.fileLogger.logFormatter = [[ZPFileLogFormatter alloc] initWithLevel:LOG_LEVEL_INFO];
 

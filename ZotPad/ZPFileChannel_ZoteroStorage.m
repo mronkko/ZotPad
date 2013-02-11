@@ -89,9 +89,34 @@ static NSOperationQueue* _uploadQueue;
         //If we are overwriting a conflicting file, just use the metadata md5 instead of the md5 that we have received
         
         if(overwriteConflicting){
-            [request addRequestHeader:@"If-Match" value:attachment.versionIdentifier_server];
+            if(attachment.md5 != NULL){
+                [request addRequestHeader:@"If-Match" value:attachment.md5];
+            }
+            
+            //This code should never run
+            
+            else{
+                DDLogError(@"Attachment %@ (%@) is missing version identification information. The local file will replace the server version without a version check.",attachment.key,attachment.filename);
+                [ZPServerConnection retrieveSingleItem:attachment completion:^(NSArray* attachmentList){
+                    if(attachmentList.count == 1){
+                        [self startUploadingAttachment:[attachmentList objectAtIndex:0] overWriteConflictingServerVersion:overwriteConflicting];
+                    }
+                    else{
+                        DDLogError(@"Retrieving version information for attachment %@ (%@) during WebDAV upload resulted in %i results. The local file cannot be uploaded and will be purged.",attachment.filename, attachment.key,attachmentList.count);
+                        [ZPFileCacheManager deleteModifiedFileForAttachment:attachment reason:@"Version information missing and server version does not exist"];
+                    }
+                }];
+                [self cleanupAfterFinishingAttachment:attachment];
+                return NULL;
+            }
+
         }
         else {
+            if(attachment.versionIdentifier_local == NULL){
+                [self presentConflictViewForAttachment:attachment reason:@"Local version identifier missing"];
+                [self cleanupAfterFinishingAttachment:attachment];
+                return NULL;
+            }
             [request addRequestHeader:@"If-Match" value:attachment.versionIdentifier_local];
         }
     }
@@ -113,6 +138,8 @@ static NSOperationQueue* _uploadQueue;
 
     
     ASIHTTPRequest* request = [self _baseRequestForAttachment:attachment type:ZPFILECHANNEL_ZOTEROSTORAGE_DOWNLOAD overWriteConflictingServerVersion:FALSE];
+    if(request == NULL) return;
+    
     request.userInfo = [NSDictionary dictionaryWithObject:attachment forKey:ZPKEY_ATTACHMENT];
     
     NSString* tempFile = [NSTemporaryDirectory() stringByAppendingPathComponent:[NSString stringWithFormat:@"ZP%@%f",attachment.key,[[NSDate date] timeIntervalSince1970]*1000000]];
@@ -149,6 +176,7 @@ static NSOperationQueue* _uploadQueue;
     [self logVersionInformationForAttachment: attachment];
 
     ASIHTTPRequest* request = [self _baseRequestForAttachment:attachment type:ZPFILECHANNEL_ZOTEROSTORAGE_UPLOAD_AUTHORIZATION overWriteConflictingServerVersion:YES];
+    if(request == NULL) return;
 
     // Get info about the file to be uploaded
     
@@ -288,10 +316,35 @@ static NSOperationQueue* _uploadQueue;
                 uploadRequest.userInfo = userInfo;
                 
                 if([(NSNumber*) [request.userInfo objectForKey:@"overwriteConflicting"] boolValue]){
-                    [request addRequestHeader:@"If-Match" value:attachment.md5];
+
+                    if(attachment.md5 != NULL){
+                        [request addRequestHeader:@"If-Match" value:attachment.md5];
+                    }
+                    //This code should never run
+                    
+                    else{
+                        DDLogError(@"Attachment %@ (%@) is missing version identification information. The local file will replace the server version without a version check.",attachment.key,attachment.filename);
+                        [ZPServerConnection retrieveSingleItem:attachment completion:^(NSArray* attachmentList){
+                            if(attachmentList.count == 1){
+                                [self startUploadingAttachment:[attachmentList objectAtIndex:0] overWriteConflictingServerVersion:YES];
+                            }
+                            else{
+                                DDLogError(@"Retrieving version information for attachment %@ (%@) during WebDAV upload resulted in %i results. The local file cannot be uploaded and will be purged.",attachment.filename, attachment.key,attachmentList.count);
+                                [ZPFileCacheManager deleteModifiedFileForAttachment:attachment reason:@"Version information missing and server version does not exist"];
+                            }
+                        }];
+                        [self cleanupAfterFinishingAttachment:attachment];
+                        return;
+                    }
+
                 }
                 else {
-                    [request addRequestHeader:@"If-Match" value:attachment.versionIdentifier_server];
+                    if(attachment.versionIdentifier_local == NULL){
+                        [self presentConflictViewForAttachment:attachment reason:@"Local version identifier missing"];
+                        [self cleanupAfterFinishingAttachment:attachment];
+                        return;
+                    }
+                    [request addRequestHeader:@"If-Match" value:attachment.versionIdentifier_local];
                 }
 
                 NSDictionary* params = [responseDictionary objectForKey:@"params"];
@@ -320,6 +373,8 @@ static NSOperationQueue* _uploadQueue;
                 
             //Register upload
             ASIHTTPRequest* registerRequest = [self _baseRequestForAttachment:attachment type:ZPFILECHANNEL_ZOTEROSTORAGE_UPLOAD_REGISTER overWriteConflictingServerVersion:[(NSNumber*)[request.userInfo objectForKey:@"overwriteConflicting"] boolValue]];
+            if(request == NULL) return;
+
             registerRequest.userInfo = request.userInfo;
             [registerRequest setPostBody:[NSMutableData dataWithData:[[NSString stringWithFormat:@"upload=%@",[request.userInfo objectForKey:@"uploadKey"]] dataUsingEncoding:NSASCIIStringEncoding]]];
             [_uploadQueue addOperation:registerRequest];

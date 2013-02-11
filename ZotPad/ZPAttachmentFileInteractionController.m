@@ -36,6 +36,7 @@
     BOOL _showsMainActionSheet;
 }
 
+
 - (BOOL) _shouldShowActionSheet;
 
 @end
@@ -45,6 +46,7 @@
 @implementation ZPAttachmentFileInteractionController
 
 @synthesize item;
+@synthesize actionSheet = _actionSheet;
 
 -(void) setAttachment:(ZPZoteroAttachment*)attachment{
 

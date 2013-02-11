@@ -1685,7 +1685,7 @@ static NSObject* writeLock;
     //Sort
     if(orderField!=NULL){
         if([specialSortColumns indexOfObject:orderField]==NSNotFound){
-            [sql appendString:@" LEFT JOIN (SELECT itemkey, fieldValue FROM fields WHERE fieldName = ?) fields ON items.itemKey = fields.itemKey"];
+            [sql appendString:@" LEFT JOIN (SELECT fields.itemkey, fieldValue FROM fields WHERE fieldName = ?) fields ON items.itemKey = fields.itemKey"];
             [parameters addObject:orderField];
         }
     }
@@ -1722,14 +1722,14 @@ static NSObject* writeLock;
         NSMutableArray* newParameters = [NSMutableArray arrayWithArray:parameters ];
         
         NSMutableString* newSql = [NSMutableString stringWithString:sql];
-        [newSql appendString:@" AND items.title LIKE '%' || ? || '%' OR items.itemKey IN (SELECT itemKey FROM fields WHERE fieldValue LIKE '%' || ? || '%' AND itemKey IN ("];
+        [newSql appendString:@" AND items.title LIKE '%' || ? || '%' OR items.itemKey IN (SELECT fields.itemKey FROM fields WHERE fieldValue LIKE '%' || ? || '%' AND fields.itemKey IN ("];
         [newParameters addObject:searchString];
         [newParameters addObject:searchString];
         
         [newSql appendString:sql];
         [newParameters addObjectsFromArray:parameters];
         
-        [newSql appendString:@" ) UNION SELECT itemKey FROM creators WHERE (firstName LIKE '%' || ? || '%' OR lastName LIKE '%' || ? || '%' OR name LIKE '%' || ? || '%') AND itemKey IN ("];
+        [newSql appendString:@" ) UNION SELECT creators.itemKey FROM creators WHERE (firstName LIKE '%' || ? || '%' OR lastName LIKE '%' || ? || '%' OR name LIKE '%' || ? || '%') AND creators.itemKey IN ("];
         [newParameters addObject:searchString];
         [newParameters addObject:searchString];
         [newParameters addObject:searchString];
@@ -1753,7 +1753,7 @@ static NSObject* writeLock;
          [sql appendString:@"))"];
          */
         for(NSString* tag in tags){
-            [sql appendString:@" AND itemKey IN (SELECT itemKey FROM tags WHERE tagName = ?)"];
+            [sql appendString:@" AND items.itemKey IN (SELECT tags.itemKey FROM tags WHERE tagName = ?)"];
         }
         [parameters addObjectsFromArray:tags];
     }

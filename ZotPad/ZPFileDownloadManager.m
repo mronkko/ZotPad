@@ -164,8 +164,13 @@ static ZPCacheStatusToolbarController* _statusView;
             if(parent.libraryID == _activelibraryID && _activeCollectionKey == NULL){
                 doCache=true;
             }
-            else if(_activeCollectionKey!= NULL && [parent.collections containsObject:[ZPZoteroCollection collectionWithKey:_activeCollectionKey] ]){
-                doCache = true;
+            else{
+                NSString* collectionKey = _activeCollectionKey;
+                if(collectionKey != NULL){
+                    if([parent.collections containsObject:[ZPZoteroCollection collectionWithKey:_activeCollectionKey] ]){
+                        doCache = true;
+                    }
+                }
             }
         }
         else if([ZPPreferences cacheAttachmentsActiveItem]){

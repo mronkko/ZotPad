@@ -370,7 +370,7 @@ NSInteger const ZPATTACHMENTICONGVIEWCONTROLLER_TAG_TITLELABEL = -5;
             [self notifyAttachmentDownloadStarted:[NSNotification notificationWithName:ZPNOTIFICATION_ATTACHMENT_FILE_DOWNLOAD_STARTED object:attachment]];
         }
         else{
-            label.text = @"Waiting for upload";
+            label.text = @"Added to upload queue";
         }    
     }
     if(self.mode == ZPATTACHMENTICONGVIEWCONTROLLER_MODE_STATIC){

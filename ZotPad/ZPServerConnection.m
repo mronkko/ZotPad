@@ -424,7 +424,15 @@ const NSInteger ZPServerConnectionRequestLastModifiedItem = 11;
         ZPServerResponseXMLParser* parserDelegate =  [[ZPServerResponseXMLParserCollection alloc] init];
         parser.delegate = parserDelegate;
         [parser parse];
-        completionBlock([parserDelegate.parsedElements objectAtIndex:0]);
+        if([parserDelegate.parsedElements count]==1){
+            completionBlock([parserDelegate.parsedElements objectAtIndex:0]);
+        }
+        else{
+            DDLogError(@"Creating collection on Zotero server failed. \n\n Request URL: %@, \nPOST data:\n%@\n\nResponse data %@",
+                       urlString,
+                       [NSString stringWithFormat:@"{\"name\":\"%@\",\"parent\":%@}",collection.title,parentString],
+                       [[NSString alloc] initWithData:responseData encoding:NSUTF8StringEncoding]);
+        }
     }];
 }
 
@@ -495,7 +503,15 @@ const NSInteger ZPServerConnectionRequestLastModifiedItem = 11;
         ZPServerResponseXMLParser* parserDelegate =  [[ZPServerResponseXMLParserItem alloc] init];
         parser.delegate = parserDelegate;
         [parser parse];
-        completionBlock([parserDelegate.parsedElements objectAtIndex:0]);
+        if([parserDelegate.parsedElements count]==1){
+            completionBlock([parserDelegate.parsedElements objectAtIndex:0]);
+        }
+        else{
+            DDLogError(@"Updating an item on Zotero server failed. \n\n Request URL: %@, \nPOST data:\n%@\n\nResponse data %@",
+                       urlString,
+                       json,
+                       [[NSString alloc] initWithData:responseData encoding:NSUTF8StringEncoding]);
+        }
     }];
 
 }
@@ -571,7 +587,15 @@ const NSInteger ZPServerConnectionRequestLastModifiedItem = 11;
         ZPServerResponseXMLParser* parserDelegate =  [[ZPServerResponseXMLParserItem alloc] init];
         parser.delegate = parserDelegate;
         [parser parse];
-        completionBlock([parserDelegate.parsedElements objectAtIndex:0]);
+        if([parserDelegate.parsedElements count]==1){
+            completionBlock([parserDelegate.parsedElements objectAtIndex:0]);
+        }
+        else{
+            DDLogError(@"Editing an item on zotero server failed. \n\n Request URL: %@, \nPOST data:\n%@\n\nResponse data %@",
+                       urlString,
+                       json,
+                       [[NSString alloc] initWithData:responseData encoding:NSUTF8StringEncoding]);
+        }
     }];
     
 }
@@ -597,7 +621,15 @@ const NSInteger ZPServerConnectionRequestLastModifiedItem = 11;
         ZPServerResponseXMLParser* parserDelegate =  [[ZPServerResponseXMLParserItem alloc] init];
         parser.delegate = parserDelegate;
         [parser parse];
-        completionBlock([parserDelegate.parsedElements objectAtIndex:0]);
+        if([parserDelegate.parsedElements count]==1){
+            completionBlock([parserDelegate.parsedElements objectAtIndex:0]);
+        }
+        else{
+            DDLogError(@"Creating a note on Zotero server failed. \n\n Request URL: %@, \nPOST data:\n%@\n\nResponse data %@",
+                       urlString,
+                       json,
+                       [[NSString alloc] initWithData:responseData encoding:NSUTF8StringEncoding]);
+        }
     }];
 
 }
@@ -620,7 +652,17 @@ const NSInteger ZPServerConnectionRequestLastModifiedItem = 11;
         ZPServerResponseXMLParser* parserDelegate =  [[ZPServerResponseXMLParserItem alloc] init];
         parser.delegate = parserDelegate;
         [parser parse];
-        completionBlock([parserDelegate.parsedElements objectAtIndex:0]);
+
+        if([parserDelegate.parsedElements count]==1){
+            completionBlock([parserDelegate.parsedElements objectAtIndex:0]);
+        }
+        else{
+            
+            DDLogError(@"Editing a note on Zotero server failed. \n\n Request URL: %@, \nPOST data:\n%@\n\nResponse data %@",
+                       urlString,
+                       [NSString stringWithFormat:@"{  \"itemType\" : \"note\",  \"note\" : \"%@\",  \"tags\" : [], \"creators\" : []}",note.note],
+                       [[NSString alloc] initWithData:responseData encoding:NSUTF8StringEncoding]);
+        }
     }];
     
 }

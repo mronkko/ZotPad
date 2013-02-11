@@ -9,8 +9,7 @@ If you install this build and want to revert to 1.1 version, you need to uninsta
 GENERAL: 
 
 - Fixes bug
-- Updated the user manuals to reflect changes in 1.2
-- Added an upgrade script to upgrade from 1.1 to 1.2
+- Adds additional error checking in WebDAV and Zotero file storage uploads
 
 ----- Other new features and notable changes since ZotPad 1.1.2 ------
 

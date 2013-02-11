@@ -239,6 +239,7 @@
 
 - (void)navigationController:(UINavigationController *)navigationController willShowViewController:(UIViewController *)viewController animated:(BOOL)animated{
     
+    [_attachmentInteractionController.actionSheet dismissWithClickedButtonIndex:-1 animated:YES];
     if(viewController != self){
         //Pop the other controller if something else than self is showing
         ZPAppDelegate* appDelegate = (ZPAppDelegate*)[[UIApplication sharedApplication] delegate];

@@ -153,7 +153,7 @@ static ZPFileViewerViewController* _instance;
     //Show tool tip about stars
     
     if([[NSUserDefaults standardUserDefaults] objectForKey:@"hasPresentedStarButtonHelpPopover"]==NULL){
-        CMPopTipView* helpPopUp = [[CMPopTipView alloc] initWithMessage:@"Use the star button to add an item to favorites"];
+        CMPopTipView* helpPopUp = [[CMPopTipView alloc] initWithMessage:@"Use the star button to add the item to favorites"];
         [helpPopUp presentPointingAtBarButtonItem:_starButton animated:YES];
         [[NSUserDefaults standardUserDefaults] setObject:@"1" forKey:@"hasPresentedStarButtonHelpPopover"];
     }
@@ -481,6 +481,7 @@ static ZPFileViewerViewController* _instance;
 #pragma mark - Button actions
 
 -(IBAction) dismiss:(id)source{
+    [_attachmentInteractionController.actionSheet dismissWithClickedButtonIndex:-1 animated:YES];
     [self dismissModalViewControllerAnimated:YES];
 }
 
@@ -529,6 +530,7 @@ static ZPFileViewerViewController* _instance;
 
 
 - (IBAction) next:(id)sender{
+    [_attachmentInteractionController.actionSheet dismissWithClickedButtonIndex:-1 animated:YES];
     _activeAttachmentIndex++;
     [self _toggleArrows];
     [self _updateTitleAndStarButton];
@@ -537,6 +539,7 @@ static ZPFileViewerViewController* _instance;
 }
 
 - (IBAction) previous:(id)sender{
+    [_attachmentInteractionController.actionSheet dismissWithClickedButtonIndex:-1 animated:YES];
     _activeAttachmentIndex--;
     [self _toggleArrows];
     [self _updateTitleAndStarButton];

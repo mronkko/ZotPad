@@ -23,6 +23,7 @@
 }
 
 @property (retain, nonatomic) ZPZoteroItem* item;
+@property (readonly) UIActionSheet* actionSheet;
 
 -(void) setAttachment:(ZPZoteroAttachment*)attachment;
 -(void) presentOptionsMenuFromBarButtonItem:(UIBarButtonItem*)button;

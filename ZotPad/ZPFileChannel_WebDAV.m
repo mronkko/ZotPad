@@ -308,23 +308,45 @@ static NSOperationQueue* _uploadQueue;
     request.delegate = self;
     
     [request addRequestHeader:@"Content-Type" value:@"application/json"];
-    [request addRequestHeader:@"If-Match" value:attachment.etag];
+
+    //Sanity checking
+
+    if(attachment.etag != NULL){
+        [request addRequestHeader:@"If-Match" value:attachment.etag];
+
+        //Update the JSON
+        NSDictionary* oldJsonContent = (NSDictionary*) [attachment.jsonFromServer JSONValue];
+        NSMutableDictionary* jsonContent = [NSMutableDictionary dictionaryWithDictionary:oldJsonContent];
+        
+        [jsonContent setObject:[userInfo objectForKey:@"md5"] forKey:@"md5"];
+        [jsonContent setObject:[userInfo objectForKey:@"mtime"] forKey:@"mtime"];
+        
+        
+        NSString* jsonString = [jsonContent JSONRepresentation];
+        [request appendPostData:[jsonString dataUsingEncoding:NSUTF8StringEncoding]];
+        request.requestMethod = @"PUT";
+        
+        DDLogInfo(@"Uploading metadata about new version (%@) of file %@ to Zotero ",[userInfo objectForKey:@"md5"],attachment.filename);
+        
+        [_uploadQueue addOperation:request];
+
+    }
     
-    //Update the JSON
-    NSDictionary* oldJsonContent = (NSDictionary*) [attachment.jsonFromServer JSONValue];
-    NSMutableDictionary* jsonContent = [NSMutableDictionary dictionaryWithDictionary:oldJsonContent];
+    //This code should never run
     
-    [jsonContent setObject:[userInfo objectForKey:@"md5"] forKey:@"md5"];
-    [jsonContent setObject:[userInfo objectForKey:@"mtime"] forKey:@"mtime"];
-    
-    
-    NSString* jsonString = [jsonContent JSONRepresentation];
-    [request appendPostData:[jsonString dataUsingEncoding:NSUTF8StringEncoding]];
-    request.requestMethod = @"PUT";
-    
-    DDLogInfo(@"Uploading metadata about new version (%@) of file %@ to Zotero ",[userInfo objectForKey:@"md5"],attachment.filename);
-    
-    [_uploadQueue addOperation:request];
+    else{
+        DDLogError(@"Attachment %@ (%@) is missing version identification information. The local file will replace the server version without a version check.",attachment.key,attachment.filename);
+        [ZPServerConnection retrieveSingleItem:attachment completion:^(NSArray* attachmentList){
+            if(attachmentList.count == 1){
+                [self _registerWebDAVUploadWithZoteroServer:[attachmentList objectAtIndex:0] userInfo:userInfo];
+            }
+            else{
+                DDLogError(@"Retrieving version information for attachment %@ (%@) during WebDAV upload resulted in %i results. The local file cannot be uploaded and will be purged.",attachment.filename, attachment.key,attachmentList.count);
+                [ZPFileCacheManager deleteModifiedFileForAttachment:attachment reason:@"Version information missing and server version does not exist"];
+            }
+        }];
+    }
+
 }
 
 -(void) useProgressView:(UIProgressView*) progressView forUploadingAttachment:(ZPZoteroAttachment*)attachment{
