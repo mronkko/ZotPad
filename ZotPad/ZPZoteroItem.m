@@ -222,7 +222,7 @@ static CSLFormatter* _cslFormatter = NULL;
         _year = 0;
         _publicationDetails =@"";
     
-        DDLogError(@"CSL formatting error. The item with key %@ does not have any fields",self.key);
+        DDLogError(@"CSL formatting error. The item with key %@ and type %@ does not have any fields",self.key, self.itemType);
     }
 }
 
