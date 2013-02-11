@@ -175,8 +175,6 @@ static NSOperationQueue* _uploadQueue;
     
     [self logVersionInformationForAttachment: attachment];
 
-    ASIHTTPRequest* request = [self _baseRequestForAttachment:attachment type:ZPFILECHANNEL_ZOTEROSTORAGE_UPLOAD_AUTHORIZATION overWriteConflictingServerVersion:YES];
-    if(request == NULL) return;
 
     // Get info about the file to be uploaded
     
@@ -190,8 +188,19 @@ static NSOperationQueue* _uploadQueue;
 
     [attachment logFileRevisions];
 
+    // The file is unmodified
+
+    if([md5 isEqual:attachment.md5]){
+        [ZPFileUploadManager finishedUploadingAttachment:attachment withVersionIdentifier:attachment.md5];
+        [self cleanupAfterFinishingAttachment:attachment];
+    }
+        
     // Get upload authorization
-     
+
+    ASIHTTPRequest* request = [self _baseRequestForAttachment:attachment type:ZPFILECHANNEL_ZOTEROSTORAGE_UPLOAD_AUTHORIZATION overWriteConflictingServerVersion:overwriteConflicting];
+    
+    if(request == NULL) return;
+    
     
     
     NSString* postBodyString = [NSString stringWithFormat:@"md5=%@&filename=%@&filesize=%llu&mtime=%lli",
@@ -286,7 +295,7 @@ static NSOperationQueue* _uploadQueue;
 
                 DDLogWarn(@"Upload of file %@ was declined by Zotero server because the file exists already on the Zotero server",attachment.filename);
 
-                [ZPFileUploadManager finishedUploadingAttachment:attachment withVersionIdentifier:attachment.versionIdentifier_local];
+                [ZPFileUploadManager finishedUploadingAttachment:attachment withVersionIdentifier:[request.userInfo objectForKey:@"md5"]];
                 //TODO: Should there be some kind of notification that the file was not uploaded because it already exists?
 
                 [self cleanupAfterFinishingAttachment:attachment];
