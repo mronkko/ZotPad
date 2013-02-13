@@ -483,13 +483,13 @@ static NSOperationQueue* _uploadQueue;
             DDLogInfo(dump);
         }
 
-        if(request.tag == ZPFILECHANNEL_WEBDAV_UPLOAD_FILE && (request.responseStatusCode == 204 || request.responseStatusCode == 201)){
+        if(request.tag == ZPFILECHANNEL_WEBDAV_UPLOAD_FILE && (request.responseStatusCode == 204 || request.responseStatusCode == 201 || request.responseStatusCode == 200)){
             [self _performWebDAVUploadForAttachment:attachment tag:ZPFILECHANNEL_WEBDAV_UPLOAD_UPDATE_PROP userInfo:request.userInfo];
         }        
-        else if(request.tag == ZPFILECHANNEL_WEBDAV_UPLOAD_UPDATE_PROP && (request.responseStatusCode == 204 || request.responseStatusCode == 201)){
+        else if(request.tag == ZPFILECHANNEL_WEBDAV_UPLOAD_UPDATE_PROP && (request.responseStatusCode == 204 || request.responseStatusCode == 201 || request.responseStatusCode == 200)){
             [self _performWebDAVUploadForAttachment:attachment tag:ZPFILECHANNEL_WEBDAV_UPLOAD_UPDATE_LASTSYNC userInfo:request.userInfo];
         }
-        else if(request.tag == ZPFILECHANNEL_WEBDAV_UPLOAD_UPDATE_LASTSYNC &&  (request.responseStatusCode == 204 || request.responseStatusCode == 201)){
+        else if(request.tag == ZPFILECHANNEL_WEBDAV_UPLOAD_UPDATE_LASTSYNC &&  (request.responseStatusCode == 204 || request.responseStatusCode == 201 || request.responseStatusCode == 200)){
             [self _registerWebDAVUploadWithZoteroServer:attachment userInfo:request.userInfo];   
         }
         
