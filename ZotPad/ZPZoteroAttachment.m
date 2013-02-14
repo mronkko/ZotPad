@@ -30,6 +30,9 @@ NSInteger const VERSION_SOURCE_DROPBOX =3;
 
 - (NSString*) _fileSystemPathWithSuffix:(NSString*)suffix;
 
+//This returns a file name or title based on link mode.
+- (NSString*) filenameBasedOnLinkMode;
+
 @end
 
 
@@ -108,7 +111,7 @@ static NSString* _documentsDirectory = NULL;
 }
 
 +(ZPZoteroAttachment*) dataObjectForAttachedFile:(NSString*) filename{
-
+    
     //Strip the file ending
     NSString* parsedFilename = [[filename lastPathComponent] stringByDeletingPathExtension];
     
@@ -130,7 +133,10 @@ static NSString* _documentsDirectory = NULL;
     else{
         attachment = [self attachmentWithKey:key];
     }
-    if(attachment.filename == NULL) attachment = NULL;
+    
+    // Does the attachment really exist
+    
+    if([attachment filenameBasedOnLinkMode] == NULL ) attachment = NULL;
 
     return attachment;
     
@@ -144,24 +150,32 @@ static NSString* _documentsDirectory = NULL;
 
 - (NSString*) _fileSystemPathWithSuffix:(NSString*)suffix{
     
-    if(self.filename == NULL ) return NULL;
+    //Linked files do not have file names, only titles
+    
+    NSString* thisFilename = [self filenameBasedOnLinkMode];
+
+
+    if(thisFilename == NULL)
+        return NULL;
     
     NSString* path;
+    
+    
     //Imported URLs are stored as ZIP files
     
     if(_linkMode == LINK_MODE_IMPORTED_URL && ([self.contentType isEqualToString:@"text/html"]
                                                               || [self.contentType isEqualToString:@"application/xhtml+xml"])){
-        path = [[self filename] stringByAppendingFormat:@"_%@%@.zip",self.key,suffix];
+        path = [thisFilename stringByAppendingFormat:@"_%@%@.zip",self.key,suffix];
     }
     else{
-        NSRange lastPeriod = [[self filename] rangeOfString:@"." options:NSBackwardsSearch];
+        NSRange lastPeriod = [thisFilename rangeOfString:@"." options:NSBackwardsSearch];
         
         
         if(lastPeriod.location == NSNotFound){
-            path = [[self filename] stringByAppendingFormat:@"_%@%@",self.key,suffix];
+            path = [thisFilename stringByAppendingFormat:@"_%@%@",self.key,suffix];
         }
         else{
-            path = [[self filename] stringByReplacingCharactersInRange:lastPeriod
+            path = [thisFilename stringByReplacingCharactersInRange:lastPeriod
                                                              withString:[NSString stringWithFormat:@"_%@%@.",self.key,suffix]];
         }
     }
@@ -222,9 +236,18 @@ static NSString* _documentsDirectory = NULL;
 
 #pragma mark - File operations
 
+- (NSString*) filenameBasedOnLinkMode{
+    if(self.linkMode == LINK_MODE_LINKED_FILE){
+        return self.title;
+    }
+    else{
+        return self.filename;
+    }
+}
+
 -(BOOL) fileExists{
     //If there is no known filename for the item, then the item cannot exists in cache
-    if(self.filename == nil || self.filename == (NSObject*)[NSNull null]){
+    if(self.filenameBasedOnLinkMode == nil || self.filenameBasedOnLinkMode == (NSObject*)[NSNull null]){
         return false;
     }
     NSString* fsPath = [self fileSystemPath];
@@ -236,7 +259,7 @@ static NSString* _documentsDirectory = NULL;
 
 -(BOOL) fileExists_original{
     //If there is no known filename for the item, then the item cannot exists in cache
-    if(self.filename == nil || self.filename == (NSObject*)[NSNull null]){
+    if(self.filenameBasedOnLinkMode == nil || self.filenameBasedOnLinkMode == (NSObject*)[NSNull null]){
         return false;
     }
     NSString* fsPath = [self fileSystemPath_original];
@@ -248,7 +271,7 @@ static NSString* _documentsDirectory = NULL;
 
 -(BOOL) fileExists_modified{
     //If there is no known filename for the item, then the item cannot exists in cache
-    if(self.filename == nil || self.filename == (NSObject*)[NSNull null]){
+    if(self.filenameBasedOnLinkMode == nil || self.filenameBasedOnLinkMode == (NSObject*)[NSNull null]){
         return false;
     }
     NSString* fsPath = [self fileSystemPath_modified];
@@ -274,13 +297,13 @@ static NSString* _documentsDirectory = NULL;
                                                               [self.contentType isEqualToString:@"application/xhtml+xml"])){
         NSString* tempDir = [NSTemporaryDirectory() stringByAppendingPathComponent:self.key];
         
-        return [NSURL fileURLWithPath:[tempDir stringByAppendingPathComponent:self.filename]];
+        return [NSURL fileURLWithPath:[tempDir stringByAppendingPathComponent:self.filenameBasedOnLinkMode]];
     }
     else return [NSURL fileURLWithPath:self.fileSystemPath];
 }
 
 -(NSString*) previewItemTitle{
-    return self.filename;
+    return self.filenameBasedOnLinkMode;
 }
 
 

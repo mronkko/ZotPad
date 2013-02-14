@@ -84,11 +84,18 @@ static ZPCacheStatusToolbarController* _statusView;
         if(attachment !=NULL && [[attachment.fileSystemPath_modified lastPathComponent] isEqualToString:_documentFilePath]){
             count++;
             if(shouldUpload){
-                DDLogInfo(@"Preparing to upload file %@.",attachment.filename);
+                DDLogInfo(@"Preparing to upload file %@.",attachment.filenameBasedOnLinkMode);
                 [self _uploadVersionOfAttachment:attachment];
+                //Only one upload at a time
+                shouldUpload = FALSE;
             }
             else{
-                DDLogInfo(@"File %@ will remain in the upload queue because the uploader is busy.",attachment.filename);
+                if(! [ZPReachability hasInternetConnection]){
+                    DDLogInfo(@"Uploading of file %@ is delayed because there is no internet connection",attachment.filenameBasedOnLinkMode);
+                }
+                else if([ZPFileChannel activeUploads]>0){
+                    DDLogInfo(@"Uploading of file %@ is  delayed because uploader is currently uploading %i file(s). The file will remain in the upload queue until the current upload finishes.",attachment.filenameBasedOnLinkMode, [ZPFileChannel activeUploads]);
+                }
             }
         }
     }
@@ -107,19 +114,19 @@ static ZPCacheStatusToolbarController* _statusView;
     }
     //Check if the file can be uploaded
     
-    if([ZPPreferences debugFileUploads]) DDLogInfo(@"Retrieving new metadata for file %@.",attachment.filename);
+    if([ZPPreferences debugFileUploads]) DDLogInfo(@"Retrieving new metadata for file %@.",attachment.filenameBasedOnLinkMode);
     
     [ZPServerConnection retrieveSingleItem:attachment completion:^(NSArray* parsedResults) {
         if(parsedResults == NULL || [parsedResults count]==0){
             //Failure
-            DDLogWarn(@"Failed retrieving metadata for file %@.",attachment.filename);
+            DDLogWarn(@"Failed retrieving metadata for file %@.",attachment.filenameBasedOnLinkMode);
             [[NSNotificationCenter defaultCenter] postNotificationName:ZPNOTIFICATION_ATTACHMENT_FILE_UPLOAD_FAILED object:attachment];
 
         }
         else{
             //Success
             ZPZoteroAttachment* updatedAttachment = [parsedResults objectAtIndex:0];
-            if([ZPPreferences debugFileUploads]) DDLogInfo(@"Starting upload sequence for %@.",updatedAttachment.filename);
+            if([ZPPreferences debugFileUploads]) DDLogInfo(@"Starting upload sequence for %@.",updatedAttachment.filenameBasedOnLinkMode);
             ZPFileChannel* uploadChannel = [ZPFileChannel fileChannelForAttachment:updatedAttachment];
             [uploadChannel startUploadingAttachment:updatedAttachment overWriteConflictingServerVersion:FALSE];
             [[NSNotificationCenter defaultCenter] postNotificationName:ZPNOTIFICATION_ATTACHMENT_FILE_UPLOAD_STARTED object:updatedAttachment];
@@ -139,7 +146,7 @@ static ZPCacheStatusToolbarController* _statusView;
         [NSException raise:@"Identifier cannot be null" format:@"File upload returned with null identifier"];
     }
     
-    DDLogInfo(@"Finished uploading file %@",attachment.filename);
+    DDLogInfo(@"Finished uploading file %@",attachment.filenameBasedOnLinkMode);
     
     //Update the timestamps and copy files into right place
     
@@ -156,7 +163,7 @@ static ZPCacheStatusToolbarController* _statusView;
 }
 
 +(void) failedUploadingAttachment:(ZPZoteroAttachment*)attachment withError:(NSError*) error toURL:(NSString*)url{
-    DDLogError(@"Failed uploading file %@. %@ (URL: %@) Troubleshooting instructions: http://www.zotpad.com/troubleshooting",attachment.filename,error.localizedDescription,url);
+    DDLogError(@"Failed uploading file %@. %@ (URL: %@) See the knowledge base for troubleshooting instructions: http://zotpad.uservoice.com",attachment.filenameBasedOnLinkMode,error.localizedDescription,url);
     
     [[NSNotificationCenter defaultCenter] postNotificationName:ZPNOTIFICATION_ATTACHMENT_FILE_UPLOAD_FAILED object:attachment userInfo:error.userInfo];
     [self performSelectorInBackground:@selector(_scanFilesToUpload) withObject:NULL];
@@ -166,7 +173,7 @@ static ZPCacheStatusToolbarController* _statusView;
 
 +(void) canceledUploadingAttachment:(ZPZoteroAttachment*)attachment{
     
-    DDLogWarn(@"Uploading file %@ was canceled.",attachment.filename);
+    DDLogWarn(@"Uploading file %@ was canceled.",attachment.filenameBasedOnLinkMode);
     
     [[NSNotificationCenter defaultCenter] postNotificationName:ZPNOTIFICATION_ATTACHMENT_FILE_UPLOAD_FAILED object:attachment];
     [self performSelectorInBackground:@selector(_scanFilesToUpload) withObject:NULL];

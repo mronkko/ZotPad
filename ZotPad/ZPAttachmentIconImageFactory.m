@@ -132,8 +132,6 @@ static ZPAttachmentIconImageFactory* _webViewDelegate;
         //Else start rendering
         else{
             
-            DDLogVerbose(@"Preparing to render image %@",cacheKey);
-
             //Only render in main thread
             
             if([NSThread isMainThread]){
@@ -171,8 +169,6 @@ static ZPAttachmentIconImageFactory* _webViewDelegate;
                         else{
                             content = [NSString stringWithFormat:@"<html><body onload=\"document.location='zotpad:%@'\"><img src=\"%@.svg\" width=%i height=%i></body></html>",cacheKey,mimeType,width,height];
                         }
-                        
-                        DDLogVerbose(content);
                         
                         NSURL *baseURL = [NSURL fileURLWithPath:NSTemporaryDirectory()];
                         
@@ -238,7 +234,7 @@ static ZPAttachmentIconImageFactory* _webViewDelegate;
     while ((uncompressedLength = gzread(file, buffer, CHUNK)) ) {
         // got data out of our file
         if(fwrite(buffer, 1, uncompressedLength, dest) != uncompressedLength || ferror(dest)) {
-            DDLogVerbose(@"error writing data");
+            DDLogVerbose(@"Error uncompressing SVG image at path %@", filePath);
         }
     }
     
@@ -404,8 +400,6 @@ static ZPAttachmentIconImageFactory* _webViewDelegate;
     float newWidth = image.size.width*scalingFactor;
     float newHeight = image.size.height*scalingFactor;
 
-    DDLogVerbose(@"Dimensions (width x height) image: %f x %f view:  %f x %f, return %f x %f",image.size.width,image.size.height,imageView.frame.size.width,imageView.frame.size.height,newWidth,newHeight);
-
     return CGRectMake(0,0,newWidth,newHeight);
     
 }
@@ -425,8 +419,6 @@ static ZPAttachmentIconImageFactory* _webViewDelegate;
         // Source: http://stackoverflow.com/questions/5658993/creating-pdf-thumbnail-in-iphone
         //
         
-        
-        DDLogVerbose(@"Start rendering pdf %@",filePath);
         
         NSURL *pdfUrl = [NSURL fileURLWithPath:filePath];
         CGPDFDocumentRef document = CGPDFDocumentCreateWithURL((__bridge_retained CFURLRef)pdfUrl);
@@ -450,7 +442,6 @@ static ZPAttachmentIconImageFactory* _webViewDelegate;
             UIGraphicsEndImageContext();
             
             if(image != NULL){
-                DDLogVerbose(@"Done rendering pdf %@",filePath);
                 //        [_previewCache setObject:image forKey:filePath];
                 dispatch_async(dispatch_get_main_queue(), ^{
                     [self _showPDFPreview:image inImageView:fileImage];

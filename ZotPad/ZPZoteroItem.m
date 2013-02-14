@@ -221,8 +221,10 @@ static CSLFormatter* _cslFormatter = NULL;
         _creatorSummaryXXX = @"";
         _year = 0;
         _publicationDetails =@"";
-    
-        DDLogError(@"CSL formatting error. The item with key %@ and type %@ does not have any fields",self.key, self.itemType);
+
+        if(![self.itemType isEqualToString:@"note"] && ! [self.itemType isEqualToString:@"attachment"]){
+            DDLogError(@"CSL formatting error. The item with key %@ and type %@ does not have any fields",self.key, self.itemType);
+        }
     }
 }
 

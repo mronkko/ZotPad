@@ -122,7 +122,7 @@ static NSObject* writeLock;
                 NSInteger counter=0;
                 for(attachment in attachments){
                     
-                    DDLogWarn(@"Calculating MD5 sum for attachment file %@",attachment.filename);
+                    DDLogWarn(@"Calculating MD5 sum for attachment file %@",attachment.filenameBasedOnLinkMode);
                     if(attachment.fileExists){
                         attachment.versionIdentifier_server = [ZPZoteroAttachment md5ForFileAtPath:attachment.fileSystemPath];
                         
@@ -982,7 +982,7 @@ static NSObject* writeLock;
     @synchronized(dbObject){
         
         FMResultSet* resultSet;
-        resultSet= [dbObject executeQuery:@"SELECT DISTINCT tags.itemKey FROM tags, items WHERE tags.itemKey = items.itemKey AND (tags.locallyAdded = 1 OR tags.locallyDeleted = 1)"];
+        resultSet= [dbObject executeQuery:@"SELECT DISTINCT tags.itemKey FROM tags, items WHERE items.itemType <> 'attachment' AND tags.itemKey = items.itemKey AND (tags.locallyAdded = 1 OR tags.locallyDeleted = 1)"];
         
         while([resultSet next]) {
             [returnArray addObject:[ZPZoteroItem itemWithKey:[resultSet stringForColumnIndex:0]]];
@@ -1042,6 +1042,7 @@ static NSObject* writeLock;
     
     FMDatabase* dbObject = [self _dbObject];
     @synchronized(dbObject){
+        [dbObject executeUpdate:@"DELETE FROM tags WHERE locallyDeleted = 1 AND itemKey = ?", itemKey];
         [dbObject executeUpdate:@"UPDATE tags SET locallyAdded = 0, locallyDeleted = 0 WHERE itemKey = ?", itemKey];
     }
     

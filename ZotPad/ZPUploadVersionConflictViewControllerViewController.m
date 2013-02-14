@@ -81,7 +81,7 @@
         }
     }    
     
-    label.text = [NSString stringWithFormat:@"File '%@' has changed on server",attachment.filename];    
+    label.text = [NSString stringWithFormat:@"File '%@' has changed on server",attachment.filenameBasedOnLinkMode];
 }
 
 -(void) dealloc{

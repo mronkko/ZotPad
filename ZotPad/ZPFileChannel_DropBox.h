@@ -19,7 +19,7 @@ extern const NSInteger ZPFILECHANNEL_DROPBOX_DOWNLOAD;
     NSMutableDictionary* remoteVersions;
 }
 
-+(void)linkDroboxIfNeeded;
++(void)linkDropboxIfNeeded;
 -(NSObject*) keyForRequest:(NSObject*)request;
 
 @end

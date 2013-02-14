@@ -144,7 +144,7 @@ static ZPFileChannel_ZoteroStorage* _fileChannel_Zotero;
 
 -(void) presentConflictViewForAttachment:(ZPZoteroAttachment*) attachment reason:(NSString*) reason{
     
-    DDLogWarn(@"Version conflict for file %@: %@", attachment.filename, reason);
+    DDLogWarn(@"Version conflict for file %@: %@", attachment.filenameBasedOnLinkMode, reason);
     
     //If we do not have the new version, start downloading it now
     
@@ -171,8 +171,10 @@ static ZPFileChannel_ZoteroStorage* _fileChannel_Zotero;
             [root.presentedViewController performSegueWithIdentifier:@"FileUploadConflictFromDialog" sender:sender];
         }
         else{
-            //Delay one second and check again if this can be presented
-            [self performSelector:@selector(presentConflictViewForAttachment:) withObject:attachment afterDelay:(NSTimeInterval) 1];
+            DDLogWarn(@"Delaying conflict view to allow existing animations to finish");
+            dispatch_after(dispatch_time(DISPATCH_TIME_NOW, 1 * NSEC_PER_SEC), dispatch_get_current_queue(), ^{
+                [self presentConflictViewForAttachment:attachment reason:reason];
+            });
         }
     }
 }
@@ -215,7 +217,7 @@ static ZPFileChannel_ZoteroStorage* _fileChannel_Zotero;
         if(attachment.fileExists_original){
             oldMD5 = [ZPZoteroAttachment md5ForFileAtPath:attachment.fileSystemPath_original];
         }
-        DDLogInfo(@"Additional version information for file %@:",attachment.filename);
+        DDLogInfo(@"Additional version information for file %@:",attachment.filenameBasedOnLinkMode);
         DDLogInfo(@"MD5 sum for old file:   %@", oldMD5);
         DDLogInfo(@"MD5 sum for new file:   %@", newMD5);
         DDLogInfo(@"Etag from current metadata: %@", attachment.etag);

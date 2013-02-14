@@ -134,7 +134,7 @@ didFinishLaunchingWithOptions:(NSDictionary *)launchOptions
             //We know that this is deprecated, so suppress warnings
 #pragma clang diagnostic push
 #pragma clang diagnostic ignored "-Wdeprecated-declarations"
-            [TestFlight setDeviceIdentifier:[[UIDevice currentDevice] uniqueIdentifier]];
+//            [TestFlight setDeviceIdentifier:[[UIDevice currentDevice] uniqueIdentifier]];
 #pragma clang diagnostic pop
             
             
@@ -149,7 +149,6 @@ didFinishLaunchingWithOptions:(NSDictionary *)launchOptions
     [DDLog addLogger:self.fileLogger];
     DDLogInfo(@"ZotPad is starting");
     DDLogVerbose(@"Verbose logging is enabled");
-    
     
     [ZPPreferences checkAndProcessApplicationResetPreferences];
     

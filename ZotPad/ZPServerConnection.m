@@ -45,7 +45,7 @@
         //Stay offline button, do nothing
     }
     else if(buttonIndex == 1){
-        [[UIApplication sharedApplication] openURL:[NSString stringWithFormat:@"https://www.zotero.org/settings/keys/edit/%@",[ZPPreferences OAuthKey]]];
+        [[UIApplication sharedApplication] openURL:[NSURL URLWithString:[NSString stringWithFormat:@"https://www.zotero.org/settings/keys/edit/%@",[ZPPreferences OAuthKey]]]];
     }
     else if(buttonIndex == 2 ){
         //New key button
@@ -175,7 +175,12 @@ const NSInteger ZPServerConnectionRequestLastModifiedItem = 11;
     }
 
     [self _makeServerRequest:ZPServerConnectionRequestSingleItem withParameters:parameters userInfo:NULL];
-    [self _makeServerRequest:ZPServerConnectionRequestSingleItemChildren withParameters:parameters userInfo:NULL];
+    
+    //Retrieve children for normal items.
+    
+    if(! [item.itemType isEqualToString:@"attachment"] && ! [item.itemType isEqualToString:@"note"]){
+        [self _makeServerRequest:ZPServerConnectionRequestSingleItemChildren withParameters:parameters userInfo:NULL];
+    }
 
     /*
     NSArray* parsedArray = [parserDelegate parsedElements];

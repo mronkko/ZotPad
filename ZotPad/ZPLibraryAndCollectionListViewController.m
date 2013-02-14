@@ -273,6 +273,15 @@
             [self _drillIntoIndexPath:indexPath];
         }
         else{
+            
+            
+            //Hide the side panel
+            // Hide the side panel that might be visible if iPad is in portrait orientation
+            
+            if (self.detailViewController.masterPopoverController != nil) {
+                [self.detailViewController.masterPopoverController dismissPopoverAnimated:YES];
+            }
+
             //Pop everything on top of this
             [self.layeredNavigationController popToViewController:self
                                                          animated: YES];

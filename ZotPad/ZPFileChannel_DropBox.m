@@ -88,7 +88,7 @@ static NSInteger _uploadCounter = 0;
 }
 
 
-+(void) linkDroboxIfNeeded{
++(void) linkDropboxIfNeeded{
     if([ZPPreferences useDropbox]){
         
         if([ZPDBSession sharedSession]==NULL){
@@ -132,9 +132,11 @@ static NSInteger _uploadCounter = 0;
             DDLogInfo(@"Linking Dropbox");
             if([NSThread isMainThread]){
 
+                DDLogInfo(@"Unlinking existing Dropbox sessions");
+                
                 //Unlink all so that we can relink
                 [[ZPDBSession sharedSession] unlinkAll];
-                
+
                 UIViewController* viewController = [UIApplication sharedApplication].delegate.window.rootViewController;
                 while(viewController.presentedViewController) viewController = viewController.presentedViewController;
                 
@@ -144,10 +146,15 @@ static NSInteger _uploadCounter = 0;
                     [viewController dismissModalViewControllerAnimated:NO];
                     viewController = parent;
                 }
+                
+                DDLogInfo(@"Presenting Dropbox linking dialog");
+                
                 [[ZPDBSession sharedSession] linkFromController:viewController];
             }
             else {
-                [[self class] performSelectorOnMainThread:@selector(linkDroboxIfNeeded) withObject:NULL waitUntilDone:YES];
+                dispatch_async(dispatch_get_main_queue(), ^{
+                    [ZPFileChannel_Dropbox linkDropboxIfNeeded];
+                });
             }
         }
     }
@@ -155,7 +162,7 @@ static NSInteger _uploadCounter = 0;
 
 -(id) init{ 
     
-    [ZPFileChannel_Dropbox linkDroboxIfNeeded];
+    [ZPFileChannel_Dropbox linkDropboxIfNeeded];
     
     self = [super init]; 
     [ZPDBSession sharedSession].delegate = self;
@@ -442,7 +449,8 @@ static NSInteger _uploadCounter = 0;
                                                       encoding:NSASCIIStringEncoding];
         }
         
-        NSString* fileTypeSuffix = [attachment.filename pathExtension];
+        NSString* fileTypeSuffix = [attachment.filenameBasedOnLinkMode pathExtension];
+        
         if(![fileTypeSuffix isEqualToString:@""]){
             [customName appendFormat:@".%@",[fileTypeSuffix lowercaseString]];
         }
@@ -469,7 +477,7 @@ static NSInteger _uploadCounter = 0;
         }
         else{
             //Otherwise, load metadata for the file usign the default patterns
-            return [NSString stringWithFormat:@"/%@%@/%@",basePath, attachment.key,attachment.filename];
+            return [NSString stringWithFormat:@"/%@%@/%@",basePath, attachment.key,attachment.filenameBasedOnLinkMode];
         }
     }
 }
@@ -501,10 +509,10 @@ static NSInteger _uploadCounter = 0;
 
     _downloadCounter++;
     
-    DDLogInfo(@"Start downloading attachment %@ from Dropbox",attachment.filename);
+    DDLogInfo(@"Start downloading attachment %@ from Dropbox",attachment.filenameBasedOnLinkMode);
 
     //Link with dropBox account if not already linked
-    [ZPFileChannel_Dropbox linkDroboxIfNeeded];
+    [ZPFileChannel_Dropbox linkDropboxIfNeeded];
     
     //TODO: consider pooling these
     ZPDBRestClient* restClient = [[ZPDBRestClient alloc] initWithSession:[ZPDBSession sharedSession]];
@@ -552,11 +560,11 @@ static NSInteger _uploadCounter = 0;
     
     [self logVersionInformationForAttachment: attachment];
 
-    DDLogInfo(@"Start uploading attachment %@ to Dropbox, overwrite: %i",attachment.filename,overwriteConflicting);
+    DDLogInfo(@"Start uploading attachment %@ to Dropbox, overwrite: %i",attachment.filenameBasedOnLinkMode,overwriteConflicting);
 
     //Link with dropBox account if not already linked
 
-    [ZPFileChannel_Dropbox linkDroboxIfNeeded];
+    [ZPFileChannel_Dropbox linkDropboxIfNeeded];
     
     //TODO: consider pooling these
     ZPDBRestClient* restClient = [[ZPDBRestClient alloc] initWithSession:[ZPDBSession sharedSession]];
@@ -614,7 +622,7 @@ static NSInteger _uploadCounter = 0;
         else{
             //Set version of the file
             client.revision=metadata.rev;
-            DDLogVerbose(@"Start downloading file /%@/%@ (rev %@)",attachment.key,attachment.filename,client.revision);
+            DDLogVerbose(@"Start downloading file /%@/%@ (rev %@)",attachment.key,attachment.filenameBasedOnLinkMode,client.revision);
             NSString* tempFile = [NSTemporaryDirectory() stringByAppendingPathComponent:[NSString stringWithFormat:@"ZP%@%f",attachment.key,[[NSDate date] timeIntervalSince1970]*1000000]];
             NSString* path = [self _pathForAttachment:attachment];
             [client loadFile:[path precomposedStringWithCanonicalMapping] atRev:client.revision intoPath:tempFile];
@@ -645,14 +653,16 @@ static NSInteger _uploadCounter = 0;
         
         //If rev is null, we assume that the file has been deleted. Fail 
         else if(metadata.rev == NULL){
-            [ZPFileDownloadManager failedDownloadingAttachment:attachment
+            _downloadCounter--;
+            [ZPFileUploadManager failedUploadingAttachment:attachment
                                                      withError:[NSError errorWithDomain:@"Dropbox"
                                                                                    code:-1
                                                                                userInfo:[NSDictionary dictionaryWithObject:@"The original file does not exist in Dropbox" forKey:NSLocalizedDescriptionKey]]
-                                                       fromURL:[self _URLForAttachment:attachment]];
+                                                       toURL:[self _URLForAttachment:attachment]];
             [self cleanupAfterFinishingAttachment:attachment];
         }
-        else if([attachment.versionIdentifier_local isEqualToString:metadata.rev]){
+        else if(! [attachment.versionIdentifier_local isEqualToString:metadata.rev]){
+            _downloadCounter--;
             [self presentConflictViewForAttachment:attachment reason:[NSString stringWithFormat:@"Version identifiers differ. Local file: %@, Dropbox server file: %@", attachment.versionIdentifier_local, metadata.rev]];
         }
         else{
@@ -669,8 +679,16 @@ static NSInteger _uploadCounter = 0;
     [self _restClient:client processError:error];
     
     ZPZoteroAttachment* attachment = client.attachment;
-    _downloadCounter--;
-    [ZPFileDownloadManager failedDownloadingAttachment:attachment withError:error fromURL:[self _URLForAttachment:attachment]];    
+    
+    
+    if(client.tag == ZPFILECHANNEL_DROPBOX_DOWNLOAD){
+        _downloadCounter--;
+        [ZPFileDownloadManager failedDownloadingAttachment:attachment withError:error fromURL:[self _URLForAttachment:attachment]];
+    }
+    else if(client.tag == ZPFILECHANNEL_DROPBOX_UPLOAD){
+        _uploadCounter--;
+        [ZPFileUploadManager failedUploadingAttachment:attachment withError:error toURL:[self _URLForAttachment:attachment]];
+    }
     [self cleanupAfterFinishingAttachment:attachment];
 
 }
@@ -830,7 +848,7 @@ static NSInteger _uploadCounter = 0;
 -(void) _restClient:(ZPDBRestClient*) client processError:(NSError *)error{
     //If we are not linked, link
     if(error.code==401){
-        [ZPFileChannel_Dropbox linkDroboxIfNeeded];
+        [ZPFileChannel_Dropbox linkDropboxIfNeeded];
     }
 
 }

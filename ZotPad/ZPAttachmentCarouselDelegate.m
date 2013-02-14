@@ -410,7 +410,8 @@ NSInteger const ZPATTACHMENTICONGVIEWCONTROLLER_TAG_TITLELABEL = -5;
             [[UIApplication sharedApplication] openURL:[NSURL URLWithString:attachment.url]];
         }
         else if(self.mode == ZPATTACHMENTICONGVIEWCONTROLLER_MODE_DOWNLOAD && ( attachment.linkMode == LINK_MODE_IMPORTED_FILE || 
-                attachment.linkMode == LINK_MODE_IMPORTED_URL)){
+                                                                               attachment.linkMode == LINK_MODE_IMPORTED_URL ||
+                                                                               (attachment.linkMode == LINK_MODE_LINKED_FILE && [ZPPreferences useDropbox] && [ZPPreferences downloadLinkedFilesWithDropbox]))){
             
 
             

@@ -448,9 +448,9 @@ static ZPCacheStatusToolbarController* _statusView;
     [ZPDatabase writeItemsFields:itemsThatNeedCreatorsAndFields];
     [ZPDatabase writeItemsCreators:itemsThatNeedCreatorsAndFields];
     
-    //TODO: Also Notes and attachments can have tags
     [ZPDatabase writeDataObjectsTags:itemsThatNeedCreatorsAndFields];
-    
+    [ZPDatabase writeDataObjectsTags:attachments];
+
     //Refresh the attachments for those items that got new attachments
     for(item in parentItemsForAttachments){
         [ZPDatabase addAttachmentsToItem:item];

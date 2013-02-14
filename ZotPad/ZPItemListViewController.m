@@ -203,13 +203,7 @@
             ZPZoteroLibrary* currentLibrary = [ZPZoteroLibrary libraryWithID:[ZPItemList instance].libraryID];
             self.navigationItem.title = currentLibrary.title;
         }
-        
-        // Hide the side panel that might be visible if iPad is in portrait orientation
-        
-        if (self.masterPopoverController != nil) {
-            [self.masterPopoverController dismissPopoverAnimated:YES];
-        }
-        
+                
         // Configuring the item list content starts here.
         
         [[ZPItemList instance] clearTable];
@@ -801,8 +795,10 @@
                 if ([self.tableView.indexPathsForVisibleRows containsObject:indexPath]) {
                     
                     //Is this the first attachment for the parent?
-                    
-                    if([[parent.attachments objectAtIndex:0] isEqual:attachment]){
+                    if([parent.attachments count]==0){
+                        DDLogError(@"Attachment with key %@ had a parent item key %@, but the parent item did not have any attachments.",attachment.key, attachment.parentKey);
+                    }
+                    else if([[parent.attachments objectAtIndex:0] isEqual:attachment]){
                         
                         dispatch_async(dispatch_get_main_queue(), ^{
                             

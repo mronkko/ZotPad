@@ -70,6 +70,7 @@
                 standAloneParent.fields = [NSDictionary dictionaryWithObject:ZPKEY_ATTACHMENT forKey:@"itemType"];
                 standAloneParent.attachments = [NSArray arrayWithObject:_currentElement];
                 standAloneParent.libraryID = _currentElement.libraryID;
+                standAloneParent.etag = _currentElement.etag;
                 [(ZPZoteroAttachment*) _currentElement setParentKey:_currentElement.key];
                 [_resultArray addObject:standAloneParent];
             }
@@ -80,6 +81,7 @@
                 standAloneParent.notes = [NSArray arrayWithObject:_currentElement];
                 standAloneParent.fields = [NSDictionary dictionaryWithObject:@"note" forKey:@"itemType"];
                 standAloneParent.libraryID = _currentElement.libraryID;
+                standAloneParent.etag = _currentElement.etag;
                 [(ZPZoteroNote*) _currentElement setParentKey:_currentElement.key];
                 [_resultArray addObject:standAloneParent];
             }

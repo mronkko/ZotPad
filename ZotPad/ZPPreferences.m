@@ -101,7 +101,7 @@ static NSInteger _maxCacheSize;
     
     NSUserDefaults* defaults = [NSUserDefaults standardUserDefaults];
 
-    for(NSString* file in [NSArray arrayWithObjects:@"Root", @"Dropbox", nil]){
+    for(NSString* file in [NSArray arrayWithObjects:@"Root", @"Dropbox", @"Advanced" , nil]){
         IASKSettingsReader* reader = [[IASKSettingsReader alloc] initWithFile:file];
         for(NSInteger section =0 ; section < [reader numberOfSections]; section++){
             for(NSInteger row =0 ; row < [reader numberOfRowsForSection:section]; row++){

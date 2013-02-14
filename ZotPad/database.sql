@@ -47,7 +47,7 @@ CREATE TABLE IF NOT EXISTS items (
     title TEXT,
     year INT DEFAULT NULL,
     itemType TEXT NOT NULL,
-    etag TEXT DEFAULT NULL,
+    etag TEXT NOT NULL,
     cacheTimestamp TEXT DEFAULT NULL,
     dateAdded TEXT DEFAULT NULL,
     locallyAdded INT DEFAULT 0,

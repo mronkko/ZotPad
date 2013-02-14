@@ -1,15 +1,14 @@
-This is a release candidate build with no known bugs or missing features.
+This is a release candidate build with no known bugs or missing features. 
 
-THIS BUILD WILL INSTALL OVER THE APP STORE VERSION OF ZOTPAD AND UPGRADE IT TO 1.2
+This build will install on parallel over the App Store version of ZotPad.
 
-If you install this build and want to revert to 1.1 version, you need to uninstall ZotPad and reinstall it from the App Store
+The ZotPad beta and ZotPad builds are identical, so testing just one is sufficient. 
 
 ----- Changes since the previous beta build -----
 
 GENERAL: 
 
 - Fixes bug
-- Adds additional error checking in WebDAV and Zotero file storage uploads
 
 ----- Other new features and notable changes since ZotPad 1.1.2 ------
 

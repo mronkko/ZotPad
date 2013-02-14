@@ -34,7 +34,7 @@ CREATE TABLE IF NOT EXISTS items (
     title TEXT,
     year INT DEFAULT NULL,
     itemType TEXT NOT NULL,
-    etag TEXT DEFAULT NULL,
+    etag TEXT NOT NULL,
     cacheTimestamp TEXT DEFAULT NULL,
     dateAdded TEXT DEFAULT NULL,
     locallyAdded INT DEFAULT 0,
@@ -42,7 +42,7 @@ CREATE TABLE IF NOT EXISTS items (
     locallyDeleted INT DEFAULT 0
 );
 
-INSERT INTO items SELECT itemKey, libraryID, title, year, itemType, NULL, NULL, dateAdded, 0, 0, 0 FROM temp;
+INSERT INTO items SELECT itemKey, libraryID, title, year, itemType, "not-set", NULL, dateAdded, 0, 0, 0 FROM temp;
 
 DROP TABLE temp;
 

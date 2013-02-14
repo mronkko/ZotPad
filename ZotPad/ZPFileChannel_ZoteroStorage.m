@@ -194,45 +194,45 @@ static NSOperationQueue* _uploadQueue;
         [ZPFileUploadManager finishedUploadingAttachment:attachment withVersionIdentifier:attachment.md5];
         [self cleanupAfterFinishingAttachment:attachment];
     }
+    else{
+        // Get upload authorization
         
-    // Get upload authorization
-
-    ASIHTTPRequest* request = [self _baseRequestForAttachment:attachment type:ZPFILECHANNEL_ZOTEROSTORAGE_UPLOAD_AUTHORIZATION overWriteConflictingServerVersion:overwriteConflicting];
-    
-    if(request == NULL) return;
-    
-    
-    
-    NSString* postBodyString = [NSString stringWithFormat:@"md5=%@&filename=%@&filesize=%llu&mtime=%lli",
-                                md5,
-                                attachment.filename,
-                                [documentFileAttributes fileSize],
-                                timeModifiedMilliseconds ];
-
-
-    NSMutableDictionary* userInfo = [[NSMutableDictionary alloc] initWithCapacity:3];
-    [userInfo setObject:attachment forKey:ZPKEY_ATTACHMENT];
-    [userInfo setObject:md5 forKey:@"md5"];
-    [userInfo setObject:[NSNumber numberWithBool:overwriteConflicting] forKey:@"overwriteConflicting"];
-    
-    request.userInfo = userInfo;
-    
-    if(attachment.contentType != NULL){
-        postBodyString = [postBodyString stringByAppendingFormat:@"&contentType=%@",attachment.contentType];
-        if(attachment.charset != NULL){
-            postBodyString = [postBodyString stringByAppendingFormat:@"&charset=%@",attachment.charset];
+        ASIHTTPRequest* request = [self _baseRequestForAttachment:attachment type:ZPFILECHANNEL_ZOTEROSTORAGE_UPLOAD_AUTHORIZATION overWriteConflictingServerVersion:overwriteConflicting];
+        
+        if(request == NULL) return;
+        
+        
+        
+        NSString* postBodyString = [NSString stringWithFormat:@"md5=%@&filename=%@&filesize=%llu&mtime=%lli",
+                                    md5,
+                                    attachment.filename,
+                                    [documentFileAttributes fileSize],
+                                    timeModifiedMilliseconds ];
+        
+        
+        NSMutableDictionary* userInfo = [[NSMutableDictionary alloc] initWithCapacity:3];
+        [userInfo setObject:attachment forKey:ZPKEY_ATTACHMENT];
+        [userInfo setObject:md5 forKey:@"md5"];
+        [userInfo setObject:[NSNumber numberWithBool:overwriteConflicting] forKey:@"overwriteConflicting"];
+        
+        request.userInfo = userInfo;
+        
+        if(attachment.contentType != NULL){
+            postBodyString = [postBodyString stringByAppendingFormat:@"&contentType=%@",attachment.contentType];
+            if(attachment.charset != NULL){
+                postBodyString = [postBodyString stringByAppendingFormat:@"&charset=%@",attachment.charset];
+            }
+            else {
+                postBodyString = [postBodyString stringByAppendingFormat:@"&charset="];
+            }
         }
-        else {
-            postBodyString = [postBodyString stringByAppendingFormat:@"&charset="];
-        }
+        postBodyString = [postBodyString stringByAppendingFormat:@"&params=1"];
+        
+        
+        [request setPostBody:[NSMutableData dataWithData:[postBodyString dataUsingEncoding:NSUTF8StringEncoding]]];
+        
+        [_uploadQueue addOperation:request];
     }
-    postBodyString = [postBodyString stringByAppendingFormat:@"&params=1"];
-    
-    
-    [request setPostBody:[NSMutableData dataWithData:[postBodyString dataUsingEncoding:NSUTF8StringEncoding]]];
-     
-    [_uploadQueue addOperation:request];
-    
 }
 
 -(void) useProgressView:(UIProgressView*) progressView forUploadingAttachment:(ZPZoteroAttachment*)attachment{
@@ -284,6 +284,7 @@ static NSOperationQueue* _uploadQueue;
         if([ZPPreferences debugFileUploads]){
             NSString* dump =[self requestDumpAsString:request];
             DDLogInfo(dump);
+            DDLogInfo(@"Request user info:%@",request.userInfo);
         }
 
         if(request.tag == ZPFILECHANNEL_ZOTEROSTORAGE_UPLOAD_AUTHORIZATION && request.responseStatusCode == 200){

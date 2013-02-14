@@ -220,7 +220,7 @@
             [_mailController setSubject:parentItem.shortCitation];
             [_mailController setMessageBody:[NSString stringWithFormat:@"<body>Please find the following file attached:<br>%@<br><br><small>Shared using <a href=\"http://www.zotpad.com\">ZotPad</a>, an iPad/iPhone client for Zotero</small></body>",parentItem.fullCitation] isHTML:YES];
                         
-            [_mailController addAttachmentData:[NSData dataWithContentsOfFile:_activeAttachment.fileSystemPath ] mimeType:_activeAttachment.contentType fileName:_activeAttachment.filename];
+            [_mailController addAttachmentData:[NSData dataWithContentsOfFile:_activeAttachment.fileSystemPath ] mimeType:_activeAttachment.contentType fileName:_activeAttachment.filenameBasedOnLinkMode];
             _mailController.mailComposeDelegate = self;
             
             UIViewController* root = [UIApplication sharedApplication].delegate.window.rootViewController;

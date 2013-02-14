@@ -93,6 +93,11 @@ static ZPCacheStatusToolbarController* _statusView;
 
 +(void) addAttachmentToDowloadQueue:(ZPZoteroAttachment *)attachment{
     
+    //Do not add links to download list
+    
+    if(attachment.linkMode == LINK_MODE_LINKED_URL ||
+       (attachment.linkMode == LINK_MODE_LINKED_FILE && (! [ZPPreferences useDropbox] || ! [ZPPreferences downloadLinkedFilesWithDropbox]))) return;
+       
     @synchronized(_filesToDownload){
         
         [_filesToDownload removeObject:attachment];
@@ -122,7 +127,8 @@ static ZPCacheStatusToolbarController* _statusView;
                     ZPZoteroAttachment* attachment = [_filesToDownload objectAtIndex:0];
                     [_filesToDownload removeObjectAtIndex:0];
                     while ( ![self checkIfCanBeDownloadedAndStartDownloadingAttachment:attachment] && [_filesToDownload count] >0){
-                        DDLogWarn(@"File %@ (key: %@) belonging to item %@ (key: %@)  could not be found for download",attachment.filename,attachment.key,[(ZPZoteroItem*)[ZPZoteroItem itemWithKey:attachment.parentKey] fullCitation],attachment.parentKey);
+                        DDLogWarn(@"File %@ (key: %@) belonging to item %@ (key: %@)  could not be found for download",attachment.filenameBasedOnLinkMode,attachment.key,[(ZPZoteroItem*)[ZPZoteroItem itemWithKey:attachment.parentKey] fullCitation],attachment.parentKey);
+                        
                         attachment = [_filesToDownload objectAtIndex:0];
                         [_filesToDownload removeObjectAtIndex:0];
                         [_statusView setFileDownloads:[_filesToDownload count]];
@@ -193,7 +199,8 @@ static ZPCacheStatusToolbarController* _statusView;
     
     //Check if the file can be downloaded
     
-    if(attachment.linkMode  == LINK_MODE_LINKED_URL || (attachment.linkMode == LINK_MODE_LINKED_FILE && ! [ZPPreferences downloadLinkedFilesWithDropbox])){
+    if(attachment.linkMode  == LINK_MODE_LINKED_URL ||
+       (attachment.linkMode == LINK_MODE_LINKED_FILE && (! [ZPPreferences downloadLinkedFilesWithDropbox] || ! [ZPPreferences useDropbox]))){
         return FALSE;
     }
     
@@ -218,12 +225,12 @@ static ZPCacheStatusToolbarController* _statusView;
         if([_activeDownloads containsObject:attachment]){
             return false;
         }
-        DDLogVerbose(@"Added %@ to active downloads. Number of files downloading is %i",attachment.filename,[_activeDownloads count]);
+        DDLogVerbose(@"Added %@ to active downloads. Number of files downloading is %i",attachment.filenameBasedOnLinkMode,[_activeDownloads count]);
         [_activeDownloads addObject:attachment];
     }
     
     
-    DDLogVerbose(@"Checking downloading %@ with filechannel %i",attachment.filename,downloadChannel.fileChannelType);
+    DDLogVerbose(@"Checking downloading %@ with filechannel %i",attachment.filenameBasedOnLinkMode,downloadChannel.fileChannelType);
     [downloadChannel startDownloadingAttachment:attachment];
     
     [[NSNotificationCenter defaultCenter] postNotificationName:ZPNOTIFICATION_ATTACHMENT_FILE_DOWNLOAD_STARTED object:attachment];
@@ -261,7 +268,7 @@ static ZPCacheStatusToolbarController* _statusView;
         }
         @synchronized(_activeDownloads){
             [_activeDownloads removeObject:attachment];
-            DDLogVerbose(@"Finished downloading %@",attachment.filename);
+            DDLogVerbose(@"Finished downloading %@",attachment.filenameBasedOnLinkMode);
         }
         
         //We need to do this in a different thread so that the current thread does not count towards the operations count
@@ -275,7 +282,7 @@ static ZPCacheStatusToolbarController* _statusView;
 +(void) failedDownloadingAttachment:(ZPZoteroAttachment*)attachment withError:(NSError*) error fromURL:(NSString *)url{
     @synchronized(_activeDownloads){
         [_activeDownloads removeObject:attachment];
-        DDLogError(@"Failed downloading file %@. %@ (URL: %@) Troubleshooting instructions: http://www.zotpad.com/troubleshooting",attachment.filename,error.localizedDescription,url);
+        DDLogError(@"Failed downloading file %@. %@ (URL: %@) Troubleshooting instructions: http://www.zotpad.com/troubleshooting",attachment.filenameBasedOnLinkMode,error.localizedDescription,url);
     }
     
     //We need to do this in a different thread so that the current thread does not count towards the operations count

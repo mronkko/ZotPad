@@ -71,7 +71,7 @@ static ZPCacheStatusToolbarController* _statusView;
     if([attachment fileExists_original]){
         [self _deleteFileFromPath:attachment.fileSystemPath_original];
         [[NSNotificationCenter defaultCenter] postNotificationName:ZPNOTIFICATION_ATTACHMENT_FILE_DELETED object:attachment];
-        DDLogWarn(@"File %@ (version from server) was deleted: %@",attachment.filename,reason);
+        DDLogWarn(@"File %@ (version from server) was deleted: %@",attachment.filenameBasedOnLinkMode,reason);
     }
 
 }
@@ -81,7 +81,7 @@ static ZPCacheStatusToolbarController* _statusView;
     if([attachment fileExists_modified]){
         [self _deleteFileFromPath:attachment.fileSystemPath_modified];
         [[NSNotificationCenter defaultCenter] postNotificationName:ZPNOTIFICATION_ATTACHMENT_FILE_DELETED object:attachment];
-        DDLogWarn(@"File %@ (locally modified) was deleted: %@",attachment.filename,reason);
+        DDLogWarn(@"File %@ (locally modified) was deleted: %@",attachment.filenameBasedOnLinkMode,reason);
     }
 
 }

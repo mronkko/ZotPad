@@ -55,6 +55,9 @@ extern NSInteger const VERSION_SOURCE_WEBDAV;
 +(ZPZoteroAttachment*) attachmentWithKey:(NSString*) key;
 +(ZPZoteroAttachment*) attachmentWithDictionary:(NSDictionary*) fields;
 
+//This returns a file name or title based on link mode.
+- (NSString*) filenameBasedOnLinkMode;
+
 - (NSString*) fileSystemPath;
 - (NSString*) fileSystemPath_modified;
 - (NSString*) fileSystemPath_original;
