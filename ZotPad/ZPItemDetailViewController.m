@@ -274,7 +274,8 @@
     }
     //Notes
     if(section==1){
-        return [_currentItem.notes count]+1;
+        if([_currentItem.itemType isEqualToString:@"note"] || [_currentItem.itemType isEqualToString:@"attachment"]) return 1;
+        else return [_currentItem.notes count]+1;
     }
     
     //Item type and title
