@@ -50,13 +50,12 @@
 +(void) addItems:(NSArray*)itemKeys toCollection:(ZPZoteroCollection*)collection completion:(void(^)(void))completionBlock;
 +(void) removeItem:(NSString*)itemKey fromCollection:(ZPZoteroCollection*)collection completion:(void(^)(void))completionBlock;
 
-+(void) editAttachment:(ZPZoteroAttachment*)attachment completion:(void(^)(ZPZoteroAttachment*))completionBlock;
-+(void) editItem:(ZPZoteroItem*)item completion:(void(^)(ZPZoteroItem*))completionBlock;
++(void) editAttachment:(ZPZoteroAttachment*)attachment completion:(void(^)(ZPZoteroAttachment*))completionBlock conflict:(void(^)(void))conflictBlock;
++(void) editItem:(ZPZoteroItem*)item completion:(void(^)(ZPZoteroItem*))completionBlock conflict:(void(^)(void))conflictBlock;
 
 +(void) createNote:(ZPZoteroNote*)note completion:(void(^)(ZPZoteroNote*))completionBlock;
-+(void) editNote:(ZPZoteroNote*)note completion:(void(^)(ZPZoteroNote*))completionBlock;
-+(void) deleteNote:(ZPZoteroNote*)note completion:(void(^)(void))completionBlock;
-
++(void) editNote:(ZPZoteroNote*)note completion:(void(^)(ZPZoteroNote*))completionBlock conflict:(void(^)(void))conflictBlock;
++(void) deleteNote:(ZPZoteroNote*)note completion:(void(^)(void))completionBlock conflict:(void(^)(void))conflictBlock;
 
 +(NSInteger) numberOfActiveMetadataWriteRequests;
 

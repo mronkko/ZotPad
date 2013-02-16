@@ -8,11 +8,11 @@
          ignoreCount = "0"
          continueAfterRunningActions = "No"
          filePath = "ZotPad/ZPDatabase.m"
-         timestampString = "382375394.658609"
+         timestampString = "382650491.338952"
          startingColumnNumber = "9223372036854775807"
          endingColumnNumber = "9223372036854775807"
-         startingLineNumber = "1089"
-         endingLineNumber = "1089"
+         startingLineNumber = "1133"
+         endingLineNumber = "1133"
          landmarkName = "+removeTagsLocally:toItemWithKey:"
          landmarkType = "5">
       </FileBreakpoint>
@@ -21,11 +21,11 @@
          ignoreCount = "0"
          continueAfterRunningActions = "No"
          filePath = "ZotPad/ZPItemDataUploadManager.m"
-         timestampString = "382372432.017252"
+         timestampString = "382720663.819255"
          startingColumnNumber = "9223372036854775807"
          endingColumnNumber = "9223372036854775807"
-         startingLineNumber = "213"
-         endingLineNumber = "213"
+         startingLineNumber = "252"
+         endingLineNumber = "252"
          landmarkName = "+_uploadTags"
          landmarkType = "5">
       </FileBreakpoint>
@@ -34,11 +34,11 @@
          ignoreCount = "0"
          continueAfterRunningActions = "No"
          filePath = "ZotPad/ZPItemDataUploadManager.m"
-         timestampString = "382372433.694008"
+         timestampString = "382648191.199349"
          startingColumnNumber = "9223372036854775807"
          endingColumnNumber = "9223372036854775807"
-         startingLineNumber = "198"
-         endingLineNumber = "198"
+         startingLineNumber = "233"
+         endingLineNumber = "233"
          landmarkName = "+_uploadTags"
          landmarkType = "5">
       </FileBreakpoint>
@@ -47,11 +47,11 @@
          ignoreCount = "0"
          continueAfterRunningActions = "No"
          filePath = "ZotPad/ZPItemDataUploadManager.m"
-         timestampString = "382372437.754097"
+         timestampString = "382648191.199349"
          startingColumnNumber = "9223372036854775807"
          endingColumnNumber = "9223372036854775807"
-         startingLineNumber = "200"
-         endingLineNumber = "200"
+         startingLineNumber = "235"
+         endingLineNumber = "235"
          landmarkName = "+_uploadTags"
          landmarkType = "5">
       </FileBreakpoint>
@@ -60,11 +60,11 @@
          ignoreCount = "0"
          continueAfterRunningActions = "No"
          filePath = "ZotPad/ZPItemDataUploadManager.m"
-         timestampString = "382372440.48867"
+         timestampString = "382720663.819255"
          startingColumnNumber = "9223372036854775807"
          endingColumnNumber = "9223372036854775807"
-         startingLineNumber = "215"
-         endingLineNumber = "215"
+         startingLineNumber = "254"
+         endingLineNumber = "254"
          landmarkName = "+_uploadTags"
          landmarkType = "5">
       </FileBreakpoint>
@@ -72,13 +72,52 @@
          shouldBeEnabled = "Yes"
          ignoreCount = "0"
          continueAfterRunningActions = "No"
-         filePath = "ZotPad/ZPDatabase.m"
-         timestampString = "382375394.658609"
+         filePath = "ZotPad/ZPServerConnection.m"
+         timestampString = "382648750.26627"
          startingColumnNumber = "9223372036854775807"
          endingColumnNumber = "9223372036854775807"
-         startingLineNumber = "1082"
-         endingLineNumber = "1082"
-         landmarkName = "+addTagsLocally:toItemWithKey:"
+         startingLineNumber = "475"
+         endingLineNumber = "475"
+         landmarkName = "+editAttachment:completion:conflict:"
+         landmarkType = "5">
+      </FileBreakpoint>
+      <FileBreakpoint
+         shouldBeEnabled = "Yes"
+         ignoreCount = "0"
+         continueAfterRunningActions = "No"
+         filePath = "ZotPad/ZPItemDataUploadManager.m"
+         timestampString = "382719501.574864"
+         startingColumnNumber = "9223372036854775807"
+         endingColumnNumber = "9223372036854775807"
+         startingLineNumber = "206"
+         endingLineNumber = "206"
+         landmarkName = "+_uploadNotes"
+         landmarkType = "5">
+      </FileBreakpoint>
+      <FileBreakpoint
+         shouldBeEnabled = "No"
+         ignoreCount = "0"
+         continueAfterRunningActions = "No"
+         filePath = "ZotPad/ZPItemDataUploadManager.m"
+         timestampString = "382719815.396212"
+         startingColumnNumber = "9223372036854775807"
+         endingColumnNumber = "9223372036854775807"
+         startingLineNumber = "61"
+         endingLineNumber = "61"
+         landmarkName = "+uploadMetadata"
+         landmarkType = "5">
+      </FileBreakpoint>
+      <FileBreakpoint
+         shouldBeEnabled = "No"
+         ignoreCount = "0"
+         continueAfterRunningActions = "No"
+         filePath = "ZotPad/ZPItemDataUploadManager.m"
+         timestampString = "382719837.314804"
+         startingColumnNumber = "9223372036854775807"
+         endingColumnNumber = "9223372036854775807"
+         startingLineNumber = "229"
+         endingLineNumber = "229"
+         landmarkName = "+_uploadTags"
          landmarkType = "5">
       </FileBreakpoint>
    </FileBreakpoints>

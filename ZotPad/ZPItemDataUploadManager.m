@@ -113,6 +113,17 @@
             
             // Proceed with other uploads
             [self uploadMetadata];
+        } conflict:^{
+            DDLogWarn(@"Version conflict editing attachment %@",locallyEditedAttachment.title);
+            dispatch_async(dispatch_get_main_queue(), ^{
+                [[[UIAlertView alloc] initWithTitle:@"Version conflict"
+                                           message:[NSString stringWithFormat:@"Your edits to the attachment note (\"%@\") have been canceled because the attachment (%@) has changed on the server.",locallyEditedAttachment.title, locallyEditedAttachment.note]
+                                          delegate:nil
+                                 cancelButtonTitle:@"OK"
+                                 otherButtonTitles:nil] show];
+            });
+            [ZPDatabase writeAttachments:[NSArray arrayWithObject:locallyEditedAttachment] checkTimestamp:NO];
+            
         }];
         return TRUE;
     }
@@ -158,11 +169,22 @@
             ZPZoteroNote* locallyEditedNote = [locallyEditedNotes objectAtIndex:0];
             [ZPServerConnection editNote:locallyEditedNote completion:^(ZPZoteroNote* note) {
 
-                DDLogInfo(@"Edited a note (%@) from the Zotero server", note.itemKey);
+                DDLogInfo(@"Edited a note (%@) on the Zotero server", note.itemKey);
                 [ZPDatabase writeNotes:[NSArray arrayWithObject:note] checkTimestamp:NO];
 
                 // Proceed with other uploads
                 [self uploadMetadata];
+            } conflict:^{
+                DDLogWarn(@"Version conflict editing note %@",locallyEditedNote.title);
+                dispatch_async(dispatch_get_main_queue(), ^{
+                    [[[UIAlertView alloc] initWithTitle:@"Version conflict"
+                                                message:[NSString stringWithFormat:@"Your edits to a note (\"%@\") have been canceled because the note has been modified on the server.", locallyEditedNote.note]
+                                               delegate:nil
+                                      cancelButtonTitle:@"OK"
+                                      otherButtonTitles:nil] show];
+                });
+                [ZPDatabase writeNotes:[NSArray arrayWithObject:locallyEditedNote] checkTimestamp:NO];
+                
             }];
             return TRUE;
         }
@@ -178,6 +200,17 @@
 
                     // Proceed with other uploads
                     [self uploadMetadata];
+                } conflict:^{
+                    DDLogWarn(@"Version conflict deleting note %@",locallyDeletedNote.title);
+                    dispatch_async(dispatch_get_main_queue(), ^{
+                        [[[UIAlertView alloc] initWithTitle:@"Version conflict"
+                                                    message:[NSString stringWithFormat:@"Deleting a note (\"%@\") has been canceled because the note has been modified on the server.",locallyDeletedNote.title]
+                                                   delegate:nil
+                                          cancelButtonTitle:@"OK"
+                                          otherButtonTitles:nil] show];
+                    });
+                    [ZPDatabase writeNotes:[NSArray arrayWithObject:locallyDeletedNote] checkTimestamp:NO];
+                    
                 }];
                 return TRUE;
             }
@@ -189,6 +222,8 @@
 
 }
 
+//TODO: Refactor this so that there is only one check for tags
+
 +(BOOL) _uploadTags{
 
     NSArray* itemsWithLocallyEditedTags = [ZPDatabase itemsWithLocallyEditedTags];
@@ -199,9 +234,15 @@
             
             [ZPDatabase writeItems:[NSArray arrayWithObject:item] checkTimestamp:NO];
             [ZPDatabase clearLocalEditFlagsForTagsWithItemKey:item.itemKey];
+
+            DDLogInfo(@"Update tags for item %@",item.itemKey);
             
             // Proceed with other uploads
             [self uploadMetadata];
+        } conflict:^{
+            DDLogWarn(@"Version conflict when uploading tags for item %@. Uploading tags is postponed until the updated version of the item is received from the server.",itemWithLocallyEditedTags.itemKey);
+            [ZPServerConnection retrieveItemsFromLibrary:itemWithLocallyEditedTags.libraryID itemKeys:[NSArray arrayWithObject:itemWithLocallyEditedTags.itemKey]];
+
         }];
         return TRUE;
     }
@@ -214,14 +255,41 @@
                 
                 [ZPDatabase writeAttachments:[NSArray arrayWithObject:attachment] checkTimestamp:NO];
                 [ZPDatabase clearLocalEditFlagsForTagsWithItemKey:attachment.itemKey];
+
+                DDLogInfo(@"Update tags for attachment %@",attachment.itemKey);
                 
                 // Proceed with other uploads
                 [self uploadMetadata];
+            } conflict:^{
+                DDLogWarn(@"Version conflict when uploading tags for attachment %@. Uploading tags is postponed until the updated version of the attachment is received from the server.",attachmentWithLocallyEditedTags.itemKey);
+                [ZPServerConnection retrieveItemsFromLibrary:attachmentWithLocallyEditedTags.libraryID itemKeys:[NSArray arrayWithObject:attachmentWithLocallyEditedTags.itemKey]];
+
             }];
             return TRUE;
         }
         else{
-            return FALSE;
+            NSArray* notesWithLocallyEditedTags = [ZPDatabase notesWithLocallyEditedTags];
+            
+            if(notesWithLocallyEditedTags.count >0 ){
+                ZPZoteroNote* noteWithLocallyEditedTags = [notesWithLocallyEditedTags objectAtIndex:0];
+                [ZPServerConnection editNote:noteWithLocallyEditedTags completion:^(ZPZoteroNote* note) {
+                    
+                    [ZPDatabase writeNotes:[NSArray arrayWithObject:note] checkTimestamp:NO];
+                    [ZPDatabase clearLocalEditFlagsForTagsWithItemKey:note.itemKey];
+                    
+                    DDLogInfo(@"Update tags for note %@",note.itemKey);
+
+                    // Proceed with other uploads
+                    [self uploadMetadata];
+                } conflict:^{
+                    DDLogWarn(@"Version conflict when uploading tags for note %@. Uploading tags is postponed until the updated version of the note is received from the server.",noteWithLocallyEditedTags.itemKey);
+                    [ZPServerConnection retrieveItemsFromLibrary:noteWithLocallyEditedTags.libraryID itemKeys:[NSArray arrayWithObject:noteWithLocallyEditedTags.itemKey]];
+                }];
+                return TRUE;
+            }
+            else{
+                return FALSE;
+            }
         }
     }
 }

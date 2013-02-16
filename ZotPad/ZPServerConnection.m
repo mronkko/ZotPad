@@ -92,7 +92,7 @@
 
 +(NSString*) _baseURLWithLibraryID:(NSInteger)libraryID;
 
-+(void) _performRequest:(ASIHTTPRequest*)request usingOperationQueue:(NSOperationQueue*)queue completion:(void(^)(NSData*))completionBlock;
++(void) _performRequest:(ASIHTTPRequest*)request usingOperationQueue:(NSOperationQueue*)queue completion:(void(^)(NSData*))completionBlock conflict:(void(^)(void))conflictBlock ;
 
 +(ZPServerResponseXMLParser*) _parseXMLResponseData:(NSData*)responseData requestType:(NSInteger) type;
 
@@ -438,7 +438,7 @@ const NSInteger ZPServerConnectionRequestLastModifiedItem = 11;
                        [NSString stringWithFormat:@"{\"name\":\"%@\",\"parent\":%@}",collection.title,parentString],
                        [[NSString alloc] initWithData:responseData encoding:NSUTF8StringEncoding]);
         }
-    }];
+    } conflict:NULL];
 }
 
 +(void) addItems:(NSArray*)itemKeys toCollection:(ZPZoteroCollection*)collection completion:(void(^)(void))completionBlock{
@@ -452,7 +452,7 @@ const NSInteger ZPServerConnectionRequestLastModifiedItem = 11;
     
     [self _performRequest:postRequest usingOperationQueue:_writeRequestQueue completion:^(NSData* responseData){
         completionBlock();
-    }];
+    } conflict:NULL];
     
 }
 
@@ -466,11 +466,11 @@ const NSInteger ZPServerConnectionRequestLastModifiedItem = 11;
     
     [self _performRequest:deleteRequest usingOperationQueue:_writeRequestQueue completion:^(NSData* responseData){
         completionBlock();
-    }];
+    }  conflict:NULL];
     
 }
 
-+(void) editAttachment:(ZPZoteroAttachment*)attachment completion:(void(^)(ZPZoteroAttachment*))completionBlock{
++(void) editAttachment:(ZPZoteroAttachment*)attachment completion:(void(^)(ZPZoteroAttachment*))completionBlock conflict:(void(^)(void))conflictBlock{
  
     NSString* urlString = [[self _baseURLWithLibraryID:attachment.libraryID] stringByAppendingFormat:@"items/%@?key=%@", attachment.itemKey, [ZPPreferences OAuthKey]];
     
@@ -517,11 +517,11 @@ const NSInteger ZPServerConnectionRequestLastModifiedItem = 11;
                        json,
                        [[NSString alloc] initWithData:responseData encoding:NSUTF8StringEncoding]);
         }
-    }];
+    }  conflict:conflictBlock];
 
 }
 
-+(void) editItem:(ZPZoteroItem *)item completion:(void (^)(ZPZoteroItem *))completionBlock{
++(void) editItem:(ZPZoteroItem *)item completion:(void (^)(ZPZoteroItem *))completionBlock conflict:(void(^)(void))conflictBlock{
     
     NSString* urlString = [[self _baseURLWithLibraryID:item.libraryID] stringByAppendingFormat:@"items/%@?key=%@", item.itemKey, [ZPPreferences OAuthKey]];
     
@@ -601,7 +601,7 @@ const NSInteger ZPServerConnectionRequestLastModifiedItem = 11;
                        json,
                        [[NSString alloc] initWithData:responseData encoding:NSUTF8StringEncoding]);
         }
-    }];
+    } conflict:conflictBlock];
     
 }
 
@@ -635,11 +635,11 @@ const NSInteger ZPServerConnectionRequestLastModifiedItem = 11;
                        json,
                        [[NSString alloc] initWithData:responseData encoding:NSUTF8StringEncoding]);
         }
-    }];
+    } conflict:NULL];
 
 }
 
-+(void) editNote:(ZPZoteroNote*)note completion:(void(^)(ZPZoteroNote*))completionBlock{
++(void) editNote:(ZPZoteroNote*)note completion:(void(^)(ZPZoteroNote*))completionBlock conflict:(void(^)(void))conflictBlock{
 
     NSString* urlString = [[self _baseURLWithLibraryID:note.libraryID] stringByAppendingFormat:@"items/%@?key=%@", note.itemKey, [ZPPreferences OAuthKey]];
     
@@ -649,7 +649,11 @@ const NSInteger ZPServerConnectionRequestLastModifiedItem = 11;
     [postRequest addRequestHeader:@"Content-Type" value:@"application/json"];
     [postRequest addRequestHeader:@"If-Match" value:note.etag];
     
-    [postRequest appendPostData:[[NSString stringWithFormat:@"{  \"itemType\" : \"note\",  \"note\" : \"%@\",  \"tags\" : [], \"creators\" : []}",note.note] dataUsingEncoding:NSUTF8StringEncoding]];
+    NSString* json = [NSString stringWithFormat:@"{  \"itemType\" : \"note\",  \"note\" : \"%@\",  \"tags\" : %@, \"creators\" : []}",
+                      note.note,
+                      [self _tagsJSSONForDataObject:note]];
+    
+    [postRequest appendPostData:[json dataUsingEncoding:NSUTF8StringEncoding]];
     
     [self _performRequest:postRequest usingOperationQueue:_writeRequestQueue completion:^(NSData* responseData){
         
@@ -668,11 +672,11 @@ const NSInteger ZPServerConnectionRequestLastModifiedItem = 11;
                        [NSString stringWithFormat:@"{  \"itemType\" : \"note\",  \"note\" : \"%@\",  \"tags\" : [], \"creators\" : []}",note.note],
                        [[NSString alloc] initWithData:responseData encoding:NSUTF8StringEncoding]);
         }
-    }];
+    } conflict:conflictBlock];
     
 }
 
-+(void) deleteNote:(ZPZoteroNote*)note completion:(void(^)(void))completionBlock{
++(void) deleteNote:(ZPZoteroNote*)note completion:(void(^)(void))completionBlock conflict:(void(^)(void))conflictBlock;{
 
     NSString* urlString = [[self _baseURLWithLibraryID:note.libraryID] stringByAppendingFormat:@"items/%@?key=%@", note.itemKey, [ZPPreferences OAuthKey]];
     
@@ -683,7 +687,7 @@ const NSInteger ZPServerConnectionRequestLastModifiedItem = 11;
     
     [self _performRequest:postRequest usingOperationQueue:_writeRequestQueue completion:^(NSData* responseData){
         completionBlock();
-    }];
+    } conflict:conflictBlock];
     
 }
 
@@ -848,7 +852,7 @@ const NSInteger ZPServerConnectionRequestLastModifiedItem = 11;
                         completionBlock(parserResponse.parsedElements);
                     }
 
-                }];
+                } conflict:NULL];
             
             
             }
@@ -859,7 +863,7 @@ const NSInteger ZPServerConnectionRequestLastModifiedItem = 11;
     }
 }
 
-+(void) _performRequest:(ASIHTTPRequest*)request usingOperationQueue:(NSOperationQueue*)queue completion:(void(^)(NSData*))completionBlock{
++(void) _performRequest:(ASIHTTPRequest*)request usingOperationQueue:(NSOperationQueue*)queue completion:(void(^)(NSData*))completionBlock conflict:(void (^)(void))conflictBlock{
 
     __weak ASIHTTPRequest* weakRequest = request;
     
@@ -875,34 +879,38 @@ const NSInteger ZPServerConnectionRequestLastModifiedItem = 11;
             
             dispatch_async(dispatch_get_global_queue(DISPATCH_QUEUE_PRIORITY_BACKGROUND,0),^{completionBlock(data);});
         }
-        
         else{
             DDLogError(@"Connection to Zotero server (%@) resulted in error %i. Full response: %@",
                        weakRequest.url, weakRequest.responseStatusCode,
                        [[NSString alloc] initWithData:weakRequest.responseData encoding:NSUTF8StringEncoding]);
-
-            //If we receive a 403 (forbidden) error, delete the authorization key because we know that it is
-            //no longer valid.
             
-            if(weakRequest.responseStatusCode==403){
-            
-                DDLogError(@"The authorization key is no longer valid.");
-
-                // Start a request for new keys
-                [self _makeServerRequest:ZPServerConnectionRequestKeys withParameters:NULL userInfo:NULL];
-
-                //Set ZotPad offline and ask the user what to do
-                [ZPPreferences setOnline:FALSE];
-                
-                if(alertViewDelegate == NULL) alertViewDelegate = [[ZPAutenticationErrorAlertViewDelegate alloc] init];
-                
-                [[[UIAlertView alloc] initWithTitle:@"Authentication error"
-                                            message:@"ZotPad is not authorized to access the library you are attempting to load and is now in offline mode. This can occur if your access key has been revoked or communications to Zotero server is blocked."
-                                           delegate:alertViewDelegate cancelButtonTitle:@"Stay offline" otherButtonTitles:@"Check key", @"New key",nil] show];
+            if(weakRequest.responseStatusCode == 412 && conflictBlock != NULL){
+                conflictBlock();
             }
+            else{
+                
+                //If we receive a 403 (forbidden) error, delete the authorization key because we know that it is
+                //no longer valid.
+                
+                if(weakRequest.responseStatusCode==403){
+                    
+                    DDLogError(@"The authorization key is no longer valid.");
+                    
+                    // Start a request for new keys
+                    [self _makeServerRequest:ZPServerConnectionRequestKeys withParameters:NULL userInfo:NULL];
+                    
+                    //Set ZotPad offline and ask the user what to do
+                    [ZPPreferences setOnline:FALSE];
+                    
+                    if(alertViewDelegate == NULL) alertViewDelegate = [[ZPAutenticationErrorAlertViewDelegate alloc] init];
+                    
+                    [[[UIAlertView alloc] initWithTitle:@"Authentication error"
+                                                message:@"ZotPad is not authorized to access the library you are attempting to load and is now in offline mode. This can occur if your access key has been revoked or communications to Zotero server is blocked."
+                                               delegate:alertViewDelegate cancelButtonTitle:@"Stay offline" otherButtonTitles:@"Check key", @"New key",nil] show];
+                }
+            }
+            
         }
-
-        
     }];
     
     [request setFailedBlock:^{

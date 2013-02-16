@@ -164,6 +164,7 @@
 
 +(NSArray*) attachmentsWithLocallyEditedTags;
 +(NSArray*) itemsWithLocallyEditedTags;
++(NSArray*) notesWithLocallyEditedTags;
 
 +(void) clearLocalEditFlagsForTagsWithItemKey:(NSString*)itemKey;
 

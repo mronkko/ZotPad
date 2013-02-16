@@ -34,7 +34,7 @@
 +(FMDatabase*) _dbObject;
 +(void) insertObjects:(NSArray*) objects intoTable:(NSString*) table;
 +(void) updateObjects:(NSArray*) objects intoTable:(NSString*) table;
-+(NSArray*) writeObjects:(NSArray*) objects intoTable:(NSString*) table checkTimestamp:(BOOL) checkTimestamp;
++(NSArray*) writeObjects:(NSArray*) objects intoTable:(NSString*) table checkTimestamp:(BOOL) checkTimestamp checkEtag:(BOOL) checkEtag;
 
 +(NSArray*) dbFieldNamesForTable:(NSString*) table;
 +(NSArray*) dbPrimaryKeyNamesForTable:(NSString*) table;
@@ -134,7 +134,7 @@ static NSObject* writeLock;
                         dispatch_async(dispatch_get_main_queue(), ^{
                             [progressView setProgress:progress];
                         });
-                        [self writeObjects:[NSArray arrayWithObject:attachment] intoTable:@"attachments" checkTimestamp:NO];
+                        [self writeObjects:[NSArray arrayWithObject:attachment] intoTable:@"attachments" checkTimestamp:NO checkEtag:NO];
                     }
                 }
                 
@@ -380,7 +380,7 @@ static NSObject* writeLock;
  
  */
 
-+(NSArray*) writeObjects:(NSArray*) objects intoTable:(NSString*) table checkTimestamp:(BOOL) checkTimestamp{
++(NSArray*) writeObjects:(NSArray*) objects intoTable:(NSString*) table checkTimestamp:(BOOL) checkTimestamp checkEtag:(BOOL) checkEtag{
     
     if([objects count] == 0 ) return objects;
     
@@ -390,7 +390,7 @@ static NSObject* writeLock;
         [NSException raise:@"Unsupported" format:@"Checking timestamp is not supported for writing opbjects with multicolumn primary keys"];
     }
     
-    //Because it is possible that the same item is received multiple times, it is important to use synchronized for almost the entire function to avoid inserting the same object twice
+    //Because it is possible that the same item is received multiple times, it is important to use synchronized  almost the entire function to avoid inserting the same object twice
     
     @synchronized(writeLock){
         
@@ -409,19 +409,21 @@ static NSObject* writeLock;
             
             BOOL keysAreString = [[keys objectAtIndex:0] isKindOfClass:[NSString class]];
             
-            if(checkTimestamp){
+            if(checkTimestamp || checkEtag){
                 //Check if the keys are string
                 NSString* selectSQL;
                 if(keysAreString){
-                    selectSQL= [NSString stringWithFormat:@"SELECT %@, cacheTimestamp FROM %@ WHERE %@ IN ('%@')",
+                    selectSQL= [NSString stringWithFormat:@"SELECT %@, %@ FROM %@ WHERE %@ IN ('%@')",
                                 [primaryKeyFieldNames objectAtIndex:0],
+                                checkEtag?(checkTimestamp?@"cacheTimestamp, etag":@"etag"):@"cacheTimestamp",
                                 table,
                                 [primaryKeyFieldNames objectAtIndex:0],
                                 [keys componentsJoinedByString:@"', '"]];
                 }
                 else{
-                    selectSQL= [NSString stringWithFormat:@"SELECT %@, cacheTimestamp FROM %@ WHERE %@ IN (%@)",
+                    selectSQL= [NSString stringWithFormat:@"SELECT %@, %@ FROM %@ WHERE %@ IN (%@)",
                                 [primaryKeyFieldNames objectAtIndex:0],
+                                checkEtag?(checkTimestamp?@"cacheTimestamp, etag":@"etag"):@"cacheTimestamp",
                                 table,
                                 [primaryKeyFieldNames objectAtIndex:0],
                                 [keys componentsJoinedByString:@", "]];
@@ -429,6 +431,7 @@ static NSObject* writeLock;
                 
                 
                 NSMutableDictionary* timestamps = [NSMutableDictionary dictionary];
+                NSMutableDictionary* etags = [NSMutableDictionary dictionary];
                 
                 //Retrieve timestamps
                 FMDatabase* dbObject = [self _dbObject];
@@ -436,12 +439,23 @@ static NSObject* writeLock;
                     FMResultSet* resultSet = [dbObject executeQuery:selectSQL];
                     
                     while([resultSet next]){
-                        NSString* cacheTimeStamp = [resultSet stringForColumnIndex:1];
+                        NSString* cacheTimeStamp = [resultSet stringForColumn:@"cacheTimestamp"];
                         if(cacheTimeStamp != NULL){
                             [timestamps setObject:cacheTimeStamp forKey:[resultSet stringForColumnIndex:0]];
                         }
                         else{
                             [timestamps setObject:[NSNull null] forKey:[resultSet stringForColumnIndex:0]];
+                        }
+                        
+                        if(checkEtag){
+                            NSString* etag = [resultSet stringForColumn:@"etag"];
+                            if(etag != NULL){
+                                [etags setObject:etag forKey:[resultSet stringForColumnIndex:0]];
+                            }
+                            else{
+                                [etags setObject:[NSNull null] forKey:[resultSet stringForColumnIndex:0]];
+                            }
+                            
                         }
                     }
                     [resultSet close];
@@ -463,6 +477,13 @@ static NSObject* writeLock;
                         [insertObjects addObject:object];
                         [returnArray addObject:object];
                         
+                    }
+                    else if(checkEtag){
+                        NSString* etag = [etags objectForKey:[[self dbFieldValuesForObject:object fieldsNames:keyArrayFieldName] objectAtIndex:0]];
+                        if(! [object.etag isEqual:etag]){
+                            [updateObjects addObject:object];
+                            [returnArray addObject:object];
+                        }
                     }
                     //Update if the server and cache timestamps differ
                     else if(! [object.serverTimestamp isEqual: timestamp]){
@@ -625,7 +646,7 @@ static NSObject* writeLock;
 
 +(void) writeLibraries:(NSArray*)libraries{
     //The code for checking timestamp currently requires a primary key that is string
-    [self writeObjects:libraries intoTable:@"libraries" checkTimestamp:NO];
+    [self writeObjects:libraries intoTable:@"libraries" checkTimestamp:NO checkEtag:NO];
     
     NSMutableArray* keys= [[NSMutableArray alloc] init];
     
@@ -718,7 +739,7 @@ static NSObject* writeLock;
         [keys addObject:collection.key];
     }
     
-    [self writeObjects:collections intoTable:@"collections" checkTimestamp:YES];
+    [self writeObjects:collections intoTable:@"collections" checkTimestamp:YES checkEtag:NO];
     
     // Delete collections that no longer exist
     
@@ -864,7 +885,7 @@ static NSObject* writeLock;
     NSDictionary* dict = [NSDictionary dictionaryWithObjectsAndKeys: title, @"title", collectionKey, ZPKEY_COLLECTION_KEY, libraryNumber, ZPKEY_LIBRARY_ID, numberOne, @"locallyAdded", nil];
     
     ZPZoteroCollection* collection = [ZPZoteroCollection collectionWithDictionary:dict];
-    [self writeObjects:[NSArray arrayWithObject:collection] intoTable:@"collections" checkTimestamp:NO];
+    [self writeObjects:[NSArray arrayWithObject:collection] intoTable:@"collections" checkTimestamp:NO checkEtag:NO];
 }
 
 +(NSArray*) locallyAddedCollections{
@@ -974,6 +995,29 @@ static NSObject* writeLock;
     
 }
 
++(NSArray*) notesWithLocallyEditedTags{
+    
+    NSMutableArray* returnArray = [[NSMutableArray alloc] init];
+    
+    FMDatabase* dbObject = [self _dbObject];
+    @synchronized(dbObject){
+        
+        FMResultSet* resultSet;
+        resultSet= [dbObject executeQuery:@"SELECT DISTINCT tags.itemKey FROM tags, notes WHERE tags.itemKey = notes.itemKey AND (tags.locallyAdded = 1 OR tags.locallyDeleted = 1)"];
+        
+        while([resultSet next]) {
+            [returnArray addObject:[ZPZoteroNote noteWithKey:[resultSet stringForColumnIndex:0]]];
+            
+        }
+        [resultSet close];
+        
+    }
+    
+    return returnArray;
+    
+}
+
+
 +(NSArray*) itemsWithLocallyEditedTags{
     
     NSMutableArray* returnArray = [[NSMutableArray alloc] init];
@@ -982,7 +1026,7 @@ static NSObject* writeLock;
     @synchronized(dbObject){
         
         FMResultSet* resultSet;
-        resultSet= [dbObject executeQuery:@"SELECT DISTINCT tags.itemKey FROM tags, items WHERE items.itemType <> 'attachment' AND tags.itemKey = items.itemKey AND (tags.locallyAdded = 1 OR tags.locallyDeleted = 1)"];
+        resultSet= [dbObject executeQuery:@"SELECT DISTINCT tags.itemKey FROM tags, items WHERE items.itemType <> 'attachment' AND  items.itemType <> 'note' AND tags.itemKey = items.itemKey AND (tags.locallyAdded = 1 OR tags.locallyDeleted = 1)"];
         
         while([resultSet next]) {
             [returnArray addObject:[ZPZoteroItem itemWithKey:[resultSet stringForColumnIndex:0]]];
@@ -1030,7 +1074,7 @@ static NSObject* writeLock;
         }
     }
     
-    [self writeObjects:tags intoTable:@"tags" checkTimestamp:FALSE];
+    [self writeObjects:tags intoTable:@"tags" checkTimestamp:FALSE checkEtag:NO];
     
     FMDatabase* dbObject = [self _dbObject];
     @synchronized(dbObject){
@@ -1159,16 +1203,16 @@ static NSObject* writeLock;
         }
         
     }
-    return [self writeObjects:items intoTable:@"items" checkTimestamp:checkTimestamp];
+    return [self writeObjects:items intoTable:@"items" checkTimestamp:checkTimestamp checkEtag:checkTimestamp];
     
 }
 
 +(NSArray*) writeNotes:(NSArray*)notes checkTimestamp:(BOOL) checkTimestamp{
-    return [self writeObjects:notes intoTable:@"notes" checkTimestamp:checkTimestamp];
+    return [self writeObjects:notes intoTable:@"notes" checkTimestamp:checkTimestamp checkEtag:checkTimestamp];
 }
 
 +(NSArray*) writeAttachments:(NSArray*)attachments checkTimestamp:(BOOL) checkTimestamp{
-    return [self writeObjects:attachments intoTable:@"attachments" checkTimestamp:checkTimestamp];
+    return [self writeObjects:attachments intoTable:@"attachments" checkTimestamp:checkTimestamp checkEtag:checkTimestamp];
 }
 
 
@@ -1193,7 +1237,7 @@ static NSObject* writeLock;
         [relationships addObject:[NSDictionary dictionaryWithObjects:[NSArray arrayWithObjects:key, collectionKey, nil] forKeys:[NSArray arrayWithObjects:ZPKEY_ITEM_KEY,ZPKEY_COLLECTION_KEY, nil]]];
     }
     
-    [self writeObjects:relationships intoTable:@"collectionItems" checkTimestamp:NO];
+    [self writeObjects:relationships intoTable:@"collectionItems" checkTimestamp:NO checkEtag:NO];
 }
 
 
@@ -1361,7 +1405,7 @@ static NSObject* writeLock;
         }
     }
     
-    [self writeObjects:creators intoTable:@"creators" checkTimestamp:FALSE];
+    [self writeObjects:creators intoTable:@"creators" checkTimestamp:FALSE checkEtag:NO];
     
     FMDatabase* dbObject = [self _dbObject];
     @synchronized(dbObject){
@@ -1395,7 +1439,7 @@ static NSObject* writeLock;
         }
     }
     
-    [self writeObjects:fields intoTable:@"fields" checkTimestamp:FALSE];
+    [self writeObjects:fields intoTable:@"fields" checkTimestamp:FALSE checkEtag:NO];
     
     FMDatabase* dbObject = [self _dbObject];
     @synchronized(dbObject){

@@ -282,7 +282,7 @@ static ZPCacheStatusToolbarController* _statusView;
 +(void) failedDownloadingAttachment:(ZPZoteroAttachment*)attachment withError:(NSError*) error fromURL:(NSString *)url{
     @synchronized(_activeDownloads){
         [_activeDownloads removeObject:attachment];
-        DDLogError(@"Failed downloading file %@. %@ (URL: %@) Troubleshooting instructions: http://www.zotpad.com/troubleshooting",attachment.filenameBasedOnLinkMode,error.localizedDescription,url);
+        DDLogError(@"Failed downloading file %@. %@ (URL: %@) Troubleshooting instructions: http://zotpad.uservoice.com",attachment.filenameBasedOnLinkMode,error.localizedDescription,url);
     }
     
     //We need to do this in a different thread so that the current thread does not count towards the operations count
