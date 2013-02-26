@@ -108,6 +108,7 @@
 
 -(void) _configureSortButton:(UIButton*)button;
 -(void) _configureSortArrow;
+-(NSInteger) _tagForActiveSortButton;
 
 @end
 
@@ -519,17 +520,18 @@
     //Because this preference is not used anywhere else, it is accessed directly.
     NSUserDefaults* defaults = [NSUserDefaults standardUserDefaults];
     NSString* orderField =  [defaults objectForKey:[NSString stringWithFormat: @"itemListView_sortButton%i",[sender tag]]];
+    
+    
+    
     if(orderField == NULL){
         [self _configureSortButton:sender];
     }
     
     else{
-        NSInteger tag = [(UIView*)sender tag];
-        if(_tagForActiveSortButton == tag){
+        if([[ZPItemList instance].orderField isEqualToString:orderField]){
             [ZPItemList instance].sortDescending  = ! [ZPItemList instance].sortDescending;
         }
         else{
-            _tagForActiveSortButton = tag;
             [ZPItemList instance].orderField = orderField;
             [ZPItemList instance].sortDescending = FALSE;
         }
@@ -540,13 +542,32 @@
     
 }
 
+-(NSInteger) _tagForActiveSortButton{
+
+    NSInteger buttonCount;
+    NSUserDefaults* defaults = [NSUserDefaults standardUserDefaults];
+
+    if ([[UIDevice currentDevice] userInterfaceIdiom] == UIUserInterfaceIdiomPad) buttonCount = 6;
+    else buttonCount = 3;
+    
+    
+    for(NSInteger i = 1; i<=buttonCount; ++i){
+        if([[ZPItemList instance].orderField isEqual:[defaults objectForKey:[NSString stringWithFormat: @"itemListView_sortButton%i",i]]]){
+            return i;
+        }
+    }
+
+    return -1;
+}
 
 -(void) _configureSortArrow{
     
     UIButton* selectedButton = NULL;
     
+    NSInteger tagForActiveSortButton = [self _tagForActiveSortButton];
+    
     for(UIBarButtonItem* view in _toolBar.items){
-        if(view.tag == _tagForActiveSortButton){
+        if(view.tag == tagForActiveSortButton){
             selectedButton = (UIButton*) view.customView;
             break;
         }

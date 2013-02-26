@@ -25,8 +25,6 @@
 @synthesize collectionKey = _collectionKey;
 @synthesize libraryID =  _libraryID;
 @synthesize searchString = _searchString;
-@synthesize orderField = _orderField;
-@synthesize sortDescending = _sortDescending;
 @synthesize itemKeysShown = _itemKeysShown;
 @synthesize targetTableView = _tableView;
 @synthesize owner;
@@ -50,11 +48,35 @@ static ZPItemList* _instance;
                                                object:nil];
     
     //Set default sort values
-    _orderField = @"dateModified";
-    _sortDescending = FALSE;
+    
+    NSUserDefaults* defaults = [NSUserDefaults standardUserDefaults];
+    _orderField = [defaults objectForKey:@"sortField"];
+    if(_orderField == nil){
+        _orderField = @"dateModified";
+    }
+    _sortDescending = [defaults boolForKey:@"sortOrderIsDesc"];
+
     _selectedTags = [NSArray array];
     
     return self;
+}
+
+-(BOOL) sortDescending{
+    return _sortDescending;
+}
+-(void) setSortDescending:(BOOL)sortDescending{
+    NSUserDefaults* defaults = [NSUserDefaults standardUserDefaults];
+    [defaults setBool:sortDescending forKey:@"sortOrderIsDesc"];
+    _sortDescending = sortDescending;
+}
+
+-(NSString*) orderField{
+    return _orderField;
+}
+-(void) setOrderField:(NSString *)orderField{
+    NSUserDefaults* defaults = [NSUserDefaults standardUserDefaults];
+    [defaults setObject:orderField forKey:@"sortField"];
+    _orderField = orderField;
 }
 
 - (void) dealloc

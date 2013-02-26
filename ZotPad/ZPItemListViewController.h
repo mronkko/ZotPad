@@ -19,7 +19,6 @@
     DSBezelActivityView* _activityView;
     UITableView* _tableView;
     UIToolbar* _toolBar;
-    NSInteger _tagForActiveSortButton;
     UIImageView* _sortDirectionArrow;
     CGPoint _offset;
     
