@@ -31,7 +31,7 @@
 
 #import <UIKit/UIKit.h>
 
-//Define 
+//Define
 
 #define IPAD UI_USER_INTERFACE_IDIOM() == UIUserInterfaceIdiomPad
 
@@ -41,14 +41,13 @@
     ZPAttachmentFileInteractionController* _attachmentInteractionController;
     ZPAttachmentCarouselDelegate* _carouselDelegate;
     NSArray* _tagButtons;
-
 }
 
 - (void) _reconfigureDetailTableView:(BOOL)animated;
 - (NSString*) _textAtIndexPath:(NSIndexPath*)indexPath isTitle:(BOOL)isTitle;
 - (BOOL) _useAbstractCell:(NSIndexPath*)indexPath;
-//-(CGRect) _getDimensionsWithImage:(UIImage*) image;
--(NSInteger) _textWidth;
+- (NSInteger) _textWidth;
+- (CGRect) _frameForUITextViewAtIndexPath:(NSIndexPath*) indexPath forTableView:(UITableView*)tableView;
 
 @end
 
@@ -78,23 +77,23 @@
         self.navigationItem.title=_currentItem.shortCitation;
     }
     //configure carousel
-    _carousel = [[iCarousel alloc] initWithFrame:CGRectMake(0,0, 
+    _carousel = [[iCarousel alloc] initWithFrame:CGRectMake(0,0,
                                                             self.view.frame.size.width,
                                                             ATTACHMENT_VIEW_HEIGHT)];
     _carousel.type = iCarouselTypeCoverFlow2;
     _carouselDelegate.actionButton=self.actionButton;
     _carouselDelegate.attachmentCarousel = _carousel;
-
+    
     
     [_carousel setDataSource:_carouselDelegate];
     [_carousel setDelegate:_carouselDelegate];
-
+    
     _carousel.bounces = FALSE;
-
+    
     _carousel.currentItemIndex = _carouselDelegate.selectedIndex;
     
     self.tableView.tableHeaderView = _carousel;
-
+    
     //Configure activity indicator.
     _activityIndicator = [[UIActivityIndicatorView alloc] initWithFrame:CGRectMake(0,0,20, 20)];
     [_activityIndicator hidesWhenStopped];
@@ -114,28 +113,28 @@
         [helpPopUp presentPointingAtBarButtonItem:starButton animated:YES];
         [[NSUserDefaults standardUserDefaults] setObject:@"1" forKey:@"hasPresentedStarButtonHelpPopover"];
     }
-
+    
     
     self.navigationItem.rightBarButtonItems = [NSArray arrayWithObjects:self.actionButton, self.starButton, activityIndicator, nil];
     
     [[NSNotificationCenter defaultCenter] addObserver:self
-                                             selector:@selector(notifyItemAvailable:) 
+                                             selector:@selector(notifyItemAvailable:)
                                                  name:ZPNOTIFICATION_ITEMS_AVAILABLE
                                                object:nil];
-
-
+    
+    
 }
 
 - (void)viewWillAppear:(BOOL)animated
 {
-
+    
     if ([[UIDevice currentDevice] userInterfaceIdiom] == UIUserInterfaceIdiomPad) {
         //Set self as a delegate for the navigation controller so that we know when the view is being dismissed by the navigation controller and know to pop the other navigation controller.
         [self.navigationController setDelegate:self];
     }
     
     [super viewWillAppear:animated];
-
+    
 }
 
 - (void)viewDidAppear:(BOOL)animated
@@ -150,7 +149,7 @@
 }
 
 -(void) dealloc{
-   [[NSNotificationCenter defaultCenter] removeObserver:self];
+    [[NSNotificationCenter defaultCenter] removeObserver:self];
     [_carouselDelegate unregisterProgressViewsBeforeUnloading];
 }
 - (void) viewWillUnload{
@@ -169,6 +168,12 @@
 {
     [_previewCache removeAllObjects];
     [super didReceiveMemoryWarning];
+}
+
+//We will reload the data to avoid the need to animate the changes in the uitable row heights
+
+- (void) didRotateFromInterfaceOrientation:(UIInterfaceOrientation)fromInterfaceOrientation{
+    [self.tableView reloadData];
 }
 
 #pragma mark - Configure view and subviews
@@ -191,21 +196,21 @@
 }
 
 - (void)_reconfigureDetailTableView:(BOOL)animated{
-
+    
     //Configure the size of the detail view table.
     _tagButtons = NULL;
+    
     [self.tableView reloadData];
-    [self.tableView layoutIfNeeded];
     
 }
 #pragma mark - Viewing and emailing
 
 - (IBAction) actionButtonPressed:(id)sender{
-
+    
     if(_attachmentInteractionController == NULL)  _attachmentInteractionController = [[ZPAttachmentFileInteractionController alloc] init];
     
     [_attachmentInteractionController setItem:_currentItem];
-                                                                                      
+    
     // If there are no attachments show the lookup menu
     
     if([_currentItem.attachments count] == 0){
@@ -225,7 +230,7 @@
             [_attachmentInteractionController setAttachment:nil];
             [_attachmentInteractionController presentLookupMenuFromBarButtonItem:sender];
         }
-
+        
     }
     // And this else for diagnosing the crash. Once the root cause is identified, these can be removed
     else{
@@ -258,10 +263,10 @@
  2) Creators
  3) Other details
  
+ 
+ */
 
-*/
-
-#pragma mark - Tableview data source 
+#pragma mark - Tableview data source
 
 - (NSInteger)numberOfSectionsInTableView:(UITableView*)tableView {
     return 5;
@@ -300,68 +305,90 @@
         else{
             return 0;
         }
-
+        
     }
     //This should not happen
     return 0;
 }
 
-
-
-- (CGFloat)tableView:(UITableView *)tableView heightForRowAtIndexPath:(NSIndexPath *)indexPath
-{
-
-    //Abstract is treated a bit differently
-    if(tableView==self.tableView && [self _useAbstractCell:indexPath]){
-        
-        NSString *text = [self _textAtIndexPath:indexPath isTitle:false];
-
-        //Margins includes margins and title.
-
-        NSInteger margins=110;
-        
-
-
-        CGSize textSize = [text sizeWithFont:[UIFont systemFontOfSize:14]
-                           constrainedToSize:CGSizeMake([self _textWidth], 1000.0f)];
-        
-        
-        return textSize.height+margins;
-       
-    }
-    //Tag cell
-    else if(tableView==self.tableView && indexPath.section==0 && _tagButtons != NULL){
-        //Get the size based on content
-        NSInteger y=0;
-        for(UIView* subView in _tagButtons){
-            y=MAX(y,subView.frame.origin.y+subView.frame.size.height);
-        }
-        //Add a small margin to the bottom of the cell
-        return MAX(y+7, tableView.rowHeight);
-    }
+- (CGRect) _frameForUITextViewAtIndexPath:(NSIndexPath*) indexPath forTableView:(UITableView*)tableView{
     
-    return tableView.rowHeight;
+    NSString* title = [self _textAtIndexPath:indexPath isTitle:YES];
+    NSString* value = [self _textAtIndexPath:indexPath isTitle:NO];
+    
+    NSInteger width;
+    NSInteger height;
+    NSInteger x;
+    NSInteger y;
+    
+    if([self _useAbstractCell:indexPath]){
+        width = [self _textWidth];
+        
+        // A rought estimate, needs to be calculated
+        y = 40;
+        
+        x = 0;
+    }
+    else{
+        NSInteger titleWidth = [title sizeWithFont:[UIFont boldSystemFontOfSize:17]].width;
+        
+        //The x for the title is 10
+        x = titleWidth + 10;
+        NSInteger textWidth = [self _textWidth];
+        width = textWidth-x;
+        y = 0;
+    }
+
+    // Calculate the required height by rendering the text
+    UITextView* textView = [[UITextView alloc] initWithFrame:CGRectMake(0, 0, width, tableView.rowHeight)];
+    textView.text = value;
+    [textView setFont:[UIFont systemFontOfSize:17]];
+    
+    //Add the textview temporarily to the view hierarchy so that it is forced to render
+    [tableView addSubview:textView];
+    height = textView.contentSize.height;
+    [textView removeFromSuperview];
+
+    return CGRectMake(x, y, width, height);
 }
 
 -(NSInteger) _textWidth{
+    
+    NSInteger margins;
+    NSInteger tableViewWidth;
+    
+    CGRect screenRect = [[UIScreen mainScreen] bounds];
+    CGFloat screenWidth = screenRect.size.width;
+    CGFloat screenHeight = screenRect.size.height;
+    
     if ([[UIDevice currentDevice] userInterfaceIdiom] == UIUserInterfaceIdiomPad) {
-        if (UIDeviceOrientationIsLandscape([UIDevice currentDevice].orientation)) return 663;
-        else return  678;
+        UIInterfaceOrientation orientation = [[UIApplication sharedApplication] statusBarOrientation];
+        if (UIDeviceOrientationIsLandscape(orientation)){
+            tableViewWidth = screenHeight - 320;
+        }
+        else{
+            tableViewWidth =  screenWidth;
+        }
+        
+        margins = 90;
     }
     else{
         if (UIDeviceOrientationIsLandscape([UIDevice currentDevice].orientation)){
-            return  460;
+            tableViewWidth =  screenHeight;
         }
         else{
-            return  300;   
+            tableViewWidth =  screenWidth;
         }
-    }    
+        margins = 20;
+    }
+    
+    return tableViewWidth - margins;
 }
 
 - (BOOL) _useAbstractCell:(NSIndexPath*)indexPath{
     if([indexPath indexAtPosition:0] != 4) return FALSE;
     
-    NSEnumerator* e = [_currentItem.fields keyEnumerator]; 
+    NSEnumerator* e = [_currentItem.fields keyEnumerator];
     
     NSInteger index = -1;
     NSString* key;
@@ -380,13 +407,13 @@
 }
 
 - (NSString*) _textAtIndexPath:(NSIndexPath*)indexPath isTitle:(BOOL)isTitle{
-
-
+    
+    
     NSString* returnString = NULL;
     
     
     //Title and itemtype
-
+    
     if([indexPath indexAtPosition:0] == 2){
         if(indexPath.row == 0){
             if(isTitle) returnString =  @"Title";
@@ -410,12 +437,12 @@
             else{
                 returnString =  [NSString stringWithFormat:@"%@ %@",[creator objectForKey:@"firstName"],lastName];
             }
-
+            
         }
     }
     //Rest of the fields
     else{
-        NSEnumerator* e = [_currentItem.fields keyEnumerator]; 
+        NSEnumerator* e = [_currentItem.fields keyEnumerator];
         
         NSInteger index = -1;
         NSString* key;
@@ -447,7 +474,7 @@
 }
 
 
- 
+
 - (UITableViewCell *)tableView:(UITableView *)tableView cellForRowAtIndexPath:(NSIndexPath *)indexPath {
     
     UITableViewCell *cell;
@@ -470,7 +497,7 @@
             {
                 cell = [[UITableViewCell alloc] initWithStyle:UITableViewCellStyleDefault reuseIdentifier:CellIdentifier];
             }
-       
+            
             //Clean the cell
             
             for(UIView* view in cell.contentView.subviews ){
@@ -482,6 +509,9 @@
                 for(UIView* tagButton in _tagButtons){
                     [cell.contentView addSubview:tagButton];
                 }
+            }
+            else{
+                [ZPTagController addTagButtonsToView:cell.contentView tags:_currentItem.tags];
             }
             
             _tagButtons = cell.contentView.subviews;
@@ -521,44 +551,75 @@
         
         // Dequeue or create a cell of the appropriate type.
         cell = [tableView dequeueReusableCellWithIdentifier:CellIdentifier];
+        
         if (cell == nil)
         {
             cell = [[UITableViewCell alloc] initWithStyle:UITableViewCellStyleDefault reuseIdentifier:CellIdentifier];
         }
         
         // Configure the cell
-        OHAttributedLabel* value = (OHAttributedLabel*) [cell viewWithTag:2];
-        value.automaticallyAddLinksForType = NSTextCheckingTypeLink;
-        
         UILabel* title = (UILabel*) [cell viewWithTag:1];
+        UITextView* value = (UITextView*) [cell viewWithTag:2];
         
         
         value.text = [self _textAtIndexPath:indexPath isTitle:FALSE];
         title.text = [self _textAtIndexPath:indexPath isTitle:TRUE];
         
-        if([title.text isEqualToString:@"DOI"]){
-            [value addCustomLink:[NSURL URLWithString:[@"http://dx.doi.org/" stringByAppendingString:value.text]] inRange:NSMakeRange(0,[value.text length])];
-        }
+        
+        /*      if([title.text isEqualToString:@"DOI"]){
+         [value addCustomLink:[NSURL URLWithString:[@"http://dx.doi.org/" stringByAppendingString:value.text]] inRange:NSMakeRange(0,[value.text length])];
+         }*/
         
         
         //Configure size of the value label
         
         if(!isAbstract){
+            //Reconfigure the title size
             CGSize labelSize = [title.text sizeWithFont:title.font];
-            CGRect frame = value.frame;
+            CGRect titleFrame = title.frame;
+            titleFrame.size.width = labelSize.width;
+            title.frame = titleFrame;
             
-            NSInteger newWidth = cell.contentView.bounds.size.width - labelSize.width - 40;
-            NSInteger widthChange = newWidth - value.frame.size.width;
-            frame.size.width = newWidth;
-            frame.origin.x = frame.origin.x - widthChange;
-            value.frame = frame;
         }
+
+        CGRect valueFrame = [self _frameForUITextViewAtIndexPath:indexPath forTableView:tableView];
+
+        value.frame = valueFrame;
         
         if(cell == NULL || ! [cell isKindOfClass:[UITableViewCell class]]){
             [NSException raise:@"Invalid cell" format:@""];
         }
     }
 	return  cell;
+}
+
+- (CGFloat)tableView:(UITableView *)tableView heightForRowAtIndexPath:(NSIndexPath *)indexPath
+{
+    
+    if(tableView!=self.tableView){
+        return tableView.rowHeight;
+    }
+    //Tag cell
+    else if(indexPath.section==0 && _tagButtons != NULL){
+        //Get the size based on content
+        NSInteger y=0;
+        for(UIView* subView in _tagButtons){
+            y=MAX(y,subView.frame.origin.y+subView.frame.size.height);
+        }
+        //Add a small margin to the bottom of the cell
+        return MAX(y+7, tableView.rowHeight);
+    }
+    //Metadata cells
+    else if(indexPath.section > 1){
+        
+        CGRect frame = [self _frameForUITextViewAtIndexPath:indexPath forTableView:tableView];
+        
+        return MAX(tableView.rowHeight, frame.origin.y + frame.size.height);
+        
+    }
+    else{
+        return tableView.rowHeight;
+    }
 }
 
 - (NSString *)tableView:(UITableView *)tableView titleForHeaderInSection:(NSInteger)section{
@@ -575,20 +636,12 @@
 
 - (void)tableView:(UITableView *)tableView willDisplayCell:(UITableViewCell *)cell forRowAtIndexPath:(NSIndexPath *)indexPath{
     
+    
+    //TODO: refactor so that we handle the tags cell size with _rowHeights as well
+    
     //If we have a cell that should show tags, but does not, reload
     if(indexPath.section==0 && [_currentItem.tags count] > 0 && [cell.contentView.subviews count] == 0){
-        
-        //Add tags and reload
-        [ZPTagController addTagButtonsToView:cell.contentView tags:_currentItem.tags];
-        
-        _tagButtons = cell.contentView.subviews;
-        
         [tableView reloadData];
-        
-        // This is more efficient, but produces an unnecessary animation
-        
-        //[tableView reloadRowsAtIndexPaths:[NSArray arrayWithObject:indexPath] withRowAnimation:UITableViewRowAnimationNone];
-
     }
 }
 
@@ -620,7 +673,7 @@
                 note = [_currentItem.notes objectAtIndex:[indexPath indexAtPosition:1]];
                 newNote = FALSE;
             }
-
+            
             if(_noteEditingViewController == NULL){
                 _noteEditingViewController = [self.storyboard instantiateViewControllerWithIdentifier:@"NoteEditingViewController"];
             }
@@ -629,17 +682,17 @@
             _noteEditingViewController.targetViewController = self;
             
             [self presentModalViewController:_noteEditingViewController animated:YES];
-
+            
         }
         [aTableView deselectRowAtIndexPath:indexPath animated:NO];
     }
     
     // Navigator
     else{
-        // Get the key for the selected item 
+        // Get the key for the selected item
         NSArray* itemArray =[(ZPItemListDataSource*) aTableView.dataSource contentArray];
-        if(indexPath.row<[itemArray count]){                    
-            NSString* currentItemKey = [itemArray objectAtIndex: indexPath.row]; 
+        if(indexPath.row<[itemArray count]){
+            NSString* currentItemKey = [itemArray objectAtIndex: indexPath.row];
             
             if((NSObject*)currentItemKey != [NSNull null]){
                 _currentItem = (ZPZoteroItem*) [ZPZoteroItem itemWithKey:currentItemKey];
@@ -670,7 +723,7 @@
 -(void) notifyItemAvailable:(NSNotification*) notification{
     
     NSArray* items = notification.object;
-
+    
     //TODO: Refactor or document.
     
     if(items.count == 0) [_activityIndicator performSelectorOnMainThread:@selector(stopAnimating) withObject:nil waitUntilDone:NO];
@@ -686,7 +739,7 @@
                 
             }
         }
-   
+        
     }
 }
 

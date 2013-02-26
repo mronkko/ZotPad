@@ -387,9 +387,22 @@ static NSOperationQueue* _uploadQueue;
                                                                             [attachment.contentType isEqualToString:@"text/html"] ||
                                                                             [attachment.contentType isEqualToString:@"application/xhtml+xml"])){
                 NSString* tempFile = [request downloadDestinationPath];
-                NSString* md5 = [ZPZoteroAttachment md5ForFileAtPath:tempFile];
-                DDLogVerbose(@"The MD5 sum of the file received from server is %@", md5);
-                [ZPFileDownloadManager finishedDownloadingAttachment:attachment toFileAtPath:tempFile withVersionIdentifier:md5 ];
+                
+                //If we got a non-empty file, then process it.
+                
+                if([[NSFileManager defaultManager] fileExistsAtPath:tempFile]){
+                    NSString* md5 = [ZPZoteroAttachment md5ForFileAtPath:tempFile];
+                    DDLogVerbose(@"The MD5 sum of the file received from server is %@", md5);
+                    [ZPFileDownloadManager finishedDownloadingAttachment:attachment toFileAtPath:tempFile withVersionIdentifier:md5 ];
+                    
+                }
+
+                //Else fail
+                
+                else{
+                    NSError* error = [[NSError alloc] initWithDomain:[request.url host] code:request.responseStatusCode userInfo:[NSDictionary dictionaryWithObject:@"Empty file from WebDAV" forKey:NSLocalizedDescriptionKey]];
+                    [ZPFileDownloadManager failedDownloadingAttachment:attachment withError:error fromURL:[request.url absoluteString]];
+                }
             }
             
             else {
