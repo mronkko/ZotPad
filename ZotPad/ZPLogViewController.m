@@ -49,7 +49,9 @@
     }
     else logView.text = @"";
     
-//    [logView scrollRangeToVisible:NSMakeRange([logView.text length], 0)];
+}
+- (void) viewWillAppear:(BOOL)animated{
+    [logView scrollRangeToVisible:NSMakeRange([logView.text length], 0)];
 }
 - (void)viewDidAppear:(BOOL)animated{
     [super viewDidAppear:YES];
