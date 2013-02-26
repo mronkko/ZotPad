@@ -260,7 +260,7 @@
            [[UIApplication sharedApplication] openURL:[NSURL URLWithString:
                                                        [NSString stringWithFormat:@"https://www.zotero.org/%@/items/itemKey/%@",
                                                                                    (self.item.libraryID == LIBRARY_ID_MY_LIBRARY?
-                                                                                    [NSString stringWithFormat:@"users/%@",[ZPPreferences userID]]:
+                                                                                    [ZPPreferences username]:
                                                                                     [NSString stringWithFormat:@"groups/%i",self.item.libraryID]),
                                                                                    item.key]]];
         }

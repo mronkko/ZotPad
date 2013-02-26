@@ -18,6 +18,7 @@
 +(void) setUserID:(NSString*)userID;
 
 +(void) setUsername:(NSString*)userName;
++(NSString*) username;
 
 +(void) setCurrentCacheSize:(NSString*)cacheSize;
 
