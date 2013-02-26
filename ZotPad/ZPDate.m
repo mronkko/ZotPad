@@ -119,7 +119,7 @@ static NSRegularExpression* _yearRe;
         NSArray* m = [_yearRe matchesInString:dateString
                                       options:0
                                         range:NSMakeRange(0, [dateString length])];
-        if(m) {
+        if(m && m.count > 2) {
             date.year = [[m objectAtIndex:2] integerValue];
         }
     }
