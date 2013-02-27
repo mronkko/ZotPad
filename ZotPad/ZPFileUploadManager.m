@@ -110,7 +110,7 @@ static ZPCacheStatusToolbarController* _statusView;
     
     //If the local file does not exist, raise an exception as this should not happen.
     if(![[NSFileManager defaultManager] fileExistsAtPath:attachment.fileSystemPath_modified]){
-        DDLogError(@"Attempted to upload a non-existing file %@", attachment.title);
+        DDLogError(@"Attempted to upload a non-existing file %@", attachment.filenameBasedOnLinkMode);
     }
     else{
         //Check if the file can be uploaded
