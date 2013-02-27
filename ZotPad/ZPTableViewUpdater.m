@@ -10,6 +10,7 @@
 
 #import "ZPTableViewUpdater.h"
 #import "ZPItemListDataSource.h"
+#import "ZPCore.h"
 
 @implementation ZPTableViewUpdater
 
@@ -31,9 +32,9 @@
             NSMutableArray* deleteIndexPaths;
             
             // Take a pointer to the old content array to check if the content has been changed
-            NSArray* oldContentArray = [(ZPItemListDataSource*) tableView.dataSource contentArray];
+            NSArray* contentArrayBeforeTableUpdates = [(ZPItemListDataSource*) tableView.dataSource contentArray];
             
-            NSMutableArray* currentContentArray = [NSMutableArray arrayWithArray:oldContentArray];
+            NSMutableArray* contentArrayAfterInsertsAndUpdates = [NSMutableArray arrayWithArray:contentArrayBeforeTableUpdates];
             
             if(animated){
                 NSInteger index=0;
@@ -47,43 +48,43 @@
                     if(contentKey == [NSNull null]) break;
                     
                     //If this is the first cell and there is currently a placeholder, reload
-                    if(index == 0 && [currentContentArray count] == 0 && [tableView numberOfRowsInSection:0] == 1){
+                    if(index == 0 && [contentArrayAfterInsertsAndUpdates count] == 0 && [tableView numberOfRowsInSection:0] == 1){
                         [reloadIndices addObject:[NSIndexPath indexPathForRow:index inSection:0]];
-                        [currentContentArray replaceObjectAtIndex:index withObject:contentKey];
+                        [contentArrayAfterInsertsAndUpdates replaceObjectAtIndex:index withObject:contentKey];
                     }
                     //If the old content is shorter than the new content, add cells
-                    else if([currentContentArray count]<=index){
+                    else if([contentArrayAfterInsertsAndUpdates count]<=index){
                         [insertIndices addObject:[NSIndexPath indexPathForRow:index inSection:0]];
-                        [currentContentArray insertObject:contentKey atIndex:index];
+                        [contentArrayAfterInsertsAndUpdates insertObject:contentKey atIndex:index];
                     }
                     //If there is currently a NULL cell, reload it
-                    else if([currentContentArray objectAtIndex:index] == [NSNull null]){
+                    else if([contentArrayAfterInsertsAndUpdates objectAtIndex:index] == [NSNull null]){
                         [reloadIndices addObject:[NSIndexPath indexPathForRow:index inSection:0]];
-                        [currentContentArray replaceObjectAtIndex:index withObject:contentKey];
+                        [contentArrayAfterInsertsAndUpdates replaceObjectAtIndex:index withObject:contentKey];
                     }
                     
                     // There is content in the way and the content is not the same as the new content
                     // and we will insert before that content
                     
-                    else if(![contentKey isEqual:[currentContentArray objectAtIndex:index]]){
+                    else if(![contentKey isEqual:[contentArrayAfterInsertsAndUpdates objectAtIndex:index]]){
                         [insertIndices addObject:[NSIndexPath indexPathForRow:index inSection:0]];
-                        [currentContentArray insertObject:contentKey atIndex:index];
+                        [contentArrayAfterInsertsAndUpdates insertObject:contentKey atIndex:index];
                     }
                     index++;
                 }
                 
                 //Add empty rows to the end if needed
                 
-                while([currentContentArray count] < [newContentArray count]){
-                    [insertIndices addObject:[NSIndexPath indexPathForRow:[insertIndices count] + [currentContentArray count] inSection:0]];
-                    [currentContentArray addObject:[NSNull null]];
+                while([contentArrayAfterInsertsAndUpdates count] < [newContentArray count]){
+                    [insertIndices addObject:[NSIndexPath indexPathForRow:[insertIndices count] + [contentArrayAfterInsertsAndUpdates count] inSection:0]];
+                    [contentArrayAfterInsertsAndUpdates addObject:[NSNull null]];
                 }
                 
                 // Trim extra rows from the end if needed
                 
                 NSInteger deleteIndex =[newContentArray count];
                 
-                while([currentContentArray count] > deleteIndex){
+                while([contentArrayAfterInsertsAndUpdates count] > deleteIndex){
                     [deleteIndexPaths addObject:[NSIndexPath indexPathForRow:deleteIndex++ inSection:0]];
                 }
             }
@@ -100,35 +101,43 @@
                     // It is possible that there has been an update to the tableview before this block has a
                     // change to execute. Ensure that the table content has not changed before doing updates
                     
-                    if(oldContentArray == [(ZPItemListDataSource*) tableView.dataSource contentArray]){
+                    if(contentArrayBeforeTableUpdates == [(ZPItemListDataSource*) tableView.dataSource contentArray]){
                         
                         if(animated){
                             
                             
-                            /*
-                             NSLog(@"INSERT %@",insertIndices);
-                             NSLog(@"RELOAD %@",reloadIndices);
-                             NSLog(@"DELETE %@",deleteIndexPaths);
-                             
-                             NSLog(@"Current rows %i",[tableView numberOfRowsInSection:0]);
-                             NSLog(@"Inserts %i",[insertIndices count]);
-                             NSLog(@"Reloads %i",[reloadIndices count]);
-                             NSLog(@"Deletes %i",[deleteIndexPaths count]);
-                             NSLog(@"New content %i",[newContentArray count]);
-                             */
-                            [(ZPItemListDataSource*) tableView.dataSource setContentArray:currentContentArray];
-                            
-                            if([insertIndices count]>0){
-                                [tableView insertRowsAtIndexPaths:insertIndices withRowAnimation:UITableViewRowAnimationAutomatic];
-                            }
-                            if([reloadIndices count]>0){
-                                [tableView reloadRowsAtIndexPaths:reloadIndices withRowAnimation:UITableViewRowAnimationAutomatic];
-                            }
-                            if(deleteIndexPaths.count > 0){
-                                [(ZPItemListDataSource*) tableView.dataSource setContentArray:newContentArray];
-                                [tableView deleteRowsAtIndexPaths:deleteIndexPaths withRowAnimation:UITableViewRowAnimationAutomatic];
+                            // Do final consistency checks.
+                            NSInteger maxRowIndex=-1;
+                            for(NSIndexPath* insertIndex in insertIndices){
+                                maxRowIndex = MAX(maxRowIndex, insertIndex.row);
                             }
                             
+                            if([insertIndices count] + [contentArrayBeforeTableUpdates count] != [contentArrayAfterInsertsAndUpdates count]){
+                                DDLogError(@"Consistency check failed when attempting to update the item list. Length of new content (%i) is not the sum of length of old content (%i) plus the number of inserted rows (%i)",
+                                           [contentArrayAfterInsertsAndUpdates count],
+                                           [contentArrayBeforeTableUpdates count],
+                                           [insertIndices count]);
+                            }
+                            else if(maxRowIndex >= [contentArrayAfterInsertsAndUpdates count]){
+                                DDLogError(@"Consistency check failed when attempting to update the item list. Attempted to insert a row (%i) after the end of the table (length %i).",
+                                           maxRowIndex,
+                                           [contentArrayAfterInsertsAndUpdates count]);
+                            }
+                            else{
+                                
+                                [(ZPItemListDataSource*) tableView.dataSource setContentArray:contentArrayAfterInsertsAndUpdates];
+                                
+                                if([insertIndices count]>0){
+                                    [tableView insertRowsAtIndexPaths:insertIndices withRowAnimation:UITableViewRowAnimationAutomatic];
+                                }
+                                if([reloadIndices count]>0){
+                                    [tableView reloadRowsAtIndexPaths:reloadIndices withRowAnimation:UITableViewRowAnimationAutomatic];
+                                }
+                                if(deleteIndexPaths.count > 0){
+                                    [(ZPItemListDataSource*) tableView.dataSource setContentArray:newContentArray];
+                                    [tableView deleteRowsAtIndexPaths:deleteIndexPaths withRowAnimation:UITableViewRowAnimationAutomatic];
+                                }
+                            }
                             
                             
                             
