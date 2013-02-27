@@ -460,10 +460,10 @@
             
             //Then check which need to be deleted
             
-            index=-1;
+            index= [shownContent count];
             
-            for(shownObject in [NSArray arrayWithArray:shownContent]){
-                index++;
+            for(shownObject in [shownContent reverseObjectEnumerator]){
+                index--;
                 NSInteger newIndexOfOldObject= [newContent indexOfObject:shownObject];
                 
                 if(newIndexOfOldObject == NSNotFound){
