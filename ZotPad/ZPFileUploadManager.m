@@ -110,29 +110,31 @@ static ZPCacheStatusToolbarController* _statusView;
     
     //If the local file does not exist, raise an exception as this should not happen.
     if(![[NSFileManager defaultManager] fileExistsAtPath:attachment.fileSystemPath_modified]){
-        [NSException raise:@"File not found" format:@"File to be uploaded to Zotero server cannot be found"];
+        DDLogError(@"Attempted to upload a non-existing file %@", attachment.title);
     }
-    //Check if the file can be uploaded
-    
-    if([ZPPreferences debugFileUploads]) DDLogInfo(@"Retrieving new metadata for file %@.",attachment.filenameBasedOnLinkMode);
-    
-    [ZPServerConnection retrieveSingleItem:attachment completion:^(NSArray* parsedResults) {
-        if(parsedResults == NULL || [parsedResults count]==0){
-            //Failure
-            DDLogWarn(@"Failed retrieving metadata for file %@.",attachment.filenameBasedOnLinkMode);
-            [[NSNotificationCenter defaultCenter] postNotificationName:ZPNOTIFICATION_ATTACHMENT_FILE_UPLOAD_FAILED object:attachment];
-
-        }
-        else{
-            //Success
-            ZPZoteroAttachment* updatedAttachment = [parsedResults objectAtIndex:0];
-            if([ZPPreferences debugFileUploads]) DDLogInfo(@"Starting upload sequence for %@.",updatedAttachment.filenameBasedOnLinkMode);
-            ZPFileChannel* uploadChannel = [ZPFileChannel fileChannelForAttachment:updatedAttachment];
-            [uploadChannel startUploadingAttachment:updatedAttachment overWriteConflictingServerVersion:FALSE];
-            [[NSNotificationCenter defaultCenter] postNotificationName:ZPNOTIFICATION_ATTACHMENT_FILE_UPLOAD_STARTED object:updatedAttachment];
-            
-        }
-    }];
+    else{
+        //Check if the file can be uploaded
+        
+        if([ZPPreferences debugFileUploads]) DDLogInfo(@"Retrieving new metadata for file %@.",attachment.filenameBasedOnLinkMode);
+        
+        [ZPServerConnection retrieveSingleItem:attachment completion:^(NSArray* parsedResults) {
+            if(parsedResults == NULL || [parsedResults count]==0){
+                //Failure
+                DDLogWarn(@"Failed retrieving metadata for file %@.",attachment.filenameBasedOnLinkMode);
+                [[NSNotificationCenter defaultCenter] postNotificationName:ZPNOTIFICATION_ATTACHMENT_FILE_UPLOAD_FAILED object:attachment];
+                
+            }
+            else{
+                //Success
+                ZPZoteroAttachment* updatedAttachment = [parsedResults objectAtIndex:0];
+                if([ZPPreferences debugFileUploads]) DDLogInfo(@"Starting upload sequence for %@.",updatedAttachment.filenameBasedOnLinkMode);
+                ZPFileChannel* uploadChannel = [ZPFileChannel fileChannelForAttachment:updatedAttachment];
+                [uploadChannel startUploadingAttachment:updatedAttachment overWriteConflictingServerVersion:FALSE];
+                [[NSNotificationCenter defaultCenter] postNotificationName:ZPNOTIFICATION_ATTACHMENT_FILE_UPLOAD_STARTED object:updatedAttachment];
+                
+            }
+        }];
+    }
 }
 
 #pragma mark - Callbacks
