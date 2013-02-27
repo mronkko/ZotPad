@@ -283,7 +283,7 @@ static NSOperationQueue* _uploadQueue;
         
         if([ZPPreferences debugFileUploads]){
             NSString* dump =[self requestDumpAsString:request];
-            DDLogInfo(dump);
+            DDLogInfo(@"%@",dump);
             DDLogInfo(@"Request user info:%@",request.userInfo);
         }
 
