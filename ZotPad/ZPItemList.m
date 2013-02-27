@@ -264,7 +264,10 @@ static ZPItemList* _instance;
     // (TODO: Figure out a more clean way to do this.)
     if(UI_USER_INTERFACE_IDIOM() == UIUserInterfaceIdiomPad){
         UISplitViewController* root =  (UISplitViewController*) [UIApplication sharedApplication].delegate.window.rootViewController;
-        [(ZPItemListViewController *)[[root.viewControllers lastObject] topViewController] configureView];
+        ZPItemListViewController* itemListViewController = (ZPItemListViewController *)[[root.viewControllers lastObject] topViewController];
+        if([itemListViewController respondsToSelector:@selector(configureView)]){
+            [itemListViewController configureView];
+        }
     }
 }
 -(void) deselectTag:(NSString*)tag{
@@ -276,7 +279,10 @@ static ZPItemList* _instance;
     // (TODO: Figure out a more clean way to do this.)
     if(UI_USER_INTERFACE_IDIOM() == UIUserInterfaceIdiomPad){
         UISplitViewController* root =  (UISplitViewController*) [UIApplication sharedApplication].delegate.window.rootViewController;
-        [(ZPItemListViewController *)[[root.viewControllers lastObject] topViewController] configureView];
+        ZPItemListViewController* itemListViewController = (ZPItemListViewController *)[[root.viewControllers lastObject] topViewController];
+        if([itemListViewController respondsToSelector:@selector(configureView)]){
+            [itemListViewController configureView];
+        }
     }
     
 }
