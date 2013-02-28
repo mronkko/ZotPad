@@ -111,14 +111,14 @@
                             for(NSIndexPath* insertIndex in insertIndices){
                                 maxRowIndex = MAX(maxRowIndex, insertIndex.row);
                             }
-                            
+                                                        
                             if([insertIndices count] + [contentArrayBeforeTableUpdates count] != [contentArrayAfterInsertsAndUpdates count]){
                                 DDLogError(@"Consistency check failed when attempting to update the item list. Length of new content (%i) is not the sum of length of old content (%i) plus the number of inserted rows (%i)",
                                            [contentArrayAfterInsertsAndUpdates count],
                                            [contentArrayBeforeTableUpdates count],
                                            [insertIndices count]);
                             }
-                            else if(maxRowIndex >= [contentArrayAfterInsertsAndUpdates count]){
+                            else if((NSInteger)[contentArrayAfterInsertsAndUpdates count] <= maxRowIndex){
                                 DDLogError(@"Consistency check failed when attempting to update the item list. Attempted to insert a row (%i) after the end of the table (length %i).",
                                            maxRowIndex,
                                            [contentArrayAfterInsertsAndUpdates count]);

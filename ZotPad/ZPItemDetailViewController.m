@@ -44,6 +44,7 @@
 }
 
 - (void) _reconfigureDetailTableView:(BOOL)animated;
+- (void) _reconfigureAttachmentCarousel:(BOOL)animated;
 - (NSString*) _textAtIndexPath:(NSIndexPath*)indexPath isTitle:(BOOL)isTitle;
 - (BOOL) _useAbstractCell:(NSIndexPath*)indexPath;
 - (NSInteger) _textWidth;
@@ -91,8 +92,6 @@
     _carousel.bounces = FALSE;
     
     _carousel.currentItemIndex = _carouselDelegate.selectedIndex;
-    
-    self.tableView.tableHeaderView = _carousel;
     
     //Configure activity indicator.
     _activityIndicator = [[UIActivityIndicatorView alloc] initWithFrame:CGRectMake(0,0,20, 20)];
@@ -188,10 +187,26 @@
     [[NSNotificationCenter defaultCenter] postNotificationName:ZPNOTIFICATION_ACTIVE_ITEM_CHANGED object:_currentItem];
     
     [self _reconfigureDetailTableView:FALSE];
-    [_carouselDelegate configureWithZoteroItem:_currentItem];
-    [_carousel reloadData];
+    [self _reconfigureAttachmentCarousel:FALSE];
+    
     [self.starButton configureWithItem:_currentItem];
     self.navigationItem.title=_currentItem.shortCitation;
+    
+}
+
+- (void) _reconfigureAttachmentCarousel:(BOOL)animated{
+    
+    if(animated) [UIView beginAnimations:nil context:NULL];
+    if([_currentItem.attachments count] == 0){
+        self.tableView.tableHeaderView = nil;
+    }
+    else{
+        [_carouselDelegate configureWithZoteroItem:_currentItem];
+        [_carousel reloadData];
+        self.tableView.tableHeaderView = _carousel;
+    }
+    if(animated) [UIView commitAnimations];
+
     
 }
 
@@ -342,7 +357,13 @@
     // Calculate the required height by rendering the text
     UITextView* textView = [[UITextView alloc] initWithFrame:CGRectMake(0, 0, width, tableView.rowHeight)];
     textView.text = value;
-    [textView setFont:[UIFont systemFontOfSize:17]];
+
+    if([self _useAbstractCell:indexPath]){
+        [textView setFont:[UIFont systemFontOfSize:14]];
+    }
+    else{
+        [textView setFont:[UIFont systemFontOfSize:17]];
+    }
     
     //Add the textview temporarily to the view hierarchy so that it is forced to render
     [tableView addSubview:textView];
@@ -737,6 +758,15 @@
                 //If we had the activity indicator animating, stop it now because we are no longer waiting for data
                 [_activityIndicator performSelectorOnMainThread:@selector(stopAnimating) withObject:nil waitUntilDone:NO];
                 
+            }
+            else if(self.tableView.tableHeaderView == nil && [_currentItem.key isEqual:item.parentKey]){
+                @synchronized(self.tableView){
+
+                    // This will guarantee that we update the table only once
+                    if(self.tableView.tableHeaderView == nil){
+                        [self performSelectorOnMainThread:@selector(_reconfigureAttachmentCarousel:) withObject:[NSNumber numberWithBool:TRUE] waitUntilDone:YES];
+                    }
+                }
             }
         }
         
