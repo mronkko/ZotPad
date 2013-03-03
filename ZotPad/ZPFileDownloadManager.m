@@ -375,7 +375,7 @@ static ZPCacheStatusToolbarController* _statusView;
 
 +(void) notifyActiveItemChanged:(NSNotification *) notification{
     
-    NSString* itemKey = [(ZPZoteroItem*) notification.object itemKey];
+    NSString* itemKey = notification.object;
     
     // Clear the download queue if we are only cacheing active collections and items
     // Both keys might be null, so we need to compare equality directly as well

@@ -53,7 +53,6 @@
 - (void)configureServerKeys:(NSArray*)uncachedItems;
 
 -(void) _updateRowForItem:(ZPZoteroItem*)item;
--(void) _performRowInsertions:(NSArray*)insertIndexPaths reloads:(NSArray*)reloadIndexPaths tableLength:(NSInteger)tableLength;
 -(void) updateItemList:(BOOL)animated;
 
 -(BOOL) isTagSelected:(NSString*)tag;

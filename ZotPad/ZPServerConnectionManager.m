@@ -173,7 +173,7 @@ const NSInteger ZPServerConnectionManagerRequestLastModifiedItem = 11;
     else if(internetStatus==ReachableViaWWAN)
         result = true;
     
-    BOOL online = [ZPPreferences online];
+    BOOL online = [ZPReachability hasInternetConnection];
     
     return online && result;
 //    return _zoteroReachability && online;
@@ -377,7 +377,7 @@ const NSInteger ZPServerConnectionManagerRequestLastModifiedItem = 11;
             }];
             [request setFailedBlock:^{
 
-                if([ZPPreferences online]){
+                if([ZPReachability hasInternetConnection]){
                     /*
                      
                      //TODO: Consider making this a preference item.

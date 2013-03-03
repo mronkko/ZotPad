@@ -324,7 +324,7 @@
         
         // Get the key for the selected item
         NSString* currentItemKey = [[(ZPItemListDataSource*)_tableView.dataSource contentArray] objectAtIndex: indexPath.row];
-        [itemDetailViewController setSelectedItem:(ZPZoteroItem*)[ZPZoteroItem itemWithKey:currentItemKey]];
+        [itemDetailViewController setItemKey:currentItemKey];
         [itemDetailViewController configure];
         
         // Set the navigation controller in iPad

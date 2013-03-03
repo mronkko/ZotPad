@@ -97,7 +97,7 @@ static NSOperationQueue* _uploadQueue;
             
             else{
                 DDLogError(@"Attachment %@ (%@) is missing version identification information. The local file will replace the server version without a version check.",attachment.key,attachment.filename);
-                [ZPServerConnection retrieveSingleItem:attachment completion:^(NSArray* attachmentList){
+                [ZPServerConnection retrieveSingleItemWithKey:attachment.key completion:^(NSArray* attachmentList){
                     if(attachmentList.count == 1){
                         [self startUploadingAttachment:[attachmentList objectAtIndex:0] overWriteConflictingServerVersion:overwriteConflicting];
                     }
@@ -334,7 +334,7 @@ static NSOperationQueue* _uploadQueue;
                     
                     else{
                         DDLogError(@"Attachment %@ (%@) is missing version identification information. The local file will replace the server version without a version check.",attachment.key,attachment.filename);
-                        [ZPServerConnection retrieveSingleItem:attachment completion:^(NSArray* attachmentList){
+                        [ZPServerConnection retrieveSingleItemWithKey:attachment.key completion:^(NSArray* attachmentList){
                             if(attachmentList.count == 1){
                                 [self startUploadingAttachment:[attachmentList objectAtIndex:0] overWriteConflictingServerVersion:YES];
                             }
@@ -414,7 +414,7 @@ static NSOperationQueue* _uploadQueue;
             }
             [ZPFileCacheManager deleteOriginalFileForAttachment:attachment reason:@"File is outdated (Zotero storage conflict)"];
             
-            [ZPServerConnection retrieveSingleItem:attachment completion:^(NSArray* parsedResults) {
+            [ZPServerConnection retrieveSingleItemWithKey:attachment.key completion:^(NSArray* parsedResults) {
                 if(parsedResults == NULL || [parsedResults count]==0){
                     [ZPFileUploadManager failedUploadingAttachment:attachment
                                                          withError:[NSError errorWithDomain:@"Zotero.org"

@@ -336,7 +336,7 @@ static NSOperationQueue* _uploadQueue;
     
     else{
         DDLogError(@"Attachment %@ (%@) is missing version identification information. The local file will replace the server version without a version check.",attachment.key,attachment.filename);
-        [ZPServerConnection retrieveSingleItem:attachment completion:^(NSArray* attachmentList){
+        [ZPServerConnection retrieveSingleItemWithKey:attachment.key completion:^(NSArray* attachmentList){
             if(attachmentList.count == 1){
                 [self _registerWebDAVUploadWithZoteroServer:[attachmentList objectAtIndex:0] userInfo:userInfo];
             }
@@ -448,7 +448,7 @@ static NSOperationQueue* _uploadQueue;
                 else if([fileArray count]==0){
                     NSString* errorMessage = [NSString stringWithFormat:@"Zip file downloaded from WebDAV URL %@ did not contain any files (%@)",[request.url absoluteString], attachment.filename];
                     
-                    DDLogError(errorMessage);
+                    DDLogError(@"%@",errorMessage);
                     
                     NSError* error = [[NSError alloc] initWithDomain:[request.url host] code:request.responseStatusCode userInfo:[NSDictionary dictionaryWithObject:errorMessage forKey:NSLocalizedDescriptionKey]];
                     [ZPFileDownloadManager failedDownloadingAttachment:attachment withError:error fromURL:[request.url absoluteString]];
@@ -461,7 +461,7 @@ static NSOperationQueue* _uploadQueue;
                     if(![[NSFileManager defaultManager] fileExistsAtPath:tempFile]){
                         NSString* errorMessage = [NSString stringWithFormat:@"Zip file downloaded from WebDAV URL %@ contained several files, but none matched %@ (%@)",[request.url absoluteString], attachment.filenameZoteroBase64Encoded,attachment.filename];
                         
-                        DDLogError(errorMessage);
+                        DDLogError(@"%@",errorMessage);
                         
                         NSError* error = [[NSError alloc] initWithDomain:[request.url host] code:request.responseStatusCode userInfo:[NSDictionary dictionaryWithObject:errorMessage forKey:NSLocalizedDescriptionKey]];
                         [ZPFileDownloadManager failedDownloadingAttachment:attachment withError:error fromURL:[request.url absoluteString]];
@@ -493,7 +493,7 @@ static NSOperationQueue* _uploadQueue;
         
         if([ZPPreferences debugFileUploads]){
             NSString* dump =[self requestDumpAsString:request];
-            DDLogInfo(dump);
+            DDLogInfo(@"%@",dump);
         }
 
         if(request.tag == ZPFILECHANNEL_WEBDAV_UPLOAD_FILE && (request.responseStatusCode == 204 || request.responseStatusCode == 201 || request.responseStatusCode == 200)){
@@ -516,11 +516,11 @@ static NSOperationQueue* _uploadQueue;
         }
         else if(request.tag == ZPFILECHANNEL_WEBDAV_UPLOAD_REGISTER && request.responseStatusCode == 412){
            
-            if([ZPPreferences debugFileUploads]) DDLogInfo([self requestDumpAsString:request]);
+            if([ZPPreferences debugFileUploads]) DDLogInfo(@"%@",[self requestDumpAsString:request]);
 
             [ZPFileCacheManager deleteOriginalFileForAttachment:attachment reason:@"File is outdated (WebDAV conflict)"];
             
-            [ZPServerConnection retrieveSingleItem:attachment completion:^(NSArray* parsedResults) {
+            [ZPServerConnection retrieveSingleItemWithKey:attachment.key completion:^(NSArray* parsedResults) {
                 if(parsedResults == NULL || [parsedResults count]==0){
                     [ZPFileUploadManager failedUploadingAttachment:attachment
                                                          withError:[NSError errorWithDomain:@"Zotero.org"

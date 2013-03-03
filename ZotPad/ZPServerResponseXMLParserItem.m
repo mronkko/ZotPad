@@ -120,7 +120,7 @@
                 NSString* value = [fields objectForKey:key];
                 if(![value isEqual:@""]){
                     if([_currentElement respondsToSelector:NSSelectorFromString(key)]){
-                        if(value==[NSNull null]) value = nil;
+                        if((NSObject*) value==[NSNull null]) value = nil;
                         [_currentElement setValue:value forKey:key];
                     }
                 }

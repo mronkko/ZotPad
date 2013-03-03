@@ -95,7 +95,7 @@
     librariesAndCollectionsLoadingActivityView = [[UIActivityIndicatorView alloc] initWithActivityIndicatorStyle:UIActivityIndicatorViewStyleWhite];
     librariesAndCollectionsLoadingActivityView.hidesWhenStopped = TRUE;
     
-    if(_librariesAndCollectionsLoadingActivityViewAnimating && [ZPReachability hasInternetConnection] && [ZPPreferences online]){
+    if(_librariesAndCollectionsLoadingActivityViewAnimating && [ZPReachability hasInternetConnection] && [ZPReachability hasInternetConnection]){
         [librariesAndCollectionsLoadingActivityView startAnimating];
     }
     else{
@@ -209,8 +209,8 @@
         [target setToolbarItems:toolBarItems];
         
         // Get the selected row from the item list
-        ZPZoteroItem* selectedItem = [(ZPItemDetailViewController*)sender selectedItem];
-        NSInteger index = [[[ZPItemList instance] itemKeysShown] indexOfObject:selectedItem.key];
+        NSString* selectedItemKey = [(ZPItemDetailViewController*)sender itemKey];
+        NSInteger index = [[[ZPItemList instance] itemKeysShown] indexOfObject:selectedItemKey];
         
         // TODO: This if statement avoids a rare crash. The root cause needs to be identified
         if(index<[target.tableView numberOfRowsInSection:0]){
