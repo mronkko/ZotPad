@@ -14,7 +14,6 @@
 		A700CA34163BD3AE005D4115 /* AppIcon114x114-alpha.png in Resources */ = {isa = PBXBuildFile; fileRef = A700CA33163BD3AE005D4115 /* AppIcon114x114-alpha.png */; };
 		A700CA36163BD3ED005D4115 /* AppIcon72x72-alpha.png in Resources */ = {isa = PBXBuildFile; fileRef = A700CA35163BD3EC005D4115 /* AppIcon72x72-alpha.png */; };
 		A700CA38163BD3F8005D4115 /* AppIcon144x144-alpha.png in Resources */ = {isa = PBXBuildFile; fileRef = A700CA37163BD3F8005D4115 /* AppIcon144x144-alpha.png */; };
-		A700CA3A163BDAF2005D4115 /* ZotPad alpha-Info.plist in Resources */ = {isa = PBXBuildFile; fileRef = A700CA39163BDAF1005D4115 /* ZotPad alpha-Info.plist */; };
 		A7025019149B0BB1004F2AAB /* ZPDatabase.m in Sources */ = {isa = PBXBuildFile; fileRef = A7025018149B0BB1004F2AAB /* ZPDatabase.m */; };
 		A702501D149B33E1004F2AAB /* ZPItemDataDownloadManager.m in Sources */ = {isa = PBXBuildFile; fileRef = A702501C149B33E1004F2AAB /* ZPItemDataDownloadManager.m */; };
 		A7025020149C6C3E004F2AAB /* ZPPreferences.m in Sources */ = {isa = PBXBuildFile; fileRef = A702501F149C6C3D004F2AAB /* ZPPreferences.m */; };
@@ -4432,7 +4431,7 @@
 		A7200DC714718DBF004347C9 /* Project object */ = {
 			isa = PBXProject;
 			attributes = {
-				LastUpgradeCheck = 0450;
+				LastUpgradeCheck = 0460;
 			};
 			buildConfigurationList = A7200DCA14718DBF004347C9 /* Build configuration list for PBXProject "ZotPad" */;
 			compatibilityVersion = "Xcode 3.2";
@@ -5273,7 +5272,6 @@
 				A700CA34163BD3AE005D4115 /* AppIcon114x114-alpha.png in Resources */,
 				A700CA36163BD3ED005D4115 /* AppIcon72x72-alpha.png in Resources */,
 				A700CA38163BD3F8005D4115 /* AppIcon144x144-alpha.png in Resources */,
-				A700CA3A163BDAF2005D4115 /* ZotPad alpha-Info.plist in Resources */,
 				A70285C3163BF352003A0192 /* AjiPDFLib.strings in Resources */,
 				A70285C6163BF352003A0192 /* AP_action_popupEditor.png in Resources */,
 				A70285C9163BF352003A0192 /* AP_action_toolbar.png in Resources */,
@@ -6439,6 +6437,10 @@
 				ALWAYS_SEARCH_USER_PATHS = NO;
 				ARCHS = "$(ARCHS_STANDARD_32_BIT)";
 				CLANG_ENABLE_OBJC_ARC = YES;
+				CLANG_WARN_CONSTANT_CONVERSION = YES;
+				CLANG_WARN_ENUM_CONVERSION = YES;
+				CLANG_WARN_INT_CONVERSION = YES;
+				CLANG_WARN__DUPLICATE_METHOD_MATCH = YES;
 				CODE_SIGN_IDENTITY = "iPhone Developer";
 				"CODE_SIGN_IDENTITY[sdk=iphoneos*]" = "iPhone Developer";
 				COPY_PHASE_STRIP = NO;
@@ -6453,6 +6455,7 @@
 				GCC_VERSION = com.apple.compilers.llvm.clang.1_0;
 				GCC_WARN_ABOUT_MISSING_PROTOTYPES = YES;
 				GCC_WARN_ABOUT_RETURN_TYPE = YES;
+				GCC_WARN_UNINITIALIZED_AUTOS = YES;
 				GCC_WARN_UNUSED_VARIABLE = YES;
 				HEADER_SEARCH_PATHS = (
 					three20/Build/Products/three20,
@@ -6479,6 +6482,10 @@
 				ALWAYS_SEARCH_USER_PATHS = NO;
 				ARCHS = "$(ARCHS_STANDARD_32_BIT)";
 				CLANG_ENABLE_OBJC_ARC = YES;
+				CLANG_WARN_CONSTANT_CONVERSION = YES;
+				CLANG_WARN_ENUM_CONVERSION = YES;
+				CLANG_WARN_INT_CONVERSION = YES;
+				CLANG_WARN__DUPLICATE_METHOD_MATCH = YES;
 				CODE_SIGN_IDENTITY = "iPhone Distribution: Mikko Ronkko";
 				"CODE_SIGN_IDENTITY[sdk=iphoneos*]" = "iPhone Distribution: Mikko Ronkko";
 				COPY_PHASE_STRIP = YES;
@@ -6486,6 +6493,7 @@
 				GCC_VERSION = com.apple.compilers.llvm.clang.1_0;
 				GCC_WARN_ABOUT_MISSING_PROTOTYPES = YES;
 				GCC_WARN_ABOUT_RETURN_TYPE = YES;
+				GCC_WARN_UNINITIALIZED_AUTOS = YES;
 				GCC_WARN_UNUSED_VARIABLE = YES;
 				HEADER_SEARCH_PATHS = (
 					three20/Build/Products/three20,
