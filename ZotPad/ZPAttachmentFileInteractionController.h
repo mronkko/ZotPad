@@ -22,7 +22,7 @@
 @interface ZPAttachmentFileInteractionController: NSObject <UIActionSheetDelegate, UIDocumentInteractionControllerDelegate, MFMailComposeViewControllerDelegate, UIPrintInteractionControllerDelegate>{
 }
 
-@property (retain, nonatomic) ZPZoteroItem* item;
+@property (retain, nonatomic) NSString* itemKey;
 @property (readonly) UIActionSheet* actionSheet;
 
 -(void) setAttachment:(ZPZoteroAttachment*)attachment;

@@ -37,10 +37,10 @@
 +(void) retrieveAllItemKeysFromLibrary:(NSInteger)libraryID;
 
 //This retrieves single item details and notes and attachments associated with that item
-+(void) retrieveSingleItemAndChildrenFromServer:(ZPZoteroItem*)item;
++(void) retrieveSingleItemAndChildrenWithKey:(NSString*)itemKey;
 
 //This retrieves a single attachment and processes it with a block
-+(void) retrieveSingleItem:(ZPZoteroAttachment*)item completion:(void(^)(NSArray*))completionBlock;
++(void) retrieveSingleItemWithKey:(NSString*)itemKey completion:(void(^)(NSArray*))completionBlock;
 
 +(NSInteger) numberOfActiveMetadataRequests;
 

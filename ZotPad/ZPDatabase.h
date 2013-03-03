@@ -135,8 +135,8 @@
 +(void) replaceLocallyAddedCollection:(ZPZoteroCollection*) localCollection withServerVersion:(ZPZoteroCollection*) serverCollection;
 
 // Locally modified collection memberships
-+(void) addItemLocally:(ZPZoteroItem*)item toCollection:(NSString*)collectionKey;
-+(void) removeItemLocally:(ZPZoteroItem*)item fromCollection:(NSString*)collectionKey;
++(void) addItemWithKeyLocally:(NSString*)itemKey toCollection:(NSString*)collectionKey;
++(void) removeItemWithKeyLocally:(NSString*)itemKey fromCollection:(NSString*)collectionKey;
 
 // Locally modifying notes
 

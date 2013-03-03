@@ -11,6 +11,6 @@
 
 @protocol ZPTagDisplay <NSObject>
 
--(void) refreshTagsFor:(ZPZoteroDataObject*) item;
+-(void) refreshTagsFor:(NSString *)itemKey;
 
 @end

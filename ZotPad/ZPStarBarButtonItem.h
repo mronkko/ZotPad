@@ -10,9 +10,9 @@
 #import "ZPCore.h"
 
 @interface ZPStarBarButtonItem : UIBarButtonItem{
-    ZPZoteroItem* _targetItem;
+    NSString* _itemKey;
 }
 
--(void) configureWithItem:(ZPZoteroItem*)item;
+-(void) configureWithItemKey:(NSString*)itemKey;
 
 @end

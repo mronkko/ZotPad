@@ -19,7 +19,6 @@
 #import "ZPNoteDisplay.h"
 
 @interface ZPItemDetailViewController : UITableViewController <UINavigationControllerDelegate, ZPTagDisplay, ZPNoteDisplay>{
-    ZPZoteroItem* _currentItem;
     iCarousel* _carousel;
     UIActivityIndicatorView* _activityIndicator;
     NSInteger _detailTitleWidth;
@@ -32,7 +31,7 @@
 - (IBAction) actionButtonPressed:(id)sender;
 
 @property (nonatomic, retain) IBOutlet UIBarButtonItem* actionButton;
-@property (nonatomic, retain) ZPZoteroItem* selectedItem;
+@property (nonatomic, retain) NSString* itemKey;
 @property (nonatomic, retain) IBOutlet ZPStarBarButtonItem* starButton;
 
 @end

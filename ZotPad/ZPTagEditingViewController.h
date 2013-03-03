@@ -16,7 +16,7 @@
 @property (retain, nonatomic) IBOutlet UITableView* tableView;
 @property (retain, nonatomic) IBOutlet UINavigationBar* navigationBar;
 
-@property (retain, nonatomic) ZPZoteroDataObject* item;
+@property (retain, nonatomic) NSString* itemKey;
 @property (retain, nonatomic) NSObject<ZPTagDisplay>* targetViewController;
 
 +(ZPTagEditingViewController*) instance;

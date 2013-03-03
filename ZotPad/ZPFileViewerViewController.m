@@ -469,7 +469,7 @@ static ZPFileViewerViewController* _instance;
 -(void) _updateTitleAndStarButton{
     ZPZoteroItem* parent = [ZPZoteroItem itemWithKey:[(ZPZoteroAttachment*) [_attachments objectAtIndex:_activeAttachmentIndex] parentKey]];
     self.navigationBar.topItem.title = parent.shortCitation;
-    [self.starButton configureWithItem:parent];
+    [self.starButton configureWithItemKey:parent.itemKey];
 }
 
 -(void) _updateLeftPullPane{
@@ -516,7 +516,7 @@ static ZPFileViewerViewController* _instance;
     ZPZoteroAttachment* currentAttachment = [_attachments objectAtIndex:_activeAttachmentIndex];
     if(_attachmentInteractionController == NULL)  _attachmentInteractionController = [[ZPAttachmentFileInteractionController alloc] init];
     
-    [_attachmentInteractionController setItem:nil];
+    [_attachmentInteractionController setItemKey:nil];
     [_attachmentInteractionController setAttachment:currentAttachment];
     
     [_attachmentInteractionController presentOptionsMenuFromBarButtonItem:sender];
@@ -955,7 +955,7 @@ static ZPFileViewerViewController* _instance;
     if(indexPath.section == 0 && ! isStandaloneAttachment){
         ZPTagEditingViewController* tagController = [ZPTagEditingViewController instance];
         tagController.targetViewController = self;
-        tagController.item = [ZPZoteroItem itemWithKey:attachment.parentKey];
+        tagController.itemKey = attachment.parentKey;
         [self presentModalViewController:tagController animated:YES];
     }
     //Attachment tags
@@ -964,7 +964,7 @@ static ZPFileViewerViewController* _instance;
 
         ZPTagEditingViewController* tagController = [ZPTagEditingViewController instance];
         tagController.targetViewController = self;
-        tagController.item = attachment;
+        tagController.itemKey = attachment.itemKey;
         [self presentModalViewController:tagController animated:YES];
 
     }
@@ -978,7 +978,7 @@ static ZPFileViewerViewController* _instance;
             noteController.isNewNote = FALSE;
         }
         else{
-            ZPZoteroNote* note = [ZPZoteroNote noteWithKey:[NSString stringWithFormat:[ZPUtils randomString]]];
+            ZPZoteroNote* note = [ZPZoteroNote noteWithKey:[ZPUtils randomString]];
             note.parentKey = parent.itemKey;
             noteController.note = note;
             noteController.isNewNote = TRUE;
@@ -1003,7 +1003,7 @@ static ZPFileViewerViewController* _instance;
 
 #pragma mark - ZPNoteDisplay and ZPTagDisplay
 
--(void) refreshNotesFor:(ZPZoteroDataObject *)item{
+-(void) refreshNotesAfterEditingNote:(ZPZoteroDataObject *)item{
     
     ZPZoteroAttachment* attachment = (ZPZoteroAttachment*) [_attachments objectAtIndex:_activeAttachmentIndex];
     BOOL isStandaloneAttachment = [attachment.parentKey isEqualToString:attachment.key];
@@ -1020,8 +1020,8 @@ static ZPFileViewerViewController* _instance;
     [self.notesAndTagsTable reloadSections:[NSIndexSet indexSetWithIndex:section] withRowAnimation:UITableViewRowAnimationAutomatic];
 }
 
--(void) refreshTagsFor:(ZPZoteroDataObject *)item{
-    
+-(void) refreshTagsFor:(NSString *)itemKey{
+
     ZPZoteroAttachment* attachment = (ZPZoteroAttachment*) [_attachments objectAtIndex:_activeAttachmentIndex];
     BOOL isStandaloneAttachment = [attachment.parentKey isEqualToString:attachment.key];
     
@@ -1031,7 +1031,7 @@ static ZPFileViewerViewController* _instance;
         section = 0;
     }
     else{
-        if(item == attachment){
+        if(itemKey == attachment.key){
             section = 1;
             _tagButtonsForAttachment = NULL;
         }

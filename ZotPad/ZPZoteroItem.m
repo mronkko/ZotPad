@@ -37,13 +37,6 @@ static CSLFormatter* _cslFormatter = NULL;
 
 }
 
-+(BOOL) existsInCache:(NSString*) key{
-    ZPZoteroItem* obj= [_objectCache objectForKey:key];
-    
-    return ! (obj == nil);
-        
-}
-
 -(id) init{
     self = [super init];
     _isStandaloneAttachment = FALSE;

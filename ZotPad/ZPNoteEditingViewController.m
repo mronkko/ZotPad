@@ -130,7 +130,7 @@ static ZPNoteEditingViewController* _instance;
     }
     
     [ZPItemDataUploadManager uploadMetadata];
-    [_targetViewController refreshNotesFor:self.note];
+    [_targetViewController refreshNotesAfterEditingNote:self.note];
 
 }
 
@@ -148,7 +148,7 @@ static ZPNoteEditingViewController* _instance;
     [ZPDatabase deleteNoteLocally:(ZPZoteroNote*)note];
     [ZPItemDataUploadManager uploadMetadata];
 
-    [_targetViewController refreshNotesFor:self.note];
+    [_targetViewController refreshNotesAfterEditingNote:self.note];
 
 }
 

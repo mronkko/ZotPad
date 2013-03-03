@@ -205,6 +205,8 @@ static NSInteger _maxCacheSize;
     return (_mode != 0);
 }
 
+//This should not be called directly, but only through the reachability class
+
 +(BOOL) online{
     return (_mode != 2);
 }

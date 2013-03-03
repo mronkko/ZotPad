@@ -45,7 +45,7 @@
 
 @implementation ZPAttachmentFileInteractionController
 
-@synthesize item;
+@synthesize itemKey;
 @synthesize actionSheet = _actionSheet;
 
 -(void) setAttachment:(ZPZoteroAttachment*)attachment{
@@ -101,10 +101,12 @@
         
         [_actionSheet addButtonWithTitle:@"Zotero Online Library"];
         
+        ZPZoteroItem* item =[ZPZoteroItem itemWithKey:itemKey];
+
         //These are not valid for webpages, attachments or notes
-        if(! [self.item.itemType isEqualToString:@"note"] &&
-           ! [self.item.itemType isEqualToString:@"attachment"] &&
-           ! [self.item.itemType isEqualToString:@"webpage"]){
+        if(! [item.itemType isEqualToString:@"note"] &&
+           ! [item.itemType isEqualToString:@"attachment"] &&
+           ! [item.itemType isEqualToString:@"webpage"]){
             [_actionSheet addButtonWithTitle:@"CrossRef Lookup"];
             [_actionSheet addButtonWithTitle:@"Google Scholar Search"];
             [_actionSheet addButtonWithTitle:@"Pubget Lookup"];
@@ -168,7 +170,7 @@
                 [_actionSheet addButtonWithTitle:@"Print"];
         
         // Options for the item
-        if(self.item != nil){
+        if(self.itemKey != nil){
             [_actionSheet addButtonWithTitle:@"Lookup"];
         }
         // Options for the attachment file
@@ -255,18 +257,20 @@
         
         if(UI_USER_INTERFACE_IDIOM() == UIUserInterfaceIdiomPad) buttonIndex++;
 
+        ZPZoteroItem* item =[ZPZoteroItem itemWithKey:itemKey];
+        
         if(buttonIndex==1){
             //Zotero online library
            [[UIApplication sharedApplication] openURL:[NSURL URLWithString:
                                                        [NSString stringWithFormat:@"https://www.zotero.org/%@/items/itemKey/%@",
-                                                                                   (self.item.libraryID == LIBRARY_ID_MY_LIBRARY?
+                                                                                   (item.libraryID == LIBRARY_ID_MY_LIBRARY?
                                                                                     [ZPPreferences username]:
-                                                                                    [NSString stringWithFormat:@"groups/%i",self.item.libraryID]),
+                                                                                    [NSString stringWithFormat:@"groups/%i",item.libraryID]),
                                                                                    item.key]]];
         }
         else if(buttonIndex==2){
             //CrossRef Lookup
-            NSString* urlString = [NSString stringWithFormat:@"http://crossref.org/openurl?%@&pid=zter:zter321",[[[ZPOpenURL alloc] initWithZoteroItem:self.item] URLString]];
+            NSString* urlString = [NSString stringWithFormat:@"http://crossref.org/openurl?%@&pid=zter:zter321",[[[ZPOpenURL alloc] initWithZoteroItem:item] URLString]];
             [[UIApplication sharedApplication] openURL:[NSURL URLWithString: urlString]];
         }
         else if(buttonIndex==3){
@@ -287,7 +291,7 @@
         }
         else if(buttonIndex==4){
             //Pubget lookup
-            ZPOpenURL* openURL = [[ZPOpenURL alloc] initWithZoteroItem:self.item];
+            ZPOpenURL* openURL = [[ZPOpenURL alloc] initWithZoteroItem:item];
             NSDictionary* fields = openURL.fields;
 
             NSString* jtitle = [[fields objectForKey:@"jtitle"] encodedURLString];
@@ -320,7 +324,7 @@
         
         else if(buttonIndex == 5){
             //Library lookup
-            NSString* urlString = [NSString stringWithFormat:@"http://worldcatlibraries.org/registry/gateway?%@",[[[ZPOpenURL alloc] initWithZoteroItem:self.item] URLString]];
+            NSString* urlString = [NSString stringWithFormat:@"http://worldcatlibraries.org/registry/gateway?%@",[[[ZPOpenURL alloc] initWithZoteroItem:item] URLString]];
             [[UIApplication sharedApplication] openURL:[NSURL URLWithString: urlString]];
         }
         _actionSheet = NULL;

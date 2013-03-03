@@ -41,7 +41,6 @@
 
 - (IBAction) dismiss:(id)sender;
 - (IBAction) actionButtonPressed:(id)sender;
-- (IBAction) toggleStar:(id)sender;
 - (IBAction) next:(id)sender;
 - (IBAction) previous:(id)sender;
 - (IBAction) presentAllFiles:(id)sender;

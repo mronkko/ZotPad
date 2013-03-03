@@ -150,8 +150,9 @@ const NSInteger ZPServerConnectionRequestLastModifiedItem = 11;
 
 #pragma mark - Read API calls
 
-+(void) retrieveSingleItem:(ZPZoteroAttachment*)item completion:(void(^)(NSArray*))completionBlock{
++(void) retrieveSingleItemWithKey:(NSString *)itemKey completion:(void (^)(NSArray *))completionBlock{
     
+    ZPZoteroItem* item = [ZPZoteroItem itemWithKey:itemKey];
     NSMutableDictionary* parameters = [NSMutableDictionary dictionaryWithObject:[NSNumber numberWithInt:item.libraryID] forKey:ZPKEY_LIBRARY_ID];
 
     [parameters setObject:item.key forKey:ZPKEY_ITEM_KEY];
@@ -161,10 +162,12 @@ const NSInteger ZPServerConnectionRequestLastModifiedItem = 11;
     
 }
 
-+(void) retrieveSingleItemAndChildrenFromServer:(ZPZoteroItem*)item{
++(void) retrieveSingleItemAndChildrenWithKey:(NSString *)itemKey{
 
+    ZPZoteroItem* item = [ZPZoteroItem itemWithKey:itemKey];
+    
     NSMutableDictionary* parameters = [NSMutableDictionary dictionaryWithObject:[NSNumber numberWithInt:item.libraryID] forKey:ZPKEY_LIBRARY_ID];
-    [parameters setObject:item.key forKey:ZPKEY_ITEM_KEY];
+    [parameters setObject:itemKey forKey:ZPKEY_ITEM_KEY];
 
     if([ZPPreferences debugCitationParser]){
         [parameters setObject:@"json,bib" forKey:@"content"];
@@ -181,49 +184,6 @@ const NSInteger ZPServerConnectionRequestLastModifiedItem = 11;
     if(! [item.itemType isEqualToString:@"attachment"] && ! [item.itemType isEqualToString:@"note"]){
         [self _makeServerRequest:ZPServerConnectionRequestSingleItemChildren withParameters:parameters userInfo:NULL];
     }
-
-    /*
-    NSArray* parsedArray = [parserDelegate parsedElements];
-    
-    if(parserDelegate == NULL || [parsedArray count] == 0 ) return NULL;
-    
-    item = [parsedArray objectAtIndex:0];   
-
-    //Request attachments for the single item
-
-    if(item.numChildren >0){
-        [parameters setObject:@"json" forKey:@"content"];
-        parserDelegate =  [self makeServerRequest:ZPServerConnectionRequestSingleItemChildren withParameters:parameters];
-        
-        NSMutableArray* attachments = NULL;
-        NSMutableArray* notes = NULL;
-        
-        for(NSObject* child in [parserDelegate parsedElements] ){
-            if([child isKindOfClass:[ZPZoteroAttachment class]]){
-                if(attachments == NULL) attachments = [NSMutableArray array];
-               [attachments addObject:child];
-            }
-            else if([child isKindOfClass:[ZPZoteroNote class]]){
-                if(notes == NULL) notes = [NSMutableArray array];
-                [notes addObject:child];
-            }
-        }
-        
-         
-        if(notes != NULL) item.notes = notes;
-        else item.notes = [NSArray array];
-        
-        if(attachments != NULL){
-            [attachments sortUsingDescriptors:[NSArray arrayWithObject:[[NSSortDescriptor alloc] initWithKey:@"title" ascending:TRUE]]];
-            if(![attachments isEqual:item.attachments]){
-                item.attachments = attachments;   
-            }
-        }
-        else item.attachments = [NSArray array];
-    
-    }
-    return item;
-     */
 }
 
 +(void) retrieveLibrariesFromServer{
@@ -548,7 +508,7 @@ const NSInteger ZPServerConnectionRequestLastModifiedItem = 11;
                 [json appendFormat:@"{\"creatorType\": \"%@\"",[creator objectForKey:@"creatorType"]];
                 
                 NSString* name = [creator objectForKey:@"name"];
-                if(name != nil && name != [NSNull null]){
+                if(name != nil && (NSObject*) name != [NSNull null]){
                     [json appendFormat:@", \"name\": \"%@\"",name];
                 }
                 else{
@@ -729,7 +689,7 @@ const NSInteger ZPServerConnectionRequestLastModifiedItem = 11;
     }
     else{
         if([ZPReachability hasInternetConnection]){
-            NSData* responseData = NULL;
+
             NSString* urlString;
             
             NSString* oauthkey =  [ZPPreferences OAuthKey];
@@ -842,7 +802,7 @@ const NSInteger ZPServerConnectionRequestLastModifiedItem = 11;
                         NSString* description = [NSString stringWithFormat:@"Parsing response resulted in an exception. Type: %i \n%@\n\n%@\n%@\n%@\n\nResponse from server was:\n%@",
                                                  type, newUserInfo, exception.name, exception.reason, exception.callStackSymbols,
                                                  [[NSString alloc] initWithData:responseData encoding:NSUTF8StringEncoding]];
-                        DDLogError(description);
+                        DDLogError(@"%@",description);
 #ifdef ZPDEBUG
 //                        [NSException raise:exception.name format:@"%@",description];
 #endif
@@ -923,7 +883,7 @@ const NSInteger ZPServerConnectionRequestLastModifiedItem = 11;
                                                             object:weakRequest
                                                           userInfo:weakRequest.userInfo];
         
-        if([ZPPreferences online]){
+        if([ZPReachability hasInternetConnection]){
             if(!weakRequest.isCancelled){
                 DDLogError(@"Connection to Zotero server (%@) failed %@",weakRequest.url,weakRequest.error.localizedDescription);
                 
@@ -1204,7 +1164,7 @@ NSInteger sortAttachments(ZPZoteroAttachment* attachment1, ZPZoteroAttachment* a
 
 +(NSString*) _JSONEscapeString:(NSString*) string{
     
-    if(string == NULL || string == [NSNull null]) return @"";
+    if(string == NULL || (NSObject*) string == [NSNull null]) return @"";
     else return [[[string stringByReplacingOccurrencesOfString:@"\\" withString:@"\\\\"] stringByReplacingOccurrencesOfString:@"\"" withString:@"\\\""] stringByReplacingOccurrencesOfString:@"\n" withString:@"\\n"];
 }
 

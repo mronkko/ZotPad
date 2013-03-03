@@ -27,7 +27,7 @@ extern NSInteger const ZPATTACHMENTICONGVIEWCONTROLLER_TAG_PROGRESSVIEW;
 extern NSInteger const ZPATTACHMENTICONGVIEWCONTROLLER_TAG_TITLELABEL;
 
 @interface ZPAttachmentCarouselDelegate : NSObject <iCarouselDelegate, iCarouselDataSource>{
-    ZPZoteroItem* _item;
+    NSString* _itemKey;
     NSArray* _attachments;
     NSInteger _selectedIndex;
     ZPZoteroAttachment* _latestManuallyTriggeredAttachment;
@@ -41,7 +41,7 @@ extern NSInteger const ZPATTACHMENTICONGVIEWCONTROLLER_TAG_TITLELABEL;
 @property (weak) UIViewController* owner;
 
 -(void) configureWithAttachmentArray:(NSArray*) attachments;
--(void) configureWithZoteroItem:(ZPZoteroItem*) item;
+-(void) configureWithItemKey:(NSString*) itemKey;
 -(void) unregisterProgressViewsBeforeUnloading;
 
 @end

@@ -85,12 +85,13 @@ NSInteger const ZPATTACHMENTICONGVIEWCONTROLLER_TAG_TITLELABEL = -5;
 
 
 -(void) configureWithAttachmentArray:(NSArray*) attachments{
-    _item = NULL;
+    _itemKey = NULL;
     _attachments = attachments;
     _latestManuallyTriggeredAttachment = NULL;
 }
--(void) configureWithZoteroItem:(ZPZoteroItem*) item{
-    _item = item;
+-(void) configureWithItemKey:(NSString*) itemKey{
+    _itemKey = itemKey;
+    ZPZoteroItem* item = [ZPZoteroItem itemWithKey:itemKey];
     _attachments = item.attachments;
     _latestManuallyTriggeredAttachment = NULL;
 }
@@ -317,7 +318,7 @@ NSInteger const ZPATTACHMENTICONGVIEWCONTROLLER_TAG_TITLELABEL = -5;
                 (linkMode == LINK_MODE_LINKED_FILE && [ZPPreferences downloadLinkedFilesWithDropbox]))
                && ! exists ){
                                 
-                if([ZPPreferences online]){
+                if([ZPReachability hasInternetConnection]){
                     
                     //TODO: Check if already downloading.
                     
@@ -342,7 +343,7 @@ NSInteger const ZPATTACHMENTICONGVIEWCONTROLLER_TAG_TITLELABEL = -5;
             // Linked URL will be shown directly from web 
             
             else if (attachment.linkMode == LINK_MODE_LINKED_URL &&
-                     !  [ZPPreferences online]){
+                     !  [ZPReachability hasInternetConnection]){
                 label.text = @"Linked URL cannot be viewed in offline mode";
                 
             }
@@ -444,8 +445,8 @@ NSInteger const ZPATTACHMENTICONGVIEWCONTROLLER_TAG_TITLELABEL = -5;
     NSArray* items = notification.object;
     
     for(ZPZoteroItem* item in items){
-        if([item.key isEqualToString:_item.key]){
-            _item = item;
+        if([item.key isEqualToString:_itemKey]){
+            _itemKey = item.key;
             _attachments = item.attachments;
             
             if([self.attachmentCarousel numberOfItems]!= _attachments.count){

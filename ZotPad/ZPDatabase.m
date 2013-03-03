@@ -1244,29 +1244,29 @@ static NSObject* writeLock;
 //Local modifications
 
 
-+(void) addItemLocally:(ZPZoteroItem*)item toCollection:(NSString*)collectionKey{
++(void) addItemWithKeyLocally:(NSString*)itemKey toCollection:(NSString*)collectionKey{
     FMDatabase* dbObject = [self _dbObject];
     @synchronized(dbObject){
         //Has the item been deleted from this collection earlier?
-        FMResultSet* resultSet = [dbObject executeQuery:@"SELECT itemKey FROM collectionItems WHERE collectionKey = ? AND itemKey = ? AND locallyDeleted = 1",collectionKey, item.itemKey];
+        FMResultSet* resultSet = [dbObject executeQuery:@"SELECT itemKey FROM collectionItems WHERE collectionKey = ? AND itemKey = ? AND locallyDeleted = 1",collectionKey, itemKey];
         
         BOOL deletedEarlier = [resultSet next];
         [resultSet close];
 
         if(! deletedEarlier){
-            [dbObject executeUpdate:@"INSERT INTO collectionItems (collectionKey, itemKey, locallyAdded) VALUES (?, ?, 1)",collectionKey, item.itemKey];
+            [dbObject executeUpdate:@"INSERT INTO collectionItems (collectionKey, itemKey, locallyAdded) VALUES (?, ?, 1)",collectionKey, itemKey];
         }
         else{
             //The item was previously deleted locally
-            [dbObject executeUpdate:@"UPDATE collectionItems SET locallyDeleted = 0, locallyAdded = 1 WHERE collectionKey = ? AND itemKey = ?",collectionKey, item.itemKey];
+            [dbObject executeUpdate:@"UPDATE collectionItems SET locallyDeleted = 0, locallyAdded = 1 WHERE collectionKey = ? AND itemKey = ?",collectionKey, itemKey];
         }
     }
 }
 
-+(void) removeItemLocally:(ZPZoteroItem*)item fromCollection:(NSString*)collectionKey{
++(void) removeItemWithKeyLocally:(NSString*)itemKey fromCollection:(NSString*)collectionKey{
     FMDatabase* dbObject = [self _dbObject];
     @synchronized(dbObject){
-        [dbObject executeUpdate:@"UPDATE collectionItems SET locallyDeleted = 1 WHERE collectionKey = ? AND itemKey = ?",collectionKey, item.itemKey];
+        [dbObject executeUpdate:@"UPDATE collectionItems SET locallyDeleted = 1 WHERE collectionKey = ? AND itemKey = ?",collectionKey, itemKey];
         
     }
 }

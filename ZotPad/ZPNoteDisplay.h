@@ -11,6 +11,6 @@
 
 @protocol ZPNoteDisplay <NSObject>
 
--(void) refreshNotesFor:(ZPZoteroDataObject*) item;
+-(void) refreshNotesAfterEditingNote:(ZPZoteroDataObject*) item;
 
 @end

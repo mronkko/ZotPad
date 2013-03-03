@@ -55,7 +55,7 @@
 @implementation ZPItemDetailViewController
 
 
-@synthesize selectedItem = _currentItem;
+@synthesize itemKey;
 @synthesize actionButton, starButton;
 
 #pragma mark - View lifecycle
@@ -73,9 +73,10 @@
         _carouselDelegate.owner = self;
         
     }
-    else if(self.selectedItem != NULL){
-        [_carouselDelegate configureWithZoteroItem:_currentItem];
-        self.navigationItem.title=_currentItem.shortCitation;
+    else if(self.itemKey != NULL){
+        [_carouselDelegate configureWithItemKey:self.itemKey];
+        ZPZoteroItem* item =[ZPZoteroItem itemWithKey:self.itemKey];
+        self.navigationItem.title=item.shortCitation;
     }
     //configure carousel
     _carousel = [[iCarousel alloc] initWithFrame:CGRectMake(0,0,
@@ -182,26 +183,29 @@
     if([ZPReachability hasInternetConnection]){
         //Animate until we get fresh data
         [_activityIndicator startAnimating];
-        [ZPServerConnection retrieveSingleItemAndChildrenFromServer:_currentItem];
+        [ZPServerConnection retrieveSingleItemAndChildrenWithKey:self.itemKey];
     }
-    [[NSNotificationCenter defaultCenter] postNotificationName:ZPNOTIFICATION_ACTIVE_ITEM_CHANGED object:_currentItem];
+    [[NSNotificationCenter defaultCenter] postNotificationName:ZPNOTIFICATION_ACTIVE_ITEM_CHANGED object:self.itemKey];
     
     [self _reconfigureDetailTableView:FALSE];
     [self _reconfigureAttachmentCarousel:FALSE];
     
-    [self.starButton configureWithItem:_currentItem];
-    self.navigationItem.title=_currentItem.shortCitation;
+    [self.starButton configureWithItemKey:self.itemKey];
+    self.navigationItem.title=[ZPZoteroItem itemWithKey:self.itemKey].shortCitation;
     
 }
 
 - (void) _reconfigureAttachmentCarousel:(BOOL)animated{
     
     if(animated) [UIView beginAnimations:nil context:NULL];
-    if([_currentItem.attachments count] == 0){
+    
+    ZPZoteroItem* item = [ZPZoteroItem itemWithKey:self.itemKey];
+    
+    if([item.attachments count] == 0){
         self.tableView.tableHeaderView = nil;
     }
     else{
-        [_carouselDelegate configureWithZoteroItem:_currentItem];
+        [_carouselDelegate configureWithItemKey:self.itemKey];
         [_carousel reloadData];
         self.tableView.tableHeaderView = _carousel;
     }
@@ -224,19 +228,21 @@
     
     if(_attachmentInteractionController == NULL)  _attachmentInteractionController = [[ZPAttachmentFileInteractionController alloc] init];
     
-    [_attachmentInteractionController setItem:_currentItem];
+    [_attachmentInteractionController setItemKey:self.itemKey];
     
+    ZPZoteroItem* item =[ZPZoteroItem itemWithKey:self.itemKey];
+
     // If there are no attachments show the lookup menu
     
-    if([_currentItem.attachments count] == 0){
+    if([item.attachments count] == 0){
         [_attachmentInteractionController setAttachment:nil];
         [_attachmentInteractionController presentLookupMenuFromBarButtonItem:sender];
     }
     
     // This is needed to protect agains a crash where the _carousel currentItemIndex is MAXINT and there are no attachments.
     
-    else if(_carousel.currentItemIndex < [_currentItem.attachments count]){
-        ZPZoteroAttachment* currentAttachment = [_currentItem.attachments objectAtIndex:[_carousel currentItemIndex]];
+    else if(_carousel.currentItemIndex < [item.attachments count]){
+        ZPZoteroAttachment* currentAttachment = [item.attachments objectAtIndex:[_carousel currentItemIndex]];
         if([currentAttachment fileExists]){
             [_attachmentInteractionController setAttachment:currentAttachment];
             [_attachmentInteractionController presentOptionsMenuFromBarButtonItem:sender];
@@ -250,7 +256,7 @@
     // And this else for diagnosing the crash. Once the root cause is identified, these can be removed
     else{
         DDLogError(@"Attempting to open action menu for attachment in index %i for an item with %i attachments. The item key is %@ and full citation is %@",
-                   _carousel.currentItemIndex,_currentItem.attachments.count,_currentItem.key,_currentItem.fullCitation);
+                   _carousel.currentItemIndex,item.attachments.count,item.key,item.fullCitation);
     }
 }
 
@@ -288,14 +294,18 @@
 }
 
 - (NSInteger)tableView:(UITableView *)aTableView numberOfRowsInSection:(NSInteger)section {
+    
+    ZPZoteroItem* item =[ZPZoteroItem itemWithKey:self.itemKey];
+
     //Tags
     if(section==0){
         return 1;
     }
     //Notes
     if(section==1){
-        if([_currentItem.itemType isEqualToString:@"note"] || [_currentItem.itemType isEqualToString:@"attachment"]) return 1;
-        else return [_currentItem.notes count]+1;
+        
+        if([item.itemType isEqualToString:@"note"] || [item.itemType isEqualToString:@"attachment"]) return 1;
+        else return [item.notes count]+1;
     }
     
     //Item type and title
@@ -304,8 +314,8 @@
     }
     //Creators
     if(section==3){
-        if(_currentItem.creators!=NULL || [_currentItem.itemType isEqualToString:ZPKEY_ATTACHMENT]|| [_currentItem.itemType isEqualToString:@"note"]){
-            return [_currentItem.creators count];
+        if(item.creators!=NULL || [item.itemType isEqualToString:ZPKEY_ATTACHMENT]|| [item.itemType isEqualToString:@"note"]){
+            return [item.creators count];
         }
         else{
             return 0;
@@ -313,9 +323,9 @@
     }
     //Rest of the fields
     if(section==4){
-        if(_currentItem.fields!=NULL || [_currentItem.itemType isEqualToString:ZPKEY_ATTACHMENT]|| [_currentItem.itemType isEqualToString:@"note"]){
+        if(item.fields!=NULL || [item.itemType isEqualToString:ZPKEY_ATTACHMENT]|| [item.itemType isEqualToString:@"note"]){
             //Two fields, itemType and title, are shown separately
-            return [_currentItem.fields count]-2;
+            return [item.fields count]-2;
         }
         else{
             return 0;
@@ -409,7 +419,9 @@
 - (BOOL) _useAbstractCell:(NSIndexPath*)indexPath{
     if([indexPath indexAtPosition:0] != 4) return FALSE;
     
-    NSEnumerator* e = [_currentItem.fields keyEnumerator];
+    ZPZoteroItem* item = [ZPZoteroItem itemWithKey:self.itemKey];
+    
+    NSEnumerator* e = [item.fields keyEnumerator];
     
     NSInteger index = -1;
     NSString* key;
@@ -432,23 +444,24 @@
     
     NSString* returnString = NULL;
     
-    
+    ZPZoteroItem* item = [ZPZoteroItem itemWithKey:self.itemKey];
+
     //Title and itemtype
     
     if([indexPath indexAtPosition:0] == 2){
         if(indexPath.row == 0){
             if(isTitle) returnString =  @"Title";
-            else returnString =  _currentItem.title;
+            else returnString =  item.title;
         }
         if(indexPath.row == 1){
             if(isTitle) returnString =  @"Item type";
-            else returnString =  [ZPLocalization getLocalizationStringWithKey:_currentItem.itemType  type:@"itemType" ];
+            else returnString =  [ZPLocalization getLocalizationStringWithKey:item.itemType  type:@"itemType" ];
         }
         
     }
     //Creators
     else if([indexPath indexAtPosition:0] == 3){
-        NSDictionary* creator=[_currentItem.creators objectAtIndex:indexPath.row];
+        NSDictionary* creator=[item.creators objectAtIndex:indexPath.row];
         if(isTitle) returnString =  [ZPLocalization getLocalizationStringWithKey:[creator objectForKey:@"creatorType"] type:@"creatorType" ];
         else{
             NSObject* lastName = [creator objectForKey:@"lastName"];
@@ -463,7 +476,7 @@
     }
     //Rest of the fields
     else{
-        NSEnumerator* e = [_currentItem.fields keyEnumerator];
+        NSEnumerator* e = [item.fields keyEnumerator];
         
         NSInteger index = -1;
         NSString* key;
@@ -478,12 +491,12 @@
         }
         
         if(isTitle) returnString =  [ZPLocalization getLocalizationStringWithKey:key  type:@"field" ];
-        else returnString =  [_currentItem.fields objectForKey:key];
+        else returnString =  [item.fields objectForKey:key];
     }
     
     //Validity checks
     if(returnString == NULL){
-        DDLogError(@"Item %@ had an empty string (%@) as field %@ in section %i, row %i of the item details table.",_currentItem.key,
+        DDLogError(@"Item %@ had an empty string (%@) as field %@ in section %i, row %i of the item details table.",item.key,
                    returnString==NULL ? @"nil" : @"NSNull",
                    isTitle ? @"title" : @"value",
                    indexPath.section,indexPath.row);
@@ -501,9 +514,11 @@
     UITableViewCell *cell;
     NSString* CellIdentifier;
     
+    ZPZoteroItem* item = [ZPZoteroItem itemWithKey:self.itemKey];
+
     //Tags
     if(indexPath.section == 0){
-        if([_currentItem.tags count]==0){
+        if([item.tags count]==0){
             CellIdentifier = @"NoTagsCell";
             cell = [tableView dequeueReusableCellWithIdentifier:CellIdentifier];
             if (cell == nil)
@@ -532,7 +547,7 @@
                 }
             }
             else{
-                [ZPTagController addTagButtonsToView:cell.contentView tags:_currentItem.tags];
+                [ZPTagController addTagButtonsToView:cell.contentView tags:item.tags];
             }
             
             _tagButtons = cell.contentView.subviews;
@@ -540,7 +555,7 @@
     }
     //Notes
     else if([indexPath indexAtPosition:0] == 1){
-        if([indexPath indexAtPosition:1]>=[_currentItem.notes count]){
+        if([indexPath indexAtPosition:1]>=[item.notes count]){
             CellIdentifier = @"NewNoteCell";
             cell = [tableView dequeueReusableCellWithIdentifier:CellIdentifier];
             if (cell == nil)
@@ -556,7 +571,10 @@
                 cell = [[UITableViewCell alloc] initWithStyle:UITableViewCellStyleDefault reuseIdentifier:CellIdentifier];
             }
             UILabel* noteText = (UILabel*)[cell viewWithTag:1];
-            noteText.text = [[[(ZPZoteroNote*) [_currentItem.notes objectAtIndex:[indexPath indexAtPosition:1]] note] stripHtml] stringByReplacingOccurrencesOfString:@"\n" withString:@" "];
+
+            ZPZoteroItem* item = [ZPZoteroItem itemWithKey:self.itemKey];
+
+            noteText.text = [[[(ZPZoteroNote*) [item.notes objectAtIndex:[indexPath indexAtPosition:1]] note] stripHtml] stringByReplacingOccurrencesOfString:@"\n" withString:@" "];
         }
     }
     //Item metadata
@@ -658,10 +676,13 @@
 - (void)tableView:(UITableView *)tableView willDisplayCell:(UITableViewCell *)cell forRowAtIndexPath:(NSIndexPath *)indexPath{
     
     
-    //TODO: refactor so that we handle the tags cell size with _rowHeights as well
+    //TODO: refactor this method away
     
     //If we have a cell that should show tags, but does not, reload
-    if(indexPath.section==0 && [_currentItem.tags count] > 0 && [cell.contentView.subviews count] == 0){
+    
+    ZPZoteroItem* item = [ZPZoteroItem itemWithKey:self.itemKey];
+
+    if(indexPath.section==0 && [item.tags count] > 0 && [cell.contentView.subviews count] == 0){
         [tableView reloadData];
     }
 }
@@ -676,7 +697,7 @@
             if(_tagEditingViewController == NULL){
                 _tagEditingViewController = [self.storyboard instantiateViewControllerWithIdentifier:@"TagEditingViewController"];
             }
-            _tagEditingViewController.item = _currentItem;
+            _tagEditingViewController.itemKey = self.itemKey;
             _tagEditingViewController.targetViewController = self;
             
             [self presentModalViewController:_tagEditingViewController animated:YES];
@@ -685,13 +706,16 @@
         else if([indexPath indexAtPosition:0]==1){
             ZPZoteroNote* note;
             BOOL newNote;
-            if([indexPath indexAtPosition:1]>=[_currentItem.notes count]){
+            
+            ZPZoteroItem* item = [ZPZoteroItem itemWithKey:self.itemKey];
+
+            if([indexPath indexAtPosition:1]>=[item.notes count]){
                 note = [ZPZoteroNote noteWithKey:[NSString stringWithFormat:[ZPUtils randomString]]];
-                note.parentKey = _currentItem.key;
+                note.parentKey = item.key;
                 newNote = TRUE;
             }
             else{
-                note = [_currentItem.notes objectAtIndex:[indexPath indexAtPosition:1]];
+                note = [item.notes objectAtIndex:[indexPath indexAtPosition:1]];
                 newNote = FALSE;
             }
             
@@ -716,7 +740,7 @@
             NSString* currentItemKey = [itemArray objectAtIndex: indexPath.row];
             
             if((NSObject*)currentItemKey != [NSNull null]){
-                _currentItem = (ZPZoteroItem*) [ZPZoteroItem itemWithKey:currentItemKey];
+                self.itemKey = currentItemKey;
                 [self configure];
             }
             
@@ -726,11 +750,11 @@
 
 #pragma mark - ZPNoteDisplay and ZPTagDisplay
 
--(void) refreshNotesFor:(ZPZoteroDataObject *)item{
+-(void) refreshNotesAfterEditingNote:(ZPZoteroDataObject *)item{
     [self.tableView reloadSections:[NSIndexSet indexSetWithIndex:1] withRowAnimation:UITableViewRowAnimationAutomatic];
 }
 
--(void) refreshTagsFor:(ZPZoteroDataObject *)item{
+-(void) refreshTagsFor:(NSString *)itemKey{
     _tagButtons = NULL;
     [self.tableView reloadSections:[NSIndexSet indexSetWithIndex:0] withRowAnimation:UITableViewRowAnimationAutomatic];
 }
@@ -751,15 +775,15 @@
     
     else{
         for(ZPZoteroItem* item in items){
-            if([item.key isEqualToString:_currentItem.key]){
-                _currentItem = item;
+            if([item.key isEqualToString:item.key]){
+                self.itemKey = item;
                 [self performSelectorOnMainThread:@selector(_reconfigureDetailTableView:) withObject:[NSNumber numberWithBool:TRUE] waitUntilDone:NO];
                 
                 //If we had the activity indicator animating, stop it now because we are no longer waiting for data
                 [_activityIndicator performSelectorOnMainThread:@selector(stopAnimating) withObject:nil waitUntilDone:NO];
                 
             }
-            else if(self.tableView.tableHeaderView == nil && [_currentItem.key isEqual:item.parentKey]){
+            else if(self.tableView.tableHeaderView == nil && [item.key isEqual:item.parentKey]){
                 @synchronized(self.tableView){
 
                     // This will guarantee that we update the table only once

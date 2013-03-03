@@ -37,10 +37,13 @@
 
     // Write the favourites collection membership in the DB
     
-    NSString* favouritesCollectionKey = [ZPDatabase collectionKeyForFavoritesCollectionInLibrary:_targetItem.libraryID];
+    ZPZoteroItem* item = [ZPZoteroItem itemWithKey:_itemKey];
+    
+    NSString* favouritesCollectionKey = [ZPDatabase collectionKeyForFavoritesCollectionInLibrary:item.libraryID];
+
     if(favouritesCollectionKey == NULL){
         NSString* favoritesCollectionTitle = [ZPPreferences favoritesCollectionTitle];
-        ZPZoteroLibrary* library = [ZPZoteroLibrary libraryWithID:_targetItem.libraryID];
+        ZPZoteroLibrary* library = [ZPZoteroLibrary libraryWithID:item.libraryID];
         [[[UIAlertView alloc] initWithTitle:@"Favorites collection created"
                                     message:[NSString stringWithFormat:@"Collection '%@' has been created in '%@'",
                                              favoritesCollectionTitle,
@@ -60,13 +63,13 @@
 
 
     if(shouldAddToFavourites){
-        [ZPDatabase addItemLocally:_targetItem toCollection:favouritesCollectionKey];
+        [ZPDatabase addItemWithKeyLocally:_itemKey toCollection:favouritesCollectionKey];
     }
     else{
-        [ZPDatabase removeItemLocally:_targetItem fromCollection:favouritesCollectionKey];
+        [ZPDatabase removeItemWithKeyLocally:_itemKey fromCollection:favouritesCollectionKey];
     }
 
-    [_targetItem setInFavourites:shouldAddToFavourites];
+    [item setInFavourites:shouldAddToFavourites];
     
     // Update the changes to the server
     [ZPItemDataUploadManager uploadMetadata];
@@ -82,11 +85,11 @@
     
 }
 
--(void) configureWithItem:(ZPZoteroItem*)item{
-    _targetItem = item;
+-(void) configureWithItemKey:(NSString*)itemKey{
+    _itemKey = itemKey;
     
     //If the favourites collection is defined, check if this item is included in the favourites
-    [self _setImageWithState:item.isInFavourites];
+    [self _setImageWithState:[ZPZoteroItem itemWithKey:itemKey].isInFavourites];
 }
 
 @end
