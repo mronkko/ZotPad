@@ -90,66 +90,51 @@ didFinishLaunchingWithOptions:(NSDictionary *)launchOptions
     self.fileLogger = [[DDFileLogger alloc] initWithLogFileManager:logFileManager];
     self.fileLogger.rollingFrequency = 60 * 60 *24; // 24 hour rolling
     self.fileLogger.logFileManager.maximumNumberOfLogFiles = 7; // one week of logs
-    
+
+#ifndef DEBUG
+
 #ifdef ZPDEBUG
-
-    //No Critercism or TestFligth when running in debugger.
-    
-    #ifndef DEBUG
-//    if(CRITTERCISM_KEY != nil) [Crittercism enableWithAppID:(NSString*)CRITTERCISM_KEY];
-
     
     if(TESTFLIGHT_KEY != nil){
-        
         //We know that this is deprecated, so suppress warnings
 #pragma clang diagnostic push
 #pragma clang diagnostic ignored "-Wdeprecated-declarations"
         [TestFlight setDeviceIdentifier:[[UIDevice currentDevice] uniqueIdentifier]];
 #pragma clang diagnostic pop
-        
-        
+
         [TestFlight takeOff:(NSString*)TESTFLIGHT_KEY];
     }
-    #endif
+#else
     
-    //Perform a memory warning every 2 seconds
-    //[NSTimer scheduledTimerWithTimeInterval:(NSTimeInterval)2 target:[UIApplication sharedApplication] selector:@selector(_performMemoryWarning) userInfo:NULL repeats:YES];
+    if([ZPPreferences reportErrors] && TESTFLIGHT_KEY != nil){
+        [TestFlight takeOff:(NSString*)TESTFLIGHT_KEY];
+    }
 
-    // Log to console
+#endif
+
+#else
+    
+    // Log to console if running in debugger
     
     [DDTTYLogger sharedInstance].logFormatter = [[ZPFileLogFormatter alloc] initWithLevel:LOG_LEVEL_VERBOSE];
     [DDLog addLogger:[DDTTYLogger sharedInstance]];
 
-    self.fileLogger.logFormatter = [[ZPFileLogFormatter alloc] initWithLevel:LOG_LEVEL_VERBOSE];
-
-    
-#else
-    if([ZPPreferences reportErrors]){
-//        if(CRITTERCISM_KEY != nil){
-//            [Crittercism enableWithAppID:(NSString*) CRITTERCISM_KEY];
-//        }
-        
-        if(TESTFLIGHT_KEY != nil){
-            
-            //We know that this is deprecated, so suppress warnings
-#pragma clang diagnostic push
-#pragma clang diagnostic ignored "-Wdeprecated-declarations"
-//            [TestFlight setDeviceIdentifier:[[UIDevice currentDevice] uniqueIdentifier]];
-#pragma clang diagnostic pop
-            
-            
-            [TestFlight takeOff:(NSString*)TESTFLIGHT_KEY];
-        }
-
-    }
-    self.fileLogger.logFormatter = [[ZPFileLogFormatter alloc] initWithLevel:LOG_LEVEL_INFO];
-
 #endif
+
+    //Set up file logger
+    self.fileLogger.logFormatter = [[ZPFileLogFormatter alloc] initWithLevel:LOG_LEVEL_INFO];
+    
     
     [DDLog addLogger:self.fileLogger];
+
     DDLogInfo(@"ZotPad is starting");
     DDLogVerbose(@"Verbose logging is enabled");
+
     
+    //Perform a memory warning every 2 seconds
+    //[NSTimer scheduledTimerWithTimeInterval:(NSTimeInterval)2 target:[UIApplication sharedApplication] selector:@selector(_performMemoryWarning) userInfo:NULL repeats:YES];
+    
+
     [ZPPreferences checkAndProcessApplicationResetPreferences];
     
     // Initialize the cache managers

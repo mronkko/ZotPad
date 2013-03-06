@@ -113,7 +113,7 @@
                 <key>Type</key>
                 <string>PSToggleSwitchSpecifier</string>
                 <key>Title</key>
-                <string>Add identifiers to server requests</string>
+                <string>Debug Zotero API calls</string>
                 <key>Key</key>
                 <string>debugserverrequests</string>
                 <key>DefaultValue</key>

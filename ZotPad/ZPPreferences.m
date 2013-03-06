@@ -402,7 +402,7 @@ static NSInteger _maxCacheSize;
     return [defaults boolForKey:@"debugfileuploads"];
 }
 
-+(BOOL) addIdentifiersToAPIRequests{
++(BOOL) debugZoteroAPIRequests{
     NSUserDefaults* defaults = [NSUserDefaults standardUserDefaults];
     return [defaults boolForKey:@"debugserverrequests"];
 }

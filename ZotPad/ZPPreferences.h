@@ -76,7 +76,7 @@
 +(BOOL) debugFileUploads;
 +(BOOL) layeredCollectionsNavigation;
 +(BOOL) unifiedCollectionsNavigation;
-+(BOOL) addIdentifiersToAPIRequests;
++(BOOL) debugZoteroAPIRequests;
 
 +(NSString*) favoritesCollectionTitle;
 

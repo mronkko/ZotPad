@@ -331,7 +331,7 @@ static NSString* _documentsDirectory = NULL;
 
 +(NSString*) zoteroBase64Decode:(NSString*)filename{
     NSString* toBeDecoded = [filename substringToIndex:[filename length] - 5];
-    NSData* decodedData = [toBeDecoded base64DecodedData];
+    NSData* decodedData = [toBeDecoded decodeBase64EncodedString];
     NSString* decodedFilename = [[NSString alloc] initWithData:decodedData encoding:NSUTF8StringEncoding];
     return decodedFilename;
 }

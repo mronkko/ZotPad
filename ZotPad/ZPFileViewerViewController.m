@@ -449,7 +449,8 @@ static ZPFileViewerViewController* _instance;
             for (NSString* file in files){
                 // The filenames end with %ZB64, which needs to be removed
                 NSString* toBeDecoded = [file substringToIndex:[file length] - 5];
-                NSString* decodedFilename = [toBeDecoded base64DecodedString];
+                NSString* decodedFilename = [[NSString alloc] initWithData:[toBeDecoded decodeBase64EncodedString]
+                                             encoding:NSUTF8StringEncoding];
                 
                 [[NSFileManager defaultManager] moveItemAtPath:[tempDir stringByAppendingPathComponent:file] toPath:[tempDir stringByAppendingPathComponent:decodedFilename] error:NULL];
                 

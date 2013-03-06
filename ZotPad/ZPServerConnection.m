@@ -98,8 +98,8 @@
 
 +(void) _processParsedResponse:(ZPServerResponseXMLParser*)parserDelegate requestType:(NSInteger) type userInfo:(NSDictionary*) userInfo;
 
-+(NSString*) _tagsJSSONForDataObject:(ZPZoteroDataObject*) dataObject;
-+(NSString*) _JSONEscapeString:(NSString*) string;
++(NSArray*) _tagsJSSONForDataObject:(ZPZoteroDataObject*) dataObject;
++(NSString*) _requestDumpAsString:(ASIHTTPRequest*)request;
 
 @end
 
@@ -447,16 +447,20 @@ const NSInteger ZPServerConnectionRequestLastModifiedItem = 11;
     else if (attachment.linkMode == LINK_MODE_LINKED_URL) linkMode = @"linked_url";
     else if (attachment.linkMode == LINK_MODE_LINKED_FILE) linkMode = @"linked_file";
     
-    NSString* json = [NSString stringWithFormat:@"{\"itemType\":\"attachment\",\"linkMode\":\"%@\",\"title\":\"%@\",\"accessDate\":\"%@\",\"url\":\"%@\",\"note\":\"%@\",\"contentType\":\"%@\",\"charset\":\"%@\",\"filename\":\"%@\",\"md5\":%@,\"mtime\":\%@,\"tags\":%@}", linkMode, [self _JSONEscapeString:attachment.title],
-                      attachment.accessDate == nil ? @"": attachment.accessDate,
-                      attachment.url == nil ? @"": [self _JSONEscapeString:attachment.url],
-                      [self _JSONEscapeString:attachment.note],
-                      attachment.contentType == nil ? @"": attachment.contentType,
-                      attachment.charset == nil ? @"": attachment.charset,
-                      [self _JSONEscapeString:attachment.filename],
-                      attachment.md5 == nil ? @"null": [NSString stringWithFormat:@"\"%@\"",attachment.md5],
-                      attachment.mtime == 0 ? @"null": [NSString stringWithFormat:@"%lli",attachment.mtime],
-                      [self _tagsJSSONForDataObject:attachment]];
+    NSDictionary* dictionary = [NSDictionary dictionaryWithObjectsAndKeys:@"attachment", @"itemType",
+                                linkMode, @"linkMode",
+                                attachment.title, @"title",
+                                attachment.accessDate == nil ? @"": attachment.accessDate,@"accessDate",
+                                attachment.url == nil ? @"": attachment.url, @"url",
+                                attachment.note, @"note",
+                                attachment.contentType == nil ? @"": attachment.contentType, @"contentType",
+                                attachment.charset == nil ? @"": attachment.charset, @"charset",
+                                attachment.filename, @"filename",
+                                attachment.md5 == nil ? [NSNull null]: attachment.md5, @"md5",
+                                attachment.mtime == 0 ? [NSNull null]: [NSNumber numberWithLongLong:attachment.mtime], @"mtime",
+                                [self _tagsJSSONForDataObject:attachment],@"tags", nil];
+
+    NSString* json = [[NSDictionary dictionaryWithObject:[NSArray arrayWithObject:dictionary]forKey:@"items"] JSONRepresentation];
     
     DDLogVerbose(@"Posting attachment JSON to server. Etag: %@ \n%@", attachment.etag, json);
 
@@ -491,34 +495,13 @@ const NSInteger ZPServerConnectionRequestLastModifiedItem = 11;
     [postRequest addRequestHeader:@"Content-Type" value:@"application/json"];
     [postRequest addRequestHeader:@"If-Match" value:item.etag];
     
-    NSMutableString* json = [NSMutableString stringWithFormat:@"{\"itemType\":\"%@\",", item.itemType];
+    NSMutableDictionary* dictionary = [[NSMutableDictionary alloc] init];
+    [dictionary setObject:item.itemType forKey:@"itemType"];
     
     for(NSString* field in [ZPZoteroItemTypes fieldsForItemType:item.itemType]){
         
         if([field isEqualToString:@"creator"]){
-            [json appendString:@"\"creators\":[" ];
-
-            BOOL firstCreator = TRUE;
-            
-            for(NSDictionary* creator in item.creators){
-                
-                if(! firstCreator) [json appendString:@", "];
-                firstCreator = FALSE;
-                
-                [json appendFormat:@"{\"creatorType\": \"%@\"",[creator objectForKey:@"creatorType"]];
-                
-                NSString* name = [creator objectForKey:@"name"];
-                if(name != nil && (NSObject*) name != [NSNull null]){
-                    [json appendFormat:@", \"name\": \"%@\"",name];
-                }
-                else{
-                    [json appendFormat:@", \"lastName\": \"%@\"",[creator objectForKey:@"lastName"]];
-                    [json appendFormat:@", \"firstName\": \"%@\"",[creator objectForKey:@"firstName"]];
-                }
-                [json appendString:@"}"];
-            }
-            [json appendString:@"]"];
-            
+            [dictionary setObject:item.creators forKey:@"creators"];
         }
         else{
             NSString* value;
@@ -527,20 +510,20 @@ const NSInteger ZPServerConnectionRequestLastModifiedItem = 11;
             }
             else{
                 value = [item.fields objectForKey:field];
+                if(value == nil) value = @"";
             }
-            [json appendFormat:@"\"%@\": \"%@\"",field,[self _JSONEscapeString:value]];
+            [dictionary setObject:value forKey:field];
             
             
         }
         
-        [json appendString:@", "];
     }
     
     // Tags
-    [json appendString:@"\"tags\":"];
-    [json appendString:[self _tagsJSSONForDataObject:item]];
+    [dictionary setObject:[self _tagsJSSONForDataObject:item] forKey:@"tags"];
 
-    [json appendString:@"}"];
+    
+    NSString* json = [[NSDictionary dictionaryWithObject:[NSArray arrayWithObject:dictionary]forKey:@"items"] JSONRepresentation];
     
     DDLogVerbose(@"Posting item JSON to server. Etag: %@ \n%@", item.etag, json);
     
@@ -576,7 +559,11 @@ const NSInteger ZPServerConnectionRequestLastModifiedItem = 11;
     [postRequest addRequestHeader:@"Content-Type" value:@"application/json"];
     [postRequest addRequestHeader:@"X-Zotero-Write-Token" value:note.itemKey];
 
-    NSString* json = [NSString stringWithFormat:@"{\"items\" : [{  \"itemType\" : \"note\",  \"note\" : \"%@\",  \"tags\" : []}]}",note.note];
+    NSDictionary* dictionary = [NSDictionary dictionaryWithObjectsAndKeys:@"note",@"itemType",
+                                note.note, @"note",
+                                [NSArray array], @"tags", nil];
+    
+    NSString* json = [[NSDictionary dictionaryWithObject:[NSArray arrayWithObject:dictionary]forKey:@"items"] JSONRepresentation];
     
     [postRequest appendPostData:[json dataUsingEncoding:NSUTF8StringEncoding]];
     
@@ -609,9 +596,12 @@ const NSInteger ZPServerConnectionRequestLastModifiedItem = 11;
     [postRequest addRequestHeader:@"Content-Type" value:@"application/json"];
     [postRequest addRequestHeader:@"If-Match" value:note.etag];
     
-    NSString* json = [NSString stringWithFormat:@"{  \"itemType\" : \"note\",  \"note\" : \"%@\",  \"tags\" : %@, \"creators\" : []}",
-                      note.note,
-                      [self _tagsJSSONForDataObject:note]];
+    NSDictionary* dictionary = [NSDictionary dictionaryWithObjectsAndKeys:@"note",@"itemType",
+                                note.note, @"note",
+                                [NSArray array], @"creators",
+                                [self _tagsJSSONForDataObject:note], @"tags", nil];
+    
+    NSString* json = [[NSDictionary dictionaryWithObject:[NSArray arrayWithObject:dictionary]forKey:@"items"] JSONRepresentation];
     
     [postRequest appendPostData:[json dataUsingEncoding:NSUTF8StringEncoding]];
     
@@ -839,11 +829,7 @@ const NSInteger ZPServerConnectionRequestLastModifiedItem = 11;
             
             dispatch_async(dispatch_get_global_queue(DISPATCH_QUEUE_PRIORITY_BACKGROUND,0),^{completionBlock(data);});
         }
-        else{
-            DDLogError(@"Connection to Zotero server (%@) resulted in error %i. Full response: %@",
-                       weakRequest.url, weakRequest.responseStatusCode,
-                       [[NSString alloc] initWithData:weakRequest.responseData encoding:NSUTF8StringEncoding]);
-            
+        else{            
             if(weakRequest.responseStatusCode == 412 && conflictBlock != NULL){
                 conflictBlock();
             }
@@ -867,6 +853,16 @@ const NSInteger ZPServerConnectionRequestLastModifiedItem = 11;
                     [[[UIAlertView alloc] initWithTitle:@"Authentication error"
                                                 message:@"ZotPad is not authorized to access the library you are attempting to load and is now in offline mode. This can occur if your access key has been revoked or communications to Zotero server is blocked."
                                                delegate:alertViewDelegate cancelButtonTitle:@"Stay offline" otherButtonTitles:@"Check key", @"New key",nil] show];
+                }
+                else{
+                    DDLogError(@"Connection to Zotero server (%@) resulted in error %i. Full response: %@",
+                               weakRequest.url, weakRequest.responseStatusCode,
+                               [[NSString alloc] initWithData:weakRequest.responseData encoding:NSUTF8StringEncoding]);
+                    
+                    if([ZPPreferences debugZoteroAPIRequests]){
+                        DDLogInfo(@"%@",[ZPServerConnection _requestDumpAsString:weakRequest]);
+                    }
+
                 }
             }
             
@@ -1151,21 +1147,43 @@ NSInteger sortAttachments(ZPZoteroAttachment* attachment1, ZPZoteroAttachment* a
     }
 }
 
-+(NSString*) _tagsJSSONForDataObject:(ZPZoteroDataObject*) dataObject{
++(NSArray*) _tagsJSSONForDataObject:(ZPZoteroDataObject*) dataObject{
     
     NSMutableArray* tags= [[NSMutableArray alloc] initWithCapacity:dataObject.tags.count];
     
     for(NSString* tag in dataObject.tags){
-        [tags addObject:[NSString stringWithFormat:@"{ \"tag\" : \"%@\" }",[self _JSONEscapeString:tag]]];
+        [tags addObject:[NSDictionary dictionaryWithObject:tag forKey:@"tag"]];
     }
     
-    return [NSString stringWithFormat:@"[%@]",[tags componentsJoinedByString:@", "]];
+    return tags;
 }
 
-+(NSString*) _JSONEscapeString:(NSString*) string{
++(NSString*) _requestDumpAsString:(ASIHTTPRequest*)request{
     
-    if(string == NULL || (NSObject*) string == [NSNull null]) return @"";
-    else return [[[string stringByReplacingOccurrencesOfString:@"\\" withString:@"\\\\"] stringByReplacingOccurrencesOfString:@"\"" withString:@"\\\""] stringByReplacingOccurrencesOfString:@"\n" withString:@"\\n"];
+    NSMutableString* dump = [[NSMutableString alloc] initWithFormat:@"Request: \n\n%@ %@ HTTP/1.1\n",request.requestMethod,request.url];
+    
+    for(NSString* key in request.requestHeaders){
+        [dump appendFormat:@"%@: %@\n",key,[request.requestHeaders objectForKey:key]];
+    }
+    
+    if(request.postBody && ! [request.requestMethod isEqualToString:@"PUT"]){
+        [dump appendString:@"\n"];
+        
+        [dump appendString:[[NSString alloc] initWithData:request.postBody
+                                                 encoding:NSUTF8StringEncoding]];
+    }
+    
+    [dump appendFormat: @"\n\nResponse: \n\n%@\n",request.responseStatusMessage];
+    
+    for(NSString* key in request.responseHeaders){
+        [dump appendFormat:@"%@: %@\n",key,[request.responseHeaders objectForKey:key]];
+    }
+    
+    if(request.responseString){
+        [dump appendString:@"\n"];
+        [dump appendString:request.responseString];
+    }
+    return dump;
 }
 
 
