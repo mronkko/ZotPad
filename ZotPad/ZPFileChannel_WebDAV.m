@@ -80,7 +80,9 @@ NSInteger const ZPFILECHANNEL_WEBDAV_UPLOAD_REGISTER = 5;
 
 @end
 
-@interface ZPFileChannel_WebDAV()
+@interface ZPFileChannel_WebDAV(){
+    UIAlertView* _alertView;
+}
 
 -(void) _registerWebDAVUploadWithZoteroServer:(ZPZoteroAttachment*)attachment userInfo:(NSDictionary*) userInfo;
 -(void) _performWebDAVUploadForAttachment:(ZPZoteroAttachment*)attachment tag:(NSInteger)tag userInfo:(NSDictionary*) userInfo;
@@ -551,40 +553,44 @@ static NSOperationQueue* _uploadQueue;
     DDLogError(@"Request to %@ failed: %@", request.url, [error description]);
 
     //Connection error
-    if(error.code ==ASIConnectionFailureErrorType){
-        //SSL error (self signed certificate)
-        // errSSLXCertChainInvalid
-        NSError* underlyingError = [error.userInfo objectForKey:NSUnderlyingErrorKey];
-        if(underlyingError.code == -9807){
-            UIAlertView *message = [[UIAlertView alloc] initWithTitle:@"SSL certificate error"
-                                                              message:[NSString stringWithFormat: @"%@ did not provide a valid SSL certificate or the signature verification failed. If you are using a self-signed certificate and understand what you are doing, you can add a security exception and choose to trust the site.",[request.url host]]
-                                                             delegate:self
-                                                    cancelButtonTitle:@"Cancel"
-                                                    otherButtonTitles:@"Disable WebDAV",@"Add security exception",nil];
-            
-            [message show];
+    
+    if(_alertView == nil || ! _alertView.isVisible){
+        if(error.code ==ASIConnectionFailureErrorType){
+            //SSL error (self signed certificate)
+            // errSSLXCertChainInvalid
+            NSError* underlyingError = [error.userInfo objectForKey:NSUnderlyingErrorKey];
+            if(underlyingError.code == -9807){
+                
+                _alertView = [[UIAlertView alloc] initWithTitle:@"SSL certificate error"
+                                                        message:[NSString stringWithFormat: @"%@ did not provide a valid SSL certificate or the signature verification failed. If you are using a self-signed certificate and understand what you are doing, you can add a security exception and choose to trust the site.",[request.url host]]
+                                                       delegate:self
+                                              cancelButtonTitle:@"Cancel"
+                                              otherButtonTitles:@"Disable WebDAV",@"Add security exception",nil];
+                
+                [_alertView show];
+                
+            }
             
         }
-        
-    }
-    //If there was an authentication issue, reauthenticate
-    else if(error.code == ASIAuthenticationErrorType){
-        UIAlertView *message = [[UIAlertView alloc] initWithTitle:@"Authentication failed"
-                                                          message:@"Authenticating with WebDAV server failed."
-                                                         delegate:self
-                                                cancelButtonTitle:@"Cancel"
-                                                otherButtonTitles:@"Disable WebDAV",nil];
-        
-        [message show];
-    }
-    else if(error.code == ASIUnableToCreateRequestErrorType){
-        UIAlertView *message = [[UIAlertView alloc] initWithTitle:@"Configuration error"
-                                                          message:@"WebDAV addresss is not configured properly. Please check ZotPad settings."
-                                                         delegate:self
-                                                cancelButtonTitle:@"Cancel"
-                                                otherButtonTitles:@"Disable WebDAV",nil];
-        
-        [message show];
+        //If there was an authentication issue, reauthenticate
+        else if(error.code == ASIAuthenticationErrorType){
+            _alertView = [[UIAlertView alloc] initWithTitle:@"Authentication failed"
+                                                    message:@"Authenticating with WebDAV server failed."
+                                                   delegate:self
+                                          cancelButtonTitle:@"Cancel"
+                                          otherButtonTitles:@"Disable WebDAV",nil];
+            
+            [_alertView show];
+        }
+        else if(error.code == ASIUnableToCreateRequestErrorType){
+            _alertView = [[UIAlertView alloc] initWithTitle:@"Configuration error"
+                                                    message:@"WebDAV addresss is not configured properly. Please check ZotPad settings."
+                                                   delegate:self
+                                          cancelButtonTitle:@"Cancel"
+                                          otherButtonTitles:@"Disable WebDAV",nil];
+            
+            [_alertView show];
+        }
     }
     
     if(request.tag == ZPFILECHANNEL_WEBDAV_DOWNLOAD){
@@ -615,6 +621,8 @@ static NSOperationQueue* _uploadQueue;
         NSString* host = [[NSURL URLWithString:[ZPPreferences webDAVURL]] host]; 
         [defaults setObject:host forKey:@"webdavsecurityexception"];
     }
+    
+    _alertView = nil;
 }
 
 
