@@ -11,14 +11,10 @@
 #import "ZPCore.h"
 
 #import "ZPFileChannel_WebDAV.h"
-
-
 #import "ASIHTTPRequest.h"
-
-
-
 #import "SBJson.h"
 #import "ZPFileCacheManager.h"
+#import "ZPWebDAVAuthenticationViewController.h"
 
 //For refreshing metadata
 #import "ZPServerConnection.h"
@@ -384,6 +380,39 @@ static NSOperationQueue* _uploadQueue;
     if(request.tag == ZPFILECHANNEL_WEBDAV_DOWNLOAD){
 
         if(request.responseStatusCode == 200){
+            
+            // Did we get a redirection to a possible authentication page?
+            
+            if(! [request.url isEqual:request.originalURL]){
+                
+                if([@"text/html" isEqual:[request.responseHeaders objectForKey:@"Content-Type"]]){
+                    
+                    if(![ZPWebDAVAuthenticationViewController isDisplaying]){
+                        ZPWebDAVAuthenticationViewController* authenticationController = [ZPWebDAVAuthenticationViewController instance];
+                        
+                        [authenticationController configureWithURL:request.originalURL andAttachment:attachment];
+                        
+                        //Find the top most viewcontroller
+                        UIViewController* viewController = [[[[UIApplication sharedApplication]delegate] window] rootViewController];
+
+                        while(viewController.presentedViewController) viewController = viewController.presentedViewController;
+                        
+                        //Show as modal dialog over the top view controller
+                        
+                        [viewController presentModalViewController:authenticationController animated:YES];
+                    }
+
+                    //Display error message
+                    
+                    NSError* error = [[NSError alloc] initWithDomain:[request.url host]
+                                                                code:request.responseStatusCode
+                                                            userInfo:[NSDictionary dictionaryWithObject:@"Needs authentication" forKey:NSLocalizedDescriptionKey]];
+                    
+                    [ZPFileDownloadManager failedDownloadingAttachment:attachment withError:error fromURL:[request.url absoluteString]];
+                    return;
+                }
+            }
+            
             //TODO: A more robust way to check if we need to uncompress
             if(attachment.linkMode == LINK_MODE_IMPORTED_URL && (
                                                                             [attachment.contentType isEqualToString:@"text/html"] ||
