@@ -143,9 +143,7 @@
         */
         
         
-        
-        config.customFields =  [NSDictionary dictionaryWithObject:technicalInfo
-                                                           forKey:@"Technical Information"];
+        config.customMessage = technicalInfo;
         
         [UserVoice presentUserVoiceInterfaceForParentViewController:self andConfig:config];
     }
