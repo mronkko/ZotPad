@@ -649,6 +649,27 @@
     }
 }
 
+- (BOOL)tableView:(UITableView *)tableView shouldShowMenuForRowAtIndexPath:(NSIndexPath *)indexPath{
+    return indexPath.section > 1;
+}
+
+- (BOOL)tableView:(UITableView *)tableView canPerformAction:(SEL)action forRowAtIndexPath:(NSIndexPath *)indexPath withSender:(id)sender{
+    if (action == @selector(copy:)){
+        return YES;
+    }
+    
+    return NO;
+}
+
+- (void)tableView:(UITableView *)tableView performAction:(SEL)action forRowAtIndexPath:(NSIndexPath *)indexPath withSender:(id)sender{
+    if(action == @selector(copy:)){
+        UITableViewCell *cell = [tableView cellForRowAtIndexPath:indexPath];
+        OHAttributedLabel *label = (OHAttributedLabel*)[cell viewWithTag:2];
+        UIPasteboard *pasteboard = [UIPasteboard generalPasteboard];
+        [pasteboard setString:label.attributedText.string];
+    }
+}
+
 #pragma mark - ZPNoteDisplay and ZPTagDisplay
 
 -(void) refreshNotesFor:(ZPZoteroDataObject *)item{
