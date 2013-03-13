@@ -192,7 +192,7 @@
     
     [self.starButton configureWithItemKey:self.itemKey];
     self.navigationItem.title=[ZPZoteroItem itemWithKey:self.itemKey].shortCitation;
-    
+    [self.tableView setContentOffset:CGPointZero animated:NO];
 }
 
 - (void) _reconfigureAttachmentCarousel:(BOOL)animated{
@@ -203,6 +203,7 @@
     
     if([item.attachments count] == 0){
         self.tableView.tableHeaderView = nil;
+        [self.tableView reloadData];
     }
     else{
         [_carouselDelegate configureWithItemKey:self.itemKey];
