@@ -40,6 +40,8 @@
 }
 
 -(void)viewWillDisappear:(BOOL)animated{
-    
+    // This does not call the parent and this is intentional. Calling the parent
+    // results in performance problems
 }
+
 @end
