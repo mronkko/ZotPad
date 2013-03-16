@@ -80,7 +80,14 @@
             for(NSDictionary* tagDict in tags){
                 [tagsArray addObject:[tagDict objectForKey:@"tag"]];
             }
-            _currentElement.tags = [tagsArray sortedArrayUsingSelector:@selector(localizedCaseInsensitiveCompare:)];
+
+            //If the tags have changed on the server, force writing this item in the DB
+            
+            NSArray* newTags = [tagsArray sortedArrayUsingSelector:@selector(localizedCaseInsensitiveCompare:)];
+            if(![_currentElement.tags isEqualToArray:newTags]){
+                _currentElement.tags = newTags;
+                _currentElement.needsToBeWrittenToCache = TRUE;
+            }
         }
         
         NSMutableDictionary* fields = [NSMutableDictionary dictionaryWithDictionary:data];
@@ -132,6 +139,11 @@
         [super _setField:@"dateAdded" toValue:value];
     }
     else if([key isEqualToString:@"updated"]){
+        NSString* ts1 = _currentElement.cacheTimestamp;
+        NSString* ts2 = value;
+        BOOL write = ! [ts2 isEqualToString:ts1];
+        _currentElement.needsToBeWrittenToCache = write;
+
         [super _setField:@"serverTimestamp" toValue:value];
     }
     else{

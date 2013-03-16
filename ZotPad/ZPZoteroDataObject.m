@@ -11,7 +11,7 @@
 @implementation ZPZoteroDataObject
 
 @synthesize key, title, libraryID, cacheTimestamp, serverTimestamp, dateAdded, etag,jsonFromServer,parentKey;
-@synthesize numChildren;
+@synthesize numChildren, needsToBeWrittenToCache;
 @synthesize locallyAdded, locallyDeleted, locallyModified;
 
 
@@ -33,12 +33,6 @@
     else return FALSE;
 }
 
--(BOOL) needsToBeWrittenToCache{
-    NSString* ts1 = self.cacheTimestamp;
-    NSString* ts2 = self.serverTimestamp;
-    BOOL write = ! [ts2 isEqualToString:ts1];
-    return write;
-}
 -(BOOL) hasChildren{
     return self.numChildren >0;
 }

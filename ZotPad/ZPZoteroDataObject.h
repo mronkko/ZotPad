@@ -40,9 +40,9 @@
 @property (retain) NSString* cacheTimestamp;
 @property (retain) NSString* serverTimestamp;
 @property (retain) NSArray* tags;
+@property (assign) BOOL needsToBeWrittenToCache;
 
 -(void) configureWithDictionary:(NSDictionary*) dictionary;
--(BOOL) needsToBeWrittenToCache;
 
 
 @end
