@@ -27,8 +27,6 @@
 
 @property(nonatomic,retain) IBOutlet UIWebView *webView;
 
-- (BOOL)webView:(UIWebView *)webView shouldStartLoadWithRequest:(NSURLRequest *)request navigationType:(UIWebViewNavigationType)navigationType;
-
 - (void)setKeyAndLoadZoteroSite:(NSString*)key;
 - (IBAction)loadFirstPage:(id)sender;
 

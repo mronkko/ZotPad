@@ -44,7 +44,7 @@
 
 - (IBAction)loadFirstPage:(id)sender{
 
-    NSString *urlAddress = [NSString stringWithFormat:@"https://www.zotero.org/oauth/authorize?oauth_token=%@&library_access=1&notes_access=1&write_access=1&all_groups=write",_key];
+    NSString *urlAddress = [NSString stringWithFormat:@"https://www.zotero.org/oauth/authorize?oauth_token=%@&library_access=1&notes_access=1&write_access=1&all_groups=write&fullsite=0",_key];
     
     
     //Create a URL object.
@@ -86,7 +86,15 @@
                           otherButtonTitles: nil] show];
         return FALSE;
     }
-
+    else if([urlString isEqualToString:@"https://www.zotero.org/settings/storage"]){
+        [[[UIAlertView alloc] initWithTitle:@"Blocked"
+                                    message:@"Accessing storage plans through ZotPad is blocked because Apple does not allow subscriptions to third party services within iPad/iPhone apps."
+                                   delegate:NULL
+                          cancelButtonTitle:@"OK"
+                          otherButtonTitles: nil] show];
+        return FALSE;
+        
+    }
     if(_activityView == NULL)
         _activityView = [DSBezelActivityView newActivityViewForView:webView];
 
@@ -154,7 +162,7 @@
         url= [NSURL URLWithString:@"https://www.zotero.org/oauth/request"];
     }
     else{
-        url= [NSURL URLWithString:@"https://www.zotero.org/oauth/access"];        
+        url= [NSURL URLWithString:@"https://www.zotero.org/oauth/access"];
     }
     OAMutableURLRequest *request = [[OAMutableURLRequest alloc] initWithURL:url
                                                                    consumer:consumer
