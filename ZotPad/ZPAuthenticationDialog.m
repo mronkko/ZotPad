@@ -13,6 +13,16 @@
 #import "DSActivityView.h"
 #import "ZPSecrets.h"
 
+// Needed for screen shots
+#import <QuartzCore/QuartzCore.h>
+
+@interface ZPAuthenticationDialog (){
+    UIView* _webViewOverlay;
+}
+
+-(UIImage*)_captureScreen:(UIView*) viewToCapture;
+
+@end
 @implementation ZPAuthenticationDialog
 
 
@@ -29,15 +39,21 @@
 #pragma mark - View lifecycle
 
 
+- (void)viewWillAppear:(BOOL)animated{
 
-- (void)viewDidLoad {
-    
-    //Add a loading indicator
-    _activityView = [DSBezelActivityView newActivityViewForView:webView];
-    [[self webView] setUserInteractionEnabled:FALSE];
+    //Cover the view with a blank view so that partial rendering is not displayed
+    _webViewOverlay = [[UIView alloc] initWithFrame:self.webView.bounds];
+    _webViewOverlay.autoresizingMask = UIViewAutoresizingFlexibleWidth | UIViewAutoresizingFlexibleHeight;
+    _webViewOverlay.backgroundColor = [UIColor whiteColor];
+    [self.webView addSubview:_webViewOverlay];
 
     [self makeOAuthRequest: NULL];
     
+    //Add a loading indicator
+    _activityView = [DSBezelActivityView newActivityViewForView:webView];
+    
+    [[self webView] setUserInteractionEnabled:FALSE];
+
 }
 
 // Takes the user back to start
@@ -76,8 +92,17 @@
 
 
     NSString* requestBody = [[NSString alloc] initWithData:request.HTTPBody encoding:NSUTF8StringEncoding];
+    if([urlString isEqualToString:@"objc:activate"]){
+        if(_activityView != NULL){
+            [DSBezelActivityView removeViewAnimated:YES];
+            [_webViewOverlay removeFromSuperview];
+            [aWebView setUserInteractionEnabled:TRUE];
+            _activityView = NULL;
+        }
 
-    if([requestBody rangeOfString:@"&revoke="].location != NSNotFound){
+        return FALSE;
+    }
+    else if([requestBody rangeOfString:@"&revoke="].location != NSNotFound){
         
         [[[UIAlertView alloc] initWithTitle:@"API key required"
                                    message:@"You need to save the API key to use ZotPad"
@@ -86,6 +111,7 @@
                           otherButtonTitles: nil] show];
         return FALSE;
     }
+    /*
     else if([urlString isEqualToString:@"https://www.zotero.org/settings/storage"]){
         [[[UIAlertView alloc] initWithTitle:@"Blocked"
                                     message:@"Accessing storage plans through ZotPad is blocked because Apple does not allow subscriptions to third party services within iPad/iPhone apps."
@@ -95,9 +121,16 @@
         return FALSE;
         
     }
-    if(_activityView == NULL)
-        _activityView = [DSBezelActivityView newActivityViewForView:webView];
-
+    else if([urlString isEqualToString:@"https://www.zotero.org/user/register"]){
+        [[[UIAlertView alloc] initWithTitle:@"Blocked"
+                                    message:@"Creating Zotero user accounts through ZotPad is blocked because Apple does not allow subscriptions to third party services within iPad/iPhone apps."
+                                   delegate:NULL
+                          cancelButtonTitle:@"OK"
+                          otherButtonTitles: nil] show];
+        return FALSE;
+     
+    }
+    */
     //If we are redirected to the front page, we do not need to show the web browser any more
 
     if([urlString hasPrefix:@"https://www.zotero.org/?oauth_token="]){
@@ -113,15 +146,32 @@
     return TRUE;
 }
 
-- (void)webViewDidStartLoad:(UIWebView *)webView{
+- (void)webViewDidStartLoad:(UIWebView *)aWebView{
+    
+    if(_activityView == NULL){
+        // Add a screenshot on top of the UIWebView so that partial rendering does not show
+        UIImage* screenshot = [self _captureScreen:aWebView];
+        _webViewOverlay = [[UIImageView alloc] initWithImage:screenshot];
+        _webViewOverlay.autoresizingMask = UIViewAutoresizingFlexibleWidth | UIViewAutoresizingFlexibleHeight;
+        [aWebView addSubview:_webViewOverlay];
+        _activityView = [DSBezelActivityView newActivityViewForView:webView];
+        
+    }
+
 }
 
-- (void)webViewDidFinishLoad:(UIWebView *)webView{
-    if(_activityView != NULL){
-        [DSBezelActivityView removeViewAnimated:YES];
-        [[self webView] setUserInteractionEnabled:TRUE];
-        _activityView = NULL;
-    }
+- (void)webViewDidFinishLoad:(UIWebView *)aWebView{
+    
+    // Remove the links
+    [aWebView stringByEvaluatingJavaScriptFromString:@"try{\
+        element = document.getElementsByTagName('nav')[0];\
+        element.parentNode.removeChild(element);\
+        element =  document.getElementsByTagName('header')[0];\
+        element.parentNode.removeChild(element);\
+     }\
+     catch(err){}\
+     window.location = 'objc:activate'"];
+
 }
 
 - (void)viewDidUnload
@@ -261,6 +311,13 @@
     DDLogError(@"Error in requesting access token: %@",error);
 }
 
-
+-(UIImage*)_captureScreen:(UIView*) viewToCapture
+{
+    UIGraphicsBeginImageContext(viewToCapture.bounds.size);
+    [viewToCapture.layer renderInContext:UIGraphicsGetCurrentContext()];
+    UIImage *viewImage = UIGraphicsGetImageFromCurrentImageContext();
+    UIGraphicsEndImageContext();
+    return viewImage;
+}
 
 @end
