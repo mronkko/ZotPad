@@ -92,3 +92,6 @@ static NSString *const ZPKEY_ORDER_DIRECTION = @"sort";
 static NSString *const ZPKEY_ALL_RESULTS = @"allResults";
 static NSString *const ZPKEY_PARAMETERS = @"params";
 
+//Generalyl useful macros
+
+#define SYSTEM_VERSION_GREATER_THAN_OR_EQUAL_TO(v)  ([[[UIDevice currentDevice] systemVersion] compare:v options:NSNumericSearch] != NSOrderedAscending)
