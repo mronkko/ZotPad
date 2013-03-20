@@ -41,6 +41,8 @@
 
 - (void)viewWillAppear:(BOOL)animated{
 
+    [super viewWillAppear:animated];
+    
     //Cover the view with a blank view so that partial rendering is not displayed
     _webViewOverlay = [[UIView alloc] initWithFrame:self.webView.bounds];
     _webViewOverlay.autoresizingMask = UIViewAutoresizingFlexibleWidth | UIViewAutoresizingFlexibleHeight;
