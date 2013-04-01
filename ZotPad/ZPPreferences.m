@@ -212,8 +212,14 @@ static NSInteger _maxCacheSize;
 }
 
 +(void) setOnline:(BOOL)online{
+    
+    
     if(online) _mode = 1;
-    else _mode = 2;
+    else{
+        _mode = 2;
+        DDLogWarn(@"ZotPad is now in offline mode");
+    }
+    
     NSUserDefaults* defaults = [NSUserDefaults standardUserDefaults];
     [defaults setObject:[NSNumber numberWithInt:_mode] forKey:@"mode"];
 }
