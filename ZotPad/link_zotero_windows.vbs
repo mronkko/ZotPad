@@ -28,7 +28,7 @@ profileBase=env("APPDATA") & "\Mozilla\Firefox"
 
 Else
 
-WScript.Echo "Could not locate Firefox or Zotero Standalone profile"
+WScript.Echo "Could not locate Firefox or Zotero Standalone profile. (Checked paths '"&env("APPDATA") & "\Zotero\Zotero\profiles.ini' and '"& env("APPDATA") & "\Mozilla\Firefox\profiles.ini')"
 WScript.Quit 1
 
 End If
