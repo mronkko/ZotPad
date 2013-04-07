@@ -74,6 +74,9 @@ static CSLFormatter* _cslFormatter = NULL;
     if(key == NULL || [key isEqual:@""])
         [NSException raise:@"Key is empty" format:@"ZPZoteroItem cannot be instantiated with empty key"];
 
+    if(![key isKindOfClass:[NSString class]])
+        [NSException raise:@"Key is not string" format:@"ZPZoteroItem must be cached with a key that is a string."];
+    
     
     ZPZoteroItem* obj= [_objectCache objectForKey:key];
     
