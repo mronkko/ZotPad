@@ -460,7 +460,7 @@ const NSInteger ZPServerConnectionRequestLastModifiedItem = 11;
                                 attachment.mtime == 0 ? [NSNull null]: [NSNumber numberWithLongLong:attachment.mtime], @"mtime",
                                 [self _tagsJSSONForDataObject:attachment],@"tags", nil];
 
-    NSString* json = [[NSDictionary dictionaryWithObject:[NSArray arrayWithObject:dictionary]forKey:@"items"] JSONRepresentation];
+    NSString* json = [dictionary JSONRepresentation];
     
     DDLogVerbose(@"Posting attachment JSON to server. Etag: %@ \n%@", attachment.etag, json);
 
@@ -523,7 +523,7 @@ const NSInteger ZPServerConnectionRequestLastModifiedItem = 11;
     [dictionary setObject:[self _tagsJSSONForDataObject:item] forKey:@"tags"];
 
     
-    NSString* json = [[NSDictionary dictionaryWithObject:[NSArray arrayWithObject:dictionary]forKey:@"items"] JSONRepresentation];
+    NSString* json = [dictionary JSONRepresentation];
     
     DDLogVerbose(@"Posting item JSON to server. Etag: %@ \n%@", item.etag, json);
     
@@ -601,7 +601,7 @@ const NSInteger ZPServerConnectionRequestLastModifiedItem = 11;
                                 [NSArray array], @"creators",
                                 [self _tagsJSSONForDataObject:note], @"tags", nil];
     
-    NSString* json = [[NSDictionary dictionaryWithObject:[NSArray arrayWithObject:dictionary]forKey:@"items"] JSONRepresentation];
+    NSString* json = [dictionary JSONRepresentation];
     
     [postRequest appendPostData:[json dataUsingEncoding:NSUTF8StringEncoding]];
     
