@@ -11,6 +11,7 @@
 #import "ZPTableViewUpdater.h"
 #import "ZPItemListDataSource.h"
 #import "ZPCore.h"
+#import "ZPItemList.h"
 
 @implementation ZPTableViewUpdater
 
@@ -145,6 +146,10 @@
                         else{
                             //Set the new content
                             [(ZPItemListDataSource*) tableView.dataSource setContentArray:newContentArray];
+                            
+                            //TODO: Refactor so that the following line is not needed
+                            [[ZPItemList instance] setItemKeysShown:newContentArray];
+                            
                             [tableView reloadData];
                         }
                     }
