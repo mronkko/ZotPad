@@ -70,6 +70,7 @@ static NSString *const ZPNOTIFICATION_ITEM_LIST_FULLY_LOADED = @"ItemListFullyLo
 // Notifications about state
 
 static NSString *const ZPNOTIFICATION_INTERNET_CONNECTION_AVAILABLE= @"InternetConnectionAvailable";
+static NSString *const ZPNOTIFICATION_ZOTPAD_MODE_CHANGED= @"ZotPadModeChanged";
 
 
 //Dictionary keys for data objects and item list retrievals

@@ -90,7 +90,15 @@ static NSInteger _maxCacheSize;
         }
 
     }
-
+    
+    // Notify that the mode setting has been reloaded.
+    // This is done with a delay so that the UI has time to load
+    
+    dispatch_after(dispatch_time(DISPATCH_TIME_NOW, NSEC_PER_SEC*1),
+                   dispatch_get_global_queue(DISPATCH_QUEUE_PRIORITY_BACKGROUND,0), ^{
+        [[NSNotificationCenter defaultCenter] postNotificationName:ZPNOTIFICATION_ZOTPAD_MODE_CHANGED object:nil];
+    });
+     
 }
 
 +(NSString*) preferencesAsDescriptiveString{
@@ -213,8 +221,10 @@ static NSInteger _maxCacheSize;
 
 +(void) setOnline:(BOOL)online{
     
-    
-    if(online) _mode = 1;
+    if(online){
+        _mode = 1;
+        DDLogInfo(@"ZotPad is now in online mode");
+    }
     else{
         _mode = 2;
         DDLogWarn(@"ZotPad is now in offline mode");
@@ -222,6 +232,9 @@ static NSInteger _maxCacheSize;
     
     NSUserDefaults* defaults = [NSUserDefaults standardUserDefaults];
     [defaults setObject:[NSNumber numberWithInt:_mode] forKey:@"mode"];
+    
+    [[NSNotificationCenter defaultCenter] postNotificationName:ZPNOTIFICATION_ZOTPAD_MODE_CHANGED object:NULL];
+
 }
 
 +(BOOL) reportErrors{
