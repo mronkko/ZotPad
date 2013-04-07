@@ -776,7 +776,7 @@
     else{
         for(ZPZoteroItem* item in items){
             if([item.key isEqualToString:item.key]){
-                self.itemKey = item;
+                self.itemKey = item.key;
                 [self performSelectorOnMainThread:@selector(_reconfigureDetailTableView:) withObject:[NSNumber numberWithBool:TRUE] waitUntilDone:NO];
                 
                 //If we had the activity indicator animating, stop it now because we are no longer waiting for data
