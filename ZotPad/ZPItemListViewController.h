@@ -6,6 +6,8 @@
 //  Copyright (c) 2011 Mikko Rönkkö. All rights reserved.
 //
 
+// TODO: Document why there is a need for ItemList and ItemListDataSource
+
 #import <UIKit/UIKit.h>
 #import "../DSActivityView/Sources/DSActivityView.h"
 #import "ZPItemListViewController.h"
