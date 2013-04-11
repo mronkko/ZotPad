@@ -780,6 +780,10 @@ const NSInteger ZPServerConnectionRequestLastModifiedItem = 11;
             
                 [self _performRequest:request usingOperationQueue:queue completion:^(NSData* responseData){
                     
+                    if([ZPPreferences debugZoteroAPIRequests]){
+                        DDLogVerbose(@"Request: %@ \n\nResponse:\n %@",request.url,[[NSString alloc] initWithData:responseData encoding:NSUTF8StringEncoding]);
+                    }
+                    
                     ZPServerResponseXMLParser* parserResponse;
                     
                     // This needs exception handling because sometimes we get garbage from the server
