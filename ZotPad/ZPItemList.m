@@ -17,8 +17,6 @@
 #import "ZPTableViewUpdater.h"
 
 #define SIZE_OF_TABLEVIEW_UPDATE_BATCH 25
-#define SIZE_OF_DATABASE_UPDATE_BATCH 50
-
 
 @implementation ZPItemList
 
@@ -220,7 +218,7 @@ static ZPItemList* _instance;
                     }
                     
                     //Update the view if we have received sufficient number of new items
-                    update = update || ([_itemKeysNotInCache count] % SIZE_OF_DATABASE_UPDATE_BATCH ==0 ||
+                    update = update || ([_itemKeysNotInCache count] % SIZE_OF_TABLEVIEW_UPDATE_BATCH ==0 ||
                                         [_itemKeysShown count] == 0 ||
                                         [_itemKeysShown lastObject]!=[NSNull null]);
                     
