@@ -129,8 +129,13 @@ static ZPCacheStatusToolbarController* _statusView;
                 ZPZoteroAttachment* updatedAttachment = [parsedResults objectAtIndex:0];
                 if([ZPPreferences debugFileUploads]) DDLogInfo(@"Starting upload sequence for %@.",updatedAttachment.filenameBasedOnLinkMode);
                 ZPFileChannel* uploadChannel = [ZPFileChannel fileChannelForAttachment:updatedAttachment];
-                [uploadChannel startUploadingAttachment:updatedAttachment overWriteConflictingServerVersion:FALSE];
-                [[NSNotificationCenter defaultCenter] postNotificationName:ZPNOTIFICATION_ATTACHMENT_FILE_UPLOAD_STARTED object:updatedAttachment];
+                if([attachment fileExists_modified]){
+                    [uploadChannel startUploadingAttachment:updatedAttachment overWriteConflictingServerVersion:FALSE];
+                    [[NSNotificationCenter defaultCenter] postNotificationName:ZPNOTIFICATION_ATTACHMENT_FILE_UPLOAD_STARTED object:updatedAttachment];
+                }
+                else{
+                    DDLogError(@"Attempting to upload non-existng file %@", attachment.filenameBasedOnLinkMode);
+                }
                 
             }
         }];

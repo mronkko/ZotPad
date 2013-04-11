@@ -113,9 +113,15 @@
 
 -(IBAction)useMyVersion:(id)sender{
     [ZPDatabase writeVersionInfoForAttachment:attachment];
-    [fileChannel startUploadingAttachment:attachment overWriteConflictingServerVersion:YES];
+    if([attachment fileExists_modified]){
+        [fileChannel startUploadingAttachment:attachment overWriteConflictingServerVersion:YES];
+        [[NSNotificationCenter defaultCenter] postNotificationName:ZPNOTIFICATION_ATTACHMENT_FILE_UPLOAD_STARTED object:attachment];
+    }
+    else{
+        DDLogError(@"Attempting to upload non-existng file %@", attachment.filenameBasedOnLinkMode);
+    }
     [self dismissModalViewControllerAnimated:YES];
-    [[NSNotificationCenter defaultCenter] postNotificationName:ZPNOTIFICATION_ATTACHMENT_FILE_UPLOAD_STARTED object:attachment];
+
 }
 -(IBAction)useRemoteVersion:(id)sender{
     attachment.versionIdentifier_local = NULL;
