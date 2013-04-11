@@ -588,7 +588,13 @@ static ZPCacheStatusToolbarController* _statusView;
         NSMutableArray* uncachedItems = [NSMutableArray arrayWithArray:itemKeys];
         [uncachedItems removeObjectsInArray:cachedKeys];
         
-        if([uncachedItems count]>0) [ZPDatabase addItemKeys:uncachedItems toCollection:collectionKey];
+        if([uncachedItems count]>0){
+            [ZPDatabase addItemKeys:uncachedItems toCollection:collectionKey];
+            
+            //Add the uncached items to the beginning of the item retrieval queue
+            [self _addToItemQueue:uncachedItems libraryID:libraryID priority:YES];
+            
+        }
         if([itemKeys count] >0) [ZPDatabase removeItemKeysNotInArray:itemKeys fromCollection:collectionKey];
     }
 
@@ -659,6 +665,7 @@ static ZPCacheStatusToolbarController* _statusView;
         ZPZoteroCollection* collection = [ZPZoteroCollection collectionWithKey:collectionKey];
         if(![newTimestamp isEqualToString:collection.cacheTimestamp]){
             [ZPServerConnection retrieveKeysInLibrary:libraryID collection:collectionKey];
+            collection.cacheTimestamp = newTimestamp;
             [ZPDatabase setUpdatedTimestampForCollection:collectionKey toValue:newTimestamp];
         }
     }
