@@ -214,10 +214,10 @@ static ZPItemList* _instance;
                         found=TRUE;
                         if([_itemKeysNotInCache count]==0){
                             [[NSNotificationCenter defaultCenter] postNotificationName:ZPNOTIFICATION_ITEM_LIST_FULLY_LOADED object:NULL];
+                            update = TRUE;
                             break;
                         }
                     }
-                    
                     
                     //Update the view if we have received sufficient number of new items
                     update = update || ([_itemKeysNotInCache count] % SIZE_OF_DATABASE_UPDATE_BATCH ==0 ||
