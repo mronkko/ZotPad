@@ -216,9 +216,6 @@
 
 - (void)_reconfigureDetailTableView:(BOOL)animated{
     
-    //Configure the size of the detail view table.
-    _tagButtons = NULL;
-    
     [self.tableView reloadData];
     
 }
@@ -546,11 +543,6 @@
                     [cell.contentView addSubview:tagButton];
                 }
             }
-            else{
-                [ZPTagController addTagButtonsToView:cell.contentView tags:item.tags];
-            }
-            
-            _tagButtons = cell.contentView.subviews;
         }
     }
     //Notes
@@ -635,21 +627,49 @@
 - (CGFloat)tableView:(UITableView *)tableView heightForRowAtIndexPath:(NSIndexPath *)indexPath
 {
     
+    NSInteger section = indexPath.section;
+    
     if(tableView!=self.tableView){
         return tableView.rowHeight;
     }
     //Tag cell
-    else if(indexPath.section==0 && _tagButtons != NULL){
-        //Get the size based on content
-        NSInteger y=0;
-        for(UIView* subView in _tagButtons){
-            y=MAX(y,subView.frame.origin.y+subView.frame.size.height);
+    else if(section==0){
+
+        NSArray* tags= [ZPZoteroItem itemWithKey:self.itemKey].tags;
+        
+        if([tags count] == 0){
+            _tagButtons = nil;
+            return tableView.rowHeight;
         }
-        //Add a small margin to the bottom of the cell
-        return MAX(y+7, tableView.rowHeight);
+        
+        else{
+            
+            //Initialize the tag buttons
+            NSInteger width = [self _textWidth];
+
+            // TODO: refactor this use of tempView after refactoring addTagButtonsToView
+            
+            UIView* tempView = [[UIView alloc] initWithFrame:CGRectMake(0, 0, width, 100)];
+            
+            [ZPTagController addTagButtonsToView:tempView tags:tags];
+            
+            _tagButtons = [NSArray arrayWithArray:tempView.subviews];
+
+            //Get the size based on content
+            NSInteger y=0;
+            for(UIView* subView in _tagButtons){
+                y=MAX(y,subView.frame.origin.y+subView.frame.size.height);
+                [subView removeFromSuperview];
+
+            }
+            //Add a small margin to the bottom of the cell
+            return MAX(y+7, tableView.rowHeight);
+
+
+        }
     }
     //Metadata cells
-    else if(indexPath.section > 1){
+    else if(section > 1){
         
         CGRect frame = [self _frameForUITextViewAtIndexPath:indexPath forTableView:tableView];
         
@@ -669,23 +689,6 @@
 }
 
 #pragma mark - UITableViewDelegate
-
-
-// Populate the tags cells after they are displayed
-
-- (void)tableView:(UITableView *)tableView willDisplayCell:(UITableViewCell *)cell forRowAtIndexPath:(NSIndexPath *)indexPath{
-    
-    
-    //TODO: refactor this method away
-    
-    //If we have a cell that should show tags, but does not, reload
-    
-    ZPZoteroItem* item = [ZPZoteroItem itemWithKey:self.itemKey];
-
-    if(indexPath.section==0 && [item.tags count] > 0 && [cell.contentView.subviews count] == 0){
-        [tableView reloadData];
-    }
-}
 
 - (void)tableView:(UITableView *)aTableView didSelectRowAtIndexPath:(NSIndexPath *)indexPath {
     
@@ -755,7 +758,6 @@
 }
 
 -(void) refreshTagsFor:(NSString *)itemKey{
-    _tagButtons = NULL;
     [self.tableView reloadSections:[NSIndexSet indexSetWithIndex:0] withRowAnimation:UITableViewRowAnimationAutomatic];
 }
 
@@ -775,8 +777,7 @@
     
     else{
         for(ZPZoteroItem* item in items){
-            if([item.key isEqualToString:item.key]){
-                self.itemKey = item.key;
+            if([item.key isEqualToString:self.itemKey]){
                 [self performSelectorOnMainThread:@selector(_reconfigureDetailTableView:) withObject:[NSNumber numberWithBool:TRUE] waitUntilDone:NO];
                 
                 //If we had the activity indicator animating, stop it now because we are no longer waiting for data
