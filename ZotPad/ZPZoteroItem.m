@@ -145,7 +145,7 @@ static CSLFormatter* _cslFormatter = NULL;
 
         NSString* issued = [macroDict objectForKey:@"issued"];
         if(issued == NULL || issued.length <= 3){
-            DDLogError(@"CSL formatting error. The item with key %@ has issued macro %@",self.key,issued);
+//            DDLogError(@"CSL formatting error. The item with key %@ has issued macro %@",self.key,issued);
         }
         else{
             _year = [[issued substringWithRange:NSMakeRange(2, [issued length]-3)] integerValue];
@@ -218,9 +218,9 @@ static CSLFormatter* _cslFormatter = NULL;
         _year = 0;
         _publicationDetails =@"";
 
-        if(![self.itemType isEqualToString:@"note"] && ! [self.itemType isEqualToString:@"attachment"]){
+/*        if(![self.itemType isEqualToString:@"note"] && ! [self.itemType isEqualToString:@"attachment"]){
             DDLogError(@"CSL formatting error. The item with key %@ and type %@ does not have any fields",self.key, self.itemType);
-        }
+        }*/
     }
 }
 
