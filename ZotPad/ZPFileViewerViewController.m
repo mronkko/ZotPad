@@ -906,6 +906,8 @@ static ZPFileViewerViewController* _instance;
 
 // Populate the tags cells after they are displayed
 
+// TODO: Refactor this method away
+
 - (void)tableView:(UITableView *)tableView willDisplayCell:(UITableViewCell *)cell forRowAtIndexPath:(NSIndexPath *)indexPath{
     
     if(indexPath.section<=1){
