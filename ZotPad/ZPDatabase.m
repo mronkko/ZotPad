@@ -1755,7 +1755,7 @@ static NSObject* writeLock;
         }
         //Normal, non-recursive collectins
         else{
-            [sql appendString:@" AND collectionItems.collectionKey = ? AND collectionItems.itemKey = items.itemKey"];
+            [sql appendString:@" AND collectionItems.collectionKey = ? AND collectionItems.itemKey = items.itemKey AND collectionItems.locallyDeleted IS NOT 1"];
             [parameters addObject:collectionKey];
         }
     }
