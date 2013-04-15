@@ -59,7 +59,7 @@ Loop
 
 If Not fileSystem.FileExists(profileBase & "\" & path & "\prefs.js") Then
 
-WScript.Echo "Could not locate preferences file"
+WScript.Echo "Could not locate preferences file. (Checked path '" & profileBase & "\" & path & "\prefs.js')"
 WScript.Quit 1
 
 End If
@@ -102,7 +102,8 @@ shell.Run "cmd.exe /c mklink /D " & currentDirectory & "\storage " & dataDirPath
 
 Else
 
-WScript.Echo "Could not locate Zotero data directory"
+WScript.Echo "Could not locate Zotero data directory. (Preferences file at '" & profileBase & "\" & path & "\prefs.js' specified data directory path '" & dataDirPath & "')"
+
 WScript.Quit 1
 
 End If
