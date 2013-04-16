@@ -67,7 +67,7 @@ End If
 Set prefsJs = fileSystem.OpenTextFile(profileBase & "\" & path & "\prefs.js",1)
 
 Set dataDirRegex = CreateObject("VBScript.RegExp")
-dataDirRegex.Pattern = "user_pref(""extensions.zotero.dataDir"", ""(.*)"");"
+dataDirRegex.Pattern = "user_pref\(""extensions.zotero.dataDir"", ""(.*)""\);"
 
 useDatadir = False
 
