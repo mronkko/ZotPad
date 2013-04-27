@@ -678,7 +678,8 @@ static ZPCacheStatusToolbarController* _statusView;
 #pragma mark Notifier methods for metadata
 
 +(void) notifyActiveItemChanged:(NSNotification *) notification{
-    [ZPServerConnection retrieveSingleItemAndChildrenWithKey:notification.object];
+    ZPZoteroItem* item = [ZPZoteroItem itemWithKey:notification.object];
+    [ZPServerConnection retrieveSingleItemAndChildrenWithKey:item.itemKey fromLibraryWithID:item.libraryID];
 }
 
 +(void) notifyActiveCollectionChanged:(NSNotification *) notification{

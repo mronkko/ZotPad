@@ -1647,7 +1647,7 @@ static NSObject* writeLock;
     
     FMDatabase* dbObject = [self _dbObject];
     @synchronized(dbObject){
-        FMResultSet* resultSet = [dbObject executeQuery: @"SELECT * FROM notes WHERE parentKey = ? ",item.key];
+        FMResultSet* resultSet = [dbObject executeQuery: @"SELECT * FROM notes WHERE parentKey = ? ORDER BY note COLLATE NOCASE",item.key];
         
         NSMutableArray* notes = [[NSMutableArray alloc] init];
         while([resultSet next]) {

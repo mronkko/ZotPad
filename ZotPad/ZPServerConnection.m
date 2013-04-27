@@ -150,23 +150,20 @@ const NSInteger ZPServerConnectionRequestLastModifiedItem = 11;
 
 #pragma mark - Read API calls
 
-+(void) retrieveSingleItemWithKey:(NSString *)itemKey completion:(void (^)(NSArray *))completionBlock{
++(void) retrieveSingleItemWithKey:(NSString *)itemKey  fromLibraryWithID:(NSInteger) libraryID completion:(void (^)(NSArray *))completionBlock{
     
-    ZPZoteroItem* item = [ZPZoteroItem itemWithKey:itemKey];
-    NSMutableDictionary* parameters = [NSMutableDictionary dictionaryWithObject:[NSNumber numberWithInt:item.libraryID] forKey:ZPKEY_LIBRARY_ID];
+    NSMutableDictionary* parameters = [NSMutableDictionary dictionaryWithObject:[NSNumber numberWithInt:libraryID] forKey:ZPKEY_LIBRARY_ID];
 
-    [parameters setObject:item.key forKey:ZPKEY_ITEM_KEY];
+    [parameters setObject:itemKey forKey:ZPKEY_ITEM_KEY];
     [parameters setObject:@"json" forKey:@"content"];
     
     [self _makeServerRequest:ZPServerConnectionRequestSingleItem withParameters:parameters userInfo:NULL completion:completionBlock];
     
 }
 
-+(void) retrieveSingleItemAndChildrenWithKey:(NSString *)itemKey{
++(void) retrieveSingleItemAndChildrenWithKey:(NSString *)itemKey fromLibraryWithID:(NSInteger) libraryID{
 
-    ZPZoteroItem* item = [ZPZoteroItem itemWithKey:itemKey];
-    
-    NSMutableDictionary* parameters = [NSMutableDictionary dictionaryWithObject:[NSNumber numberWithInt:item.libraryID] forKey:ZPKEY_LIBRARY_ID];
+    NSMutableDictionary* parameters = [NSMutableDictionary dictionaryWithObject:[NSNumber numberWithInt:libraryID] forKey:ZPKEY_LIBRARY_ID];
     [parameters setObject:itemKey forKey:ZPKEY_ITEM_KEY];
 
     if([ZPPreferences debugCitationParser]){
@@ -181,6 +178,8 @@ const NSInteger ZPServerConnectionRequestLastModifiedItem = 11;
     
     //Retrieve children for normal items.
     
+    ZPZoteroItem* item = [ZPZoteroItem itemWithKey:itemKey];
+
     if(! [item.itemType isEqualToString:@"attachment"] && ! [item.itemType isEqualToString:@"note"]){
         [self _makeServerRequest:ZPServerConnectionRequestSingleItemChildren withParameters:parameters userInfo:NULL];
     }

@@ -334,7 +334,7 @@ static NSOperationQueue* _uploadQueue;
     
     else{
         DDLogError(@"Attachment %@ (%@) is missing version identification information. The local file will replace the server version without a version check.",attachment.key,attachment.filename);
-        [ZPServerConnection retrieveSingleItemWithKey:attachment.key completion:^(NSArray* attachmentList){
+        [ZPServerConnection retrieveSingleItemWithKey:attachment.key fromLibraryWithID:attachment.libraryID completion:^(NSArray* attachmentList){
             if(attachmentList.count == 1){
                 [self _registerWebDAVUploadWithZoteroServer:[attachmentList objectAtIndex:0] userInfo:userInfo];
             }
@@ -551,7 +551,7 @@ static NSOperationQueue* _uploadQueue;
 
             [ZPFileCacheManager deleteOriginalFileForAttachment:attachment reason:@"File is outdated (WebDAV conflict)"];
             
-            [ZPServerConnection retrieveSingleItemWithKey:attachment.key completion:^(NSArray* parsedResults) {
+            [ZPServerConnection retrieveSingleItemWithKey:attachment.key fromLibraryWithID:attachment.libraryID completion:^(NSArray* parsedResults) {
                 if(parsedResults == NULL || [parsedResults count]==0){
                     [ZPFileUploadManager failedUploadingAttachment:attachment
                                                          withError:[NSError errorWithDomain:@"Zotero.org"

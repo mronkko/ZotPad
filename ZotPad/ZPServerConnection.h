@@ -37,10 +37,10 @@
 +(void) retrieveAllItemKeysFromLibrary:(NSInteger)libraryID;
 
 //This retrieves single item details and notes and attachments associated with that item
-+(void) retrieveSingleItemAndChildrenWithKey:(NSString*)itemKey;
++(void) retrieveSingleItemAndChildrenWithKey:(NSString*)itemKey fromLibraryWithID:(NSInteger) libraryID;
 
 //This retrieves a single attachment and processes it with a block
-+(void) retrieveSingleItemWithKey:(NSString*)itemKey completion:(void(^)(NSArray*))completionBlock;
++(void) retrieveSingleItemWithKey:(NSString*)itemKey fromLibraryWithID:(NSInteger) libraryID completion:(void(^)(NSArray*))completionBlock;
 
 +(NSInteger) numberOfActiveMetadataRequests;
 

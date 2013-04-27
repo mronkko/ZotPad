@@ -183,7 +183,8 @@
     if([ZPReachability hasInternetConnection]){
         //Animate until we get fresh data
         [_activityIndicator startAnimating];
-        [ZPServerConnection retrieveSingleItemAndChildrenWithKey:self.itemKey];
+        ZPZoteroItem* item = [ZPZoteroItem itemWithKey:self.itemKey];
+        [ZPServerConnection retrieveSingleItemAndChildrenWithKey:self.itemKey fromLibraryWithID:item.libraryID];
     }
     [[NSNotificationCenter defaultCenter] postNotificationName:ZPNOTIFICATION_ACTIVE_ITEM_CHANGED object:self.itemKey];
     

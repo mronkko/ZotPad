@@ -117,7 +117,7 @@ static ZPCacheStatusToolbarController* _statusView;
         
         if([ZPPreferences debugFileUploads]) DDLogInfo(@"Retrieving new metadata for file %@.",attachment.filenameBasedOnLinkMode);
         
-        [ZPServerConnection retrieveSingleItemWithKey:attachment.key completion:^(NSArray* parsedResults) {
+        [ZPServerConnection retrieveSingleItemWithKey:attachment.key fromLibraryWithID:attachment.libraryID completion:^(NSArray* parsedResults) {
             if(parsedResults == NULL || [parsedResults count]==0){
                 //Failure
                 DDLogWarn(@"Failed retrieving metadata for file %@.",attachment.filenameBasedOnLinkMode);
