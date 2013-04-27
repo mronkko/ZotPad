@@ -22,6 +22,8 @@
 // Needed for purging files
 #import "ZPFileCacheManager.h"
 
+#import "ZPGoodReaderIntegration.h"
+
 @interface ZPAttachmentFileInteractionController(){
     ZPZoteroAttachment* _activeAttachment;
     BOOL _fileCanBeOpened;
@@ -144,7 +146,7 @@
             _fileCanBeOpened = [docController presentOpenInMenuFromBarButtonItem:button animated: NO];
             [docController dismissMenuAnimated:NO];
             
-            if(_fileCanBeOpened){
+            if(! _fileCanBeOpened){
                 DDLogWarn(@"File in path %@ cannot be opened", _activeAttachment.fileSystemPath);
             }
         }
@@ -161,6 +163,7 @@
                                  otherButtonTitles:nil];
         
         if(_fileCanBeOpened){
+            if([ZPGoodReaderIntegration isGoodReaderAppInstalled]) [_actionSheet addButtonWithTitle:@"Send to GoodReader"];
             [_actionSheet addButtonWithTitle:@"Open in..."];
         }
         
@@ -189,9 +192,13 @@
         
         if(UI_USER_INTERFACE_IDIOM() == UIUserInterfaceIdiomPad && buttonIndex > 0) buttonIndex++;
 
+        
         if( ! _fileCanBeOpened && buttonIndex > 1 ) buttonIndex++;
+        if(buttonIndex > 1 && (! [ZPGoodReaderIntegration isGoodReaderAppInstalled] || ! _fileCanBeOpened)) buttonIndex++;
+
+        
         if((![UIPrintInteractionController isPrintingAvailable] ||
-            ! [UIPrintInteractionController canPrintURL:[NSURL fileURLWithPath:[_activeAttachment fileSystemPath]]]) && buttonIndex > 3)
+            ! [UIPrintInteractionController canPrintURL:[NSURL fileURLWithPath:[_activeAttachment fileSystemPath]]]) && buttonIndex > 4)
         {
             buttonIndex++;
         }
@@ -209,6 +216,10 @@
             _actionSheet = NULL;
         }
         else if(buttonIndex==2){
+            //Send to good reader
+            [ZPGoodReaderIntegration sendAttachmentToGoodReader:_activeAttachment];
+        }
+        else if(buttonIndex==3){
             //Open in...
             _docController = [UIDocumentInteractionController interactionControllerWithURL:[NSURL fileURLWithPath:_activeAttachment.fileSystemPath]];
             _docController.delegate = self;
@@ -216,7 +227,7 @@
             [_docController presentOpenInMenuFromBarButtonItem:_sourceButton animated:YES];
             _actionSheet = NULL;
         }
-        else if(buttonIndex==3){
+        else if(buttonIndex==4){
             ZPZoteroItem* parentItem = [ZPZoteroItem itemWithKey:_activeAttachment.parentKey];
             _mailController = [[MFMailComposeViewController alloc] init];
             [_mailController setSubject:parentItem.shortCitation];
@@ -230,7 +241,7 @@
             [root presentModalViewController:_mailController animated:YES];
             _actionSheet = NULL;
         }
-        else if(buttonIndex==4){
+        else if(buttonIndex==5){
             _printController = [UIPrintInteractionController sharedPrintController];
             _printController.delegate = self;
             [_printController setPrintingItem:[NSURL fileURLWithPath:[_activeAttachment fileSystemPath]]];
@@ -243,7 +254,7 @@
             }
             _actionSheet = NULL;
         }
-        else if(buttonIndex==5){
+        else if(buttonIndex==6){
             // Look up
             _actionSheet = NULL;
             [self presentLookupMenuFromBarButtonItem:_sourceButton];

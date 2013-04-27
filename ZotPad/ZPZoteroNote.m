@@ -77,6 +77,12 @@ static NSCache* _objectCache = NULL;
     }
 }
 
+-(void) setParentKey:(NSString *)parentKey{
+    if(parentKey != nil && ! [parentKey isKindOfClass:[NSString class]]){
+        [NSException raise:@"Internal consistency exception" format:@"Trying to set a non-string parent key (%@) for note %@",parentKey,self];
+    }
+    [super setParentKey:parentKey];
+}
 -(BOOL)locallyAdded{ return FALSE;}
 -(BOOL)locallyModified{ return FALSE;}
 -(BOOL)locallyDeleted{ return FALSE;}

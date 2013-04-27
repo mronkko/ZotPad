@@ -148,7 +148,7 @@
 			<key>Key</key>
 			<string>dropboxauthorsuffix</string>
 			<key>DefaultValue</key>
-			<string>et al</string>
+			<string> et al</string>
 		</dict>
 	</array>
 	<key>StringsTable</key>

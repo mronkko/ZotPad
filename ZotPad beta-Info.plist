@@ -75,6 +75,14 @@
 				<string>db-w1nps3e4js2va7z</string>
 			</array>
 		</dict>
+		<dict>
+			<key>CFBundleTypeRole</key>
+			<string>Editor</string>
+			<key>CFBundleURLSchemes</key>
+			<array>
+				<string>com.mronkko.zotpad-beta.sendtogr</string>
+			</array>
+		</dict>
 	</array>
 	<key>CFBundleVersion</key>
 	<string>1.2.4372</string>

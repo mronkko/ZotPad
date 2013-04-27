@@ -905,6 +905,12 @@
 		A74FCCE21641C477002FEA90 /* ZPNoteEditingViewController.m in Sources */ = {isa = PBXBuildFile; fileRef = A74FCCE11641C477002FEA90 /* ZPNoteEditingViewController.m */; };
 		A74FCCE31641C477002FEA90 /* ZPNoteEditingViewController.m in Sources */ = {isa = PBXBuildFile; fileRef = A74FCCE11641C477002FEA90 /* ZPNoteEditingViewController.m */; };
 		A74FCCE41641C477002FEA90 /* ZPNoteEditingViewController.m in Sources */ = {isa = PBXBuildFile; fileRef = A74FCCE11641C477002FEA90 /* ZPNoteEditingViewController.m */; };
+		A755A1DD172BBEA7008DEE19 /* libSendToGoodReader.a in Frameworks */ = {isa = PBXBuildFile; fileRef = A755A1DB172BBEA7008DEE19 /* libSendToGoodReader.a */; };
+		A755A1DE172BBEA7008DEE19 /* libSendToGoodReader.a in Frameworks */ = {isa = PBXBuildFile; fileRef = A755A1DB172BBEA7008DEE19 /* libSendToGoodReader.a */; };
+		A755A1DF172BBEA7008DEE19 /* libSendToGoodReader.a in Frameworks */ = {isa = PBXBuildFile; fileRef = A755A1DB172BBEA7008DEE19 /* libSendToGoodReader.a */; };
+		A755A1E3172BE8EA008DEE19 /* ZPGoodReaderIntegration.m in Sources */ = {isa = PBXBuildFile; fileRef = A755A1E2172BE8EA008DEE19 /* ZPGoodReaderIntegration.m */; };
+		A755A1E4172BE8EA008DEE19 /* ZPGoodReaderIntegration.m in Sources */ = {isa = PBXBuildFile; fileRef = A755A1E2172BE8EA008DEE19 /* ZPGoodReaderIntegration.m */; };
+		A755A1E5172BE8EA008DEE19 /* ZPGoodReaderIntegration.m in Sources */ = {isa = PBXBuildFile; fileRef = A755A1E2172BE8EA008DEE19 /* ZPGoodReaderIntegration.m */; };
 		A756F9BF167E328C008E3514 /* libFMDB.a in Frameworks */ = {isa = PBXBuildFile; fileRef = A702845A163BE32F003A0192 /* libFMDB.a */; };
 		A758FC521648560E00D431BE /* ZPQLPreviewControllerViewController.m in Sources */ = {isa = PBXBuildFile; fileRef = A758FC511648560E00D431BE /* ZPQLPreviewControllerViewController.m */; };
 		A758FC531648560E00D431BE /* ZPQLPreviewControllerViewController.m in Sources */ = {isa = PBXBuildFile; fileRef = A758FC511648560E00D431BE /* ZPQLPreviewControllerViewController.m */; };
@@ -975,6 +981,8 @@
 		A77FD065159F702E00774D50 /* gear@2x.png in Resources */ = {isa = PBXBuildFile; fileRef = A77FD061159F702E00774D50 /* gear@2x.png */; };
 		A77FD068159F750A00774D50 /* ZPLogViewController.m in Sources */ = {isa = PBXBuildFile; fileRef = A77FD067159F750900774D50 /* ZPLogViewController.m */; };
 		A77FD069159F750A00774D50 /* ZPLogViewController.m in Sources */ = {isa = PBXBuildFile; fileRef = A77FD067159F750900774D50 /* ZPLogViewController.m */; };
+		A7803856170F1E81006B6407 /* ZPWebDAVAuthenticationViewController.m in Sources */ = {isa = PBXBuildFile; fileRef = A7803855170F1E81006B6407 /* ZPWebDAVAuthenticationViewController.m */; };
+		A7803857170F1E81006B6407 /* ZPWebDAVAuthenticationViewController.m in Sources */ = {isa = PBXBuildFile; fileRef = A7803855170F1E81006B6407 /* ZPWebDAVAuthenticationViewController.m */; };
 		A78322D815EE3173004BB4F7 /* main.m in Sources */ = {isa = PBXBuildFile; fileRef = A7200DE014718DC0004347C9 /* main.m */; };
 		A78322D915EE3173004BB4F7 /* ZPAppDelegate.m in Sources */ = {isa = PBXBuildFile; fileRef = A7200DE414718DC0004347C9 /* ZPAppDelegate.m */; };
 		A78322DA15EE3173004BB4F7 /* ZPLibraryAndCollectionListViewController.m in Sources */ = {isa = PBXBuildFile; fileRef = A7200DEA14718DC1004347C9 /* ZPLibraryAndCollectionListViewController.m */; };
@@ -2529,6 +2537,10 @@
 		A74FCC9B16414E8B002FEA90 /* AccountSettingsUI_com.apple.Dataclass.Notes.png */ = {isa = PBXFileReference; lastKnownFileType = image.png; name = AccountSettingsUI_com.apple.Dataclass.Notes.png; path = Icons/AccountSettingsUI_com.apple.Dataclass.Notes.png; sourceTree = SOURCE_ROOT; };
 		A74FCCE01641C477002FEA90 /* ZPNoteEditingViewController.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = ZPNoteEditingViewController.h; sourceTree = "<group>"; };
 		A74FCCE11641C477002FEA90 /* ZPNoteEditingViewController.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = ZPNoteEditingViewController.m; sourceTree = "<group>"; };
+		A755A1DB172BBEA7008DEE19 /* libSendToGoodReader.a */ = {isa = PBXFileReference; lastKnownFileType = archive.ar; path = libSendToGoodReader.a; sourceTree = "<group>"; };
+		A755A1DC172BBEA7008DEE19 /* SendToGoodReader.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = SendToGoodReader.h; sourceTree = "<group>"; };
+		A755A1E1172BE8EA008DEE19 /* ZPGoodReaderIntegration.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = ZPGoodReaderIntegration.h; sourceTree = "<group>"; };
+		A755A1E2172BE8EA008DEE19 /* ZPGoodReaderIntegration.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = ZPGoodReaderIntegration.m; sourceTree = "<group>"; };
 		A758FC501648560E00D431BE /* ZPQLPreviewControllerViewController.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = ZPQLPreviewControllerViewController.h; sourceTree = "<group>"; };
 		A758FC511648560E00D431BE /* ZPQLPreviewControllerViewController.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = ZPQLPreviewControllerViewController.m; sourceTree = "<group>"; };
 		A7592E801637E83600CC4EA9 /* locales-en-US.xml */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = text.xml; name = "locales-en-US.xml"; path = "CSLProcessor/locales/locales-en-US.xml"; sourceTree = SOURCE_ROOT; };
@@ -2589,6 +2601,8 @@
 		A77FD061159F702E00774D50 /* gear@2x.png */ = {isa = PBXFileReference; lastKnownFileType = image.png; name = "gear@2x.png"; path = "Icons/gear@2x.png"; sourceTree = SOURCE_ROOT; };
 		A77FD066159F750700774D50 /* ZPLogViewController.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = ZPLogViewController.h; sourceTree = "<group>"; };
 		A77FD067159F750900774D50 /* ZPLogViewController.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = ZPLogViewController.m; sourceTree = "<group>"; };
+		A7803854170F1E81006B6407 /* ZPWebDAVAuthenticationViewController.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = ZPWebDAVAuthenticationViewController.h; sourceTree = "<group>"; };
+		A7803855170F1E81006B6407 /* ZPWebDAVAuthenticationViewController.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = ZPWebDAVAuthenticationViewController.m; sourceTree = "<group>"; };
 		A78324A915EE3174004BB4F7 /* ZotPad alpha.app */ = {isa = PBXFileReference; explicitFileType = wrapper.application; includeInIndex = 0; path = "ZotPad alpha.app"; sourceTree = BUILT_PRODUCTS_DIR; };
 		A786F7771476A56200B35B92 /* MainStoryboard_iPhone.storyboard */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = file.storyboard; path = MainStoryboard_iPhone.storyboard; sourceTree = "<group>"; };
 		A78D46A21692E31A00BA5C29 /* ZPUtils.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = ZPUtils.h; sourceTree = "<group>"; };
@@ -2812,6 +2826,7 @@
 				A7200DD514718DC0004347C9 /* UIKit.framework in Frameworks */,
 				A7200DD714718DC0004347C9 /* Foundation.framework in Frameworks */,
 				A73D1BFD1560E234002D4A2D /* libTestFlight.a in Frameworks */,
+				A755A1DD172BBEA7008DEE19 /* libSendToGoodReader.a in Frameworks */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
@@ -2847,6 +2862,7 @@
 				A783237D15EE3173004BB4F7 /* Foundation.framework in Frameworks */,
 				A783237E15EE3173004BB4F7 /* libTestFlight.a in Frameworks */,
 				A70288BA163BF3AF003A0192 /* libAjiPDFLib.a in Frameworks */,
+				A755A1DF172BBEA7008DEE19 /* libSendToGoodReader.a in Frameworks */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
@@ -2880,6 +2896,7 @@
 				A7CD076115161555007A8E1D /* UIKit.framework in Frameworks */,
 				A7CD076215161555007A8E1D /* Foundation.framework in Frameworks */,
 				A73D1BFE1560E234002D4A2D /* libTestFlight.a in Frameworks */,
+				A755A1DE172BBEA7008DEE19 /* libSendToGoodReader.a in Frameworks */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
@@ -3295,6 +3312,8 @@
 		A70399AF159703CD002F4293 /* Dialogs */ = {
 			isa = PBXGroup;
 			children = (
+				A7803854170F1E81006B6407 /* ZPWebDAVAuthenticationViewController.h */,
+				A7803855170F1E81006B6407 /* ZPWebDAVAuthenticationViewController.m */,
 				A77FD066159F750700774D50 /* ZPLogViewController.h */,
 				A77FD067159F750900774D50 /* ZPLogViewController.m */,
 				A7699E5A159B1AC7002F09DA /* ZPUploadVersionConflictViewControllerViewController.h */,
@@ -3626,6 +3645,7 @@
 				A7C19FF715F4D5D100A5AF49 /* FRLayeredNavigationController.xcodeproj */,
 				A702844E163BE32F003A0192 /* fmdb.xcodeproj */,
 				A77E0DC415D65FAB00134D35 /* UserVoice.xcodeproj */,
+				A755A1CE172BBE7F008DEE19 /* GoodReaderSDK */,
 				A7E06897164254AE00A2597F /* StripHTML */,
 				A70284AC163BEE38003A0192 /* ZipArchive */,
 				A75D4B4215BC9B56003291CB /* Base64 */,
@@ -3686,6 +3706,7 @@
 		A72853FE147E33F400D3FE97 /* User interface */ = {
 			isa = PBXGroup;
 			children = (
+				A755A1E0172BE8C1008DEE19 /* Supporting files */,
 				A74C48CC1639867400B14A55 /* Controllers */,
 				A74C48CB1639866D00B14A55 /* Views */,
 				A786F7771476A56200B35B92 /* MainStoryboard_iPhone.storyboard */,
@@ -3783,6 +3804,24 @@
 			);
 			name = CMPopTipView;
 			path = CMPopTipView/CMPopTipView;
+			sourceTree = "<group>";
+		};
+		A755A1CE172BBE7F008DEE19 /* GoodReaderSDK */ = {
+			isa = PBXGroup;
+			children = (
+				A755A1DB172BBEA7008DEE19 /* libSendToGoodReader.a */,
+				A755A1DC172BBEA7008DEE19 /* SendToGoodReader.h */,
+			);
+			name = GoodReaderSDK;
+			sourceTree = "<group>";
+		};
+		A755A1E0172BE8C1008DEE19 /* Supporting files */ = {
+			isa = PBXGroup;
+			children = (
+				A755A1E1172BE8EA008DEE19 /* ZPGoodReaderIntegration.h */,
+				A755A1E2172BE8EA008DEE19 /* ZPGoodReaderIntegration.m */,
+			);
+			name = "Supporting files";
 			sourceTree = "<group>";
 		};
 		A7592E8C1637E85400CC4EA9 /* CSL parser data files */ = {
@@ -6051,6 +6090,8 @@
 				A7F1850316A5DE8A002750F8 /* ZPItemListDataSource.m in Sources */,
 				A7027D7C16C24F5A00F2C557 /* ZPZoteroItemTypes.m in Sources */,
 				A7117D3616E5BB3500D2D99F /* Base64.m in Sources */,
+				A7803856170F1E81006B6407 /* ZPWebDAVAuthenticationViewController.m in Sources */,
+				A755A1E3172BE8EA008DEE19 /* ZPGoodReaderIntegration.m in Sources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
@@ -6168,6 +6209,7 @@
 				A7F1850516A5DE8A002750F8 /* ZPItemListDataSource.m in Sources */,
 				A7027D7E16C24F5A00F2C557 /* ZPZoteroItemTypes.m in Sources */,
 				A7117D3816E5BB3500D2D99F /* Base64.m in Sources */,
+				A755A1E5172BE8EA008DEE19 /* ZPGoodReaderIntegration.m in Sources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
@@ -6285,6 +6327,8 @@
 				A7F1850416A5DE8A002750F8 /* ZPItemListDataSource.m in Sources */,
 				A7027D7D16C24F5A00F2C557 /* ZPZoteroItemTypes.m in Sources */,
 				A7117D3716E5BB3500D2D99F /* Base64.m in Sources */,
+				A7803857170F1E81006B6407 /* ZPWebDAVAuthenticationViewController.m in Sources */,
+				A755A1E4172BE8EA008DEE19 /* ZPGoodReaderIntegration.m in Sources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};

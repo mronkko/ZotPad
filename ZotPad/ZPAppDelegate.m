@@ -32,6 +32,7 @@
 #import "DDFileLogger.h"
 #import "CompressingLogFileManager.h"
 
+#import "ZPGoodReaderIntegration.h"
 
 @interface ZPFileLogFormatter : NSObject <DDLogFormatter>{
     NSInteger _level;
@@ -247,6 +248,13 @@ didFinishLaunchingWithOptions:(NSDictionary *)launchOptions
         }
         return YES;
     }
+    
+    //GoodReader integration
+    else if([ZPGoodReaderIntegration takeOverIncomingURLRequest:url]){
+        return YES;
+    }
+    
+    // Receiving files from other apps
     else{
               
         //Is the file recognized?
@@ -258,7 +266,7 @@ didFinishLaunchingWithOptions:(NSDictionary *)launchOptions
             [[[UIAlertView alloc] initWithTitle:@"Unknown file" message:[NSString stringWithFormat:@"ZotPad could not identify a Zotero item for file '%@' received from %@. The file will be ignored.",[url lastPathComponent],[[sourceApplication componentsSeparatedByString:@"."] lastObject]] delegate:NULL cancelButtonTitle:@"Cancel" otherButtonTitles: nil] show];
         }
         else{
-            DDLogInfo(@"A file %@ from %@",[url lastPathComponent],sourceApplication);
+            DDLogInfo(@"Received a file %@ from %@",[url lastPathComponent],sourceApplication);
             
             [self dismissViewControllerHierarchy];
             [self.window.rootViewController performSegueWithIdentifier:@"Import" sender:url];
@@ -278,6 +286,9 @@ didFinishLaunchingWithOptions:(NSDictionary *)launchOptions
     // Add whatever other url handling code your app requires here
     return NO;
 }
+
+
+// Dropbox integration
 
 - (void) _uploadFolderToDropBox:(DBRestClient*) client toPath:(NSString*)toPath fromPath:(NSString*) fromPath{
     

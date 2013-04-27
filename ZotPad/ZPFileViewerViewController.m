@@ -24,6 +24,7 @@
 #import "ZipArchive.h"
 #import "NSString+Base64.h"
 
+#import "ZPGoodReaderIntegration.h"
 
 @interface ZPFileViewerViewController (){
     //An ugly way to load table view cells for tags twice so that they are sized correctly
@@ -57,14 +58,20 @@ static ZPFileViewerViewController* _instance;
 +(void) presentWithAttachment:(ZPZoteroAttachment*)attachment{
     if ([NSThread isMainThread]){
 
-        UIViewController* root =[UIApplication sharedApplication].delegate.window.rootViewController;
-        
-        
-        // Only show the viewer if there is no modal view controller visible
-        if(root.presentedViewController == nil){
-            ZPFileViewerViewController* vc = [self instance];
-            [vc addAttachmentToViewer:attachment];
-            [root presentModalViewController:vc animated:YES];
+        if([ZPPreferences sendToGoodReaderInsteadOfOpeningInDefaultViewer] && [ZPGoodReaderIntegration isGoodReaderAppInstalled]){
+            //Send to good reader
+            [ZPGoodReaderIntegration sendAttachmentToGoodReader:attachment];
+        }
+        else{
+            UIViewController* root =[UIApplication sharedApplication].delegate.window.rootViewController;
+            
+            
+            // Only show the viewer if there is no modal view controller visible
+            if(root.presentedViewController == nil){
+                ZPFileViewerViewController* vc = [self instance];
+                [vc addAttachmentToViewer:attachment];
+                [root presentModalViewController:vc animated:YES];
+            }
         }
     }
     else{

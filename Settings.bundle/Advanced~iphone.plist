@@ -48,6 +48,22 @@
                 <key>Key</key>
                 <string>prioritizepdfs</string>
                 <key>DefaultValue</key>
+                <false/>
+            </dict>
+            <dict>
+                <key>Type</key>
+                <string>PSGroupSpecifier</string>
+                <key>Title</key>
+                <string>File viewer</string>
+            </dict>
+            <dict>
+                <key>Type</key>
+                <string>PSToggleSwitchSpecifier</string>
+                <key>Title</key>
+                <string>Disable built-in viewer and send to GoodReader instead</string>
+                <key>Key</key>
+                <string>disablebuiltinviewerandsendtogoodreader</string>
+                <key>DefaultValue</key>
                 <true/>
             </dict>
             <dict>

@@ -447,4 +447,10 @@ static NSInteger _maxCacheSize;
     return [defaults boolForKey:@"displayitemkeys"];
 }
 
++(BOOL) sendToGoodReaderInsteadOfOpeningInDefaultViewer{
+    NSUserDefaults* defaults = [NSUserDefaults standardUserDefaults];
+    return [defaults boolForKey:@"disablebuiltinviewerandsendtogoodreader"];
+}
+
+
 @end

@@ -83,5 +83,6 @@
 +(BOOL) prioritizePDFsInAttachmentLists;
 +(BOOL) displayItemKeys;
 
++(BOOL) sendToGoodReaderInsteadOfOpeningInDefaultViewer;
 
 @end
