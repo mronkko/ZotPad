@@ -394,7 +394,7 @@ static NSInteger _uploadCounter = 0;
             basePath = defaultPath;
         }
         
-        basePath = [basePath stringByReplacingOccurrencesOfString:[NSString stringWithFormat:@"Apps/%@/",appFolder] withString:@""] ;
+        basePath = [basePath stringByReplacingOccurrencesOfString:[NSString stringWithFormat:@"Apps/%@",appFolder] withString:@""] ;
     }
 
 
@@ -460,10 +460,10 @@ static NSInteger _uploadCounter = 0;
             folderPattern = [folderPattern stringByReplacingOccurrencesOfString:@"\\" withString:@"/"];
             folderPattern = [folderPattern stringByTrimmingCharactersInSet:[NSCharacterSet characterSetWithCharactersInString:@" /"]];
             folderPattern = [NSString stringWithFormat:@"/%@/", folderPattern];
-            NSString* folder = [self _filenameOrPathForAttachment:attachment withPattern:pattern];
+            NSString* folder = [self _filenameOrPathForAttachment:attachment withPattern:folderPattern];
             folder = [folder stringByReplacingOccurrencesOfString:@"//" withString:@"/undefined/"];
             
-            customName = (NSMutableString*) [[folderPattern stringByAppendingString:customName] stringByTrimmingCharactersInSet:[NSCharacterSet characterSetWithCharactersInString:@"/"]];
+            customName = (NSMutableString*) [[folder stringByAppendingString:customName] stringByTrimmingCharactersInSet:[NSCharacterSet characterSetWithCharactersInString:@"/"]];
         }
         return [NSString stringWithFormat:@"/%@%@",basePath,customName];
         
