@@ -16,6 +16,10 @@
 
 #import "ZPFileCacheManager.h"
 
+//Needed for UTIs
+
+#import <MobileCoreServices/MobileCoreServices.h>
+
 NSInteger const LINK_MODE_IMPORTED_FILE = 0;
 NSInteger const LINK_MODE_IMPORTED_URL = 1;
 NSInteger const LINK_MODE_LINKED_FILE = 2;
@@ -158,6 +162,42 @@ static NSString* _documentsDirectory = NULL;
     if(thisFilename == NULL)
         return NULL;
     
+    // Some iOS features require that the file UTI should be identified based on
+    // the filename. Check that we can actually do this and if not, add the
+    // proper suffix.
+    
+    NSString* fileNameExtension = [thisFilename pathExtension];
+
+    if(fileNameExtension != NULL){
+
+        if([fileNameExtension isEqualToString:@""]){
+            fileNameExtension = NULL;
+        }
+        else{
+            NSString* UTI = (__bridge NSString*) UTTypeCreatePreferredIdentifierForTag(kUTTagClassFilenameExtension,
+                                                                           (__bridge CFStringRef) fileNameExtension,
+                                                                           NULL);
+            if(UTI == NULL){
+                fileNameExtension = NULL;
+            }
+        }
+    }
+
+    //Add file name extension if it could not be mapped to an UTI
+    
+    if(fileNameExtension == NULL){
+
+        CFStringRef UTI = UTTypeCreatePreferredIdentifierForTag(kUTTagClassMIMEType,
+                                                                (__bridge CFStringRef) self.contentType,
+                                                                NULL);
+        
+        fileNameExtension = (__bridge NSString*) UTTypeCopyPreferredTagWithClass(UTI,
+                                                                                 kUTTagClassFilenameExtension);
+        CFRelease(UTI);
+
+        thisFilename = [thisFilename stringByAppendingPathExtension:fileNameExtension];
+    }
+
     NSString* path;
     
     
