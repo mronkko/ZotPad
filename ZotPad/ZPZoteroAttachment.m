@@ -183,19 +183,24 @@ static NSString* _documentsDirectory = NULL;
         }
     }
 
-    //Add file name extension if it could not be mapped to an UTI
+    //Add file name extension if it could not be mapped to an UTI and if we the
+    //content type is known. 
     
-    if(fileNameExtension == NULL){
+    if(fileNameExtension == NULL && self.contentType != nil){
 
         CFStringRef UTI = UTTypeCreatePreferredIdentifierForTag(kUTTagClassMIMEType,
                                                                 (__bridge CFStringRef) self.contentType,
                                                                 NULL);
         
-        fileNameExtension = (__bridge NSString*) UTTypeCopyPreferredTagWithClass(UTI,
+        if(UTI != NULL){
+            fileNameExtension = (__bridge NSString*) UTTypeCopyPreferredTagWithClass(UTI,
                                                                                  kUTTagClassFilenameExtension);
-        CFRelease(UTI);
-
-        thisFilename = [thisFilename stringByAppendingPathExtension:fileNameExtension];
+            CFRelease(UTI);
+            
+            if(fileNameExtension != nil){
+                thisFilename = [thisFilename stringByAppendingPathExtension:fileNameExtension];
+            }
+        }
     }
 
     NSString* path;
