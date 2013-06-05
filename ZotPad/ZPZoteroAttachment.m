@@ -120,30 +120,29 @@ static NSString* _documentsDirectory = NULL;
     NSString* parsedFilename = [[filename lastPathComponent] stringByDeletingPathExtension];
     
     //Get the key from the filename
-    NSString* key =[[parsedFilename componentsSeparatedByString: @"_"] lastObject];
+    NSArray* keyCandidates =[parsedFilename componentsSeparatedByString: @"_"];
     
-    //TODO: 
-    if(key == NULL || [key isEqualToString:@""]){
-        DDLogError(@"While scanning for files to upload, parsing filename %@ resulted in empty key",filename);
-        return NULL;
-    }
+    //Reverse iterate the key candidates. It is possible that something has been
+    //appended at the end by the PDF editor
     
-    ZPZoteroAttachment* attachment;
-    //If this is a locally modified file or a version, strip the trailing - from the key
-    if(key.length>8){
-        NSString* newKey = [key substringToIndex:8];
-        attachment = [self attachmentWithKey:newKey];
-    }
-    else{
-        attachment = [self attachmentWithKey:key];
-    }
+    for(NSString* keyCandidate in [keyCandidates reverseObjectEnumerator]){
     
-    // Does the attachment really exist
-    
-    if([attachment filenameBasedOnLinkMode] == NULL ) attachment = NULL;
+        //The key cannot be in the first element
+        if(keyCandidate == [keyCandidates objectAtIndex:0]) return NULL;
 
-    return attachment;
-    
+        //Only process filename parts that are long enough to be keys
+
+        if(keyCandidate.length>=8){
+         
+            //Trim extra characters
+            
+            ZPZoteroAttachment* attachment = [self attachmentWithKey:[keyCandidate substringToIndex:8]];
+            
+            if([attachment filenameBasedOnLinkMode] != NULL ) return attachment;
+
+        }
+    }
+    return NULL;
 }
 
 - (NSString*) fileSystemPath{
