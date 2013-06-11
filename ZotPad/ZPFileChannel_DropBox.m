@@ -22,7 +22,6 @@
 #import "ZipArchive.h"
 
 
-
 const NSInteger ZPFILECHANNEL_DROPBOX_UPLOAD = 1;
 const NSInteger ZPFILECHANNEL_DROPBOX_DOWNLOAD = 2;
 
@@ -72,10 +71,12 @@ const NSInteger ZPFILECHANNEL_DROPBOX_DOWNLOAD = 2;
 -(NSString*) _pathForAttachment:(ZPZoteroAttachment*)attachment;
 -(NSString*) _URLForAttachment:(ZPZoteroAttachment*)attachment;
 -(NSString*) _filenameOrPathForAttachment:(ZPZoteroAttachment*)attachment withPattern:(NSString*)pattern;
-
 @end
 
 @implementation ZPFileChannel_Dropbox
+
+//TODO: Refactor this so that only one DBClient is used for uploading and one for downloading
+// removing the need for counters
 
 static NSInteger _downloadCounter = 0;
 static NSInteger _uploadCounter = 0;
@@ -387,9 +388,13 @@ static NSInteger _uploadCounter = 0;
         if([ZPPreferences dropboxPath] != NULL && ! [[ZPPreferences dropboxPath] hasPrefix:[@"Apps/" stringByAppendingString:appFolder]]){
             
             NSString* defaultPath = [NSString stringWithFormat:@"Apps/%@/storage",appFolder];
-            [[[UIAlertView alloc] initWithTitle:@"Dropbox configuration error"
-                                       message:[NSString stringWithFormat:@"Your Dropbox settings allow ZotPad to acces only app folder located at 'Apps/%@', but the current path to our Dropbox files pointed to '%@'. Path to Dropbox files has been reset to default value 'Apps/%@/storage'",appFolder,[ZPPreferences dropboxPath], appFolder]
-                                      delegate:NULL cancelButtonTitle:@"OK" otherButtonTitles: nil] show];
+            
+            UIAlertView* alertView = [[UIAlertView alloc] initWithTitle:@"Dropbox configuration error"
+                                                                message:[NSString stringWithFormat:@"Your Dropbox settings allow ZotPad to acces only app folder located at 'Apps/%@', but the current path to our Dropbox files pointed to '%@'. Path to Dropbox files has been reset to default value 'Apps/%@/storage'",appFolder,[ZPPreferences dropboxPath], appFolder]
+                                                               delegate:NULL cancelButtonTitle:@"OK" otherButtonTitles: nil];
+
+            [alertView performSelectorOnMainThread:@selector(show) withObject:nil waitUntilDone:NO];
+
             [ZPPreferences setDropboxPath:defaultPath];
             basePath = defaultPath;
         }
@@ -526,7 +531,7 @@ static NSInteger _uploadCounter = 0;
     NSString* path = [self _pathForAttachment:attachment];
     //If this is a website snapshot, we need to download all files
 
-    DDLogVerbose(@"Requesting metadata from Dropbox path %@",path);
+    if([ZPPreferences debugFileUploadsAndDownloads]) DDLogInfo(@"Requesting metadata from Dropbox path %@",path);
     
     //Drobbox uses NSURLconnection internally, so it needs to be called in the main thread.
     [restClient performSelectorOnMainThread:@selector(loadMetadata:) withObject:[path precomposedStringWithCanonicalMapping] waitUntilDone:NO];
@@ -598,20 +603,20 @@ static NSInteger _uploadCounter = 0;
 
 - (void)restClient:(ZPDBRestClient*)client loadedMetadata:(DBMetadata *)metadata {
     
-    DDLogVerbose(@"Dropbox returned metadata");
+    if([ZPPreferences debugFileUploadsAndDownloads]) DDLogInfo(@"Dropbox returned metadata");
     
     ZPZoteroAttachment* attachment = client.attachment;
     
     if(client.tag == ZPFILECHANNEL_DROPBOX_DOWNLOAD){
         if (metadata.isDirectory) {
            
-            DDLogVerbose(@"Folder '%@' contains:", metadata.path);
+            if([ZPPreferences debugFileUploadsAndDownloads]) DDLogInfo(@"Folder '%@' contains:", metadata.path);
             NSString* basePath=[NSTemporaryDirectory() stringByAppendingPathComponent:[NSString stringWithFormat:@"ZP%@%f",attachment.key,[[NSDate date] timeIntervalSince1970]*1000000]];
             [[NSFileManager defaultManager] createDirectoryAtPath:basePath withIntermediateDirectories:YES attributes:NULL error:NULL];
 
             NSString* path = [self _pathForAttachment:attachment];
             for (DBMetadata *file in metadata.contents) {
-                DDLogVerbose(@"\t%@", file.filename);
+                if([ZPPreferences debugFileUploadsAndDownloads]) DDLogInfo(@"\t%@", file.filename);
                 NSString* tempFile = [basePath stringByAppendingPathComponent:file.filename];
                 [client loadFile:[[path stringByAppendingPathComponent:file.filename] precomposedStringWithCanonicalMapping] intoPath:tempFile];
             }
@@ -622,7 +627,7 @@ static NSInteger _uploadCounter = 0;
         else{
             //Set version of the file
             client.revision=metadata.rev;
-            DDLogVerbose(@"Start downloading file /%@/%@ (rev %@)",attachment.key,attachment.filenameBasedOnLinkMode,client.revision);
+            if([ZPPreferences debugFileUploadsAndDownloads]) DDLogInfo(@"Start downloading file /%@/%@ (rev %@)",attachment.key,attachment.filenameBasedOnLinkMode,client.revision);
             NSString* tempFile = [NSTemporaryDirectory() stringByAppendingPathComponent:[NSString stringWithFormat:@"ZP%@%f",attachment.key,[[NSDate date] timeIntervalSince1970]*1000000]];
             NSString* path = [self _pathForAttachment:attachment];
             [client loadFile:[path precomposedStringWithCanonicalMapping] atRev:client.revision intoPath:tempFile];
@@ -633,7 +638,7 @@ static NSInteger _uploadCounter = 0;
         NSString* path = [self _pathForAttachment:attachment];
         NSString* targetPath = [path stringByDeletingLastPathComponent];
         
-        if([ZPPreferences debugFileUploads]){
+        if([ZPPreferences debugFileUploadsAndDownloads]){
             DDLogInfo(@"DropBox metadata");
             DDLogInfo(@"lastModifiedDate: %@",metadata.lastModifiedDate);
             DDLogInfo(@"clientMtime: %@",metadata.clientMtime);
@@ -653,7 +658,7 @@ static NSInteger _uploadCounter = 0;
         
         //If rev is null, we assume that the file has been deleted. Fail 
         else if(metadata.rev == NULL){
-            _downloadCounter--;
+            _uploadCounter--;
             [ZPFileUploadManager failedUploadingAttachment:attachment
                                                      withError:[NSError errorWithDomain:@"Dropbox"
                                                                                    code:-1
@@ -662,7 +667,7 @@ static NSInteger _uploadCounter = 0;
             [self cleanupAfterFinishingAttachment:attachment];
         }
         else if(! [attachment.versionIdentifier_local isEqualToString:metadata.rev]){
-            _downloadCounter--;
+            _uploadCounter--;
             [self presentConflictViewForAttachment:attachment reason:[NSString stringWithFormat:@"Version identifiers differ. Local file: %@, Dropbox server file: %@", attachment.versionIdentifier_local, metadata.rev]];
         }
         else{
@@ -674,7 +679,7 @@ static NSInteger _uploadCounter = 0;
 
 - (void)restClient:(ZPDBRestClient*) client loadMetadataFailedWithError:(NSError *)error {
     
-    DDLogVerbose(@"Error loading metadata: %@", error);
+    if([ZPPreferences debugFileUploadsAndDownloads]) DDLogInfo(@"Error loading metadata: %@", error);
     
     [self _restClient:client processError:error];
     
@@ -707,7 +712,7 @@ static NSInteger _uploadCounter = 0;
 }
 - (void)restClient:(ZPDBRestClient*)client loadedFile:(NSString*)localPath {
     
-    DDLogVerbose(@"Dropbox returned file");
+    if([ZPPreferences debugFileUploadsAndDownloads]) DDLogInfo(@"Dropbox returned file");
 
     ZPZoteroAttachment* attachment = client.attachment;
     
@@ -750,7 +755,7 @@ static NSInteger _uploadCounter = 0;
             for (NSString* file in files){
                 // The filenames end with %ZB64, which needs to be removed
                 NSString* encodedFilename = [ZPZoteroAttachment zoteroBase64Encode:[file lastPathComponent]];                
-                DDLogVerbose(@"Encoded %@ as %@",file , encodedFilename);
+                if([ZPPreferences debugFileUploadsAndDownloads]) DDLogInfo(@"Encoded %@ as %@",file , encodedFilename);
                 
                 //Add to Zip with the new name
                 [zipArchive addFileToZip:[tempPath stringByAppendingPathComponent:file] newname:encodedFilename];
@@ -781,7 +786,7 @@ static NSInteger _uploadCounter = 0;
 }
 
 - (void)restClient:(ZPDBRestClient*)client loadFileFailedWithError:(NSError*)error {
-    DDLogVerbose(@"There was an error downloading the file - %@", error);
+    if([ZPPreferences debugFileUploadsAndDownloads]) DDLogInfo(@"There was an error downloading the file - %@", error);
 
     [self _restClient:client processError:error];
     
@@ -795,7 +800,7 @@ static NSInteger _uploadCounter = 0;
 - (void)restClient:(ZPDBRestClient*)client uploadedFile:(NSString*)destPath from:(NSString*)srcPath 
           metadata:(DBMetadata*)metadata{
     
-    DDLogVerbose(@"Dropbox uploaded file");
+    if([ZPPreferences debugFileUploadsAndDownloads]) DDLogInfo(@"Dropbox uploaded file");
 
     ZPZoteroAttachment* attachment = client.attachment;
     _uploadCounter--;
@@ -812,7 +817,7 @@ static NSInteger _uploadCounter = 0;
 
 }
 - (void)restClient:(ZPDBRestClient*)client uploadFileFailedWithError:(NSError*)error{
-    DDLogVerbose(@"There was an error uploading the file - %@", error);
+    if([ZPPreferences debugFileUploadsAndDownloads]) DDLogInfo(@"There was an error uploading the file - %@", error);
     
     [self _restClient:client processError:error];
     
