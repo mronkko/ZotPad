@@ -50,7 +50,9 @@ static CSLFormatter* _cslFormatter = NULL;
     
     if(key == NULL || [key isEqual:@""])
         [NSException raise:@"Key is empty" format:@"ZPZoteroItem cannot be instantiated with empty key"];
-        
+    if([(NSString*)key length] !=8)
+        [NSException raise:@"Key is not valid" format:@"ZPZoteroItem key must be eight characters long"];
+    
     
     ZPZoteroItem* obj= [_objectCache objectForKey:key];
     
@@ -76,7 +78,8 @@ static CSLFormatter* _cslFormatter = NULL;
 
     if(![key isKindOfClass:[NSString class]])
         [NSException raise:@"Key is not string" format:@"ZPZoteroItem must be cached with a key that is a string."];
-    
+    if([(NSString*)key length] != 8)
+        [NSException raise:@"Key is not valid" format:@"ZPZoteroItem key must be eight characters long"];
     
     ZPZoteroItem* obj= [_objectCache objectForKey:key];
     
@@ -326,7 +329,6 @@ static CSLFormatter* _cslFormatter = NULL;
     return _notes;
 }
 - (void) setNotes:(NSArray*)notes{
-
     _notes = notes;
 }
 

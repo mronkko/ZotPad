@@ -22,6 +22,9 @@ static NSCache* _objectCache = NULL;
     if(key == NULL){
         [NSException raise:@"Key is null" format:@"ZPZoteroCollection cannot be instantiated with NULL key"];
     }
+    if([(NSString*)key length] != 8){
+        [NSException raise:@"Key is not valid" format:@"ZPZoteroCollection key must be 8 characters"];
+    }
     
     if(_objectCache == NULL) _objectCache = [[NSCache alloc] init];
     
@@ -44,7 +47,10 @@ static NSCache* _objectCache = NULL;
     if(key == NULL){
         [NSException raise:@"Key is null" format:@"ZPZoteroCollection cannot be instantiated with NULL key"];
     }
-    
+    if([(NSString*)key length] != 8){
+        [NSException raise:@"Key is not valid" format:@"ZPZoteroCollection key must be 8 characters"];
+    }
+
     if(_objectCache == NULL) _objectCache = [[NSCache alloc] init];
     
     ZPZoteroCollection* obj= [_objectCache objectForKey:key];
