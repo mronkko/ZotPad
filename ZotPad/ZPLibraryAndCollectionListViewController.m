@@ -481,6 +481,7 @@
                 //NSLog(@"%@",dataObj.title);
             }
             
+            //TODO: Refactor this to use the table view updater
             
             if(([insertArray count] !=0) || ([deleteArray count] > 0)){
             
