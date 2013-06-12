@@ -72,6 +72,21 @@ static ZPGoodReaderIntegration_saveBackDelegate* _delegateInstance;
                        transferDelegate:nil
                      optionalResultCode:nil];
     
+    //Store the version identifier. This is later used to upload modified files to Zotero
+
+    //TODO: Refactor, this is duplicate code
+    
+    if( attachment.versionIdentifier_local == NULL){
+        if(attachment.versionIdentifier_server == NULL){
+            DDLogCError(@"Server version identifier for attachment %@ was null",attachment.key);
+            attachment.versionIdentifier_server = [ZPZoteroAttachment md5ForFileAtPath:attachment.fileSystemPath_original];
+            //[NSException raise:@"Attachment version identifier cannot be null" format:@"Server version identifier for attachment %@ was null",_activeAttachment.key];
+        }
+        attachment.versionIdentifier_local = attachment.versionIdentifier_server;
+    }
+    
+    [ZPDatabase writeVersionInfoForAttachment:attachment];
+
 }
 
 @end
