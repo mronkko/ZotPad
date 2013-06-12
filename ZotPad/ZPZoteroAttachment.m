@@ -12,7 +12,7 @@
 
 #import "FileMD5Hash.h"
 #import "ZPItemDataDownloadManager.h"
-#import "NSString+Base64.h"
+#import "Base64.h"
 
 #import "ZPFileCacheManager.h"
 
@@ -375,7 +375,7 @@ static NSString* _documentsDirectory = NULL;
 
 +(NSString*) zoteroBase64Decode:(NSString*)filename{
     NSString* toBeDecoded = [filename substringToIndex:[filename length] - 5];
-    NSData* decodedData = [toBeDecoded decodeBase64EncodedString];
+    NSData* decodedData = [toBeDecoded base64DecodedData];
     NSString* decodedFilename = [[NSString alloc] initWithData:decodedData encoding:NSUTF8StringEncoding];
     return decodedFilename;
 }
