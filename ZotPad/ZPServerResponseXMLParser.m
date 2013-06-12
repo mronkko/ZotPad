@@ -28,22 +28,21 @@
     self=[super init];
     _resultArray=[NSMutableArray array];
     _temporaryFieldStorage =[NSMutableDictionary dictionary];
-    _currentStringContent = @"";
     _insideEntry=FALSE;
-    _currentID=NULL; 
+    _currentID=NULL;
     
     return self;
-
+    
 }
 
 
 - (void)parser:(NSXMLParser *)parser didEndElement:(NSString *)elementName namespaceURI:(NSString *)namespaceURI qualifiedName:(NSString *)qName{
     
-//    DDLogVerbose(@"Parser finished element %@ with content %@",elementName,_currentStringContent);
+    //    DDLogVerbose(@"Parser finished element %@ with content %@",elementName,_currentStringContent);
     
     // HTML elements ( <i> ) in the formatted citation
     if([elementName isEqualToString:@"i"]){
-        _currentStringContent =[_currentStringContent stringByAppendingString:@"</i>"];
+        [_currentStringContent appendString:@"</i>"];
     }
     else{
         if([elementName isEqualToString: @"zapi:totalResults"]){
@@ -105,23 +104,25 @@
             
             if(_totalResults ==0 ) _totalResults = 1;
         }
-        else if(_insideEntry){
+        else if(_insideEntry && _currentStringContent != nil){
             [self _setField:elementName toValue:_currentStringContent];
         }
+        
+        _currentStringContent = nil;
     }
 }
 
 - (void)parser:(NSXMLParser *)parser didStartElement:(NSString *)elementName namespaceURI:(NSString *)namespaceURI qualifiedName:(NSString *)qualifiedName attributes:(NSDictionary *)attributeDict{
-
-//    DDLogVerbose(@"Parser starting element %@",elementName);
-
+    
+    //    DDLogVerbose(@"Parser starting element %@",elementName);
+    
     // HTML elements ( <i> ) inthe formatted citation
-
+    
     if([elementName isEqualToString:@"i"]){
-        _currentStringContent =[_currentStringContent stringByAppendingString:@"<i>"];
-    } 
+        [_currentStringContent appendString:@"<i>"];
+    }
     else{
-        _currentStringContent = @"";
+        _currentStringContent = [[NSMutableString alloc] init];
         
         if([elementName isEqualToString:@"entry"]){
             _insideEntry = TRUE;
@@ -132,7 +133,7 @@
             NSArray* parts= [(NSString*)[attributeDict objectForKey:@"href"] componentsSeparatedByString:@"/"];
             
             //Strip URL parameters
-            NSString* value = [[[parts lastObject] componentsSeparatedByString:@"?"] objectAtIndex:0];    
+            NSString* value = [[[parts lastObject] componentsSeparatedByString:@"?"] objectAtIndex:0];
             
             if([@"self" isEqualToString:(NSString*)[attributeDict objectForKey:@"rel"]]){
                 _currentID = value;
@@ -144,7 +145,7 @@
                 else{
                     _libraryID = [[parts objectAtIndex:4] intValue];
                 }
-
+                
             }
             else if([@"up" isEqualToString:(NSString*)[attributeDict objectForKey:@"rel"]]){
                 [self _setField:@"parentKey" toValue:value];
@@ -156,7 +157,7 @@
                 NSString* length=[attributeDict objectForKey:@"length"];
                 
                 [self _setField:@"existsOnZoteroServer" toValue:[NSNumber numberWithInt:1]];
-
+                
                 if(length!=NULL){
                     [self _setField:@"attachmentSize" toValue:[NSNumber numberWithInt:[length intValue]]];
                 }
@@ -167,8 +168,7 @@
 
 
 - (void)parser:(NSXMLParser *)parser foundCharacters:(NSString *)string{
-
-    _currentStringContent =[_currentStringContent stringByAppendingString:string];
+    if(_currentStringContent != nil) [_currentStringContent appendString:string];
 }
 
 - (NSInteger) totalResults{
@@ -192,10 +192,10 @@
             [_currentElement setValue:value forKey:attributeName];
         }
         else{
-//            DDLogVerbose(@"XML parser rejected field %@",attributeName);
+            //            DDLogVerbose(@"XML parser rejected field %@",attributeName);
         }
     }
-
+    
 }
 
 - (void) _processTemporaryFieldStorage{
@@ -206,7 +206,7 @@
         [self _setField:key toValue:value];
     }
     [_temporaryFieldStorage removeAllObjects];
-
+    
 }
 
 

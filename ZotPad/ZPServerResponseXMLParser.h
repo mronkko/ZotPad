@@ -13,7 +13,7 @@
     NSMutableArray* _resultArray;
     NSMutableDictionary* _temporaryFieldStorage;
     NSInteger _totalResults;
-    NSString* _currentStringContent;
+    NSMutableString* _currentStringContent;
     BOOL _insideEntry;
     ZPZoteroDataObject* _currentElement;
     NSString* _updateTimestamp;
