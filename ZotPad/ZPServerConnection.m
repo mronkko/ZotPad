@@ -775,8 +775,9 @@ const NSInteger ZPServerConnectionRequestLastModifiedItem = 11;
                 NSMutableDictionary* newUserInfo = [NSMutableDictionary dictionaryWithDictionary:userInfo];
                 if(parameters != NULL) [newUserInfo setObject:parameters forKey:ZPKEY_PARAMETERS];
                 request.userInfo = newUserInfo;
-
-            
+                
+                NSAssert(request.url != nil, @"Server connection with nil URL");
+                
                 [self _performRequest:request usingOperationQueue:queue completion:^(NSData* responseData){
                     
                     if([ZPPreferences debugZoteroAPIRequests]){
@@ -973,6 +974,11 @@ const NSInteger ZPServerConnectionRequestLastModifiedItem = 11;
             parserDelegate =  [[ZPServerResponseXMLParserItem alloc] init];
         }
         
+#ifdef ZPDEBUG
+        parserDelegate.fullResponse = [[NSString alloc] initWithData:responseData
+                                                            encoding:NSUTF8StringEncoding];
+#endif
+
         [parser setDelegate: parserDelegate];
         [parser parse];
         
@@ -1096,6 +1102,15 @@ NSInteger sortAttachments(ZPZoteroAttachment* attachment1, ZPZoteroAttachment* a
                 
             case ZPServerConnectionRequestSingleItemChildren:
             {
+                
+                //TODO: This function needs to be fixed. Consider the following
+                // use case: A user adds two notes. After adding the first note
+                // there is a call to the server to add the note and then
+                // we refresh the item from the server. During this time
+                // the user has added a second note. When we arrive here, the
+                // second note is discarded (in the UI) because it is incorrectly
+                // assumed that the server version of the item is up to date.
+                
                 NSString* itemKey = [parameters objectForKey:ZPKEY_ITEM_KEY];
                 ZPZoteroItem* item = [ZPZoteroItem itemWithKey:itemKey];
                 
