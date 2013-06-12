@@ -163,6 +163,7 @@ static ZPFileChannel_ZoteroStorage* _fileChannel_Zotero;
         UIViewController* root = [UIApplication sharedApplication].delegate.window.rootViewController;
         
         //TODO: Consider refactoring this some place else
+        
         NSDictionary* sender = [NSDictionary dictionaryWithObjectsAndKeys:self,@"fileChannel",attachment,ZPKEY_ATTACHMENT, nil];
         if(root.presentedViewController == NULL){
             [root performSegueWithIdentifier:@"FileUploadConflict" sender:sender];
@@ -211,7 +212,7 @@ static ZPFileChannel_ZoteroStorage* _fileChannel_Zotero;
 -(void) logVersionInformationForAttachment:(ZPZoteroAttachment *)attachment{
 
     //Do some extra logging if we have a prefence set for this
-    if([ZPPreferences debugFileUploads]){
+    if([ZPPreferences debugFileUploadsAndDownloads]){
         NSString* newMD5 = [ZPZoteroAttachment md5ForFileAtPath:attachment.fileSystemPath_modified];
         NSString* oldMD5 = NULL;
         if(attachment.fileExists_original){

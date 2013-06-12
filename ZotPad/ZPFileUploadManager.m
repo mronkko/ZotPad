@@ -115,7 +115,7 @@ static ZPCacheStatusToolbarController* _statusView;
     else{
         //Check if the file can be uploaded
         
-        if([ZPPreferences debugFileUploads]) DDLogInfo(@"Retrieving new metadata for file %@.",attachment.filenameBasedOnLinkMode);
+        if([ZPPreferences debugFileUploadsAndDownloads]) DDLogInfo(@"Retrieving new metadata for file %@.",attachment.filenameBasedOnLinkMode);
         
         [ZPServerConnection retrieveSingleItemWithKey:attachment.key fromLibraryWithID:attachment.libraryID completion:^(NSArray* parsedResults) {
             if(parsedResults == NULL || [parsedResults count]==0){
@@ -127,7 +127,7 @@ static ZPCacheStatusToolbarController* _statusView;
             else{
                 //Success
                 ZPZoteroAttachment* updatedAttachment = [parsedResults objectAtIndex:0];
-                if([ZPPreferences debugFileUploads]) DDLogInfo(@"Starting upload sequence for %@.",updatedAttachment.filenameBasedOnLinkMode);
+                if([ZPPreferences debugFileUploadsAndDownloads]) DDLogInfo(@"Starting upload sequence for %@.",updatedAttachment.filenameBasedOnLinkMode);
                 ZPFileChannel* uploadChannel = [ZPFileChannel fileChannelForAttachment:updatedAttachment];
                 if([attachment fileExists_modified]){
                     [uploadChannel startUploadingAttachment:updatedAttachment overWriteConflictingServerVersion:FALSE];

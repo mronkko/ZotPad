@@ -281,7 +281,7 @@ static NSOperationQueue* _uploadQueue;
         
         // Additional troubleshooting info
         
-        if([ZPPreferences debugFileUploads]){
+        if([ZPPreferences debugFileUploadsAndDownloads]){
             NSString* dump =[self requestDumpAsString:request];
             DDLogInfo(@"%@",dump);
             DDLogInfo(@"Request user info:%@",request.userInfo);

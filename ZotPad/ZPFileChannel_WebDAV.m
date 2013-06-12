@@ -522,7 +522,7 @@ static NSOperationQueue* _uploadQueue;
         
         // Additional troubleshooting info
         
-        if([ZPPreferences debugFileUploads]){
+        if([ZPPreferences debugFileUploadsAndDownloads]){
             NSString* dump =[self requestDumpAsString:request];
             DDLogInfo(@"%@",dump);
         }
@@ -547,7 +547,7 @@ static NSOperationQueue* _uploadQueue;
         }
         else if(request.tag == ZPFILECHANNEL_WEBDAV_UPLOAD_REGISTER && request.responseStatusCode == 412){
            
-            if([ZPPreferences debugFileUploads]) DDLogInfo(@"%@",[self requestDumpAsString:request]);
+            if([ZPPreferences debugFileUploadsAndDownloads]) DDLogInfo(@"%@",[self requestDumpAsString:request]);
 
             [ZPFileCacheManager deleteOriginalFileForAttachment:attachment reason:@"File is outdated (WebDAV conflict)"];
             
