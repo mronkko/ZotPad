@@ -22,7 +22,7 @@
 
 //Unzipping and base64 decoding
 #import "ZipArchive.h"
-#import "NSString+Base64.h"
+#import "Base64.h"
 
 #import "ZPGoodReaderIntegration.h"
 
@@ -456,7 +456,7 @@ static ZPFileViewerViewController* _instance;
             for (NSString* file in files){
                 // The filenames end with %ZB64, which needs to be removed
                 NSString* toBeDecoded = [file substringToIndex:[file length] - 5];
-                NSString* decodedFilename = [[NSString alloc] initWithData:[toBeDecoded decodeBase64EncodedString]
+                NSString* decodedFilename = [[NSString alloc] initWithData:[toBeDecoded base64DecodedData]
                                              encoding:NSUTF8StringEncoding];
                 
                 [[NSFileManager defaultManager] moveItemAtPath:[tempDir stringByAppendingPathComponent:file] toPath:[tempDir stringByAppendingPathComponent:decodedFilename] error:NULL];
