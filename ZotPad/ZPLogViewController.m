@@ -123,27 +123,40 @@
                                    logText];
         
         
-        // These are disabled because the log file lenght is limited
+        NSMutableArray* attachments = [[NSMutableArray alloc] init];
         
-        // Do we want to include a database dump
-        /*
+        //If we have a log file, include that
+        
+        ZPAppDelegate* appDelegate = (ZPAppDelegate*) [[UIApplication sharedApplication] delegate];
+        NSArray* logFiles = appDelegate.fileLogger.logFileManager.sortedLogFilePaths;
+        if(logFiles.count>0){
+            NSString* logPath = [logFiles objectAtIndex:0];
+            [attachments addObject:logPath];
+        }
+
         if([ZPPreferences includeDatabaseWithSupportRequest]){
-            //Read the database file and append it as base64 encoded string
-            technicalInfo = [technicalInfo stringByAppendingFormat:@"\n\n --- Database file ---\n\n%@",[ZPDatabase base64encodedDBfile]];
+            [attachments addObject:[[NSSearchPathForDirectoriesInDomains(NSDocumentDirectory, NSUserDomainMask, YES) objectAtIndex:0] stringByAppendingPathComponent:@"zotpad.sqlite"]];
         }
         // Do we want to include a file list
 
         if([ZPPreferences includeFileListWithSupportRequest]){
-            technicalInfo = [technicalInfo stringByAppendingString:@"\n\n --- Files in documents folder ---\n\n"];
-            
             NSString* documentsDirectory = [NSSearchPathForDirectoriesInDomains(NSDocumentDirectory, NSUserDomainMask, YES)  objectAtIndex:0];
             NSArray *directoryContent = [[NSFileManager defaultManager] contentsOfDirectoryAtPath:documentsDirectory error:NULL];
-            technicalInfo = [technicalInfo stringByAppendingString:[directoryContent componentsJoinedByString:@"\n"]];
+            
+            NSString* fileListFile = [NSTemporaryDirectory() stringByAppendingPathComponent: @"files.txt"];
+            NSString* fileListString  = [directoryContent componentsJoinedByString:@"\n"];
+            
+            [fileListString writeToFile:fileListFile
+                             atomically:NO
+                               encoding:NSStringEncodingConversionAllowLossy
+                                  error:nil];
+
+            [attachments addObject:fileListFile];
+            
         }
-        */
         
-        
-        config.customMessage = technicalInfo;
+        config.attachmentFilePaths = attachments;
+        config.extraTicketInfo = technicalInfo;
         
         [UserVoice presentUserVoiceInterfaceForParentViewController:self andConfig:config];
     }
