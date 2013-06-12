@@ -256,9 +256,7 @@
         NSInteger libraryID = [[userInfo objectForKey:ZPKEY_LIBRARY_ID] integerValue];
         NSString* collectionKey = [userInfo objectForKey:ZPKEY_COLLECTION_KEY];
         NSString* searchString = [userInfo objectForKey:ZPKEY_SEARCH_STRING];
-        NSString* orderField = [userInfo objectForKey:ZPKEY_SORT_COLUMN];
         NSArray* tags = [userInfo objectForKey:ZPKEY_TAG];
-        BOOL sortDescending = [[userInfo objectForKey:ZPKEY_ORDER_DIRECTION] boolValue];
         
         //Check if this item list is the one that we are waiting for
         
@@ -266,15 +264,24 @@
             [NSException raise:@"Internal consistency exception" format:@"Internal consistency exception"];
         }
         
-        if([ZPItemList instance].libraryID == libraryID &&
-           (([ZPItemList instance].collectionKey == NULL && collectionKey == NULL) || [collectionKey isEqualToString:[ZPItemList instance].collectionKey]) &&
-           (([ZPItemList instance].searchString == NULL && searchString == NULL) || [searchString isEqualToString:[ZPItemList instance].searchString]) &&
-           [orderField isEqualToString:[ZPItemList instance].orderField] &&
-           ((tags == NULL && [[ZPItemList instance].tags count] == 0) || [[ZPItemList instance].tags isEqualToArray:tags])  &&
-           sortDescending == [ZPItemList instance].sortDescending){
+        ZPItemList *itemList = [ZPItemList instance];
+        
+        BOOL libraryMatch = itemList.libraryID == libraryID;
+        BOOL collectionMatch = ((itemList.collectionKey == NULL && collectionKey == NULL) || [collectionKey isEqualToString:itemList.collectionKey]);
+        BOOL searchMatch = ((itemList.searchString == NULL && searchString == NULL) || [searchString isEqualToString:itemList.searchString]);
+        BOOL tagMatch = ((tags == NULL && [itemList.tags count] == 0) || [itemList.tags isEqualToArray:tags]);
+        /*
+        // These are probably not needed because sorting is done on the client side. Delete later
+        NSString* orderField = [userInfo objectForKey:ZPKEY_SORT_COLUMN];
+        BOOL sortDescending = [[userInfo objectForKey:ZPKEY_ORDER_DIRECTION] boolValue];
+        BOOL sortMatch = sortDescending == itemList.sortDescending)
+        BOOL orderMatch = [orderField isEqualToString:itemList.orderField]
+         */
+        
+        if(libraryMatch && collectionMatch && searchMatch && tagMatch){
             
             NSArray* itemKeys = notification.object;
-            [[ZPItemList instance] configureServerKeys:itemKeys];
+            [itemList configureServerKeys:itemKeys];
             [self makeAvailable];
         }
     }
