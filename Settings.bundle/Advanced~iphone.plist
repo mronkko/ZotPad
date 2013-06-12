@@ -1,142 +1,139 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <!DOCTYPE plist PUBLIC "-//Apple//DTD PLIST 1.0//EN" "http://www.apple.com/DTDs/PropertyList-1.0.dtd">
 <plist version="1.0">
-    
-    <dict>
-        <key>PreferenceSpecifiers</key>
-        <array>
-            <dict>
-                <key>Type</key>
-                <string>PSGroupSpecifier</string>
-                <key>Title</key>
-                <string>Collections</string>
-                <key>FooterText</key>
-                <string>Recursive collections mimics Zotero&apos;s hidden recursiveCollections preference (http://www.zotero.org/support/preferences/hidden_preferences). Recursion is implemented only for cached items and collections because Zotero server does not implement this feature.</string>
-            </dict>
-            <dict>
-                <key>Type</key>
-                <string>PSToggleSwitchSpecifier</string>
-                <key>Title</key>
-                <string>Recursive collections</string>
-                <key>Key</key>
-                <string>recursivecollections</string>
-                <key>DefaultValue</key>
-                <false/>
-            </dict>
-            <dict>
-                <key>Type</key>
-                <string>PSTextFieldSpecifier</string>
-                <key>Title</key>
-                <string>Favorites collection title</string>
-                <key>Key</key>
-                <string>favoritescollectiontitle</string>
-                <key>ZotPad favorites</key>
-                <string></string>
-            </dict>
-            
-            <dict>
-                <key>Type</key>
-                <string>PSGroupSpecifier</string>
-                <key>Title</key>
-                <string>Items</string>
-            </dict>
-            <dict>
-                <key>Type</key>
-                <string>PSToggleSwitchSpecifier</string>
-                <key>Title</key>
-                <string>Put PDFs on top of attachment list</string>
-                <key>Key</key>
-                <string>prioritizepdfs</string>
-                <key>DefaultValue</key>
-                <false/>
-            </dict>
-            <dict>
-                <key>Type</key>
-                <string>PSGroupSpecifier</string>
-                <key>Title</key>
-                <string>File viewer</string>
-            </dict>
-            <dict>
-                <key>Type</key>
-                <string>PSToggleSwitchSpecifier</string>
-                <key>Title</key>
-                <string>Disable built-in viewer and send to GoodReader instead</string>
-                <key>Key</key>
-                <string>disablebuiltinviewerandsendtogoodreader</string>
-                <key>DefaultValue</key>
-                <true/>
-            </dict>
-            <dict>
-                <key>Type</key>
-                <string>PSGroupSpecifier</string>
-                <key>Title</key>
-                <string>Troubleshooting</string>
-                <key>FooterText</key>
-                <string>These should not be enables unless you are specifically requested to do so after contacting ZotPad support.</string>
-            </dict>
-            <!-- 		<dict>
-             <key>Type</key>
-             <string>PSToggleSwitchSpecifier</string>
-             <key>Title</key>
-             <string>Include database file in support requests</string>
-             <key>Key</key>
-             <string>supportincludedatabase</string>
-             <key>DefaultValue</key>
-             <false/>
-             </dict>
-             <dict>
-             <key>Type</key>
-             <string>PSToggleSwitchSpecifier</string>
-             <key>Title</key>
-             <string>Include file listing in support requests</string>
-             <key>Key</key>
-             <string>supportincludefilelisting</string>
-             <key>DefaultValue</key>
-             <false/>
-             </dict>
-             -->
-            <dict>
-                <key>Type</key>
-                <string>PSToggleSwitchSpecifier</string>
-                <key>Title</key>
-                <string>Display item keys</string>
-                <key>Key</key>
-                <string>displayitemkeys</string>
-                <key>DefaultValue</key>
-                <false/>
-            </dict>
-            <dict>
-                <key>Type</key>
-                <string>PSToggleSwitchSpecifier</string>
-                <key>Title</key>
-                <string>Debug citation parser</string>
-                <key>Key</key>
-                <string>debugcitationparser</string>
-                <key>DefaultValue</key>
-                <false/>
-            </dict>
-            <dict>
-                <key>Type</key>
-                <string>PSToggleSwitchSpecifier</string>
-                <key>Title</key>
-                <string>Debug file uploads</string>
-                <key>Key</key>
-                <string>debugfileuploads</string>
-                <key>DefaultValue</key>
-                <false/>
-            </dict>
-            <dict>
-                <key>Type</key>
-                <string>PSToggleSwitchSpecifier</string>
-                <key>Title</key>
-                <string>Debug Zotero API calls</string>
-                <key>Key</key>
-                <string>debugserverrequests</string>
-                <key>DefaultValue</key>
-                <false/>
-            </dict>
-        </array>
-        <key>StringsTable</key>
-        <string>Advanced</string>
-    </dict>
+<dict>
+	<key>PreferenceSpecifiers</key>
+	<array>
+		<dict>
+			<key>Type</key>
+			<string>PSGroupSpecifier</string>
+			<key>Title</key>
+			<string>Collections</string>
+			<key>FooterText</key>
+			<string>Recursive collections mimics Zotero&apos;s hidden recursiveCollections preference (http://www.zotero.org/support/preferences/hidden_preferences). Recursion is implemented only for cached items and collections because Zotero server does not implement this feature.</string>
+		</dict>
+		<dict>
+			<key>Type</key>
+			<string>PSToggleSwitchSpecifier</string>
+			<key>Title</key>
+			<string>Recursive collections</string>
+			<key>Key</key>
+			<string>recursivecollections</string>
+			<key>DefaultValue</key>
+			<false/>
+		</dict>
+		<dict>
+			<key>Type</key>
+			<string>PSTextFieldSpecifier</string>
+			<key>Title</key>
+			<string>Favorites collection title</string>
+			<key>Key</key>
+			<string>favoritescollectiontitle</string>
+			<key>ZotPad favorites</key>
+			<string></string>
+		</dict>
+		<dict>
+			<key>Type</key>
+			<string>PSGroupSpecifier</string>
+			<key>Title</key>
+			<string>Items</string>
+		</dict>
+		<dict>
+			<key>Type</key>
+			<string>PSToggleSwitchSpecifier</string>
+			<key>Title</key>
+			<string>Put PDFs on top of attachment list</string>
+			<key>Key</key>
+			<string>prioritizepdfs</string>
+			<key>DefaultValue</key>
+			<false/>
+		</dict>
+		<dict>
+			<key>Type</key>
+			<string>PSGroupSpecifier</string>
+			<key>Title</key>
+			<string>File viewer</string>
+		</dict>
+		<dict>
+			<key>Type</key>
+			<string>PSToggleSwitchSpecifier</string>
+			<key>Title</key>
+			<string>Disable built-in viewer and send to GoodReader instead</string>
+			<key>Key</key>
+			<string>disablebuiltinviewerandsendtogoodreader</string>
+			<key>DefaultValue</key>
+			<true/>
+		</dict>
+		<dict>
+			<key>Type</key>
+			<string>PSGroupSpecifier</string>
+			<key>Title</key>
+			<string>Troubleshooting</string>
+			<key>FooterText</key>
+			<string>These should not be enables unless you are specifically requested to do so after contacting ZotPad support.</string>
+		</dict>
+		<dict>
+			<key>Type</key>
+			<string>PSToggleSwitchSpecifier</string>
+			<key>Title</key>
+			<string>Display item keys</string>
+			<key>Key</key>
+			<string>displayitemkeys</string>
+			<key>DefaultValue</key>
+			<false/>
+		</dict>
+		<dict>
+			<key>Type</key>
+			<string>PSToggleSwitchSpecifier</string>
+			<key>Title</key>
+			<string>Debug citation parser</string>
+			<key>Key</key>
+			<string>debugcitationparser</string>
+			<key>DefaultValue</key>
+			<false/>
+		</dict>
+		<dict>
+			<key>Type</key>
+			<string>PSToggleSwitchSpecifier</string>
+			<key>Title</key>
+			<string>Debug file uploads and downloads</string>
+			<key>Key</key>
+			<string>debugfileuploads</string>
+			<key>DefaultValue</key>
+			<false/>
+		</dict>
+		<dict>
+			<key>Type</key>
+			<string>PSToggleSwitchSpecifier</string>
+			<key>Title</key>
+			<string>Debug Zotero API calls</string>
+			<key>Key</key>
+			<string>debugserverrequests</string>
+			<key>DefaultValue</key>
+			<false/>
+		</dict>
+        <dict>
+			<key>Type</key>
+			<string>PSToggleSwitchSpecifier</string>
+			<key>Title</key>
+			<string>Include database in support requests</string>
+			<key>Key</key>
+			<string>supportincludedatabase</string>
+			<key>DefaultValue</key>
+			<false/>
+		</dict>
+		<dict>
+			<key>Type</key>
+			<string>PSToggleSwitchSpecifier</string>
+			<key>Title</key>
+			<string>Include file list in support requests</string>
+			<key>Key</key>
+			<string>supportincludefilelisting</string>
+			<key>DefaultValue</key>
+			<false/>
+		</dict>
+	</array>
+	<key>StringsTable</key>
+	<string>Advanced</string>
+</dict>
 </plist>
