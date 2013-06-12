@@ -10,7 +10,7 @@
 
 @implementation ZPZoteroDataObject
 
-@synthesize key, title, libraryID, cacheTimestamp, serverTimestamp, dateAdded, etag,jsonFromServer,parentKey;
+@synthesize title, libraryID, cacheTimestamp, serverTimestamp, dateAdded, etag,jsonFromServer,parentKey;
 @synthesize numChildren, needsToBeWrittenToCache;
 @synthesize locallyAdded, locallyDeleted, locallyModified;
 
@@ -20,6 +20,15 @@
 //@synthesize responseDataFromWhichThisItemWasCreated;
 #endif
 
+//@synthesize key
+
+-(void) setKey:(NSString *)key{
+    NSAssert([key length] == 8, @"Data object keys must be 8 characters");
+    _key = key;
+}
+-(NSString*) key{
+    return _key;
+}
 
 -(void) configureWithDictionary:(NSDictionary*) dictionary{
     [self setValuesForKeysWithDictionary:dictionary];

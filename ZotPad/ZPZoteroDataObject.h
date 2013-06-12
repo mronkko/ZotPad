@@ -10,6 +10,7 @@
 
 @interface ZPZoteroDataObject : NSObject{
     NSArray* _tags;
+    NSString* _key;
 }
 
 // This is very useful for troubleshooting, but because of memory issues, is only used for debug builds
