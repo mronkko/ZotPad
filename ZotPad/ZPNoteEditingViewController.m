@@ -9,6 +9,7 @@
 #import "ZPNoteEditingViewController.h"
 #import "ZPFileViewerViewController.h"
 #import "ZPItemDataUploadManager.h"
+#import "CMPopTipView.h"
 
 @interface ZPNoteEditingViewController ()
 
@@ -98,6 +99,30 @@ static ZPNoteEditingViewController* _instance;
                     baseURL:NULL];
 
 }
+
+-(void) viewDidAppear:(BOOL)animated{
+
+    [super viewDidAppear:animated];
+    
+    // Display an alert explaining that the user needs to tap the note to edit
+    
+    if ([[[UIDevice currentDevice] systemVersion] floatValue] < 6.0) {
+
+        if([[NSUserDefaults standardUserDefaults] objectForKey:@"hasPresentedNoteHelpPopover"]==NULL){
+            
+            dispatch_async(dispatch_get_main_queue(), ^{
+                CMPopTipView* helpPopUp = [[CMPopTipView alloc] initWithMessage:@"Tap the note to edit"];
+                helpPopUp.preferredPointDirection = PointDirectionDown;
+                UIBarButtonItem* doneButton = self.navigationItem.rightBarButtonItem;
+                UIView* targetView = (UIView *)[doneButton performSelector:@selector(view)];
+                [helpPopUp presentPointingAtView:self.webView inView:self.view animated:YES];
+                [[NSUserDefaults standardUserDefaults] setObject:@"1" forKey:@"hasPresentedNoteHelpPopover"];
+            });
+        }
+    }
+
+}
+
 - (void)didReceiveMemoryWarning
 {
     [super didReceiveMemoryWarning];
@@ -140,7 +165,9 @@ static ZPNoteEditingViewController* _instance;
     [self dismissModalViewControllerAnimated:YES];
 
     ZPZoteroItem* item = [ZPZoteroItem itemWithKey:note.parentKey];
-    
+
+    DDLogInfo(@"User tapped delete button for note (%@)", item.itemKey);
+
     NSMutableArray* newNotes = [NSMutableArray arrayWithArray:item.notes];
     [newNotes removeObject:note];
     item.notes = newNotes;
