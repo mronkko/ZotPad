@@ -73,7 +73,7 @@
 +(BOOL) includeFileListWithSupportRequest;
 +(BOOL) recursiveCollections;
 +(BOOL) debugCitationParser;
-+(BOOL) debugFileUploads;
++(BOOL) debugFileUploadsAndDownloads;
 +(BOOL) layeredCollectionsNavigation;
 +(BOOL) unifiedCollectionsNavigation;
 +(BOOL) debugZoteroAPIRequests;

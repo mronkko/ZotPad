@@ -416,7 +416,7 @@ static NSInteger _maxCacheSize;
     NSUserDefaults* defaults = [NSUserDefaults standardUserDefaults];
     return [defaults boolForKey:@"debugcitationparser"];
 }
-+(BOOL) debugFileUploads{
++(BOOL) debugFileUploadsAndDownloads{
     NSUserDefaults* defaults = [NSUserDefaults standardUserDefaults];
     return [defaults boolForKey:@"debugfileuploads"];
 }
