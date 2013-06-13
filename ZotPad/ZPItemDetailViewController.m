@@ -493,7 +493,7 @@
     }
     
     //Validity checks
-    if(returnString == NULL){
+    if(returnString == NULL || returnString == (NSObject*)[NSNull null]){
         DDLogError(@"Item %@ had an empty string (%@) as field %@ in section %i, row %i of the item details table.",item.key,
                    returnString==NULL ? @"nil" : @"NSNull",
                    isTitle ? @"title" : @"value",
@@ -501,7 +501,7 @@
         
         returnString = @"";
     }
-    
+            
     return returnString;
 }
 
