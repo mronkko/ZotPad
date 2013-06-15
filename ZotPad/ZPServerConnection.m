@@ -538,7 +538,7 @@ const NSInteger ZPServerConnectionRequestLastModifiedItem = 11;
             completionBlock([parserDelegate.parsedElements objectAtIndex:0]);
         }
         else{
-            DDLogError(@"Editing an item on zotero server failed. \n\n Request URL: %@, \nPOST data:\n%@\n\nResponse data %@",
+            DDLogError(@"Editing an item on zotero server failed. \n\n Request URL: %@,\nPOST data:\n%@\n\nResponse data %@",
                        urlString,
                        json,
                        [[NSString alloc] initWithData:responseData encoding:NSUTF8StringEncoding]);
@@ -781,7 +781,7 @@ const NSInteger ZPServerConnectionRequestLastModifiedItem = 11;
                 [self _performRequest:request usingOperationQueue:queue completion:^(NSData* responseData){
                     
                     if([ZPPreferences debugZoteroAPIRequests]){
-                        DDLogVerbose(@"Request: %@ \n\nResponse:\n %@",request.url,[[NSString alloc] initWithData:responseData encoding:NSUTF8StringEncoding]);
+                        DDLogVerbose(@"%@",[ZPServerConnection _requestDumpAsString:request]);
                     }
                     
                     ZPServerResponseXMLParser* parserResponse;
@@ -1184,7 +1184,7 @@ NSInteger sortAttachments(ZPZoteroAttachment* attachment1, ZPZoteroAttachment* a
         [dump appendFormat:@"%@: %@\n",key,[request.requestHeaders objectForKey:key]];
     }
     
-    if(request.postBody && ! [request.requestMethod isEqualToString:@"PUT"]){
+    if(request.postBody){
         [dump appendString:@"\n"];
         
         [dump appendString:[[NSString alloc] initWithData:request.postBody
