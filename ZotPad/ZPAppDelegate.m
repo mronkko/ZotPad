@@ -135,6 +135,8 @@ didFinishLaunchingWithOptions:(NSDictionary *)launchOptions
     //Perform a memory warning every 2 seconds
     //[NSTimer scheduledTimerWithTimeInterval:(NSTimeInterval)2 target:[UIApplication sharedApplication] selector:@selector(_performMemoryWarning) userInfo:NULL repeats:YES];
     
+    //Reset the database
+    //[ZPDatabase resetDatabase];
 
     [ZPPreferences checkAndProcessApplicationResetPreferences];
     
