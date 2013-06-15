@@ -62,15 +62,7 @@
         //The creators do not have a field for authorOrder in the Zotero API, so this needs to be added
         NSArray* authors = [data objectForKey:@"creators"];
         if(authors != NULL){
-            NSMutableArray* fixedAuthors= [NSMutableArray arrayWithCapacity:[authors count]];
-            NSInteger counter=0;
-            for(NSDictionary* author in authors){
-                NSMutableDictionary* fixedAuthor = [NSMutableDictionary dictionaryWithDictionary:author];
-                [fixedAuthor setValue:[NSNumber numberWithInt:counter] forKey:@"authorOrder"];
-                [fixedAuthors addObject:fixedAuthor];
-                counter++;
-            }
-            [(ZPZoteroItem*) _currentElement setCreators:fixedAuthors];
+            [(ZPZoteroItem*) _currentElement setCreators:authors];
         }
         NSArray* tags = [data objectForKey:@"tags"];
 

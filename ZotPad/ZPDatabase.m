@@ -1393,9 +1393,17 @@ static NSObject* writeLock;
     NSMutableString* deleteSQL;
     
     for(ZPZoteroItem* item in items){
-        for(NSMutableDictionary* creator in item.creators){
-            [creator setObject:item.key forKey:ZPKEY_ITEM_KEY];
-            [creators addObject:creator];
+
+        NSInteger counter =0;
+        
+        for(NSDictionary* creator in item.creators){
+            NSMutableDictionary* mutableCreator = [NSMutableDictionary dictionaryWithDictionary:creator];
+            [mutableCreator setObject:item.key forKey:ZPKEY_ITEM_KEY];
+            //The order of the authors needs to be stored in the DB
+            [mutableCreator setObject:[NSNumber numberWithInt:counter] forKey:@"authorOrder"];
+
+            [creators addObject:mutableCreator];
+            counter++;
         }
         if(deleteSQL == NULL){
             deleteSQL = [NSMutableString stringWithFormat:@"DELETE FROM creators WHERE (itemKey = '%@' AND authorOrder >= %i)",item.key,[item.creators count]];
@@ -1470,7 +1478,8 @@ static NSObject* writeLock;
     
     FMDatabase* dbObject = [self _dbObject];
     @synchronized(dbObject){
-        FMResultSet* resultSet = [dbObject executeQuery: @"SELECT * FROM creators WHERE itemKey = ? ORDER BY \"order\"",item.key];
+        
+        FMResultSet* resultSet = [dbObject executeQuery: @"SELECT firstName, lastName, name, creatorType FROM creators WHERE itemKey = ? ORDER BY authorOrder",item.key];
         
         while([resultSet next]) {
             [creators addObject:[resultSet resultDictionary]];
