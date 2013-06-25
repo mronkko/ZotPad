@@ -830,6 +830,8 @@
 		A7200DE514718DC0004347C9 /* ZPAppDelegate.m in Sources */ = {isa = PBXBuildFile; fileRef = A7200DE414718DC0004347C9 /* ZPAppDelegate.m */; };
 		A7200DEB14718DC1004347C9 /* ZPLibraryAndCollectionListViewController.m in Sources */ = {isa = PBXBuildFile; fileRef = A7200DEA14718DC1004347C9 /* ZPLibraryAndCollectionListViewController.m */; };
 		A7200DF8147193C0004347C9 /* libsqlite3.dylib in Frameworks */ = {isa = PBXBuildFile; fileRef = A7200DF7147193C0004347C9 /* libsqlite3.dylib */; };
+		A725A78B1773CF1500E4AA5F /* ZPModalViewController.m in Sources */ = {isa = PBXBuildFile; fileRef = A725A78A1773CF1500E4AA5F /* ZPModalViewController.m */; };
+		A725A78C1773CF1500E4AA5F /* ZPModalViewController.m in Sources */ = {isa = PBXBuildFile; fileRef = A725A78A1773CF1500E4AA5F /* ZPModalViewController.m */; };
 		A72853F9147E319700D3FE97 /* ZPZoteroLibrary.m in Sources */ = {isa = PBXBuildFile; fileRef = A72853F8147E319600D3FE97 /* ZPZoteroLibrary.m */; };
 		A72853FD147E31B600D3FE97 /* ZPZoteroCollection.m in Sources */ = {isa = PBXBuildFile; fileRef = A72853FC147E31B500D3FE97 /* ZPZoteroCollection.m */; };
 		A72C3CA71487C9DA00F6744E /* MainStoryboard_iPad.storyboard in Resources */ = {isa = PBXBuildFile; fileRef = A72C3CA61487C9DA00F6744E /* MainStoryboard_iPad.storyboard */; };
@@ -936,8 +938,8 @@
 		A7699E50159A68EF002F09DA /* FileMD5Hash.c in Sources */ = {isa = PBXBuildFile; fileRef = A7699E4E159A68EF002F09DA /* FileMD5Hash.c */; };
 		A7699E54159A6B75002F09DA /* FileMD5Hash.c in Sources */ = {isa = PBXBuildFile; fileRef = A7699E4E159A68EF002F09DA /* FileMD5Hash.c */; };
 		A7699E57159A6C44002F09DA /* CoreFoundation.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = A7699E56159A6C44002F09DA /* CoreFoundation.framework */; };
-		A7699E5C159B1AC7002F09DA /* ZPUploadVersionConflictViewControllerViewController.m in Sources */ = {isa = PBXBuildFile; fileRef = A7699E5B159B1AC7002F09DA /* ZPUploadVersionConflictViewControllerViewController.m */; };
-		A7699E5D159B1AC7002F09DA /* ZPUploadVersionConflictViewControllerViewController.m in Sources */ = {isa = PBXBuildFile; fileRef = A7699E5B159B1AC7002F09DA /* ZPUploadVersionConflictViewControllerViewController.m */; };
+		A7699E5C159B1AC7002F09DA /* ZPUploadVersionConflictViewController.m in Sources */ = {isa = PBXBuildFile; fileRef = A7699E5B159B1AC7002F09DA /* ZPUploadVersionConflictViewController.m */; };
+		A7699E5D159B1AC7002F09DA /* ZPUploadVersionConflictViewController.m in Sources */ = {isa = PBXBuildFile; fileRef = A7699E5B159B1AC7002F09DA /* ZPUploadVersionConflictViewController.m */; };
 		A76D3C6714A9F3F3000C3ED9 /* ZPZoteroNote.m in Sources */ = {isa = PBXBuildFile; fileRef = A76D3C6614A9F3F3000C3ED9 /* ZPZoteroNote.m */; };
 		A76D3C7414AD97BB000C3ED9 /* CFNetwork.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = A76D3C7314AD97BA000C3ED9 /* CFNetwork.framework */; };
 		A76D3C7614AD97CC000C3ED9 /* SystemConfiguration.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = A76D3C7514AD97CB000C3ED9 /* SystemConfiguration.framework */; };
@@ -1041,7 +1043,7 @@
 		A783232715EE3173004BB4F7 /* ZPAttachmentCarouselDelegate.m in Sources */ = {isa = PBXBuildFile; fileRef = A70399B31598A40D002F4293 /* ZPAttachmentCarouselDelegate.m */; };
 		A783232815EE3173004BB4F7 /* ASIFormDataRequest.m in Sources */ = {isa = PBXBuildFile; fileRef = A79D6017159A355100F55C54 /* ASIFormDataRequest.m */; settings = {COMPILER_FLAGS = "-fno-objc-arc"; }; };
 		A783232915EE3173004BB4F7 /* FileMD5Hash.c in Sources */ = {isa = PBXBuildFile; fileRef = A7699E4E159A68EF002F09DA /* FileMD5Hash.c */; };
-		A783232A15EE3173004BB4F7 /* ZPUploadVersionConflictViewControllerViewController.m in Sources */ = {isa = PBXBuildFile; fileRef = A7699E5B159B1AC7002F09DA /* ZPUploadVersionConflictViewControllerViewController.m */; };
+		A783232A15EE3173004BB4F7 /* ZPUploadVersionConflictViewController.m in Sources */ = {isa = PBXBuildFile; fileRef = A7699E5B159B1AC7002F09DA /* ZPUploadVersionConflictViewController.m */; };
 		A783232B15EE3173004BB4F7 /* DDFileLogger.m in Sources */ = {isa = PBXBuildFile; fileRef = A7648024159F1BD00075CFB9 /* DDFileLogger.m */; };
 		A783232C15EE3173004BB4F7 /* DDLog.m in Sources */ = {isa = PBXBuildFile; fileRef = A7648026159F1BD00075CFB9 /* DDLog.m */; };
 		A783232D15EE3173004BB4F7 /* DDTTYLogger.m in Sources */ = {isa = PBXBuildFile; fileRef = A7648028159F1BD00075CFB9 /* DDTTYLogger.m */; };
@@ -2495,6 +2497,8 @@
 		A7200DEA14718DC1004347C9 /* ZPLibraryAndCollectionListViewController.m */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.objc; path = ZPLibraryAndCollectionListViewController.m; sourceTree = "<group>"; };
 		A7200DF7147193C0004347C9 /* libsqlite3.dylib */ = {isa = PBXFileReference; lastKnownFileType = "compiled.mach-o.dylib"; name = libsqlite3.dylib; path = usr/lib/libsqlite3.dylib; sourceTree = SDKROOT; };
 		A7231AF2164AF6F3004ABB78 /* ZPZoteroDataObjectWithNote.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = ZPZoteroDataObjectWithNote.h; sourceTree = "<group>"; };
+		A725A7891773CF1500E4AA5F /* ZPModalViewController.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = ZPModalViewController.h; sourceTree = "<group>"; };
+		A725A78A1773CF1500E4AA5F /* ZPModalViewController.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = ZPModalViewController.m; sourceTree = "<group>"; };
 		A72853F7147E319600D3FE97 /* ZPZoteroLibrary.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = ZPZoteroLibrary.h; sourceTree = "<group>"; };
 		A72853F8147E319600D3FE97 /* ZPZoteroLibrary.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = ZPZoteroLibrary.m; sourceTree = "<group>"; };
 		A72853FB147E31B500D3FE97 /* ZPZoteroCollection.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = ZPZoteroCollection.h; sourceTree = "<group>"; };
@@ -2559,8 +2563,8 @@
 		A7699E53159A6B3D002F09DA /* FileMD5Hash_Prefix.pch */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; name = FileMD5Hash_Prefix.pch; path = FileMD5Hash/Common/FileMD5Hash_Prefix.pch; sourceTree = "<group>"; };
 		A7699E56159A6C44002F09DA /* CoreFoundation.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; name = CoreFoundation.framework; path = System/Library/Frameworks/CoreFoundation.framework; sourceTree = SDKROOT; };
 		A7699E58159A6C65002F09DA /* libcommonCrypto.dylib */ = {isa = PBXFileReference; lastKnownFileType = "compiled.mach-o.dylib"; name = libcommonCrypto.dylib; path = usr/lib/system/libcommonCrypto.dylib; sourceTree = SDKROOT; };
-		A7699E5A159B1AC7002F09DA /* ZPUploadVersionConflictViewControllerViewController.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = ZPUploadVersionConflictViewControllerViewController.h; sourceTree = "<group>"; };
-		A7699E5B159B1AC7002F09DA /* ZPUploadVersionConflictViewControllerViewController.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = ZPUploadVersionConflictViewControllerViewController.m; sourceTree = "<group>"; };
+		A7699E5A159B1AC7002F09DA /* ZPUploadVersionConflictViewController.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = ZPUploadVersionConflictViewController.h; sourceTree = "<group>"; };
+		A7699E5B159B1AC7002F09DA /* ZPUploadVersionConflictViewController.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = ZPUploadVersionConflictViewController.m; sourceTree = "<group>"; };
 		A76D3C6514A9F3F3000C3ED9 /* ZPZoteroNote.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = ZPZoteroNote.h; sourceTree = "<group>"; };
 		A76D3C6614A9F3F3000C3ED9 /* ZPZoteroNote.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = ZPZoteroNote.m; sourceTree = "<group>"; };
 		A76D3C7314AD97BA000C3ED9 /* CFNetwork.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; name = CFNetwork.framework; path = System/Library/Frameworks/CFNetwork.framework; sourceTree = SDKROOT; };
@@ -3309,21 +3313,13 @@
 			name = "Item details";
 			sourceTree = "<group>";
 		};
-		A70399AF159703CD002F4293 /* Dialogs */ = {
+		A70399AF159703CD002F4293 /* Support */ = {
 			isa = PBXGroup;
 			children = (
-				A7803854170F1E81006B6407 /* ZPWebDAVAuthenticationViewController.h */,
-				A7803855170F1E81006B6407 /* ZPWebDAVAuthenticationViewController.m */,
 				A77FD066159F750700774D50 /* ZPLogViewController.h */,
 				A77FD067159F750900774D50 /* ZPLogViewController.m */,
-				A7699E5A159B1AC7002F09DA /* ZPUploadVersionConflictViewControllerViewController.h */,
-				A7699E5B159B1AC7002F09DA /* ZPUploadVersionConflictViewControllerViewController.m */,
-				A79E6FE21531A06C00612DD9 /* ZPFileImportViewController.h */,
-				A79E6FE31531A06C00612DD9 /* ZPFileImportViewController.m */,
-				A74348D5147AB37A00DA6FC3 /* ZPAuthenticationDialog.h */,
-				A74348D6147AB37A00DA6FC3 /* ZPAuthenticationDialog.m */,
 			);
-			name = Dialogs;
+			name = Support;
 			sourceTree = "<group>";
 		};
 		A707A7D4163BFE3500775E88 /* FileViewer */ = {
@@ -3703,11 +3699,28 @@
 			name = "Supporting Files";
 			sourceTree = "<group>";
 		};
+		A725A7991774179F00E4AA5F /* ModalViewControllers */ = {
+			isa = PBXGroup;
+			children = (
+				A725A7891773CF1500E4AA5F /* ZPModalViewController.h */,
+				A725A78A1773CF1500E4AA5F /* ZPModalViewController.m */,
+				A79E6FE21531A06C00612DD9 /* ZPFileImportViewController.h */,
+				A79E6FE31531A06C00612DD9 /* ZPFileImportViewController.m */,
+				A74348D5147AB37A00DA6FC3 /* ZPAuthenticationDialog.h */,
+				A74348D6147AB37A00DA6FC3 /* ZPAuthenticationDialog.m */,
+				A7803854170F1E81006B6407 /* ZPWebDAVAuthenticationViewController.h */,
+				A7803855170F1E81006B6407 /* ZPWebDAVAuthenticationViewController.m */,
+				A7699E5A159B1AC7002F09DA /* ZPUploadVersionConflictViewController.h */,
+				A7699E5B159B1AC7002F09DA /* ZPUploadVersionConflictViewController.m */,
+			);
+			name = ModalViewControllers;
+			sourceTree = "<group>";
+		};
 		A72853FE147E33F400D3FE97 /* User interface */ = {
 			isa = PBXGroup;
 			children = (
-				A755A1E0172BE8C1008DEE19 /* Supporting files */,
 				A74C48CC1639867400B14A55 /* Controllers */,
+				A755A1E0172BE8C1008DEE19 /* Supporting files */,
 				A74C48CB1639866D00B14A55 /* Views */,
 				A786F7771476A56200B35B92 /* MainStoryboard_iPhone.storyboard */,
 				A72C3CA61487C9DA00F6744E /* MainStoryboard_iPad.storyboard */,
@@ -3784,6 +3797,7 @@
 		A74C48CC1639867400B14A55 /* Controllers */ = {
 			isa = PBXGroup;
 			children = (
+				A725A7991774179F00E4AA5F /* ModalViewControllers */,
 				A7F184EB16A5DA40002750F8 /* UITableView controllers */,
 				A7F36B3415B6B4B600492DC3 /* RootViewControllers */,
 				A70399AD15970371002F4293 /* Item details */,
@@ -3791,7 +3805,7 @@
 				A7F5ABE316450154005DC63C /* Tags */,
 				A7D9BF6D1645B51E00288265 /* Notes */,
 				A707A7D4163BFE3500775E88 /* FileViewer */,
-				A70399AF159703CD002F4293 /* Dialogs */,
+				A70399AF159703CD002F4293 /* Support */,
 			);
 			name = Controllers;
 			sourceTree = "<group>";
@@ -6037,7 +6051,7 @@
 				A70399B41598A40E002F4293 /* ZPAttachmentCarouselDelegate.m in Sources */,
 				A79D6018159A355100F55C54 /* ASIFormDataRequest.m in Sources */,
 				A7699E50159A68EF002F09DA /* FileMD5Hash.c in Sources */,
-				A7699E5C159B1AC7002F09DA /* ZPUploadVersionConflictViewControllerViewController.m in Sources */,
+				A7699E5C159B1AC7002F09DA /* ZPUploadVersionConflictViewController.m in Sources */,
 				A764802B159F1BD00075CFB9 /* DDFileLogger.m in Sources */,
 				A764802D159F1BD00075CFB9 /* DDLog.m in Sources */,
 				A764802F159F1BD00075CFB9 /* DDTTYLogger.m in Sources */,
@@ -6092,6 +6106,7 @@
 				A7117D3616E5BB3500D2D99F /* Base64.m in Sources */,
 				A7803856170F1E81006B6407 /* ZPWebDAVAuthenticationViewController.m in Sources */,
 				A755A1E3172BE8EA008DEE19 /* ZPGoodReaderIntegration.m in Sources */,
+				A725A78B1773CF1500E4AA5F /* ZPModalViewController.m in Sources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
@@ -6157,7 +6172,7 @@
 				A783232715EE3173004BB4F7 /* ZPAttachmentCarouselDelegate.m in Sources */,
 				A783232815EE3173004BB4F7 /* ASIFormDataRequest.m in Sources */,
 				A783232915EE3173004BB4F7 /* FileMD5Hash.c in Sources */,
-				A783232A15EE3173004BB4F7 /* ZPUploadVersionConflictViewControllerViewController.m in Sources */,
+				A783232A15EE3173004BB4F7 /* ZPUploadVersionConflictViewController.m in Sources */,
 				A783232B15EE3173004BB4F7 /* DDFileLogger.m in Sources */,
 				A783232C15EE3173004BB4F7 /* DDLog.m in Sources */,
 				A783232D15EE3173004BB4F7 /* DDTTYLogger.m in Sources */,
@@ -6275,7 +6290,7 @@
 				A70399B51598A40E002F4293 /* ZPAttachmentCarouselDelegate.m in Sources */,
 				A79D6019159A355100F55C54 /* ASIFormDataRequest.m in Sources */,
 				A7699E54159A6B75002F09DA /* FileMD5Hash.c in Sources */,
-				A7699E5D159B1AC7002F09DA /* ZPUploadVersionConflictViewControllerViewController.m in Sources */,
+				A7699E5D159B1AC7002F09DA /* ZPUploadVersionConflictViewController.m in Sources */,
 				A764802C159F1BD00075CFB9 /* DDFileLogger.m in Sources */,
 				A764802E159F1BD00075CFB9 /* DDLog.m in Sources */,
 				A7648030159F1BD00075CFB9 /* DDTTYLogger.m in Sources */,
@@ -6329,6 +6344,7 @@
 				A7117D3716E5BB3500D2D99F /* Base64.m in Sources */,
 				A7803857170F1E81006B6407 /* ZPWebDAVAuthenticationViewController.m in Sources */,
 				A755A1E4172BE8EA008DEE19 /* ZPGoodReaderIntegration.m in Sources */,
+				A725A78C1773CF1500E4AA5F /* ZPModalViewController.m in Sources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
@@ -6735,6 +6751,7 @@
 				GCC_PREPROCESSOR_DEFINITIONS = (
 					"ZPDEBUG=1",
 					"BETA=1",
+					"DEBUG=1",
 				);
 				GCC_PREPROCESSOR_DEFINITIONS_NOT_USED_IN_PRECOMPS = "";
 				HEADER_SEARCH_PATHS = /usr/include/libxml2;
