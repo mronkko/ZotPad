@@ -9,6 +9,7 @@
 #import "ZPGoodReaderIntegration.h"
 #import "ZPAppDelegate.h"
 #import "ZPFileUploadManager.h"
+#import "ZPFileImportViewController.h"
 
 #if (TARGET_IPHONE_SIMULATOR)
 
@@ -40,13 +41,11 @@
     
     ZPZoteroAttachment* attachment = [ZPZoteroAttachment attachmentWithKey:[[NSString alloc] initWithData:saveBackTag encoding:NSUTF8StringEncoding]];
     
+    DDLogInfo(@"An attachment %@ as a save back from GoodReader",attachment.itemKey);
+    [ZPFileImportViewController presentInstanceModallyWithAttachment:attachment];
+    
     NSURL* url = [NSURL URLWithString:[receivedFilePath stringByAddingPercentEscapesUsingEncoding:NSUTF8StringEncoding]];
-    
-    DDLogInfo(@"A file %@ as a save back from GoodReader",[url lastPathComponent]);
-    
-    ZPAppDelegate* appDelegate = (ZPAppDelegate*) [[UIApplication sharedApplication] delegate];
-    [appDelegate dismissViewControllerHierarchy];
-    [appDelegate.window.rootViewController performSegueWithIdentifier:@"Import" sender:url];
+
     [ZPFileUploadManager addAttachmentToUploadQueue:attachment withNewFile:url];
     
 }

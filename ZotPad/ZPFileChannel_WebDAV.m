@@ -387,7 +387,7 @@ static NSOperationQueue* _uploadQueue;
                 
                 if([@"text/html" isEqual:[request.responseHeaders objectForKey:@"Content-Type"]]){
                     
-                    if(![ZPWebDAVAuthenticationViewController isDisplaying]){
+                    if(![ZPWebDAVAuthenticationViewController isPresenting]){
                         ZPWebDAVAuthenticationViewController* authenticationController = [ZPWebDAVAuthenticationViewController instance];
                         
                         [authenticationController configureWithURL:request.originalURL andAttachment:attachment];

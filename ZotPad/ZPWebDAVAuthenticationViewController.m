@@ -23,23 +23,33 @@
 
 @implementation ZPWebDAVAuthenticationViewController
 
-static ZPWebDAVAuthenticationViewController* _instance;
+static BOOL _isPresenting;
 
-+(ZPWebDAVAuthenticationViewController*) instance{
-    if(_instance == nil){
-        UIViewController *rootController = [[[[UIApplication sharedApplication]delegate] window] rootViewController];
-        _instance = [rootController.storyboard instantiateViewControllerWithIdentifier:@"WebDAVRedirectDialog"];
++(void) presentInstanceModallyWithAttachment:(ZPZoteroAttachment*) attachment{
+
+    if([NSThread isMainThread]){
+        _isPresenting = TRUE;
+        ZPWebDAVAuthenticationViewController* instance = (ZPWebDAVAuthenticationViewController*) [self instance];
+        [instance configureWithAttachment:attachment];
+        [instance presentModally:YES];
     }
-    return _instance;
+    else{
+        dispatch_async(dispatch_get_main_queue(), ^{
+            [self presentInstanceModallyWithAttachment:attachment];
+        });
+    }
 }
 
-+(BOOL) isDisplaying{
-    return _instance != nil;
++(BOOL) isPresenting{
+    return _isPresenting;
 }
 
-
--(void) configureWithURL:(NSURL*)url andAttachment:(ZPZoteroAttachment*)attachment{
-    _originalURL = url;
+-(void) configureWithAttachment:(ZPZoteroAttachment*)attachment{
+    
+    NSString* WebDAVRoot = [ZPPreferences webDAVURL];
+    NSString* key =  attachment.key;
+    NSString* urlString = [WebDAVRoot stringByAppendingFormat:@"/%@.zip",key];
+    _originalURL = [NSURL URLWithString:urlString];
     _attachment = attachment;
     _hasRedirected = false;
 }
@@ -75,9 +85,7 @@ static ZPWebDAVAuthenticationViewController* _instance;
 -(IBAction)cancel:(id)sender{
     
     [self dismissModalViewControllerAnimated:YES];
-
-    //Clear the instance to save memory
-    _instance = nil;
+    _isPresenting = FALSE;
 }
 
 #pragma mark - UIWebViewDelegate
@@ -94,7 +102,7 @@ static ZPWebDAVAuthenticationViewController* _instance;
             [self dismissModalViewControllerAnimated:YES];
             
             //Clear the instance to save memory
-            _instance = nil;
+            _isPresenting = FALSE;
             
             //Retry the download
             [[ZPFileChannel_WebDAV fileChannelForAttachment:_attachment] startDownloadingAttachment:_attachment];

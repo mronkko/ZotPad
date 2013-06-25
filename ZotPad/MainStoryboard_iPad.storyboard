@@ -1,5 +1,5 @@
 <?xml version="1.0" encoding="UTF-8" standalone="no"?>
-<document type="com.apple.InterfaceBuilder3.CocoaTouch.Storyboard.XIB" version="2.0" toolsVersion="3084" systemVersion="12D78" targetRuntime="iOS.CocoaTouch.iPad" propertyAccessControl="none" initialViewController="5">
+<document type="com.apple.InterfaceBuilder3.CocoaTouch.Storyboard.XIB" version="2.0" toolsVersion="3084" systemVersion="12E55" targetRuntime="iOS.CocoaTouch.iPad" propertyAccessControl="none" initialViewController="5">
     <dependencies>
         <plugIn identifier="com.apple.InterfaceBuilder.IBCocoaTouchPlugin" version="2083"/>
     </dependencies>
@@ -508,9 +508,6 @@
                     <simulatedOrientationMetrics key="simulatedOrientationMetrics" orientation="landscapeRight"/>
                     <connections>
                         <segue destination="42" kind="relationship" relationship="detailViewController" id="53"/>
-                        <segue destination="bpw-6z-DmG" kind="modal" identifier="Authentication" modalPresentationStyle="pageSheet" id="jVu-Eo-vW4"/>
-                        <segue destination="3ej-hc-vCg" kind="modal" identifier="Import" modalPresentationStyle="formSheet" id="5eY-X6-fSZ"/>
-                        <segue destination="htM-EZ-pFH" kind="modal" identifier="FileUploadConflict" id="bAm-Ev-B5H"/>
                         <segue destination="krk-Vp-4gf" kind="modal" identifier="ShowLogView" modalPresentationStyle="fullScreen" modalTransitionStyle="flipHorizontal" id="ODr-oO-YQ7"/>
                         <segue destination="cEO-2j-Td0" kind="relationship" relationship="masterViewController" id="cyW-1i-zAw"/>
                         <segue destination="BLe-jL-WRe" kind="modal" identifier="PresentDocumentViewer" modalPresentationStyle="fullScreen" modalTransitionStyle="crossDissolve" id="E8F-bp-ima"/>
@@ -1010,9 +1007,9 @@
         <!--Authentication Dialog - Login to Zotero-->
         <scene sceneID="kZo-Vw-R2l">
             <objects>
-                <viewController title="Login to Zotero" modalPresentationStyle="pageSheet" id="bpw-6z-DmG" customClass="ZPAuthenticationDialog" sceneMemberID="viewController">
+                <viewController storyboardIdentifier="AuthenticationDialog" title="Login to Zotero" modalPresentationStyle="pageSheet" id="bpw-6z-DmG" customClass="ZPAuthenticationDialog" sceneMemberID="viewController">
                     <view key="view" contentMode="scaleToFill" id="h8h-R3-ciQ">
-                        <rect key="frame" x="0.0" y="0.0" width="768" height="768"/>
+                        <rect key="frame" x="0.0" y="20" width="768" height="748"/>
                         <autoresizingMask key="autoresizingMask" flexibleMaxX="YES" flexibleMaxY="YES"/>
                         <subviews>
                             <navigationBar contentMode="scaleToFill" id="Gj2-V7-ipd">
@@ -1029,7 +1026,7 @@
                                 </items>
                             </navigationBar>
                             <webView contentMode="scaleToFill" id="g43-sE-XbP">
-                                <rect key="frame" x="0.0" y="44" width="768" height="724"/>
+                                <rect key="frame" x="0.0" y="44" width="768" height="704"/>
                                 <autoresizingMask key="autoresizingMask" widthSizable="YES" heightSizable="YES"/>
                                 <color key="backgroundColor" red="1" green="1" blue="1" alpha="1" colorSpace="calibratedRGB"/>
                                 <connections>
@@ -1041,6 +1038,7 @@
                         <simulatedOrientationMetrics key="simulatedOrientationMetrics" orientation="landscapeRight"/>
                     </view>
                     <nil key="simulatedBottomBarMetrics"/>
+                    <simulatedOrientationMetrics key="simulatedOrientationMetrics" orientation="landscapeRight"/>
                     <modalPageSheetSimulatedSizeMetrics key="simulatedDestinationMetrics"/>
                     <connections>
                         <outlet property="webView" destination="g43-sE-XbP" id="8Iy-P9-OMw"/>
@@ -1082,27 +1080,25 @@
         <!--File Import View Controller-->
         <scene sceneID="DYx-Wi-uBz">
             <objects>
-                <viewController storyboardIdentifier="" id="3ej-hc-vCg" customClass="ZPFileImportViewController" sceneMemberID="viewController">
+                <viewController storyboardIdentifier="FileImportViewController" id="3ej-hc-vCg" customClass="ZPFileImportViewController" sceneMemberID="viewController">
                     <view key="view" contentMode="scaleToFill" id="Whn-CO-3pz" customClass="iCarousel">
-                        <rect key="frame" x="0.0" y="0.0" width="540" height="620"/>
+                        <rect key="frame" x="0.0" y="20" width="540" height="600"/>
                         <autoresizingMask key="autoresizingMask" flexibleMaxX="YES" flexibleMaxY="YES"/>
                         <color key="backgroundColor" white="1" alpha="1" colorSpace="custom" customColorSpace="calibratedWhite"/>
-                        <simulatedOrientationMetrics key="simulatedOrientationMetrics" orientation="landscapeRight"/>
                     </view>
                     <modalFormSheetSimulatedSizeMetrics key="simulatedDestinationMetrics"/>
                     <connections>
                         <outlet property="carousel" destination="Whn-CO-3pz" id="S0h-gr-moB"/>
-                        <segue destination="htM-EZ-pFH" kind="modal" identifier="FileUploadConflictFromDialog" modalPresentationStyle="pageSheet" id="GHg-CO-l1D"/>
                     </connections>
                 </viewController>
                 <placeholder placeholderIdentifier="IBFirstResponder" id="24i-ur-u3x" userLabel="First Responder" sceneMemberID="firstResponder"/>
             </objects>
             <point key="canvasLocation" x="432" y="-1335"/>
         </scene>
-        <!--Upload Version Conflict View Controller View Controller - Version conflict-->
+        <!--Upload Version Conflict View Controller - Version conflict-->
         <scene sceneID="TZV-il-WlM">
             <objects>
-                <viewController storyboardIdentifier="" title="Version conflict" modalPresentationStyle="pageSheet" id="htM-EZ-pFH" customClass="ZPUploadVersionConflictViewControllerViewController" sceneMemberID="viewController">
+                <viewController storyboardIdentifier="" title="Version conflict" modalPresentationStyle="pageSheet" id="htM-EZ-pFH" customClass="ZPUploadVersionConflictViewController" sceneMemberID="viewController">
                     <view key="view" contentMode="scaleToFill" id="tzC-ae-egO">
                         <rect key="frame" x="0.0" y="20" width="768" height="748"/>
                         <autoresizingMask key="autoresizingMask" flexibleMaxX="YES" flexibleMaxY="YES"/>
@@ -1270,7 +1266,4 @@
         <simulatedOrientationMetrics key="orientation"/>
         <simulatedScreenMetrics key="destination"/>
     </simulatedMetricsContainer>
-    <inferredMetricsTieBreakers>
-        <segue reference="bAm-Ev-B5H"/>
-    </inferredMetricsTieBreakers>
 </document>

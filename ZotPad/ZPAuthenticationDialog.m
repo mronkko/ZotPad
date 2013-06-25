@@ -13,6 +13,7 @@
 #import "DSActivityView.h"
 #import "ZPSecrets.h"
 
+
 // Needed for screen shots
 #import <QuartzCore/QuartzCore.h>
 
@@ -27,6 +28,29 @@
 
 
 @synthesize webView;
+
+static BOOL _isPresenting;
+
+static ZPAuthenticationDialog* _instance;
+
++ (void) presentInstanceModally{
+    
+    if(! _isPresenting){
+        _isPresenting = TRUE;
+        if([NSThread isMainThread]){
+            [[self instance] presentModally:YES];
+        }
+        else{
+            dispatch_async(dispatch_get_main_queue(), ^{
+                [self presentInstanceModally];
+            });
+        }
+    }
+}
+
++ (BOOL) isPresenting{
+    return _isPresenting;
+}
 
 - (void)didReceiveMemoryWarning
 {
@@ -271,6 +295,7 @@
     
     [[UIApplication sharedApplication] setNetworkActivityIndicatorVisible:NO];
     [self dismissModalViewControllerAnimated:YES];
+    _isPresenting = FALSE;
 
     if (ticket.didSucceed) {
         NSString *responseBody = [[NSString alloc] initWithData:data

@@ -9,16 +9,18 @@
 #import <UIKit/UIKit.h>
 #import "DSActivityView.h"
 #import "ZPCore.h"
+#import "ZPModalViewController.h"
 
-@interface ZPWebDAVAuthenticationViewController : UIViewController <UIWebViewDelegate, NSURLConnectionDelegate>{
+@interface ZPWebDAVAuthenticationViewController : ZPModalViewController <UIWebViewDelegate, NSURLConnectionDelegate>{
 }
 
 
 @property(nonatomic,retain) IBOutlet UIWebView *webView;
 
 
-+(ZPWebDAVAuthenticationViewController*) instance;
-+(BOOL) isDisplaying;
++(void) presentInstanceModallyWithAttachment:(ZPZoteroAttachment*) attachment;
++(BOOL) isPresenting;
+
 -(IBAction)cancel:(id)sender;
 -(void) configureWithURL:(NSURL*)url andAttachment:(ZPZoteroAttachment*)attachment;
 

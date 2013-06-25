@@ -1,5 +1,5 @@
 <?xml version="1.0" encoding="UTF-8" standalone="no"?>
-<document type="com.apple.InterfaceBuilder3.CocoaTouch.Storyboard.XIB" version="2.0" toolsVersion="3084" systemVersion="12D78" targetRuntime="iOS.CocoaTouch" propertyAccessControl="none" initialViewController="3">
+<document type="com.apple.InterfaceBuilder3.CocoaTouch.Storyboard.XIB" version="2.0" toolsVersion="3084" systemVersion="12E55" targetRuntime="iOS.CocoaTouch" propertyAccessControl="none" initialViewController="3">
     <dependencies>
         <plugIn identifier="com.apple.InterfaceBuilder.IBCocoaTouchPlugin" version="2083"/>
     </dependencies>
@@ -12,9 +12,6 @@
                         <autoresizingMask key="autoresizingMask"/>
                     </navigationBar>
                     <connections>
-                        <segue destination="mdR-2R-M4d" kind="modal" identifier="Authentication" id="hyc-84-qgP"/>
-                        <segue destination="AXS-C3-mVS" kind="modal" identifier="Import" id="WKt-2X-hWO"/>
-                        <segue destination="RIY-yW-qZT" kind="modal" identifier="FileUploadConflict" id="8vN-1U-A0T"/>
                         <segue destination="Awc-Eh-kqF" kind="relationship" relationship="rootViewController" id="bj4-xc-9DW"/>
                         <segue destination="waz-ow-W6T" kind="modal" identifier="ShowLogView" modalTransitionStyle="flipHorizontal" id="MUU-yM-Vcf"/>
                         <segue destination="a5b-s2-gTv" kind="modal" identifier="PresentDocumentViewer" id="fNi-CM-zpa"/>
@@ -244,7 +241,7 @@
         <!--File Import View Controller-->
         <scene sceneID="6Lq-Rz-Ywp">
             <objects>
-                <viewController storyboardIdentifier="" id="AXS-C3-mVS" customClass="ZPFileImportViewController" sceneMemberID="viewController">
+                <viewController storyboardIdentifier="FileImportViewController" id="AXS-C3-mVS" customClass="ZPFileImportViewController" sceneMemberID="viewController">
                     <view key="view" contentMode="scaleToFill" id="opB-Jm-dX9" customClass="iCarousel">
                         <rect key="frame" x="0.0" y="20" width="320" height="460"/>
                         <autoresizingMask key="autoresizingMask" flexibleMaxX="YES" flexibleMaxY="YES"/>
@@ -253,7 +250,6 @@
                     <simulatedStatusBarMetrics key="simulatedStatusBarMetrics"/>
                     <connections>
                         <outlet property="carousel" destination="opB-Jm-dX9" id="bql-Ye-jEw"/>
-                        <segue destination="RIY-yW-qZT" kind="modal" identifier="FileUploadConflictFromDialog" id="Dn4-w4-r0y"/>
                     </connections>
                 </viewController>
                 <placeholder placeholderIdentifier="IBFirstResponder" id="TfT-zN-bNV" userLabel="First Responder" sceneMemberID="firstResponder"/>
@@ -510,10 +506,10 @@
             </objects>
             <point key="canvasLocation" x="1818" y="-637"/>
         </scene>
-        <!--Upload Version Conflict View Controller View Controller - Version conflict-->
+        <!--Upload Version Conflict View Controller - Version conflict-->
         <scene sceneID="raI-k1-hcJ">
             <objects>
-                <viewController storyboardIdentifier="" title="Version conflict" modalPresentationStyle="pageSheet" id="RIY-yW-qZT" customClass="ZPUploadVersionConflictViewControllerViewController" sceneMemberID="viewController">
+                <viewController storyboardIdentifier="" title="Version conflict" modalPresentationStyle="pageSheet" id="RIY-yW-qZT" customClass="ZPUploadVersionConflictViewController" sceneMemberID="viewController">
                     <view key="view" contentMode="scaleToFill" id="lVP-cF-OyN">
                         <rect key="frame" x="0.0" y="20" width="320" height="460"/>
                         <autoresizingMask key="autoresizingMask" flexibleMaxX="YES" flexibleMaxY="YES"/>
@@ -1095,163 +1091,9 @@
         <image name="icon-up-black.png" width="23" height="20"/>
         <image name="verticalLines.png" width="6" height="1"/>
     </resources>
-    <classes>
-        <class className="HLSPlaceholderViewController" superclassName="HLSViewController">
-            <source key="sourceIdentifier" type="project" relativePath="./Classes/HLSPlaceholderViewController.h"/>
-            <relationships>
-                <relationship kind="outlet" name="delegate"/>
-                <relationship kind="outlet" name="placeholderView" candidateClass="UIView"/>
-            </relationships>
-        </class>
-        <class className="HLSViewController" superclassName="UIViewController">
-            <source key="sourceIdentifier" type="project" relativePath="./Classes/HLSViewController.h"/>
-        </class>
-        <class className="OHAttributedLabel" superclassName="UILabel">
-            <source key="sourceIdentifier" type="project" relativePath="./Classes/OHAttributedLabel.h"/>
-            <relationships>
-                <relationship kind="outlet" name="delegate"/>
-            </relationships>
-        </class>
-        <class className="ZPAuthenticationDialog" superclassName="UIViewController">
-            <source key="sourceIdentifier" type="project" relativePath="./Classes/ZPAuthenticationDialog.h"/>
-            <relationships>
-                <relationship kind="action" name="loadFirstPage:"/>
-                <relationship kind="outlet" name="webView" candidateClass="UIWebView"/>
-            </relationships>
-        </class>
-        <class className="ZPBarBackgroundGradientView" superclassName="UIView">
-            <source key="sourceIdentifier" type="project" relativePath="./Classes/ZPBarBackgroundGradientView.h"/>
-        </class>
-        <class className="ZPCollectionsAndTagsViewController" superclassName="HLSPlaceholderViewController">
-            <source key="sourceIdentifier" type="project" relativePath="./Classes/ZPCollectionsAndTagsViewController.h"/>
-            <relationships>
-                <relationship kind="action" name="handlePanGesture:" candidateClass="UIPanGestureRecognizer"/>
-                <relationship kind="action" name="toggleTagSelector:"/>
-                <relationship kind="outlet" name="cacheControllerPlaceHolder" candidateClass="UIBarButtonItem"/>
-                <relationship kind="outlet" name="collectionsView" candidateClass="UIView"/>
-                <relationship kind="outlet" name="gearButton" candidateClass="UIBarButtonItem"/>
-                <relationship kind="outlet" name="headerArrowLeft" candidateClass="UIImageView"/>
-                <relationship kind="outlet" name="headerArrowRight" candidateClass="UIImageView"/>
-                <relationship kind="outlet" name="tagsHeader" candidateClass="ZPBarBackgroundGradientView"/>
-                <relationship kind="outlet" name="tagsView" candidateClass="UIView"/>
-                <relationship kind="outlet" name="toolBar" candidateClass="UIToolbar"/>
-            </relationships>
-        </class>
-        <class className="ZPFileImportViewController" superclassName="UIViewController">
-            <source key="sourceIdentifier" type="project" relativePath="./Classes/ZPFileImportViewController.h"/>
-            <relationships>
-                <relationship kind="outlet" name="carousel" candidateClass="iCarousel"/>
-            </relationships>
-        </class>
-        <class className="ZPFileViewerViewController" superclassName="HLSPlaceholderViewController">
-            <source key="sourceIdentifier" type="project" relativePath="./Classes/ZPFileViewerViewController.h"/>
-            <relationships>
-                <relationship kind="action" name="actionButtonPressed:"/>
-                <relationship kind="action" name="dismiss:"/>
-                <relationship kind="action" name="handlePanGestureOnPullPane:" candidateClass="UIPanGestureRecognizer"/>
-                <relationship kind="action" name="next:"/>
-                <relationship kind="action" name="presentAllFiles:"/>
-                <relationship kind="action" name="previous:"/>
-                <relationship kind="action" name="toggleNavigationBar:"/>
-                <relationship kind="action" name="togglePullPane:"/>
-                <relationship kind="outlet" name="leftPullPane" candidateClass="UIView"/>
-                <relationship kind="outlet" name="leftPullTab" candidateClass="UIView"/>
-                <relationship kind="outlet" name="navigationBar" candidateClass="UINavigationBar"/>
-                <relationship kind="outlet" name="notesAndTagsTable" candidateClass="UITableView"/>
-                <relationship kind="outlet" name="rightPullPane" candidateClass="UIView"/>
-                <relationship kind="outlet" name="rightPullTab" candidateClass="UIView"/>
-            </relationships>
-        </class>
-        <class className="ZPItemDetailViewController" superclassName="UITableViewController">
-            <source key="sourceIdentifier" type="project" relativePath="./Classes/ZPItemDetailViewController.h"/>
-            <relationships>
-                <relationship kind="action" name="actionButtonPressed:"/>
-                <relationship kind="outlet" name="actionButton" candidateClass="UIBarButtonItem"/>
-                <relationship kind="outlet" name="starButton" candidateClass="ZPStarBarButtonItem"/>
-            </relationships>
-        </class>
-        <class className="ZPItemListViewController" superclassName="UIViewController">
-            <source key="sourceIdentifier" type="project" relativePath="./Classes/ZPItemListViewController.h"/>
-            <relationships>
-                <relationship kind="action" name="sortButtonPressed:"/>
-                <relationship kind="outlet" name="searchBar" candidateClass="UISearchBar"/>
-                <relationship kind="outlet" name="tableView" candidateClass="UITableView"/>
-                <relationship kind="outlet" name="toolBar" candidateClass="UIToolbar"/>
-            </relationships>
-        </class>
-        <class className="ZPLibraryAndCollectionListViewController" superclassName="UITableViewController">
-            <source key="sourceIdentifier" type="project" relativePath="./Classes/ZPLibraryAndCollectionListViewController.h"/>
-        </class>
-        <class className="ZPLogViewController" superclassName="UIViewController">
-            <source key="sourceIdentifier" type="project" relativePath="./Classes/ZPLogViewController.h"/>
-            <relationships>
-                <relationship kind="action" name="contactSupport:"/>
-                <relationship kind="action" name="dismiss:"/>
-                <relationship kind="action" name="manageKey:"/>
-                <relationship kind="action" name="showManual:"/>
-                <relationship kind="outlet" name="logView" candidateClass="UITextView"/>
-                <relationship kind="outlet" name="manualButton" candidateClass="UIBarButtonItem"/>
-            </relationships>
-        </class>
-        <class className="ZPNavigationController" superclassName="UINavigationController">
-            <source key="sourceIdentifier" type="project" relativePath="./Classes/ZPNavigationController.h"/>
-            <relationships>
-                <relationship kind="action" name="showLogView:"/>
-            </relationships>
-        </class>
-        <class className="ZPNoteEditingViewController" superclassName="UIViewController">
-            <source key="sourceIdentifier" type="project" relativePath="./Classes/ZPNoteEditingViewController.h"/>
-            <relationships>
-                <relationship kind="action" name="cancel:"/>
-                <relationship kind="action" name="deleteNote:"/>
-                <relationship kind="action" name="save:"/>
-                <relationship kind="outlet" name="navigationItem" candidateClass="UINavigationItem"/>
-                <relationship kind="outlet" name="webView" candidateClass="UIWebView"/>
-            </relationships>
-        </class>
-        <class className="ZPStarBarButtonItem" superclassName="UIBarButtonItem">
-            <source key="sourceIdentifier" type="project" relativePath="./Classes/ZPStarBarButtonItem.h"/>
-        </class>
-        <class className="ZPTagEditingViewController" superclassName="UIViewController">
-            <source key="sourceIdentifier" type="project" relativePath="./Classes/ZPTagEditingViewController.h"/>
-            <relationships>
-                <relationship kind="action" name="dismiss:"/>
-                <relationship kind="action" name="showPopover:"/>
-                <relationship kind="outlet" name="navigationBar" candidateClass="UINavigationBar"/>
-                <relationship kind="outlet" name="tableView" candidateClass="UITableView"/>
-            </relationships>
-        </class>
-        <class className="ZPUploadVersionConflictViewControllerViewController" superclassName="UIViewController">
-            <source key="sourceIdentifier" type="project" relativePath="./Classes/ZPUploadVersionConflictViewControllerViewController.h"/>
-            <relationships>
-                <relationship kind="action" name="useMyVersion:"/>
-                <relationship kind="action" name="useRemoteVersion:"/>
-                <relationship kind="outlet" name="carousel" candidateClass="iCarousel"/>
-                <relationship kind="outlet" name="label" candidateClass="UILabel"/>
-                <relationship kind="outlet" name="secondaryCarousel" candidateClass="iCarousel"/>
-            </relationships>
-        </class>
-        <class className="ZPWebDAVAuthenticationViewController" superclassName="UIViewController">
-            <source key="sourceIdentifier" type="project" relativePath="./Classes/ZPWebDAVAuthenticationViewController.h"/>
-            <relationships>
-                <relationship kind="action" name="cancel:"/>
-                <relationship kind="outlet" name="webView" candidateClass="UIWebView"/>
-            </relationships>
-        </class>
-        <class className="iCarousel" superclassName="UIView">
-            <source key="sourceIdentifier" type="project" relativePath="./Classes/iCarousel.h"/>
-            <relationships>
-                <relationship kind="outlet" name="dataSource"/>
-                <relationship kind="outlet" name="delegate"/>
-            </relationships>
-        </class>
-    </classes>
     <simulatedMetricsContainer key="defaultSimulatedMetrics">
         <simulatedStatusBarMetrics key="statusBar"/>
         <simulatedOrientationMetrics key="orientation"/>
         <simulatedScreenMetrics key="destination"/>
     </simulatedMetricsContainer>
-    <inferredMetricsTieBreakers>
-        <segue reference="8vN-1U-A0T"/>
-    </inferredMetricsTieBreakers>
 </document>

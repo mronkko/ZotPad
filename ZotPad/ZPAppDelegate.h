@@ -14,7 +14,6 @@
     DBRestClient* _restClient;
 }
 
-- (void) dismissViewControllerHierarchy;
 - (void) startAuthenticationSequence;
 - (void) _uploadFolderToDropBox:(DBRestClient*) client toPath:(NSString*)toPath fromPath:(NSString*) fromPath;
 

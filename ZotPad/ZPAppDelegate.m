@@ -27,7 +27,6 @@
 
 #import "ZPSecrets.h"
 #import "TestFlight.h"
-#import "Crittercism.h"
 #import "DDTTYLogger.h"
 #import "DDFileLogger.h"
 #import "CompressingLogFileManager.h"
@@ -269,9 +268,7 @@ didFinishLaunchingWithOptions:(NSDictionary *)launchOptions
         }
         else{
             DDLogInfo(@"Received a file %@ from %@",[url lastPathComponent],sourceApplication);
-            
-            [self dismissViewControllerHierarchy];
-            [self.window.rootViewController performSegueWithIdentifier:@"Import" sender:url];
+            [ZPFileImportViewController presentInstanceModallyWithAttachment:attachment];
             [ZPFileUploadManager addAttachmentToUploadQueue:attachment withNewFile:url];
         }
                                                                 
@@ -324,35 +321,19 @@ didFinishLaunchingWithOptions:(NSDictionary *)launchOptions
 }
 
 - (void) startAuthenticationSequence{
+    
+    if(![ZPAuthenticationDialog isPresenting]){
 
-    if([NSThread isMainThread]){
-        UIViewController* root = self.window.rootViewController;  
-        UIViewController* presentedViewController = root.presentedViewController;
-        
-        if(presentedViewController == NULL || ![presentedViewController isKindOfClass:[ZPAuthenticationDialog class]]){
-            [self dismissViewControllerHierarchy];
-            DDLogInfo(@"Displaying authentication view");
-            [root performSegueWithIdentifier:@"Authentication" sender:NULL];
+        if([NSThread isMainThread]){
+            if([NSThread isMainThread]){
+                DDLogInfo(@"Displaying authentication view");
+                [ZPAuthenticationDialog presentInstanceModally];
+            }
+        }
+        else{
+            [self performSelectorOnMainThread:@selector(startAuthenticationSequence) withObject:NULL waitUntilDone:NO];
         }
     }
-    else{
-        [self performSelectorOnMainThread:@selector(startAuthenticationSequence) withObject:NULL waitUntilDone:NO];
-    }
-
 }
 
--(void) dismissViewControllerHierarchy{
-   
-    //Find the top most viewcontroller
-    UIViewController* viewController = self.window.rootViewController;
-    while(viewController.presentedViewController) viewController = viewController.presentedViewController;
-    
-    //Start dismissing modal views
-    while(viewController != self.window.rootViewController){
-        UIViewController* parent = viewController.presentingViewController;
-        [viewController dismissModalViewControllerAnimated:NO];
-        viewController = parent;
-    }
-    
-}
 @end

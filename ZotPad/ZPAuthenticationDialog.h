@@ -10,8 +10,10 @@
 #import "DSActivityView.h"
 #import "OAuthConsumer.h"
 #import "OAToken.h"
+#import "ZPModalViewController.h"
 
-@interface ZPAuthenticationDialog : UIViewController <UIApplicationDelegate, UIWebViewDelegate> {
+@interface ZPAuthenticationDialog : ZPModalViewController <UIApplicationDelegate, UIWebViewDelegate> {
+    
     DSActivityView* _activityView;
     NSString* _key;
 
@@ -26,6 +28,9 @@
 }
 
 @property(nonatomic,retain) IBOutlet UIWebView *webView;
+
++ (void) presentInstanceModally;
++ (BOOL) isPresenting;
 
 - (void)setKeyAndLoadZoteroSite:(NSString*)key;
 - (IBAction)loadFirstPage:(id)sender;

@@ -8,15 +8,15 @@
 
 #import <UIKit/UIKit.h>
 #import "iCarousel.h"
+#import "ZPCore.h"
+#import "ZPModalViewController.h"
 
-@interface ZPFileImportViewController : UIViewController <iCarouselDelegate>{
+@interface ZPFileImportViewController : ZPModalViewController <iCarouselDelegate>{
 }
 
-@property BOOL isFullyPresented;
+@property (retain, nonatomic) IBOutlet iCarousel* carousel;
+@property (retain, nonatomic) ZPZoteroAttachment* attachment;
 
-@property (retain) IBOutlet iCarousel* carousel;
-@property (retain) NSURL* url;
-
--(void) notifyFileUploadCompleted:(NSNotification*)notification;
++(void) presentInstanceModallyWithAttachment:(ZPZoteroAttachment*) attachment;
 
 @end

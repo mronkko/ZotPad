@@ -17,7 +17,7 @@
 #import "ZPFileChannel_ZoteroStorage.h"
 
 
-#import "ZPUploadVersionConflictViewControllerViewController.h"
+#import "ZPUploadVersionConflictViewController.h"
 #import "ZPFileImportViewController.h"
 #import "ZPAppDelegate.h"
 
@@ -159,24 +159,7 @@ static ZPFileChannel_ZoteroStorage* _fileChannel_Zotero;
     }
     else{
         [attachment logFileRevisions];
-        
-        UIViewController* root = [UIApplication sharedApplication].delegate.window.rootViewController;
-        
-        //TODO: Consider refactoring this some place else
-        
-        NSDictionary* sender = [NSDictionary dictionaryWithObjectsAndKeys:self,@"fileChannel",attachment,ZPKEY_ATTACHMENT, nil];
-        if(root.presentedViewController == NULL){
-            [root performSegueWithIdentifier:@"FileUploadConflict" sender:sender];
-        }
-        else if ([root.presentedViewController isKindOfClass:[ZPFileImportViewController class]] && [(ZPFileImportViewController*) root.presentedViewController isFullyPresented]){
-            [root.presentedViewController performSegueWithIdentifier:@"FileUploadConflictFromDialog" sender:sender];
-        }
-        else{
-            DDLogWarn(@"Delaying conflict view to allow existing animations to finish");
-            dispatch_after(dispatch_time(DISPATCH_TIME_NOW, 1 * NSEC_PER_SEC), dispatch_get_current_queue(), ^{
-                [self presentConflictViewForAttachment:attachment reason:reason];
-            });
-        }
+        [ZPUploadVersionConflictViewController presentInstanceModallyWithAttachment:attachment];
     }
 }
 
