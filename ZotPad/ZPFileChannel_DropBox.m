@@ -233,7 +233,32 @@ static DBRestClient* _downloadClient;
     
     NSInteger nameLength = [ZPPreferences maxTitleLengthInDropboxFilenames];
     if(nameLength >0 && [title length] > nameLength){
-        title = [title substringToIndex:nameLength];
+        
+        NSString* newTitle = [title substringToIndex:nameLength];
+
+        // This implements the truncate_smart option of ZotFile. This is a hidden preference in Zotfile, and probably always on.
+        // Apply if the title contains spaces and if the first truncated character matches a regexp
+        
+        BOOL hasSpaces = [newTitle rangeOfString:@" "].location != NSNotFound;
+        
+        NSRegularExpression *regex = [NSRegularExpression regularExpressionWithPattern:@"[a-zA-Z0-9]"
+                                                                               options:0
+                                                                                 error:nil];
+
+        BOOL firstTruncatedCharacterIsAplhaNumeric = [regex numberOfMatchesInString:title
+                                                                options:0
+                                                                  range:NSMakeRange(nameLength, 1)] > 0;
+        
+        if(hasSpaces && firstTruncatedCharacterIsAplhaNumeric){
+            while(! [[newTitle substringWithRange:NSMakeRange([newTitle length]-1, 1)] isEqualToString:@" "])
+                newTitle = [newTitle substringToIndex:[newTitle length]-1];
+
+            //Remove the last space
+        
+            newTitle = [newTitle substringToIndex:[newTitle length]-1];
+        }
+        
+        title = newTitle;
     }
     
     NSString* publicationTitle = [parent.fields objectForKey:@"publicationTitle"];
