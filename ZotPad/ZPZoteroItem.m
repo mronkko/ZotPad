@@ -273,6 +273,10 @@ static CSLFormatter* _cslFormatter = NULL;
 }
 
 - (void) setCreators:(NSArray*)creators{
+    // Check that each creator has two or three key-value pairs (firstname and lastname or name plus creator type)
+    for(NSDictionary* creator in creators){
+        NSAssert([creator count]==3 ||[creator count]==2, @"Attempted to assing invalid creator %@ to item %@", creator, self.key);
+    }
     _creators = creators;
 }
 

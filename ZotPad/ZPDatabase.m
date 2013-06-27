@@ -1482,7 +1482,18 @@ static NSObject* writeLock;
         FMResultSet* resultSet = [dbObject executeQuery: @"SELECT firstName, lastName, name, creatorType FROM creators WHERE itemKey = ? ORDER BY authorOrder",item.key];
         
         while([resultSet next]) {
-            [creators addObject:[resultSet resultDictionary]];
+            NSDictionary* creator = [resultSet resultDictionary];
+
+            //Remove NSNulls
+            NSMutableDictionary* mutableCreator = [creator mutableCopy];
+            
+            for(NSString *key in creator) {
+                if([creator objectForKey:key] == [NSNull null]) {
+                    [mutableCreator removeObjectForKey:key];
+                }
+            }
+            
+            [creators addObject:[mutableCreator copy]];
         }
         
         [resultSet close];
