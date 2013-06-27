@@ -407,7 +407,7 @@ NSInteger const ZPATTACHMENTICONGVIEWCONTROLLER_TAG_TITLELABEL = -5;
             [ZPFileViewerViewController presentWithAttachment:attachment];
            
         }
-        else if(attachment.linkMode == LINK_MODE_LINKED_URL && [ZPReachability hasInternetConnection]){
+        else if(attachment.linkMode == LINK_MODE_LINKED_URL && [ZPPreferences online]){
             [[UIApplication sharedApplication] openURL:[NSURL URLWithString:attachment.url]];
         }
         else if(self.mode == ZPATTACHMENTICONGVIEWCONTROLLER_MODE_DOWNLOAD && ( attachment.linkMode == LINK_MODE_IMPORTED_FILE || 
@@ -417,7 +417,7 @@ NSInteger const ZPATTACHMENTICONGVIEWCONTROLLER_TAG_TITLELABEL = -5;
 
             
             
-            if([ZPReachability hasInternetConnection] && ! [ZPFileDownloadManager isAttachmentDownloading:attachment]){
+            if([ZPPreferences online] && ! [ZPFileDownloadManager isAttachmentDownloading:attachment]){
                 [ZPFileDownloadManager checkIfCanBeDownloadedAndStartDownloadingAttachment:attachment];
                 _latestManuallyTriggeredAttachment = attachment;
             }
