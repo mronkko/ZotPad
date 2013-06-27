@@ -964,7 +964,7 @@
         <!--WebDAV Authentication View Controller - WebDAV redirect-->
         <scene sceneID="DnA-QO-4WO">
             <objects>
-                <viewController storyboardIdentifier="WebDAVRedirectDialog" title="WebDAV redirect" modalPresentationStyle="pageSheet" id="Z3h-M4-dg1" customClass="ZPWebDAVAuthenticationViewController" sceneMemberID="viewController">
+                <viewController storyboardIdentifier="WebDAVAuthenticationViewController" title="WebDAV redirect" modalPresentationStyle="pageSheet" id="Z3h-M4-dg1" customClass="ZPWebDAVAuthenticationViewController" sceneMemberID="viewController">
                     <view key="view" contentMode="scaleToFill" id="BcP-7D-oqd">
                         <rect key="frame" x="0.0" y="20" width="768" height="748"/>
                         <autoresizingMask key="autoresizingMask" flexibleMaxX="YES" flexibleMaxY="YES"/>
@@ -1098,7 +1098,7 @@
         <!--Upload Version Conflict View Controller - Version conflict-->
         <scene sceneID="TZV-il-WlM">
             <objects>
-                <viewController storyboardIdentifier="" title="Version conflict" modalPresentationStyle="pageSheet" id="htM-EZ-pFH" customClass="ZPUploadVersionConflictViewController" sceneMemberID="viewController">
+                <viewController storyboardIdentifier="UploadVersionConflictViewController" title="Version conflict" modalPresentationStyle="pageSheet" id="htM-EZ-pFH" customClass="ZPUploadVersionConflictViewController" sceneMemberID="viewController">
                     <view key="view" contentMode="scaleToFill" id="tzC-ae-egO">
                         <rect key="frame" x="0.0" y="20" width="768" height="748"/>
                         <autoresizingMask key="autoresizingMask" flexibleMaxX="YES" flexibleMaxY="YES"/>

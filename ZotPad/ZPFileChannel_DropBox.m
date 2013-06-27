@@ -61,14 +61,16 @@
 
 @implementation ZPFileChannel_Dropbox
 
-static DBRestClient* _uploadClient;
+static DBRestClient* _uploadClientThatOverwritesServerVersion;
+static DBRestClient* _uploadClientThatCreatesConflict;
 static DBRestClient* _downloadClient;
 
 +(NSInteger) activeDownloads{
     return [_downloadClient requestCount];
 }
 +(NSInteger) activeUploads{
-    return [_uploadClient requestCount];
+    return [_uploadClientThatOverwritesServerVersion requestCount] +
+        [_uploadClientThatCreatesConflict requestCount];
 }
 
 
@@ -152,8 +154,10 @@ static DBRestClient* _downloadClient;
     self = [super init];
     [ZPDBSession sharedSession].delegate = self;
     
-    _uploadClient = [[DBRestClient alloc] initWithSession:[ZPDBSession sharedSession]];
-    _uploadClient.delegate = self;
+    _uploadClientThatOverwritesServerVersion = [[DBRestClient alloc] initWithSession:[ZPDBSession sharedSession]];
+    _uploadClientThatOverwritesServerVersion.delegate = self;
+    _uploadClientThatCreatesConflict = [[DBRestClient alloc] initWithSession:[ZPDBSession sharedSession]];
+    _uploadClientThatCreatesConflict.delegate = self;
     _downloadClient = [[DBRestClient alloc] initWithSession:[ZPDBSession sharedSession]];
     _downloadClient.delegate = self;
     
@@ -213,8 +217,12 @@ static DBRestClient* _downloadClient;
     
     for(NSDictionary* creator in creators){
         if([creatorTypes containsObject:[creator objectForKey:@"creatorType"]]){
-            NSObject* name = [creator objectForKey:@"lastName"];
-            if(name != [NSNull null] && name != nil){
+            NSObject* lastName = [creator objectForKey:@"lastName"];
+            NSObject* name = [creator objectForKey:@"name"];
+            if(lastName != nil){
+                [creatorNames addObject:lastName];
+            }
+            else if(name != nil){
                 [creatorNames addObject:name];
             }
         }
@@ -571,24 +579,17 @@ static DBRestClient* _downloadClient;
     NSString* path = [self _pathForAttachment:attachment];
     
     //Drobbox uses NSURLconnection internally, so it needs to be called in the main thread.
-    
-    dispatch_async(dispatch_get_main_queue(), ^{
-        if(overwriteConflicting){
-            
-            // If this file will replace the server version, get the version info from the server first.
-            
-            [_uploadClient loadMetadata:[path precomposedStringWithCanonicalMapping]];
-        }
-        else{
-            
-            // If this file should not replace existing file, just upload it. It will fail if there is a conflict and we can then proceed from there
-            
-            NSString* targetPath = [path stringByDeletingLastPathComponent];
-            [_uploadClient uploadFile:[[path lastPathComponent] precomposedStringWithCanonicalMapping] toPath:[targetPath precomposedStringWithCanonicalMapping] withParentRev:attachment.versionIdentifier_local fromPath:attachment.fileSystemPath_modified];
-        }
-        
-    });
-    
+    if (overwriteConflicting) {
+        [_uploadClientThatOverwritesServerVersion performSelectorOnMainThread:@selector(loadMetadata:)
+                                                                   withObject:[path precomposedStringWithCanonicalMapping]
+                                                                waitUntilDone:NO];
+    }
+    else{
+        [_uploadClientThatCreatesConflict performSelectorOnMainThread:@selector(loadMetadata:)
+                                                           withObject:[path precomposedStringWithCanonicalMapping]
+                                                        waitUntilDone:NO];
+    }
+
 }
 
 -(void) useProgressView:(UIProgressView *)progressView forUploadingAttachment:(ZPZoteroAttachment *)attachment{
@@ -649,7 +650,7 @@ static DBRestClient* _downloadClient;
         }
     }
     // Uploading
-    else if(client == _uploadClient){
+    else if(client == _uploadClientThatOverwritesServerVersion){
 
         NSString* path = [self _pathForAttachment:attachment];
         NSString* targetPath = [path stringByDeletingLastPathComponent];
@@ -657,6 +658,34 @@ static DBRestClient* _downloadClient;
         // Uploading will retrieve metadata only if we want to overwrite the server version. Just proceed with upload in all cases.
         
         [client uploadFile:[[path lastPathComponent] precomposedStringWithCanonicalMapping] toPath:[targetPath precomposedStringWithCanonicalMapping] withParentRev:metadata.rev fromPath:attachment.fileSystemPath_modified];
+    
+    }
+    else if(client == _uploadClientThatCreatesConflict){
+        
+         //If rev is null, we assume that the file has been deleted. Fail
+        
+        if(metadata.rev == NULL){
+            NSDictionary* userInfo = [NSDictionary dictionaryWithObject:@"The original file does not exist in Dropbox" forKey:NSLocalizedDescriptionKey];
+            NSError* error = [NSError errorWithDomain:@"Dropbox"
+                                                 code:-1
+                                             userInfo:userInfo];
+            
+            [ZPFileUploadManager failedUploadingAttachment:attachment
+                                                 withError:error
+                                                     toURL:[self _URLForAttachment:attachment]];
+            [self cleanupAfterFinishingAttachment:attachment];
+        }
+        else if(! [attachment.versionIdentifier_local isEqualToString:metadata.rev]){
+            [self presentConflictViewForAttachment:attachment reason:[NSString stringWithFormat:@"Version identifiers differ. Local file: %@, Dropbox server file: %@", attachment.versionIdentifier_local, metadata.rev]];
+        }
+        else{
+            NSString* path = [self _pathForAttachment:attachment];
+            NSString* targetPath = [path stringByDeletingLastPathComponent];
+
+            [client uploadFile:[[path lastPathComponent] precomposedStringWithCanonicalMapping] toPath:[targetPath precomposedStringWithCanonicalMapping] withParentRev:attachment.versionIdentifier_local fromPath:attachment.fileSystemPath_modified];
+        }
+        
+        
     }
     
 }
@@ -674,7 +703,7 @@ static DBRestClient* _downloadClient;
     if(client == _downloadClient){
         [ZPFileDownloadManager failedDownloadingAttachment:attachment withError:error fromURL:[self _URLForAttachment:attachment]];
     }
-    else if(client == _uploadClient){
+    else if(client == _uploadClientThatOverwritesServerVersion){
         [ZPFileUploadManager failedUploadingAttachment:attachment withError:error toURL:[self _URLForAttachment:attachment]];
     }
     [self cleanupAfterFinishingAttachment:attachment];
@@ -814,30 +843,6 @@ static DBRestClient* _downloadClient;
 
     [ZPFileUploadManager failedUploadingAttachment:attachment withError:error toURL:[self _URLForAttachment:attachment]];
     [self cleanupAfterFinishingAttachment:attachment];
-    
-    /*
-     //If rev is null, we assume that the file has been deleted. Fail
-     else if(metadata.rev == NULL){
-     _uploadCounter--;
-     NSDictionary* userInfo = [NSDictionary dictionaryWithObject:@"The original file does not exist in Dropbox" forKey:NSLocalizedDescriptionKey];
-     NSError* error = [NSError errorWithDomain:@"Dropbox"
-     code:-1
-     userInfo:userInfo];
-     
-     [ZPFileUploadManager failedUploadingAttachment:attachment
-     withError:error
-     toURL:[self _URLForAttachment:attachment]];
-     [self cleanupAfterFinishingAttachment:attachment];
-     }
-     else if(! [attachment.versionIdentifier_local isEqualToString:metadata.rev]){
-     _uploadCounter--;
-     [self presentConflictViewForAttachment:attachment reason:[NSString stringWithFormat:@"Version identifiers differ. Local file: %@, Dropbox server file: %@", attachment.versionIdentifier_local, metadata.rev]];
-     }
-     else{
-     [client uploadFile:[[path lastPathComponent] precomposedStringWithCanonicalMapping] toPath:[targetPath precomposedStringWithCanonicalMapping] withParentRev:metadata.rev fromPath:attachment.fileSystemPath_modified];
-     }
-     
-     */
 }
 
 

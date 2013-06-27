@@ -222,11 +222,11 @@ static ZPCacheStatusToolbarController* _statusView;
     
     @synchronized(_activeDownloads){
         //Do not download item if it is already being downloaded
-        if([_activeDownloads containsObject:attachment]){
+        if([_activeDownloads containsObject:attachment.key]){
             return false;
         }
         DDLogVerbose(@"Added %@ to active downloads. Number of files downloading is %i",attachment.filenameBasedOnLinkMode,[_activeDownloads count]);
-        [_activeDownloads addObject:attachment];
+        [_activeDownloads addObject:attachment.key];
     }
     
     
@@ -267,7 +267,7 @@ static ZPCacheStatusToolbarController* _statusView;
             
         }
         @synchronized(_activeDownloads){
-            [_activeDownloads removeObject:attachment];
+            [_activeDownloads removeObject:attachment.key];
             DDLogVerbose(@"Finished downloading %@",attachment.filenameBasedOnLinkMode);
         }
         
@@ -281,7 +281,7 @@ static ZPCacheStatusToolbarController* _statusView;
 
 +(void) failedDownloadingAttachment:(ZPZoteroAttachment*)attachment withError:(NSError*) error fromURL:(NSString *)url{
     @synchronized(_activeDownloads){
-        [_activeDownloads removeObject:attachment];
+        [_activeDownloads removeObject:attachment.key];
         DDLogError(@"Failed downloading file %@. %@ (URL: %@) Troubleshooting instructions: http://zotpad.uservoice.com",attachment.filenameBasedOnLinkMode,error.localizedDescription,url);
     }
     
@@ -305,7 +305,8 @@ static ZPCacheStatusToolbarController* _statusView;
 
 +(BOOL) isAttachmentDownloading:(ZPZoteroAttachment*)attachment{
     @synchronized(_activeDownloads){
-        return [_activeDownloads containsObject:attachment];
+        BOOL isDownloading = [_activeDownloads containsObject:attachment.key];
+        return isDownloading;
     }
     
 }
