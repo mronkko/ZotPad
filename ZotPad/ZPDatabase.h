@@ -46,9 +46,9 @@
 
 
 //These are hard coded for now.
-+ (NSArray*) fieldsThatCanBeUsedForSorting;
-
++(NSArray*) fieldsThatCanBeUsedForSorting;
 +(NSString*) getFirstItemKeyWithTimestamp:(NSString*)timestamp from:(NSInteger)libraryID;
++(NSArray*) allAttachmentKeys;
 
 
 // Methods for filling data into existing objects

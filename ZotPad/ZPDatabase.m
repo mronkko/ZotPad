@@ -1695,6 +1695,26 @@ static NSObject* writeLock;
     return keys;
 }
 
++(NSArray*) allAttachmentKeys{
+    
+    NSMutableArray* keys = [[NSMutableArray alloc] init];
+    
+    NSString* sql = @"SELECT itemKey FROM attachments";
+    
+    FMDatabase* dbObject = [self _dbObject];
+    @synchronized(dbObject){
+        FMResultSet* resultSet;
+        
+        resultSet = [dbObject executeQuery: sql];
+        
+        while([resultSet next]) [keys addObject:[resultSet stringForColumnIndex:0]];
+        
+        [resultSet close];
+    }
+    
+    return keys;
+}
+
 +(NSString*) getFirstItemKeyWithTimestamp:(NSString*)timestamp from:(NSInteger)libraryID{
     FMDatabase* dbObject = [self _dbObject];
     @synchronized(dbObject){
