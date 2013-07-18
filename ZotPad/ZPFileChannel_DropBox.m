@@ -300,12 +300,12 @@ static DBRestClient* _downloadClient;
                 
                 // %a - last names of authors (not editors etc) or inventors.
             case 'a':
-                [customName appendString:creatorString];
+                if(customName != nil) [customName appendString:creatorString];
                 break;
                 
                 // %A - first letter of author (useful for subfolders)
             case 'A':
-                [customName appendString:[[creatorString substringToIndex:1] uppercaseString]];
+                if(creatorString != nil)[customName appendString:[[creatorString substringToIndex:1] uppercaseString]];
                 break;
                 
                 // %y - year (extracted from Date field)
@@ -315,7 +315,7 @@ static DBRestClient* _downloadClient;
                 
                 // %t - title. Usually truncated after : . ? The maximal length of the remaining part of the title can be changed.
             case 't':
-                [customName appendString:title];
+                if(title != nil) [customName appendString:title];
                 break;
                 
                 // %T - item type (localized)
