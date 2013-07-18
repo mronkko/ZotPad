@@ -36,6 +36,7 @@ static ZPAuthenticationDialog* _instance;
 + (void) presentInstanceModally{
     
     if(! _isPresenting){
+        DDLogInfo(@"Displaying authentication view");
         _isPresenting = TRUE;
         if([NSThread isMainThread]){
             [[self instance] presentModally:YES];
@@ -283,8 +284,9 @@ static ZPAuthenticationDialog* _instance;
         _latestToken = [[OAToken alloc] initWithHTTPResponseBody:responseBody];
         
         [self setKeyAndLoadZoteroSite:[_latestToken key]];
+    }else{
+        DDLogWarn(@"Requesting temporary token failed");
     }
-    
 }
 
 /*
@@ -302,10 +304,7 @@ static ZPAuthenticationDialog* _instance;
                                                        encoding:NSUTF8StringEncoding];
         _latestToken = [[OAToken alloc] initWithHTTPResponseBody:responseBody];
         
-        
-        DDLogVerbose(@"Got access token");
-        
-        //Save the key to preferences
+                //Save the key to preferences
         [ZPPreferences setOAuthKey:[_latestToken key]];
         _oauthkey = [_latestToken key];
         
@@ -320,10 +319,14 @@ static ZPAuthenticationDialog* _instance;
         [ZPPreferences setUsername:username];
         _username = username;
         
+        DDLogInfo(@"Authentication of user %@ succeeded", username);
+
         //Tell the application to start updating libraries and collections from server
         [[NSNotificationCenter defaultCenter] postNotificationName:ZPNOTIFICATION_ZOTERO_AUTHENTICATION_SUCCESSFUL object:nil];
  
         
+    }else{
+        DDLogWarn(@"Requesting permanent token failed");
     }
     
 }

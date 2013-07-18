@@ -326,7 +326,6 @@ didFinishLaunchingWithOptions:(NSDictionary *)launchOptions
 
         if([NSThread isMainThread]){
             if([NSThread isMainThread]){
-                DDLogInfo(@"Displaying authentication view");
                 [ZPAuthenticationDialog presentInstanceModally];
             }
         }
