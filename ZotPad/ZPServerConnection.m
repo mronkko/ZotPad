@@ -863,11 +863,12 @@ const NSInteger ZPServerConnectionRequestLastModifiedItem = 11;
                                weakRequest.url, weakRequest.responseStatusCode,
                                [[NSString alloc] initWithData:weakRequest.responseData encoding:NSUTF8StringEncoding]);
                     
-                    if([ZPPreferences debugZoteroAPIRequests]){
-                        DDLogInfo(@"%@",[ZPServerConnection _requestDumpAsString:weakRequest]);
-                    }
-
                 }
+
+                if([ZPPreferences debugZoteroAPIRequests]){
+                    DDLogInfo(@"%@",[ZPServerConnection _requestDumpAsString:weakRequest]);
+                }
+
             }
             
         }
