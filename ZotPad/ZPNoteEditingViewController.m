@@ -11,8 +11,9 @@
 #import "ZPItemDataUploadManager.h"
 #import "CMPopTipView.h"
 
-@interface ZPNoteEditingViewController ()
-
+@interface ZPNoteEditingViewController (){
+    UIActionSheet* _confirmDelete;
+}
 
 @end
 
@@ -131,6 +132,7 @@ static ZPNoteEditingViewController* _instance;
 
 -(IBAction)cancel:(id)sender{
     [webView loadHTMLString:@"" baseURL:NULL];
+    if(_confirmDelete != nil) [_confirmDelete dismissWithClickedButtonIndex:-1 animated:YES];
     [self dismissModalViewControllerAnimated:YES];
 }
 -(IBAction)save:(id)sender{
@@ -140,6 +142,7 @@ static ZPNoteEditingViewController* _instance;
     note.note = noteText;
 
     [webView loadHTMLString:@"" baseURL:NULL];
+    if(_confirmDelete != nil) [_confirmDelete dismissWithClickedButtonIndex:-1 animated:YES];
     [self dismissModalViewControllerAnimated:YES];
 
     if(isNewNote){
@@ -160,23 +163,35 @@ static ZPNoteEditingViewController* _instance;
 }
 
 -(IBAction)deleteNote:(id)sender{
+ 
+    _confirmDelete = [[UIActionSheet alloc] initWithTitle:nil
+                                                        delegate:self
+                                        cancelButtonTitle: UI_USER_INTERFACE_IDIOM() == UIUserInterfaceIdiomPad ? nil : @"Cancel"
+                                          destructiveButtonTitle:@"Delete note"
+                                               otherButtonTitles:nil];
+    [_confirmDelete showFromBarButtonItem:sender animated:YES];
+}
 
-    [webView loadHTMLString:@"" baseURL:NULL];
-    [self dismissModalViewControllerAnimated:YES];
-
-    ZPZoteroItem* item = [ZPZoteroItem itemWithKey:note.parentKey];
-
-    DDLogInfo(@"User tapped delete button for note (%@)", item.itemKey);
-
-    NSMutableArray* newNotes = [NSMutableArray arrayWithArray:item.notes];
-    [newNotes removeObject:note];
-    item.notes = newNotes;
+- (void)actionSheet:(UIActionSheet *)actionSheet willDismissWithButtonIndex:(NSInteger)buttonIndex{
     
-    [ZPDatabase deleteNoteLocally:(ZPZoteroNote*)note];
-    [ZPItemDataUploadManager uploadMetadata];
-
-    [_targetViewController refreshNotesAfterEditingNote:self.note];
-
+    if(buttonIndex == 0){
+        [webView loadHTMLString:@"" baseURL:NULL];
+        [self dismissModalViewControllerAnimated:YES];
+        
+        ZPZoteroItem* item = [ZPZoteroItem itemWithKey:note.parentKey];
+        
+        DDLogInfo(@"User tapped delete button for note (%@)", item.itemKey);
+        
+        NSMutableArray* newNotes = [item.notes mutableCopy];
+        [newNotes removeObject:note];
+        item.notes = newNotes;
+        
+        [ZPDatabase deleteNoteLocally:(ZPZoteroNote*)note];
+        [ZPItemDataUploadManager uploadMetadata];
+        
+        [_targetViewController refreshNotesAfterEditingNote:self.note];
+    }
+    _confirmDelete = nil;
 }
 
 -(void) _refreshParent{

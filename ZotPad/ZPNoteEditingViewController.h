@@ -10,7 +10,7 @@
 #import "ZPNoteDisplay.h"
 #import <UIKit/UIKit.h>
 
-@interface ZPNoteEditingViewController : UIViewController
+@interface ZPNoteEditingViewController : UIViewController <UIActionSheetDelegate>
 
 @property (retain, nonatomic) IBOutlet UIWebView* webView;
 @property (retain, nonatomic) IBOutlet UINavigationItem* navigationItem;
