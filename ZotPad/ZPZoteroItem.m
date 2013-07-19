@@ -72,7 +72,6 @@ static CSLFormatter* _cslFormatter = NULL;
 }
 
 +(ZPZoteroItem*) itemWithKey:(NSObject*) key{
-    
     if(key == NULL || [key isEqual:@""])
         [NSException raise:@"Key is empty" format:@"ZPZoteroItem cannot be instantiated with empty key"];
 
@@ -333,6 +332,15 @@ static CSLFormatter* _cslFormatter = NULL;
     return _notes;
 }
 - (void) setNotes:(NSArray*)notes{
+//Ensure that the notes are in order
+
+#ifdef ZPDEBUG
+    //Ensure that the notes are in order
+    NSMutableArray* mutableNotes = [notes mutableCopy];
+    [mutableNotes sortUsingDescriptors:[NSArray arrayWithObject:[[NSSortDescriptor alloc] initWithKey:@"title" ascending:TRUE]]];
+    NSAssert([mutableNotes isEqual:notes], @"Tried to set notes that were in incorrect order. %@", notes);
+#endif
+
     _notes = notes;
 }
 
