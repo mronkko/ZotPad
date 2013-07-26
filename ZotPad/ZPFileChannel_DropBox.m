@@ -176,10 +176,16 @@ static UIAlertView* _alertView;
     return [NSNumber numberWithInt: (NSInteger) request];
 }
 
-
 -(NSString*) _filenameOrPathForAttachment:(ZPZoteroAttachment*)attachment withPattern:(NSString*)pattern{
-    
-    NSString* creatorString;
+    NSMutableString *ret = [[NSMutableString alloc] init];
+    [self _resolvePattern:pattern withAttachment:attachment intoString:ret];
+    return ret;
+}
+
+-(BOOL) _resolvePattern:(NSString*)pattern withAttachment:(ZPZoteroAttachment*)attachment intoString:(NSMutableString*) targetString{
+
+    BOOL hasContent = FALSE;
+
     NSArray* creators;
     NSString* suffix;
     
@@ -215,21 +221,34 @@ static UIAlertView* _alertView;
     }
     
     NSMutableArray* creatorNames = [[NSMutableArray alloc] initWithCapacity:[creators count]];
+    NSMutableArray* creatorInitials = [[NSMutableArray alloc] initWithCapacity:[creators count]];
+    NSMutableArray* creatorLastnameFirstLetter = [[NSMutableArray alloc] initWithCapacity:[creators count]];
     
     for(NSDictionary* creator in creators){
         if([creatorTypes containsObject:[creator objectForKey:@"creatorType"]]){
-            NSObject* lastName = [creator objectForKey:@"lastName"];
-            NSObject* name = [creator objectForKey:@"name"];
+            NSString* lastName = [creator objectForKey:@"lastName"];
+            NSString* firstName = [creator objectForKey:@"firstName"];
+            NSString* name = [creator objectForKey:@"name"];
+            
             if(lastName != nil){
                 [creatorNames addObject:lastName];
+                [creatorLastnameFirstLetter addObject:[[[firstName substringToIndex:1] uppercaseString] stringByAppendingString:
+                                                       [[lastName substringToIndex:1] uppercaseString]]];
+                [creatorInitials addObject:[[lastName substringToIndex:1] uppercaseString]];
             }
             else if(name != nil){
                 [creatorNames addObject:name];
+                [creatorLastnameFirstLetter addObject:[[name substringToIndex:1] uppercaseString]];
+                [creatorInitials addObject:[[name substringToIndex:1] uppercaseString]];
             }
         }
     }
     
-    creatorString = [[creatorNames componentsJoinedByString:@"_"] stringByAppendingString:suffix];
+    NSString* authorDelimiter = [ZPPreferences authorDelimiterInDropboxFilenames];
+    
+    NSString* creatorString = [[creatorNames componentsJoinedByString:authorDelimiter] stringByAppendingString:suffix];
+    NSString* creatorInitialsString = [[creatorInitials componentsJoinedByString:authorDelimiter] stringByAppendingString:suffix];
+    NSString* creatorLastnameFirstLetterString = [[creatorLastnameFirstLetter componentsJoinedByString:authorDelimiter] stringByAppendingString:suffix];
     
     NSString* title;
     
@@ -278,6 +297,7 @@ static UIAlertView* _alertView;
     NSString* patentNumber = [parent.fields objectForKey:@"patentNumber"];
     NSString* assignee = [parent.fields objectForKey:@"assignee"];
     NSString* issued = [parent.fields objectForKey:@"issueDate"];
+    NSString* pages = [parent.fields objectForKey:@"pages"];
     
     NSInteger year;
     
@@ -288,112 +308,205 @@ static UIAlertView* _alertView;
         year = parent.year;
     }
     
-    NSArray* nameFragments = [pattern componentsSeparatedByString:@"%"];
-    NSMutableString* customName = [NSMutableString stringWithString:[nameFragments objectAtIndex:0]];
+    NSMutableString* temporaryBuffer = [[NSMutableString alloc] init];
+
+    BOOL wildcard = FALSE;
+    BOOL exlusive = FALSE;
     
-    
-    for (NSInteger i = 1; i < [nameFragments count]; i++) {
+    NSString* resolvedFragment = nil;
+
+    for (NSInteger i = 0; i < [pattern length]; i++) {
+
+        unichar character = [pattern characterAtIndex:i];
+
+        if(character == '%' || character == '{' ){
+            //Append the content of temporary buffer and the previous wildcard because we know that we did not hit an exclusive pattern specifier
+            if(resolvedFragment != nil){
+                [targetString appendString:resolvedFragment];
+                resolvedFragment = nil;
+            }
+            [targetString appendString:temporaryBuffer];
+            [temporaryBuffer setString:@""];
+        }
         
-        NSString* nameFragment = [nameFragments objectAtIndex:i];
-        
-        
-        switch ([nameFragment characterAtIndex:0]) {
+        if(character == '%'){
+            //The next character specifies a wildcard
+            wildcard = TRUE;
+            
+        }
+        else if(wildcard){
+            wildcard = FALSE;
+            switch (character) {
+                
                 
                 // %a - last names of authors (not editors etc) or inventors.
             case 'a':
-                if(customName != nil) [customName appendString:creatorString];
+                resolvedFragment = creatorString;
                 break;
                 
+                //%I - author initials.
+
+            case 'I':
+                resolvedFragment = creatorInitialsString;
+                break;
+                
+                //%F - author's last name with first letter of first name (e.g. EinsteinA).
+
+            case 'F':
+                resolvedFragment = creatorLastnameFirstLetterString;
+                break;
+
                 // %A - first letter of author (useful for subfolders)
             case 'A':
-                if(creatorString != nil)[customName appendString:[[creatorString substringToIndex:1] uppercaseString]];
+                if(creatorString != nil) resolvedFragment = [[creatorString substringToIndex:1] uppercaseString];
+                else resolvedFragment = nil;
                 break;
                 
                 // %y - year (extracted from Date field)
             case 'y':
-                if(year != 0) [customName appendString:[[NSNumber numberWithInt:year] stringValue]];
+                if(year != 0) resolvedFragment = [[NSNumber numberWithInt:year] stringValue];
+                else resolvedFragment = nil;
                 break;
                 
                 // %t - title. Usually truncated after : . ? The maximal length of the remaining part of the title can be changed.
             case 't':
-                if(title != nil) [customName appendString:title];
+                resolvedFragment = title;
                 break;
                 
                 // %T - item type (localized)
             case 'T':
-                [customName appendString:[ZPLocalization getLocalizationStringWithKey:parent.itemType type:@"itemType"]];
+                resolvedFragment = [ZPLocalization getLocalizationStringWithKey:parent.itemType type:@"itemType"];
                 break;
                 
                 // %j - name of the journal
             case 'j':
-                if(publicationTitle != NULL) [customName appendString:publicationTitle];
+                resolvedFragment = publicationTitle;
                 break;
                 
                 // %p - name of the publisher
             case 'p':
-                if(publisher != NULL) [customName appendString:publisher];
+                resolvedFragment = publisher;
                 break;
                 
                 // %w - name of the journal or publisher
             case 'w':
-                if(publicationTitle != NULL) [customName appendString:publicationTitle];
-                else if(publisher != NULL) [customName appendString:publisher];
+                if(publicationTitle != NULL) resolvedFragment = publicationTitle;
+                else if(publisher != NULL) resolvedFragment = publisher;
+                else resolvedFragment = nil;
                 break;
                 
                 // %s - journal abbreviation
             case 's':
-                if(journalAbbreviation != NULL) [customName appendString:journalAbbreviation];
+                resolvedFragment = journalAbbreviation;
                 break;
                 
                 // %v - journal volume
             case 'v':
-                if(volume != NULL) [customName appendString:volume];
+                resolvedFragment = volume;
                 break;
                 
                 // %e - journal issue
             case 'e':
-                if(issue != NULL) [customName appendString:issue];
+                resolvedFragment = issue;
                 break;
                 
-                
+                //%f - pages
+            case 'f':
+                resolvedFragment = pages;
+                break;
+
                 // %n - patent number (patent items only)
             case 'n':
-                if(patentNumber != NULL) [customName appendString:patentNumber];
+                resolvedFragment = patentNumber;
                 break;
                 
                 // %i - assignee (patent items only)
             case 'i':
-                if(assignee != NULL) [customName appendString:assignee];
+                resolvedFragment = assignee;
                 break;
                 
                 // %u - issue date (patent items only)
             case 'u':
-                if(issued != NULL) [customName appendString:[issued substringToIndex:4]] ;
+                if(issued != NULL) resolvedFragment = [issued substringToIndex:4];
+                else resolvedFragment = nil;
                 break;
                 
-                //Specific to ZotPad
-                /*
-                 case 'k':
-                 [customName appendString:attachment.key] ;
-                 break;
-                 
-                 case 'f':
-                 [customName appendString:attachment.filename] ;
-                 break;
-                 */
                 
             default:
-                DDLogError(@"Invalid dropbox file pattern specifier %c in pattern %@",[nameFragment characterAtIndex:0],pattern);
+                DDLogError(@"Invalid dropbox file pattern specifier %c in pattern %@",character,pattern);
                 break;
+            }
+            
+            if(resolvedFragment != nil){
+                hasContent = TRUE;
+            }
         }
-        
-        //Add rest of the fragment
-        if([nameFragment length]>1){
-            [customName appendString:[nameFragment substringFromIndex:1]];
+        else if(character == '{'){
+            
+            //Start of an optional wildcard. Scan until end of pattern
+            NSMutableString* optionalPattern = [[NSMutableString alloc] init];
+            while (i < [pattern length] && character != '}') {
+                i++;
+                character = [pattern characterAtIndex:i];
+                if(character != '}') [optionalPattern appendFormat:@"%c", character];
+            }
+            
+            if([optionalPattern length]>0){
+                NSMutableString* optionalPatternTarget = [[NSMutableString alloc] init];
+                if([self _resolvePattern:optionalPattern withAttachment:attachment intoString:optionalPatternTarget]){
+                    resolvedFragment= optionalPatternTarget;
+                    hasContent = TRUE;
+                }
+                else{
+                    resolvedFragment = nil;
+                }
+            }
         }
-        
+        else if(character == '|'){
+            //Exclusive pattern.
+            
+            //Ignore the characters between previous wildcard and exclusive specifier.
+            [temporaryBuffer setString:@""];
+            
+            //Scan until we find the next wildcard
+            
+            while (i < [pattern length] && character != '%' && character != '{') {
+                i++;
+                character = [pattern characterAtIndex:i];
+            }
+            
+            //If previous wildcard did not produce output, take one step back and proceed normally
+            if(resolvedFragment == nil) i--;
+            
+            //Else skip the next pattern
+            else if(character == '%'){
+                i++;
+            }
+            // Scan until the end of optional pattern
+            else{
+                while (i < [pattern length] && character != '}') {
+                    i++;
+                    character = [pattern characterAtIndex:i];
+                }
+            }
+                
+        }
+
+        //Orherwise just add the character
+        else{
+            [temporaryBuffer appendFormat:@"%c", character];
+        }
     }
-    return customName;
+    
+    // Append the last wildcard and buffer because we did not encounter exclusive specifiers
+    
+    if(resolvedFragment != nil){
+        [targetString appendString:resolvedFragment];
+    }
+    [targetString appendString:temporaryBuffer];
+
+    
+    return hasContent;
 }
 
 -(NSString*) _pathForAttachment:(ZPZoteroAttachment*)attachment{
