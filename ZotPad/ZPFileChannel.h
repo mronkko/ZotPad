@@ -37,7 +37,11 @@
 -(void) removeProgressView:(UIProgressView*) progressView;
 -(NSArray*) allRequests;
 
+//The download URL and remote filename and support article IDs used by the support system
 -(NSString*) manualDownloadURLForAttachment:(ZPZoteroAttachment*)attachment;
+-(NSString*) remoteNameForAttachment:(ZPZoteroAttachment*)attachment;
+-(NSInteger) supportArticleIdForDownloads;
+-(NSInteger) supportArticleIdForUploads;
 
 //Helper methods
 
