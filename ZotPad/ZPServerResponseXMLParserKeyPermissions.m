@@ -24,7 +24,7 @@
         NSString* library =[attributeDict objectForKey:@"library"];
         NSString* group = [attributeDict objectForKey:@"group"];
         if(library!= NULL){
-            [_results addObject:[NSString stringWithFormat:@"%i",LIBRARY_ID_MY_LIBRARY]];
+            [_results addObject:[NSString stringWithFormat:@"%i",ZPLIBRARY_ID_MY_LIBRARY]];
         }
         else if(group!=NULL){
             [_results addObject:group];

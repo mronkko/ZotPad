@@ -14,6 +14,7 @@
 #import "ASIFormDataRequest.h"
 #import "ZPFileCacheManager.h"
 #import "ZPServerConnection.h"
+#import "ZPUserSupport.h"
 
 #import "SBJson.h"
 
@@ -22,6 +23,10 @@ NSInteger const ZPFILECHANNEL_ZOTEROSTORAGE_DOWNLOAD = 1;
 NSInteger const ZPFILECHANNEL_ZOTEROSTORAGE_UPLOAD_AUTHORIZATION = 2;
 NSInteger const ZPFILECHANNEL_ZOTEROSTORAGE_UPLOAD_FILE = 3;
 NSInteger const ZPFILECHANNEL_ZOTEROSTORAGE_UPLOAD_REGISTER = 4;
+
+
+NSInteger const ZPFILECHANNEL_ZOTEROSTORAGE_ALERT_GENERIC = 1;
+NSInteger const ZPFILECHANNEL_ZOTEROSTORAGE_ALERT_FILESTORAGE = 2;
 
 
 @interface ZPFileChannel_ZoteroStorage()
@@ -64,7 +69,7 @@ static NSOperationQueue* _uploadQueue;
     NSString* urlString;
     NSInteger libraryID= attachment.libraryID;
     
-    if( libraryID== LIBRARY_ID_MY_LIBRARY ){
+    if( libraryID== ZPLIBRARY_ID_MY_LIBRARY ){
         urlString = [NSString stringWithFormat:@"https://api.zotero.org/users/%@",[ZPPreferences userID]];
     }
     else{
@@ -167,6 +172,26 @@ static NSOperationQueue* _uploadQueue;
         [request setDownloadProgressDelegate:progressView];
     }
 }
+
+-(NSString*) manualDownloadURLForAttachment:(ZPZoteroAttachment*)attachment{
+    
+    NSString* oauthkey =  [ZPPreferences OAuthKey];
+    NSString* urlString;
+
+    if( attachment.libraryID== ZPLIBRARY_ID_MY_LIBRARY ){
+        urlString = [NSString stringWithFormat:@"https://api.zotero.org/users/%@",[ZPPreferences userID]];
+    }
+    else{
+        urlString = [NSString stringWithFormat:@"https://api.zotero.org/groups/%i",attachment.libraryID];
+    }
+    
+    urlString = [NSString stringWithFormat:@"%@/items/%@/file",urlString, attachment.key];
+    urlString = [NSString stringWithFormat:@"%@?key=%@",urlString, oauthkey];
+
+    return urlString;
+    
+}
+
 
 #pragma mark - Uploading
 
@@ -441,12 +466,12 @@ static NSOperationQueue* _uploadQueue;
                                             userInfo:[NSDictionary dictionaryWithObject:@"Storage space exceeded"
                                                                                  forKey:NSLocalizedDescriptionKey]];
             
-            if(! _alertVisible){
+            if(! _alert){
                 [[[UIAlertView alloc] initWithTitle:@"Storage space exceeded"
-                                            message:[NSString stringWithFormat:@"Uploading  of file (%@) failed because you have exceeded your storage space on the Zotero server",attachment.filename]
+                                            message:[NSString stringWithFormat:@"Uploading of file (%@) failed because you have exceeded your storage space on the Zotero server",attachment.filename]
                                            delegate:self
-                                  cancelButtonTitle:@"Cancel" otherButtonTitles:@"Check storage", @"Learn more", nil] show];
-                _alertVisible = TRUE;
+                                  cancelButtonTitle:@"Cancel" otherButtonTitles:@"Check storage", @"Help", nil] show];
+                _alert = ZPFILECHANNEL_ZOTEROSTORAGE_ALERT_FILESTORAGE;
             }
             
             [ZPFileUploadManager failedUploadingAttachment:attachment withError:error toURL:[request.url absoluteString]];
@@ -458,6 +483,14 @@ static NSOperationQueue* _uploadQueue;
             NSError* error =[NSError errorWithDomain:@"zotero.org" code:request.responseStatusCode userInfo:NULL];
             DDLogError(@"Uploading file %@ to Zotero server failed with error: %@",attachment.filename,request.responseStatusMessage);
             
+            if(! _alert){
+                [[[UIAlertView alloc] initWithTitle:@"File upload failed"
+                                            message:[NSString stringWithFormat:@"Uploading of file (%@) to Zotero server failed with error: %@",attachment.filename, request.responseStatusMessage]
+                                           delegate:self
+                                  cancelButtonTitle:@"Cancel" otherButtonTitles:@"Help", nil] show];
+                _alert = ZPFILECHANNEL_ZOTEROSTORAGE_ALERT_GENERIC;
+            }
+
             [ZPFileUploadManager failedUploadingAttachment:attachment withError:error toURL:[request.url absoluteString]];
             [self cleanupAfterFinishingAttachment:attachment];
 
@@ -524,24 +557,27 @@ static NSOperationQueue* _uploadQueue;
     
     //0: cancel
     
-    if(buttonIndex==1){
-        NSURL *url = [NSURL URLWithString:@"https://www.zotero.org/settings/storage"];
-        
-        if (![[UIApplication sharedApplication] openURL:url])
+    if(_alert == ZPFILECHANNEL_ZOTEROSTORAGE_ALERT_FILESTORAGE){
+        if(buttonIndex==1){
+            NSURL *url = [NSURL URLWithString:@"https://www.zotero.org/settings/storage"];
             
-            DDLogError(@"%@%@",@"Failed to open url:",[url description]);
-        
-    }
-    else if(buttonIndex==2){
-        NSURL *url = [NSURL URLWithString:@"http://zotpad.uservoice.com/knowledgebase/articles/103784-which-file-storage-solution-should-i-use-"];
-        
-        if (![[UIApplication sharedApplication] openURL:url])
+            if (![[UIApplication sharedApplication] openURL:url])
+                
+                DDLogError(@"%@%@",@"Failed to open url:",[url description]);
             
-            DDLogError(@"%@%@",@"Failed to open url:",[url description]);
-        
+        }
+        else if(buttonIndex==2){
+            [ZPUserSupport openSupportSystemFromTopViewControllerWithArticleID:229761];
+            
+        }
     }
-    
-    _alertVisible = false;
+    else if(_alert == ZPFILECHANNEL_ZOTEROSTORAGE_ALERT_GENERIC){
+        if(buttonIndex==1){
+            [ZPUserSupport openSupportSystemFromTopViewControllerWithArticleID:229762];
+        }
+    }
+
+    _alert = 0;
 }
 
 @end

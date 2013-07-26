@@ -274,7 +274,7 @@
             //Zotero online library
            [[UIApplication sharedApplication] openURL:[NSURL URLWithString:
                                                        [NSString stringWithFormat:@"https://www.zotero.org/%@/items/itemKey/%@",
-                                                                                   (item.libraryID == LIBRARY_ID_MY_LIBRARY?
+                                                                                   (item.libraryID == ZPLIBRARY_ID_MY_LIBRARY?
                                                                                     [ZPPreferences username]:
                                                                                     [NSString stringWithFormat:@"groups/%i",item.libraryID]),
                                                                                    item.key]]];

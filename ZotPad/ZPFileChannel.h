@@ -37,6 +37,8 @@
 -(void) removeProgressView:(UIProgressView*) progressView;
 -(NSArray*) allRequests;
 
+-(NSString*) manualDownloadURLForAttachment:(ZPZoteroAttachment*)attachment;
+
 //Helper methods
 
 -(void) cleanupAfterFinishingAttachment:(ZPZoteroAttachment*)attachment;

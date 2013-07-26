@@ -233,8 +233,8 @@ const NSInteger ZPServerConnectionRequestLastModifiedItem = 11;
     }
     
     //Is my library available
-    else if([librariesThatCanBeAccessed indexOfObject:[NSString stringWithFormat:@"%i",LIBRARY_ID_MY_LIBRARY]]!=NSNotFound){
-        returnArray = [[NSArray arrayWithObject:[ZPZoteroLibrary libraryWithID:LIBRARY_ID_MY_LIBRARY]] arrayByAddingObjectsFromArray:returnArray];
+    else if([librariesThatCanBeAccessed indexOfObject:[NSString stringWithFormat:@"%i",ZPLIBRARY_ID_MY_LIBRARY]]!=NSNotFound){
+        returnArray = [[NSArray arrayWithObject:[ZPZoteroLibrary libraryWithID:ZPLIBRARY_ID_MY_LIBRARY]] arrayByAddingObjectsFromArray:returnArray];
     }
             
     return returnArray;
@@ -648,7 +648,7 @@ const NSInteger ZPServerConnectionRequestLastModifiedItem = 11;
 
 +(NSString*) _baseURLWithLibraryID:(NSInteger)libraryID{
  
-    if(libraryID== LIBRARY_ID_MY_LIBRARY || libraryID == LIBRARY_ID_NOT_SET){
+    if(libraryID== ZPLIBRARY_ID_MY_LIBRARY || libraryID == ZPLIBRARY_ID_NOT_SET){
         return [NSString stringWithFormat:@"https://api.zotero.org/users/%@/",[ZPPreferences userID]];
     }
     else{
@@ -685,7 +685,7 @@ const NSInteger ZPServerConnectionRequestLastModifiedItem = 11;
             
             if(oauthkey!=NULL){
                 
-                NSInteger libraryID = LIBRARY_ID_NOT_SET;
+                NSInteger libraryID = ZPLIBRARY_ID_NOT_SET;
                 
                 if(parameters != NULL){
                     libraryID = [[parameters objectForKey:ZPKEY_LIBRARY_ID] integerValue];
@@ -1076,8 +1076,8 @@ NSInteger sortAttachments(ZPZoteroAttachment* attachment1, ZPZoteroAttachment* a
                             [returnArray addObjectsFromArray:groups];
                         }
                         //My library
-                        //                        else if(libraryString isEqualToString:[NSString stringWithFormat:@"%i",LIBRARY_ID_MY_LIBRARY]]){
-                        //                            [returnArray addObject:[ZPZoteroLibrary libraryWithID:LIBRARY_ID_MY_LIBRARY]];
+                        //                        else if(libraryString isEqualToString:[NSString stringWithFormat:@"%i",ZPLIBRARY_ID_MY_LIBRARY]]){
+                        //                            [returnArray addObject:[ZPZoteroLibrary libraryWithID:ZPLIBRARY_ID_MY_LIBRARY]];
                         //                        }
                         //Group
                         else{

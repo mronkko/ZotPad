@@ -26,7 +26,7 @@ extern NSInteger const ZPATTACHMENTICONGVIEWCONTROLLER_TAG_STATUSLABEL;
 extern NSInteger const ZPATTACHMENTICONGVIEWCONTROLLER_TAG_PROGRESSVIEW;
 extern NSInteger const ZPATTACHMENTICONGVIEWCONTROLLER_TAG_TITLELABEL;
 
-@interface ZPAttachmentCarouselDelegate : NSObject <iCarouselDelegate, iCarouselDataSource>{
+@interface ZPAttachmentCarouselDelegate : NSObject <iCarouselDelegate, iCarouselDataSource, UIAlertViewDelegate>{
     NSString* _itemKey;
     NSArray* _attachments;
     NSInteger _selectedIndex;

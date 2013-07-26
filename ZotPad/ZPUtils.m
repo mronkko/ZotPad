@@ -11,9 +11,9 @@
 @implementation ZPUtils
 
 +(NSString*)randomString{
-    char data[16];
-    for (int x=0;x<16;data[x++] = (char)('A' + (arc4random_uniform(26))));
-    return [[NSString alloc] initWithBytes:data length:16 encoding:NSUTF8StringEncoding];
+    char data[8];
+    for (int x=0;x<8;data[x++] = (char)('A' + (arc4random_uniform(26))));
+    return [[NSString alloc] initWithBytes:data length:8 encoding:NSUTF8StringEncoding];
 
 }
 

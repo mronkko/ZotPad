@@ -218,7 +218,7 @@ static ZPCacheStatusToolbarController* _statusView;
             //If we found a non-empty que, queue item retrival
             if(keyArray != NULL && [keyArray count]>0){
                 
-                if(libraryID == LIBRARY_ID_NOT_SET){
+                if(libraryID == ZPLIBRARY_ID_NOT_SET){
                     [NSException raise:@"LibraryID cannot be NULL" format:@""];
                 }
                 
@@ -293,7 +293,7 @@ static ZPCacheStatusToolbarController* _statusView;
     
     //Is it a library or a collection
     NSString* collectionKey = NULL;
-    NSInteger libraryID = LIBRARY_ID_NOT_SET;
+    NSInteger libraryID = ZPLIBRARY_ID_NOT_SET;
     
     if([container isKindOfClass:[ZPZoteroLibrary class]]){
         libraryID = [(ZPZoteroLibrary*)container libraryID];
@@ -371,7 +371,7 @@ static ZPCacheStatusToolbarController* _statusView;
     ZPZoteroCollection* container = (ZPZoteroCollection*) [ZPZoteroCollection collectionWithKey:collectionKey];
     NSInteger libraryID = container.libraryID;
     
-    if(libraryID == LIBRARY_ID_NOT_SET) [NSException raise:@"libraryID for collection object was null" format:@"This should not happen"];
+    if(libraryID == ZPLIBRARY_ID_NOT_SET) [NSException raise:@"libraryID for collection object was null" format:@"This should not happen"];
     
     //Get the time stamp to see if we need to retrieve more
     

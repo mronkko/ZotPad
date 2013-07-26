@@ -174,7 +174,7 @@
     if(! [NSThread isMainThread]) [NSException raise:@"configureView must be called in main thread" format:@"configureView must be called in main thread"];
     
     //If the library ID is not set, set it to the first library
-    if([ZPItemList instance].libraryID==LIBRARY_ID_NOT_SET){
+    if([ZPItemList instance].libraryID==ZPLIBRARY_ID_NOT_SET){
         NSArray* libraries = [ZPDatabase libraries];
         if([libraries count]>0){
             NSInteger libraryID = [(ZPZoteroLibrary*) [libraries objectAtIndex:0] libraryID];
@@ -188,7 +188,7 @@
     
     //Clear item keys shown so that UI knows to stop drawing the old items
     
-    if([ZPItemList instance].libraryID!=LIBRARY_ID_NOT_SET){
+    if([ZPItemList instance].libraryID!=ZPLIBRARY_ID_NOT_SET){
         
         //Set the data source to target this view
         
@@ -685,7 +685,7 @@
     
     //If we are not showing any library, choose the first library
     
-    if([ZPItemList instance].libraryID == LIBRARY_ID_NOT_SET ){
+    if([ZPItemList instance].libraryID == ZPLIBRARY_ID_NOT_SET ){
         if([NSThread isMainThread]){
             [self configureView];
         }

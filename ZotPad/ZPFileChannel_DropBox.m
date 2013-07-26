@@ -15,7 +15,7 @@
 
 #import "ZPLocalization.h"
 #import "ZPSecrets.h"
-
+#import "ZPUserSupport.h"
 
 
 //Zipping and base64 encoding
@@ -64,13 +64,14 @@
 static DBRestClient* _uploadClientThatOverwritesServerVersion;
 static DBRestClient* _uploadClientThatCreatesConflict;
 static DBRestClient* _downloadClient;
+static UIAlertView* _alertView;
 
 +(NSInteger) activeDownloads{
     return [_downloadClient requestCount];
 }
 +(NSInteger) activeUploads{
     return [_uploadClientThatOverwritesServerVersion requestCount] +
-        [_uploadClientThatCreatesConflict requestCount];
+    [_uploadClientThatCreatesConflict requestCount];
 }
 
 
@@ -243,7 +244,7 @@ static DBRestClient* _downloadClient;
     if(nameLength >0 && [title length] > nameLength){
         
         NSString* newTitle = [title substringToIndex:nameLength];
-
+        
         // This implements the truncate_smart option of ZotFile. This is a hidden preference in Zotfile, and probably always on.
         // Apply if the title contains spaces and if the first truncated character matches a regexp
         
@@ -252,17 +253,17 @@ static DBRestClient* _downloadClient;
         NSRegularExpression *regex = [NSRegularExpression regularExpressionWithPattern:@"[a-zA-Z0-9]"
                                                                                options:0
                                                                                  error:nil];
-
+        
         BOOL firstTruncatedCharacterIsAplhaNumeric = [regex numberOfMatchesInString:title
-                                                                options:0
-                                                                  range:NSMakeRange(nameLength, 1)] > 0;
+                                                                            options:0
+                                                                              range:NSMakeRange(nameLength, 1)] > 0;
         
         if(hasSpaces && firstTruncatedCharacterIsAplhaNumeric){
             while(! [[newTitle substringWithRange:NSMakeRange([newTitle length]-1, 1)] isEqualToString:@" "])
                 newTitle = [newTitle substringToIndex:[newTitle length]-1];
-
+            
             //Remove the last space
-        
+            
             newTitle = [newTitle substringToIndex:[newTitle length]-1];
         }
         
@@ -564,6 +565,12 @@ static DBRestClient* _downloadClient;
     }
 }
 
+-(NSString*) manualDownloadURLForAttachment:(ZPZoteroAttachment*)attachment{
+    
+    NSString* url = [self _URLForAttachment:attachment];
+    return [url stringByDeletingLastPathComponent];
+}
+
 #pragma mark - Uploads
 
 -(void) startUploadingAttachment:(ZPZoteroAttachment*)attachment overWriteConflictingServerVersion:(BOOL)overwriteConflicting{
@@ -589,7 +596,7 @@ static DBRestClient* _downloadClient;
                                                            withObject:[path precomposedStringWithCanonicalMapping]
                                                         waitUntilDone:NO];
     }
-
+    
 }
 
 -(void) useProgressView:(UIProgressView *)progressView forUploadingAttachment:(ZPZoteroAttachment *)attachment{
@@ -651,18 +658,18 @@ static DBRestClient* _downloadClient;
     }
     // Uploading
     else if(client == _uploadClientThatOverwritesServerVersion){
-
+        
         NSString* path = [self _pathForAttachment:attachment];
         NSString* targetPath = [path stringByDeletingLastPathComponent];
         
         // Uploading will retrieve metadata only if we want to overwrite the server version. Just proceed with upload in all cases.
         
         [client uploadFile:[[path lastPathComponent] precomposedStringWithCanonicalMapping] toPath:[targetPath precomposedStringWithCanonicalMapping] withParentRev:metadata.rev fromPath:attachment.fileSystemPath_modified];
-    
+        
     }
     else if(client == _uploadClientThatCreatesConflict){
         
-         //If rev is null, we assume that the file has been deleted. Fail
+        //If rev is null, we assume that the file has been deleted. Fail
         
         if(metadata.rev == NULL){
             NSDictionary* userInfo = [NSDictionary dictionaryWithObject:@"The original file does not exist in Dropbox" forKey:NSLocalizedDescriptionKey];
@@ -673,6 +680,7 @@ static DBRestClient* _downloadClient;
             [ZPFileUploadManager failedUploadingAttachment:attachment
                                                  withError:error
                                                      toURL:[self _URLForAttachment:attachment]];
+            [self _displayUploadErrorAlertForAttachment:attachment error:error];
             [self cleanupAfterFinishingAttachment:attachment];
         }
         else if(! [attachment.versionIdentifier_local isEqualToString:metadata.rev]){
@@ -681,7 +689,7 @@ static DBRestClient* _downloadClient;
         else{
             NSString* path = [self _pathForAttachment:attachment];
             NSString* targetPath = [path stringByDeletingLastPathComponent];
-
+            
             [client uploadFile:[[path lastPathComponent] precomposedStringWithCanonicalMapping] toPath:[targetPath precomposedStringWithCanonicalMapping] withParentRev:attachment.versionIdentifier_local fromPath:attachment.fileSystemPath_modified];
         }
         
@@ -705,6 +713,7 @@ static DBRestClient* _downloadClient;
     }
     else if(client == _uploadClientThatOverwritesServerVersion){
         [ZPFileUploadManager failedUploadingAttachment:attachment withError:error toURL:[self _URLForAttachment:attachment]];
+        [self _displayUploadErrorAlertForAttachment:attachment error:error];
     }
     [self cleanupAfterFinishingAttachment:attachment];
     
@@ -789,7 +798,7 @@ static DBRestClient* _downloadClient;
             localPath = zipFilePath;
             
             //Website snapshots do not use revision info in Dropbox
-
+            
             [ZPFileDownloadManager finishedDownloadingAttachment:attachment toFileAtPath:localPath withVersionIdentifier:@"" ];
             [self cleanupAfterFinishingAttachment:attachment];
         }
@@ -834,14 +843,15 @@ static DBRestClient* _downloadClient;
     
 }
 - (void)restClient:(DBRestClient*)client uploadFileFailedWithError:(NSError*)error{
-
+    
     DDLogWarn(@"There was an error uploading the file - %@", error);
     
     [self _restClient:client processError:error];
     
     ZPZoteroAttachment* attachment = [self _attachmentForDBError:error];
-
+    
     [ZPFileUploadManager failedUploadingAttachment:attachment withError:error toURL:[self _URLForAttachment:attachment]];
+    [self _displayUploadErrorAlertForAttachment:attachment error:error];
     [self cleanupAfterFinishingAttachment:attachment];
 }
 
@@ -863,7 +873,7 @@ static DBRestClient* _downloadClient;
             }
         }
     }
-
+    
 }
 
 #pragma DBSession delegate
@@ -891,7 +901,7 @@ static DBRestClient* _downloadClient;
         //TODO: Use attachment ID instead
         [uploadProgressViewsByAttachment removeObjectForKey:attachment.key];
     }
-
+    
     @synchronized(downloadProgressViewsByAttachment){
         //TODO: Use attachment ID instead
         [downloadProgressViewsByAttachment removeObjectForKey:attachment.key];
@@ -913,7 +923,7 @@ static DBRestClient* _downloadClient;
 }
 
 -(ZPZoteroAttachment*) _attachmentForLocalDestinationPath:(NSString*)destPath{
-
+    
     
     NSString* key = [destPath substringWithRange:NSMakeRange([NSTemporaryDirectory() length]+2, 8)];
     return [ZPZoteroAttachment attachmentWithKey:key];
@@ -935,18 +945,18 @@ static DBRestClient* _downloadClient;
         
         if([key length]==8){
             attachment = [ZPZoteroAttachment attachmentWithKey:key];
-        
+            
             //Verify that the filename matches. If not
             if(! [filename isEqualToString:attachment.filenameBasedOnLinkMode]){
                 DDLogWarn(@"File name in Dropbox (%@) does not match the local filename (%@) for item with key %@",
-                      filename, attachment.filenameBasedOnLinkMode, key);
+                          filename, attachment.filenameBasedOnLinkMode, key);
                 attachment = nil;
             }
         }
     }
     
     // Try matching based on file name pattern
-
+    
     if(attachment == nil && [ZPPreferences useCustomFilenamesWithDropbox]){
         //Loop over all attachments to identify which file this belongs to
         for(NSString* key in [ZPDatabase allAttachmentKeys]){
@@ -960,10 +970,28 @@ static DBRestClient* _downloadClient;
     
     if(attachment == nil) DDLogError(@"Attachment could not be identified for remote path %@", path);
     NSAssert(attachment != nil, @"Attachment could not be identified for remote path %@", path);
-
+    
     return attachment;
 }
 
+- (void) _displayUploadErrorAlertForAttachment:(ZPZoteroAttachment*) attachment error:(NSError*)error{
+    if(_alertView == nil){
+        _alertView = [[UIAlertView alloc] initWithTitle:@"File upload failed"
+                                                 message:[NSString stringWithFormat:@"Uploading of file (%@) to Dropbox failed with error: %@",attachment.filenameBasedOnLinkMode, error.localizedDescription]
+                                                delegate:self
+                                       cancelButtonTitle:@"Cancel" otherButtonTitles:@"Help", nil];
+        [_alertView show];
+    }
+}
 
+#pragma mark - UIAlertViewDelegate
+
+- (void)alertView:(UIAlertView *)alertView clickedButtonAtIndex:(NSInteger)buttonIndex
+{
+    if(buttonIndex == 1){
+        [ZPUserSupport openSupportSystemFromTopViewControllerWithArticleID:103381];
+    }
+    _alertView = nil;
+}
 
 @end

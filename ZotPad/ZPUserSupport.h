@@ -12,5 +12,6 @@
 
 +(void) openSupportSystemWithArticleID:(NSInteger)articleId fromParentViewController:(UIViewController*)viewController;
 +(void) openSupportSystemFromParentViewController:(UIViewController*)viewController;
++(void) openSupportSystemFromTopViewControllerWithArticleID:(NSInteger)articleId;
 
 @end

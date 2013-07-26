@@ -119,4 +119,13 @@
     [self openSupportSystemWithArticleID:-1 fromParentViewController:viewController];
 }
 
++(void) openSupportSystemFromTopViewControllerWithArticleID:(NSInteger)articleId{
+    UIViewController *topController = [UIApplication sharedApplication].keyWindow.rootViewController;
+    
+    while (topController.presentedViewController) {
+        topController = topController.presentedViewController;
+    }
+    [self openSupportSystemWithArticleID:articleId fromParentViewController:topController];
+}
+
 @end

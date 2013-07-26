@@ -60,7 +60,7 @@
             [self _initNewElementWithID:_currentID];
             [self _processTemporaryFieldStorage];
             //Current element MUST have a libraryID
-            if(_currentElement.libraryID == LIBRARY_ID_NOT_SET) [NSException raise:@"Data object is missing library ID" format:@"All data objects must have library ID. Object with missing Library ID: %@",_currentElement];
+            if(_currentElement.libraryID == ZPLIBRARY_ID_NOT_SET) [NSException raise:@"Data object is missing library ID" format:@"All data objects must have library ID. Object with missing Library ID: %@",_currentElement];
             
             //If this is a standalone note, add itself as a parent
             if([_currentElement isKindOfClass:[ZPZoteroAttachment class]] && [(ZPZoteroAttachment*) _currentElement parentKey] == NULL){
@@ -140,7 +140,7 @@
                 
                 //The value is URL and we want to get the part after last /
                 if([[parts objectAtIndex:3] isEqualToString:@"users"]){
-                    _libraryID = LIBRARY_ID_MY_LIBRARY;
+                    _libraryID = ZPLIBRARY_ID_MY_LIBRARY;
                 }
                 else{
                     _libraryID = [[parts objectAtIndex:4] intValue];

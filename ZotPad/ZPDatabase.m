@@ -688,7 +688,7 @@ static NSObject* writeLock;
     FMDatabase* dbObject = [self _dbObject];
     @synchronized(dbObject){
         
-        FMResultSet* resultSet = [dbObject executeQuery:@"SELECT *, (SELECT count(*) FROM collections WHERE libraryID=libraries.libraryID AND parentKey IS NULL) AS numChildren FROM libraries ORDER BY libraryID <> ? ,LOWER(title)",[NSNumber numberWithInt:LIBRARY_ID_MY_LIBRARY]];
+        FMResultSet* resultSet = [dbObject executeQuery:@"SELECT *, (SELECT count(*) FROM collections WHERE libraryID=libraries.libraryID AND parentKey IS NULL) AS numChildren FROM libraries ORDER BY libraryID <> ? ,LOWER(title)",[NSNumber numberWithInt:ZPLIBRARY_ID_MY_LIBRARY]];
         
         while([resultSet next]) {
             [returnArray addObject:[ZPZoteroLibrary libraryWithDictionary:[resultSet resultDictionary]]];

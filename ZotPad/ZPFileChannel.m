@@ -37,7 +37,7 @@ static ZPFileChannel_ZoteroStorage* _fileChannel_Zotero;
     if([ZPPreferences useDropbox]){
         return _fileChannel_Dropbox;
     }
-    else if(attachment.libraryID == LIBRARY_ID_MY_LIBRARY && [ZPPreferences useWebDAV]){
+    else if(attachment.libraryID == ZPLIBRARY_ID_MY_LIBRARY && [ZPPreferences useWebDAV]){
         return _fileChannel_WebDAV;
     }
     else {
@@ -109,6 +109,12 @@ static ZPFileChannel_ZoteroStorage* _fileChannel_Zotero;
 }
 
 -(void) removeProgressView:(UIProgressView*) progressView{
+    //Does nothing by default
+}
+
+-(NSString*) manualDownloadURLForAttachment:(ZPZoteroAttachment*)attachment{
+    [NSException raise:@"Not implemented" format:@"Subclasses of ZPFileChannel must implement manualDownloadURLForAttachment:"];
+    return NULL;
     //Does nothing by default
 }
 

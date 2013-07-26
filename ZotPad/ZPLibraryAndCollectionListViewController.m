@@ -73,7 +73,7 @@
     [super viewDidLoad];
         
     //If the current library is not defined, show a list of libraries
-    if(self->_currentlibraryID == LIBRARY_ID_NOT_SET){
+    if(self->_currentlibraryID == ZPLIBRARY_ID_NOT_SET){
         self->_content = [ZPDatabase libraries];
         [self.tableView reloadData];
         //Select the first library if nothing else is selected
@@ -394,7 +394,7 @@
 
     //If this is a library that we are not showing now, just return;
     
-    if(_currentlibraryID == LIBRARY_ID_NOT_SET || _currentlibraryID == library.libraryID){
+    if(_currentlibraryID == ZPLIBRARY_ID_NOT_SET || _currentlibraryID == library.libraryID){
         if([NSThread isMainThread]){
             
             //Loop over the existing content to see if we need to refresh the content of the cells that are already showing
@@ -431,7 +431,7 @@
             
             NSArray* newContent;
             
-            if(_currentlibraryID == LIBRARY_ID_NOT_SET){
+            if(_currentlibraryID == ZPLIBRARY_ID_NOT_SET){
                 newContent = [ZPDatabase libraries];
             }
             else if(_currentlibraryID == library.libraryID){
@@ -515,7 +515,7 @@
                 
                 [self.tableView endUpdates];
                 
-                if(_currentlibraryID == LIBRARY_ID_NOT_SET){
+                if(_currentlibraryID == ZPLIBRARY_ID_NOT_SET){
                     if([self.tableView numberOfRowsInSection:0]>0){
                         [self.tableView selectRowAtIndexPath:[NSIndexPath indexPathForRow:0 inSection:0] animated:NO scrollPosition:UITableViewScrollPositionTop];
 //                        [self tableView:self.tableView didSelectRowAtIndexPath:[NSIndexPath indexPathForRow:0 inSection:0]];

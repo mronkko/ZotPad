@@ -18,6 +18,7 @@
 #import "ZPFileChannel.h"
 #import "ZPFileDownloadManager.h"
 #import "ZPReachability.h"
+#import "ZPUserSupport.h"
 
 NSInteger const ZPATTACHMENTICONGVIEWCONTROLLER_MODE_STATIC = 0;
 NSInteger const ZPATTACHMENTICONGVIEWCONTROLLER_MODE_UPLOAD = 1;
@@ -59,18 +60,19 @@ NSInteger const ZPATTACHMENTICONGVIEWCONTROLLER_TAG_TITLELABEL = -5;
 
 -(id) init{
     self = [super init];
-
+    
     //Register self as observer for item downloads
     [[NSNotificationCenter defaultCenter] addObserver:self selector:@selector(notifyAttachmentDownloadCompleted:) name:ZPNOTIFICATION_ATTACHMENT_FILE_DOWNLOAD_FINISHED object:nil];
     [[NSNotificationCenter defaultCenter] addObserver:self selector:@selector(notifyAttachmentDownloadFailed:) name:ZPNOTIFICATION_ATTACHMENT_FILE_DOWNLOAD_FAILED object:nil];
     [[NSNotificationCenter defaultCenter] addObserver:self selector:@selector(notifyAttachmentDownloadStarted:) name:ZPNOTIFICATION_ATTACHMENT_FILE_DOWNLOAD_STARTED object:nil];
-
+    
     [[NSNotificationCenter defaultCenter] addObserver:self selector:@selector(notifyAttachmentDeleted:) name:ZPNOTIFICATION_ATTACHMENT_FILE_DELETED object:nil];
-
+    
     [[NSNotificationCenter defaultCenter] addObserver:self selector:@selector(notifyAttachmentUploadCompleted:) name:ZPNOTIFICATION_ATTACHMENT_FILE_UPLOAD_FINISHED object:nil];
     [[NSNotificationCenter defaultCenter] addObserver:self selector:@selector(notifyAttachmentUploadFailed:) name:ZPNOTIFICATION_ATTACHMENT_FILE_UPLOAD_FAILED object:nil];
+    [[NSNotificationCenter defaultCenter] addObserver:self selector:@selector(notifyAttachmentUploadCanceled:) name:ZPNOTIFICATION_ATTACHMENT_FILE_UPLOAD_CANCELED object:nil];
     [[NSNotificationCenter defaultCenter] addObserver:self selector:@selector(notifyAttachmentUploadStarted:) name:ZPNOTIFICATION_ATTACHMENT_FILE_UPLOAD_STARTED object:nil];
-
+    
     [[NSNotificationCenter defaultCenter] addObserver:self selector:@selector(notifyItemsAvailable:) name:ZPNOTIFICATION_ITEMS_AVAILABLE object:nil];
     
     _progressViews = [[NSMutableSet alloc] init];
@@ -98,7 +100,7 @@ NSInteger const ZPATTACHMENTICONGVIEWCONTROLLER_TAG_TITLELABEL = -5;
 
 -(void) unregisterProgressViewsBeforeUnloading{
     for(UIProgressView* progressView in _progressViews){
-         [ZPFileChannel removeProgressView:progressView];
+        [ZPFileChannel removeProgressView:progressView];
     }
 }
 
@@ -140,13 +142,13 @@ NSInteger const ZPATTACHMENTICONGVIEWCONTROLLER_TAG_TITLELABEL = -5;
 - (UIView *)carousel:(iCarousel *)carousel viewForItemAtIndex:(NSUInteger)index reusingView:(UIView*)view
 {
     NSAssert(carousel==self.attachmentCarousel,@"ZPAttachmentCarouselDelegate can only be used with the iCarousel set in the carousel property");
-  
+    
     if(view != NULL && view.tag == index) return view;
-
+    
     
     ZPZoteroAttachment* attachment = [_attachments objectAtIndex:index];
     
-
+    
     UIImageView* fileImage;
     UIProgressView* progressView;
     UILabel* titleLabel;
@@ -177,9 +179,9 @@ NSInteger const ZPATTACHMENTICONGVIEWCONTROLLER_TAG_TITLELABEL = -5;
         [view addSubview:labelBackground];
         
         NSInteger labelSubviewOffset = 10;
-        NSInteger labelSubviewWidth = labelWidth-2*labelSubviewOffset; 
+        NSInteger labelSubviewWidth = labelWidth-2*labelSubviewOffset;
         NSInteger labelSubviewHeight = labelHeight-2*labelSubviewOffset;
-
+        
         titleLabel = [[UILabel alloc] initWithFrame:CGRectMake(labelSubviewOffset, labelSubviewOffset, labelSubviewWidth, labelSubviewHeight*.6)];
         titleLabel.numberOfLines = 4;
         titleLabel.tag = ZPATTACHMENTICONGVIEWCONTROLLER_TAG_TITLELABEL;
@@ -192,11 +194,11 @@ NSInteger const ZPATTACHMENTICONGVIEWCONTROLLER_TAG_TITLELABEL = -5;
         progressLabel.tag = ZPATTACHMENTICONGVIEWCONTROLLER_TAG_STATUSLABEL;
         progressLabel.backgroundColor = [UIColor clearColor];
         progressLabel.textColor = [UIColor whiteColor];
-
+        
         [labelBackground addSubview: progressLabel];
         
         progressView = [[UIProgressView alloc] initWithFrame:CGRectMake(labelSubviewOffset, labelSubviewOffset + labelSubviewHeight*.75, labelSubviewWidth, labelSubviewHeight*.15)];
-
+        
         //Store the view so that we can unregister them later
         [_progressViews addObject:progressView];
         
@@ -230,11 +232,11 @@ NSInteger const ZPATTACHMENTICONGVIEWCONTROLLER_TAG_TITLELABEL = -5;
         progressView = (UIProgressView*)[view viewWithTag:ZPATTACHMENTICONGVIEWCONTROLLER_TAG_PROGRESSVIEW];
         errorLabel = (UILabel*)[view viewWithTag:ZPATTACHMENTICONGVIEWCONTROLLER_TAG_ERRORLABEL];
     }
-
-
+    
+    
     [self _configureFileImageView:fileImage withAttachment:attachment];
     [self _configureProgressLabel:progressLabel withAttachment:attachment];
-
+    
     titleLabel.text = attachment.title;
     errorLabel.hidden = TRUE;
     
@@ -264,26 +266,26 @@ NSInteger const ZPATTACHMENTICONGVIEWCONTROLLER_TAG_TITLELABEL = -5;
 -(void) _configureFileImageView:(UIImageView*) imageView withAttachment:(ZPZoteroAttachment*)attachment{
     
     //TODO: Cache rendered PDF images
-
-    if([attachment.contentType isEqualToString:@"application/pdf"] && 
-        (attachment.linkMode == LINK_MODE_IMPORTED_FILE ||
-         attachment.linkMode == LINK_MODE_IMPORTED_URL)){
-        
-        NSString* path;
-        if([self _showForAttachment:attachment] == ZPATTACHMENTICONGVIEWCONTROLLER_SHOW_ORIGINAL){
-            path =attachment.fileSystemPath_original;
-        }
-        else{
-            path =attachment.fileSystemPath;    
-        }
-        
-        if([[NSFileManager defaultManager] fileExistsAtPath:path]){
-            dispatch_async(dispatch_get_global_queue(DISPATCH_QUEUE_PRIORITY_BACKGROUND,0), ^{
-                [ZPAttachmentIconImageFactory renderPDFPreviewForFileAtPath:path intoImageView:imageView];
-            });
-        }
-        
-    }
+    
+    if([attachment.contentType isEqualToString:@"application/pdf"] &&
+       (attachment.linkMode == LINK_MODE_IMPORTED_FILE ||
+        attachment.linkMode == LINK_MODE_IMPORTED_URL)){
+           
+           NSString* path;
+           if([self _showForAttachment:attachment] == ZPATTACHMENTICONGVIEWCONTROLLER_SHOW_ORIGINAL){
+               path =attachment.fileSystemPath_original;
+           }
+           else{
+               path =attachment.fileSystemPath;
+           }
+           
+           if([[NSFileManager defaultManager] fileExistsAtPath:path]){
+               dispatch_async(dispatch_get_global_queue(DISPATCH_QUEUE_PRIORITY_BACKGROUND,0), ^{
+                   [ZPAttachmentIconImageFactory renderPDFPreviewForFileAtPath:path intoImageView:imageView];
+               });
+           }
+           
+       }
     
     // Assing a place holder icon if the current icon is null while we wait for the previews to render
     if(imageView.image == nil){
@@ -293,12 +295,12 @@ NSInteger const ZPATTACHMENTICONGVIEWCONTROLLER_TAG_TITLELABEL = -5;
 
 
 -(void) _configureProgressLabel:(UILabel*) label withAttachment:(ZPZoteroAttachment*)attachment{
-
+    
     NSInteger thisMode = [self _modeForAttachment:attachment];
     NSInteger thisShow = [self _showForAttachment:attachment];
-                          
+    
     if(thisMode == ZPATTACHMENTICONGVIEWCONTROLLER_MODE_DOWNLOAD){
-
+        
         if([ZPFileDownloadManager isAttachmentDownloading:attachment]){
             [self notifyAttachmentDownloadStarted:[NSNotification notificationWithName:ZPNOTIFICATION_ATTACHMENT_FILE_DOWNLOAD_STARTED object:attachment]];
         }
@@ -317,13 +319,13 @@ NSInteger const ZPATTACHMENTICONGVIEWCONTROLLER_TAG_TITLELABEL = -5;
             if((linkMode == LINK_MODE_IMPORTED_FILE || linkMode == LINK_MODE_IMPORTED_URL ||
                 (linkMode == LINK_MODE_LINKED_FILE && [ZPPreferences downloadLinkedFilesWithDropbox]))
                && ! exists ){
-                                
+                
                 if([ZPReachability hasInternetConnection]){
                     
                     //TODO: Check if already downloading.
                     
                     if ([ZPPreferences useDropbox]) label.text = @"Download from Dropbox";
-                    else if([ZPPreferences useWebDAV] && attachment.libraryID == LIBRARY_ID_MY_LIBRARY) label.text = @"Download from WebDAV";
+                    else if([ZPPreferences useWebDAV] && attachment.libraryID == ZPLIBRARY_ID_MY_LIBRARY) label.text = @"Download from WebDAV";
                     else{
                         
                         if (attachment.existsOnZoteroServer){
@@ -340,7 +342,7 @@ NSInteger const ZPATTACHMENTICONGVIEWCONTROLLER_TAG_TITLELABEL = -5;
                 else  label.text = @"File cannot be downloaded when offline";
             }
             
-            // Linked URL will be shown directly from web 
+            // Linked URL will be shown directly from web
             
             else if (attachment.linkMode == LINK_MODE_LINKED_URL &&
                      !  [ZPReachability hasInternetConnection]){
@@ -357,7 +359,7 @@ NSInteger const ZPATTACHMENTICONGVIEWCONTROLLER_TAG_TITLELABEL = -5;
             else{
                 label.hidden = TRUE;
             }
-        }    
+        }
     }
     
     
@@ -372,7 +374,7 @@ NSInteger const ZPATTACHMENTICONGVIEWCONTROLLER_TAG_TITLELABEL = -5;
         }
         else{
             label.text = @"Added to upload queue";
-        }    
+        }
     }
     if(self.mode == ZPATTACHMENTICONGVIEWCONTROLLER_MODE_STATIC){
         if(attachment.fileExists)
@@ -394,27 +396,27 @@ NSInteger const ZPATTACHMENTICONGVIEWCONTROLLER_TAG_TITLELABEL = -5;
     NSAssert(carousel==self.attachmentCarousel,@"ZPAttachmentCarouselDelegate can only be used with the iCarousel set in the carousel property");
     if([carousel currentItemIndex] == index){
         
-        ZPZoteroAttachment* attachment = [_attachments objectAtIndex:index]; 
+        ZPZoteroAttachment* attachment = [_attachments objectAtIndex:index];
         
         if([self _fileExistsForAttachment:attachment]){
             UIView* sourceView;
             for(sourceView in carousel.visibleItemViews){
                 if([carousel indexOfItemView:sourceView] == index){
-                    break;   
+                    break;
                 }
             }
             
             [ZPFileViewerViewController presentWithAttachment:attachment];
-           
+            
         }
         else if(attachment.linkMode == LINK_MODE_LINKED_URL && [ZPPreferences online]){
             [[UIApplication sharedApplication] openURL:[NSURL URLWithString:attachment.url]];
         }
-        else if(self.mode == ZPATTACHMENTICONGVIEWCONTROLLER_MODE_DOWNLOAD && ( attachment.linkMode == LINK_MODE_IMPORTED_FILE || 
+        else if(self.mode == ZPATTACHMENTICONGVIEWCONTROLLER_MODE_DOWNLOAD && ( attachment.linkMode == LINK_MODE_IMPORTED_FILE ||
                                                                                attachment.linkMode == LINK_MODE_IMPORTED_URL ||
                                                                                (attachment.linkMode == LINK_MODE_LINKED_FILE && [ZPPreferences useDropbox] && [ZPPreferences downloadLinkedFilesWithDropbox]))){
             
-
+            
             
             
             if([ZPPreferences online] && ! [ZPFileDownloadManager isAttachmentDownloading:attachment]){
@@ -429,7 +431,7 @@ NSInteger const ZPATTACHMENTICONGVIEWCONTROLLER_TAG_TITLELABEL = -5;
 
 - (void)carouselCurrentItemIndexUpdated:(iCarousel *)carousel{
     NSAssert(carousel==self.attachmentCarousel,@"ZPAttachmentCarouselDelegate can only be used with the iCarousel set in the carousel property");
-
+    
     // Prevent automatically opening an attachment if the active attachment has changed
     _latestManuallyTriggeredAttachment = NULL;
 }
@@ -479,55 +481,80 @@ NSInteger const ZPATTACHMENTICONGVIEWCONTROLLER_TAG_TITLELABEL = -5;
 
 
 -(void) notifyAttachmentDownloadCompleted:(NSNotification *) notification{
-
+    
     ZPZoteroAttachment* attachment = notification.object;
     
-    if(mode ==ZPATTACHMENTICONGVIEWCONTROLLER_MODE_DOWNLOAD || 
+    if(mode ==ZPATTACHMENTICONGVIEWCONTROLLER_MODE_DOWNLOAD ||
        (ZPATTACHMENTICONGVIEWCONTROLLER_MODE_FIRST_STATIC_SECOND_DOWNLOAD && [_attachments indexOfObject:attachment]==2)){
         
         [self _setLabelsForAttachment:attachment progressText:NULL errorText:NULL mode:ZPATTACHMENTICONGVIEWCONTROLLER_MODE_STATIC reconfigureIcon:TRUE];
-
+        
         // If this is manually triggered, open it
         
         if(_latestManuallyTriggeredAttachment == attachment){
             _latestManuallyTriggeredAttachment = NULL;
             [ZPFileViewerViewController  presentWithAttachment:attachment];
         }
-
+        
     }
 }
 -(void) notifyAttachmentDownloadFailed:(NSNotification *) notification{
-
+    
     ZPZoteroAttachment* attachment = notification.object;
-
+    
     if(mode ==ZPATTACHMENTICONGVIEWCONTROLLER_MODE_DOWNLOAD ||
        (ZPATTACHMENTICONGVIEWCONTROLLER_MODE_FIRST_STATIC_SECOND_DOWNLOAD && [_attachments indexOfObject:attachment]==2)){
         [self _setLabelsForAttachment:attachment progressText:@"Download failed" errorText:[notification.userInfo objectForKey:NSLocalizedDescriptionKey] mode:ZPATTACHMENTICONGVIEWCONTROLLER_MODE_STATIC reconfigureIcon:FALSE];
+        
+        
+        // If this is manually triggered, display an alert dialog.
+        
+        if(_latestManuallyTriggeredAttachment == attachment){
+            
+            NSString* message;
+            
+            if([ZPPreferences useDropbox]){
+                message = [NSString stringWithFormat:@"Download from Dropbox failed with error: %@",[notification.userInfo objectForKey:NSLocalizedDescriptionKey]];
+            }
+            else if([ZPPreferences useWebDAV] && _latestManuallyTriggeredAttachment.libraryID == ZPLIBRARY_ID_MY_LIBRARY){
+                message = [NSString stringWithFormat:@"Download from WebDAV server failed with error: %@",[notification.userInfo objectForKey:NSLocalizedDescriptionKey]];
+            }
+            else{
+                message = [NSString stringWithFormat:@"Download from Zotero server failed with error: %@",[notification.userInfo objectForKey:NSLocalizedDescriptionKey]];
+            }
+            
+            [[[UIAlertView alloc] initWithTitle:@"File download failed"
+                                        message:message
+                                       delegate:self
+                              cancelButtonTitle:@"Cancel" otherButtonTitles:@"Open in Safari",@"Help", nil] show];
+            
+        }
+        
     }
 }
 
 -(void) notifyAttachmentDownloadStarted:(NSNotification *) notification{
     
     ZPZoteroAttachment* attachment = notification.object;
-
+    
     if(mode ==ZPATTACHMENTICONGVIEWCONTROLLER_MODE_DOWNLOAD ||
        (ZPATTACHMENTICONGVIEWCONTROLLER_MODE_FIRST_STATIC_SECOND_DOWNLOAD && [_attachments indexOfObject:attachment]==2)){
-        [self _setLabelsForAttachment:attachment progressText:@"Downloading" errorText:NULL mode:ZPATTACHMENTICONGVIEWCONTROLLER_MODE_DOWNLOAD reconfigureIcon:FALSE];    
+        [self _setLabelsForAttachment:attachment progressText:@"Downloading" errorText:NULL mode:ZPATTACHMENTICONGVIEWCONTROLLER_MODE_DOWNLOAD reconfigureIcon:FALSE];
     }
 }
 
 -(void) notifyAttachmentDeleted:(NSNotification *) notification{
     
     ZPZoteroAttachment* attachment = notification.object;
-
+    
     [self _setLabelsForAttachment:attachment progressText:@"File deleted" errorText:NULL mode:ZPATTACHMENTICONGVIEWCONTROLLER_MODE_STATIC reconfigureIcon:FALSE];
-
+    
 }
 
 -(void) notifyAttachmentUploadCompleted:(NSNotification *) notification{
     
     ZPZoteroAttachment* attachment = notification.object;
-
+    
     if(mode ==ZPATTACHMENTICONGVIEWCONTROLLER_MODE_UPLOAD){
         [self _setLabelsForAttachment:attachment progressText:@"Upload completed" errorText:NULL mode:ZPATTACHMENTICONGVIEWCONTROLLER_MODE_STATIC reconfigureIcon:FALSE];
     }
@@ -539,13 +566,14 @@ NSInteger const ZPATTACHMENTICONGVIEWCONTROLLER_TAG_TITLELABEL = -5;
     
     if(mode ==ZPATTACHMENTICONGVIEWCONTROLLER_MODE_UPLOAD){
         [self _setLabelsForAttachment:attachment progressText:@"Upload failed" errorText:[notification.userInfo objectForKey:NSLocalizedDescriptionKey] mode:ZPATTACHMENTICONGVIEWCONTROLLER_MODE_STATIC reconfigureIcon:FALSE];
+        
     }
 }
 
 -(void) notifyAttachmentUploadStarted:(NSNotification *) notification{
     
     ZPZoteroAttachment* attachment = notification.object;
-
+    
     if(mode ==ZPATTACHMENTICONGVIEWCONTROLLER_MODE_UPLOAD){
         [self _setLabelsForAttachment:attachment progressText:@"Uploading" errorText:NULL mode:ZPATTACHMENTICONGVIEWCONTROLLER_MODE_UPLOAD reconfigureIcon:FALSE];
     }
@@ -564,31 +592,31 @@ NSInteger const ZPATTACHMENTICONGVIEWCONTROLLER_TAG_TITLELABEL = -5;
 
 
 -(void) _setLabelsForAttachment:(ZPZoteroAttachment*)attachment progressText:(NSString*)progressText errorText:(NSString*)errorText mode:(NSInteger)aMode reconfigureIcon:(BOOL)reconfigureIcon{
-    NSInteger index = [_attachments indexOfObject:attachment];    
+    NSInteger index = [_attachments indexOfObject:attachment];
     
     if(index!=NSNotFound){
-
+        
         UIView* view = [attachmentCarousel itemViewAtIndex:index];
         
         if(view != NULL){
             
             if ([NSThread isMainThread]){
-
+                
                 UILabel* progressLabel = (UILabel*)[view viewWithTag:ZPATTACHMENTICONGVIEWCONTROLLER_TAG_STATUSLABEL];
                 if(progressText == NULL){
-                    progressLabel.hidden = TRUE;   
+                    progressLabel.hidden = TRUE;
                 }
                 else{
-                    progressLabel.text = progressText;   
+                    progressLabel.text = progressText;
                     progressLabel.hidden = FALSE;
                 }
                 
                 UILabel* errorLabel = (UILabel*)[view viewWithTag:ZPATTACHMENTICONGVIEWCONTROLLER_TAG_ERRORLABEL];
                 if(errorText == NULL){
-                    errorLabel.hidden = TRUE;   
+                    errorLabel.hidden = TRUE;
                 }
                 else{
-                    errorLabel.text = errorText;   
+                    errorLabel.text = errorText;
                     errorLabel.hidden = FALSE;
                 }
                 
@@ -611,8 +639,8 @@ NSInteger const ZPATTACHMENTICONGVIEWCONTROLLER_TAG_TITLELABEL = -5;
                 }
                 
                 if(reconfigureIcon) [self _configureFileImageView:(UIImageView*)[view viewWithTag:ZPATTACHMENTICONGVIEWCONTROLLER_TAG_FILEIMAGE] withAttachment:attachment];
-
-
+                
+                
             }
             else{
                 dispatch_async(dispatch_get_main_queue(), ^{
@@ -627,15 +655,15 @@ NSInteger const ZPATTACHMENTICONGVIEWCONTROLLER_TAG_TITLELABEL = -5;
     
     
     //If we have had a low memory condition, it is possible that views are not loaded
-
+    
     if(! [owner isViewLoaded]){
         [owner loadView];
         [owner viewDidLoad];
         [self.attachmentCarousel reloadData];
     }
-
+    
     // Because the user interface orientation may have changed, we need to layout subviews
-
+    
     if(UI_USER_INTERFACE_IDIOM() == UIUserInterfaceIdiomPad){
         UISplitViewController* root =  (UISplitViewController*) [UIApplication sharedApplication].delegate.window.rootViewController;
         [root viewWillAppear:NO];
@@ -650,18 +678,18 @@ NSInteger const ZPATTACHMENTICONGVIEWCONTROLLER_TAG_TITLELABEL = -5;
         [root viewWillAppear:NO];
         [root.view layoutSubviews];
     }
-
-        
-
-        
-/* 
-        UIViewController* parent = owner.parentViewController;
-        while(parent != NULL && ! [parent isViewLoaded]){
-            [parent loadView];
-            [parent viewDidLoad];
-            parent = parent.parentViewController;
-        }
- */
+    
+    
+    
+    
+    /*
+     UIViewController* parent = owner.parentViewController;
+     while(parent != NULL && ! [parent isViewLoaded]){
+     [parent loadView];
+     [parent viewDidLoad];
+     parent = parent.parentViewController;
+     }
+     */
     
     
     
@@ -679,8 +707,45 @@ NSInteger const ZPATTACHMENTICONGVIEWCONTROLLER_TAG_TITLELABEL = -5;
         temp = tempVC.view;
         tempVC = tempVC.parentViewController;
     }
-
+    
     return sourceView;
+}
+
+#pragma mark - UIAlertViewDelegate
+
+- (void)alertView:(UIAlertView *)alertView clickedButtonAtIndex:(NSInteger)buttonIndex{
+    
+    //0: cancel
+    
+    if(_latestManuallyTriggeredAttachment != nil){
+        if(buttonIndex==1){
+            NSString* fileUrl = [[ZPFileChannel fileChannelForAttachment:_latestManuallyTriggeredAttachment] manualDownloadURLForAttachment:_latestManuallyTriggeredAttachment];
+            
+            NSURL *url = [NSURL URLWithString:fileUrl];
+            
+            if (![[UIApplication sharedApplication] openURL:url])
+                DDLogError(@"%@%@",@"Failed to open url:",[url description]);
+            
+        }
+        else if(buttonIndex==2){
+            
+            NSInteger articleId;
+            
+            if([ZPPreferences useDropbox]){
+                articleId = 103381;
+            }
+            else if([ZPPreferences useWebDAV] && _latestManuallyTriggeredAttachment.libraryID == ZPLIBRARY_ID_MY_LIBRARY){
+                articleId = 229798;
+            }
+            else{
+                articleId = 132429;
+            }
+            
+            [ZPUserSupport openSupportSystemFromTopViewControllerWithArticleID:articleId];
+            
+        }
+    }
+    _latestManuallyTriggeredAttachment = NULL;
 }
 
 @end

@@ -170,7 +170,7 @@ static ZPCacheStatusToolbarController* _statusView;
 }
 
 +(void) failedUploadingAttachment:(ZPZoteroAttachment*)attachment withError:(NSError*) error toURL:(NSString*)url{
-    DDLogError(@"Failed uploading file %@. %@ (URL: %@) See the knowledge base for troubleshooting instructions: http://zotpad.uservoice.com",attachment.filenameBasedOnLinkMode,error.localizedDescription,url);
+    DDLogError(@"Failed uploading file %@. %@ (URL: %@)",attachment.filenameBasedOnLinkMode,error.localizedDescription,url);
     
     [[NSNotificationCenter defaultCenter] postNotificationName:ZPNOTIFICATION_ATTACHMENT_FILE_UPLOAD_FAILED object:attachment userInfo:error.userInfo];
     [self performSelectorInBackground:@selector(_scanFilesToUpload) withObject:NULL];
@@ -182,7 +182,7 @@ static ZPCacheStatusToolbarController* _statusView;
     
     DDLogWarn(@"Uploading file %@ was canceled.",attachment.filenameBasedOnLinkMode);
     
-    [[NSNotificationCenter defaultCenter] postNotificationName:ZPNOTIFICATION_ATTACHMENT_FILE_UPLOAD_FAILED object:attachment];
+    [[NSNotificationCenter defaultCenter] postNotificationName:ZPNOTIFICATION_ATTACHMENT_FILE_UPLOAD_CANCELED object:attachment];
     [self performSelectorInBackground:@selector(_scanFilesToUpload) withObject:NULL];
 }
 

@@ -10,8 +10,8 @@
 #import "ZPZoteroDataObject.h"
 
 
-extern NSInteger const LIBRARY_ID_MY_LIBRARY;
-extern NSInteger const LIBRARY_ID_NOT_SET;
+extern NSInteger const ZPLIBRARY_ID_MY_LIBRARY;
+extern NSInteger const ZPLIBRARY_ID_NOT_SET;
 
 @interface ZPZoteroLibrary : ZPZoteroDataObject {
 }

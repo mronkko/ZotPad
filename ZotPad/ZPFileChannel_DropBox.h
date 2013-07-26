@@ -10,7 +10,7 @@
 #import <DropboxSDK/DropboxSDK.h>
 #import "ZPFileChannel.h"
 
-@interface ZPFileChannel_Dropbox : ZPFileChannel <DBRestClientDelegate, DBSessionDelegate>{
+@interface ZPFileChannel_Dropbox : ZPFileChannel <DBRestClientDelegate, DBSessionDelegate, UIAlertViewDelegate>{
     NSMutableDictionary* downloadProgressViewsByAttachment;
     NSMutableDictionary* uploadProgressViewsByAttachment;
     NSMutableDictionary* downloadCountsByAttachment;

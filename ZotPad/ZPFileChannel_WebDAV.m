@@ -15,6 +15,7 @@
 #import "SBJson.h"
 #import "ZPFileCacheManager.h"
 #import "ZPWebDAVAuthenticationViewController.h"
+#import "ZPUserSupport.h"
 
 //For refreshing metadata
 #import "ZPServerConnection.h"
@@ -177,6 +178,14 @@ static NSOperationQueue* _uploadQueue;
         }
         [request setDownloadProgressDelegate:progressDelegate];
     }
+}
+
+-(NSString*) manualDownloadURLForAttachment:(ZPZoteroAttachment*)attachment{
+
+    NSString* WebDAVRoot = [ZPPreferences webDAVURL];
+    NSString* key =  attachment.key;
+    return [WebDAVRoot stringByAppendingFormat:@"/%@.zip",key];
+
 }
 
 #pragma mark - Uploading
@@ -594,7 +603,7 @@ static NSOperationQueue* _uploadQueue;
                                                         message:[NSString stringWithFormat: @"%@ did not provide a valid SSL certificate or the signature verification failed. If you are using a self-signed certificate and understand what you are doing, you can add a security exception and choose to trust the site.",[request.url host]]
                                                        delegate:self
                                               cancelButtonTitle:@"Cancel"
-                                              otherButtonTitles:@"Disable WebDAV",@"Add security exception",nil];
+                                              otherButtonTitles:@"Disable WebDAV",@"Add security exception",@"Help",nil];
                 
                 [_alertView show];
                 
@@ -607,7 +616,7 @@ static NSOperationQueue* _uploadQueue;
                                                     message:@"Authenticating with WebDAV server failed."
                                                    delegate:self
                                           cancelButtonTitle:@"Cancel"
-                                          otherButtonTitles:@"Disable WebDAV",nil];
+                                          otherButtonTitles:@"Disable WebDAV",@"Help",nil];
             
             [_alertView show];
         }
@@ -616,7 +625,7 @@ static NSOperationQueue* _uploadQueue;
                                                     message:@"WebDAV addresss is not configured properly. Please check ZotPad settings."
                                                    delegate:self
                                           cancelButtonTitle:@"Cancel"
-                                          otherButtonTitles:@"Disable WebDAV",nil];
+                                          otherButtonTitles:@"Disable WebDAV",@"Help",nil];
             
             [_alertView show];
         }
@@ -626,6 +635,14 @@ static NSOperationQueue* _uploadQueue;
         [ZPFileDownloadManager failedDownloadingAttachment:attachment withError:error fromURL:[request.url absoluteString]];
     }
     else{
+        _alertView = [[UIAlertView alloc] initWithTitle:@"File upload failed"
+                                                message:[NSString stringWithFormat:@"Uploading of file to WebDAV URL %@ failed with error %@",[request.url absoluteString] , error.localizedDescription]
+                                               delegate:self
+                                      cancelButtonTitle:@"Cancel"
+                                      otherButtonTitles:@"Help",nil];
+        
+        [_alertView show];
+
         [ZPFileUploadManager failedUploadingAttachment:attachment withError:error toURL:[request.url absoluteString]];
     }
     
@@ -638,10 +655,21 @@ static NSOperationQueue* _uploadQueue;
     }
 
 }
+
+#pragma mark - UIAlertViewDelegate
+
 - (void)alertView:(UIAlertView *)alertView clickedButtonAtIndex:(NSInteger)buttonIndex
 {
+    // This is really ugly, but works: The upload alert has only two buttons whereas others have at least three
+    if(alertView.numberOfButtons == 2 && buttonIndex == 1){
+        [ZPUserSupport openSupportSystemFromTopViewControllerWithArticleID:109064];
+    }
+    //The last button is always the help button
+    else if(buttonIndex == alertView.numberOfButtons-1){
+        [ZPUserSupport openSupportSystemFromTopViewControllerWithArticleID:229798];
+    }
     //Disable webdav
-    if(buttonIndex == 1){
+    else if(buttonIndex == 1){
         [ZPPreferences setUseWebDAV:FALSE];
     }
     //Add security exception
@@ -653,6 +681,8 @@ static NSOperationQueue* _uploadQueue;
     
     _alertView = nil;
 }
+
+
 
 
 @end

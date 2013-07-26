@@ -9,8 +9,8 @@
 #import "ZPCore.h"
 
 
-NSInteger const LIBRARY_ID_MY_LIBRARY = -1;
-NSInteger const LIBRARY_ID_NOT_SET = 0;
+NSInteger const ZPLIBRARY_ID_MY_LIBRARY = -1;
+NSInteger const ZPLIBRARY_ID_NOT_SET = 0;
 
 @implementation ZPZoteroLibrary
 
@@ -24,7 +24,7 @@ static NSCache* _objectCache = NULL;
     
     NSNumber* libraryIDObj = [fields objectForKey:ZPKEY_LIBRARY_ID];
     
-    if(libraryIDObj == NULL || [libraryIDObj integerValue] == LIBRARY_ID_NOT_SET)
+    if(libraryIDObj == NULL || [libraryIDObj integerValue] == ZPLIBRARY_ID_NOT_SET)
         [NSException raise:@"ID is null" format:@"ZPZoteroLibrary cannot be instantiated with NULL ID"];
     
     NSInteger libraryID = [libraryIDObj integerValue];
@@ -46,7 +46,7 @@ static NSCache* _objectCache = NULL;
 
 +(ZPZoteroLibrary*) libraryWithID:(NSInteger)libraryID{
 
-    if(libraryID == LIBRARY_ID_NOT_SET)
+    if(libraryID == ZPLIBRARY_ID_NOT_SET)
         [NSException raise:@"ID is not set" format:@"ZPZoteroLibrary cannot be instantiated with undefined ID"];
 
     if(_objectCache == NULL) _objectCache = [[NSCache alloc] init];
@@ -58,7 +58,7 @@ static NSCache* _objectCache = NULL;
         obj= [[ZPZoteroLibrary alloc] init];
         obj.libraryID=libraryID;
 
-        if(obj.libraryID == LIBRARY_ID_MY_LIBRARY){
+        if(obj.libraryID == ZPLIBRARY_ID_MY_LIBRARY){
             obj.title = @"My Library";
             [obj setNumChildren:[[ZPDatabase collectionsForLibrary:obj.libraryID withParentCollection:NULL] count]];
         }
