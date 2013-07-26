@@ -11,10 +11,7 @@
 #import "ZPAppDelegate.h"
 #import "DDFileLogger.h"
 #import "CMPopTipView.h"
-#import "UserVoice.h"
-#import "UVSession.h"
-#import "UVClientConfig.h"
-#import "ZPSecrets.h"
+#import "ZPUserSupport.h"
 
 @interface ZPLogViewController (){
     MFMailComposeViewController *mailController;
@@ -81,85 +78,7 @@
 }
 
 -(IBAction)contactSupport:(id)sender{
-    
-    if(USERVOICE_API_KEY == nil || USERVOICE_SECRET == nil){
-        [[[UIAlertView alloc] initWithTitle:@"Not implemented"
-                                    message:@"Feedback and knowledge base are not available in this build because UserVoice key or secret is missing."
-                                   delegate:nil
-                          cancelButtonTitle:@"Cancel"
-                          otherButtonTitles:nil]show];
-
-    }
-    else{
-        UVConfig *config = [UVConfig configWithSite:@"zotpad.uservoice.com"
-                                             andKey:(NSString*)USERVOICE_API_KEY
-                                          andSecret:(NSString*)USERVOICE_SECRET];
-        
-        NSArray* logLines = [self.logView.text componentsSeparatedByString:@"\n"];
-        NSInteger logLineCount = logLines.count;
-        NSString* logText;
-        if(logLineCount> 300){
-            logLines = [logLines subarrayWithRange:NSMakeRange(logLines.count-300, 300)];
-        }
-        
-        logText =[logLines componentsJoinedByString:@"\n"];
-        
-        if(logLineCount>300){
-            logText = [NSString stringWithFormat:@"%i lines of log (omitting lines 1-%i)\n\n%@",logLineCount,logLineCount-300,logText];
-        }
-        else{
-            logText = [NSString stringWithFormat:@"%i lines of log\n\n%@",logLineCount,logText];
-        }
-        
-        NSString* technicalInfo = [NSString stringWithFormat:@"\n\n --- Technical info ---\n\n%@ %@ (build %@)\n%@ (iOS %@)\nuserID: %@\nAPI key: %@\n\n --- Settings ----\n\n%@\n\n --- Application log ----\n\n%@",
-                                   [[NSBundle mainBundle] objectForInfoDictionaryKey:@"CFBundleDisplayName"],
-                                   [[NSBundle mainBundle] objectForInfoDictionaryKey:@"CFBundleShortVersionString"],
-                                   [[NSBundle mainBundle] objectForInfoDictionaryKey:@"CFBundleVersion"],
-                                   [[UIDevice currentDevice] model],
-                                   [[UIDevice currentDevice] systemVersion],
-                                   [ZPPreferences userID],
-                                   [ZPPreferences OAuthKey],
-                                   [ZPPreferences preferencesAsDescriptiveString],
-                                   logText];
-        
-        
-        NSMutableArray* attachments = [[NSMutableArray alloc] init];
-        
-        //If we have a log file, include that
-        
-        ZPAppDelegate* appDelegate = (ZPAppDelegate*) [[UIApplication sharedApplication] delegate];
-        NSArray* logFiles = appDelegate.fileLogger.logFileManager.sortedLogFilePaths;
-        if(logFiles.count>0){
-            NSString* logPath = [logFiles objectAtIndex:0];
-            [attachments addObject:logPath];
-        }
-
-        if([ZPPreferences includeDatabaseWithSupportRequest]){
-            [attachments addObject:[[NSSearchPathForDirectoriesInDomains(NSDocumentDirectory, NSUserDomainMask, YES) objectAtIndex:0] stringByAppendingPathComponent:@"zotpad.sqlite"]];
-        }
-        // Do we want to include a file list
-
-        if([ZPPreferences includeFileListWithSupportRequest]){
-            NSString* documentsDirectory = [NSSearchPathForDirectoriesInDomains(NSDocumentDirectory, NSUserDomainMask, YES)  objectAtIndex:0];
-            NSArray *directoryContent = [[NSFileManager defaultManager] contentsOfDirectoryAtPath:documentsDirectory error:NULL];
-            
-            NSString* fileListFile = [NSTemporaryDirectory() stringByAppendingPathComponent: @"files.txt"];
-            NSString* fileListString  = [directoryContent componentsJoinedByString:@"\n"];
-            
-            [fileListString writeToFile:fileListFile
-                             atomically:NO
-                               encoding:NSStringEncodingConversionAllowLossy
-                                  error:nil];
-
-            [attachments addObject:fileListFile];
-            
-        }
-        
-        config.attachmentFilePaths = attachments;
-        config.extraTicketInfo = technicalInfo;
-        
-        [UserVoice presentUserVoiceInterfaceForParentViewController:self andConfig:config];
-    }
+    [ZPUserSupport openSupportSystemFromParentViewController:self];
 }
 
 

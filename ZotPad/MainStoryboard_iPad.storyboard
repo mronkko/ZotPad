@@ -1017,9 +1017,9 @@
                                 <autoresizingMask key="autoresizingMask" widthSizable="YES" flexibleMaxY="YES"/>
                                 <items>
                                     <navigationItem title="Log in to Zotero" id="ELS-Rt-bzu">
-                                        <barButtonItem key="rightBarButtonItem" title="Back to start" id="Io0-c8-MzK">
+                                        <barButtonItem key="rightBarButtonItem" systemItem="action" id="Io0-c8-MzK">
                                             <connections>
-                                                <action selector="loadFirstPage:" destination="bpw-6z-DmG" id="YKr-hn-jfp"/>
+                                                <action selector="openActionSheet:" destination="bpw-6z-DmG" id="gaA-WP-xo9"/>
                                             </connections>
                                         </barButtonItem>
                                     </navigationItem>

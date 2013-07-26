@@ -11,14 +11,15 @@
 #import "ZPAuthenticationDialog.h"
 #import "OAToken.h"
 #import "DSActivityView.h"
+#import "ZPUserSupport.h"
 #import "ZPSecrets.h"
-
 
 // Needed for screen shots
 #import <QuartzCore/QuartzCore.h>
 
 @interface ZPAuthenticationDialog (){
     UIView* _webViewOverlay;
+    UIActionSheet* _actionSheet;
 }
 
 -(UIImage*)_captureScreen:(UIView*) viewToCapture;
@@ -65,7 +66,7 @@ static ZPAuthenticationDialog* _instance;
 
 
 - (void)viewWillAppear:(BOOL)animated{
-
+    
     [super viewWillAppear:animated];
     
     //Cover the view with a blank view so that partial rendering is not displayed
@@ -73,20 +74,20 @@ static ZPAuthenticationDialog* _instance;
     _webViewOverlay.autoresizingMask = UIViewAutoresizingFlexibleWidth | UIViewAutoresizingFlexibleHeight;
     _webViewOverlay.backgroundColor = [UIColor whiteColor];
     [self.webView addSubview:_webViewOverlay];
-
+    
     [self makeOAuthRequest: NULL];
     
     //Add a loading indicator
     _activityView = [DSBezelActivityView newActivityViewForView:webView];
     
     [[self webView] setUserInteractionEnabled:FALSE];
-
+    
 }
 
 // Takes the user back to start
 
-- (IBAction)loadFirstPage:(id)sender{
-
+- (void)loadFirstPage{
+    
     NSString *urlAddress = [NSString stringWithFormat:@"https://www.zotero.org/oauth/authorize?oauth_token=%@&library_access=1&notes_access=1&write_access=1&all_groups=write&fullsite=0",_key];
     
     
@@ -99,25 +100,50 @@ static ZPAuthenticationDialog* _instance;
     //Load the request in the UIWebView.
     [[self webView] loadRequest:requestObj];
     
-
+    
     
 }
+
+- (IBAction)openActionSheet:(id)sender{
+    
+    _actionSheet = [[UIActionSheet alloc] initWithTitle:nil
+                                               delegate:self
+                                      cancelButtonTitle: UI_USER_INTERFACE_IDIOM() == UIUserInterfaceIdiomPad ? nil : @"Cancel"
+                                 destructiveButtonTitle:nil
+                                      otherButtonTitles:@"Restart",@"Help",nil];
+
+    [_actionSheet showFromBarButtonItem:sender animated:YES];
+    
+}
+
+- (void)actionSheet:(UIActionSheet *)actionSheet willDismissWithButtonIndex:(NSInteger)buttonIndex{
+    
+    if(buttonIndex == 0){
+        [self loadFirstPage];
+    }
+    if(buttonIndex == 1){
+        [ZPUserSupport openSupportSystemWithArticleID:229601 fromParentViewController:self];
+    }
+    
+    _actionSheet = nil;
+}
+
 
 - (void)setKeyAndLoadZoteroSite:(NSString*) key{
     
     _key = key;
-
-    [self loadFirstPage:NULL];
-
+    
+    [self loadFirstPage];
+    
 }
 - (BOOL)webView:(UIWebView *)aWebView shouldStartLoadWithRequest:(NSURLRequest *)request navigationType:(UIWebViewNavigationType)navigationType{
-
-
+    
+    
     NSString* urlString = [[request mainDocumentURL] absoluteString];
     DDLogVerbose(@"Start loading URL %@",urlString);
-
-
-
+    
+    
+    
     NSString* requestBody = [[NSString alloc] initWithData:request.HTTPBody encoding:NSUTF8StringEncoding];
     if([urlString isEqualToString:@"objc:activate"]){
         if(_activityView != NULL){
@@ -126,47 +152,47 @@ static ZPAuthenticationDialog* _instance;
             [aWebView setUserInteractionEnabled:TRUE];
             _activityView = NULL;
         }
-
+        
         return FALSE;
     }
     else if([requestBody rangeOfString:@"&revoke="].location != NSNotFound){
         
         [[[UIAlertView alloc] initWithTitle:@"API key required"
-                                   message:@"You need to save the API key to use ZotPad"
-                                  delegate:NULL
-                         cancelButtonTitle:@"OK"
+                                    message:@"You need to save the API key to use ZotPad"
+                                   delegate:NULL
+                          cancelButtonTitle:@"OK"
                           otherButtonTitles: nil] show];
         return FALSE;
     }
     /*
-    else if([urlString isEqualToString:@"https://www.zotero.org/settings/storage"]){
-        [[[UIAlertView alloc] initWithTitle:@"Blocked"
-                                    message:@"Accessing storage plans through ZotPad is blocked because Apple does not allow subscriptions to third party services within iPad/iPhone apps."
-                                   delegate:NULL
-                          cancelButtonTitle:@"OK"
-                          otherButtonTitles: nil] show];
-        return FALSE;
-        
-    }
-    else if([urlString isEqualToString:@"https://www.zotero.org/user/register"]){
-        [[[UIAlertView alloc] initWithTitle:@"Blocked"
-                                    message:@"Creating Zotero user accounts through ZotPad is blocked because Apple does not allow subscriptions to third party services within iPad/iPhone apps."
-                                   delegate:NULL
-                          cancelButtonTitle:@"OK"
-                          otherButtonTitles: nil] show];
-        return FALSE;
+     else if([urlString isEqualToString:@"https://www.zotero.org/settings/storage"]){
+     [[[UIAlertView alloc] initWithTitle:@"Blocked"
+     message:@"Accessing storage plans through ZotPad is blocked because Apple does not allow subscriptions to third party services within iPad/iPhone apps."
+     delegate:NULL
+     cancelButtonTitle:@"OK"
+     otherButtonTitles: nil] show];
+     return FALSE;
      
-    }
-    */
+     }
+     else if([urlString isEqualToString:@"https://www.zotero.org/user/register"]){
+     [[[UIAlertView alloc] initWithTitle:@"Blocked"
+     message:@"Creating Zotero user accounts through ZotPad is blocked because Apple does not allow subscriptions to third party services within iPad/iPhone apps."
+     delegate:NULL
+     cancelButtonTitle:@"OK"
+     otherButtonTitles: nil] show];
+     return FALSE;
+     
+     }
+     */
     //If we are redirected to the front page, we do not need to show the web browser any more
-
+    
     if([urlString hasPrefix:@"https://www.zotero.org/?oauth_token="]){
         
         //Get permanent key with the temporary key
         NSString* verifier=[[urlString componentsSeparatedByString:@"="] lastObject];
-
+        
         [self processVerifier:verifier];
-            
+        
         return FALSE;
     }
     
@@ -184,21 +210,21 @@ static ZPAuthenticationDialog* _instance;
         _activityView = [DSBezelActivityView newActivityViewForView:webView];
         
     }
-
+    
 }
 
 - (void)webViewDidFinishLoad:(UIWebView *)aWebView{
     
     // Remove the links
     [aWebView stringByEvaluatingJavaScriptFromString:@"try{\
-        element = document.getElementsByTagName('nav')[0];\
-        element.parentNode.removeChild(element);\
-        element =  document.getElementsByTagName('header')[0];\
-        element.parentNode.removeChild(element);\
+     element = document.getElementsByTagName('nav')[0];\
+     element.parentNode.removeChild(element);\
+     element =  document.getElementsByTagName('header')[0];\
+     element.parentNode.removeChild(element);\
      }\
      catch(err){}\
      window.location = 'objc:activate'"];
-
+    
 }
 
 - (void)viewDidUnload
@@ -226,12 +252,12 @@ static ZPAuthenticationDialog* _instance;
 }
 
 - (void) makeOAuthRequest:(OAToken *) token {
-
+    
     //Check that the keys are installed and crash if not
     if(ZOTERO_KEY == nil || ZOTERO_SECRET == nil) [NSException raise:@"Missing credentials exception" format:@"Authentication key or secret for Zotero is missing. Please see the file ZotPad/Secrets.h for details"];
     
     OAConsumer *consumer = [[OAConsumer alloc] initWithKey:ZOTERO_KEY
-                                        secret:ZOTERO_SECRET];
+                                                    secret:ZOTERO_SECRET];
     
     NSURL *url;
     
@@ -298,13 +324,13 @@ static ZPAuthenticationDialog* _instance;
     [[UIApplication sharedApplication] setNetworkActivityIndicatorVisible:NO];
     [self dismissModalViewControllerAnimated:YES];
     _isPresenting = FALSE;
-
+    
     if (ticket.didSucceed) {
         NSString *responseBody = [[NSString alloc] initWithData:data
                                                        encoding:NSUTF8StringEncoding];
         _latestToken = [[OAToken alloc] initWithHTTPResponseBody:responseBody];
         
-                //Save the key to preferences
+        //Save the key to preferences
         [ZPPreferences setOAuthKey:[_latestToken key]];
         _oauthkey = [_latestToken key];
         
@@ -320,10 +346,10 @@ static ZPAuthenticationDialog* _instance;
         _username = username;
         
         DDLogInfo(@"Authentication of user %@ succeeded", username);
-
+        
         //Tell the application to start updating libraries and collections from server
         [[NSNotificationCenter defaultCenter] postNotificationName:ZPNOTIFICATION_ZOTERO_AUTHENTICATION_SUCCESSFUL object:nil];
- 
+        
         
     }else{
         DDLogWarn(@"Requesting permanent token failed");
@@ -332,7 +358,7 @@ static ZPAuthenticationDialog* _instance;
 }
 
 - (void)requestTokenTicket:(OAServiceTicket *)ticket didFailWithError:(NSError *)error {
-    [[UIApplication sharedApplication] setNetworkActivityIndicatorVisible:NO];    
+    [[UIApplication sharedApplication] setNetworkActivityIndicatorVisible:NO];
     DDLogError(@"Error in requesting token ticket: %@",error);
 }
 - (void)requestAccessToken:(OAServiceTicket *)ticket didFailWithError:(NSError *)error {

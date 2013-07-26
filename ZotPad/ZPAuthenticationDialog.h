@@ -12,7 +12,7 @@
 #import "OAToken.h"
 #import "ZPModalViewController.h"
 
-@interface ZPAuthenticationDialog : ZPModalViewController <UIApplicationDelegate, UIWebViewDelegate> {
+@interface ZPAuthenticationDialog : ZPModalViewController <UIApplicationDelegate, UIWebViewDelegate, UIActionSheetDelegate> {
     
     DSActivityView* _activityView;
     NSString* _key;
@@ -33,7 +33,8 @@
 + (BOOL) isPresenting;
 
 - (void)setKeyAndLoadZoteroSite:(NSString*)key;
-- (IBAction)loadFirstPage:(id)sender;
+- (void)loadFirstPage;
+- (IBAction)openActionSheet:(id)sender;
 
 - (void) makeOAuthRequest: (OAToken *) token;
 - (void)requestTokenTicket:(OAServiceTicket *)ticket didFinishWithData:(NSData *)data;
