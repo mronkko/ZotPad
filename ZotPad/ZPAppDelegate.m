@@ -139,8 +139,6 @@ didFinishLaunchingWithOptions:(NSDictionary *)launchOptions
 
     [ZPPreferences checkAndProcessApplicationResetPreferences];
     
-    // Initialize the cache managers
-    
     // Override point for customization after application launch.
     if ([[UIDevice currentDevice] userInterfaceIdiom] == UIUserInterfaceIdiomPad) {
         UISplitViewController *splitViewController = (UISplitViewController *)self.window.rootViewController;
