@@ -509,12 +509,12 @@ NSInteger const ZPATTACHMENTICONGVIEWCONTROLLER_TAG_TITLELABEL = -5;
         
         // If this is manually triggered, display an alert dialog.
         
-        if(_latestManuallyTriggeredAttachment == attachment){
+        if([_latestManuallyTriggeredAttachment isEqual: attachment]){
             
             NSString* message;
             
             if([ZPPreferences useDropbox]){
-                message = [NSString stringWithFormat:@"Download from Dropbox failed with error: %@",[notification.userInfo objectForKey:NSLocalizedDescriptionKey]];
+                message = [NSString stringWithFormat:@"Download from Dropbox failed with error: %@",[notification.userInfo objectForKey:@"error"]];
             }
             else if([ZPPreferences useWebDAV] && _latestManuallyTriggeredAttachment.libraryID == ZPLIBRARY_ID_MY_LIBRARY){
                 message = [NSString stringWithFormat:@"Download from WebDAV server failed with error: %@",[notification.userInfo objectForKey:NSLocalizedDescriptionKey]];

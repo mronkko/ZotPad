@@ -120,7 +120,7 @@
 }
 
 +(void) openSupportSystemFromTopViewControllerWithArticleID:(NSInteger)articleId{
-    UIViewController *topController = [UIApplication sharedApplication].keyWindow.rootViewController;
+    UIViewController *topController = [(ZPAppDelegate*) [[UIApplication sharedApplication] delegate] window].rootViewController;
     
     while (topController.presentedViewController) {
         topController = topController.presentedViewController;
