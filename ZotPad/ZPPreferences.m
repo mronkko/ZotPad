@@ -28,11 +28,11 @@ static NSInteger _maxCacheSize;
 }
 
 +(void) reload {
-   
+    
     DDLogInfo(@"Reloading settings");
     
     NSUserDefaults* defaults = [NSUserDefaults standardUserDefaults];
-
+    
     //Read the defaults preferences and set these if no preferences are set.
     
     NSString *settingsBundle = [[NSBundle mainBundle] pathForResource:@"Settings" ofType:@"bundle"];
@@ -41,9 +41,9 @@ static NSInteger _maxCacheSize;
         return;
     }
     
-
+    
     NSMutableDictionary *defaultsToRegister = [[NSMutableDictionary alloc] init];
-
+    
     NSArray* preferenceFiles = [NSArray arrayWithObjects:@"Root.plist", @"Dropbox.plist", nil];
     
     NSString* preferenceFile;
@@ -58,9 +58,9 @@ static NSInteger _maxCacheSize;
                 [defaultsToRegister setObject:defaultValue forKey:key];
             }
         }
-    }    
+    }
     [defaults registerDefaults:defaultsToRegister];
-
+    
     _metadataCacheLevel = [defaults integerForKey:@"preemptivecachemetadata"];
     _attachmentsCacheLevel = [defaults integerForKey:@"preemptivecacheattachmentfiles"];
     _mode = [defaults integerForKey:@"mode"];
@@ -79,16 +79,37 @@ static NSInteger _maxCacheSize;
             if(! [webdavUrl hasSuffix:@"/zotero"]) newWebDAVURL = [NSString stringWithFormat:@"%@/zotero",newWebDAVURL];
             
             [[[UIAlertView alloc] initWithTitle:@"WebDAV configuration error"
-                                       message:[NSString stringWithFormat:@"WebDAV is enabled, but the WebDAV address was not specified correctly. The WebDAV address must start with 'http://' or 'https://' and end with '/zotero'. The WebDAV url was '%@' and has been automaticall changed to '%@'",webdavUrl,newWebDAVURL]
-                                      delegate:NULL
-                             cancelButtonTitle:@"OK"
+                                        message:[NSString stringWithFormat:@"WebDAV is enabled, but the WebDAV address was not specified correctly. The WebDAV address must start with 'http://' or 'https://' and end with '/zotero'. The WebDAV url was '%@' and has been automaticall changed to '%@'",webdavUrl,newWebDAVURL]
+                                       delegate:NULL
+                              cancelButtonTitle:@"OK"
                               otherButtonTitles: nil] show];
             
             NSUserDefaults* defaults = [NSUserDefaults standardUserDefaults];
             [defaults setObject:newWebDAVURL forKey:@"webdavurl"];
-
+            
         }
-
+        
+    }
+    
+    // Alert if any of the troubleshooting options are enabled
+    if([self includeDatabaseWithSupportRequest] || [self includeFileListWithSupportRequest] ||
+       [self debugCitationParser] || [self debugFileUploadsAndDownloads] || [self debugZoteroAPIRequests] ||
+       [self displayItemKeys]){
+        
+        if(![defaults boolForKey:@"hasDisplayedWarningAboutDebugOptions"]){
+            [defaults setBool:YES forKey:@"hasDisplayedWarningAboutDebugOptions"];
+            
+            [[[UIAlertView alloc]
+              initWithTitle:@"Troubleshooting options enabled"
+              message:@"One or more of the troubleshooting options in advanced settings has been enabled. These should only be enabled after contacting ZotPad support."
+              delegate:[self class]
+              cancelButtonTitle:@"OK"
+              otherButtonTitles:@"Disable", nil] show];
+            
+        }
+    }
+    else{
+        [defaults removeObjectForKey:@"hasDisplayedWarningAboutDebugOptions"];
     }
     
     // Notify that the mode setting has been reloaded.
@@ -96,19 +117,19 @@ static NSInteger _maxCacheSize;
     
     dispatch_after(dispatch_time(DISPATCH_TIME_NOW, NSEC_PER_SEC*1),
                    dispatch_get_global_queue(DISPATCH_QUEUE_PRIORITY_BACKGROUND,0), ^{
-        [[NSNotificationCenter defaultCenter] postNotificationName:ZPNOTIFICATION_ZOTPAD_MODE_CHANGED object:nil];
-    });
-     
+                       [[NSNotificationCenter defaultCenter] postNotificationName:ZPNOTIFICATION_ZOTPAD_MODE_CHANGED object:nil];
+                   });
+    
 }
 
 +(NSString*) preferencesAsDescriptiveString{
-
+    
     //Dump the preferences into a string
     
     NSMutableString* preferenceString = [[NSMutableString alloc] init];
     
     NSUserDefaults* defaults = [NSUserDefaults standardUserDefaults];
-
+    
     for(NSString* file in [NSArray arrayWithObjects:@"Root", @"Dropbox", @"Advanced" , nil]){
         IASKSettingsReader* reader = [[IASKSettingsReader alloc] initWithFile:file];
         for(NSInteger section =0 ; section < [reader numberOfSections]; section++){
@@ -130,25 +151,25 @@ static NSInteger _maxCacheSize;
         }
     }
     return preferenceString;
-
+    
 }
 
 +(void) checkAndProcessApplicationResetPreferences{
     
     NSUserDefaults* defaults = [NSUserDefaults standardUserDefaults];
-
+    
     if([defaults boolForKey:@"resetusername"]){
         DDLogWarn(@"Reseting username");
         [self resetUserCredentials];
         
         //Also reset the data
-
+        
         [ZPDatabase resetDatabase];
         [ZPFileCacheManager performSelectorInBackground:@selector(purgeAllAttachmentFilesFromCache) withObject:NULL];
         
         [defaults removeObjectForKey:@"resetusername"];
         [defaults removeObjectForKey:@"resetdata"];
-
+        
     }
     
     else if([defaults boolForKey:@"resetdata"]){
@@ -166,7 +187,7 @@ static NSInteger _maxCacheSize;
     self.userID = NULL;
     [defaults removeObjectForKey:@"OAuthKey"];
     self.OAuthKey = NULL;
-
+    
     //Empty the key chain
     
     NSURLCredentialStorage *store = [NSURLCredentialStorage sharedCredentialStorage];
@@ -234,7 +255,7 @@ static NSInteger _maxCacheSize;
     [defaults setObject:[NSNumber numberWithInt:_mode] forKey:@"mode"];
     
     [[NSNotificationCenter defaultCenter] postNotificationName:ZPNOTIFICATION_ZOTPAD_MODE_CHANGED object:NULL];
-
+    
 }
 
 +(BOOL) reportErrors{
@@ -254,7 +275,7 @@ static NSInteger _maxCacheSize;
 }
 +(NSString*) dropboxPath{
     NSUserDefaults* defaults = [NSUserDefaults standardUserDefaults];
-    return [[[defaults stringForKey:@"dropboxpath"] 
+    return [[[defaults stringForKey:@"dropboxpath"]
              stringByTrimmingCharactersInSet:[NSCharacterSet whitespaceCharacterSet]]
             stringByTrimmingCharactersInSet:[NSCharacterSet characterSetWithCharactersInString:@"/\\"]];
 }
@@ -310,6 +331,11 @@ static NSInteger _maxCacheSize;
     NSUserDefaults* defaults = [NSUserDefaults standardUserDefaults];
     return [defaults stringForKey:@"dropboxauthorsuffix"];
 }
++(NSString*) authorDelimiterInDropboxFilenames{
+    NSUserDefaults* defaults = [NSUserDefaults standardUserDefaults];
+    return [defaults stringForKey:@"dropboxauthordelimiter"];
+}
+
 +(BOOL) downloadLinkedFilesWithDropbox{
     NSUserDefaults* defaults = [NSUserDefaults standardUserDefaults];
     return [defaults boolForKey:@"dropboxdownloadlinkedfiles"];
@@ -332,7 +358,7 @@ static NSInteger _maxCacheSize;
     if([ret hasSuffix:@"/"]){
         ret = [ret substringToIndex:[ret length] - 1];
     }
-
+    
     return ret;
 }
 
@@ -452,5 +478,22 @@ static NSInteger _maxCacheSize;
     return [defaults boolForKey:@"disablebuiltinviewerandsendtogoodreader"];
 }
 
+#pragma mark - UIAlertViewDelegate
+
++ (void)alertView:(UIAlertView *)alertView clickedButtonAtIndex:(NSInteger)buttonIndex {
+
+    if(buttonIndex == 1){
+
+        NSUserDefaults* defaults = [NSUserDefaults standardUserDefaults];
+        
+        [defaults setBool:NO forKey:@"supportincludedatabase"];
+        [defaults setBool:NO forKey:@"supportincludefilelisting"];
+        [defaults setBool:NO forKey:@"debugcitationparser"];
+        [defaults setBool:NO forKey:@"debugfileuploads"];
+        [defaults setBool:NO forKey:@"debugserverrequests"];
+        [defaults setBool:NO forKey:@"displayitemkeys"];
+        
+    }
+}
 
 @end

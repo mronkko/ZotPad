@@ -64,6 +64,7 @@
 +(NSInteger) maxTitleLengthInDropboxFilenames;
 +(NSInteger) maxNumberOfAuthorsInDropboxFilenames;
 +(NSString*) authorSuffixInDropboxFilenames;
++(NSString*) authorDelimiterInDropboxFilenames;
 +(BOOL) downloadLinkedFilesWithDropbox;
 +(BOOL) reportErrors;
 
