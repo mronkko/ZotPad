@@ -140,6 +140,17 @@
 			<key>DefaultValue</key>
 			<string>2</string>
 		</dict>
+        <dict>
+			<key>Type</key>
+			<string>PSTextFieldSpecifier</string>
+			<key>Title</key>
+			<string>Delimiter between multiple authors</string>
+			<key>Key</key>
+			<string>dropboxauthordelimiter</string>
+			<key>DefaultValue</key>
+			<string>_</string>
+		</dict>
+
 		<dict>
 			<key>Type</key>
 			<string>PSTextFieldSpecifier</string>
