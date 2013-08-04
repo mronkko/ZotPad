@@ -1,13 +1,15 @@
 <?xml version="1.0" encoding="UTF-8" standalone="no"?>
-<document type="com.apple.InterfaceBuilder3.CocoaTouch.Storyboard.XIB" version="2.0" toolsVersion="3084" systemVersion="12E55" targetRuntime="iOS.CocoaTouch.iPad" propertyAccessControl="none" initialViewController="5">
+<document type="com.apple.InterfaceBuilder3.CocoaTouch.Storyboard.XIB" version="2.0" toolsVersion="4488.1" systemVersion="12E55" targetRuntime="iOS.CocoaTouch.iPad" variant="6xAndEarlier" propertyAccessControl="none" initialViewController="5">
     <dependencies>
-        <plugIn identifier="com.apple.InterfaceBuilder.IBCocoaTouchPlugin" version="2083"/>
+        <deployment defaultVersion="1280" identifier="iOS"/>
+        <development version="4600" identifier="xcode"/>
+        <plugIn identifier="com.apple.InterfaceBuilder.IBCocoaTouchPlugin" version="3715.3"/>
     </dependencies>
     <scenes>
         <!--Item List View Controller - Detail-->
         <scene sceneID="16">
             <objects>
-                <viewController storyboardIdentifier="" title="Detail" id="4" customClass="ZPItemListViewController" sceneMemberID="viewController">
+                <viewController title="Detail" id="4" customClass="ZPItemListViewController" sceneMemberID="viewController">
                     <view key="view" contentMode="scaleToFill" id="26">
                         <rect key="frame" x="0.0" y="64" width="703" height="704"/>
                         <autoresizingMask key="autoresizingMask" widthSizable="YES" heightSizable="YES"/>
@@ -21,7 +23,7 @@
                                         <rect key="frame" x="0.0" y="22" width="703" height="79"/>
                                         <autoresizingMask key="autoresizingMask"/>
                                         <view key="contentView" opaque="NO" clipsSubviews="YES" multipleTouchEnabled="YES" contentMode="center">
-                                            <rect key="frame" x="0.0" y="0.0" width="683" height="78"/>
+                                            <rect key="frame" x="0.0" y="0.0" width="703" height="79"/>
                                             <autoresizingMask key="autoresizingMask"/>
                                             <subviews>
                                                 <label opaque="NO" clipsSubviews="YES" userInteractionEnabled="NO" tag="1" contentMode="left" text="Title" lineBreakMode="wordWrap" numberOfLines="2" minimumFontSize="11" id="9jR-nJ-7x4">
@@ -78,7 +80,7 @@
                                         <rect key="frame" x="0.0" y="101" width="703" height="80"/>
                                         <autoresizingMask key="autoresizingMask"/>
                                         <view key="contentView" opaque="NO" clipsSubviews="YES" multipleTouchEnabled="YES" contentMode="center">
-                                            <rect key="frame" x="0.0" y="0.0" width="703" height="79"/>
+                                            <rect key="frame" x="0.0" y="0.0" width="703" height="80"/>
                                             <autoresizingMask key="autoresizingMask"/>
                                             <subviews>
                                                 <label opaque="NO" clipsSubviews="YES" userInteractionEnabled="NO" tag="2" contentMode="left" text="Loading from Zotero server" textAlignment="center" lineBreakMode="tailTruncation" minimumFontSize="10" id="rRR-vX-0Nh">
@@ -101,7 +103,7 @@
                                         <rect key="frame" x="0.0" y="181" width="703" height="80"/>
                                         <autoresizingMask key="autoresizingMask"/>
                                         <view key="contentView" opaque="NO" clipsSubviews="YES" multipleTouchEnabled="YES" contentMode="center">
-                                            <rect key="frame" x="0.0" y="0.0" width="703" height="79"/>
+                                            <rect key="frame" x="0.0" y="0.0" width="703" height="80"/>
                                             <autoresizingMask key="autoresizingMask"/>
                                             <subviews>
                                                 <label opaque="NO" clipsSubviews="YES" userInteractionEnabled="NO" tag="2" contentMode="left" text="No items" textAlignment="center" lineBreakMode="tailTruncation" minimumFontSize="10" id="qqf-qG-UGZ">
@@ -120,7 +122,7 @@
                                         <rect key="frame" x="0.0" y="261" width="703" height="80"/>
                                         <autoresizingMask key="autoresizingMask" flexibleMinX="YES" flexibleMaxX="YES" flexibleMinY="YES" flexibleMaxY="YES"/>
                                         <view key="contentView" opaque="NO" clipsSubviews="YES" multipleTouchEnabled="YES" contentMode="center">
-                                            <rect key="frame" x="0.0" y="0.0" width="703" height="79"/>
+                                            <rect key="frame" x="0.0" y="0.0" width="703" height="80"/>
                                             <autoresizingMask key="autoresizingMask"/>
                                             <subviews>
                                                 <label opaque="NO" clipsSubviews="YES" userInteractionEnabled="NO" tag="2" contentMode="left" text="Choose a library" textAlignment="center" lineBreakMode="tailTruncation" minimumFontSize="10" id="kXd-7R-gjc">
@@ -139,7 +141,7 @@
                                         <rect key="frame" x="0.0" y="341" width="703" height="80"/>
                                         <autoresizingMask key="autoresizingMask"/>
                                         <view key="contentView" opaque="NO" clipsSubviews="YES" multipleTouchEnabled="YES" contentMode="center">
-                                            <rect key="frame" x="0.0" y="0.0" width="703" height="79"/>
+                                            <rect key="frame" x="0.0" y="0.0" width="703" height="80"/>
                                             <autoresizingMask key="autoresizingMask"/>
                                             <color key="backgroundColor" white="0.0" alpha="0.0" colorSpace="calibratedWhite"/>
                                         </view>
@@ -193,7 +195,7 @@
                                 <rect key="frame" x="0.0" y="54" width="703" height="45"/>
                                 <autoresizingMask key="autoresizingMask"/>
                                 <view key="contentView" opaque="NO" clipsSubviews="YES" multipleTouchEnabled="YES" contentMode="center">
-                                    <rect key="frame" x="43" y="1" width="617" height="43"/>
+                                    <rect key="frame" x="0.0" y="0.0" width="703" height="45"/>
                                     <autoresizingMask key="autoresizingMask"/>
                                     <subviews>
                                         <label opaque="NO" clipsSubviews="YES" multipleTouchEnabled="YES" tag="1" contentMode="left" text="Title" lineBreakMode="tailTruncation" baselineAdjustment="alignBaselines" adjustsFontSizeToFit="NO" id="ctl-ud-6zk">
@@ -220,7 +222,7 @@
                                 <rect key="frame" x="0.0" y="99" width="703" height="100"/>
                                 <autoresizingMask key="autoresizingMask" flexibleMaxY="YES"/>
                                 <view key="contentView" opaque="NO" clipsSubviews="YES" multipleTouchEnabled="YES" contentMode="center">
-                                    <rect key="frame" x="43" y="0.0" width="617" height="99"/>
+                                    <rect key="frame" x="0.0" y="0.0" width="703" height="100"/>
                                     <autoresizingMask key="autoresizingMask"/>
                                     <subviews>
                                         <label opaque="NO" clipsSubviews="YES" userInteractionEnabled="NO" tag="1" contentMode="left" text="Abstract" lineBreakMode="tailTruncation" minimumFontSize="10" adjustsFontSizeToFit="NO" id="ThI-kg-9Uy">
@@ -247,7 +249,7 @@
                                 <rect key="frame" x="0.0" y="199" width="703" height="44"/>
                                 <autoresizingMask key="autoresizingMask" flexibleMaxY="YES"/>
                                 <view key="contentView" opaque="NO" clipsSubviews="YES" multipleTouchEnabled="YES" contentMode="center">
-                                    <rect key="frame" x="43" y="0.0" width="597" height="43"/>
+                                    <rect key="frame" x="0.0" y="0.0" width="703" height="44"/>
                                     <autoresizingMask key="autoresizingMask"/>
                                     <subviews>
                                         <label opaque="NO" clipsSubviews="YES" userInteractionEnabled="NO" tag="1" contentMode="left" text="No tags" textAlignment="center" lineBreakMode="tailTruncation" baselineAdjustment="alignBaselines" adjustsFontSizeToFit="NO" id="ucT-A2-39A">
@@ -265,7 +267,7 @@
                                 <rect key="frame" x="0.0" y="243" width="703" height="44"/>
                                 <autoresizingMask key="autoresizingMask" flexibleMaxY="YES"/>
                                 <view key="contentView" opaque="NO" clipsSubviews="YES" multipleTouchEnabled="YES" contentMode="center">
-                                    <rect key="frame" x="43" y="0.0" width="597" height="43"/>
+                                    <rect key="frame" x="0.0" y="0.0" width="703" height="44"/>
                                     <autoresizingMask key="autoresizingMask"/>
                                     <color key="backgroundColor" white="0.0" alpha="0.0" colorSpace="calibratedWhite"/>
                                 </view>
@@ -275,7 +277,7 @@
                                 <rect key="frame" x="0.0" y="287" width="703" height="44"/>
                                 <autoresizingMask key="autoresizingMask" flexibleMaxY="YES"/>
                                 <view key="contentView" opaque="NO" clipsSubviews="YES" multipleTouchEnabled="YES" contentMode="center">
-                                    <rect key="frame" x="43" y="0.0" width="597" height="43"/>
+                                    <rect key="frame" x="0.0" y="0.0" width="703" height="44"/>
                                     <autoresizingMask key="autoresizingMask"/>
                                     <subviews>
                                         <label opaque="NO" clipsSubviews="YES" userInteractionEnabled="NO" tag="2" contentMode="left" text="Label" lineBreakMode="wordWrap" numberOfLines="0" baselineAdjustment="alignBaselines" minimumFontSize="10" adjustsFontSizeToFit="NO" id="g5S-RU-tpq" customClass="OHAttributedLabel">
@@ -305,7 +307,7 @@
                                 <rect key="frame" x="0.0" y="331" width="703" height="45"/>
                                 <autoresizingMask key="autoresizingMask" flexibleMaxY="YES"/>
                                 <view key="contentView" opaque="NO" clipsSubviews="YES" multipleTouchEnabled="YES" contentMode="center">
-                                    <rect key="frame" x="43" y="0.0" width="597" height="43"/>
+                                    <rect key="frame" x="0.0" y="0.0" width="703" height="45"/>
                                     <autoresizingMask key="autoresizingMask"/>
                                     <subviews>
                                         <imageView userInteractionEnabled="NO" contentMode="scaleToFill" image="AccountSettingsUI_com.apple.Dataclass.Notes.png" id="OlX-Xz-MQ2">
@@ -414,7 +416,7 @@
                                         <rect key="frame" x="0.0" y="22" width="768" height="44"/>
                                         <autoresizingMask key="autoresizingMask"/>
                                         <view key="contentView" opaque="NO" clipsSubviews="YES" multipleTouchEnabled="YES" contentMode="center">
-                                            <rect key="frame" x="0.0" y="0.0" width="768" height="43"/>
+                                            <rect key="frame" x="0.0" y="0.0" width="768" height="44"/>
                                             <autoresizingMask key="autoresizingMask"/>
                                             <color key="backgroundColor" white="0.0" alpha="0.0" colorSpace="calibratedWhite"/>
                                         </view>
@@ -461,7 +463,7 @@
             <objects>
                 <viewController id="NLQ-na-S2f" sceneMemberID="viewController">
                     <view key="view" contentMode="scaleToFill" id="1el-Bb-2gU">
-                        <rect key="frame" x="0.0" y="20" width="540" height="60"/>
+                        <rect key="frame" x="0.0" y="20" width="540" height="180"/>
                         <autoresizingMask key="autoresizingMask" flexibleMaxX="YES" flexibleMaxY="YES"/>
                         <subviews>
                             <label opaque="NO" clipsSubviews="YES" userInteractionEnabled="NO" contentMode="left" text="New tag:" lineBreakMode="tailTruncation" baselineAdjustment="alignBaselines" adjustsFontSizeToFit="NO" id="aIY-eI-1PW">
@@ -504,7 +506,7 @@
             <objects>
                 <splitViewController id="5" customClass="ZPSplitViewController" sceneMemberID="viewController">
                     <toolbarItems/>
-                    <simulatedStatusBarMetrics key="simulatedStatusBarMetrics" statusBarStyle="blackTranslucent"/>
+                    <simulatedStatusBarMetrics key="simulatedStatusBarMetrics" statusBarStyle="blackOpaque"/>
                     <simulatedOrientationMetrics key="simulatedOrientationMetrics" orientation="landscapeRight"/>
                     <connections>
                         <segue destination="42" kind="relationship" relationship="detailViewController" id="53"/>
@@ -625,7 +627,7 @@
                     <navigationBar key="navigationBar" contentMode="scaleToFill" id="wgC-1q-9xX">
                         <autoresizingMask key="autoresizingMask"/>
                     </navigationBar>
-                    <toolbar key="toolbar" opaque="NO" clearsContextBeforeDrawing="NO" contentMode="scaleToFill" id="G7T-8Q-NLR">
+                    <toolbar key="toolbar" opaque="NO" clearsContextBeforeDrawing="NO" contentMode="scaleToFill" translucent="NO" id="G7T-8Q-NLR">
                         <rect key="frame" x="0.0" y="724" width="320" height="44"/>
                         <autoresizingMask key="autoresizingMask"/>
                     </toolbar>
@@ -650,7 +652,7 @@
                                 <rect key="frame" x="0.0" y="22" width="320" height="44"/>
                                 <autoresizingMask key="autoresizingMask"/>
                                 <view key="contentView" opaque="NO" clipsSubviews="YES" multipleTouchEnabled="YES" contentMode="center">
-                                    <rect key="frame" x="0.0" y="0.0" width="300" height="43"/>
+                                    <rect key="frame" x="0.0" y="0.0" width="320" height="44"/>
                                     <autoresizingMask key="autoresizingMask"/>
                                     <color key="backgroundColor" white="0.0" alpha="0.0" colorSpace="calibratedWhite"/>
                                 </view>
@@ -685,7 +687,7 @@
                                 <rect key="frame" x="0.0" y="22" width="320" height="79"/>
                                 <autoresizingMask key="autoresizingMask"/>
                                 <view key="contentView" opaque="NO" clipsSubviews="YES" multipleTouchEnabled="YES" contentMode="center">
-                                    <rect key="frame" x="0.0" y="0.0" width="320" height="78"/>
+                                    <rect key="frame" x="0.0" y="0.0" width="320" height="79"/>
                                     <autoresizingMask key="autoresizingMask"/>
                                     <subviews>
                                         <label opaque="NO" clipsSubviews="YES" userInteractionEnabled="NO" tag="1" contentMode="left" text="Title" lineBreakMode="tailTruncation" numberOfLines="2" minimumFontSize="1" adjustsFontSizeToFit="NO" id="axH-Yp-Nz2">
@@ -711,7 +713,7 @@
                                 <rect key="frame" x="0.0" y="101" width="320" height="80"/>
                                 <autoresizingMask key="autoresizingMask"/>
                                 <view key="contentView" opaque="NO" clipsSubviews="YES" multipleTouchEnabled="YES" contentMode="center">
-                                    <rect key="frame" x="0.0" y="0.0" width="320" height="79"/>
+                                    <rect key="frame" x="0.0" y="0.0" width="320" height="80"/>
                                     <autoresizingMask key="autoresizingMask"/>
                                     <subviews>
                                         <label opaque="NO" clipsSubviews="YES" userInteractionEnabled="NO" tag="2" contentMode="left" text="This item has not been loaded yet" lineBreakMode="tailTruncation" minimumFontSize="10" id="1pB-Fm-inh">
@@ -770,7 +772,7 @@
                                                 <rect key="frame" x="0.0" y="34" width="318" height="45"/>
                                                 <autoresizingMask key="autoresizingMask" flexibleMaxY="YES"/>
                                                 <view key="contentView" opaque="NO" clipsSubviews="YES" multipleTouchEnabled="YES" contentMode="center">
-                                                    <rect key="frame" x="10" y="1" width="278" height="43"/>
+                                                    <rect key="frame" x="0.0" y="0.0" width="318" height="45"/>
                                                     <autoresizingMask key="autoresizingMask"/>
                                                     <subviews>
                                                         <label opaque="NO" clipsSubviews="YES" userInteractionEnabled="NO" tag="1" contentMode="left" text="No tags" textAlignment="center" lineBreakMode="tailTruncation" baselineAdjustment="alignBaselines" adjustsFontSizeToFit="NO" id="Zt2-6j-Eec">
@@ -788,7 +790,7 @@
                                                 <rect key="frame" x="0.0" y="79" width="318" height="44"/>
                                                 <autoresizingMask key="autoresizingMask" flexibleMaxY="YES"/>
                                                 <view key="contentView" opaque="NO" clipsSubviews="YES" multipleTouchEnabled="YES" contentMode="center">
-                                                    <rect key="frame" x="10" y="0.0" width="278" height="43"/>
+                                                    <rect key="frame" x="0.0" y="0.0" width="318" height="44"/>
                                                     <autoresizingMask key="autoresizingMask"/>
                                                     <color key="backgroundColor" white="0.0" alpha="0.0" colorSpace="calibratedWhite"/>
                                                 </view>
@@ -798,7 +800,7 @@
                                                 <rect key="frame" x="0.0" y="123" width="318" height="44"/>
                                                 <autoresizingMask key="autoresizingMask" flexibleMaxY="YES"/>
                                                 <view key="contentView" opaque="NO" clipsSubviews="YES" multipleTouchEnabled="YES" contentMode="center">
-                                                    <rect key="frame" x="10" y="0.0" width="278" height="43"/>
+                                                    <rect key="frame" x="0.0" y="0.0" width="318" height="44"/>
                                                     <autoresizingMask key="autoresizingMask"/>
                                                     <subviews>
                                                         <label opaque="NO" clipsSubviews="YES" userInteractionEnabled="NO" tag="2" contentMode="left" text="Label" lineBreakMode="wordWrap" numberOfLines="0" baselineAdjustment="alignBaselines" minimumFontSize="10" adjustsFontSizeToFit="NO" id="nc6-iA-Fjl" customClass="OHAttributedLabel">
@@ -828,7 +830,7 @@
                                                 <rect key="frame" x="0.0" y="167" width="318" height="45"/>
                                                 <autoresizingMask key="autoresizingMask" flexibleMaxY="YES"/>
                                                 <view key="contentView" opaque="NO" clipsSubviews="YES" multipleTouchEnabled="YES" contentMode="center">
-                                                    <rect key="frame" x="10" y="0.0" width="278" height="43"/>
+                                                    <rect key="frame" x="0.0" y="0.0" width="318" height="45"/>
                                                     <autoresizingMask key="autoresizingMask"/>
                                                     <subviews>
                                                         <imageView userInteractionEnabled="NO" contentMode="scaleToFill" image="AccountSettingsUI_com.apple.Dataclass.Notes.png" id="Jdz-A5-MQd">
@@ -1177,9 +1179,9 @@
         <scene sceneID="4ln-7v-SSW">
             <objects>
                 <navigationController definesPresentationContext="YES" id="krk-Vp-4gf" sceneMemberID="viewController">
-                    <simulatedNavigationBarMetrics key="simulatedTopBarMetrics" barStyle="blackOpaque" prompted="NO"/>
+                    <simulatedNavigationBarMetrics key="simulatedTopBarMetrics" barStyle="black" prompted="NO"/>
                     <simulatedOrientationMetrics key="simulatedOrientationMetrics" orientation="landscapeRight"/>
-                    <navigationBar key="navigationBar" clipsSubviews="YES" multipleTouchEnabled="YES" contentMode="scaleToFill" barStyle="blackOpaque" id="ddk-ze-Ijq">
+                    <navigationBar key="navigationBar" clipsSubviews="YES" multipleTouchEnabled="YES" contentMode="scaleToFill" barStyle="black" id="ddk-ze-Ijq">
                         <rect key="frame" x="0.0" y="-44" width="0.0" height="44"/>
                         <autoresizingMask key="autoresizingMask"/>
                     </navigationBar>
@@ -1207,7 +1209,7 @@
                                 <fontDescription key="fontDescription" type="system" pointSize="14"/>
                                 <textInputTraits key="textInputTraits" autocapitalizationType="sentences"/>
                             </textView>
-                            <toolbar opaque="NO" clearsContextBeforeDrawing="NO" contentMode="scaleToFill" barStyle="blackOpaque" id="mxb-AN-1gU">
+                            <toolbar opaque="NO" clearsContextBeforeDrawing="NO" contentMode="scaleToFill" barStyle="black" id="mxb-AN-1gU">
                                 <rect key="frame" x="0.0" y="660" width="1024" height="44"/>
                                 <autoresizingMask key="autoresizingMask" widthSizable="YES" flexibleMinY="YES"/>
                                 <items>
@@ -1262,7 +1264,7 @@
         <image name="verticalLines.png" width="6" height="1"/>
     </resources>
     <simulatedMetricsContainer key="defaultSimulatedMetrics">
-        <simulatedStatusBarMetrics key="statusBar" statusBarStyle="blackTranslucent"/>
+        <simulatedStatusBarMetrics key="statusBar" statusBarStyle="lightContent"/>
         <simulatedOrientationMetrics key="orientation"/>
         <simulatedScreenMetrics key="destination"/>
     </simulatedMetricsContainer>
