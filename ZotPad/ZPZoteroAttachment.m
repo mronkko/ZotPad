@@ -30,6 +30,7 @@ NSInteger const VERSION_SOURCE_WEBDAV =2;
 NSInteger const VERSION_SOURCE_DROPBOX =3;
 
 @interface ZPZoteroAttachment(){
+    NSString* _contentType;
 }
 
 - (NSString*) _fileSystemPathWithSuffix:(NSString*)suffix;
@@ -48,13 +49,12 @@ static NSString* _documentsDirectory = NULL;
 @synthesize lastViewed, attachmentSize, existsOnZoteroServer, filename, url, versionSource,  charset, note, md5, mtime;
 @synthesize versionIdentifier_server;
 @synthesize versionIdentifier_local;
-@synthesize contentType, accessDate;
+@synthesize accessDate;
 
 +(void)initialize{
     _objectCache =  [[NSCache alloc] init];
     _documentsDirectory = [NSSearchPathForDirectoriesInDomains(NSDocumentDirectory, NSUserDomainMask, YES) objectAtIndex:0];
 }
-
 
 +(ZPZoteroAttachment*) attachmentWithDictionary:(NSDictionary *)fields{
     
@@ -95,6 +95,28 @@ static NSString* _documentsDirectory = NULL;
 }
 -(NSString*)itemKey{
     return [super key];
+}
+
+-(void) setContenType:(NSString*)contentType{
+    _contentType = contentType;
+}
+
+-(NSString*) contentType{
+    if(_contentType == nil){
+        // Get the UTI from the file's extension:
+        
+        CFStringRef pathExtension = (__bridge_retained CFStringRef)[self.filename pathExtension];
+        CFStringRef type = UTTypeCreatePreferredIdentifierForTag(kUTTagClassFilenameExtension, pathExtension, NULL);
+        CFRelease(pathExtension);
+        
+        // The UTI can be converted to a mime type:
+        
+        _contentType = (__bridge_transfer NSString *)UTTypeCopyPreferredTagWithClass(type, kUTTagClassMIMEType);
+        if (type != NULL)
+            CFRelease(type);
+    }
+    
+    return _contentType;
 }
 
 - (NSInteger) libraryID{
@@ -330,6 +352,10 @@ static NSString* _documentsDirectory = NULL;
 -(BOOL)locallyModified{ return FALSE;}
 -(BOOL)locallyDeleted{ return FALSE;}
 
+
+-(BOOL) isPDF{
+    return [self.contentType isEqualToString:@"application/pdf"];
+}
 
 #pragma mark - QLPreviewItem protocol
 

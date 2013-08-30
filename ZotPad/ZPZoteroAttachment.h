@@ -27,7 +27,7 @@ extern NSInteger const VERSION_SOURCE_WEBDAV;
 }
 
 @property (retain) NSString* note;
-@property (retain) NSString* contentType;
+@property (retain, nonatomic) NSString* contentType;
 @property (assign) NSInteger linkMode;
 @property (assign) BOOL existsOnZoteroServer;
 @property (assign) NSInteger attachmentSize;
@@ -64,6 +64,7 @@ extern NSInteger const VERSION_SOURCE_WEBDAV;
 - (BOOL) fileExists;
 -(BOOL) fileExists_original;
 -(BOOL) fileExists_modified;
+-(BOOL) isPDF;
 
 -(NSString*) filenameZoteroBase64Encoded;
 
