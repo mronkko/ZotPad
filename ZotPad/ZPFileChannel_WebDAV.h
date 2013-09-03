@@ -7,7 +7,7 @@
 //
 
 #import "ZPFileChannel.h"
-
+#import "ZipArchive.h"
 
 extern NSInteger const ZPFILECHANNEL_WEBDAV_DOWNLOAD;
 extern NSInteger const ZPFILECHANNEL_WEBDAV_UPLOAD_FILE;
@@ -15,7 +15,7 @@ extern NSInteger const ZPFILECHANNEL_WEBDAV_UPLOAD_UPDATE_LASTSYNC;
 extern NSInteger const ZPFILECHANNEL_WEBDAV_UPLOAD_UPDATE_PROP;
 extern NSInteger const ZPFILECHANNEL_WEBDAV_UPLOAD_REGISTER;
 
-@interface ZPFileChannel_WebDAV : ZPFileChannel <UIAlertViewDelegate>{
+@interface ZPFileChannel_WebDAV : ZPFileChannel <UIAlertViewDelegate, ZipArchiveDelegate>{
     NSMutableDictionary* progressDelegates;
 }
 

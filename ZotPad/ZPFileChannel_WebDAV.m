@@ -276,12 +276,22 @@ static NSOperationQueue* _uploadQueue;
         //Zip the file before uploading
         
         ZipArchive* zipArchive = [[ZipArchive alloc] init];
+        zipArchive.delegate = self;
         
         NSString* tempFile = [NSTemporaryDirectory() stringByAppendingPathComponent:[NSString stringWithFormat:@"ZP%@%f",attachment.key,[[NSDate date] timeIntervalSince1970]*1000000]];
         
         [zipArchive CreateZipFile2:tempFile];
         [zipArchive addFileToZip:attachment.fileSystemPath_modified newname:attachment.filenameZoteroBase64Encoded];
         [zipArchive CloseZipFile2];
+        
+        // Verify that the file can be uncompressed
+        /*
+        NSString* tempFileUncompressed = [NSTemporaryDirectory() stringByAppendingPathComponent:[NSString stringWithFormat:@"ZP%@%f_uncompressed",attachment.key,[[NSDate date] timeIntervalSince1970]*1000000]];
+
+        [zipArchive UnzipOpenFile:tempFile];
+        [zipArchive UnzipFileTo:tempFileUncompressed overWrite:YES];
+        [zipArchive UnzipCloseFile];
+        */
         
         [uploadRequest appendPostDataFromFile:tempFile];
         [[NSFileManager defaultManager] removeItemAtPath:tempFile error:NULL];
@@ -448,6 +458,8 @@ static NSOperationQueue* _uploadQueue;
             else {
                 //Unzip the attachment
                 ZipArchive* zipArchive = [[ZipArchive alloc] init];
+                zipArchive.delegate = self;
+    
                 [zipArchive UnzipOpenFile:[request downloadDestinationPath]];
                 
                 NSString* tempFile = [NSTemporaryDirectory() stringByAppendingPathComponent:[NSString stringWithFormat:@"ZP%@%f",attachment.key,[[NSDate date] timeIntervalSince1970]*1000000]];
@@ -682,7 +694,11 @@ static NSOperationQueue* _uploadQueue;
     _alertView = nil;
 }
 
+#pragma mark - ZipArchive delegate
 
+- (void) ErrorMessage:(NSString*) error{
+    DDLogError(@"Error unzipping file: %@", error);
+}
 
 
 @end
