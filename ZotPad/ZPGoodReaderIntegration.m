@@ -13,7 +13,7 @@
 
 #if (TARGET_IPHONE_SIMULATOR)
 
-// A dummy implementation for runnign in simulator
+// A dummy implementation for running in simulator
 
 @implementation ZPGoodReaderIntegration
 
@@ -31,23 +31,69 @@
 
 #import "SendToGoodReader.h"
 
-@interface ZPGoodReaderIntegration_saveBackDelegate : NSObject <GoodReaderSaveBackDelegate>
+@interface ZPGoodReaderIntegration_saveBackDelegate : NSObject <GoodReaderSaveBackDelegate, UIAlertViewDelegate>{
+    UIAlertView* _progressDialog;
+    unsigned long long _incomingFileSize;
+}
 
 @end
 
 @implementation ZPGoodReaderIntegration_saveBackDelegate
 
 -(void)didFinishReceivingSaveBackFromGoodReaderWithResultCode:(GoodReaderTransferResultCodeEnum)resultCode receivedFilePath:(NSString *)receivedFilePath saveBackTag:(NSData *)saveBackTag{
-    
-    ZPZoteroAttachment* attachment = [ZPZoteroAttachment attachmentWithKey:[[NSString alloc] initWithData:saveBackTag encoding:NSUTF8StringEncoding]];
-    
-    DDLogInfo(@"An attachment %@ as a save back from GoodReader",attachment.itemKey);
-    [ZPFileImportViewController presentInstanceModallyWithAttachment:attachment];
-    
-    NSURL* url = [NSURL URLWithString:[receivedFilePath stringByAddingPercentEscapesUsingEncoding:NSUTF8StringEncoding]];
 
-    [ZPFileUploadManager addAttachmentToUploadQueue:attachment withNewFile:url];
+    // Dismiss the progress dialog
     
+    if(_progressDialog != nil){
+        [_progressDialog dismissWithClickedButtonIndex:0 animated:NO];
+        _progressDialog = nil;
+    }
+
+    if(resultCode == kGoodReaderTransferResult_Success){
+        ZPZoteroAttachment* attachment = [ZPZoteroAttachment attachmentWithKey:[[NSString alloc] initWithData:saveBackTag encoding:NSUTF8StringEncoding]];
+    
+        DDLogInfo(@"An attachment %@ as a save back from GoodReader",attachment.itemKey);
+        [ZPFileImportViewController presentInstanceModallyWithAttachment:attachment];
+    
+        NSURL* url = [NSURL URLWithString:[receivedFilePath stringByAddingPercentEscapesUsingEncoding:NSUTF8StringEncoding]];
+
+        [ZPFileUploadManager addAttachmentToUploadQueue:attachment withNewFile:url];
+    }
+    else{
+        DDLogInfo(@"Save back from GoodReader failed or was canceled: %i", resultCode);
+    }
+    
+}
+
+-(void) willStartReceivingSaveBackFromGoodReader:(UInt64)estimatedFileSize{
+    DDLogInfo(@"Started receiving data (%lli bytes) from GoodReader", estimatedFileSize);
+
+// If the estimated file size is more than a megabyte, show a progress view
+// TODO: Refactor for ZotPad 2.0
+    if(estimatedFileSize > 1048576){
+        _progressDialog = [[UIAlertView alloc] initWithTitle:@"Receiving file (0%)"
+                                                     message:@""
+                                                    delegate:self
+                                           cancelButtonTitle:@"Cancel"
+                                           otherButtonTitles:nil];
+        _incomingFileSize = estimatedFileSize;
+        
+        [_progressDialog show];
+    }
+}
+
+-(void) saveBackProgressUpdate:(UInt64)totalBytesReceived{
+    if(_progressDialog != nil){
+        _progressDialog.title = [NSString stringWithFormat:@"Receiving file (%lli%%)", MIN(100,totalBytesReceived*100/_incomingFileSize)];
+    }
+}
+
+-(void) alertView:(UIAlertView *)alertView willDismissWithButtonIndex:(NSInteger)buttonIndex{
+    _progressDialog = nil;
+    
+    if([GoodReaderTransferClient isCurrentlyReceiving]){
+        [GoodReaderTransferClient cancelSendingOrReceivingWithoutNotifyingTheDelegate];
+    }
 }
 
 @end
