@@ -481,7 +481,8 @@ static NSOperationQueue* _uploadQueue;
 
         else {
             NSError* error =[NSError errorWithDomain:@"zotero.org" code:request.responseStatusCode userInfo:NULL];
-            DDLogError(@"Uploading file %@ to Zotero server failed with error: %@",attachment.filename,request.responseStatusMessage);
+            DDLogError(@"Uploading file %@ to Zotero server failed with error: %@. Full request and response: %@",attachment.filename,request.responseStatusMessage, [self requestDumpAsString:request]);
+            
             
             if(! _alert){
                 [[[UIAlertView alloc] initWithTitle:@"File upload failed"
