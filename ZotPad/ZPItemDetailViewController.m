@@ -698,13 +698,10 @@
     if(aTableView == self.tableView){
         //Tags
         if([indexPath indexAtPosition:0]==0){
-            if(_tagEditingViewController == NULL){
-                _tagEditingViewController = [self.storyboard instantiateViewControllerWithIdentifier:@"TagEditingViewController"];
-            }
-            _tagEditingViewController.itemKey = self.itemKey;
-            _tagEditingViewController.targetViewController = self;
             
-            [self presentModalViewController:_tagEditingViewController animated:YES];
+            ZPTagEditingViewController* tagEditingViewController = [ZPTagEditingViewController instance];
+            [tagEditingViewController configureWithItemKey:self.itemKey andTarget:self];
+            [self presentModalViewController:tagEditingViewController animated:YES];
         }
         //Notes
         else if([indexPath indexAtPosition:0]==1){
@@ -723,14 +720,9 @@
                 newNote = FALSE;
             }
             
-            if(_noteEditingViewController == NULL){
-                _noteEditingViewController = [self.storyboard instantiateViewControllerWithIdentifier:@"NoteEditingViewController"];
-            }
-            _noteEditingViewController.note = note;
-            _noteEditingViewController.isNewNote = newNote;
-            _noteEditingViewController.targetViewController = self;
-            
-            [self presentModalViewController:_noteEditingViewController animated:YES];
+            ZPNoteEditingViewController* noteEditingViewController = [ZPNoteEditingViewController instance];
+            [noteEditingViewController configureWithNote:note  andTarget:self isNew:newNote];
+            [self presentModalViewController:noteEditingViewController animated:YES];
             
         }
         [aTableView deselectRowAtIndexPath:indexPath animated:NO];

@@ -30,15 +30,13 @@
 
 @synthesize webView;
 
-static BOOL _isPresenting;
 
 static ZPAuthenticationDialog* _instance;
 
 + (void) presentInstanceModally{
     
-    if(! _isPresenting){
+    if(! [self isPresenting]){
         DDLogInfo(@"Displaying authentication view");
-        _isPresenting = TRUE;
         if([NSThread isMainThread]){
             [[self instance] presentModally:YES];
         }
@@ -51,7 +49,7 @@ static ZPAuthenticationDialog* _instance;
 }
 
 + (BOOL) isPresenting{
-    return _isPresenting;
+    return _instance != NULL && _instance.isViewLoaded && _instance.view.window;
 }
 
 - (void)didReceiveMemoryWarning
@@ -323,7 +321,6 @@ static ZPAuthenticationDialog* _instance;
     
     [[UIApplication sharedApplication] setNetworkActivityIndicatorVisible:NO];
     [self dismissModalViewControllerAnimated:YES];
-    _isPresenting = FALSE;
     
     if (ticket.didSucceed) {
         NSString *responseBody = [[NSString alloc] initWithData:data

@@ -13,13 +13,17 @@
 
 @interface ZPNoteEditingViewController (){
     UIActionSheet* _confirmDelete;
+    NSString* _currentContent;
+    ZPZoteroDataObject<ZPZoteroDataObjectWithNote>* _note;
+    BOOL _isNew;
+    UIViewController<ZPNoteDisplay>* _target;
 }
 
 @end
 
 @implementation ZPNoteEditingViewController
 
-@synthesize note, webView, isNewNote, navigationItem;
+@synthesize webView, navigationItem;
 
 static ZPNoteEditingViewController* _instance;
 
@@ -31,36 +35,21 @@ static ZPNoteEditingViewController* _instance;
     return _instance;
 }
 
-- (id)initWithNibName:(NSString *)nibNameOrNil bundle:(NSBundle *)nibBundleOrNil
-{
-    self = [super initWithNibName:nibNameOrNil bundle:nibBundleOrNil];
-    if (self) {
-        // Custom initialization
-    }
-    return self;
+-(void) configureWithNote:(ZPZoteroDataObject<ZPZoteroDataObjectWithNote>*) note andTarget:(UIViewController<ZPNoteDisplay>*) target isNew:(BOOL)isNew{
+
+    _note = note;
+    _isNew = isNew;
+    _target = target;
+    _currentContent = note.note==NULL?@"":note.note;
+    
+    [self configure];
 }
 
-- (void)viewDidLoad
-{
-    [super viewDidLoad];
-	
-    // Do any additional setup after loading the view.
-    
+- (void) configure{
 
-    // Displaying the keyboard automatically requires iOS 6
-
-    if ([[[UIDevice currentDevice] systemVersion] floatValue] >= 6.0) {
-        webView.keyboardDisplayRequiresUserAction=NO;
-    }
-    
-
-}
--(void) viewWillAppear:(BOOL)animated{
-    [super viewWillAppear:animated];
-    
-    if([note isKindOfClass:[ZPZoteroAttachment class]] || isNewNote){
+    if([_note isKindOfClass:[ZPZoteroAttachment class]] || _isNew){
         
-        if(isNewNote){
+        if(_isNew){
             self.navigationItem.title = @"New note";
         }
         else{
@@ -68,7 +57,7 @@ static ZPNoteEditingViewController* _instance;
         }
         
         if(self.navigationItem.leftBarButtonItems.count == 2){
-
+            
             UIBarButtonItem* cancelButton = [self.navigationItem.leftBarButtonItems objectAtIndex:0];
             self.navigationItem.leftBarButtonItems = nil;
             self.navigationItem.leftBarButtonItem = cancelButton;
@@ -91,14 +80,41 @@ static ZPNoteEditingViewController* _instance;
             
         }
     }
-
     
-    NSString* noteString = note.note;
-    if(noteString == NULL) noteString = @"";
     
-    [webView loadHTMLString:[NSString stringWithFormat:@"<html><body onload=\"document.getElementById('content').focus()\"><div id='content' contentEditable='true' style='font-family: Helvetica'>%@</div></body></html>",noteString]
+    [webView loadHTMLString:[NSString stringWithFormat:@"<html><body onload=\"document.getElementById('content').focus()\"><div id='content' contentEditable='true' style='font-family: Helvetica'>%@</div></body></html>",_currentContent]
                     baseURL:NULL];
+    
+}
 
+- (id)initWithNibName:(NSString *)nibNameOrNil bundle:(NSBundle *)nibBundleOrNil
+{
+    self = [super initWithNibName:nibNameOrNil bundle:nibBundleOrNil];
+    if (self) {
+        // Custom initialization
+    }
+    return self;
+}
+
+- (void)viewDidLoad
+{
+    [super viewDidLoad];
+
+	[self configure];
+    // Do any additional setup after loading the view.
+    
+
+    // Displaying the keyboard automatically requires iOS 6
+
+    if ([[[UIDevice currentDevice] systemVersion] floatValue] >= 6.0) {
+        webView.keyboardDisplayRequiresUserAction=NO;
+    }
+    
+
+}
+-(void) viewWillAppear:(BOOL)animated{
+    [super viewWillAppear:animated];
+    [webView stringByEvaluatingJavaScriptFromString:@"document.getElementById('content').focus()"];
 }
 
 -(void) viewDidAppear:(BOOL)animated{
@@ -124,6 +140,12 @@ static ZPNoteEditingViewController* _instance;
 
 }
 
+- (void)viewWillUnload{
+    _currentContent = [webView stringByEvaluatingJavaScriptFromString:
+                       @"document.getElementById('content').innerHTML"];
+    [super viewWillUnload];
+    
+}
 - (void)didReceiveMemoryWarning
 {
     [super didReceiveMemoryWarning];
@@ -139,26 +161,26 @@ static ZPNoteEditingViewController* _instance;
 
     NSString* noteText = [webView stringByEvaluatingJavaScriptFromString:
                           @"document.getElementById('content').innerHTML"];
-    note.note = noteText;
+    _note.note = noteText;
 
     [webView loadHTMLString:@"" baseURL:NULL];
     if(_confirmDelete != nil) [_confirmDelete dismissWithClickedButtonIndex:-1 animated:YES];
     [self dismissModalViewControllerAnimated:YES];
 
-    if(isNewNote){
-        [ZPDatabase createNoteLocally:(ZPZoteroNote*) self.note];
-        ZPZoteroItem* item = [ZPZoteroItem itemWithKey:note.parentKey];
-        item.notes = [item.notes arrayByAddingObject:note];
+    if(_isNew){
+        [ZPDatabase createNoteLocally:(ZPZoteroNote*) _note];
+        ZPZoteroItem* item = [ZPZoteroItem itemWithKey:_note.parentKey];
+        item.notes = [item.notes arrayByAddingObject:_note];
     }
-    else if([note isKindOfClass:[ZPZoteroAttachment class]]){
-        [ZPDatabase saveLocallyEditedAttachmentNote:(ZPZoteroAttachment*)note];
+    else if([_note isKindOfClass:[ZPZoteroAttachment class]]){
+        [ZPDatabase saveLocallyEditedAttachmentNote:(ZPZoteroAttachment*)_note];
     }
     else{
-        [ZPDatabase saveLocallyEditedNote:(ZPZoteroNote*) self.note];
+        [ZPDatabase saveLocallyEditedNote:(ZPZoteroNote*) _note];
     }
     
     [ZPItemDataUploadManager uploadMetadata];
-    [_targetViewController refreshNotesAfterEditingNote:self.note];
+    [_target refreshNotesAfterEditingNote:_note];
 
 }
 
@@ -178,18 +200,18 @@ static ZPNoteEditingViewController* _instance;
         [webView loadHTMLString:@"" baseURL:NULL];
         [self dismissModalViewControllerAnimated:YES];
         
-        ZPZoteroItem* item = [ZPZoteroItem itemWithKey:note.parentKey];
+        ZPZoteroItem* item = [ZPZoteroItem itemWithKey:_note.parentKey];
         
         DDLogInfo(@"User tapped delete button for note (%@)", item.itemKey);
         
         NSMutableArray* newNotes = [item.notes mutableCopy];
-        [newNotes removeObject:note];
+        [newNotes removeObject:_note];
         item.notes = newNotes;
         
-        [ZPDatabase deleteNoteLocally:(ZPZoteroNote*)note];
+        [ZPDatabase deleteNoteLocally:(ZPZoteroNote*)_note];
         [ZPItemDataUploadManager uploadMetadata];
         
-        [_targetViewController refreshNotesAfterEditingNote:self.note];
+        [_target refreshNotesAfterEditingNote:_note];
     }
     _confirmDelete = nil;
 }

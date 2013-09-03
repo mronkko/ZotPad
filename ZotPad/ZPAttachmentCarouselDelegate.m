@@ -267,7 +267,7 @@ NSInteger const ZPATTACHMENTICONGVIEWCONTROLLER_TAG_TITLELABEL = -5;
     
     //TODO: Cache rendered PDF images
     
-    if([attachment.contentType isEqualToString:@"application/pdf"] &&
+    if(attachment.isPDF &&
        (attachment.linkMode == LINK_MODE_IMPORTED_FILE ||
         attachment.linkMode == LINK_MODE_IMPORTED_URL)){
            

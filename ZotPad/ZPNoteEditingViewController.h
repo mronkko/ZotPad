@@ -15,12 +15,11 @@
 @property (retain, nonatomic) IBOutlet UIWebView* webView;
 @property (retain, nonatomic) IBOutlet UINavigationItem* navigationItem;
 
-@property (retain, nonatomic) ZPZoteroDataObject<ZPZoteroDataObjectWithNote>* note;
-@property (retain, nonatomic) NSObject<ZPNoteDisplay>* targetViewController;
-
-@property (assign) BOOL isNewNote;
+//@property (retain, nonatomic) NSObject<ZPNoteDisplay>* targetViewController;
 
 +(ZPNoteEditingViewController*) instance;
+
+-(void) configureWithNote:(ZPZoteroDataObject<ZPZoteroDataObjectWithNote>*) note andTarget:(UIViewController<ZPNoteDisplay>*) target isNew:(BOOL)isNew;
 
 -(IBAction)cancel:(id)sender;
 -(IBAction)save:(id)sender;

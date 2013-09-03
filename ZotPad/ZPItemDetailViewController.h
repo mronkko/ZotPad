@@ -23,8 +23,6 @@
     UIActivityIndicatorView* _activityIndicator;
     NSInteger _detailTitleWidth;
     NSCache* _previewCache;
-    ZPTagEditingViewController* _tagEditingViewController;
-    ZPNoteEditingViewController* _noteEditingViewController;
 }
 
 - (void) configure;

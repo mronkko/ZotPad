@@ -18,6 +18,7 @@
     ZPTagController* _tagDataSource;
     UIPopoverController* newTagPopover;
     UIViewController* newTagDialog;
+    NSObject<ZPTagDisplay>* _target;
 }
 
 
@@ -37,6 +38,11 @@ static ZPTagEditingViewController* _instance;
     return _instance;
 }
 
+- (void) configureWithItemKey:(NSString*) itemKey andTarget:(UIViewController<ZPTagDisplay>*) target{
+    _target = target;
+    _selectedTags = [ZPZoteroItem itemWithKey:itemKey].tags;
+    _itemKey = itemKey;
+}
 
 - (id)initWithNibName:(NSString *)nibNameOrNil bundle:(NSBundle *)nibBundleOrNil
 {
@@ -68,22 +74,13 @@ static ZPTagEditingViewController* _instance;
     // Dispose of any resources that can be recreated.
 }
 
--(void) setItemKey:(NSString*)itemKey{
-    _itemKey = itemKey;
-    _selectedTags = [ZPZoteroItem itemWithKey:itemKey].tags;
-}
--(NSString*) itemKey{
-    return _itemKey;
-}
-
-
 # pragma mark - IBOutlets
 
 -(IBAction)dismiss:(id)sender{
     NSMutableArray* removedTags = [[NSMutableArray alloc] init];
     NSMutableArray* addedTags = [[NSMutableArray alloc] init];
     
-    ZPZoteroItem* item = [ZPZoteroItem itemWithKey:self.itemKey];
+    ZPZoteroItem* item = [ZPZoteroItem itemWithKey:_itemKey];
     
     for(NSString* tag in item.tags){
         if([_selectedTags indexOfObject:tag] == NSNotFound){
@@ -96,12 +93,14 @@ static ZPTagEditingViewController* _instance;
         }
     }
 
-    if([removedTags count]>0) [ZPDatabase removeTagsLocally:removedTags toItemWithKey:self.itemKey];
-    if([addedTags count]>0) [ZPDatabase addTagsLocally:addedTags toItemWithKey:self.itemKey];
+    if([removedTags count]>0) [ZPDatabase removeTagsLocally:removedTags toItemWithKey:_itemKey];
+    if([addedTags count]>0) [ZPDatabase addTagsLocally:addedTags toItemWithKey:_itemKey];
     
     if([addedTags count]>0 || [removedTags count]>0){
         item.tags = _selectedTags;
-        [_targetViewController refreshTagsFor:self.itemKey];
+        
+        
+        [_target refreshTagsFor:_itemKey];
         [ZPItemDataUploadManager uploadMetadata];
     }
     
@@ -127,7 +126,7 @@ static ZPTagEditingViewController* _instance;
 -(NSArray*) availableTags{
     //Get the tags for currently visible items
     
-    ZPZoteroItem* item = [ZPZoteroItem itemWithKey:self.itemKey];
+    ZPZoteroItem* item = [ZPZoteroItem itemWithKey:_itemKey];
     
     NSArray* tags = [ZPDatabase tagsForLibrary:item.libraryID];
     

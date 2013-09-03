@@ -29,7 +29,7 @@ static NSMutableDictionary* _instanceStore;
     //If we do not have an instance or an instance is already being presented,
     //create a new instance
     
-    if(instance == nil || [instance parentViewController]){
+    if(instance == nil || [instance presentingViewController]){
         //Remove the ZP class name prefix
         NSString* storyboardIdentifier = [className substringFromIndex:2];
         instance =[[UIApplication sharedApplication].delegate.window.rootViewController.storyboard instantiateViewControllerWithIdentifier:storyboardIdentifier];

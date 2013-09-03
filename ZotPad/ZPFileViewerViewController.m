@@ -964,8 +964,7 @@ static ZPFileViewerViewController* _instance;
     //Parent tags
     if(indexPath.section == 0 && ! isStandaloneAttachment){
         ZPTagEditingViewController* tagController = [ZPTagEditingViewController instance];
-        tagController.targetViewController = self;
-        tagController.itemKey = attachment.parentKey;
+        [tagController configureWithItemKey:attachment.parentKey andTarget:self];
         [self presentModalViewController:tagController animated:YES];
     }
     //Attachment tags
@@ -973,25 +972,22 @@ static ZPFileViewerViewController* _instance;
             (indexPath.section == 1 && ! isStandaloneAttachment)){
 
         ZPTagEditingViewController* tagController = [ZPTagEditingViewController instance];
-        tagController.targetViewController = self;
-        tagController.itemKey = attachment.itemKey;
+        [tagController configureWithItemKey:attachment.itemKey andTarget:self];
         [self presentModalViewController:tagController animated:YES];
 
     }
     //Parent notes
     else if(indexPath.section == 2){
         ZPNoteEditingViewController* noteController = [ZPNoteEditingViewController instance];
-        noteController.targetViewController = self;
+
         ZPZoteroItem* parent = [ZPZoteroItem itemWithKey:attachment.parentKey];
         if([parent.notes count]>indexPath.row){
-            noteController.note = [parent.notes objectAtIndex:indexPath.row];
-            noteController.isNewNote = FALSE;
+            [noteController configureWithNote:[parent.notes objectAtIndex:indexPath.row]  andTarget:self isNew:FALSE];
         }
         else{
             ZPZoteroNote* note = [ZPZoteroNote noteWithKey:[ZPUtils randomString]];
             note.parentKey = parent.itemKey;
-            noteController.note = note;
-            noteController.isNewNote = TRUE;
+            [noteController configureWithNote:note  andTarget:self isNew:YES];
         }
         [self presentModalViewController:noteController animated:YES];
 
@@ -1001,9 +997,7 @@ static ZPFileViewerViewController* _instance;
             (indexPath.section == 1 && isStandaloneAttachment)){
 
         ZPNoteEditingViewController* noteController = [ZPNoteEditingViewController instance];
-        noteController.note = attachment;
-        noteController.isNewNote = FALSE;
-        noteController.targetViewController = self;
+        [noteController configureWithNote:attachment  andTarget:self isNew:FALSE];
         [self presentModalViewController:noteController animated:YES];
 
     }
