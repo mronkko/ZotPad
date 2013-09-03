@@ -17,7 +17,7 @@ static BOOL _zoteroReachability;
 
 +(void) initialize {
 
-    _reach = [Reachability reachabilityWithHostName:@"https://api.zotero.org"];
+    _reach = [Reachability reachabilityForInternetConnection];
     
     [[NSNotificationCenter defaultCenter] addObserver:[self class]
                                              selector:@selector(reachabilityChanged:)
@@ -32,29 +32,24 @@ static BOOL _zoteroReachability;
     
     _zoteroReachability = [localReachability isReachable];
     if (_zoteroReachability){
-        DDLogWarn(@"Connected to Zotero server");
+        DDLogWarn(@"Connected to internet");
         [[NSNotificationCenter defaultCenter] postNotificationName:ZPNOTIFICATION_INTERNET_CONNECTION_AVAILABLE object:NULL];
     }
     else{
-        DDLogWarn(@"Lost connection to Zotero server");
+        DDLogWarn(@"Lost internet connection");
     }
 }
 
 +(BOOL) hasInternetConnection{
     
     
-    Reachability *HostReach = [Reachability reachabilityForInternetConnection];
-    NetworkStatus internetStatus = [HostReach currentReachabilityStatus];
-    bool result = false;
-    if (internetStatus == ReachableViaWiFi)
-        result = true;
-    else if(internetStatus==ReachableViaWWAN)
-        result = true;
+    // This provide false negative results.
     
+    BOOL hasConnection = [_reach isReachable];
     BOOL online = [ZPPreferences online];
     
-    return online && result;
-    //    return _zoteroReachability && online;
+    return online && hasConnection;
+     
 }
 
 @end
