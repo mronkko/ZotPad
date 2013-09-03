@@ -130,8 +130,8 @@ static ZPCacheStatusToolbarController* _statusView;
                 if([ZPPreferences debugFileUploadsAndDownloads]) DDLogInfo(@"Starting upload sequence for %@.",updatedAttachment.filenameBasedOnLinkMode);
                 ZPFileChannel* uploadChannel = [ZPFileChannel fileChannelForAttachment:updatedAttachment];
                 if([attachment fileExists_modified]){
-                    [uploadChannel startUploadingAttachment:updatedAttachment overWriteConflictingServerVersion:FALSE];
                     [[NSNotificationCenter defaultCenter] postNotificationName:ZPNOTIFICATION_ATTACHMENT_FILE_UPLOAD_STARTED object:updatedAttachment];
+                    [uploadChannel startUploadingAttachment:updatedAttachment overWriteConflictingServerVersion:FALSE];
                 }
                 else{
                     DDLogError(@"Attempting to upload non-existng file %@", attachment.filenameBasedOnLinkMode);
