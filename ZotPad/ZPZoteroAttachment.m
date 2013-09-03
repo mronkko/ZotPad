@@ -46,10 +46,10 @@ NSInteger const VERSION_SOURCE_DROPBOX =3;
 static NSCache* _objectCache = NULL;
 static NSString* _documentsDirectory = NULL;
 
-@synthesize lastViewed, attachmentSize, existsOnZoteroServer, filename, url, versionSource,  charset, note, md5, mtime;
+@synthesize lastViewed, attachmentSize, existsOnZoteroServer, filename, url, versionSource,  charset, note, md5, mtime, linkMode;
 @synthesize versionIdentifier_server;
 @synthesize versionIdentifier_local;
-@synthesize accessDate;
+@synthesize accessDate ;
 
 +(void)initialize{
     _objectCache =  [[NSCache alloc] init];
@@ -103,17 +103,33 @@ static NSString* _documentsDirectory = NULL;
 
 -(NSString*) contentType{
     if(_contentType == nil){
-        // Get the UTI from the file's extension:
         
-        CFStringRef pathExtension = (__bridge_retained CFStringRef)[self.filename pathExtension];
-        CFStringRef type = UTTypeCreatePreferredIdentifierForTag(kUTTagClassFilenameExtension, pathExtension, NULL);
-        CFRelease(pathExtension);
+        //set text/HTML as the default type for links
+
+        if(_linkMode ==LINK_MODE_LINKED_URL){
+            _contentType = @"text/html";
+        }
         
-        // The UTI can be converted to a mime type:
+        //else determine from the filename
         
-        _contentType = (__bridge_transfer NSString *)UTTypeCopyPreferredTagWithClass(type, kUTTagClassMIMEType);
-        if (type != NULL)
-            CFRelease(type);
+        else{
+             
+             // Get the UTI from the file's extension:
+        
+             CFStringRef pathExtension = (__bridge_retained CFStringRef)[self.filename pathExtension];
+            
+            if(pathExtension != NULL){
+                CFStringRef type = UTTypeCreatePreferredIdentifierForTag(kUTTagClassFilenameExtension, pathExtension, NULL);
+                CFRelease(pathExtension);
+                
+                // The UTI can be converted to a mime type:
+        
+                if (type != NULL){
+                    _contentType = (__bridge_transfer NSString *)UTTypeCopyPreferredTagWithClass(type, kUTTagClassMIMEType);
+                    CFRelease(type);
+                }
+            }
+        }
     }
     
     return _contentType;
@@ -258,17 +274,6 @@ static NSString* _documentsDirectory = NULL;
 
 - (NSString*) fileSystemPath_original{
     return [self _fileSystemPathWithSuffix:@""];
-}
-
--(void) setLinkMode:(NSInteger)linkMode{
-    _linkMode = linkMode;
-    //set text/HTML as the default type for links
-    if(_linkMode ==LINK_MODE_LINKED_URL && self.contentType == NULL){
-        self.contentType = @"text/html";
-    }
-}
--(NSInteger)linkMode{
-    return _linkMode;
 }
 
 //If an attachment is updated, delete the old attachment file
