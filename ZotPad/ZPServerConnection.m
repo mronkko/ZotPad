@@ -683,7 +683,7 @@ const NSInteger ZPServerConnectionRequestLastModifiedItem = 11;
             
             NSString* oauthkey =  [ZPPreferences OAuthKey];
             
-            if(oauthkey!=NULL){
+            if(oauthkey!=NULL && [ZPPreferences userID] != NULL){
                 
                 NSInteger libraryID = ZPLIBRARY_ID_NOT_SET;
                 
