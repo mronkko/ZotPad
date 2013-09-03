@@ -232,14 +232,18 @@ static UIAlertView* _alertView;
             
             if(lastName != nil){
                 [creatorNames addObject:lastName];
-                [creatorLastnameFirstLetter addObject:[[[firstName substringToIndex:1] uppercaseString] stringByAppendingString:
-                                                       [[lastName substringToIndex:1] uppercaseString]]];
-                [creatorInitials addObject:[[lastName substringToIndex:1] uppercaseString]];
+                NSString* firstNameInitial = (firstName != nil && [firstName length]!=0)?[[firstName substringToIndex:1] uppercaseString]:@"";
+                NSString* lastNameInitial = ([lastName length]>0)?[[lastName substringToIndex:1] uppercaseString]:@"";
+
+                [creatorLastnameFirstLetter addObject:lastNameInitial];
+                [creatorInitials addObject:[firstNameInitial stringByAppendingString:
+                                              lastNameInitial]];
             }
             else if(name != nil){
                 [creatorNames addObject:name];
-                [creatorLastnameFirstLetter addObject:[[name substringToIndex:1] uppercaseString]];
-                [creatorInitials addObject:[[name substringToIndex:1] uppercaseString]];
+                NSString* nameInitial = [name length]>0?[[name substringToIndex:1] uppercaseString]:@"";
+                [creatorLastnameFirstLetter addObject:nameInitial];
+                [creatorInitials addObject:nameInitial];
             }
         }
     }
