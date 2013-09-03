@@ -79,7 +79,7 @@ static NSInteger _maxCacheSize;
             if(! [webdavUrl hasSuffix:@"/zotero"]) newWebDAVURL = [NSString stringWithFormat:@"%@/zotero",newWebDAVURL];
             
             [[[UIAlertView alloc] initWithTitle:@"WebDAV configuration error"
-                                        message:[NSString stringWithFormat:@"WebDAV is enabled, but the WebDAV address was not specified correctly. The WebDAV address must start with 'http://' or 'https://' and end with '/zotero'. The WebDAV url was '%@' and has been automaticall changed to '%@'",webdavUrl,newWebDAVURL]
+                                        message:[NSString stringWithFormat:@"WebDAV is enabled, but the WebDAV address was not specified correctly. The WebDAV address must start with 'http://' or 'https://' and end with '/zotero'. The WebDAV url was '%@' and has been automatically changed to '%@'",webdavUrl,newWebDAVURL]
                                        delegate:NULL
                               cancelButtonTitle:@"OK"
                               otherButtonTitles: nil] show];
