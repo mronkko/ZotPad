@@ -23,7 +23,6 @@ extern NSInteger const VERSION_SOURCE_ZOTERO;
 extern NSInteger const VERSION_SOURCE_WEBDAV;
 
 @interface ZPZoteroAttachment : ZPZoteroDataObject <QLPreviewItem, ZPZoteroDataObjectWithNote>{
-    NSInteger _linkMode;
 }
 
 @property (retain) NSString* note;

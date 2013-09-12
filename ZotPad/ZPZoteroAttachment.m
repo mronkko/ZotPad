@@ -106,7 +106,7 @@ static NSString* _documentsDirectory = NULL;
         
         //set text/HTML as the default type for links
 
-        if(_linkMode ==LINK_MODE_LINKED_URL){
+        if([self linkMode] ==LINK_MODE_LINKED_URL){
             _contentType = @"text/html";
         }
         
@@ -245,7 +245,7 @@ static NSString* _documentsDirectory = NULL;
     
     //Imported URLs are stored as ZIP files
     
-    if(_linkMode == LINK_MODE_IMPORTED_URL && ([self.contentType isEqualToString:@"text/html"]
+    if([self linkMode] == LINK_MODE_IMPORTED_URL && ([self.contentType isEqualToString:@"text/html"]
                                                               || [self.contentType isEqualToString:@"application/xhtml+xml"])){
         path = [thisFilename stringByAppendingFormat:@"_%@%@.zip",self.key,suffix];
     }
@@ -368,7 +368,7 @@ static NSString* _documentsDirectory = NULL;
     
     //Return path to uncompressed files.
     //TODO: Encapsulate as a method
-    if(_linkMode == LINK_MODE_IMPORTED_URL && ([self.contentType isEqualToString:@"text/html"] ||
+    if([self linkMode] == LINK_MODE_IMPORTED_URL && ([self.contentType isEqualToString:@"text/html"] ||
                                                               [self.contentType isEqualToString:@"application/xhtml+xml"])){
         NSString* tempDir = [NSTemporaryDirectory() stringByAppendingPathComponent:self.key];
         
